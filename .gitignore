@@ -1,4 +1,16 @@
+# ignore svn repository files
 .svn/
-*.sqlite3
+
+# ignore unimportant folders
+core/doc/
+core/public/
+core/vendor/
+core/script/
+core/log/
+
+# ignore database
+core/db/*.sqlite3
+
+# ignore temp files
 *~
 
