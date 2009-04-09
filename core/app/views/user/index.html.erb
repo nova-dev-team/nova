@@ -1,10 +1,75 @@
 <html>
   <head>
-    <title>User</title>
+    <title>Controls for User</title>
   </head>
+  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <script src="/jquery.min.js" type="text/javascript"></script>
   <body>
-    <a href="add">add: Add user</a> <br>
-    <a href="list">list: List all information</a> <br>
-    TODO User view
+      <center><h1>Controls for User</h1></center>
+      <hr>
+      <!--Content starts below this row-->
+
+<script>
+
+function show_info(user_name) {
+  var info_pane = $("#info_pane");
+  $.getJSON("/user/info/" + user_name,
+    function(result) {
+      info_pane.html("User email: " + result.email + "<p>User's vcluster list:");
+      for (i = 0; i < result.vclusters.length; i++) {
+        info_pane.append(result.vclusters[i] + " ");
+      }
+    }
+  );
+}
+
+function refresh_users_list() {
+  var user_list = $("#user_list");
+  user_list.empty();
+  $.getJSON("/user/list",
+    function(result) {
+      for (i = 0; i < result.length; i++) {
+        user_list.append("<a href='#' class='user_name' onclick='show_info(\"" + result[i] + "\")'>" + result[i] + "</a><br>");
+      }
+    }
+  );
+}
+
+function add_new_user() {
+  var new_user_email = $("input[name='input_user_name']").val();
+  $.getJSON("/user/add/" + new_user_email,
+    function(result) {
+      if (result.success) {
+        refresh_users_list();
+        $("#notice").html(result.msg);
+      } else {
+        $("#notice").html(result.msg);
+      }
+    }
+  );
+}
+
+$(document).ready(function() {
+  refresh_users_list();
+});
+
+</script>
+
+<table>
+<tr>
+<td>
+New user email: <input name="input_user_name" type="text"><a href="#" onclick="add_new_user()">Add</a></td>
+<td><div id="notice"></div></td>
+</tr>
+<tr>
+<td><a href="#" onclick="refresh_users_list()">Refresh user list</a><p><div id="user_list"></div></td>
+<td><div id="info_pane"></div></td>
+</tr>
+</table>
+
+      <!--Content ends above this row-->
+      <div class="footer">
+        This page is part of the "Core" component of Nova project, hosted at <a href="http://www.github.com/santazhang/nova">http://www.github.com/santazhang/nova</a>.
+      </div>
   </body>
 </html>
