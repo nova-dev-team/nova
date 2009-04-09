@@ -14,3 +14,6 @@ core/db/*.sqlite3
 # ignore temp files
 *~
 
+# ignore Rakefile
+Rakefile
+
