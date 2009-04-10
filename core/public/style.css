@@ -19,6 +19,9 @@ input {
   font-size: 13px;
 }
 
+table {
+}
+
 .footer {
   text-align: center;
   color: #663;
@@ -29,3 +32,4 @@ input {
 .footer a {
   color: #440;
 }
+

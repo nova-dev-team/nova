@@ -4,7 +4,7 @@ class VmachineController < ApplicationController
 
   # list all the available virtual machines
   def list
-    result = VmachineWorker.list
+    result = vmachine_list
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -12,9 +12,9 @@ class VmachineController < ApplicationController
     end
   end
 
-  # create a new virtual machine 
+  # create a new virtual machine
   def create
-    result = VmachineWorker.create
+    result = vmachine_create
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -24,7 +24,7 @@ class VmachineController < ApplicationController
 
   # delete a virtual machine, the vmachine cannot be under use
   def delete
-    result = VmachineWorker.delete params[:id]
+    result = vmachine_delete params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -34,7 +34,7 @@ class VmachineController < ApplicationController
 
   # show detailed information about a virtual machine
   def info
-    result = VmachineWorker.info params[:id]
+    result = vmachine_info params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -44,7 +44,7 @@ class VmachineController < ApplicationController
 
   # start a vmachine, it should be already put on a pmachine
   def start
-    result = VmachineWorker.start params[:id]
+    result = vmachine_start params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -54,37 +54,37 @@ class VmachineController < ApplicationController
 
   # stop a vmachine, and also remove it from the hosting pmachine
   def stop
-    result = VmachineWorker.stop params[:id]
+    result = vmachine_stop params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
-    end  
+    end
   end
 
   # suspend a virtual machine
   def suspend
-    result = VmachineWorker.suspend params[:id]
+    result = vmachine_suspend params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
-    end  
+    end
   end
 
   # resume a virtual machine
   def resume
-    result = VmachineWorker.resume params[:id]
+    result = vmachine_resume params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
-    end 
+    end
   end
 
   # NOTE only to be called by pmachine
   def notify_status_change
-    result = VmachineWorker.notify_status_change params[:id], params[:arg]
+    result = vmachine_notify_status_change params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}

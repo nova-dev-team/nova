@@ -4,7 +4,7 @@ class UserController < ApplicationController
 
   # show all the users' id (email)
   def list
-    result = UserWorker.list
+    result = user_list
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -15,7 +15,7 @@ class UserController < ApplicationController
 
   # add a new user
   def add
-    result = UserWorker.add params[:id]
+    result = user_add params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -26,7 +26,7 @@ class UserController < ApplicationController
 
   # show a certain user's detailed information
   def info
-    result = UserWorker.info params[:id]
+    result = user_info params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -37,7 +37,7 @@ class UserController < ApplicationController
 
   # add a virtual cluster to a user. the vcluster is already created
   def add_vcluster
-    result = UserWorker.add_vcluster params[:id], params[:arg]
+    result = user_add_vcluster params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -48,7 +48,7 @@ class UserController < ApplicationController
 
   # remove a virtual cluster from a user
   def remove_vcluster
-    result = UserWorker.remove_vcluster params[:id], params[:arg]
+    result = user_remove_vcluster params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}

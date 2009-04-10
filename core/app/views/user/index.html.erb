@@ -9,21 +9,81 @@
     <hr>
     <!--Content starts below this row-->
 
+<style type="text/css">
+.error_msg {
+  color: red;
+}
+
+.success_msg {
+  color: green;
+}
+
+.user_name {
+  color: #70654d;
+}
+
+.refresh_user_list {
+  color: gray;
+}
+</style>
+
 <script>
 
-function show_info(user_name) {
-  var info_pane = $("#info_pane");
-  $.getJSON("/user/info/" + user_name,
+function show_msg(msg, success) {
+  var notice_pane = $("#notice");
+  if (success) {
+    notice_pane.html("<div class='success_msg'>" + msg + "</div>");
+  } else {
+    notice_pane.html("<div class='error_msg'>" + msg + "</div>");
+  }
+}
+
+function add_new_vcluster(user_name) {
+  $.getJSON("/vcluster/create", 
     function(result) {
-      info_pane.html("User email: " + result.email + "<p>User's vcluster list:");
-      for (i = 0; i < result.vclusters.length; i++) {
-        info_pane.append(result.vclusters[i] + " ");
+      if (result.success) {
+        $.getJSON("/user/add_vcluster/" + user_name + "/" + result.vcluster_cid,
+          function(result2) {
+            if (result2.success) {
+              show_info(user_name);
+            }
+            show_msg(result.msg + ";" + result2.msg, result2.success);
+          }
+        );
+      } else {
+        show_msg(result.msg, result.success);
       }
     }
   );
 }
 
-function refresh_users_list() {
+function remove_vcluster(user_name, vcluster_vid) {
+  $.getJSON("/user/remove_vcluster/" + user_name + "/" + vcluster_vid,
+    function(result) {
+      show_msg(result.msg, result.success);
+      if (result.success) {
+        show_info(user_name);
+      }
+    }
+  );
+}
+
+function show_info(user_name) {
+  var info_pane = $("#info_pane");
+  $.getJSON("/user/info/" + user_name,
+    function(result) {
+      var html = "User email: " + result.email + "<p>User's vcluster list:<p>";
+      for (i = 0; i < result.vclusters.length; i++) {
+        html += result.vclusters[i] + " <a href='#' onclick=\"remove_vcluster('"
+              + user_name + "', '" + result.vclusters[i] + "')\">remove!</a><br>";
+      }
+      html += "<p><a href='#' onclick=add_new_vcluster('" + user_name + "')>Add new vcluster</a>";
+      info_pane.html(html);
+    }
+  );
+}
+
+function refresh_user_list() {
   var user_list = $("#user_list");
   user_list.empty();
   $.getJSON("/user/list",
@@ -40,30 +100,33 @@ function add_new_user() {
   $.getJSON("/user/add/" + new_user_email,
     function(result) {
       if (result.success) {
-        refresh_users_list();
-        $("#notice").html(result.msg);
-      } else {
-        $("#notice").html(result.msg);
+        refresh_user_list();
       }
+      show_msg(result.msg, result.success);
     }
   );
 }
 
 $(document).ready(function() {
-  refresh_users_list();
+  refresh_user_list();
 });
 
 </script>
 
-<table>
+<table cellpadding='10'>
 <tr>
 <td>
-New user email: <input name="input_user_name" type="text"><a href="#" onclick="add_new_user()">Add</a></td>
-<td><div id="notice"></div></td>
+  New user email: <input name="input_user_name" type="text"><a href="#" onclick="add_new_user()">Add</a>
+</td>
+<td id="notice"></td>
 </tr>
 <tr>
-<td><a href="#" onclick="refresh_users_list()">Refresh user list</a><p><div id="user_list"></div></td>
-<td><div id="info_pane"></div></td>
+<td valign='top'>
+  <a href="#" class='refresh_user_list' onclick="refresh_user_list()">Refresh user list</a><p>
+  <div id="user_list"></div>
+</td>
+<td valign="top">
+  <div id="info_pane">Click a user name to show detail information.</div></td>
 </tr>
 </table>
 

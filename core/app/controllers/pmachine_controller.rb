@@ -2,10 +2,10 @@ class PmachineController < ApplicationController
 
   include PmachineHelper
 
-  # list all the physical machines  
+  # list all the physical machines
   def list
-    result = PmachineWorker.list
-    
+    result = pmachine_list
+
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
@@ -14,7 +14,7 @@ class PmachineController < ApplicationController
 
   # add a new physical machine by ip address, eg: /pmachine/add/10.0.0.1
   def add
-    result = PmachineWorker.add params[:id]
+    result = pmachine_add params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -23,7 +23,7 @@ class PmachineController < ApplicationController
   end
 
   def mark_remove
-    result = PmachineWorker.mark_remove params[:id]
+    result = pmachine_mark_remove params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -32,7 +32,7 @@ class PmachineController < ApplicationController
   end
 
   def unmark_remove
-    result = PmachineWorker.unmark_remove params[:id]
+    result = pmachine_unmark_remove params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -64,8 +64,8 @@ class PmachineController < ApplicationController
 
   # information about a physical machine
   def info
-    result = PmachineWorker.info params[:id]
-    
+    result = pmachine_info params[:id]
+
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
