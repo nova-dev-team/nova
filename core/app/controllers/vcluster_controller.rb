@@ -26,7 +26,7 @@ class VclusterController < ApplicationController
   def delete
     result = vcluster_delete params[:id]
 
-    repsond_to do |accept|
+    respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
     end

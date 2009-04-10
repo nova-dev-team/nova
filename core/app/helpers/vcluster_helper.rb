@@ -39,14 +39,23 @@ private
 
     else # vcluster found
 
-      if vcluster.vmachines.empty? # could delete empty vcluster
-        Vcluster.delete vcluster
-        result[:success] = true
-        result[:msg] = "Removed empty vcluster #{vcluster_cid}"
-
-      else # cannot delete vcluster if it's not empty
+      # cannot delete vcluster if it is under use
+      if vcluster.user != nil #
         result[:success] = false
-        result[:msg] = "Vcluster #{vcluster_cid} is not empty!"
+        result[:msg] = "Cannot delete vcluster #{vcluster_cid} when it belongs to a user!"
+
+      else # no body is using it
+
+        if vcluster.vmachines.empty? # could delete empty vcluster
+          Vcluster.delete vcluster
+          result[:success] = true
+          result[:msg] = "Removed empty vcluster #{vcluster_cid}"
+
+        else # cannot delete vcluster if it's not empty
+          result[:success] = false
+          result[:msg] = "Vcluster #{vcluster_cid} is not empty!"
+
+        end
 
       end
     end
@@ -143,6 +152,13 @@ private
 
       vmachine_list = []
       vcluster.vmachines.each {|vmachine| vmachine_list << "v#{vmachine.id}"}
+
+      if vcluster.user != nil
+        result[:user] = vcluster.user.email
+      else
+        result[:user] = ""
+      end
+
       result[:vmachines] = vmachine_list
 
     end

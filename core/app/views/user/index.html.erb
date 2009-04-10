@@ -25,6 +25,18 @@
 .refresh_user_list {
   color: gray;
 }
+
+.add_link {
+  color : green;
+}
+
+.vcluster_link {
+  color : gray;
+}
+
+.remove_link {
+  color : red;
+}
 </style>
 
 <script>
@@ -39,7 +51,7 @@ function show_msg(msg, success) {
 }
 
 function add_new_vcluster(user_name) {
-  $.getJSON("/vcluster/create", 
+  $.getJSON("/vcluster/create",
     function(result) {
       if (result.success) {
         $.getJSON("/user/add_vcluster/" + user_name + "/" + result.vcluster_cid,
@@ -47,7 +59,7 @@ function add_new_vcluster(user_name) {
             if (result2.success) {
               show_info(user_name);
             }
-            show_msg(result.msg + ";" + result2.msg, result2.success);
+            show_msg(result.msg + "<br>" + result2.msg, result2.success);
           }
         );
       } else {
@@ -86,12 +98,13 @@ function show_info(user_name) {
     function(result) {
       var html = "User email: " + result.email + "<p>User's vcluster list:<p>";
       for (i = 0; i < result.vclusters.length; i++) {
-        html += result.vclusters[i] + " <a href='#' onclick=\"remove_vcluster('"
+        html += "<a class='vcluster_link' href='/vcluster#" + result.vclusters[i] + "'>" + result.vclusters[i]
+              + "</a> <a class='remove_link' href='#' onclick=\"remove_vcluster('"
               + user_name + "', '" + result.vclusters[i] + "')\">remove!</a><br>";
       }
-      html += "<p><a href='#' onclick=\"add_new_vcluster('" + user_name + "')\">Add new vcluster</a><br>"
+      html += "<p><a href='#' class='add_link' onclick=\"add_new_vcluster('" + user_name + "')\">Add new vcluster</a><br>"
             + "Existing vcluster cid: <input type='text' name='vcluster_cid'>"
-            + "<a href='#' onclick=\"add_existing_vcluster('"+ user_name + "')\">Add</a>";
+            + "<a href='#' class='add_link' onclick=\"add_existing_vcluster('"+ user_name + "')\">Add</a>";
       info_pane.html(html);
     }
   );
@@ -123,6 +136,13 @@ function add_new_user() {
 
 $(document).ready(function() {
   refresh_user_list();
+  var loc = window.location.toString();
+  if (loc.indexOf('#') > 0) {
+    var user_name = loc.split('#')[1];
+    if (user_name.length > 0) {
+      show_info(user_name);
+    }
+  }
 });
 
 </script>
@@ -130,7 +150,7 @@ $(document).ready(function() {
 <table cellpadding='10'>
 <tr>
 <td>
-  New user email: <input name="input_user_name" type="text"><a href="#" onclick="add_new_user()">Add</a>
+  New user email: <input name="input_user_name" type="text"><a class='add_link' href="#" onclick="add_new_user()">Add</a>
 </td>
 <td id="notice"></td>
 </tr>
