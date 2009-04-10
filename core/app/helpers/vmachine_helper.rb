@@ -1,8 +1,8 @@
 module VmachineHelper
 
-private
-
   include PmachineHelper
+
+private
 
   def vmachine_list
     list = []
@@ -125,7 +125,7 @@ private
           result[:msg] = "Cannot find a pmachine to host vmachine #{vmachine_vid}"
 
         else # pmachine found
-          sub_result = PmachineHelper::pmachine_host_vmachine hosting_pmachine.ip, "v#{vmachine.id}"
+          sub_result = PmachineHelper::Helper.host_vmachine hosting_pmachine.ip, "v#{vmachine.id}"
 
           if sub_result[:success] # successfully deployed pmachine
             vmachine.status = "deploying"

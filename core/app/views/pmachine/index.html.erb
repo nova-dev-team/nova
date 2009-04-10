@@ -3,11 +3,160 @@
     <title>Controls for Pmachine</title>
   </head>
   <link rel="stylesheet" type="text/css" href="/style.css" />
+  <script src="/jquery.min.js" type="text/javascript"></script>
   <body>
     <center><h1>Controls for Pmachine</h1></center>
     <hr>
     <!--Content starts below this row-->
 
+<style type="text/css">
+.error_msg {
+  color: red;
+}
+
+.success_msg {
+  color: green;
+}
+
+.pmachine_ip {
+  color: #70654d;
+}
+
+.refresh_link {
+  color: gray;
+}
+
+.vm_link {
+  color: brown;
+}
+
+.add_link {
+  color: green;
+}
+
+.remove_link {
+  color: red;
+}
+
+</style>
+
+<script>
+
+function show_msg(msg, success) {
+  var notice_pane = $("#notice");
+  if (success) {
+    notice_pane.html("<div class='success_msg'>" + msg + "</div>");
+  } else {
+    notice_pane.html("<div class='error_msg'>" + msg + "</div>");
+  }
+}
+
+function mark_remove(pmachine_ip) {
+  $.getJSON("/pmachine/mark_remove/" + pmachine_ip,
+    function(result) {
+      if (result.success) {
+        show_info(pmachine_ip);
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function unmark_remove(pmachine_ip) {
+  $.getJSON("/pmachine/unmark_remove/" + pmachine_ip,
+    function(result) {
+      if (result.success) {
+        show_info(pmachine_ip);
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function show_info(pmachine_ip) {
+  var info_pane = $("#info_pane");
+  $.getJSON("/pmachine/info/" + pmachine_ip,
+    function(result) {
+      var html = "Pmachine IP: " + result.pmachine_ip + "<p>Pmachine Status: ";
+      
+      if (result.status == "working") {
+        html += "<font class='success_msg'>" + result.status + "</font>&nbsp;&nbsp;&nbsp;&nbsp;";
+        html += "<a class='remove_link' href='#' onclick='mark_remove(\"" + result.pmachine_ip + "\")'>Mark "
+              + result.pmachine_ip + " as 'pending remove'</a>";
+      } else {
+        html += "<font class='error_msg'>" + result.status + "</font>&nbsp;&nbsp;&nbsp;&nbsp;";
+              html += "<a class='add_link' href='#' onclick='unmark_remove(\"" + result.pmachine_ip + "\")'>Unmark " 
+              + result.pmachine_ip + " from 'pending remove'</a>";
+      }
+      
+      html += "<p>List of hosted vmachines:<br>";
+      
+      for (i = 0; i < result.hosted_vmachines.length; i++) {
+        html += "<a href='/vmachine#" + result.hosted_vmachines[i] + "' class='vm_link'>"
+              + result.hosted_vmachines[i] + "</a> &nbsp;";
+      }
+      
+      html += "<p>";
+
+
+      info_pane.html(html);
+    }
+  );
+}
+
+function refresh_pmachine_list() {
+  var pmachine_list = $("#pmachine_list");
+  pmachine_list.empty();
+  $.getJSON("/pmachine/list",
+    function(result) {
+      for (i = 0; i < result.length; i++) {
+        pmachine_list.append("<a href='#' class='pmachine_ip' onclick='show_info(\"" + result[i] + "\")'>" + result[i] + "</a><br>");
+      }
+    }
+  );
+}
+
+function add_pmachine() {
+  var new_ip = $("input[name='input_pmachine_ip']").val();
+  $.getJSON("/pmachine/add/" + new_ip,
+    function(result) {
+      if (result.success) {
+        refresh_pmachine_list();
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+$(document).ready(function() {
+  refresh_pmachine_list();
+  var loc = window.location.toString();
+  if (loc.indexOf('#') > 0) {
+    var ip = loc.split('#')[1];
+    if (ip.length > 0) {
+      show_info(ip);
+    }
+  }
+});
+
+</script>
+
+<table cellpadding='10'>
+<tr>
+<td>
+  New pmachine ip: <input name="input_pmachine_ip" type="text"><a class='add_link' href="#" onclick="add_pmachine()">Add</a>
+</td>
+<td id="notice"></td>
+</tr>
+<tr>
+<td valign='top'>
+  <a href="#" class='refresh_link' onclick="refresh_pmachine_list()">Refresh pmachine list</a><p>
+  <div id="pmachine_list"></div>
+</td>
+<td valign="top">
+  <div id="info_pane">Click a pmachine ip to show detail information.</div></td>
+</tr>
+</table>
 
     <!--Content ends above this row-->
     <div class="footer">
