@@ -57,8 +57,20 @@ function add_new_vcluster(user_name) {
   );
 }
 
-function remove_vcluster(user_name, vcluster_vid) {
-  $.getJSON("/user/remove_vcluster/" + user_name + "/" + vcluster_vid,
+function add_existing_vcluster(user_name) {
+  var vcluster_cid = $("input[name='vcluster_cid']").val();
+  $.getJSON("/user/add_vcluster/" + user_name + "/" + vcluster_cid,
+    function(result) {
+      if (result.success) {
+        show_info(user_name);
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function remove_vcluster(user_name, vcluster_cid) {
+  $.getJSON("/user/remove_vcluster/" + user_name + "/" + vcluster_cid,
     function(result) {
       show_msg(result.msg, result.success);
       if (result.success) {
@@ -77,7 +89,9 @@ function show_info(user_name) {
         html += result.vclusters[i] + " <a href='#' onclick=\"remove_vcluster('"
               + user_name + "', '" + result.vclusters[i] + "')\">remove!</a><br>";
       }
-      html += "<p><a href='#' onclick=add_new_vcluster('" + user_name + "')>Add new vcluster</a>";
+      html += "<p><a href='#' onclick=\"add_new_vcluster('" + user_name + "')\">Add new vcluster</a><br>"
+            + "Existing vcluster cid: <input type='text' name='vcluster_cid'>"
+            + "<a href='#' onclick=\"add_existing_vcluster('"+ user_name + "')\">Add</a>";
       info_pane.html(html);
     }
   );
