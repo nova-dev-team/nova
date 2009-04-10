@@ -4,7 +4,7 @@ class VclusterController < ApplicationController
 
   # list all the virtual clusters
   def list
-    result = vcluster_list
+    result = Helper.list
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -14,7 +14,7 @@ class VclusterController < ApplicationController
 
   # create a new virtual cluster
   def create
-    result = vcluster_create
+    result = Helper.create
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -24,7 +24,7 @@ class VclusterController < ApplicationController
 
   # delete a vcluster, only when it is empty
   def delete
-    result = vcluster_delete params[:id]
+    result = Helper.delete params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -35,7 +35,7 @@ class VclusterController < ApplicationController
   # register a virtual machine to a virtual cluster
   # the virtual cluster must NOT be running when doing this (is it necessary?)
   def add_vmachine
-    result = vcluster_add_vmachine params[:id], params[:arg]
+    result = Helper.add_vmachine params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -46,7 +46,7 @@ class VclusterController < ApplicationController
   # remove a virtual machine from a virtual cluster
   # the virtual cluster must NOT be running when doing this (it will be checked)
   def remove_vmachine
-    result = vcluster_remove_vmachine params[:id], params[:arg]
+    result = Helper.remove_vmachine params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -56,7 +56,7 @@ class VclusterController < ApplicationController
 
   # show detailed information about a virtual cluster
   def info
-    result = vcluster_info params[:id]
+    result = Helper.info params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}

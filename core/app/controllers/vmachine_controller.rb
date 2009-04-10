@@ -4,7 +4,7 @@ class VmachineController < ApplicationController
 
   # list all the available virtual machines
   def list
-    result = vmachine_list
+    result = Helper.list
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -14,7 +14,7 @@ class VmachineController < ApplicationController
 
   # create a new virtual machine
   def create
-    result = vmachine_create
+    result = Helper.create
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -24,7 +24,7 @@ class VmachineController < ApplicationController
 
   # delete a virtual machine, the vmachine cannot be under use
   def delete
-    result = vmachine_delete params[:id]
+    result = Helper.delete params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -34,7 +34,7 @@ class VmachineController < ApplicationController
 
   # show detailed information about a virtual machine
   def info
-    result = vmachine_info params[:id]
+    result = Helper.info params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -44,7 +44,7 @@ class VmachineController < ApplicationController
 
   # start a vmachine, it should be already put on a pmachine
   def start
-    result = vmachine_start params[:id]
+    result = Helper.start params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -54,7 +54,7 @@ class VmachineController < ApplicationController
 
   # stop a vmachine, and also remove it from the hosting pmachine
   def stop
-    result = vmachine_stop params[:id]
+    result = Helper.stop params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -64,7 +64,7 @@ class VmachineController < ApplicationController
 
   # suspend a virtual machine
   def suspend
-    result = vmachine_suspend params[:id]
+    result = Helper.suspend params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -74,7 +74,7 @@ class VmachineController < ApplicationController
 
   # resume a virtual machine
   def resume
-    result = vmachine_resume params[:id]
+    result = Helper.resume params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -84,7 +84,7 @@ class VmachineController < ApplicationController
 
   # NOTE only to be called by pmachine
   def notify_status_change
-    result = vmachine_notify_status_change params[:id], params[:arg]
+    result = Helper.notify_status_change params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
