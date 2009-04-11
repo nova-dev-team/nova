@@ -87,6 +87,73 @@ function init_info_pane() {
   info_pane.html("Click a vmachine vid to show detail information");
 }
 
+
+function start_vm(vmachine_vid) {
+  $.getJSON("/vmachine/start/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function notify_deployed_vm(vmachine_vid) {
+  $.getJSON("/vmachine/notify_status_change/" + vmachine_vid + "/running",
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function suspend_vm(vmachine_vid) {
+  $.getJSON("/vmachine/suspend/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function resume_vm(vmachine_vid) {
+  $.getJSON("/vmachine/resume/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function stop_vm(vmachine_vid) {
+  $.getJSON("/vmachine/stop/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function notify_undeployed_vm(vmachine_vid) {
+  $.getJSON("/vmachine/notify_status_change/" + vmachine_vid + "/not running",
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
 function show_info(vmachine_vid) {
   var info_pane = $("#info_pane");
   $.getJSON("/vmachine/info/" + vmachine_vid,
@@ -105,7 +172,23 @@ function show_info(vmachine_vid) {
         html += "Hosted on pmachine <a class='pm_link' href='/pmachine#" + result.pmachine_ip + "'>" + result.pmachine_ip + "</a><p>";
       }
       
-      html += "Status: " + result.status;
+      html += "Status: " + result.status + "<br>";
+      
+      html += "Available actions: ";
+      
+      if (result.status == "not running") {
+        html += "<a class='add_link' href='#' onclick='start_vm(\"" + vmachine_vid + "\")'>Start</a>";
+      } else if (result.status == "deploying") {
+        html += "<a class='add_link' href='#' onclick='notify_deployed_vm(\"" + vmachine_vid + "\")'>Notify deployed</a>";
+      } else if (result.status == "running") {
+        html += "<a class='remove_link' href='#' onclick='suspend_vm(\"" + vmachine_vid + "\")'>Suspend</a>";
+        html += "&nbsp;&nbsp;&nbsp;&nbsp;"
+        html += "<a class='remove_link' href='#' onclick='stop_vm(\"" + vmachine_vid + "\")'>Stop</a>";
+      } else if (result.status == "suspended") {
+        html += "<a class='add_link' href='#' onclick='resume_vm(\"" + vmachine_vid + "\")'>Resume</a>";
+      } else if (result.status == "undeploying") {
+        html += "<a class='add_link' href='#' onclick='notify_undeployed_vm(\"" + vmachine_vid + "\")'>Notify undeployed</a>";
+      }
       
       info_pane.html(html);
     }
