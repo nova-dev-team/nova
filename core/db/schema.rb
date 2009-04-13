@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090331031146) do
+ActiveRecord::Schema.define(:version => 20090413073037) do
 
   create_table "pmachines", :force => true do |t|
     t.string   "ip"
@@ -30,10 +30,20 @@ ActiveRecord::Schema.define(:version => 20090331031146) do
     t.datetime "updated_at"
   end
 
+  create_table "vimages", :force => true do |t|
+    t.integer  "iid"
+    t.string   "os_family"
+    t.string   "os_name"
+    t.boolean  "hidden",     :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "vmachines", :force => true do |t|
     t.string   "ip"
     t.integer  "pmachine_id"
     t.integer  "vcluster_id"
+    t.integer  "vimage_id"
     t.string   "status",      :default => "not running"
     t.string   "settings"
     t.datetime "created_at"

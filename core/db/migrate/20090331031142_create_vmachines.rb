@@ -4,7 +4,7 @@ class CreateVmachines < ActiveRecord::Migration
       t.column "ip", :string
       t.column "pmachine_id", :integer
       t.column "vcluster_id", :integer
-
+      t.column "vimage_id", :integer
       t.column "status", :string, :default => "not running"
         # other possible values for "status":
         # deploying: when copying data to pmachine, and installing software
