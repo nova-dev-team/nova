@@ -32,3 +32,4 @@ NOTE ON THE DESKTOP AND THE ORIGINAL EXT JS DESKTOP DEMO:
 	1. App.js
 	2. Desktop.js
 	3. Module.js
+

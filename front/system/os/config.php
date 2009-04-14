@@ -34,7 +34,7 @@ class config {
 	public $DB_HOST = 'localhost';
 	public $DB_USERNAME = 'grid';
 	public $DB_PASSWORD = 'chinagrid';
-	public $DB_NAME = 'vc_front';
+	public $DB_NAME = 'nova_front';
 	
 	public function __construct(){
 		$_SERVER['DOCUMENT_ROOT'] = str_replace('\\', '/', getcwd());
