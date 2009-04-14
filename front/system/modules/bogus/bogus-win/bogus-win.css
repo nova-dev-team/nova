@@ -1,0 +1,10 @@
+.bogus-icon {
+	background-image: url(images/bogus16x16.gif) !important;
+}
+.demo-bogus-shortcut img {
+    background-image: url(images/bogus48x48.png);
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='system/modules/bogus/bogus-win/images/bogus48x48.png', sizingMethod='scale');
+}
+#bogus-nav-panel li {
+	margin-bottom:5px;
+}

@@ -1,0 +1,14 @@
+.superadmin-user-manager-icon {
+    background-image:url(images/grid16x16.png);
+}
+.superadmin-user-manager-shortcut img {
+    background-image: url(images/grid48x48.png);
+}
+
+.superadmin-user-manager-online {
+	background: url(images/online.png) no-repeat;
+}
+
+.superadmin-user-manager-offline {
+	background: url(images/offline.png) no-repeat;
+}
