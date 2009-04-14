@@ -5,6 +5,8 @@ class CreateVimages < ActiveRecord::Migration
       t.column "os_family", :string
       t.column "os_name", :string
       t.column "hidden", :boolean, :default => false
+      t.column "location", :string
+      t.column "comment", :string
       t.timestamps
     end
   end

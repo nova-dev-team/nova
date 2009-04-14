@@ -8,22 +8,28 @@ module VimageHelper
         result << {
           :os_family => vimage.os_family,
           :os_name => vimage.os_name,
-          :hidden => vimage.hidden
+          :hidden => vimage.hidden,
+          :location => vimage.location,
+          :comment => vimage.comment
         }
       end
       return result
     end
 
-    def Helper.add os_family, os_name
+    def Helper.add os_family, os_name, location, comment
       result = {}
 
       os_family = "other" if os_family == nil
-      if os_name == nil
+      if os_name == nil or location == nil
         result[:success] = false
         result[:msg] = "Not enough information!"
 
       else
         result[:success] = true
+        result[:location] = location
+        comment ||= ""
+        result[:comment] = comment
+        
         vimage = Vimage.new
         vimage.os_family = os_family
         vimage.os_name = os_name

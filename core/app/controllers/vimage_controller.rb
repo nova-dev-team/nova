@@ -11,7 +11,7 @@ class VimageController < ApplicationController
   end
 
   def add
-    result = Helper.add params[:os_family], params[:os_name]
+    result = Helper.add params[:os_family], params[:os_name], params[:location], params[:comment]
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
