@@ -25,26 +25,26 @@ ActiveRecord::Schema.define(:version => 20090413073037) do
   end
 
   create_table "vclusters", :force => true do |t|
-    t.integer  "user_id"
+    t.integer  "user_id",    :limit => 11
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "vimages", :force => true do |t|
-    t.integer  "iid"
+    t.integer  "iid",        :limit => 11
     t.string   "os_family"
     t.string   "os_name"
-    t.boolean  "hidden",     :default => false
+    t.boolean  "hidden",                   :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "vmachines", :force => true do |t|
     t.string   "ip"
-    t.integer  "pmachine_id"
-    t.integer  "vcluster_id"
-    t.integer  "vimage_id"
-    t.string   "status",      :default => "not running"
+    t.integer  "pmachine_id", :limit => 11
+    t.integer  "vcluster_id", :limit => 11
+    t.integer  "vimage_id",   :limit => 11
+    t.string   "status",                    :default => "not running"
     t.string   "settings"
     t.datetime "created_at"
     t.datetime "updated_at"
