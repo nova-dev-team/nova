@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<module>
+	<id>TemplateModule</id>
+
+	<directory>templateModule/</directory>
+
+	<author>TemplateModule Author</author>
+	<version>0.0.0</version>
+	<url>http://www.qwikioffice.com</url>
+	<description>TemplateModule Module - Description: A Desktop Template Module.  See readme.txt file for installation instructions.</description>
+
+	<class_name>QoDesk.TemplateModule</class_name>
+
+	<module_type>templateModule</module_type>
+	<module_id>templateModule</module_id>
+	<menu_path>StartMenu</menu_path>
+
+	<launcher_icon_cls>templateModule-icon</launcher_icon>cls>
+	<launcher_shortcut_icon_cls>templateModule-shortcut</launcher_shortcut_icon_cls>
+	<launcher_text>TemplateModule</launcher_text>
+	<launcher_tooltip>TemplateModule</launcher_tooltip>
+
+	<active>1</active>
+	<preload>0</preload>
+
+	<moduleName>QoDesk.TemplateModule</moduleName>
+	<files>
+		<css>
+			<file>templateModule.css</file>
+		</css>
+		<js>
+			<file>templateModule.js</file>
+		</js>
+		<php>
+			<file>templateModule.php</file>
+		</php>
+	</files>
+</module>

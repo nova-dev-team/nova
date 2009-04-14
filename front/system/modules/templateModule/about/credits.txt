@@ -1,0 +1,18 @@
+<div id="-credits">
+	Credits for this module:
+
+	<ul>
+		<li>
+			<a href="http://www.creditlink1">creditName1</a><br />
+			<span class="-credit-info">credit info1</span><br />
+		</li>
+		<li>
+			<a href="http://www.creditlink2">creditName2</a><br />
+			<span class="-credit-info">credit info2</span><br />
+		</li>
+		<li>
+			<a href="http://www.creditlink3">creditName3</a><br />
+			<span class="-credit-info">credit info3</span><br />
+		</li>
+	</ul>
+</div>

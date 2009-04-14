@@ -1,0 +1,16 @@
+.user-job-manager-icon {
+    background-image:url(images/grid16x16.png) !important;
+}
+.user-job-manager-shortcut img {
+    background-image: url(images/grid48x48.png);
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='system/modules/grid-win/images/grid48x48.png', sizingMethod='scale');
+}
+.user-job-manager-option {
+	background-image: url(images/plugin.gif) !important;
+}
+.user-job-manager-add {
+	background-image: url(images/add.gif) !important;
+}
+.user-job-manager-remove {
+	background-image: url(images/delete.gif) !important;
+}

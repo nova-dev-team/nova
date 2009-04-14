@@ -1,0 +1,7 @@
+.templateModule-icon {
+	background-image:url(icons/application_form.png) !important;
+}
+.templateModule-shortcut-icon img {
+	background-image:url(icons/application_form.png);
+	filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='system/modules/templateModule/icons/application_form.png', sizingMethod='scale');
+}
