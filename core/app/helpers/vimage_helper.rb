@@ -6,6 +6,7 @@ module VimageHelper
       result = []
       Vimage.all.each do |vimage|
         result << {
+          :iid => "i#{vimage.id}",
           :os_family => vimage.os_family,
           :os_name => vimage.os_name,
           :hidden => vimage.hidden,
@@ -20,24 +21,26 @@ module VimageHelper
       result = {}
 
       os_family = "other" if os_family == nil
-      if os_name == nil or location == nil
+      if os_name == nil or os_name == "" or location == nil or location == ""
         result[:success] = false
         result[:msg] = "Not enough information!"
 
       else
         result[:success] = true
-        result[:location] = location
         comment ||= ""
-        result[:comment] = comment
         
         vimage = Vimage.new
         vimage.os_family = os_family
         vimage.os_name = os_name
+        vimage.location = location
+        vimage.comment = comment
         vimage.save
         result[:os_family] = os_family
         result[:os_name] = os_name
+        result[:location] = location
+        result[:comment] = comment
         result[:iid] = "i#{vimage.id}"
-        result[:msg] = "Added new vimage"
+        result[:msg] = "Added new vimage '#{os_name}', in family '#{os_family}', located at #{location}"
 
       end
       return result
@@ -69,6 +72,24 @@ module VimageHelper
     def Helper.unhide iid
       result = {}
       vimage = Vimage.find_by_id iid[1..-1]
+      if vimage != nil # vimage found
+        if vimage.hidden == false # already visible
+          result[:success] = false
+          result[:msg] = "Vimage #{iid} already visible!"
+
+        else # vimage hidden
+          vimage.hidden = false
+          vimage.save
+          result[:success] = true
+          result[:msg] = "Vimage #{iid} is now visible"
+        end
+
+      else # vimage not found
+        result[:success] = false
+        result[:msg] = "Vimage #{iid} not found!"
+      end
+
+      return result
     end
 
   end

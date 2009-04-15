@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(:version => 20090413073037) do
     t.string   "os_name"
     t.boolean  "hidden",                   :default => false
     t.string   "location"
+    t.string   "comment"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
