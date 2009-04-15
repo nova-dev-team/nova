@@ -1,4 +1,7 @@
 module PmachineHelper
+  
+  require 'net/http'
+  require 'thread'
 
   class Helper
 
@@ -22,8 +25,17 @@ module PmachineHelper
         result[:msg] = "Pmachine #{pmachine_ip} already added!"
 
       else # pmachine ip provided and not added before
-        # TODO authenticate the pmachine ip
-        pmachine_ip_works = true
+
+        begin
+          # TODO multithread authentication
+          http_res = Net::HTTP.start(pmachine_ip, 3000) do |http|
+            http.get '/a/auth'
+          end
+
+          pmachine_ip_works = true if http_res.body.length > 0
+        rescue
+
+        end
 
         if pmachine_ip_works
           pmachine = Pmachine.new(:ip => pmachine_ip)
