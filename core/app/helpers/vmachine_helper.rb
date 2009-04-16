@@ -1,5 +1,7 @@
 module VmachineHelper
 
+  require 'net/http'
+
   include PmachineHelper
 
   class Helper
@@ -91,7 +93,6 @@ module VmachineHelper
         result[:msg] = "Vmachine #{vmachine_vid} not found!"
 
       else # vmachine found
-        # TODO implement vm.start
 
         if vmachine.status != "not running" # not in correct status
           result[:success] = false
@@ -131,8 +132,26 @@ module VmachineHelper
               vmachine.status = "deploying"
               vmachine.save
               # TODO send control to pmon on corresponding pmachine
+              
+              http_res = Net::HTTP.start(hosting_pmachine.ip, 3000) do |http|
+                http.put '/x/4dea24b3-1d52-d8f3-2516-782e98a23fcc/start', ""
+              end
+
+              # TODO make vmachine xml 
+              vm_xml = Helper.to_xml vmachine
+
+# FIXME
+=begin
+              http_res = Net::HTTP.post_form  URI.parse("http://#{hosting_pmachine.ip}:3000/x/create"), {
+                    :vm => "{
+                      :define => #{vm_xml},
+                    }"
+                  }
+=end
+              result[:pmon_info] = http_res.body
 
               result[:success] = true
+              result[:xml] = vm_xml
               result[:msg] = "Deployed vmachine #{vmachine_vid} to pmachine #{hosting_pmachine.ip}"
 
             else
@@ -146,6 +165,40 @@ module VmachineHelper
       end
 
       return result
+    end
+
+require 'pp'
+
+    # helper class that translates a vmachine to xml specification
+    def Helper.to_xml vmachine
+      ret = "<domain type='kvm'>"
+      ret += "<name>intrepid</name>"
+      ret += "<uuid>4dea24b3-1d52-d8f3-2516-782e98a23fcc</uuid>"
+      ret += "<memory>512072</memory>"
+      ret += "<vcpu>1</vcpu>"
+      ret += "<os>"
+      ret += "<type arch='i686'>hvm</type>"
+      ret += "</os>"
+      ret += "<clock sync='localtime'/>"
+      ret += "<devices>"
+      ret += "<emulator>/usr/bin/kvm </emulator>"
+      ret += "<disk type='file' device='disk'>"
+      ret += "<source file='{:src=>" + '"copy"' + ", :uuid=>" +'"os100m.img"' + "}'/>"
+      ret += "<target dev='hda'/>"
+      ret += "</disk>"
+      ret += "<disk type='file' device='disk'>"
+      ret += "<source file='{:src=>" + '"new"' + ", :size=>" + '"500m"' + ", :format=>" + '"ext3"' + "}'/>"
+      ret += "<target dev='hda'/>"
+      ret += "</disk>"
+      ret += "<interface type='network'>"
+      ret += "<source network='default'/>"
+      ret += "<mac address='24:42:53:21:52:45'/>"
+      ret += "</interface>"
+      ret += "<graphics type='vnc' port='-1' keymap='de'/>"
+      ret += "</devices>"
+      ret += "</domain>"
+      print ret.to_s.to_s
+      return ret
     end
 
     def Helper.stop vmachine_vid
@@ -170,6 +223,11 @@ module VmachineHelper
           # TODO send control to pmon, change the vmachine into "undeploying" status
           vmachine.status = "undeploying"
           vmachine.save
+    
+# TODO change uuid
+          http_res = Net::HTTP.start(hosting_pmachine.ip, 3000) do |http|
+            http.put '/x/4dea24b3-1d52-d8f3-2516-782e98a23fcc/stop', ""
+          end
 
           result[:success] = true
           result[:msg] = "Closing vmachine #{vmachine_vid}, 'undeploying' it now"
@@ -199,6 +257,10 @@ module VmachineHelper
           vmachine.save
           # TODO send suspend signal
 
+# TODO change uuid
+          http_res = Net::HTTP.start(hosting_pmachine.ip, 3000) do |http|
+            http.put '/x/4dea24b3-1d52-d8f3-2516-782e98a23fcc/suspend', ""
+          end
           result[:success] = true
           result[:msg] = "Vmachine #{vmachine_vid} suspended"
 
@@ -227,6 +289,10 @@ module VmachineHelper
           vmachine.save
           # TODO send resume signal
 
+# TODO change uuid
+          http_res = Net::HTTP.start(hosting_pmachine.ip, 3000) do |http|
+            http.put '/x/4dea24b3-1d52-d8f3-2516-782e98a23fcc/resume', ""
+          end
           result[:success] = true
           result[:msg] = "Vmachine #{vmachine_vid} resumed"
 

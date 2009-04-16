@@ -26,6 +26,9 @@ module VimageHelper
         result[:msg] = "Not enough information!"
 
       else
+
+        # TODO tell all pmons to add the image
+
         result[:success] = true
         comment ||= ""
         
