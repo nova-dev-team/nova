@@ -72,16 +72,33 @@ if (class_exists('os')) {
 			
 			$sql = "
 				insert into qo_styles (
-					qo_members_id, qo_groups_id, fontcolor
+					qo_members_id, qo_groups_id, qo_wallpapers_id, qo_themes_id, fontcolor
 				) values (
 					" . $id .",
-					" . $group_id .",
-					000000
+					" . $group_id .",10,1,
+					'fcf8f8'
 				)
 			";
 			
 			if (!mysql_query($sql)) {
 				print "{errors:[{id:'failed-set-style', msg:'Failed to set the style'}]}";
+				return;
+			}
+			
+			$sql = "
+			  insert into qo_members_has_module_launchers(
+			    qo_members_id, qo_groups_id, qo_modules_id, qo_launchers_id, sort_order
+			  ) values (
+			    " . $id . ",
+			    " . $group_id . ",
+			    105,
+			    4,
+			    0
+			  )
+			";
+			
+			if (!mysql_query($sql)) {
+				print "{errors:[{id:'failed-set-modules', msg:'Failed to set the modules'}]}";
 				return;
 			}
 			
