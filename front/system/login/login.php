@@ -1,30 +1,23 @@
-<?php
-// get the os
+<?php
 require_once ("../os/os.php");
-if (class_exists('os'))
-{
-    $os = new os();
 
-    $module = $_POST['module'];
+if (class_exists('os')) {
 
-    if ($module == "")
-    {
-        die ("success: false");
-    }
-
-    if ($module == 'login')
-    {
-        print $os->session->login($_POST['user'], $_POST['pass'], $_POST['group']);
-    } else if ($module == 'signup')
-    {	
+  $os = new os();
+  $module = $_POST['module'];
+  if ($module == "") {
+    die("{errors:[{id:'module-not-specified', msg:'module not specified'}]}");
+  }
+  
+  if ($module == 'login') {
+    print $os->session->login($_POST['user'], $_POST['pass'], $_POST['group']);
+    
+  } else if ($module == 'signup') {
 		if($os->member->exists($_REQUEST['email'])) {
-			
 			print "{errors:[{id:'email-already-used', msg:'Email already used: " . $_REQUEST['email'] ."'}]}";	
-			return;
-			
-		} else {
-			
-			$sql = "
+			return;
+    } else {
+      $sql = "
 				insert into qo_members (
 					first_name,
 					last_name,
@@ -41,7 +34,7 @@ if (class_exists('os'))
 			";
 
 			if (!mysql_query($sql)) {
-				print "{success: false}";
+				print "{errors:[{id:'sql-error', msg:'error in sql'}]}";
 				return;
 			}
 			
@@ -51,12 +44,12 @@ if (class_exists('os'))
 			
 			// add to group
 			if ($_REQUEST['role'] == "User") {
-				$group_id = 2;
+				$group_id = 10000;
 			} else if($_REQUEST['role'] == "Administrator") {
 				$group_id = 1;
 				$is_admin = 1;
 			} else {
-				print "{success: false}";
+				print "{errors:[{id:'sql-error', msg:'error in sql'}]}";
 				return;
 			}
 			
@@ -107,7 +100,7 @@ if (class_exists('os'))
 		
     } else
     {
-        print "{success: false}";
+          print "{errors:[{id:'some-error', msg:'Some error'}]}";			
     }
 }
 ?>
