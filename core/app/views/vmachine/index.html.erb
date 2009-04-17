@@ -179,7 +179,7 @@ function show_info(vmachine_vid) {
       if (result.status == "not running") {
         html += "<a class='add_link' href='#' onclick='start_vm(\"" + vmachine_vid + "\")'>Start</a>";
       } else if (result.status == "deploying") {
-        html += "<a class='add_link' href='#' onclick='notify_deployed_vm(\"" + vmachine_vid + "\")'>Notify deployed</a>";
+        //html += "<a class='add_link' href='#' onclick='notify_deployed_vm(\"" + vmachine_vid + "\")'>Notify deployed</a>";
       } else if (result.status == "running") {
         html += "<a class='remove_link' href='#' onclick='suspend_vm(\"" + vmachine_vid + "\")'>Suspend</a>";
         html += "&nbsp;&nbsp;&nbsp;&nbsp;"
@@ -187,7 +187,7 @@ function show_info(vmachine_vid) {
       } else if (result.status == "suspended") {
         html += "<a class='add_link' href='#' onclick='resume_vm(\"" + vmachine_vid + "\")'>Resume</a>";
       } else if (result.status == "undeploying") {
-        html += "<a class='add_link' href='#' onclick='notify_undeployed_vm(\"" + vmachine_vid + "\")'>Notify undeployed</a>";
+        //html += "<a class='add_link' href='#' onclick='notify_undeployed_vm(\"" + vmachine_vid + "\")'>Notify undeployed</a>";
       }
       
       info_pane.html(html);

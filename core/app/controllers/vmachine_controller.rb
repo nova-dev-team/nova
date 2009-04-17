@@ -82,7 +82,8 @@ class VmachineController < ApplicationController
     end
   end
 
-  # NOTE only to be called by pmachine
+
+=begin This function is internally initiated by core
   def notify_status_change
     result = Helper.notify_status_change params[:id], params[:arg]
 
@@ -91,5 +92,6 @@ class VmachineController < ApplicationController
       accept.json {render :json => result}
     end
   end
+=end
 
 end

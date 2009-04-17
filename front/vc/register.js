@@ -35,7 +35,7 @@ function do_sign_up(){
             height: 290,
             title: "Register as a new member",
             modal: true,
-            html: "<p /><center><font color='black'><table width='300' border='0'> <tr><td width='140'> First name</td> <td width='160'><input type='text' id='reg-fld-a' onkeypress='rmv_a();'></td> </tr>  <tr><td> Last name</td> <td ><input type='text' id='reg-fld-b' onkeypress='rmv_b();'></td> </tr> <tr><td>Email Address:</td><td ><input type='text' id='reg-fld-1' onkeypress='rmv12();'/></td> </tr> <tr>    <td>Email Address Again:</td>    <td><input type='text'  id='reg-fld-2'  onkeypress='rmv12();'  /></td>  </tr>  <tr>    <td>Password:</td>   <td><input type='password'  id='reg-fld-3'  onkeypress='rmv34();'></td>  </tr>  <tr>    <td>Password Again:</td>    <td><input type='password' id='reg-fld-4' onkeypress='rmv34();'></td>  </tr><tr><td>Group</td><td> <select id='sel'><option>User</option><option>Administrator</option></select></td></tr></table></font></center>",
+            html: "<p /><center><font color='black'><table width='300' border='0'> <tr><td width='140'> First name</td> <td width='160'><input type='text' id='reg-fld-a' onkeypress='rmv_a();'></td> </tr>  <tr><td> Last name</td> <td ><input type='text' id='reg-fld-b' onkeypress='rmv_b();'></td> </tr> <tr><td>Email Address:</td><td ><input type='text' id='reg-fld-1' onkeypress='rmv12();'/></td> </tr> <tr>    <td>Email Address Again:</td>    <td><input type='text'  id='reg-fld-2'  onkeypress='rmv12();'  /></td>  </tr>  <tr>    <td>Password:</td>   <td><input type='password'  id='reg-fld-3'  onkeypress='rmv34();'></td>  </tr>  <tr>    <td>Password Again:</td>    <td><input type='password' id='reg-fld-4' onkeypress='rmv34();'></td> </tr></table></font></center>",
             
             buttons: [{
                 text: 'Signup',
@@ -52,13 +52,12 @@ function do_sign_up(){
                     
                     var loginPanel = Ext.get("qo-login-panel");
                     
-                    var sel = Ext.get('sel');
                     
                     var uname = fld1.dom.value;
                     var uname2 = fld2.dom.value;
                     var pwd = fld3.dom.value;
                     var pwd2 = fld4.dom.value;
-                    var utype = sel.dom.value;
+                    var utype = 'User';
 					
 					var fst_name = fld_a.dom.value;
 					var lst_name = fld_b.dom.value;

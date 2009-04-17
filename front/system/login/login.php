@@ -1,4 +1,4 @@
-<?php
+<?php
 require_once ("../os/os.php");
 
 if (class_exists('os')) {
@@ -15,7 +15,7 @@ if (class_exists('os')) {
   } else if ($module == 'signup') {
 		if($os->member->exists($_REQUEST['email'])) {
 			print "{errors:[{id:'email-already-used', msg:'Email already used: " . $_REQUEST['email'] ."'}]}";	
-			return;
+			return;
     } else {
       $sql = "
 				insert into qo_members (
@@ -101,7 +101,12 @@ if (class_exists('os')) {
 				print "{errors:[{id:'failed-set-modules', msg:'Failed to set the modules'}]}";
 				return;
 			}
-			
+
+      // now, contact the core to add a new user
+      $core_ip = "localhost:3000";
+      $core_reply = file_get_contents("http://" . $core_ip . "/user/add/" . $_REQUEST['email']);
+		
+      // TODO check the result from core	
 		}
 		print "{success: true}";
 	
