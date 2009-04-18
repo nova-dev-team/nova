@@ -9,7 +9,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090413073037) do
+ActiveRecord::Schema.define(:version => 20090417054023) do
+
+  create_table "notifies", :force => true do |t|
+    t.string   "notify_uuid"
+    t.string   "notify_receiver_type"
+    t.integer  "notify_receiver_id",   :limit => 11
+    t.string   "notify_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "pmachines", :force => true do |t|
     t.string   "ip"
@@ -43,10 +52,11 @@ ActiveRecord::Schema.define(:version => 20090413073037) do
 
   create_table "vmachines", :force => true do |t|
     t.string   "ip"
-    t.integer  "pmachine_id", :limit => 11
-    t.integer  "vcluster_id", :limit => 11
-    t.integer  "vimage_id",   :limit => 11
-    t.string   "status",                    :default => "not running"
+    t.integer  "pmachine_id",        :limit => 11
+    t.integer  "vcluster_id",        :limit => 11
+    t.integer  "vimage_id",          :limit => 11
+    t.string   "pmon_vmachine_uuid"
+    t.string   "status",                           :default => "not running"
     t.string   "settings"
     t.datetime "created_at"
     t.datetime "updated_at"

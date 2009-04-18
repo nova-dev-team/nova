@@ -48,6 +48,7 @@ module VmachineHelper
           result[:msg] = "Vmachine #{vmachine_vid} is under use!"
 
         else # vmachine not under use, could be deleted
+          Vmachine.delete vmachine
           result[:success] = true
           result[:msg] = "Removed vmachine #{vmachine_vid}"
 
@@ -131,8 +132,6 @@ module VmachineHelper
             sub_result = PmachineHelper::Helper.host_vmachine hosting_pmachine.ip, "v#{vmachine.id}"
 
             if sub_result[:success] # successfully deployed pmachine
-              vmachine.status = "deploying"
-              vmachine.save
               # TODO send control to pmon on corresponding pmachine
               
 create_xml = <<EOF
@@ -142,14 +141,15 @@ EOF
 
 create_xml = create_xml.rstrip
 srand Time.now.to_i
-create_xml += 'yet_anothoer_vm' + rand(100).to_s
+create_xml += 'yet_anothoer_vm_by_santa_' + rand(100).to_s
 create_xml += <<EOF
 </name>
   <uuid>
 EOF
 
 create_xml = create_xml.rstrip
-create_xml += UUID.random_create
+vmachine.pmon_vmachine_uuid = UUID.random_create
+create_xml += vmachine.pmon_vmachine_uuid 
 create_xml += <<EOF
 </uuid>
   <memory>512072</memory>
@@ -187,11 +187,18 @@ else
   res.error!
 end
 
+              vmachine.status = "deploying"
+              vmachine.save
+
+
               result[:pmon_info] = http_res.body
 
               result[:success] = true
               result[:xml] = create_xml
               result[:msg] = "Deployed vmachine #{vmachine_vid} to pmachine #{hosting_pmachine.ip}"
+# for demo purpose, immediately start pmachine
+              res2 = Helper.notify_status_change vmachine_vid, "running"
+              result[:msg] += "\n" + res2[:msg]
 
             else
               result[:success] = false
@@ -225,17 +232,23 @@ end
           result[:msg] = "Vmachine #{vmachine_vid} is already in closing stage!"
 
         else # could be closed, status = "deploying", "running", "suspended"
-          # TODO send control to pmon, change the vmachine into "undeploying" status
-          vmachine.status = "undeploying"
-          vmachine.save
     
 # TODO change uuid
-          http_res = Net::HTTP.start(hosting_pmachine.ip, 3000) do |http|
-            http.put '/x/4dea24b3-1d52-d8f3-2516-782e98a23fcc/stop', ""
+         
+          http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+            http.put '/x/' + vmachine.pmon_vmachine_uuid + '/stop', ""
           end
 
+          # TODO send control to pmon, change the vmachine into "undeploying" status
+          vmachine.status = "undeploying"
+          vmachine.pmon_vmachine_uuid = ""
+          vmachine.save
           result[:success] = true
           result[:msg] = "Closing vmachine #{vmachine_vid}, 'undeploying' it now"
+
+# XXX for demo purpose, notify status change immediately
+          res2 = Helper.notify_status_change vmachine_vid, "not running"
+          result[:msg] += "\n" + res2[:msg];
 
         end
       end
@@ -263,8 +276,8 @@ end
           # TODO send suspend signal
 
 # TODO change uuid
-          http_res = Net::HTTP.start(hosting_pmachine.ip, 3000) do |http|
-            http.put '/x/4dea24b3-1d52-d8f3-2516-782e98a23fcc/suspend', ""
+          http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+            http.put '/x/' + vmachine.pmon_vmachine_uuid + '/suspend', ""
           end
           result[:success] = true
           result[:msg] = "Vmachine #{vmachine_vid} suspended"
@@ -295,8 +308,8 @@ end
           # TODO send resume signal
 
 # TODO change uuid
-          http_res = Net::HTTP.start(hosting_pmachine.ip, 3000) do |http|
-            http.put '/x/4dea24b3-1d52-d8f3-2516-782e98a23fcc/resume', ""
+          http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+            http.put '/x/' + vmachine.pmon_vmachine_uuid + '/resume', ""
           end
           result[:success] = true
           result[:msg] = "Vmachine #{vmachine_vid} resumed"

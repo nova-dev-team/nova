@@ -5,6 +5,7 @@ class CreateVmachines < ActiveRecord::Migration
       t.column "pmachine_id", :integer
       t.column "vcluster_id", :integer
       t.column "vimage_id", :integer
+      t.column "pmon_vmachine_uuid", :string # the uuid for pmon
       t.column "status", :string, :default => "not running"
         # other possible values for "status":
         # deploying: when copying data to pmachine, and installing software
