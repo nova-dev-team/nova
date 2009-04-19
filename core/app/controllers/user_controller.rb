@@ -15,7 +15,7 @@ class UserController < ApplicationController
 
   # add a new user
   def add
-    result = Helper.add params[:id]
+    result = Helper.add params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}

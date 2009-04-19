@@ -12,7 +12,7 @@ module UserHelper
     end
 
     # add a new user
-    def Helper.add user_email
+    def Helper.add user_email, user_id
       result = {}
 
       if user_email == nil # if did not given user email
@@ -31,6 +31,7 @@ module UserHelper
 
         else # if user does not exist
           u = User.new(:email => user_email)
+          u.id = user_id if user_id != nil
           u.save
           result[:success] = true
           result[:msg] = "User '#{user_email}' successfully added."
