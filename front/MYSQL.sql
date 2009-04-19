@@ -20,23 +20,51 @@
 
 CREATE DATABASE IF NOT EXISTS nova_front;
 USE nova_front;
+
+--
+-- Definition of table `nova_front`.`currentlyloggedin`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`currentlyloggedin`;
 CREATE TABLE  `nova_front`.`currentlyloggedin` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `session_id` varchar(45) NOT NULL,
   `member_id` varchar(45) NOT NULL,
   `group_id` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`currentlyloggedin`
+--
+
+/*!40000 ALTER TABLE `currentlyloggedin` DISABLE KEYS */;
+LOCK TABLES `currentlyloggedin` WRITE;
 INSERT INTO `nova_front`.`currentlyloggedin` VALUES  (10,'6d51c3c6ec21dc91c5b488900938ef94','232','10'),
- (12,'9592aead66b3dc5e08dc6ea3e973e851','237','10000'),
- (14,'123b0cf1354dfde259a60fae4c562300','237','10000'),
- (18,'6b2f777d9deb9bb0158e2e891dc07019','237','10000');
+ (21,'a91aad3431077e5f4206f4096c81f28b','237','10000'),
+ (23,'18c9f3e92e7596bdc38d73313fd827d5','259','10000');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `currentlyloggedin` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_dependencies`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_dependencies`;
 CREATE TABLE  `nova_front`.`qo_dependencies` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `directory` varchar(255) default '' COMMENT 'The directory within the modules directory stated in the system/os/config.php',
   `file` varchar(255) default NULL COMMENT 'The file that contains the dependency',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=109 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_dependencies`
+--
+
+/*!40000 ALTER TABLE `qo_dependencies` DISABLE KEYS */;
+LOCK TABLES `qo_dependencies` WRITE;
 INSERT INTO `nova_front`.`qo_dependencies` VALUES  (100,'templateModule/','Ext.ux.AboutWindow.js'),
  (101,'vc-dependency/grid/filter/','Filter.js'),
  (102,'vc-dependency/grid/filter/','BooleanFilter.js'),
@@ -45,6 +73,15 @@ INSERT INTO `nova_front`.`qo_dependencies` VALUES  (100,'templateModule/','Ext.u
  (108,'vc-dependency/grid/','GridFilters.js'),
  (106,'vc-dependency/grid/filter/','NumericFilter.js'),
  (107,'vc-dependency/grid/filter/','StringFilter.js');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_dependencies` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_domains`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_domains`;
 CREATE TABLE  `nova_front`.`qo_domains` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `name` varchar(35) default NULL,
@@ -52,18 +89,41 @@ CREATE TABLE  `nova_front`.`qo_domains` (
   `is_singular` tinyint(1) unsigned default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_domains`
+--
+
+/*!40000 ALTER TABLE `qo_domains` DISABLE KEYS */;
+LOCK TABLES `qo_domains` WRITE;
 INSERT INTO `nova_front`.`qo_domains` VALUES  (1,'All Modules','All the modules',0),
  (2,'QoPreferences','The QoPreferences module',1),
  (9,'superadminModules',NULL,0),
  (10,'adminModules','Modules for vc admin',0),
  (11,'userModules','Modules for vc users',0),
  (200,'TemplateModule','Basic Module template.',1);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_domains` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_domains_has_modules`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_domains_has_modules`;
 CREATE TABLE  `nova_front`.`qo_domains_has_modules` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `qo_domains_id` int(11) unsigned default NULL,
   `qo_modules_id` int(11) unsigned default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_domains_has_modules`
+--
+
+/*!40000 ALTER TABLE `qo_domains_has_modules` DISABLE KEYS */;
+LOCK TABLES `qo_domains_has_modules` WRITE;
 INSERT INTO `nova_front`.`qo_domains_has_modules` VALUES  (1,1,1),
  (2,1,2),
  (3,1,3),
@@ -94,12 +154,28 @@ INSERT INTO `nova_front`.`qo_domains_has_modules` VALUES  (1,1,1),
  (36,11,105),
  (37,1,105),
  (38,2,104);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_domains_has_modules` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_error_log`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_error_log`;
 CREATE TABLE  `nova_front`.`qo_error_log` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `text` text,
   `timestamp` datetime default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_error_log`
+--
+
+/*!40000 ALTER TABLE `qo_error_log` DISABLE KEYS */;
+LOCK TABLES `qo_error_log` WRITE;
 INSERT INTO `nova_front`.`qo_error_log` VALUES  (1,'Script: module.php, Method: find_files, Missing file: system/modules/superadmin-user-manager/superadmin-user-manager-override.js','2009-02-24 14:55:48'),
  (2,'Script: module.php, Method: find_files, Missing file: system/modules/superadmin-user-manager/superadmin-user-manager.css','2009-02-24 14:55:48'),
  (3,'Script: module.php, Method: find_files, Missing file: system/modules/superadmin-user-manager/superadmin-user-manager.js','2009-02-24 14:55:48'),
@@ -120,6 +196,15 @@ INSERT INTO `nova_front`.`qo_error_log` VALUES  (17,'Script: module.php, Method:
  (18,'Script: module.php, Method: find_files, Missing file: system/modules/user-job-manager/user-job-manager.php','2009-04-19 17:49:06'),
  (19,'Script: module.php, Method: find_files, Missing file: system/modules/user-job-manager/user-job-manager.php','2009-04-19 17:49:19'),
  (20,'Script: module.php, Method: find_files, Missing file: system/modules/user-job-manager/user-job-manager.php','2009-04-19 17:49:34');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_error_log` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_groups`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_groups`;
 CREATE TABLE  `nova_front`.`qo_groups` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `name` varchar(35) default NULL,
@@ -128,10 +213,26 @@ CREATE TABLE  `nova_front`.`qo_groups` (
   `active` tinyint(1) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10001 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_groups`
+--
+
+/*!40000 ALTER TABLE `qo_groups` DISABLE KEYS */;
+LOCK TABLES `qo_groups` WRITE;
 INSERT INTO `nova_front`.`qo_groups` VALUES  (1,'administrator','System administrator',50,1),
  (10000,'user','General user',20,1),
  (10,'debug',NULL,1000,1),
  (1000,'super_admin','The almighty',100,1);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_groups` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_groups_has_domain_privileges`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_groups_has_domain_privileges`;
 CREATE TABLE  `nova_front`.`qo_groups_has_domain_privileges` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `qo_groups_id` int(11) unsigned default '0',
@@ -140,6 +241,13 @@ CREATE TABLE  `nova_front`.`qo_groups_has_domain_privileges` (
   `is_allowed` tinyint(1) unsigned default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_groups_has_domain_privileges`
+--
+
+/*!40000 ALTER TABLE `qo_groups_has_domain_privileges` DISABLE KEYS */;
+LOCK TABLES `qo_groups_has_domain_privileges` WRITE;
 INSERT INTO `nova_front`.`qo_groups_has_domain_privileges` VALUES  (102,1000,2,2,1),
  (103,1000,200,3,1),
  (203,10000,2,2,1),
@@ -154,6 +262,15 @@ INSERT INTO `nova_front`.`qo_groups_has_domain_privileges` VALUES  (102,1000,2,2
  (221,1000,9,1,1),
  (222,10,1,1,1),
  (223,10,2,2,1);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_groups_has_domain_privileges` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_groups_has_members`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_groups_has_members`;
 CREATE TABLE  `nova_front`.`qo_groups_has_members` (
   `qo_groups_id` int(11) unsigned NOT NULL default '0',
   `qo_members_id` int(11) unsigned NOT NULL default '0',
@@ -161,6 +278,13 @@ CREATE TABLE  `nova_front`.`qo_groups_has_members` (
   `admin` tinyint(1) unsigned NOT NULL default '0' COMMENT 'Is the member the administrator of this group',
   PRIMARY KEY  (`qo_members_id`,`qo_groups_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_groups_has_members`
+--
+
+/*!40000 ALTER TABLE `qo_groups_has_members` DISABLE KEYS */;
+LOCK TABLES `qo_groups_has_members` WRITE;
 INSERT INTO `nova_front`.`qo_groups_has_members` VALUES  (1,231,1,1),
  (10000,230,1,0),
  (1000,200,1,1),
@@ -189,16 +313,43 @@ INSERT INTO `nova_front`.`qo_groups_has_members` VALUES  (1,231,1,1),
  (10000,254,1,0),
  (10000,255,1,0),
  (10000,256,1,0),
- (10000,257,1,0);
+ (10000,257,1,0),
+ (10000,258,1,0),
+ (10000,259,1,0);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_groups_has_members` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_launchers`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_launchers`;
 CREATE TABLE  `nova_front`.`qo_launchers` (
   `id` int(2) unsigned NOT NULL auto_increment,
   `name` varchar(25) default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_launchers`
+--
+
+/*!40000 ALTER TABLE `qo_launchers` DISABLE KEYS */;
+LOCK TABLES `qo_launchers` WRITE;
 INSERT INTO `nova_front`.`qo_launchers` VALUES  (1,'autorun'),
  (2,'contextmenu'),
  (3,'quickstart'),
  (4,'shortcut');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_launchers` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_members`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_members`;
 CREATE TABLE  `nova_front`.`qo_members` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `first_name` varchar(25) default NULL,
@@ -208,7 +359,14 @@ CREATE TABLE  `nova_front`.`qo_members` (
   `language` varchar(5) default 'en',
   `active` tinyint(1) unsigned NOT NULL default '0' COMMENT 'Is the member currently active',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=258 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=260 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_members`
+--
+
+/*!40000 ALTER TABLE `qo_members` DISABLE KEYS */;
+LOCK TABLES `qo_members` WRITE;
 INSERT INTO `nova_front`.`qo_members` VALUES  (200,'Santa','Zhang','santa','zhang','en',1),
  (232,'debug','debug','debug','debug','en',1),
  (231,'admin','admin','admin','admin','en',1),
@@ -232,7 +390,18 @@ INSERT INTO `nova_front`.`qo_members` VALUES  (200,'Santa','Zhang','santa','zhan
 INSERT INTO `nova_front`.`qo_members` VALUES  (254,'bigman','bigman','bigman','bigman','en',1),
  (255,'pppppppp','pppppppp','pppppppp','pppppppp','en',1),
  (256,'llllllllll','llllllllll','llllllllll','llllllllll','en',1),
- (257,'nvida','nvida','nvida','nvida','en',1);
+ (257,'nvida','nvida','nvida','nvida','en',1),
+ (258,'macjohn','macjohn','macjohn','macjohn','en',1),
+ (259,'misamisa','misamisa','misamisa','misamisa','en',1);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_members` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_members_has_module_launchers`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_members_has_module_launchers`;
 CREATE TABLE  `nova_front`.`qo_members_has_module_launchers` (
   `qo_members_id` int(11) unsigned NOT NULL default '0',
   `qo_groups_id` int(11) unsigned NOT NULL default '0',
@@ -241,6 +410,13 @@ CREATE TABLE  `nova_front`.`qo_members_has_module_launchers` (
   `sort_order` int(5) unsigned NOT NULL default '0' COMMENT 'sort within each launcher',
   PRIMARY KEY  (`qo_members_id`,`qo_groups_id`,`qo_modules_id`,`qo_launchers_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_members_has_module_launchers`
+--
+
+/*!40000 ALTER TABLE `qo_members_has_module_launchers` DISABLE KEYS */;
+LOCK TABLES `qo_members_has_module_launchers` WRITE;
 INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (230,10000,105,4,3),
  (230,10000,104,4,4),
  (230,10000,1,4,6),
@@ -299,7 +475,18 @@ INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (248,10000,10
  (254,10000,105,4,0),
  (255,10000,105,4,0),
  (256,10000,105,4,0),
- (257,10000,105,4,0);
+ (257,10000,105,4,0),
+ (258,10000,105,4,0),
+ (259,10000,105,4,0);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_members_has_module_launchers` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_modules`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_modules`;
 CREATE TABLE  `nova_front`.`qo_modules` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `author` varchar(35) default NULL,
@@ -312,6 +499,13 @@ CREATE TABLE  `nova_front`.`qo_modules` (
   `load_on_demand` tinyint(1) unsigned NOT NULL default '1' COMMENT 'Preload this module at start up?',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=106 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_modules`
+--
+
+/*!40000 ALTER TABLE `qo_modules` DISABLE KEYS */;
+LOCK TABLES `qo_modules` WRITE;
 INSERT INTO `nova_front`.`qo_modules` VALUES  (1,'Todd Murdock','1.0','http://www.qwikioffice.com','A system application.  Allows users to set, and save their desktop preferences to the database.','system/preferences','qo-preferences',1,1),
  (2,'Jack Slocum','1.0','http://www.qwikioffice.com','Demo of window with grid.','demo','demo-grid',1,1),
  (3,'Jack Slocum','1.0','http://www.qwikioffice.com','Demo of window with tabs.','demo','demo-tabs',1,1),
@@ -325,13 +519,29 @@ INSERT INTO `nova_front`.`qo_modules` VALUES  (102,'Santa Zhang',NULL,NULL,NULL,
  (103,'Santa Zhang',NULL,NULL,NULL,'user-manual','user-manual',1,1),
  (104,'Santa Zhang',NULL,NULL,NULL,'account-setting','account-setting',1,1),
  (105,'Santa Zhang',NULL,NULL,NULL,'user-job-manager','user-job-manager',1,1);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_modules` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_modules_actions`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_modules_actions`;
 CREATE TABLE  `nova_front`.`qo_modules_actions` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `qo_modules_id` int(11) unsigned default NULL,
   `name` varchar(35) default NULL,
   `description` text,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_modules_actions`
+--
+
+/*!40000 ALTER TABLE `qo_modules_actions` DISABLE KEYS */;
+LOCK TABLES `qo_modules_actions` WRITE;
 INSERT INTO `nova_front`.`qo_modules_actions` VALUES  (1,0,'loadModule','Allow the user to load the module.  Give them access to it.  Does not belong to any particular module'),
  (2,1,'saveAppearance','Save appearance'),
  (3,1,'saveAutorun','Save autorun'),
@@ -347,7 +557,27 @@ INSERT INTO `nova_front`.`qo_modules_actions` VALUES  (1,0,'loadModule','Allow t
  (95,100,'kickAss',NULL),
  (96,104,'viewAccount',NULL),
  (97,104,'updateAccount',NULL),
- (98,105,'dummyTest','For dummy test purpose');
+ (98,105,'dummyTest','For dummy test purpose'),
+ (99,105,'infoVM',NULL),
+ (100,105,'resumeVM',NULL),
+ (101,105,'pauseVM',NULL),
+ (102,105,'listVM',NULL),
+ (103,105,'stopVM',NULL),
+ (104,105,'startVM',NULL),
+ (105,105,'removeVM',NULL),
+ (106,105,'newVM',NULL),
+ (107,105,'removeCluster',NULL),
+ (108,105,'addCluster',NULL);
+INSERT INTO `nova_front`.`qo_modules_actions` VALUES  (109,105,'listCluster',NULL);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_modules_actions` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_modules_files`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_modules_files`;
 CREATE TABLE  `nova_front`.`qo_modules_files` (
   `qo_modules_id` int(11) unsigned NOT NULL default '0',
   `directory` varchar(255) default '' COMMENT 'The directory within the modules directory stated in the system/os/config.php',
@@ -358,6 +588,13 @@ CREATE TABLE  `nova_front`.`qo_modules_files` (
   `class_name` varchar(55) default '',
   PRIMARY KEY  (`qo_modules_id`,`file`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_modules_files`
+--
+
+/*!40000 ALTER TABLE `qo_modules_files` DISABLE KEYS */;
+LOCK TABLES `qo_modules_files` WRITE;
 INSERT INTO `nova_front`.`qo_modules_files` VALUES  (1,'qo-preferences/','qo-preferences-override.js',0,0,0,''),
  (4,'acc-win/','acc-win-override.js',0,0,0,''),
  (5,'layout-win/','layout-win-override.js',0,0,0,''),
@@ -402,15 +639,40 @@ INSERT INTO `nova_front`.`qo_modules_files` VALUES  (103,'user-manual/','user-ma
  (105,'user-job-manager/','user-job-manager-override.js',0,0,0,''),
  (100,'superadmin-user-manager/','superadmin-user-manager.php',0,1,0,'SuperAdminUserManager'),
  (105,'user-job-manager/','user-job-manager.php',0,1,0,'UserJobManager');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_modules_files` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_modules_has_dependencies`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_modules_has_dependencies`;
 CREATE TABLE  `nova_front`.`qo_modules_has_dependencies` (
   `qo_modules_id` int(11) unsigned NOT NULL default '0',
   `qo_dependencies_id` int(11) unsigned NOT NULL default '0',
   PRIMARY KEY  (`qo_modules_id`,`qo_dependencies_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_modules_has_dependencies`
+--
+
+/*!40000 ALTER TABLE `qo_modules_has_dependencies` DISABLE KEYS */;
+LOCK TABLES `qo_modules_has_dependencies` WRITE;
 INSERT INTO `nova_front`.`qo_modules_has_dependencies` VALUES  (90,100),
  (100,101),
  (100,103),
  (100,108);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_modules_has_dependencies` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_privileges`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_privileges`;
 CREATE TABLE  `nova_front`.`qo_privileges` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `name` varchar(35) default NULL,
@@ -418,6 +680,13 @@ CREATE TABLE  `nova_front`.`qo_privileges` (
   `is_singular` tinyint(1) unsigned default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_privileges`
+--
+
+/*!40000 ALTER TABLE `qo_privileges` DISABLE KEYS */;
+LOCK TABLES `qo_privileges` WRITE;
 INSERT INTO `nova_front`.`qo_privileges` VALUES  (1,'Load Module','Allows the user access to the loadModule action',0),
  (2,'QoPreferences','Allows the user access to all the actions of the QoPreferences mdoule',1),
  (9,'superadminPrivilege',NULL,0),
@@ -425,12 +694,28 @@ INSERT INTO `nova_front`.`qo_privileges` VALUES  (1,'Load Module','Allows the us
  (11,'userPrivilege',NULL,0),
  (90,'accountPrivilege',NULL,0),
  (91,'TemplateModule','Allows the user access to the doTask action.',1);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_privileges` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_privileges_has_module_actions`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_privileges_has_module_actions`;
 CREATE TABLE  `nova_front`.`qo_privileges_has_module_actions` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `qo_privileges_id` int(11) unsigned default NULL,
   `qo_modules_actions_id` int(11) unsigned default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_privileges_has_module_actions`
+--
+
+/*!40000 ALTER TABLE `qo_privileges_has_module_actions` DISABLE KEYS */;
+LOCK TABLES `qo_privileges_has_module_actions` WRITE;
 INSERT INTO `nova_front`.`qo_privileges_has_module_actions` VALUES  (1,1,1),
  (2,2,2),
  (3,2,3),
@@ -446,7 +731,27 @@ INSERT INTO `nova_front`.`qo_privileges_has_module_actions` VALUES  (1,1,1),
  (13,9,95),
  (14,2,96),
  (15,2,97),
- (16,1,98);
+ (16,1,98),
+ (17,1,109),
+ (18,1,108),
+ (19,1,107),
+ (20,1,106),
+ (21,1,105),
+ (22,1,104),
+ (23,1,103),
+ (24,1,102),
+ (25,1,101),
+ (26,1,100),
+ (27,1,99);
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_privileges_has_module_actions` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_sessions`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_sessions`;
 CREATE TABLE  `nova_front`.`qo_sessions` (
   `id` varchar(128) NOT NULL default '' COMMENT 'a randomly generated id',
   `qo_members_id` int(11) unsigned NOT NULL default '0',
@@ -455,10 +760,25 @@ CREATE TABLE  `nova_front`.`qo_sessions` (
   `date` datetime default NULL,
   PRIMARY KEY  (`id`,`qo_members_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_sessions`
+--
+
+/*!40000 ALTER TABLE `qo_sessions` DISABLE KEYS */;
+LOCK TABLES `qo_sessions` WRITE;
 INSERT INTO `nova_front`.`qo_sessions` VALUES  ('6d51c3c6ec21dc91c5b488900938ef94',232,10,'10.0.0.216','2009-04-17 17:14:27'),
- ('9592aead66b3dc5e08dc6ea3e973e851',237,10000,'10.0.0.216','2009-04-19 15:29:51'),
- ('123b0cf1354dfde259a60fae4c562300',237,10000,'10.0.0.216','2009-04-19 16:57:07'),
- ('6b2f777d9deb9bb0158e2e891dc07019',237,10000,'10.0.0.216','2009-04-19 17:49:34');
+ ('a91aad3431077e5f4206f4096c81f28b',237,10000,'10.0.0.216','2009-04-19 21:06:17'),
+ ('18c9f3e92e7596bdc38d73313fd827d5',259,10000,'10.0.0.216','2009-04-19 21:27:04');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_sessions` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_styles`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_styles`;
 CREATE TABLE  `nova_front`.`qo_styles` (
   `qo_members_id` int(11) unsigned NOT NULL default '0',
   `qo_groups_id` int(11) unsigned NOT NULL default '0',
@@ -470,6 +790,13 @@ CREATE TABLE  `nova_front`.`qo_styles` (
   `wallpaperposition` varchar(6) NOT NULL default 'center',
   PRIMARY KEY  (`qo_members_id`,`qo_groups_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_styles`
+--
+
+/*!40000 ALTER TABLE `qo_styles` DISABLE KEYS */;
+LOCK TABLES `qo_styles` WRITE;
 INSERT INTO `nova_front`.`qo_styles` VALUES  (232,9999,1,12,'ffffff','0',100,'center'),
  (231,1,1,12,'ffffff','0',100,'tile'),
  (200,1000,1,10,'f9f9f9','FCF8F8',100,'tile'),
@@ -495,7 +822,18 @@ INSERT INTO `nova_front`.`qo_styles` VALUES  (232,9999,1,12,'ffffff','0',100,'ce
 INSERT INTO `nova_front`.`qo_styles` VALUES  (254,10000,1,10,'ffffff','fcf8f8',100,'center'),
  (255,10000,1,10,'ffffff','fcf8f8',100,'center'),
  (256,10000,1,10,'ffffff','fcf8f8',100,'center'),
- (257,10000,1,10,'ffffff','fcf8f8',100,'center');
+ (257,10000,1,10,'ffffff','fcf8f8',100,'center'),
+ (258,10000,1,10,'ffffff','fcf8f8',100,'center'),
+ (259,10000,1,10,'ffffff','fcf8f8',100,'center');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_styles` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_themes`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_themes`;
 CREATE TABLE  `nova_front`.`qo_themes` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `name` varchar(25) default NULL COMMENT 'The display name',
@@ -506,9 +844,25 @@ CREATE TABLE  `nova_front`.`qo_themes` (
   `path_to_file` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_themes`
+--
+
+/*!40000 ALTER TABLE `qo_themes` DISABLE KEYS */;
+LOCK TABLES `qo_themes` WRITE;
 INSERT INTO `nova_front`.`qo_themes` VALUES  (1,'Vista Blue','Todd Murdock','0.8',NULL,'xtheme-vistablue/xtheme-vistablue.png','xtheme-vistablue/css/xtheme-vistablue.css'),
  (2,'Vista Black','Todd Murdock','0.8',NULL,'xtheme-vistablack/xtheme-vistablack.png','xtheme-vistablack/css/xtheme-vistablack.css'),
  (3,'Vista Glass','Todd Murdock','0.8',NULL,'xtheme-vistaglass/xtheme-vistaglass.png','xtheme-vistaglass/css/xtheme-vistaglass.css');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_themes` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`qo_wallpapers`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`qo_wallpapers`;
 CREATE TABLE  `nova_front`.`qo_wallpapers` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(25) default NULL COMMENT 'Display name',
@@ -518,6 +872,13 @@ CREATE TABLE  `nova_front`.`qo_wallpapers` (
   `path_to_file` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`qo_wallpapers`
+--
+
+/*!40000 ALTER TABLE `qo_wallpapers` DISABLE KEYS */;
+LOCK TABLES `qo_wallpapers` WRITE;
 INSERT INTO `nova_front`.`qo_wallpapers` VALUES  (1,'qWikiOffice','Todd Murdock',NULL,'thumbnails/qwikioffice.jpg','qwikioffice.jpg'),
  (2,'Colorado Farm',NULL,NULL,'thumbnails/colorado-farm.jpg','colorado-farm.jpg'),
  (3,'Curls On Green',NULL,NULL,'thumbnails/curls-on-green.jpg','curls-on-green.jpg'),
@@ -531,6 +892,15 @@ INSERT INTO `nova_front`.`qo_wallpapers` VALUES  (1,'qWikiOffice','Todd Murdock'
  (11,'Blue Psychedelic',NULL,NULL,'thumbnails/blue-psychedelic.jpg','blue-psychedelic.jpg'),
  (12,'Blue Curtain',NULL,NULL,'thumbnails/blue-curtain.jpg','blue-curtain.jpg'),
  (13,'Blank',NULL,NULL,'thumbnails/blank.gif','blank.gif');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `qo_wallpapers` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_front`.`templatemodule`
+--
+
+DROP TABLE IF EXISTS `nova_front`.`templatemodule`;
 CREATE TABLE  `nova_front`.`templatemodule` (
   `id` int(11) unsigned NOT NULL auto_increment,
   `firstName` varchar(25) default NULL,
@@ -540,6 +910,16 @@ CREATE TABLE  `nova_front`.`templatemodule` (
   `active` set('false','true') NOT NULL default 'false',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `nova_front`.`templatemodule`
+--
+
+/*!40000 ALTER TABLE `templatemodule` DISABLE KEYS */;
+LOCK TABLES `templatemodule` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `templatemodule` ENABLE KEYS */;
+
 
 
 

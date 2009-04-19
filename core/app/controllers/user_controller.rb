@@ -12,6 +12,8 @@ class UserController < ApplicationController
     end
 
   end
+  
+  
 
   # add a new user
   def add
@@ -33,6 +35,21 @@ class UserController < ApplicationController
       accept.json {render :json => result}
     end
 
+  end
+  
+  
+  # port for front
+  def info_vclusters
+    r = Helper.info params[:id]
+    result = []
+    r[:vclusters].each { |cid|
+      result << cid;
+      result << "Unnamed";
+    }
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
   end
 
   # add a virtual cluster to a user. the vcluster is already created

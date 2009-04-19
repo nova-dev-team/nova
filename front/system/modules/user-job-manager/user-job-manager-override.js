@@ -92,7 +92,7 @@ var vm_store = new Ext.data.JsonStore({
   root: 'all_vms',
 idProperty: 'vm_id',
 fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
-autoLoad:"True",
+//autoLoad:"True",
 			proxy: new Ext.data.HttpProxy({
 				url: '/connect.php?action=listVM&moduleId=user-job-manager'
 			})
@@ -141,6 +141,7 @@ autoLoad:"True",
 		var cluster_pane = new Ext.grid.GridPanel({
 			title : "Clusters",
 			region : "west",
+
 	store:cluster_store,
 			split : true,
 			loadMask: true,
@@ -161,18 +162,38 @@ autoLoad:"True",
 			
 			      cluster_store.reload();
 			      vm_store.removeAll();
-			      
-			      
-			      // XXX how to change the vmachine lists -> change the cid
-			      vm_store.proxy = new Ext.data.HttpProxy({
-				url: '/connect.php?action=listVM&moduleId=user-job-manager&cid=2'
-			})
-			      vm_store.reload();
+			   
 //			        cluster_pane.getView().refresh(true);
 //			        alert(3);
 			
 			}}]
 		});
+		
+		
+	
+	 function cluster_row_click() {
+
+
+   // XXX how to change the vmachine lists -> change the cid
+   
+    rows = cluster_pane.getSelectionModel().getSelections();
+
+      vm_store.proxy = new Ext.data.HttpProxy({
+				url: '/connect.php?action=listVM&moduleId=user-job-manager&cid=' + rows[0].data.cluster_id
+			});
+			      vm_store.reload();
+   
+			     
+}
+		
+		cluster_pane.addListener("rowclick", cluster_row_click);
+		
+		
+		function vm_row_click() {
+		  alert("TODO row click of vm list");
+}
+		
+		vm_pane.addListener("rowclick", vm_row_click);
 		
 		var right_pane = new Ext.Panel({
 			region: "center",

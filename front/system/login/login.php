@@ -103,8 +103,7 @@ if (class_exists('os')) {
 			}
 
       // now, contact the core to add a new user
-      $core_ip = "localhost:3000";
-      $core_reply = file_get_contents("http://" . $core_ip . "/user/add/" . $_REQUEST['email'] . "/" . $id);
+      $core_reply = file_get_contents("http://localhost:3000/user/add/" . $_REQUEST['email'] . "/" . $id);
 		
       // TODO check the result from core	
 		}

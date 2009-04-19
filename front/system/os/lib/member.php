@@ -125,6 +125,29 @@ class member {
 		
 		return $response;
 	}
+	
+	
+	// santa?
+	function get_email($id) {
+	  $response = '';
+		
+		if($id != ""){
+			// query the db for the members name
+			$sql = "SELECT
+				email_address as email
+				FROM
+				qo_members
+				WHERE
+				id = '".$id ."'";
+			
+			if(mysql_num_rows($result = mysql_query($sql)) > 0){
+				$row = mysql_fetch_assoc($result);
+				$response = $row['email'];
+			}
+		}
+		
+		return $response;
+}
 
 	
 	

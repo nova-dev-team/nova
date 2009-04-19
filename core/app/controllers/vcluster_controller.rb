@@ -53,6 +53,23 @@ class VclusterController < ApplicationController
       accept.json {render :json => result}
     end
   end
+  
+  # for front
+  def info_vm_list
+    r = Helper.info params[:id]
+    result = []
+    r[:vmachines].each { |vid|
+      result << vid
+      result << "ip = TODO"
+      result << "img = TODO"
+      result << "create on = TODO"
+    }
+
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
 
   # show detailed information about a virtual cluster
   def info

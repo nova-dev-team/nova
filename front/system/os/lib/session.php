@@ -41,8 +41,7 @@ class session {
 		$response = '';
 		
 		$session_id = $this->get_id();
-		
-		
+		
 		
 		if($session_id != ""){
 			
@@ -52,18 +51,49 @@ class session {
 				qo_sessions
 				where
 				id = '".$session_id."'";
+				
+				
+
 		
 
 				
 			if(mysql_num_rows($result = mysql_query($sql)) > 0){
 				$row = mysql_fetch_assoc($result);
 				$response = $row['id'];
+
 			}
 			
 		}
 		
 		return $response;
 	} // end get_member_id()
+	
+	
+	
+	// santa
+	
+	public function get_member_email() {
+		$response = '';
+
+		$member_id = $this->get_member_id();
+
+    if($member_id != ""){
+			// query the db for the members name
+			$sql = "SELECT
+				email_address as email
+				FROM
+				qo_members
+				WHERE
+				id = '".$member_id ."'";
+			
+			if(mysql_num_rows($result = mysql_query($sql)) > 0){
+				$row = mysql_fetch_assoc($result);
+				$response = $row['email'];
+			}
+		}
+		
+		return $response;
+	} 
 	
 	
 	

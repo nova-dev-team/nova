@@ -17,13 +17,29 @@ class UserJobManager {
 
 
   public function listCluster() {
-    $id = $this->os->session->get_member_id();
+  
+    $email = $this->os->session->get_member_email();
+    
+//echo $email;
+
+   $core_reply = file_get_contents("http://localhost:3000/user/info_vclusters/" . $email);
+ // echo $core_reply;
+  $lst = json_decode($core_reply);
+
+//  echo sizeof($lst);
+  
+/*  for ($i = 0; $i < sizeof($lst); $i++) {
+    echo $lst[$i];
+}*/
+//   $json = new Services_JSON();
+
+    echo "{'success':true, 'all_clusters':[";
     
     // XXX DUMMY CODE
     
-    if ($_REQUEST["cid"] == "") {
+ /*   if ($_REQUEST["cid"] == "") {
   
-    echo "{'success':true, 'all_clusters':[";
+
     
     $total = 6;
     for ($i = 0; $i < $total; $i++) {
@@ -34,14 +50,25 @@ class UserJobManager {
       }
     }
     
-    echo "]}";
-  }
+  }*/
+  
+  $total = sizeof($lst);
+//  echo $total;
+  for ($i = 0; $i < $total; $i += 2) {
+    echo "{'cluster_id' :  '" . $lst[$i] . "', cluster_name:'" . $lst[$i + 1] ."'}";
+if ($i < $total - 2) {
+  echo ',';
+}
+}
+  
+  
+      echo "]}";
 
   }
   
   
   public function addCluster() {
-  
+      
   }
   
    public function removeCluster() {
@@ -51,39 +78,26 @@ class UserJobManager {
 
 
 public function listVM() {
+    
+    $core_reply = file_get_contents("http://localhost:3000/vcluster/info_vm_list/" . $_REQUEST['cid']);
+    //echo $core_reply;
+    
+    $lst = json_decode($core_reply);
 
-
-
-  // XXX Dummy code  , will be removed
-  if ($_REQUEST["cid"] == "") {
-  
     echo "{'success':true, 'all_vms':[";
     
-    $total = 10;
-    for ($i = 0; $i < $total; $i++) {
-      echo "{'vm_id':'v" . $i ."', 'vm_ip':'1.2.3.4', 'vm_image':'ubuntu', 'create_time':'yesterday-once-more'}";
+    
+    $total = sizeof($lst);
+    for ($i = 0; $i < $total; $i+=4) {
+      echo "{'vm_id':'" . $lst[$i] ."', 'vm_ip':'" . $lst[$i + 1] . "', 'vm_image':'" . $lst[$i + 2] 
+        ."', 'create_time':'"  . $lst[$i + 3] . "'}";
       
-      if ($i < $total - 1) {
+      if ($i < $total - 4) {
         echo ",";
       }
     }
     
     echo "]}";
-  } else {
-  
-    echo "{'success':true, 'all_vms':[";
-    
-    $total = 8;
-    for ($i = 0; $i < $total; $i++) {
-      echo "{'vm_id':'XXv" . $i ."', 'vm_ip':'1.2.asdfasdf3.4', 'vm_image':'ubuntu', 'create_time':'yesterday-once-more'}";
-      
-      if ($i < $total - 1) {
-        echo ",";
-      }
-    }
-    
-    echo "]}";
-}
   
 }
 
