@@ -1,15 +1,50 @@
 
+
+
 Ext.override(QoDesk.UserJobManager, {
 
     createWindow : function(){
         var desktop = this.app.getDesktop();
         var win = desktop.getWindow('user-job-manager-win');
+
+        var dummyText = "This is a piece of dummy text.";
+        
+        Ext.Ajax.request({
+                url: '/connect.php',
+                params: {
+                    moduleId: 'user-job-manager',
+                    action: "dummyTest"
+                },
+                success: function(o){
+                    if (o && o.responseText && Ext.decode(o.responseText).success) {
+                      dummyText = "success: ";
+                    }
+                    else {
+                        dummyText = "Failure 1";
+                    }
+                    alert(dummyText + " : " + o.responseText);
+                },
+                failure: function(){
+                    dummyText = "Failure 2";
+                    alert(dummyText);
+                }
+                }
+        );
         
         var info_pane = new Ext.Panel({
           region : 'center',
            margins     : '3 0 3 3',
             cmargins    : '3 3 3 3',
-          html: "Detailed information goes here"
+            split : true,
+          html: /*"<div><applet archive='/vncviewer.jar' code='VncViewer.class' width='250' height='200'>"
+                + "<param name='PORT' value='5900' />"
+                + "<param name='ENCODING' value='tight' />"
+                + "<param name='Show controls' value='yes' />"
+                // FIXME how to set the vnc server?
+//                + "        <PARAM name='Server' value='10.0.0.196:0'>"
+                + "</applet> " + dummyText + "</div>"
+                */
+                dummyText
         });
         
         
@@ -61,7 +96,7 @@ Ext.override(QoDesk.UserJobManager, {
          var vm_pane = new Ext.grid.GridPanel({
                 region : "north",
                 store: store,
-                
+                split : true,
 				height: 200,
                 disableSelection: false,
                 loadMask: true,
@@ -125,7 +160,7 @@ Ext.override(QoDesk.UserJobManager, {
         
         var right_pane = new Ext.Panel({
         region: "center",
-        
+
           layout: 'border',
           items: [vm_pane, info_pane]
         })
