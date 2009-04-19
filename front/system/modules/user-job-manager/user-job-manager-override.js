@@ -32,7 +32,7 @@ Ext.override(QoDesk.UserJobManager, {
 			margins : '3 0 3 3',
 			cmargins : '3 3 3 3',
 			split : true,
-			html: "Pieces of dummy html code here"
+			html: "Select a virtual cluster, and choose one of its virtual machines to show the detail information."
 		});
 		
 		
@@ -241,14 +241,27 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 }
 		
 		cluster_pane.addListener("rowclick", cluster_row_click);
-		
-		
+				
 		function vm_row_click() {
 		//  alert("TODO row click of vm list");
-		
-		
-		
-		
+
+var html = "";
+
+
+rows = vm_pane.getSelectionModel().getSelections();
+
+    vmid = rows[0].data.vm_id;
+
+    
+    
+    rows2 = cluster_pane.getSelectionModel().getSelections();
+    
+    cid = rows2[0].data.cluster_id;
+
+
+  html = "TODO: detail of " + cid + ", " + vmid;
+
+	info_pane.body.update(html);
 		
 }
 		
