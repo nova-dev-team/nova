@@ -127,7 +127,61 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 				} , '-', {
 				text : "Select All"
 				}, '-' , {
-				text : "Observe"
+				text : "Observe",
+				
+				
+				handler: function() {
+				
+				
+				rows = vm_pane.getSelectionModel().getSelections();
+  
+       if (rows.length == 0) {
+       
+       alert("You need to select a vmachine first");
+      
+} else {
+
+    vmid = rows[0].data.vm_id;
+
+    
+    
+    rows2 = cluster_pane.getSelectionModel().getSelections();
+    
+    cid = rows2[0].data.cluster_id;
+
+
+
+			// for the vnc displays
+			
+			function createVNCwin(_cid, _vmid) {
+				desktop.createWindow({
+					id: 'vnc_vm_' + _cid + "_" + _vmid , // TODO  change the win name
+					title: "VNC of " + _cid + ", " + _vmid,
+					width: 700,
+					height: 550,
+					shim: false,
+					animeCollapse: false,
+					constrainHeader: true,
+					html : "<font color='red'>You might want to minimize other windows to get best using experience.</font><p><applet archive='/vncviewer.jar' code='VncViewer.class' width='640' height='480'><param name='PORT' value='5900' /><param name='ENCODING' value='tight' /><param name='Show controls' value='yes' /></applet>"
+				});
+			}
+
+
+      var vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
+			if (!vncwin) {
+        createVNCwin(cid, vmid);
+        vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
+        
+			}    
+			
+			vncwin.show(); // TODO show it
+			
+}
+
+				
+				
+				
+}
 			}, '-' ,{
 			  text: "Refresh",
 			  handler: function() {
@@ -190,7 +244,12 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 		
 		
 		function vm_row_click() {
-		  alert("TODO row click of vm list");
+		//  alert("TODO row click of vm list");
+		
+		
+		
+		
+		
 }
 		
 		vm_pane.addListener("rowclick", vm_row_click);
@@ -216,25 +275,7 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 				items: [right_pane, cluster_pane],
 				taskbuttonTooltip: '<b>Grid Window</b><br>A window with a grid'
 			});
-			// for the vnc displays
-			function createVNCwin() {
-				desktop.createWindow({
-					id: 'vnc_vm_' , // TODO  change the win name
-					title: "VNC",
-					width: 700,
-					height: 550,
-					shim: false,
-					animeCollapse: false,
-					constrainHeader: true,
-					html : "<font color='red'>You might want to minimize other windows to get best using experience.</font><p><applet archive='/vncviewer.jar' code='VncViewer.class' width='640' height='480'><param name='PORT' value='5900' /><param name='ENCODING' value='tight' /><param name='Show controls' value='yes' /></applet>"
-				});
-			}
-			var vncwin = desktop.getWindow('vnc_vm_');
-			if (!vncwin) {
-        createVNCwin();
-        vncwin = desktop.getWindow('vnc_vm_');
-				//vncwin.show();  TODO show it
-			}
+			
 		}
 		win.show();
 	}
