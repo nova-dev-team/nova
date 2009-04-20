@@ -153,25 +153,46 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 
 			// for the vnc displays
 			
-			function createVNCwin(_cid, _vmid) {
+			function createVNCwin(_cid, _vmid, _pmip) {
 				desktop.createWindow({
 					id: 'vnc_vm_' + _cid + "_" + _vmid , // TODO  change the win name
 					title: "VNC of " + _cid + ", " + _vmid,
-					width: 700,
-					height: 550,
+					width: 815,
+					height: 633,
+					minWidth: 640,
+					minHeight: 480,
 					shim: false,
+					margins : '0 0 0 0',
+					cmargins : '0 0 0 0',
 					animeCollapse: false,
 					constrainHeader: true,
-					html : "<font color='red'>You might want to minimize other windows to get best using experience.</font><p><applet archive='/vncviewer.jar' code='VncViewer.class' width='640' height='480'><param name='PORT' value='5900' /><param name='ENCODING' value='tight' /><param name='Show controls' value='yes' /></applet>"
+
+					
+					listeners: {
+					  resize: {
+					    fn: function() {
+					    
+					    var vncapp = Ext.get('crappyVNC');
+					    var sz = this.getSize();
+
+					    vncapp.dom.height = sz.height - 33;
+					    vncapp.dom.width = sz.width - 15;
+              }
+					  }
+					},
+					
+					
+					html : "<applet archive='http://"
+					+ _pmip
+					+ ":3000/vncviewer.jar' id='crappyVNC' code='VncViewer.class' width='800' height='600'><param name='PORT' value='5900' /><param name='ENCODING' value='tight' /><param name='HOST' value='10.0.0.196'><param name='Show controls' value='no' /></applet>"
 				});
 			}
 
 
       var vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
 			if (!vncwin) {
-        createVNCwin(cid, vmid);
+        createVNCwin(cid, vmid, "10.0.0.196");
         vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
-        
 			}    
 			
 			vncwin.show(); // TODO show it
