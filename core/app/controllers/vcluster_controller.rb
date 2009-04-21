@@ -1,10 +1,12 @@
 class VclusterController < ApplicationController
 
+  include VmachineHelper
+  include UserHelper
   include VclusterHelper
 
   # list all the virtual clusters
   def list
-    result = Helper.list
+    result = VclusterHelper::Helper.list
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -14,7 +16,7 @@ class VclusterController < ApplicationController
 
   # create a new virtual cluster
   def create
-    result = Helper.create
+    result = VclusterHelper::Helper.create params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -24,7 +26,7 @@ class VclusterController < ApplicationController
 
   # delete a vcluster, only when it is empty
   def delete
-    result = Helper.delete params[:id]
+    result = VclusterHelper::Helper.delete params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -35,7 +37,7 @@ class VclusterController < ApplicationController
   # register a virtual machine to a virtual cluster
   # the virtual cluster must NOT be running when doing this (is it necessary?)
   def add_vmachine
-    result = Helper.add_vmachine params[:id], params[:arg]
+    result = VclusterHelper::Helper.add_vmachine params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -46,7 +48,18 @@ class VclusterController < ApplicationController
   # remove a virtual machine from a virtual cluster
   # the virtual cluster must NOT be running when doing this (it will be checked)
   def remove_vmachine
-    result = Helper.remove_vmachine params[:id], params[:arg]
+    result = VclusterHelper::Helper.remove_vmachine params[:id], params[:arg]
+
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
+
+  # remove a vmachine from any vcluster
+  def remove_vmachine_ex
+    v = Vmachine.find_by_id params[:id][1..-1]
+    result = VclusterHelper::Helper.remove_vmachine "c#{v.vcluster.id}", params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -56,7 +69,7 @@ class VclusterController < ApplicationController
   
   # for front
   def info_vm_list
-    r = Helper.info params[:id]
+    r = VclusterHelper::Helper.info params[:id]
     result = []
     r[:vmachines].each { |vid|
       result << vid
@@ -73,13 +86,49 @@ class VclusterController < ApplicationController
 
   # show detailed information about a virtual cluster
   def info
-    result = Helper.info params[:id]
+    result = VclusterHelper::Helper.info params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
     end
   end
+
+  # create a vcluster and add to an user
+  def create_and_add_to
+    r = VclusterHelper::Helper.create params[:arg]
+    r2 = UserHelper::Helper.add_vcluster params[:id], r[:vcluster_cid]
+    result = {}
+    result[:msg] = r[:msg] + "\n" + r2[:msg]
+    if (r2[:success] and r[:success]) then
+      result[:success] = true
+    else
+      result[:success] = false
+    end
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
+
+
+  # create a new vmachine and add to this vcluster
+  def add_new_vm
+    r = VmachineHelper::Helper.create
+    r2 = VclusterHelper::Helper.add_vmachine params[:id], r[:vmachine_vid]
+    result = {}
+    result[:msg] = r[:msg] + "\n" + r2[:msg]
+    if (r[:success] and r2[:success]) then
+      result[:success] = true
+    else
+      result[:success] = false
+    end
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :jons => result}
+    end
+  end
+
 
 end
 

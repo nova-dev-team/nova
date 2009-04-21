@@ -34,7 +34,8 @@ ActiveRecord::Schema.define(:version => 20090417054023) do
   end
 
   create_table "vclusters", :force => true do |t|
-    t.integer  "user_id",    :limit => 11
+    t.integer  "user_id",       :limit => 11
+    t.string   "vcluster_name",               :default => "#unnamed#"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

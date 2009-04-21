@@ -32,7 +32,7 @@ CREATE TABLE  `nova_front`.`currentlyloggedin` (
   `member_id` varchar(45) NOT NULL,
   `group_id` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`currentlyloggedin`
@@ -41,8 +41,8 @@ CREATE TABLE  `nova_front`.`currentlyloggedin` (
 /*!40000 ALTER TABLE `currentlyloggedin` DISABLE KEYS */;
 LOCK TABLES `currentlyloggedin` WRITE;
 INSERT INTO `nova_front`.`currentlyloggedin` VALUES  (10,'6d51c3c6ec21dc91c5b488900938ef94','232','10'),
- (21,'a91aad3431077e5f4206f4096c81f28b','237','10000'),
- (23,'18c9f3e92e7596bdc38d73313fd827d5','259','10000');
+ (31,'37a2e6dd5621b36ab9c5d0ef5acadf4d','200','1000'),
+ (46,'bb57512d3dcf55a9d5d2ff67f3c88bb4','259','10000');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `currentlyloggedin` ENABLE KEYS */;
 
@@ -315,7 +315,8 @@ INSERT INTO `nova_front`.`qo_groups_has_members` VALUES  (1,231,1,1),
  (10000,256,1,0),
  (10000,257,1,0),
  (10000,258,1,0),
- (10000,259,1,0);
+ (10000,259,1,0),
+ (10000,260,1,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_groups_has_members` ENABLE KEYS */;
 
@@ -359,7 +360,7 @@ CREATE TABLE  `nova_front`.`qo_members` (
   `language` varchar(5) default 'en',
   `active` tinyint(1) unsigned NOT NULL default '0' COMMENT 'Is the member currently active',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=260 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=261 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`qo_members`
@@ -392,7 +393,8 @@ INSERT INTO `nova_front`.`qo_members` VALUES  (254,'bigman','bigman','bigman','b
  (256,'llllllllll','llllllllll','llllllllll','llllllllll','en',1),
  (257,'nvida','nvida','nvida','nvida','en',1),
  (258,'macjohn','macjohn','macjohn','macjohn','en',1),
- (259,'misamisa','misamisa','misamisa','misamisa','en',1);
+ (259,'misamisa','misamisa','misamisa','misamisa','en',1),
+ (260,'Johyb','Johyb','Johyb','Johyb','en',1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_members` ENABLE KEYS */;
 
@@ -477,7 +479,11 @@ INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (248,10000,10
  (256,10000,105,4,0),
  (257,10000,105,4,0),
  (258,10000,105,4,0),
- (259,10000,105,4,0);
+ (259,10000,105,4,0),
+ (260,10000,105,4,0),
+ (259,10000,104,3,0),
+ (259,10000,2,3,1),
+ (259,10000,105,3,2);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_members_has_module_launchers` ENABLE KEYS */;
 
@@ -768,8 +774,17 @@ CREATE TABLE  `nova_front`.`qo_sessions` (
 /*!40000 ALTER TABLE `qo_sessions` DISABLE KEYS */;
 LOCK TABLES `qo_sessions` WRITE;
 INSERT INTO `nova_front`.`qo_sessions` VALUES  ('6d51c3c6ec21dc91c5b488900938ef94',232,10,'10.0.0.216','2009-04-17 17:14:27'),
- ('a91aad3431077e5f4206f4096c81f28b',237,10000,'10.0.0.216','2009-04-19 21:06:17'),
- ('18c9f3e92e7596bdc38d73313fd827d5',259,10000,'10.0.0.216','2009-04-19 21:27:04');
+ ('c031452b5b691fb98d843a67558c11f8',259,10000,'10.0.0.216','2009-04-20 10:48:28'),
+ ('e972aabd58799167c8bf68fdc5c92005',259,10000,'10.0.0.216','2009-04-19 23:59:41'),
+ ('4bda8101595fbd945f9a56ab80ee7b78',259,10000,'10.0.0.216','2009-04-20 10:42:46'),
+ ('76e5e0297238fa608f759fa5f178f3a4',259,10000,'10.0.0.216','2009-04-20 00:00:06'),
+ ('37a2e6dd5621b36ab9c5d0ef5acadf4d',200,1000,'10.0.0.216','2009-04-20 00:01:37'),
+ ('a18d7bf915e4a8223c228855b3cc3713',259,10000,'10.0.0.216','2009-04-20 00:01:19'),
+ ('5663ef3d793ffc0e9b45455b593a71c7',259,10000,'10.0.0.216','2009-04-20 21:42:50'),
+ ('6168a84d755c16fb08a63103603b877a',259,10000,'10.0.0.216','2009-04-20 11:01:01'),
+ ('f7bf945f33941ee631ac8fad0e5c0fcf',259,10000,'10.0.0.216','2009-04-20 12:25:45'),
+ ('bb57512d3dcf55a9d5d2ff67f3c88bb4',259,10000,'127.0.0.1','2009-04-21 23:32:01'),
+ ('a06ca950014372a6fc55132ec091b9cc',259,10000,'10.0.0.192','2009-04-21 15:51:48');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_sessions` ENABLE KEYS */;
 
@@ -824,7 +839,8 @@ INSERT INTO `nova_front`.`qo_styles` VALUES  (254,10000,1,10,'ffffff','fcf8f8',1
  (256,10000,1,10,'ffffff','fcf8f8',100,'center'),
  (257,10000,1,10,'ffffff','fcf8f8',100,'center'),
  (258,10000,1,10,'ffffff','fcf8f8',100,'center'),
- (259,10000,1,10,'ffffff','fcf8f8',100,'center');
+ (259,10000,1,10,'ffffff','fcf8f8',100,'center'),
+ (260,10000,1,10,'ffffff','fcf8f8',100,'center');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_styles` ENABLE KEYS */;
 

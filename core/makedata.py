@@ -26,9 +26,10 @@ def invoke(rest):
 invoke('user/add/santa')
 invoke('user/add/jiong')
 invoke('user/add/rocks')
+invoke('user/add/misamisa')
 invoke('user/list')
 
-invoke('vcluster/create') # create c1
+invoke('vcluster/create/mika') # create c1
 invoke('vcluster/create') # create c2
 invoke('vcluster/create') # create c3
 invoke('vcluster/list')
@@ -42,6 +43,8 @@ invoke('vmachine/create') # create v1
 invoke('vmachine/create') # create v2
 invoke('vmachine/create') # create v3
 invoke('vmachine/list')
+
+invoke('')
 
 # hosting function is not to be used
 #invoke('pmachine/host_vmachine/10.0.2.3/v1')

@@ -53,7 +53,9 @@ module UserHelper
 
       else # user exists
         vc_list = []
-        user.vclusters.each {|vcluster| vc_list << "c#{vcluster.id}"}
+        user.vclusters.each {|vcluster| vc_list << {:cid => "c#{vcluster.id}",
+          :name => vcluster.vcluster_name
+        }}
 
         result[:success] = true
         result[:email] = user_email

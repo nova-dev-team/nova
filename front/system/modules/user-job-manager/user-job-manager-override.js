@@ -1,32 +1,9 @@
 Ext.override(QoDesk.UserJobManager, {
+
 	createWindow : function(){
+	
 		var desktop = this.app.getDesktop();
 		var win = desktop.getWindow('user-job-manager-win');
-
-		/*
-		Ext.Ajax.request({
-			url: '/connect.php',
-			params: {
-				moduleId: 'user-job-manager',
-				action: "dummyTest"
-			},
-			success: function(o){
-				if (o && o.responseText && Ext.decode(o.responseText).success) {
-					dummyText = "success: ";
-				}
-				else {
-					dummyText = "Failure 1";
-				}
-				//alert(dummyText + " : " + o.responseText);
-			},
-			failure: function(){
-				dummyText = "Failure 2";
-				// alert(dummyText);
-			}
-		}
-		);
-		*/
-		
 		var info_pane = new Ext.Panel({
 			region : 'center',
 			margins : '3 0 3 3',
@@ -34,7 +11,6 @@ Ext.override(QoDesk.UserJobManager, {
 			split : true,
 			html: "Select a virtual cluster, and choose one of its virtual machines to show the detail information."
 		});
-		
 		
 		var vm_cm = new Ext.grid.ColumnModel([{
 			header: "Vmachine ID",
@@ -111,45 +87,271 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 			tbar: [{
 				text:'New',
 				tooltip:'Add a new row',
-				iconCls:'demo-grid-add'
+				iconCls:'demo-grid-add',
+				
+				
+// Add a new vm
+handler: function() {
+
+
+var rows = cluster_pane.getSelectionModel().getSelections();
+if (rows.length == 0) {
+  alert("Select a cluster first!");
+  return;
+}
+
+  var cluster_cid = rows[0].data.cluster_id;
+
+
+
+
+
+
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "newVM",
+      vcluster_cid: cluster_cid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+          vm_store.reload();
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+  
+
+
+				
+}
 				}, {
 				text:'Remove',
 				tooltip:'Remove the selected item',
-				iconCls:'demo-grid-remove'
+				iconCls:'demo-grid-remove',
+
+// rm an vm
+handler: function() {
+
+
+var rows = vm_pane.getSelectionModel().getSelections();
+if (rows.length == 0) {
+  alert("Select a vmachine first!");
+  return;
+}
+
+  var vid = rows[0].data.vm_id;
+
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "removeVM",
+      vm_vid: vid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+          vm_store.reload();
+          
+          // TODO change the info pane
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+
+				
+}
+
 				} ,'-', {
-				text : "Start"
+				text : "Start",
+
+// start an vm
+handler: function() {
+
+
+var rows = vm_pane.getSelectionModel().getSelections();
+if (rows.length == 0) {
+  alert("Select a vmachine first!");
+  return;
+}
+
+  var vid = rows[0].data.vm_id;
+
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "startVM",
+      vm_vid: vid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+          alert(Ext.decode(o.responseText).msg);
+          
+          // TODO change the info pane
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+
+				
+}
 				} , {
-				text : "Stop"
+				text : "Stop",
+
+// stop an vm
+handler: function() {
+
+
+var rows = vm_pane.getSelectionModel().getSelections();
+if (rows.length == 0) {
+  alert("Select a vmachine first!");
+  return;
+}
+
+  var vid = rows[0].data.vm_id;
+
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "stopVM",
+      vm_vid: vid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+                 alert(Ext.decode(o.responseText).msg);
+          
+          // TODO change the info pane
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+
+				
+}
 				} , {
-				text : "Pause"
+				text : "Pause",
+
+// rm an vm
+handler: function() {
+
+
+var rows = vm_pane.getSelectionModel().getSelections();
+if (rows.length == 0) {
+  alert("Select a vmachine first!");
+  return;
+}
+
+  var vid = rows[0].data.vm_id;
+
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "pauseVM",
+      vm_vid: vid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+                   alert(Ext.decode(o.responseText).msg);
+          
+          // TODO change the info pane
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+
+				
+}
 				} , {
-				text : "Resume"
+				text : "Resume",
+
+// rm an vm
+handler: function() {
+
+
+var rows = vm_pane.getSelectionModel().getSelections();
+if (rows.length == 0) {
+  alert("Select a vmachine first!");
+  return;
+}
+
+  var vid = rows[0].data.vm_id;
+
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "resumeVM",
+      vm_vid: vid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+                   alert(Ext.decode(o.responseText).msg);
+          
+          // TODO change the info pane
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+
+				
+}
 				} , '-', {
 				text : "Select All"
 				}, '-' , {
 				text : "Observe",
-				
-				
 				handler: function() {
-				
-				
-				rows = vm_pane.getSelectionModel().getSelections();
-  
-       if (rows.length == 0) {
+  				rows = vm_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
        
-       alert("You need to select a vmachine first");
+           alert("You need to select a vmachine first");
       
-} else {
+        } else {
 
-    vmid = rows[0].data.vm_id;
+          vmid = rows[0].data.vm_id;
 
+          rows2 = cluster_pane.getSelectionModel().getSelections();
     
-    
-    rows2 = cluster_pane.getSelectionModel().getSelections();
-    
-    cid = rows2[0].data.cluster_id;
-
-
+          cid = rows2[0].data.cluster_id;
 
 			// for the vnc displays
 			
@@ -198,16 +400,13 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 			vncwin.show(); // TODO show it
 			
 }
-
-				
-				
-				
-}
+	
+        }
 			}, '-' ,{
 			  text: "Refresh",
 			  handler: function() {
 			    vm_store.reload();
-}
+        }
 			}
 			]
 		});
@@ -227,16 +426,99 @@ fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
 			tbar: [{
 				text:'New',
 				tooltip:'Add a new row',
-				iconCls:'demo-grid-add'
+				iconCls:'demo-grid-add',
+				
+// XXX add cluster
+handler:function() {
+  
+  // TODO choose cluster name
+  
+
+  
+  var cluster_name = "test-TODO";
+  
+  
+  Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "addCluster",
+      vcluster_name: cluster_name 
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+            cluster_store.reload();
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+  
+  
+  
+}
+
 				}, '-', {
 				text:'Remove',
 				tooltip:'Remove the selected item',
-				iconCls:'demo-grid-remove'
+				iconCls:'demo-grid-remove',
+
+// XXX remove grid
+handler:function() {
+
+
+var rows = cluster_pane.getSelectionModel().getSelections();
+if (rows.length == 0) {
+  alert("Select a cluster first!");
+  return;
+}
+
+
+  var cluster_cid = rows[0].data.cluster_id;
+
+  Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "removeCluster",
+     vcluster_cid: cluster_cid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+            cluster_store.reload();
+            vm_store.removeAll();
+			      
+			      vm_store.proxy = new Ext.data.HttpProxy({
+		    		  url: '/connect.php?action=listVM&moduleId=user-job-manager'
+    			});
+            
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+  
+}
+
 			},'-', {text:'Refresh', handler:function(){
 			
 			
 			      cluster_store.reload();
 			      vm_store.removeAll();
+			      
+			      vm_store.proxy = new Ext.data.HttpProxy({
+				url: '/connect.php?action=listVM&moduleId=user-job-manager'
+			});
 			   
 //			        cluster_pane.getView().refresh(true);
 //			        alert(3);
@@ -280,9 +562,37 @@ rows = vm_pane.getSelectionModel().getSelections();
     cid = rows2[0].data.cluster_id;
 
 
-  html = "TODO: detail of " + cid + ", " + vmid;
 
-	info_pane.body.update(html);
+
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "infoVM",
+     vm_id: vmid
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+            // refresh
+           
+    			
+    			html = "TODO: detail of " + cid + ", " + vmid;
+    			
+    			html += "server: " + Ext.decode(o.responseText).info;
+  
+          	info_pane.body.update(html);
+            
+        }
+        else {
+            // TODO when create failed
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+    }
+  });
+
+  
 		
 }
 		

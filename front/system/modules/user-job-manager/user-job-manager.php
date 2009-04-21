@@ -68,13 +68,60 @@ if ($i < $total - 2) {
   
   
   public function addCluster() {
-      
+    $email = $this->os->session->get_member_email();
+    $core_reply = file_get_contents("http://localhost:3000/vcluster/create_and_add_to/" .   $email.'/'.  $_REQUEST['vcluster_name']);
+
+    echo $core_reply;
   }
   
-   public function removeCluster() {
-   
-   
-}
+  public function removeCluster() {
+    $email = $this->os->session->get_member_email();
+    $core_reply = file_get_contents("http://localhost:3000/user/remove_vcluster/" . $email. '/' . $_REQUEST['vcluster_cid']);
+    echo $core_reply;
+  }
+  
+  
+  public function newVM() {
+    
+    $core_reply = file_get_contents("http://localhost:3000/vcluster/add_new_vm/" . $_REQUEST['vcluster_cid']);
+
+    echo $core_reply;
+  }
+  
+  public function removeVM() {
+    $core_reply = file_get_contents("http://localhost:3000/vcluster/remove_vmachine_ex/" . $_REQUEST['vm_vid']);
+    echo $core_reply;
+  }
+  
+  
+    public function startVM() {
+    echo "{success:true, msg:'start'}";
+        // TODO
+  }
+  
+  
+  
+    public function stopVM() {
+    echo "{success:true, msg:'stop'}";
+        // TODO
+  }
+  
+  
+    public function pauseVM() {
+    echo "{success:true, msg:'pause'}";
+        // TODO
+  }
+  
+    public function resumeVM() {
+    echo "{success:true, msg:'resume'}";
+        // TODO
+  }
+  
+    public function infoVM() {
+    
+    echo "{success:true, info:'info-from-server, hello "   . $_REQUEST['vm_id']  ."'}"; // TODO
+
+  }
 
 
 public function listVM() {

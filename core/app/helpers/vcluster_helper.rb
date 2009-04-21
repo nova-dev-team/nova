@@ -5,14 +5,18 @@ module VclusterHelper
     # list all the vclusters
     def Helper.list
       list = []
-      Vcluster.all.each {|vcluster| list << "c#{vcluster.id}"}
+      Vcluster.all.each do |vcluster|
+        list << "c#{vcluster.id}"
+        list << vcluster.vcluster_name
+      end
       return list
     end
 
     # create a new cluster
-    def Helper.create
+    def Helper.create name
       result = {}
       vcluster = Vcluster.new
+      vcluster.vcluster_name = name if name != nil && name.length > 1
 
       if vcluster.save # if successfully saved
         result[:success] = true

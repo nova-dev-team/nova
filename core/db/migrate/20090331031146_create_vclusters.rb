@@ -2,6 +2,7 @@ class CreateVclusters < ActiveRecord::Migration
   def self.up
     create_table :vclusters do |t|
       t.column "user_id", :integer
+      t.column "vcluster_name", :string, :default => "#unnamed#"   # the name of the cluster
       t.timestamps
     end
   end

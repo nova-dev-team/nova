@@ -20,8 +20,8 @@ Ext.onReady(function(){
         }
     });
     
-    Ext.get("field3-label").setDisplayed('none');
-    Ext.get("field3").setDisplayed('none');
+//    Ext.get("field3-label").setDisplayed('none');
+//    Ext.get("field3").setDisplayed('none');
     
     centerPanel();
     
@@ -80,8 +80,8 @@ Ext.onReady(function(){
         var email = emailField.dom.value;
         var pwdField = Ext.get("field2");
         var pwd = pwdField.dom.value;
-        var groupField = Ext.get("field3");
-        var group = groupField.dom.value;
+//        var groupField = Ext.get("field3");
+  //      var group = groupField.dom.value;
         
         if (validate(email) === false) {
             emailField.addClass('qo-invalid-textarea');
@@ -102,8 +102,8 @@ Ext.onReady(function(){
             params: {
                 module: 'login',
                 user: email,
-                pass: pwd,
-                group: group
+                pass: pwd
+//                ,group: group
             },
             success: function(o){
                 loginPanel.unmask();
