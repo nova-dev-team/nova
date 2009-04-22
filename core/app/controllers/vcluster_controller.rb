@@ -71,11 +71,15 @@ class VclusterController < ApplicationController
   def info_vm_list
     r = VclusterHelper::Helper.info params[:id]
     result = []
-    r[:vmachines].each { |vid|
-      result << vid
-      result << "ip = TODO"
-      result << "img = TODO"
-      result << "create on = TODO"
+    r[:vmachines].each { |vinfo|
+      result << vinfo[:vid]
+      if vinfo[:ip]
+        result << vinfo[:ip]
+      else
+        result << "NOT DEPLOYED"
+      end
+      result << vinfo[:vimage_name]
+      result << vinfo[:status]
     }
 
     respond_to do |accept|

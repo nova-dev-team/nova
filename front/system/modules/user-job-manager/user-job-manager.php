@@ -119,7 +119,7 @@ if ($i < $total - 2) {
   
     public function infoVM() {
     
-    echo "{success:true, info:'info-from-server, hello "   . $_REQUEST['vm_id']  ."'}"; // TODO
+    echo "{success:true, info:'TODO: Detail info of "   . $_REQUEST['vm_id']  .".'}"; // TODO
 
   }
 

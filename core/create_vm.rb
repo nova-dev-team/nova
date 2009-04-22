@@ -5,7 +5,7 @@ require 'uuidtools'
 require 'optparse'
 require 'ostruct'
 require 'pp'
-require 'REXML/Document'
+#require 'REXML/Document'
 
 
 $VERSION = 'version 2, support 5btc'
@@ -167,7 +167,8 @@ xml += <<EOF
 EOF
 
 if options.verbose
-  REXML::Document.new(xml).write $stdout
+#  REXML::Document.new(xml).write $stdout
+  pp xml
 end
 
 url = 'http://' + options.server + ':' + options.port + '/x/create'

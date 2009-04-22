@@ -155,7 +155,16 @@ module VclusterHelper
         result[:vcluster_cid] = "c#{vcluster.id}"
 
         vmachine_list = []
-        vcluster.vmachines.each {|vmachine| vmachine_list << "v#{vmachine.id}"}
+        vcluster.vmachines.each do |vmachine|
+          info_map = { :vid => "v#{vmachine.id}",
+              :ip => vmachine.ip,
+              :status => vmachine.status
+            }
+          info_map[:vimage_name] = "Unknown sys image"
+          info_map[:vimage_name] = vmachine.vimage.location if vmachine.vimage != nil
+          vmachine_list << info_map
+
+        end
 
         if vcluster.user != nil
           result[:user] = vcluster.user.email

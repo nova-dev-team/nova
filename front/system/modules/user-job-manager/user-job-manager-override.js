@@ -574,12 +574,8 @@ Ext.Ajax.request({
     success: function(o){
         if (o && o.responseText && Ext.decode(o.responseText).success) {
             // refresh
-           
-    			
-    			html = "TODO: detail of " + cid + ", " + vmid;
-    			
-    			html += "server: " + Ext.decode(o.responseText).info;
-  
+          
+    			html = Ext.decode(o.responseText).info;
           	info_pane.body.update(html);
             
         }
