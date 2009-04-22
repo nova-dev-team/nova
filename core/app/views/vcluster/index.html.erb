@@ -106,9 +106,9 @@ function show_vcluster(vcluster_cid) {
       html += "<p>Vcluster cid: " + result.vcluster_cid + "<p>";
       html += "Vcluster vmachines list:<br>";
       for (i = 0; i < result.vmachines.length; i++) {
-        html += "<a class='vm_link' href='/vmachine#" + result.vmachines[i] + "'>" + result.vmachines[i] + "</a> "
+        html += "<a class='vm_link' href='/vmachine#" + result.vmachines[i].vid + "'>" + result.vmachines[i].vid + "</a> "
               + "<a class='remove_link' href='#' onclick=\"remove_vmachine('" + vcluster_cid
-              + "', '" + result.vmachines[i] + "')\">remove!</a><br>";
+              + "', '" + result.vmachines[i].vid + "')\">remove!</a><br>";
       }
       html += "<p>Existing vmachine vid: <input type='text' name='input_vid'>"
             +"<a href='#' class='add_link' onclick='add_vmachine(\""
@@ -136,8 +136,11 @@ function refresh_cid_list() {
   cid_list.empty();
   $.getJSON("/vcluster/list",
     function(result) {
-      for (i = 0; i < result.length; i++) {
-        var html = "<a href='#' class='cid_item' onclick='show_vcluster(\"" + result[i] + "\")'>" + result[i] + "</a></br>"
+      for (i = 0; i < result.length; i+=2) {
+        var html = "<a href='#' class='cid_item' onclick='show_vcluster(\"" + result[i] + "\")'>" + result[i] + "</a>  (" +
+        
+              result[i+1]
+         + ")</br>"
                 /*+ "<a href='#' class='remove_link' onclick='delete_vcluster(\"" + result[i] + "\")'>delete!</a><br>";*/
         cid_list.append(html);
       }

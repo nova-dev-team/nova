@@ -98,9 +98,9 @@ function show_info(user_name) {
     function(result) {
       var html = "User email: " + result.email + "<p>User's vcluster list:<p>";
       for (i = 0; i < result.vclusters.length; i++) {
-        html += "<a class='vcluster_link' href='/vcluster#" + result.vclusters[i] + "'>" + result.vclusters[i]
-              + "</a> <a class='remove_link' href='#' onclick=\"remove_vcluster('"
-              + user_name + "', '" + result.vclusters[i] + "')\">remove!</a><br>";
+        html += "<a class='vcluster_link' href='/vcluster#" + result.vclusters[i].cid + "'>" + result.vclusters[i].cid
+              + "</a>  (" + result.vclusters[i].name +  ") <a class='remove_link' href='#' onclick=\"remove_vcluster('"
+              + user_name + "', '" + result.vclusters[i].cid + "')\">remove!</a><br>";
       }
       html += "<p><a href='#' class='add_link' onclick=\"add_new_vcluster('" + user_name + "')\">Add new vcluster</a><br>"
             + "Existing vcluster cid: <input type='text' name='vcluster_cid'>"

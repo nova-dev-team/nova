@@ -29,9 +29,9 @@ Ext.override(QoDesk.UserJobManager, {
 			//renderer: renderEmail,
 			sortable: true
 			}, {
-			header: "Created on",
+			header: "Status",
 			width: 120,
-			dataIndex: 'create_time',
+			dataIndex: 'status',
 			sortable: true,
 		}]);
 		
@@ -67,7 +67,7 @@ Ext.override(QoDesk.UserJobManager, {
 var vm_store = new Ext.data.JsonStore({
   root: 'all_vms',
 idProperty: 'vm_id',
-fields: ["vm_id", "vm_ip", "vm_image", "create_time"],
+fields: ["vm_id", "vm_ip", "vm_image", "status"],
 //autoLoad:"True",
 			proxy: new Ext.data.HttpProxy({
 				url: '/connect.php?action=listVM&moduleId=user-job-manager'
@@ -335,9 +335,16 @@ Ext.Ajax.request({
 
 				
 }
-				} , '-', {
+				} ,
+				
+				/*
+				'-', {
 				text : "Select All"
-				}, '-' , {
+				},  
+				*/
+				
+				
+				'-' , {
 				text : "Observe",
 				handler: function() {
   				rows = vm_pane.getSelectionModel().getSelections();

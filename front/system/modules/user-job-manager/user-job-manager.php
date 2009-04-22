@@ -137,7 +137,7 @@ public function listVM() {
     $total = sizeof($lst);
     for ($i = 0; $i < $total; $i+=4) {
       echo "{'vm_id':'" . $lst[$i] ."', 'vm_ip':'" . $lst[$i + 1] . "', 'vm_image':'" . $lst[$i + 2] 
-        ."', 'create_time':'"  . $lst[$i + 3] . "'}";
+        ."', 'status':'"  . $lst[$i + 3] . "'}";
       
       if ($i < $total - 4) {
         echo ",";
