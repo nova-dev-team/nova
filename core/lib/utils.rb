@@ -1,35 +1,45 @@
 
 module Utils
+  require 'rubygems'
   require 'uuidtools'
 
   class IPCalc
-    def initialize(ip, mask)
+
+    def self.int2ip(ip)
+      [24, 16, 8, 0].collect {|b| (ip >> b) & 255}.join('.')
+    end
+
+    def self.gen_mac(ip, mac54='54:7E')
+      mac54 + ':' + ip.split('.').inject { |p, x|
+        p += ":" + ("%02x" % x.to_i)
+      }
+    end
+
+    def initialize(ip, mask, mac54='54:7E')
       @ip = ip.split('.').inject(0) {|total,value| (total << 8 ) + value.to_i}
       @mask = mask
+      @mac54 = mac54
     end
 
     def value
-      return _int2ip
+      return(IPCalc.int2ip(@ip))
+    end
+
+    def mask
+      IPCalc.int2ip(0b11111111111111111111111111111111 << (32 - @mask))
     end
 
     def next
       @ip += 1
-      return _int2ip
+      return IPCalc.int2ip(@ip)
     end
 
-    def _int2ip()
-      [24, 16, 8, 0].collect {|b| (@ip >> b) & 255}.join('.')
+    def mac
+      IPCalc.gen_mac value(), @mac54
     end
-  end
-
-  def self.gen_mac(mac54, ip)
-    mac54 + ip.split('.').inject { |p, x|
-      p += ":" + ("%02x" % x.to_i)
-    }
   end
 
   class KvmXml
-    MAC54 = '00:FF'
 
     def initialize(args = {})
       @vm = {}
@@ -37,15 +47,24 @@ module Utils
       @vm[:uuid] = UUID.random_create.to_s
       @vm[:image] = 'os100m.img'
       @vm[:ip] = '10.0.3.1'
-      @vm[:mem] = '512'
+      @vm[:mem] = 512
       @vm[:vcpu] = 1
+      @vm[:bridge] = 'br0'
 
       args.each_pair do |k, v|
         @vm[k] = v
       end
 
-      @vm[:mac] = Utils.gen_mac(MAC54, @vm[:ip])
+      @vm[:mac] = Utils::IPCalc.gen_mac(@vm[:ip])
 
+    end
+
+    def bridge
+      @vm[:bridge]
+    end
+
+    def bridge=(bridge)
+      @vm[:bridge] = bridge
     end
 
     def name
@@ -122,8 +141,20 @@ xml = xml.rstrip
 xml += @vm[:uuid]
 xml += <<EOF
 </uuid>
-  <memory>512072</memory>
-  <vcpu>1</vcpu>
+  <memory>
+EOF
+
+xml = xml.rstrip
+xml += @vm[:mem].to_s
+xml += <<EOF
+</memory>
+  <vcpu>
+EOF
+
+xml = xml.rstrip
+xml += @vm[:vcpu].to_s
+xml += <<EOF
+</vcpu>
   <os>
     <type arch='i686'>hvm</type>
   </os>
@@ -141,7 +172,12 @@ xml += <<EOF
       <target dev='hda'/>
     </disk>
     <interface type='bridge'>
-      <source bridge='br0'/>
+      <source bridge='
+EOF
+xml = xml.rstrip
+xml += @vm[:bridge]
+xml += <<EOF
+'/>
       <mac address='
 EOF
 
@@ -157,4 +193,6 @@ EOF
 
     end
   end
+
+
 end
