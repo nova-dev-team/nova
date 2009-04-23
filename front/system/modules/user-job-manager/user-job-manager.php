@@ -95,7 +95,8 @@ if ($i < $total - 2) {
   
   
     public function startVM() {
-    echo "{success:true, msg:'start'}";
+//    echo "{success:true, msg:'start'}";
+    $core_reply = file_get_contents("http://localhost:3000/vmachine/start/" . $email. '/' . $_REQUEST['vcluster_cid']);
         // TODO
   }
   

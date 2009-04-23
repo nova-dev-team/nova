@@ -3,6 +3,7 @@ module VmachineHelper
   require 'uri'
   require 'net/http'
   require 'uuidtools'
+  require 'utils'
 
   include PmachineHelper
 
@@ -132,50 +133,16 @@ module VmachineHelper
             sub_result = PmachineHelper::Helper.host_vmachine hosting_pmachine.ip, "v#{vmachine.id}"
 
             if sub_result[:success] # successfully deployed pmachine
-              # TODO send control to pmon on corresponding pmachine
               
-create_xml = <<EOF
-<domain type='kvm'>
-  <name>
-EOF
-
-create_xml = create_xml.rstrip
-srand Time.now.to_i
-create_xml += 'yet_anothoer_vm_by_santa_' + rand(100).to_s
-create_xml += <<EOF
-</name>
-  <uuid>
-EOF
-
-create_xml = create_xml.rstrip
-vmachine.pmon_vmachine_uuid = UUID.random_create
-create_xml += vmachine.pmon_vmachine_uuid 
-create_xml += <<EOF
-</uuid>
-  <memory>512072</memory>
-  <vcpu>1</vcpu>
-  <os>
-    <type arch='i686'>hvm</type>
-  </os>
-  <clock sync='localtime'/>
-  <devices>
-    <emulator>/usr/bin/kvm</emulator>
-    <disk type='file' device='disk'>
-      <source file='{:src=>"copy", :uuid=>"os100m.img"}'/>
-      <target dev='hda'/>
-    </disk>
-    <interface type='network'>
-      <source network='default'/>
-      <mac address='24:42:53:21:52:45'/>
-    </interface>
-    <graphics type='vnc' port='-1' keymap='de'/>
-  </devices>
-</domain>
-EOF
+              kvm_xml = Utils::KvmXml.new
+              kvm_xml.mem = 128  # TODO change parameters
+              kvm_xml.ip = "10.0.3.1" # TODO allocate ip address
+              kvm_xml.image = "os100m.img"  # TODO select image
+              print kvm_xml.xml
 
 url = URI.parse('http://' + hosting_pmachine.ip.to_s + ':3000/x/create')
 req = Net::HTTP::Post.new(url.path)
-req.set_form_data({:define => create_xml })
+req.set_form_data({:define => kvm_xml.xml })
 res = Net::HTTP.new(url.host, url.port).start {
   |http| http.request(req)
 }
@@ -188,13 +155,13 @@ else
 end
 
               vmachine.status = "deploying"
+              vmachine.pmachine = hosting_pmachine
               vmachine.save
 
-
-              result[:pmon_info] = http_res.body
+              result[:pmon_info] = res.body
 
               result[:success] = true
-              result[:xml] = create_xml
+              result[:xml] = kvm_xml.xml
               result[:msg] = "Deployed vmachine #{vmachine_vid} to pmachine #{hosting_pmachine.ip}"
 # for demo purpose, immediately start pmachine
               res2 = Helper.notify_status_change vmachine_vid, "running"
