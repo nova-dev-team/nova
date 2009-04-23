@@ -1,5 +1,7 @@
 class VmachineController < ApplicationController
 
+  require 'pp'
+
   include VmachineHelper
 
   # list all the available virtual machines
@@ -15,7 +17,7 @@ class VmachineController < ApplicationController
   # create a new virtual machine
   def create
     result = Helper.create
-
+    pp result
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
@@ -25,7 +27,7 @@ class VmachineController < ApplicationController
   # delete a virtual machine, the vmachine cannot be under use
   def delete
     result = Helper.delete params[:id]
-
+    pp result
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
@@ -35,7 +37,7 @@ class VmachineController < ApplicationController
   # show detailed information about a virtual machine
   def info
     result = Helper.info params[:id]
-
+    pp result
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
@@ -45,7 +47,7 @@ class VmachineController < ApplicationController
   # start a vmachine, it should be already put on a pmachine
   def start
     result = Helper.start params[:id]
-
+    pp result
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
@@ -55,7 +57,7 @@ class VmachineController < ApplicationController
   # stop a vmachine, and also remove it from the hosting pmachine
   def stop
     result = Helper.stop params[:id]
-
+    pp result
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
@@ -65,7 +67,7 @@ class VmachineController < ApplicationController
   # suspend a virtual machine
   def suspend
     result = Helper.suspend params[:id]
-
+    pp result
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}
@@ -75,7 +77,7 @@ class VmachineController < ApplicationController
   # resume a virtual machine
   def resume
     result = Helper.resume params[:id]
-
+    pp result
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}

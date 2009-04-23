@@ -155,7 +155,10 @@ else
 end
 
               vmachine.status = "deploying"
+              print "status set to deploying"
               vmachine.pmachine = hosting_pmachine
+              vmachine.pmon_vmachine_uuid = kvm_xml.uuid
+              vmachine.ip = kvm_xml.ip
               vmachine.save
 
               result[:pmon_info] = res.body
@@ -163,8 +166,9 @@ end
               result[:success] = true
               result[:xml] = kvm_xml.xml
               result[:msg] = "Deployed vmachine #{vmachine_vid} to pmachine #{hosting_pmachine.ip}"
-# for demo purpose, immediately start pmachine
+# XXX for demo purpose, immediately start pmachine
               res2 = Helper.notify_status_change vmachine_vid, "running"
+              print "Notified status change"
               result[:msg] += "\n" + res2[:msg]
 
             else
@@ -209,7 +213,11 @@ end
           # TODO send control to pmon, change the vmachine into "undeploying" status
           vmachine.status = "undeploying"
           vmachine.pmon_vmachine_uuid = ""
+          PmachineHelper::Helper.unhost_vmachine vmachine.pmachine.ip, "v#{vmachine.id}"
+          vmachine.pmachine = nil
           vmachine.save
+
+
           result[:success] = true
           result[:msg] = "Closing vmachine #{vmachine_vid}, 'undeploying' it now"
 
@@ -243,9 +251,13 @@ end
           # TODO send suspend signal
 
 # TODO change uuid
+          print "Trying to suspend vm, uuid = " + vmachine.pmon_vmachine_uuid
           http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
             http.put '/x/' + vmachine.pmon_vmachine_uuid + '/suspend', ""
           end
+
+          result[:body] = http_res.body
+
           result[:success] = true
           result[:msg] = "Vmachine #{vmachine_vid} suspended"
 

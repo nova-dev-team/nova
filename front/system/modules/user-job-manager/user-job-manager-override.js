@@ -199,17 +199,13 @@ Ext.Ajax.request({
     },
     success: function(o){
         if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-          alert(Ext.decode(o.responseText).msg);
-          
-          // TODO change the info pane
+          alert(o.responseText);
         }
-        else {
-            // TODO when create failed
+        else {          alert(o.responseText);
         }
     },
     failure: function(){
-        // TODO when connect failed
+
     }
   });
 
@@ -381,7 +377,7 @@ Ext.Ajax.request({
 					  resize: {
 					    fn: function() {
 					    
-					    var vncapp = Ext.get('crappyVNC');
+					    var vncapp = Ext.get('vnc_vm_' + _cid + "_" + _vmid);
 					    var sz = this.getSize();
 
 					    vncapp.dom.height = sz.height - 33;
@@ -440,10 +436,9 @@ handler:function() {
   
   // TODO choose cluster name
   
-
-  
-  var cluster_name = "test-TODO";
-  
+  var cluster_name = prompt("", "My_Cluster_" + cluster_store.getCount());
+  if (cluster_name.length < 1)
+    return;
   
   Ext.Ajax.request({
       url: '/connect.php',

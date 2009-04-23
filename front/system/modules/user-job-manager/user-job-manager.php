@@ -95,27 +95,26 @@ if ($i < $total - 2) {
   
   
     public function startVM() {
-//    echo "{success:true, msg:'start'}";
-    $core_reply = file_get_contents("http://localhost:3000/vmachine/start/" . $email. '/' . $_REQUEST['vcluster_cid']);
-        // TODO
+      $core_reply = file_get_contents("http://localhost:3000/vmachine/start/" . $_REQUEST['vm_vid']);
+      echo $core_reply;
   }
   
   
   
     public function stopVM() {
-    echo "{success:true, msg:'stop'}";
-        // TODO
+      $core_reply = file_get_contents("http://localhost:3000/vmachine/stop/" . $_REQUEST['vm_vid']);
+      echo $core_reply;
   }
   
   
     public function pauseVM() {
-    echo "{success:true, msg:'pause'}";
-        // TODO
+      $core_reply = file_get_contents("http://localhost:3000/vmachine/suspend/" . $_REQUEST['vm_vid']);
+      echo $core_reply;
   }
   
     public function resumeVM() {
-    echo "{success:true, msg:'resume'}";
-        // TODO
+      $core_reply = file_get_contents("http://localhost:3000/vmachine/resume/" . $_REQUEST['vm_vid']);
+      echo $core_reply;
   }
   
     public function infoVM() {
