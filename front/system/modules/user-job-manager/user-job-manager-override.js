@@ -358,7 +358,7 @@ Ext.Ajax.request({
 
 			// for the vnc displays
 			
-			function createVNCwin(_cid, _vmid, _pmip) {
+			function createVNCwin(_cid, _vmid, _pmip, _vnc_port) {
 				desktop.createWindow({
 					id: 'vnc_vm_' + _cid + "_" + _vmid , // TODO  change the win name
 					title: "VNC of " + _cid + ", " + _vmid,
@@ -378,6 +378,7 @@ Ext.Ajax.request({
 					    fn: function() {
 					    
 					    var vncapp = Ext.get('vnc_vm_' + _cid + "_" + _vmid);
+					    console.log(vncapp);
 					    var sz = this.getSize();
 
 					    vncapp.dom.height = sz.height - 33;
@@ -389,18 +390,46 @@ Ext.Ajax.request({
 					
 					html : "<applet archive='http://"
 					+ _pmip
-					+ ":3000/vncviewer.jar' id='crappyVNC' code='VncViewer.class' width='800' height='600'><param name='PORT' value='5900' /><param name='ENCODING' value='tight' /><param name='HOST' value='10.0.0.196'><param name='Show controls' value='no' /></applet>"
+					+ ":3000/vncviewer.jar' id='" + 'vnc_vm_' + _cid + "_" + _vmid +"' code='VncViewer.class' width='800' height='600'><param name='PORT' value='" + _vnc_port + "' /><param name='ENCODING' value='tight' /><param name='HOST' value='" + _pmip + "'><param name='Show controls' value='no' /></applet>"
 				});
 			}
 
 
       var vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
 			if (!vncwin) {
-        createVNCwin(cid, vmid, "10.0.0.196");
-        vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
+			
+			
+			        Ext.Ajax.request({
+              url: '/connect.php',
+            params: {
+                moduleId: 'user-job-manager',
+                action: "infoVM",
+             vm_id: vmid
+            },
+            success: function(o){
+                if (o && o.responseText && Ext.decode(o.responseText).success) {
+                    // refresh
+                  createVNCwin(cid, vmid, Ext.decode(o.responseText).pmip, Ext.decode(o.responseText).vnc_port );
+                vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
+                    vncwin.show();
+                }
+                else {
+                    // TODO when create failed
+                }
+            },
+            failure: function(){
+                // TODO when connect failed
+            }
+          });
+			
+			
+			
+			
+
 			}    
 			
-			vncwin.show(); // TODO show it
+			if (vncwin)
+  			vncwin.show(); // TODO show it
 			
 }
 	
@@ -566,7 +595,7 @@ rows = vm_pane.getSelectionModel().getSelections();
 
 
 
-Ext.Ajax.request({
+  Ext.Ajax.request({
       url: '/connect.php',
     params: {
         moduleId: 'user-job-manager',
@@ -577,7 +606,7 @@ Ext.Ajax.request({
         if (o && o.responseText && Ext.decode(o.responseText).success) {
             // refresh
           
-    			html = Ext.decode(o.responseText).info;
+    			html = Ext.decode(o.responseText).info + "<br>" + o.responseText;
           	info_pane.body.update(html);
             
         }

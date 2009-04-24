@@ -119,11 +119,10 @@ if ($i < $total - 2) {
   
     public function infoVM() {
     
-    echo "{success:true, info:'TODO: Detail info of "   . $_REQUEST['vm_id']  .".'}"; // TODO
+    echo "{success:true, info:'TODO: Detail info of "   . $_REQUEST['vm_id']  .".', pmip:'" . "10.0.0.210" . "', vnc_port:'" . "5900" ."'  }"; // TODO
 
   }
-
-
+  
 public function listVM() {
     
     $core_reply = file_get_contents("http://localhost:3000/vcluster/info_vm_list/" . $_REQUEST['cid']);
