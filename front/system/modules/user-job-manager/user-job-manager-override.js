@@ -409,7 +409,7 @@ Ext.Ajax.request({
             success: function(o){
                 if (o && o.responseText && Ext.decode(o.responseText).success) {
                     // refresh
-                  createVNCwin(cid, vmid, Ext.decode(o.responseText).pmip, Ext.decode(o.responseText).vnc_port );
+                  createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port );
                 vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
                     vncwin.show();
                 }
@@ -606,7 +606,7 @@ rows = vm_pane.getSelectionModel().getSelections();
         if (o && o.responseText && Ext.decode(o.responseText).success) {
             // refresh
           
-    			html = Ext.decode(o.responseText).info + "<br>" + o.responseText;
+    			html = o.responseText;
           	info_pane.body.update(html);
             
         }

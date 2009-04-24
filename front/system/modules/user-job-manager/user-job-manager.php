@@ -119,7 +119,14 @@ if ($i < $total - 2) {
   
     public function infoVM() {
     
-    echo "{success:true, info:'TODO: Detail info of "   . $_REQUEST['vm_id']  .".', pmip:'" . "10.0.0.210" . "', vnc_port:'" . "5900" ."'  }"; // TODO
+    
+    $core_reply = file_get_contents("http://localhost:3000/vmachine/detail_info/" . $_REQUEST['vm_id'] );
+    
+//    $obj = json_decode($core_reply);
+//    echo $obj["success"];
+    
+    echo $core_reply;
+//    echo "{success:true, info:'TODO: Detail info of "   . $_REQUEST['vm_id']  .".', pmip:'" . "10.0.0.210" . "', vnc_port:'" . "5900" ."'  }"; // TODO
 
   }
   

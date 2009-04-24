@@ -85,6 +85,16 @@ class VmachineController < ApplicationController
   end
 
 
+  # get information of a vmachine on a pmachine
+  def detail_info
+    result = Helper.detail_info params[:id]
+    pp result
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
+
 =begin This function is internally initiated by core
   def notify_status_change
     result = Helper.notify_status_change params[:id], params[:arg]

@@ -137,7 +137,7 @@ module VmachineHelper
               kvm_xml = Utils::KvmXml.new
               kvm_xml.mem = 512  # TODO change parameters
               kvm_xml.ip = "10.0.3.1" # TODO allocate ip address
-              kvm_xml.image = "intrepid2.img"  # TODO select image
+              kvm_xml.image = "hadoop-slave.img"  # TODO select image
               print kvm_xml.xml
 
 url = URI.parse('http://' + hosting_pmachine.ip.to_s + ':3000/x/create')
@@ -347,6 +347,34 @@ end
 
       return result
 
+    end
+
+    def Helper.detail_info vid
+      result = {}
+
+      vmachine = Vmachine.find_by_id vid[1..-1]
+      if vmachine != nil
+        result[:success] = true
+        result[:pm_ip] = ""
+        result[:pmon_uuid] = ""
+        result[:vnc_port] = "-1"
+        if vmachine.pmachine
+          result[:pm_ip] = vmachine.pmachine.ip
+          result[:pmon_uuid] = vmachine.pmon_vmachine_uuid
+
+          http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+            http.get '/x/' + vmachine.pmon_vmachine_uuid + '/vnc_port'
+          end
+          
+          if http_res.code == "200"
+            result[:vnc_port] = http_res.body
+          end
+
+        end
+      else
+        result[:success] = false
+      end
+      return result
     end
   
   end
