@@ -135,9 +135,9 @@ module VmachineHelper
             if sub_result[:success] # successfully deployed pmachine
               
               kvm_xml = Utils::KvmXml.new
-              kvm_xml.mem = 128  # TODO change parameters
+              kvm_xml.mem = 512  # TODO change parameters
               kvm_xml.ip = "10.0.3.1" # TODO allocate ip address
-              kvm_xml.image = "os100m.img"  # TODO select image
+              kvm_xml.image = "intrepid2.img"  # TODO select image
               print kvm_xml.xml
 
 url = URI.parse('http://' + hosting_pmachine.ip.to_s + ':3000/x/create')
@@ -166,6 +166,17 @@ end
               result[:success] = true
               result[:xml] = kvm_xml.xml
               result[:msg] = "Deployed vmachine #{vmachine_vid} to pmachine #{hosting_pmachine.ip}"
+
+# XXX inform pmon to start vm
+          http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+            http.put '/x/' + vmachine.pmon_vmachine_uuid + '/start', ""
+          end
+
+          pp  '/x/' + vmachine.pmon_vmachine_uuid + '/start'
+
+          result[:pmon_info2] = http_res.body
+
+
 # XXX for demo purpose, immediately start pmachine
               res2 = Helper.notify_status_change vmachine_vid, "running"
               print "Notified status change"
@@ -257,9 +268,9 @@ end
           end
 
           result[:body] = http_res.body
-
           result[:success] = true
           result[:msg] = "Vmachine #{vmachine_vid} suspended"
+          pp result
 
         end
       end
@@ -291,7 +302,9 @@ end
             http.put '/x/' + vmachine.pmon_vmachine_uuid + '/resume', ""
           end
           result[:success] = true
+          result[:pmon_info] = http_res.body
           result[:msg] = "Vmachine #{vmachine_vid} resumed"
+          pp result
 
         end
       end
