@@ -82,10 +82,19 @@ if ($i < $total - 2) {
   
   
   public function newVM() {
+  
+    $add_opt = "mem=" . $_REQUEST['mem'] . "&img=" . $_REQUEST['img'] . "&vcpu=" . $_REQUEST['vcpu'];
     
-    $core_reply = file_get_contents("http://localhost:3000/vcluster/add_new_vm/" . $_REQUEST['vcluster_cid']);
+    
+    if ($add_opt == "")
+      $core_reply = file_get_contents("http://localhost:3000/vcluster/add_new_vm/" . $_REQUEST['vcluster_cid']);
+    else
+      $core_reply = file_get_contents("http://localhost:3000/vcluster/add_new_vm/" . $_REQUEST['vcluster_cid'] . "?" . $add_opt);
 
     echo $core_reply;
+    
+    
+
   }
   
   public function removeVM() {

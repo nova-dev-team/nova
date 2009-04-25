@@ -1,5 +1,7 @@
 module VmachineHelper
 
+  require 'rubygems'
+  require 'json'
   require 'uri'
   require 'net/http'
   require 'uuidtools'
@@ -15,9 +17,14 @@ module VmachineHelper
       return list
     end
 
+  # only for creating single machines, so we have to set the mac addr
     def Helper.create
       result = {}
       vmachine = Vmachine.create
+      vmachine.settings =<<HERE
+{"mem":512, "img":"", "vcpu":1, "mac":"", "ip":""}
+HERE
+      vmachine.save
 
       if vmachine.save # check save successful
         result[:success] = true
@@ -88,6 +95,14 @@ module VmachineHelper
       return result
     end
 
+    def Helper.change_setting vmachine_vid, item, new_val
+      vmachine = Vmachine.find_by_id vmachine_vid[1..-1] if vmachine_vid != nil
+      old_dict = JSON.parse(vmachine.settings)
+        old_dict[item] = new_val
+      vmachine.settings = old_dict.to_json
+      vmachine.save
+    end
+
     def Helper.start vmachine_vid
       result = {}
       vmachine = Vmachine.find_by_id vmachine_vid[1..-1] if vmachine_vid != nil
@@ -133,12 +148,27 @@ module VmachineHelper
             sub_result = PmachineHelper::Helper.host_vmachine hosting_pmachine.ip, "v#{vmachine.id}"
 
             if sub_result[:success] # successfully deployed pmachine
+             
+              setting = JSON.parse(vmachine.settings)
+
+              pp setting
               
               kvm_xml = Utils::KvmXml.new
-              kvm_xml.mem = 512  # TODO change parameters
-              kvm_xml.ip = "10.0.3.1" # TODO allocate ip address
-              kvm_xml.image = "hadoop-slave.img"  # TODO select image
-              print kvm_xml.xml
+              kvm_xml.mem = setting[:mem]  # TODO change parameters
+
+
+              if setting[:mac] != nil
+                kvm_xml.mac = setting[:mac]
+              elsif setting[:ip] != nil
+                kvm_xml.ip = setting[:ip]
+              else
+                kvm_xml.ip = "10.0.3.1" # TODO allocate ip address
+              end
+
+              kvm_xml.image = setting[:img]  # TODO select image
+              if kvm_xml.image == nil
+                kvm_xml.image = "hadoop-slave.img"
+              end
 
 url = URI.parse('http://' + hosting_pmachine.ip.to_s + ':3000/x/create')
 req = Net::HTTP::Post.new(url.path)
@@ -358,6 +388,7 @@ end
         result[:pm_ip] = ""
         result[:pmon_uuid] = ""
         result[:vnc_port] = "-1"
+        result[:vm_setting] = vmachine.settings
         if vmachine.pmachine
           result[:pm_ip] = vmachine.pmachine.ip
           result[:pmon_uuid] = vmachine.pmon_vmachine_uuid
@@ -369,6 +400,7 @@ end
           if http_res.code == "200"
             result[:vnc_port] = http_res.body
           end
+
 
         end
       else

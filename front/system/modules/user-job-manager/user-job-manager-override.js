@@ -104,7 +104,9 @@ if (rows.length == 0) {
 
 
 
-
+mem_val = prompt("Memory?");
+img_val = prompt("Image?");
+vcpu_val = prompt("Vcpu?");
 
 
 Ext.Ajax.request({
@@ -112,7 +114,10 @@ Ext.Ajax.request({
     params: {
         moduleId: 'user-job-manager',
         action: "newVM",
-      vcluster_cid: cluster_cid
+      vcluster_cid: cluster_cid,
+      mem: mem_val,
+      img: img_val,
+      vcpu: vcpu_val
     },
     success: function(o){
         if (o && o.responseText && Ext.decode(o.responseText).success) {

@@ -4,7 +4,7 @@ class CreateVmachines < ActiveRecord::Migration
       t.column "ip", :string
       t.column "pmachine_id", :integer
       t.column "vcluster_id", :integer
-      t.column "vimage_id", :integer
+      t.column "vimage_id", :integer # discarded
       t.column "pmon_vmachine_uuid", :string # the uuid for pmon
       t.column "status", :string, :default => "not running"
         # other possible values for "status":
@@ -13,7 +13,7 @@ class CreateVmachines < ActiveRecord::Migration
         # suspended: when the vmachine is suspended by the user
         # undeploying: when copying data back to data center
         
-      t.column "settings", :string # settings in xml
+      t.column "settings", :string # settings in json
         # included:
         # cpu count, memory size, disks size, disk images' uuids, etc
 

@@ -120,6 +120,9 @@ class VclusterController < ApplicationController
   def add_new_vm
     r = VmachineHelper::Helper.create
     r2 = VclusterHelper::Helper.add_vmachine params[:id], r[:vmachine_vid]
+    VmachineHelper::Helper.change_setting r[:vmachine_vid], "img", params[:img]
+    VmachineHelper::Helper.change_setting r[:vmachine_vid], "mem", params[:mem]
+    VmachineHelper::Helper.change_setting r[:vmachine_vid], "vcpu", params[:vcpu]
     result = {}
     result[:msg] = r[:msg] + "\n" + r2[:msg]
     if (r[:success] and r2[:success]) then
