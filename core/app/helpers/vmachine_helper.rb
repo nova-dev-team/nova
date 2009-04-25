@@ -154,21 +154,25 @@ HERE
               pp setting
               
               kvm_xml = Utils::KvmXml.new
-              kvm_xml.mem = setting[:mem]  # TODO change parameters
+              kvm_xml.mem = setting["mem"]  # TODO change parameters
+
+              kvm_xml.vcpu = setting["vcpu"]
 
 
-              if setting[:mac] != nil
-                kvm_xml.mac = setting[:mac]
-              elsif setting[:ip] != nil
-                kvm_xml.ip = setting[:ip]
+              if setting["mac"] != nil
+                kvm_xml.mac = setting["mac"]
+              elsif setting["ip"] != nil
+                kvm_xml.ip = setting["ip"]
               else
-                kvm_xml.ip = "10.0.3.1" # TODO allocate ip address
+                kvm_xml.ip = "10.0.3.3" # TODO allocate ip address
               end
 
-              kvm_xml.image = setting[:img]  # TODO select image
+              kvm_xml.image = setting["img"]  # TODO select image
               if kvm_xml.image == nil
                 kvm_xml.image = "hadoop-slave.img"
               end
+
+              p kvm_xml.xml
 
 url = URI.parse('http://' + hosting_pmachine.ip.to_s + ':3000/x/create')
 req = Net::HTTP::Post.new(url.path)
