@@ -58,7 +58,7 @@ Ext.override(QoDesk.SuperAdminManagerWindow, {
             });
             
             function renderEmail(value, p, record){
-                return String.format('<a href="mailto:{0}">{0} {1}</a>', value, record.data.user_id);
+                return String.format('<a href="mailto:{0}">{0}</a>', value, record.data.user_id);
             }
             
             function renderRole(value, p, record){
