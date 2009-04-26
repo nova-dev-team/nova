@@ -94,14 +94,38 @@ if (class_exists('os')) {
 			    105,
 			    4,
 			    0
+			  ), (
+			  " . $id . ",
+			    " . $group_id . ",
+			    106,
+			    4,
+			    0
+			  ), (
+			  " . $id . ",
+			    " . $group_id . ",
+			    104,
+			    4,
+			    0
+			  ), (
+			  " . $id . ",
+			    " . $group_id . ",
+			    103,
+			    4,
+			    0
+			  ), (
+			  " . $id . ",
+			    " . $group_id . ",
+			    1,
+			    4,
+			    0
 			  )
 			";
 			
-			if (!mysql_query($sql)) {
+      if (!mysql_query($sql)) {
 				print "{errors:[{id:'failed-set-modules', msg:'Failed to set the modules'}]}";
 				return;
 			}
-
+			
       // now, contact the core to add a new user
       $core_reply = file_get_contents("http://localhost:3000/user/add/" . $_REQUEST['email'] . "/" . $id);
 		

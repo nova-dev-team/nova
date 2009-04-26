@@ -1,0 +1,9 @@
+.hadoop-wizard-icon {
+	background-image: url(images/hadoop-logo-small.png) !important;
+}
+.hadoop-wizard-shortcut img {
+    background-image: url(images/hadoop-logo-large.png);
+}
+#bogus-nav-panel li {
+	margin-bottom:5px;
+}
