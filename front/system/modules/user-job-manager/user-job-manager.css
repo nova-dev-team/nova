@@ -8,6 +8,10 @@
 .user-job-manager-option {
 	background-image: url(images/plugin.gif) !important;
 }
+
+.user-job-manager-refresh {
+	background-image: url(images/refresh.gif) !important;
+}
 .user-job-manager-add {
 	background-image: url(images/add.gif) !important;
 }

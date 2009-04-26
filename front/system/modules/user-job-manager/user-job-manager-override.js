@@ -14,23 +14,23 @@ Ext.override(QoDesk.UserJobManager, {
 		
 		var vm_cm = new Ext.grid.ColumnModel([{
 			header: "Vmachine ID",
-			width: 70,
+			width: 80,
 			dataIndex: 'vm_id',
 			sortable: true
 			}, {
 			header: "Vmachine IP",
-			width: 130,
+			width: 90,
 			dataIndex: 'vm_ip',
 			sortable: true
 			}, {
 			header: "System Image",
-			width: 200,
+			width: 220,
 			dataIndex: 'vm_image',
 			//renderer: renderEmail,
 			sortable: true
 			}, {
 			header: "Status",
-			width: 120,
+			width: 100,
 			dataIndex: 'status',
 			sortable: true,
 		}]);
@@ -58,7 +58,7 @@ Ext.override(QoDesk.UserJobManager, {
 			sortable: true
 			}, {
 			header: "Cluster Name",
-			width: 130,
+			width: 134,
 			dataIndex: 'cluster_name',
 			sortable: true
 		}]);
@@ -87,7 +87,8 @@ fields: ["vm_id", "vm_ip", "vm_image", "status"],
 			tbar: [{
 				text:'New',
 				tooltip:'Add a new row',
-				iconCls:'demo-grid-add',
+				iconCls:'user-job-manager-add',
+				new_vm_dialog : null,
 				
 				
 // Add a new vm
@@ -103,11 +104,53 @@ if (rows.length == 0) {
   var cluster_cid = rows[0].data.cluster_id;
 
 
+// TODO make a beautiful UI to ask for Machine setting
 
-mem_val = prompt("Memory?");
-img_val = prompt("Image?");
-vcpu_val = prompt("Vcpu?");
 
+Ext.Ajax.request({
+      url: '/connect.php',
+    params: {
+        moduleId: 'user-job-manager',
+        action: "listImage"
+    },
+    success: function(o){
+        if (o && o.responseText && Ext.decode(o.responseText).success) {
+
+
+vimageList = Ext.decode(o.responseText).imglist;
+
+formHtml = "<table><tr><td>CPU count:</td><td><input id='new_vm_dialog_vcpu'></td></tr><tr><td>Memory:</td><td><input id='new_vm_dialog_mem'></td></tr>";
+
+formHtml += "<tr><td>OS Image:</td><td><select id='new_vm_dialog_img'>";
+
+for (i = 0; i < vimageList.length; i++) {
+  formHtml += "<option>" + vimageList[i] + "</option>";
+}
+
+formHtml += "</select></td></tr>";
+
+formHtml += "</table>";
+
+if (vm_pane.new_vm_dialog == null) {
+
+  var winManager = desktop.getManager();
+
+  vm_pane.new_vm_dialog = new Ext.Window({
+    	bodyStyle:'padding:10px',
+        layout:'fit',
+        width:300,
+        height:200,
+        closeAction:'hide',
+        plain: true,
+        title: "Create a new vmachine",
+        html: formHtml,
+        buttons: [{
+            text:'Submit',
+            handler: function() {
+
+var mem_val = Ext.get("new_vm_dialog_mem").dom.value;
+var img_val = Ext.get("new_vm_dialog_img").dom.value;
+var vcpu_val = Ext.get("new_vm_dialog_vcpu").dom.value;
 
 Ext.Ajax.request({
       url: '/connect.php',
@@ -126,21 +169,50 @@ Ext.Ajax.request({
         }
         else {
             // TODO when create failed
+            vm_pane.new_vm_dialog.hide();
         }
     },
     failure: function(){
         // TODO when connect failed
+        vm_pane.new_vm_dialog.hide();
     }
   });
   
+  
+  vm_pane.new_vm_dialog.hide();
+  
+            }
+        },{
+            text: 'Close',
+            handler: function(){
+                vm_pane.new_vm_dialog.hide();
+            }
+        }],
+        manager: winManager,
+        modal: true
+    });
+}
 
+vm_pane.new_vm_dialog.show();
+
+        }
+        else {
+            // TODO when failed to load image list
+            vm_pane.new_vm_dialog.hide();
+        }
+    },
+    failure: function(){
+        // TODO when connect failed
+        vm_pane.new_vm_dialog.hide();
+    }
+  });
 
 				
 }
 				}, {
 				text:'Remove',
 				tooltip:'Remove the selected item',
-				iconCls:'demo-grid-remove',
+				iconCls:'user-job-manager-remove',
 
 // rm an vm
 handler: function() {
@@ -441,6 +513,7 @@ Ext.Ajax.request({
         }
 			}, '-' ,{
 			  text: "Refresh",
+			  iconCls:'user-job-manager-refresh',
 			  handler: function() {
 			    vm_store.reload();
         }
@@ -456,14 +529,14 @@ Ext.Ajax.request({
 	store:cluster_store,
 			split : true,
 			loadMask: true,
-			width : 200,
+			width : 210,
 			margins : '3 0 3 3',
 			cmargins : '3 3 3 3',
 	cm: cluster_cm,
 			tbar: [{
 				text:'New',
 				tooltip:'Add a new row',
-				iconCls:'demo-grid-add',
+				iconCls:'user-job-manager-add',
 				
 // XXX add cluster
 handler:function() {
@@ -502,7 +575,7 @@ handler:function() {
 				}, '-', {
 				text:'Remove',
 				tooltip:'Remove the selected item',
-				iconCls:'demo-grid-remove',
+				iconCls:'user-job-manager-remove',
 
 // XXX remove grid
 handler:function() {
@@ -546,7 +619,11 @@ if (rows.length == 0) {
   
 }
 
-			},'-', {text:'Refresh', handler:function(){
+			},'-', {text:'Refresh',
+			
+			iconCls:'user-job-manager-refresh',
+			
+			handler:function(){
 			
 			
 			      cluster_store.reload();
@@ -641,7 +718,7 @@ rows = vm_pane.getSelectionModel().getSelections();
 			win = desktop.createWindow({
 				id: 'user-job-manager-win',
 				title:'Cluster Manager',
-				width:740,
+				width:750,
 				height:480,
 				iconCls: 'user-job-manager-icon',
 				shim:false,
@@ -649,7 +726,7 @@ rows = vm_pane.getSelectionModel().getSelections();
 				constrainHeader:true,
 				layout: 'border',
 				items: [right_pane, cluster_pane],
-				taskbuttonTooltip: '<b>Grid Window</b><br>A window with a grid'
+				taskbuttonTooltip: '<b>Cluster Manger</b><br>Application for managing virtual clusters'
 			});
 			
 		}
