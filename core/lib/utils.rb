@@ -186,7 +186,7 @@ xml += @vm[:mac]
 xml += <<EOF
 '/>
     </interface>
-    <graphics type='vnc' port='-1'/>
+    <graphics type='vnc' port='-1' listen='0.0.0.0'/>
   </devices>
 </domain>
 EOF

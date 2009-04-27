@@ -467,7 +467,7 @@ Ext.Ajax.request({
 					
 					html : "<applet archive='http://"
 					+ _pmip
-					+ ":3000/vncviewer.jar' id='" + 'vnc_vm_' + _cid + "_" + _vmid +"' code='VncViewer.class' width='800' height='600'><param name='PORT' value='" + _vnc_port + "' /><param name='ENCODING' value='tight' /><param name='HOST' value='" + _pmip + "'><param name='Show controls' value='no' /></applet>"
+					+ ":3000/vncviewer.jar' id='" + 'vnc_vm_' + _cid + "_" + _vmid +"' code='VncViewer.class' width='800' height='600'><param name='PORT' value='" + _vnc_port + "' /><param name='ENCODING' value='tight' /><param name='PASSWORD' value='MacOSX10.5'><param name='HOST' value='" + _pmip + "'><param name='Show controls' value='no' /></applet>"
 				});
 			}
 
