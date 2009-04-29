@@ -10,10 +10,10 @@ QoDesk.UserJobManager = Ext.extend(Ext.app.Module, {
 	moduleType : 'user-job-manager',
     moduleId : 'user-job-manager',
     menuPath : 'StartMenu',
-	launcher : {
-        iconCls: 'user-job-manager-icon',
-        shortcutIconCls: 'user-job-manager-shortcut',
-        text: 'Cluster Manager',
-        tooltip: '<b>Cluster Manager</b><br />Manage user\'s cluster'
+  	launcher : {
+      iconCls: 'user-job-manager-icon',
+      shortcutIconCls: 'user-job-manager-shortcut',
+      text: 'Cluster Manager',
+      tooltip: '<b>Cluster Manager</b><br />Manage user\'s cluster'
     }
 });

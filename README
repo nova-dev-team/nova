@@ -1,8 +1,14 @@
-Huang Gang's scripts are located on the NFS server. Core is expected to
-call those scripts.
+NOVA - Manage virtual machines running on a cluster
 
-In order to invoke HG's scripts, core need to mount NFS folders to
-/config & /share.
+// TODO add information
+
+* Core's interaction with Vmon(Software installer in virtual machines)
+
+  Software installing scripts are located on the NFS server. Core is
+  expected to invoke those scripts.
+
+  In order to invoke HG's scripts, core need to mount NFS folders to
+  /config & /share.
 
 // TODO add more detail
 

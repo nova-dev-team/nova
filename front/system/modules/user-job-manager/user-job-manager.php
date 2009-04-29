@@ -165,7 +165,7 @@ public function listVM() {
 
 public function listImage() {
 
-  echo "{success:true, imglist:['hadoop-slave.img', 'intrepid2.img']}";
+  echo "{success:true, imglist:['hadoop-slave.img', 'intrepid2.img', 'f8.img']}";
   // TODO
 }
 
