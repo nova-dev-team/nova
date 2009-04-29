@@ -4,6 +4,8 @@ Ext.override(QoDesk.UserJobManager, {
 	
 		var desktop = this.app.getDesktop();
 		var win = desktop.getWindow('user-job-manager-win');
+		
+		// Infomation panel that located at bottom-right side
 		var info_pane = new Ext.Panel({
 			region : 'center',
 			margins : '3 0 3 3',
@@ -35,11 +37,16 @@ Ext.override(QoDesk.UserJobManager, {
 			sortable: true,
 		}]);
 		
+		// The Store object that binds with cluster data, it will automatically query information from server
 		var cluster_store = new Ext.data.JsonStore({
 			autoLoad:"True",
-			root: 'all_clusters',
+			root: 'all_clusters', // JSON root
+			// the JSON from server is like this:
+			/*
+			    {xxx:yyy, zzz:www, all_clusters:[{cluster_id:???, cluster_name:???}, {cluster_id:???, cluster_name:???}...{cluster_id:???, cluster_name:???}]}
+			*/
 //			totalProperty: 'totalCount',
-			idProperty: 'cluster_id',
+			idProperty: 'cluster_id', // the item that serves as "PRIMARY KEY"
 			//remoteSort: true,
 			fields: ["cluster_id", "cluster_name"],
 			// load using script tags for cross domain, if the data in on the same domain as
@@ -49,7 +56,6 @@ Ext.override(QoDesk.UserJobManager, {
 			})
 		});
 //		cluster_store.setDefaultSort('email', 'desc');
-
 
 		var cluster_cm = new Ext.grid.ColumnModel([{
 			header: "Cluster ID",
@@ -63,19 +69,19 @@ Ext.override(QoDesk.UserJobManager, {
 			sortable: true
 		}]);
 
-
-var vm_store = new Ext.data.JsonStore({
-  root: 'all_vms',
-idProperty: 'vm_id',
-fields: ["vm_id", "vm_ip", "vm_image", "status"],
-//autoLoad:"True",
+    // information of Virtual machines
+    var vm_store = new Ext.data.JsonStore({
+      root: 'all_vms',
+      idProperty: 'vm_id',
+      fields: ["vm_id", "vm_ip", "vm_image", "status"],
+      //autoLoad:"True",
 			proxy: new Ext.data.HttpProxy({
 				url: '/connect.php?action=listVM&moduleId=user-job-manager'
 			})
-});
+    });
 
 		var vm_pane = new Ext.grid.GridPanel({
-			region : "north",
+			region : "north", // indicator for "border-layout" policy
 			store: vm_store,
 			split : true,
 			height: 200,
@@ -86,177 +92,155 @@ fields: ["vm_id", "vm_ip", "vm_image", "status"],
 			cmargins : '3 3 3 3',
 			tbar: [{
 				text:'New',
-				tooltip:'Add a new row',
+				tooltip:'Add a new Virtual Machine',
 				iconCls:'user-job-manager-add',
+				
+				// this is a "member variable", a window for creating new virtual machines
 				new_vm_dialog : null,
-				
-				
-// Add a new vm
-handler: function() {
+// Handler for adding a new virual machine
+        handler: function() {
+        
+          // first of all, test if a cluster was selected
+          var rows = cluster_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
+            alert("Select a cluster first!");
+            return;
+          }
 
+          // if a cluster was selected, get its id
+          var cluster_cid = rows[0].data.cluster_id;
 
-var rows = cluster_pane.getSelectionModel().getSelections();
-if (rows.length == 0) {
-  alert("Select a cluster first!");
-  return;
-}
+          // Ajax request to get list of images
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "listImage"
+            },
+            // callback function, called when request successfully finished
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                // if request successfly (got vmachine image list), create "new vmachine form"
+                vimageList = Ext.decode(o.responseText).imglist;
+                formHtml = "<table><tr><td>CPU count:</td><td><input id='new_vm_dialog_vcpu'></td></tr><tr><td>Memory:</td><td><input id='new_vm_dialog_mem'></td></tr>";
+                formHtml += "<tr><td>OS Image:</td><td><select id='new_vm_dialog_img'>";
+                for (i = 0; i < vimageList.length; i++) {
+                  formHtml += "<option>" + vimageList[i] + "</option>";
+                }
+                formHtml += "</select></td></tr>";
+                formHtml += "</table>";
+                if (vm_pane.new_vm_dialog == null) {
+                  // now, create a new "new vmachine dialog" if necessary
+                
+                  // this "winManager" is a component of QoDesktop
+                  var winManager = desktop.getManager();
+                  vm_pane.new_vm_dialog = new Ext.Window({
+                  	bodyStyle:'padding:10px',
+                    layout:'fit',
+                    width:300,
+                    height:200,
+                    closeAction:'hide',
+                    plain: true,
+                    title: "Create a new virtual machine",
+                    html: formHtml,
+                    buttons: [{
+                      text:'Submit',
+                      handler: function() {
+                        var mem_val = Ext.get("new_vm_dialog_mem").dom.value;
+                        var img_val = Ext.get("new_vm_dialog_img").dom.value;
+                        var vcpu_val = Ext.get("new_vm_dialog_vcpu").dom.value;
+                        
+                        // Ajax to get 
+                        Ext.Ajax.request({
+                          url: '/connect.php',
+                          params: {
+                            moduleId: 'user-job-manager',
+                            action: "newVM",
+                            vcluster_cid: cluster_cid,
+                            mem: mem_val,
+                            img: img_val,
+                            vcpu: vcpu_val
+                          },
+                          success: function(o){
+                            if (o && o.responseText && Ext.decode(o.responseText).success) {
+                              // refresh
+                              vm_store.reload();
+                            } else {
+                              // TODO when create failed
+                              vm_pane.new_vm_dialog.hide();
+                            }
+                          },
+                          failure: function(){
+                            // TODO when connect failed
+                            vm_pane.new_vm_dialog.hide();
+                          }
+                        });
+                        vm_pane.new_vm_dialog.hide();
+                      }
+                    },{
+                      text: 'Close',
+                      handler: function(){
+                        vm_pane.new_vm_dialog.hide();
+                      }
+                    }],
+                    manager: winManager,
+                    modal: true
+                  });
+                }
 
-  var cluster_cid = rows[0].data.cluster_id;
+                vm_pane.new_vm_dialog.show();
 
-
-// TODO make a beautiful UI to ask for Machine setting
-
-
-Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "listImage"
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-
-
-vimageList = Ext.decode(o.responseText).imglist;
-
-formHtml = "<table><tr><td>CPU count:</td><td><input id='new_vm_dialog_vcpu'></td></tr><tr><td>Memory:</td><td><input id='new_vm_dialog_mem'></td></tr>";
-
-formHtml += "<tr><td>OS Image:</td><td><select id='new_vm_dialog_img'>";
-
-for (i = 0; i < vimageList.length; i++) {
-  formHtml += "<option>" + vimageList[i] + "</option>";
-}
-
-formHtml += "</select></td></tr>";
-
-formHtml += "</table>";
-
-if (vm_pane.new_vm_dialog == null) {
-
-  var winManager = desktop.getManager();
-
-  vm_pane.new_vm_dialog = new Ext.Window({
-    	bodyStyle:'padding:10px',
-        layout:'fit',
-        width:300,
-        height:200,
-        closeAction:'hide',
-        plain: true,
-        title: "Create a new vmachine",
-        html: formHtml,
-        buttons: [{
-            text:'Submit',
-            handler: function() {
-
-var mem_val = Ext.get("new_vm_dialog_mem").dom.value;
-var img_val = Ext.get("new_vm_dialog_img").dom.value;
-var vcpu_val = Ext.get("new_vm_dialog_vcpu").dom.value;
-
-Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "newVM",
-      vcluster_cid: cluster_cid,
-      mem: mem_val,
-      img: img_val,
-      vcpu: vcpu_val
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-          vm_store.reload();
-        }
-        else {
-            // TODO when create failed
-            vm_pane.new_vm_dialog.hide();
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-        vm_pane.new_vm_dialog.hide();
-    }
-  });
-  
-  
-  vm_pane.new_vm_dialog.hide();
-  
+              } else {
+              // TODO when failed to load image list
+                if (vm_pane.new_vm_dialog != null)
+                  vm_pane.new_vm_dialog.hide();
+              }
+            },
+            failure: function(){
+              // TODO when connect failed
+              vm_pane.new_vm_dialog.hide();
             }
-        },{
-            text: 'Close',
-            handler: function(){
-                vm_pane.new_vm_dialog.hide();
-            }
-        }],
-        manager: winManager,
-        modal: true
-    });
-}
-
-vm_pane.new_vm_dialog.show();
-
+          });
         }
-        else {
-            // TODO when failed to load image list
-            vm_pane.new_vm_dialog.hide();
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-        vm_pane.new_vm_dialog.hide();
-    }
-  });
-
-				
-}
-				}, {
+			}, {
 				text:'Remove',
 				tooltip:'Remove the selected item',
 				iconCls:'user-job-manager-remove',
-
-// rm an vm
-handler: function() {
-
-
-var rows = vm_pane.getSelectionModel().getSelections();
-if (rows.length == 0) {
-  alert("Select a vmachine first!");
-  return;
-}
-
-  var vid = rows[0].data.vm_id;
-
-Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "removeVM",
-      vm_vid: vid
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-          vm_store.reload();
-          
-          // TODO change the info pane
-        }
-        else {
-            // TODO when create failed
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-    }
-  });
-
 				
-}
-
-				} ,'-', {
+        // rm an vm
+        handler: function() {
+          var rows = vm_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
+            alert("Select a vmachine first!");
+            return;
+          }
+          var vid = rows[0].data.vm_id;
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "removeVM",
+              vm_vid: vid
+            },
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                // refresh
+                vm_store.reload();
+                // TODO change the info pane
+              } else {
+                // TODO when create failed
+              }
+            },
+            failure: function(){
+              // TODO when connect failed
+            }
+          });
+        }
+      } ,'-', {
 				text : "Start",
-
-// start an vm
-handler: function() {
+				
+        // start an vm
+        handler: function() {
 
 
 var rows = vm_pane.getSelectionModel().getSelections();
@@ -442,7 +426,7 @@ Ext.Ajax.request({
 					width: 815,
 					height: 633,
 					minWidth: 640,
-					minHeight: 480,
+					minHeight: 400,
 					shim: false,
 					margins : '0 0 0 0',
 					cmargins : '0 0 0 0',
