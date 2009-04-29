@@ -241,462 +241,370 @@ Ext.override(QoDesk.UserJobManager, {
 				
         // start an vm
         handler: function() {
+          var rows = vm_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
+            alert("Select a vmachine first!");
+            return;
+          }
+          var vid = rows[0].data.vm_id;
 
-
-var rows = vm_pane.getSelectionModel().getSelections();
-if (rows.length == 0) {
-  alert("Select a vmachine first!");
-  return;
-}
-
-  var vid = rows[0].data.vm_id;
-
-Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "startVM",
-      vm_vid: vid
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-          alert(o.responseText);
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "startVM",
+              vm_vid: vid
+            },
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                alert(o.responseText);
+              } else {                alert(o.responseText);
+              }
+            },
+            failure: function(){
+            }
+          });
         }
-        else {          alert(o.responseText);
-        }
-    },
-    failure: function(){
-
-    }
-  });
-
-				
-}
-				} , {
+		  } , {
 				text : "Stop",
 
-// stop an vm
-handler: function() {
-
-
-var rows = vm_pane.getSelectionModel().getSelections();
-if (rows.length == 0) {
-  alert("Select a vmachine first!");
-  return;
-}
-
-  var vid = rows[0].data.vm_id;
-
-Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "stopVM",
-      vm_vid: vid
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-                 alert(Ext.decode(o.responseText).msg);
+        // stop an vm
+        handler: function() {
+          var rows = vm_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
+            alert("Select a vmachine first!");
+            return;
+          }
+          var vid = rows[0].data.vm_id;
           
-          // TODO change the info pane
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "stopVM",
+              vm_vid: vid
+            },
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                // refresh
+                alert(Ext.decode(o.responseText).msg);
+                // TODO change the info pane
+              } else {
+                // TODO when create failed
+              }
+            },
+            failure: function(){
+            // TODO when connect failed
+            }
+          });
         }
-        else {
-            // TODO when create failed
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-    }
-  });
-
-				
-}
-				} , {
+  		} , {
 				text : "Pause",
 
-// rm an vm
-handler: function() {
-
-
-var rows = vm_pane.getSelectionModel().getSelections();
-if (rows.length == 0) {
-  alert("Select a vmachine first!");
-  return;
-}
-
-  var vid = rows[0].data.vm_id;
-
-Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "pauseVM",
-      vm_vid: vid
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-                   alert(Ext.decode(o.responseText).msg);
+        // pause an vm
+        handler: function() {
+          var rows = vm_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
+            alert("Select a vmachine first!");
+            return;
+          }
+          var vid = rows[0].data.vm_id;
           
-          // TODO change the info pane
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "pauseVM",
+              vm_vid: vid
+            },
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                // refresh
+                alert(Ext.decode(o.responseText).msg);
+                // TODO change the info pane
+              } else {
+              // TODO when create failed
+              }
+            },
+            failure: function(){
+              // TODO when connect failed
+            }
+          });
         }
-        else {
-            // TODO when create failed
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-    }
-  });
-
-				
-}
-				} , {
+			} , {
 				text : "Resume",
 
-// rm an vm
-handler: function() {
+        // resume an vm
+        handler: function() {
+          var rows = vm_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
+            alert("Select a vmachine first!");
+            return;
+          }
+          var vid = rows[0].data.vm_id;
 
-
-var rows = vm_pane.getSelectionModel().getSelections();
-if (rows.length == 0) {
-  alert("Select a vmachine first!");
-  return;
-}
-
-  var vid = rows[0].data.vm_id;
-
-Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "resumeVM",
-      vm_vid: vid
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-                   alert(Ext.decode(o.responseText).msg);
-          
-          // TODO change the info pane
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "resumeVM",
+              vm_vid: vid
+            },
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                // refresh
+                alert(Ext.decode(o.responseText).msg);
+                // TODO change the info pane
+              } else {
+                // TODO when create failed
+              }
+            },
+            failure: function(){
+              // TODO when connect failed
+            }
+          });
         }
-        else {
-            // TODO when create failed
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-    }
-  });
-
+		  } ,
 				
-}
-				} ,
-				
-				/*
+				/* TODO "select all"
 				'-', {
 				text : "Select All"
 				},  
 				*/
-				
 				
 				'-' , {
 				text : "Observe",
 				handler: function() {
   				rows = vm_pane.getSelectionModel().getSelections();
           if (rows.length == 0) {
-       
-           alert("You need to select a vmachine first");
-      
-        } else {
-
-          vmid = rows[0].data.vm_id;
-
-          rows2 = cluster_pane.getSelectionModel().getSelections();
-    
-          cid = rows2[0].data.cluster_id;
-
-			// for the vnc displays
-			
-			function createVNCwin(_cid, _vmid, _pmip, _vnc_port) {
-				desktop.createWindow({
-					id: 'vnc_vm_' + _cid + "_" + _vmid , // TODO  change the win name
-					title: "VNC of " + _cid + ", " + _vmid,
-					width: 815,
-					height: 633,
-					minWidth: 640,
-					minHeight: 400,
-					shim: false,
-					margins : '0 0 0 0',
-					cmargins : '0 0 0 0',
-					animeCollapse: false,
-					constrainHeader: true,
-
-					
-					listeners: {
-					  resize: {
-					    fn: function() {
-					    
-					    var vncapp = Ext.get('vnc_vm_' + _cid + "_" + _vmid);
-					    console.log(vncapp);
-					    var sz = this.getSize();
-
-					    vncapp.dom.height = sz.height - 33;
-					    vncapp.dom.width = sz.width - 15;
-              }
-					  }
-					},
-					
-					
-					html : "<applet archive='http://"
-					+ _pmip
-					+ ":3000/vncviewer.jar' id='" + 'vnc_vm_' + _cid + "_" + _vmid +"' code='VncViewer.class' width='800' height='600'><param name='PORT' value='" + _vnc_port + "' /><param name='ENCODING' value='tight' /><param name='PASSWORD' value='MacOSX10.5'><param name='HOST' value='" + _pmip + "'><param name='Show controls' value='no' /></applet>"
-				});
-			}
+            alert("You need to select a vmachine first");
+          } else {
+            vmid = rows[0].data.vm_id;
+            rows2 = cluster_pane.getSelectionModel().getSelections();  
+            cid = rows2[0].data.cluster_id;
 
 
-      var vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
-			if (!vncwin) {
-			
-			
+      			// for the vnc displays, create a new vnc window			
+      			function createVNCwin(_cid, _vmid, _pmip, _vnc_port) {
+      				desktop.createWindow({
+			      		id: 'vnc_vm_' + _cid + "_" + _vmid , // TODO  change the win name
+      					title: "VNC of " + _cid + ", " + _vmid,
+      					width: 815,
+					      height: 633,
+					      minWidth: 640,
+					      minHeight: 400,
+					      shim: false,
+					      margins : '0 0 0 0',
+					      cmargins : '0 0 0 0',
+					      animeCollapse: false,
+					      constrainHeader: true,
+
+      					listeners: {
+      					  resize: {
+					          fn: function() {
+        					    var vncapp = Ext.get('vnc_vm_' + _cid + "_" + _vmid);
+        					    console.log(vncapp);
+        					    var sz = this.getSize();
+        					    vncapp.dom.height = sz.height - 33;
+        					    vncapp.dom.width = sz.width - 15;
+                    }
+      					  }
+      					},
+
+      					html : "<applet archive='http://" + _pmip + ":3000/vncviewer.jar' id='" + 'vnc_vm_' + _cid + "_" + _vmid +
+      					        "' code='VncViewer.class' width='800' height='600'><param name='PORT' value='" + _vnc_port + 
+      					        "' /><param name='ENCODING' value='tight' /><param name='PASSWORD' value='MacOSX10.5'><param name='HOST' value='" + _pmip +
+      					        "'><param name='Show controls' value='no' /></applet>"
+      				});
+      			}
+
+            var vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
+      			if (!vncwin) {
+      			
 			        Ext.Ajax.request({
-              url: '/connect.php',
-            params: {
-                moduleId: 'user-job-manager',
-                action: "infoVM",
-             vm_id: vmid
-            },
-            success: function(o){
-                if (o && o.responseText && Ext.decode(o.responseText).success) {
+                url: '/connect.php',
+                params: {
+                  moduleId: 'user-job-manager',
+                  action: "infoVM",
+                  vm_id: vmid
+                },
+                success: function(o){
+                  if (o && o.responseText && Ext.decode(o.responseText).success) {
                     // refresh
-                  createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port );
-                vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
+                    createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port );
+                    vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
                     vncwin.show();
-                }
-                else {
+                  } else {
                     // TODO when create failed
+                  }
+                },
+                failure: function(){
+                  // TODO when connect failed
                 }
-            },
-            failure: function(){
-                // TODO when connect failed
+              });
+    			  }
+    			  
+      			if (vncwin)
+        			vncwin.show(); // TODO show it
             }
-          });
-			
-			
-			
-			
-
-			}    
-			
-			if (vncwin)
-  			vncwin.show(); // TODO show it
-			
-}
-	
-        }
-			}, '-' ,{
-			  text: "Refresh",
-			  iconCls:'user-job-manager-refresh',
-			  handler: function() {
-			    vm_store.reload();
-        }
-			}
+            
+          }
+  			}, '-' ,{
+  			  text: "Refresh",
+	  		  iconCls:'user-job-manager-refresh',
+  			  handler: function() {
+	  		    vm_store.reload();
+          }
+  			}
 			]
 		});
-		
 		
 		var cluster_pane = new Ext.grid.GridPanel({
 			title : "Clusters",
 			region : "west",
-
-	store:cluster_store,
+			
+    	store:cluster_store,
 			split : true,
 			loadMask: true,
 			width : 210,
 			margins : '3 0 3 3',
 			cmargins : '3 3 3 3',
-	cm: cluster_cm,
+    	cm: cluster_cm,
 			tbar: [{
 				text:'New',
 				tooltip:'Add a new row',
 				iconCls:'user-job-manager-add',
 				
-// XXX add cluster
-handler:function() {
-  
-  // TODO choose cluster name
-  
-  var cluster_name = prompt("", "My_Cluster_" + cluster_store.getCount());
-  if (cluster_name.length < 1)
-    return;
-  
-  Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "addCluster",
-      vcluster_name: cluster_name 
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-            cluster_store.reload();
+        // add new cluster
+        handler:function() {
+          var cluster_name = prompt("", "My_Cluster_" + (cluster_store.getCount() + 1));
+          if (cluster_name.length < 1) {
+            return;
+          }
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "addCluster",
+              vcluster_name: cluster_name 
+            },
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                // refresh
+                cluster_store.reload();
+              } else {
+                // TODO when create failed
+              }
+            },
+            failure: function(){
+              // TODO when connect failed
+            }
+          });
         }
-        else {
-            // TODO when create failed
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-    }
-  });
-  
-  
-  
-}
-
-				}, '-', {
+		  }, '-', {
 				text:'Remove',
 				tooltip:'Remove the selected item',
 				iconCls:'user-job-manager-remove',
+				
+        //  remove grid
+        handler:function() {
+          var rows = cluster_pane.getSelectionModel().getSelections();
+          if (rows.length == 0) {
+            alert("Select a cluster first!");
+            return;
+          }
+          
+          var cluster_cid = rows[0].data.cluster_id;
 
-// XXX remove grid
-handler:function() {
+          Ext.Ajax.request({
+            url: '/connect.php',
+            params: {
+              moduleId: 'user-job-manager',
+              action: "removeCluster",
+              vcluster_cid: cluster_cid
+            },
+            success: function(o){
+              if (o && o.responseText && Ext.decode(o.responseText).success) {
+                // refresh
+                cluster_store.reload();
+                vm_store.removeAll();			      
 
+    			      vm_store.proxy = new Ext.data.HttpProxy({
+    		    		  url: '/connect.php?action=listVM&moduleId=user-job-manager'
+          			});            
+              } else {
+                // TODO when create failed
+              }
+            },
+            failure: function(){
+              // TODO when connect failed
+            }
+          });
+        }
+        
+			},'-', {
+			  text:'Refresh',
+  			iconCls:'user-job-manager-refresh',
+  			handler:function(){
+		      cluster_store.reload();
+		      vm_store.removeAll();
 
-var rows = cluster_pane.getSelectionModel().getSelections();
-if (rows.length == 0) {
-  alert("Select a cluster first!");
-  return;
-}
-
-
-  var cluster_cid = rows[0].data.cluster_id;
-
-  Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "removeCluster",
-     vcluster_cid: cluster_cid
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
-            // refresh
-            cluster_store.reload();
-            vm_store.removeAll();
-			      
-			      vm_store.proxy = new Ext.data.HttpProxy({
-		    		  url: '/connect.php?action=listVM&moduleId=user-job-manager'
+		      vm_store.proxy = new Ext.data.HttpProxy({
+    				url: '/connect.php?action=listVM&moduleId=user-job-manager'
     			});
-            
-        }
-        else {
-            // TODO when create failed
-        }
-    },
-    failure: function(){
-        // TODO when connect failed
-    }
-  });
-  
-}
-
-			},'-', {text:'Refresh',
-			
-			iconCls:'user-job-manager-refresh',
-			
-			handler:function(){
-			
-			
-			      cluster_store.reload();
-			      vm_store.removeAll();
-			      
-			      vm_store.proxy = new Ext.data.HttpProxy({
-				url: '/connect.php?action=listVM&moduleId=user-job-manager'
-			});
-			   
-//			        cluster_pane.getView().refresh(true);
-//			        alert(3);
-			
-			}}]
+  			}
+  		}]
 		});
 		
-		
-	
-	 function cluster_row_click() {
-
-
-   // XXX how to change the vmachine lists -> change the cid
-   
-    rows = cluster_pane.getSelectionModel().getSelections();
+  	function cluster_row_click() {
+  	
+      // XXX how to change the vmachine lists -> change the cid
+      rows = cluster_pane.getSelectionModel().getSelections();
 
       vm_store.proxy = new Ext.data.HttpProxy({
 				url: '/connect.php?action=listVM&moduleId=user-job-manager&cid=' + rows[0].data.cluster_id
 			});
-			      vm_store.reload();
-   
-			     
-}
+      vm_store.reload();
+    }
 		
 		cluster_pane.addListener("rowclick", cluster_row_click);
 				
 		function vm_row_click() {
-		//  alert("TODO row click of vm list");
+		  //  alert("TODO row click of vm list");
+      var html = "";
+      rows = vm_pane.getSelectionModel().getSelections();
+      vmid = rows[0].data.vm_id;
+      rows2 = cluster_pane.getSelectionModel().getSelections();
+      cid = rows2[0].data.cluster_id;
 
-var html = "";
-
-
-rows = vm_pane.getSelectionModel().getSelections();
-
-    vmid = rows[0].data.vm_id;
-
-    
-    
-    rows2 = cluster_pane.getSelectionModel().getSelections();
-    
-    cid = rows2[0].data.cluster_id;
-
-
-
-
-  Ext.Ajax.request({
-      url: '/connect.php',
-    params: {
-        moduleId: 'user-job-manager',
-        action: "infoVM",
-     vm_id: vmid
-    },
-    success: function(o){
-        if (o && o.responseText && Ext.decode(o.responseText).success) {
+      Ext.Ajax.request({
+        url: '/connect.php',
+        params: {
+          moduleId: 'user-job-manager',
+          action: "infoVM",
+          vm_id: vmid
+        },
+        success: function(o){
+          if (o && o.responseText && Ext.decode(o.responseText).success) {
             // refresh
-          
-    			html = o.responseText;
-          	info_pane.body.update(html);
-            
-        }
-        else {
+      			html = o.responseText;
+          	info_pane.body.update(html);            
+          } else {
             // TODO when create failed
+          }
+        },
+        failure: function(){
+          // TODO when connect failed
         }
-    },
-    failure: function(){
-        // TODO when connect failed
+      });
     }
-  });
 
-  
-		
-}
-		
 		vm_pane.addListener("rowclick", vm_row_click);
-		
 		var right_pane = new Ext.Panel({
 			region: "center",
 			layout: 'border',
 			items: [vm_pane, info_pane]
 		});
-		
 		
 		if(!win){
 			win = desktop.createWindow({
@@ -712,7 +620,6 @@ rows = vm_pane.getSelectionModel().getSelections();
 				items: [right_pane, cluster_pane],
 				taskbuttonTooltip: '<b>Cluster Manger</b><br>Application for managing virtual clusters'
 			});
-			
 		}
 		win.show();
 	}
