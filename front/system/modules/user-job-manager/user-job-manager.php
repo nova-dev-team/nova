@@ -117,8 +117,21 @@ class UserJobManager {
   }
 
   public function listImage() {
-    echo "{success:true, imglist:['hadoop-slave.img', 'intrepid2.img', 'f8.img']}";
-    // TODO get image list from core
+    $core_reply = file_get_contents("http://localhost:3000/vimage/short_list/");
+    $lst = json_decode($core_reply);
+
+    echo "{'success':true, 'imglist':[";
+
+//    echo "{success:true, imglist:['hadoop-slave.img', 'intrepid2.img', 'f8.img']}";
+    $total = sizeof($lst);
+    for ($i = 0; $i < $total; $i++) {
+      echo "'" . $lst[$i] . "'";
+      if ($i < $total - 1) {
+        echo ",";
+      }
+    }
+    
+    echo "]}";
   }
 
 }

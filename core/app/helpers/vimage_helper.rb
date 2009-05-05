@@ -17,6 +17,22 @@ module VimageHelper
       return result
     end
 
+    # show a list of images, only for the "front"
+    def Helper.short_list
+      result = []
+      Vimage.all.each do |vimage|
+        result << "#{vimage.os_family}: #{vimage.os_name}" # this is to be displayed for users
+        img_name = "" # name of the image, for pmon
+        if vimage.location.rindex "/"
+          img_name = vimage.location[((vimage.location.rindex "/") + 1)..-1]
+        else
+          img_name = vimage.location
+        end
+        result << img_name
+      end
+      return result
+    end
+
     def Helper.add os_family, os_name, location, comment
       result = {}
 

@@ -124,8 +124,8 @@ Ext.override(QoDesk.UserJobManager, {
                 vimageList = Ext.decode(o.responseText).imglist;
                 formHtml = "<table><tr><td>CPU count:</td><td><input id='new_vm_dialog_vcpu'></td></tr><tr><td>Memory:</td><td><input id='new_vm_dialog_mem'></td></tr>";
                 formHtml += "<tr><td>OS Image:</td><td><select id='new_vm_dialog_img'>";
-                for (i = 0; i < vimageList.length; i++) {
-                  formHtml += "<option>" + vimageList[i] + "</option>";
+                for (i = 0; i < vimageList.length; i+=2) {
+                  formHtml += "<option value='" + vimageList[i + 1] + "'>" + vimageList[i] + "</option>";
                 }
                 formHtml += "</select></td></tr>";
                 formHtml += "</table>";
