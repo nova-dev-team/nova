@@ -28,7 +28,7 @@ Ext.override(QoDesk.HadoopWizard, {
 	},
 	
 	hideWindow: function() {
-    this.win.hide();
+    this.win.close();
     this.currentCardId = "";
   },
 	
@@ -55,8 +55,8 @@ Ext.override(QoDesk.HadoopWizard, {
           autoScroll: true,
           id: 'hadoop-wizard-win',
           title: 'Hadoop Wizard Window',
-          width:640,
-          height:480,
+          width:480,
+          height:320,
           iconCls: 'hadoop-wizard-icon',
           items: this.contentPanel,
           shim:false,
@@ -89,13 +89,55 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
 		autoScroll: true,
 		bodyStyle: 'padding:15px',
 		border: false,
-		html: "Cluster Size:<input></input><p><a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a>",
+		html: "<img src='/image/hadoop-logo.jpg'><p>\
+		  Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p>\
+		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
+		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a>",
 		id: config.id
 	});
 	
 	this.actions = {
 		'next' : function(owner){
-			owner.viewCard('hadoop-wizard-2');
+      input_size = Ext.get("hadoop-wiz-clu-size");
+      input_name = Ext.get("hadoop-wiz-clu-name");
+      clu_size = input_size.dom.value;
+      clu_name = input_name.dom.value;
+      
+      if (clu_name.indexOf(" ") != -1 || clu_name.indexOf("\t") != -1) {
+        alert("Space is not allowed in cluster name!");
+        return;
+      }
+      
+      soft_list = ["hadoop", "ganglia"];
+      
+      soft_list_req = "";
+      for (i = 0; i < soft_list.length; i++) {
+        soft_list_req += soft_list[i];
+        if (i < soft_list.length - 1) {
+          soft_list_req += '\n';
+        }
+      }
+      
+      Ext.Ajax.request({
+        url: '/connect.php',
+        params: {
+          moduleId: 'hadoop-wizard',
+          action: "create",
+          vcluster_name: clu_name,
+          vcluster_size: clu_size,
+          software_list: soft_list_req
+        },
+        
+        success: function(o){
+          alert(o.responseText);
+          owner.viewCard('hadoop-wizard-2');
+        },
+        failure: function(){
+          // TODO when connect failed
+        }
+      });
+      
+
 		},
 		
 		'exit' : function(owner){
@@ -162,7 +204,7 @@ Ext.extend(QoDesk.HadoopWizard.ProgressPanel, Ext.Panel, {
   },
   
   freshFunc: function () {
-    alert("HI");
+    alert("TODO: autorefresh");
   },
   
   autorefreshProcId:null,

@@ -104,6 +104,7 @@ class VclusterController < ApplicationController
     r2 = UserHelper::Helper.add_vcluster params[:id], r[:vcluster_cid]
     result = {}
     result[:msg] = r[:msg] + "\n" + r2[:msg]
+    result[:vcluster_cid] = r[:vcluster_cid]
     if (r2[:success] and r[:success]) then
       result[:success] = true
     else

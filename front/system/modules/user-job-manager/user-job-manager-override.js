@@ -478,7 +478,10 @@ Ext.override(QoDesk.UserJobManager, {
         // add new cluster
         handler:function() {
           var cluster_name = prompt("", "My_Cluster_" + (cluster_store.getCount() + 1));
-          if (cluster_name.length < 1) {
+          if (cluster_name == null || cluster_name.length < 1) {
+            return;
+          } else if (cluster_name.indexOf(" ") != -1 || cluster_name.indexOf("\t") != -1) {
+            alert("Space is not allowed in cluster name!");
             return;
           }
           Ext.Ajax.request({

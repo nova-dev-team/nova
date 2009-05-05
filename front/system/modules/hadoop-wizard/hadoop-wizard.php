@@ -1,6 +1,5 @@
 <?php
 
-
 class HadoopWizard {
   
   private $os;
@@ -11,18 +10,18 @@ class HadoopWizard {
   
   
   public function create() {
-    // TODO
+    echo $_REQUEST["software_list"];
+    // TODO send request to core
     echo "{success:true}";
   }
   
+  
   public function progress() {
-    // TODO
+    // TODO: input = cid
     echo "{success:true}";
   }
   
 }
 
-
 ?>
-
 
