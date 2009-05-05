@@ -27,7 +27,6 @@ module PmachineHelper
       else # pmachine ip provided and not added before
 
         begin
-          # TODO multithread authentication
           http_res = Net::HTTP.start(pmachine_ip, 3000) do |http|
             http.get '/a/auth'
           end

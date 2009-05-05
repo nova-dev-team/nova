@@ -21,6 +21,8 @@ module VmachineHelper
     def Helper.create
       result = {}
       vmachine = Vmachine.create
+
+#default settings
       vmachine.settings =<<HERE
 {"mem":512, "img":"", "vcpu":1, "mac":"", "ip":""}
 HERE
@@ -40,7 +42,7 @@ HERE
       return result
     end
 
-    # delete a vmachine, this action will fail if the vmachine is under use
+    # delete a vmachine, this action will force running machines to halt
     def Helper.delete vmachine_vid
       result = {}
       vmachine = Vmachine.find_by_id vmachine_vid[1..-1] if vmachine_vid != nil
@@ -52,9 +54,20 @@ HERE
       else # vmachine found
 
         if vmachine.status != "not running" # check if under use
-          result[:success] = false
-          result[:msg] = "Vmachine #{vmachine_vid} is under use!"
+          # tell pmachine to stop it
+         
+          if vmachine.pmachine != nil 
+            http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+              http.put '/x/' + vmachine.pmon_vmachine_uuid + '/destroy', ""
+            end
+            pmon_msg = http_res.body
+          else
+            pmon_msg = ""
+          end
 
+          Vmachine.delete vmachine
+          result[:success] = true
+          result[:msg] = "Vmachine #{vmachine_vid} is under use, remove forced. Pmon Message:" + pmon_msg
         else # vmachine not under use, could be deleted
           Vmachine.delete vmachine
           result[:success] = true
@@ -174,19 +187,19 @@ HERE
 
               p kvm_xml.xml
 
-url = URI.parse('http://' + hosting_pmachine.ip.to_s + ':3000/x/create')
-req = Net::HTTP::Post.new(url.path)
-req.set_form_data({:define => kvm_xml.xml })
-res = Net::HTTP.new(url.host, url.port).start {
-  |http| http.request(req)
-}
+              url = URI.parse('http://' + hosting_pmachine.ip.to_s + ':3000/x/create')
+              req = Net::HTTP::Post.new(url.path)
+              req.set_form_data({:define => kvm_xml.xml })
+              res = Net::HTTP.new(url.host, url.port).start {
+                |http| http.request(req)
+              }
 
-case res
-when Net::HTTPSuccess, Net::HTTPRedirection
-  puts 'create vmachine ok'
-else
-  res.error!
-end
+              case res
+              when Net::HTTPSuccess, Net::HTTPRedirection
+                puts 'create vmachine ok'
+              else
+                res.error!
+              end
 
               vmachine.status = "deploying"
               print "status set to deploying"
@@ -202,13 +215,13 @@ end
               result[:msg] = "Deployed vmachine #{vmachine_vid} to pmachine #{hosting_pmachine.ip}"
 
 # XXX inform pmon to start vm
-          http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
-            http.put '/x/' + vmachine.pmon_vmachine_uuid + '/start', ""
-          end
+              http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+                http.put '/x/' + vmachine.pmon_vmachine_uuid + '/start', ""
+              end
 
-          pp  '/x/' + vmachine.pmon_vmachine_uuid + '/start'
+              pp  '/x/' + vmachine.pmon_vmachine_uuid + '/start'
 
-          result[:pmon_info2] = http_res.body
+              result[:pmon_info2] = http_res.body
 
 
 # XXX for demo purpose, immediately start pmachine
