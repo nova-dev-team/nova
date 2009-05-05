@@ -7,32 +7,49 @@ Ext.override(QoDesk.HadoopWizard, {
 	
 	contentPanel : null,
 	
+	currentCard : "",
+	
 	layout: null,
 	win : null,
 	
 	bottomBar:null,
 	
+	
+	progressPane: null,
+	
 	viewCard : function(card){
-		this.layout.setActiveItem(card);
+		this.layout.setActiveItem(card);    this.currentCard = card;
+    
+    if (card == "hadoop-wizard-2" && this.win.isVisible()) {
+      this.progressPane.startAutorefresh();
+    } else {
+      this.progressPane.stopAutorefresh();
+    }
 	},
+	
+	hideWindow: function() {
+    this.win.hide();
+    this.currentCardId = "";
+  },
 	
 	createWindow : function(){
 		var desktop = this.app.getDesktop();
 		var win = desktop.getWindow('hadoop-wizard-win');
 		
 		if(!win){
+
+      this.progressPane = new QoDesk.HadoopWizard.ProgressPanel({owner: this, id: 'hadoop-wizard-2'});
 		
 	    this.contentPanel = new Ext.Panel({
-			    activeItem: 0,
-          border: false,
-			    id: 'pref-win-content',
-			    items: [
-          	new QoDesk.HadoopWizard.SettingPanel({owner: this, id: 'hadoop-wizard-1'}),
-          	new QoDesk.HadoopWizard.ProgressPanel({owner: this, id: 'hadoop-wizard-2'})
-          ],
-          layout: 'card',
-        });
-		
+		    activeItem: 0,
+        border: false,
+		    id: 'pref-win-content',
+		    items: [
+        	new QoDesk.HadoopWizard.SettingPanel({owner: this, id: 'hadoop-wizard-1'}),
+        	this.progressPane
+        ],
+        layout: 'card',
+      });
 		
       win = desktop.createWindow({
           autoScroll: true,
@@ -50,10 +67,15 @@ Ext.override(QoDesk.HadoopWizard, {
           taskbuttonTooltip: '<b>HadoopWizard Window</b><br />A HadoopWizard window'
       });
       
+      progressP = this.progressPane;
+      win.on("hide", function() {progressP.stopAutorefresh()});
+      
  			this.layout = this.contentPanel.getLayout();
+ 			this.win = win;
     }
         
     win.show();
+    this.viewCard("hadoop-wizard-1");
   }  
 });
 
@@ -67,56 +89,18 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
 		autoScroll: true,
 		bodyStyle: 'padding:15px',
 		border: false,
-		html: '<ul id="pref-nav-panel"> \
-				<li> \
-					<img src="'+Ext.BLANK_IMAGE_URL+'" class="icon-pref-autorun"/> \
-					<a id="viewShortcuts" href="#">Shortcuts</a><br /> \
-					<span>Choose which applications appear in your shortcuts.</span> \
-				</li> \
-				<li> \
-					<img src="'+Ext.BLANK_IMAGE_URL+'" class="icon-pref-autorun"/> \
-					<a id="viewAutoRun" href="#">Auto Run Apps</a><br /> \
-					<span>Choose which applications open automatically once logged in.</span> \
-				</li> \
-				<li> \
-					<img src="'+Ext.BLANK_IMAGE_URL+'" class="icon-pref-quickstart"/> \
-					<a id="viewQuickstart" href="#">Quick Start Apps</a><br /> \
-					<span>Choose which applications appear in your Quick Start panel.</span> \
-				</li> \
-				<li> \
-					<img src="'+Ext.BLANK_IMAGE_URL+'" class="icon-pref-appearance"/> \
-					<a id="viewAppearance" href="#">Window Color and Appearance</a><br /> \
-					<span>Fine tune window color and style of your windows.</span> \
-				</li> \
-				<li> \
-					<img src="'+Ext.BLANK_IMAGE_URL+'" class="icon-pref-wallpaper"/> \
-					<a id="viewWallpapers" href="#">Desktop Background</a><br /> \
-					<span>Choose from available wallpapers or colors to decorate you desktop.</span> \
-				</li> \
-			</ul>',
+		html: "Cluster Size:<input></input><p><a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a>",
 		id: config.id
 	});
 	
 	this.actions = {
-		'viewShortcuts' : function(owner){
+		'next' : function(owner){
 			owner.viewCard('hadoop-wizard-2');
 		},
 		
-		'viewAutoRun' : function(owner){
-			owner.viewCard('hadoop-wizard-2');
-		},
-		
-		'viewQuickstart' : function(owner){
-	   		owner.viewCard('hadoop-wizard-2');
-	   	},
-	   	
-	   	'viewAppearance' : function(owner){
-	   		owner.viewCard('hadoop-wizard-2');
-	   	},
-	   	
-	   	'viewWallpapers' : function(owner){
-	   		owner.viewCard('hadoop-wizard-2');
-	   	}
+		'exit' : function(owner){
+      owner.hideWindow();
+		}
 	};
 };
 
@@ -146,24 +130,50 @@ Ext.extend(QoDesk.HadoopWizard.SettingPanel, Ext.Panel, {
 });
 
 
+
+
+
 QoDesk.HadoopWizard.ProgressPanel = function(config){
 	this.owner = config.owner;
+	
+
 	
 	QoDesk.HadoopWizard.ProgressPanel.superclass.constructor.call(this, {
 		autoScroll: true,
 		bodyStyle: 'padding:15px',
 		border: false,
-		html: 'BAGA',
+		html: '', // this will be updated automatically by the following function
 		id: config.id
 	});
-	
+
+
 	this.actions = {
 		
 	};
+
+	
 };
 
 
 Ext.extend(QoDesk.HadoopWizard.ProgressPanel, Ext.Panel, {
+
+  startAutorefresh: function() {
+    this.autorefreshProcId = setInterval(this.freshFunc,3 * 1000);
+  },
+  
+  freshFunc: function () {
+    alert("HI");
+  },
+  
+  autorefreshProcId:null,
+  
+  stopAutorefresh: function() {
+    if (this.autorefreshProcId) {
+      clearInterval(this.autorefreshProcId);
+    }
+    this.autorefreshProcId = null;
+  },
+
 	afterRender : function(){
 		this.body.on({
 			'mousedown': {
@@ -180,6 +190,7 @@ Ext.extend(QoDesk.HadoopWizard.ProgressPanel, Ext.Panel, {
 		});
 		
 		QoDesk.HadoopWizard.ProgressPanel.superclass.afterRender.call(this); // do sizing calcs last
+		
 	},
 	
 	doAction : function(e, t){
