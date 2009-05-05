@@ -1,0 +1,12 @@
+Vmon commands:
+
+  vnew node.list install.list <name>
+    Generate scripts for cluster-installation.
+    node.list is a text file, each line is an ip address
+      format: ip \space hostname
+      
+    install.list is a text file, each line is an software name
+    <name> is a distinct name, represents the installation process.
+
+  vmon <name>
+    <name>, similar to vnew's <name>
