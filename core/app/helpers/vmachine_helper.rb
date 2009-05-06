@@ -404,6 +404,7 @@ HERE
         result[:pm_ip] = ""
         result[:pmon_uuid] = ""
         result[:vnc_port] = "-1"
+        result[:vm_image] = "Img"
         result[:vm_setting] = vmachine.settings
         if vmachine.pmachine
           result[:pm_ip] = vmachine.pmachine.ip

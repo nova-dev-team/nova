@@ -1,5 +1,8 @@
 module VclusterHelper
 
+  require 'rubygems'
+  require 'json'
+
   require 'net_pool'
   require 'ftools'
 
@@ -187,7 +190,12 @@ module VclusterHelper
               :status => vmachine.status
             }
           info_map[:vimage_name] = "Unknown sys image"
-          info_map[:vimage_name] = vmachine.vimage.location if vmachine.vimage != nil
+
+          vmsetting = JSON.parse(vmachine.settings)
+          info_map[:vimage_name] = vmsetting["img"]
+#          info_map[:raw_setting] = vmsetting.keys
+
+#          info_map[:vimage_name] = vmachine.vimage.location if vmachine.vimage != nil
           vmachine_list << info_map
 
         end

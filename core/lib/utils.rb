@@ -47,7 +47,7 @@ module Utils
       @vm[:uuid] = UUID.random_create.to_s
       @vm[:image] = 'os100m.img'
       @vm[:ip] = '10.0.3.1'
-      @vm[:mem] = 512
+      @vm[:mem] = 512000
       @vm[:vcpu] = 1
       @vm[:bridge] = 'br0'
 
@@ -104,7 +104,7 @@ module Utils
     end
 
     def mem=(mem)
-      @vm[:mem] = mem
+      @vm[:mem] = mem*1024x
     end
 
     def vcpu

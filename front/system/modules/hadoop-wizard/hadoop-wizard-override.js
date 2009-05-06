@@ -56,7 +56,7 @@ Ext.override(QoDesk.HadoopWizard, {
           id: 'hadoop-wizard-win',
           title: 'Hadoop Wizard Window',
           width:480,
-          height:320,
+          height:240,
           iconCls: 'hadoop-wizard-icon',
           items: this.contentPanel,
           shim:false,
@@ -85,23 +85,53 @@ Ext.override(QoDesk.HadoopWizard, {
 QoDesk.HadoopWizard.SettingPanel = function(config){
 	this.owner = config.owner;
 	
+	this.basic_html = "<img src='/image/hadoop-logo.jpg'><p>\
+		  Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p>\
+		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
+		  <div align='right'><a id='advanced' href='#'>Show advanced options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
+		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
+		  
+	this.advanced_html = "<img src='/image/hadoop-logo.jpg'><p>\
+		  Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p>\
+		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
+ 		  Memory Size:<input id='hadoop-wiz-mem-size' value='512'></input><p>\
+ 		  Cpu Count:<input id='hadoop-wiz-vcpu' value='1'></input><p>\
+		  <div align='right'><a id='basic' href='#'>Show basic options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
+		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
+	
 	QoDesk.HadoopWizard.SettingPanel.superclass.constructor.call(this, {
 		autoScroll: true,
 		bodyStyle: 'padding:15px',
 		border: false,
-		html: "<img src='/image/hadoop-logo.jpg'><p>\
-		  Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p>\
-		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
-		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a>",
+		html: this.basic_html,
 		id: config.id
 	});
 	
+	helper = this;
+	
+  this.setHeight(240);
+	
 	this.actions = {
+  	'basic' : function(owner) {
+      helper.body.update(helper.basic_html);
+      owner.win.setHeight(240);
+    },
+    
+	  'advanced' : function(owner) {
+      helper.body.update(helper.advanced_html);
+      owner.win.setHeight(320);
+    },
+	
 		'next' : function(owner){
       input_size = Ext.get("hadoop-wiz-clu-size");
       input_name = Ext.get("hadoop-wiz-clu-name");
+      input_mem_size = Ext.get("hadoop-wiz-mem-size");
+      input_vcpu = Ext.get("hadoop-wiz-vcpu");
       clu_size = input_size.dom.value;
       clu_name = input_name.dom.value;
+      mem_size_val = input_mem_size.dom.value;
+      vcpu_count = input_vcpu.dom.value;
+      
       
       if (clu_name.indexOf(" ") != -1 || clu_name.indexOf("\t") != -1) {
         alert("Space is not allowed in cluster name!");
@@ -125,7 +155,10 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
           action: "create",
           vcluster_name: clu_name,
           vcluster_size: clu_size,
-          software_list: soft_list_req
+          software_list: soft_list_req,
+          mem_size: mem_size_val,
+          vcpu: vcpu_count,
+          app_name: "hadoop"
         },
         
         success: function(o){

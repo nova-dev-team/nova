@@ -20,12 +20,12 @@ class HadoopWizard {
     }
     
     // CHANGE Settings
-    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=vcpu&value=4");
+    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=vcpu&value=" . $_REQUEST["vcpu"]);
 
-    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=mem&value=4001");
+    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=mem&value="  . $_REQUEST["mem_size"]);
     
     // image will be mapped
-    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=img&value=hadoop");
+    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=img&value=" . $_REQUEST["app_name"]);
     
 //    echo "http://localhost:3000/batch/change_setting/" . $cid."?item=vcpu&value=4";
     // TODO add soft list
