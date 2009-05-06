@@ -37,7 +37,7 @@ CREATE TABLE  `nova_core`.`net_pools` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=832494619 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nova_core`.`net_pools`
@@ -45,6 +45,9 @@ CREATE TABLE  `nova_core`.`net_pools` (
 
 /*!40000 ALTER TABLE `net_pools` DISABLE KEYS */;
 LOCK TABLES `net_pools` WRITE;
+INSERT INTO `nova_core`.`net_pools` VALUES  (832494616,'neta','10.0.3.2','28',13,1,3,'2009-05-06 06:43:05','2009-05-06 06:48:40'),
+ (832494617,'netb','10.0.3.18','28',13,0,0,'2009-05-06 06:43:05','2009-05-06 06:43:05'),
+ (832494618,'netc','10.0.3.34','28',13,0,0,'2009-05-06 06:43:05','2009-05-06 06:43:05');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `net_pools` ENABLE KEYS */;
 
@@ -95,8 +98,6 @@ CREATE TABLE  `nova_core`.`pmachines` (
 
 /*!40000 ALTER TABLE `pmachines` DISABLE KEYS */;
 LOCK TABLES `pmachines` WRITE;
-INSERT INTO `nova_core`.`pmachines` VALUES  (1,'10.0.0.210','pending remove','2009-04-22 08:02:43','2009-04-27 03:56:19'),
- (2,'10.0.0.220','working','2009-04-27 03:56:29','2009-04-27 03:56:29');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `pmachines` ENABLE KEYS */;
 
@@ -138,7 +139,7 @@ CREATE TABLE  `nova_core`.`users` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=266 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=267 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nova_core`.`users`
@@ -146,11 +147,7 @@ CREATE TABLE  `nova_core`.`users` (
 
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 LOCK TABLES `users` WRITE;
-INSERT INTO `nova_core`.`users` VALUES  (1,'misamisa','2009-04-21 15:33:08','2009-04-21 15:33:08'),
- (262,'madao','2009-04-26 14:21:50','2009-04-26 14:21:50'),
- (263,'mako1','2009-04-26 14:26:00','2009-04-26 14:26:00'),
- (264,'hg@hg.com','2009-04-26 14:44:13','2009-04-26 14:44:13'),
- (265,'zhyang','2009-04-27 05:20:09','2009-04-27 05:20:09');
+INSERT INTO `nova_core`.`users` VALUES  (266,'tomcat','2009-05-06 06:51:12','2009-05-06 06:51:12');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
@@ -167,7 +164,7 @@ CREATE TABLE  `nova_core`.`vclusters` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=140 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nova_core`.`vclusters`
@@ -175,142 +172,9 @@ CREATE TABLE  `nova_core`.`vclusters` (
 
 /*!40000 ALTER TABLE `vclusters` DISABLE KEYS */;
 LOCK TABLES `vclusters` WRITE;
-INSERT INTO `nova_core`.`vclusters` VALUES  (1,NULL,'miko','2009-04-21 15:21:39','2009-04-22 06:29:43'),
- (2,NULL,'#unnamed#','2009-04-21 15:33:26','2009-04-22 06:29:21'),
- (3,NULL,'#unnamed#','2009-04-21 15:35:56','2009-04-21 15:35:56'),
- (4,NULL,'mina','2009-04-21 15:36:27','2009-04-21 15:36:27'),
- (5,NULL,'#unnamed#','2009-04-21 15:36:44','2009-04-21 15:36:44'),
- (6,NULL,'#unnamed#','2009-04-21 15:37:03','2009-04-21 15:37:03'),
- (7,NULL,'#unnamed#','2009-04-21 15:37:03','2009-04-21 15:37:03'),
- (8,NULL,'#unnamed#','2009-04-21 15:37:17','2009-04-21 15:37:17'),
- (9,NULL,'#unnamed#','2009-04-21 15:37:23','2009-04-21 15:37:23'),
- (10,NULL,'#unnamed#','2009-04-21 15:37:24','2009-04-21 15:37:24'),
- (11,NULL,'#unnamed#','2009-04-21 15:37:25','2009-04-21 15:37:25'),
- (12,NULL,'nana','2009-04-21 15:37:54','2009-04-21 15:37:54'),
- (13,NULL,'nana','2009-04-21 15:38:14','2009-04-21 15:38:14'),
- (14,NULL,'nana','2009-04-21 15:38:16','2009-04-21 15:38:16'),
- (15,NULL,'nana','2009-04-21 15:38:34','2009-04-21 15:38:34'),
- (16,NULL,'nana','2009-04-21 15:38:53','2009-04-21 15:38:53');
-INSERT INTO `nova_core`.`vclusters` VALUES  (17,NULL,'nana','2009-04-21 15:38:53','2009-04-21 15:38:53'),
- (18,NULL,'nana','2009-04-21 15:39:02','2009-04-21 15:39:02'),
- (19,NULL,'nana','2009-04-21 15:39:13','2009-04-21 15:39:13'),
- (20,NULL,'nana','2009-04-21 15:39:19','2009-04-21 15:39:19'),
- (21,NULL,'nana','2009-04-21 15:39:21','2009-04-21 15:39:21'),
- (22,NULL,'nana','2009-04-21 15:39:22','2009-04-21 15:39:22'),
- (23,NULL,'moka','2009-04-21 15:48:05','2009-04-21 15:48:05'),
- (24,NULL,'moka','2009-04-21 15:48:06','2009-04-21 15:48:06'),
- (25,NULL,'moka','2009-04-21 15:48:27','2009-04-21 15:48:27'),
- (26,NULL,'#unnamed#','2009-04-21 15:48:54','2009-04-21 15:48:54'),
- (27,NULL,'moka','2009-04-21 15:49:07','2009-04-21 15:49:07'),
- (28,NULL,'nanamisamisa','2009-04-21 15:49:13','2009-04-21 15:49:13'),
- (29,NULL,'nanamisamisa','2009-04-21 15:50:19','2009-04-21 15:50:19'),
- (30,NULL,'nanamisamisa','2009-04-21 15:50:20','2009-04-21 15:50:20'),
- (31,NULL,'nana','2009-04-21 15:50:39','2009-04-21 15:50:39'),
- (32,NULL,'nana','2009-04-21 15:50:40','2009-04-21 15:50:40');
-INSERT INTO `nova_core`.`vclusters` VALUES  (33,NULL,'nana','2009-04-21 15:50:52','2009-04-21 15:50:52'),
- (34,NULL,'nana','2009-04-21 15:50:52','2009-04-21 15:50:52'),
- (35,NULL,'misamisa','2009-04-21 15:52:40','2009-04-21 15:52:40'),
- (36,NULL,'misamisa','2009-04-21 15:52:45','2009-04-21 15:52:45'),
- (37,NULL,'misamisa','2009-04-21 15:52:49','2009-04-21 15:52:49'),
- (38,NULL,'nana','2009-04-21 15:52:56','2009-04-21 15:52:56'),
- (39,NULL,'nana','2009-04-21 15:52:57','2009-04-21 15:52:57'),
- (40,NULL,'nana','2009-04-21 15:52:58','2009-04-21 15:52:58'),
- (41,NULL,'nana','2009-04-21 15:52:59','2009-04-21 15:52:59'),
- (42,NULL,'nana','2009-04-21 15:53:02','2009-04-21 15:53:02'),
- (43,NULL,'nana','2009-04-21 15:53:07','2009-04-21 15:53:07'),
- (44,NULL,'nana','2009-04-21 15:53:08','2009-04-21 15:53:08'),
- (45,NULL,'nana','2009-04-21 15:53:08','2009-04-21 15:53:08'),
- (46,NULL,'nana','2009-04-21 15:53:08','2009-04-21 15:53:08'),
- (47,NULL,'nana','2009-04-21 15:53:08','2009-04-21 15:53:08'),
- (48,NULL,'nana','2009-04-21 15:53:09','2009-04-21 15:53:09');
-INSERT INTO `nova_core`.`vclusters` VALUES  (49,NULL,'nana','2009-04-21 15:53:09','2009-04-21 15:53:09'),
- (50,NULL,'nana','2009-04-21 15:53:09','2009-04-21 15:53:09'),
- (51,NULL,'nana','2009-04-21 15:53:09','2009-04-21 15:53:09'),
- (52,NULL,'nana','2009-04-21 15:53:32','2009-04-21 15:53:32'),
- (53,NULL,'nana','2009-04-21 15:53:33','2009-04-21 15:53:33'),
- (54,NULL,'nana','2009-04-21 15:53:33','2009-04-21 15:53:33'),
- (55,NULL,'nana','2009-04-21 15:53:34','2009-04-21 15:53:34'),
- (56,NULL,'nana','2009-04-21 15:53:58','2009-04-21 15:53:58'),
- (57,NULL,'nana','2009-04-21 15:53:58','2009-04-21 15:53:58'),
- (58,NULL,'nana','2009-04-21 15:53:59','2009-04-21 15:53:59'),
- (59,NULL,'nana','2009-04-21 15:53:59','2009-04-21 15:53:59'),
- (60,NULL,'crappy-test','2009-04-21 15:54:10','2009-04-21 15:54:10'),
- (61,NULL,'crappy-test','2009-04-21 15:54:25','2009-04-21 15:54:25'),
- (62,NULL,'crappy-test','2009-04-21 15:54:26','2009-04-21 15:54:26'),
- (63,NULL,'crappy-test','2009-04-21 15:54:27','2009-04-21 15:54:27'),
- (64,NULL,'crappy-test','2009-04-21 15:54:28','2009-04-21 15:54:28');
-INSERT INTO `nova_core`.`vclusters` VALUES  (65,NULL,'crappy-test','2009-04-21 15:54:29','2009-04-21 15:54:29'),
- (66,NULL,'crappy-test','2009-04-21 15:54:30','2009-04-21 15:54:30'),
- (67,NULL,'crappy-test','2009-04-21 15:54:31','2009-04-21 15:54:31'),
- (68,NULL,'crappy-test','2009-04-21 15:54:33','2009-04-21 15:54:33'),
- (69,NULL,'crappy-test','2009-04-21 15:54:35','2009-04-21 15:54:35'),
- (70,NULL,'crappytest','2009-04-21 15:55:29','2009-04-21 15:55:29'),
- (71,NULL,'nana','2009-04-21 15:55:36','2009-04-21 15:55:36'),
- (72,NULL,'crappytest','2009-04-21 16:15:07','2009-04-21 16:15:07'),
- (73,NULL,'test-TODO','2009-04-21 16:16:16','2009-04-21 16:16:16'),
- (74,NULL,'test-TODO','2009-04-21 16:16:17','2009-04-21 16:16:17'),
- (75,NULL,'test-TODO','2009-04-21 16:16:18','2009-04-21 16:16:18'),
- (76,NULL,'test-TODO','2009-04-21 16:16:18','2009-04-21 16:16:18'),
- (77,NULL,'test-TODO','2009-04-21 16:17:23','2009-04-21 16:17:23'),
- (78,NULL,'test-TODO','2009-04-21 16:17:24','2009-04-21 16:17:24'),
- (79,NULL,'test-TODO','2009-04-21 16:17:25','2009-04-21 16:17:25');
-INSERT INTO `nova_core`.`vclusters` VALUES  (80,NULL,'test-TODO','2009-04-22 02:10:13','2009-04-22 02:10:13'),
- (81,NULL,'test-TODO','2009-04-22 02:10:14','2009-04-22 02:10:14'),
- (82,NULL,'test-TODO','2009-04-22 02:10:14','2009-04-22 02:10:14'),
- (83,NULL,'test-TODO','2009-04-22 14:27:47','2009-04-22 14:27:47'),
- (84,NULL,'test-TODO','2009-04-22 14:27:48','2009-04-22 14:27:48'),
- (85,NULL,'#unnamed#','2009-04-23 17:17:04','2009-04-23 17:17:04'),
- (86,NULL,'My_Cluster_9','2009-04-23 17:17:33','2009-04-23 17:17:33'),
- (87,NULL,'#unnamed#','2009-04-23 17:18:04','2009-04-23 17:18:04'),
- (88,NULL,'test','2009-04-24 07:53:17','2009-04-24 07:53:17'),
- (89,NULL,'My_Cluster_7','2009-04-24 11:56:06','2009-04-24 11:56:06'),
- (90,NULL,'My_Cluster_8','2009-04-25 16:10:37','2009-04-25 16:10:37'),
- (91,NULL,'My_Cluster_0','2009-04-26 14:52:35','2009-04-26 14:52:35'),
- (92,264,'My_Cluster_0','2009-04-26 15:05:12','2009-04-26 15:05:12'),
- (93,264,'My_Cluster_1','2009-04-26 15:05:15','2009-04-26 15:05:15'),
- (94,265,'My_Cluster_1','2009-04-27 05:33:40','2009-04-27 05:33:40');
-INSERT INTO `nova_core`.`vclusters` VALUES  (95,265,'My_Cluster_2','2009-04-27 05:48:22','2009-04-27 05:48:22'),
- (96,NULL,'My_Cluster_1','2009-04-27 05:49:19','2009-04-27 05:49:19'),
- (97,NULL,'My_Cluster_2','2009-04-27 06:12:38','2009-04-27 06:12:38'),
- (98,NULL,'#unnamed#','2009-05-05 08:13:54','2009-05-05 08:13:54'),
- (99,NULL,'#unnamed#','2009-05-05 08:16:47','2009-05-05 08:16:47'),
- (100,NULL,'#unnamed#','2009-05-05 08:18:41','2009-05-05 08:18:41'),
- (101,NULL,'#unnamed#','2009-05-05 08:18:53','2009-05-05 08:18:53'),
- (102,NULL,'#unnamed#','2009-05-05 08:19:49','2009-05-05 08:19:49'),
- (103,NULL,'#unnamed#','2009-05-05 08:20:05','2009-05-05 08:20:05'),
- (104,NULL,'#unnamed#','2009-05-05 08:20:33','2009-05-05 08:20:33'),
- (105,1,'Hadoop_Cluster','2009-05-05 08:22:12','2009-05-05 08:22:12'),
- (106,NULL,'alice','2009-05-06 03:45:29','2009-05-06 03:45:29'),
- (107,NULL,'alice2','2009-05-06 03:46:10','2009-05-06 03:46:10'),
- (108,NULL,'alice3','2009-05-06 03:50:25','2009-05-06 03:50:25'),
- (109,NULL,'alice4','2009-05-06 03:51:18','2009-05-06 03:51:18');
-INSERT INTO `nova_core`.`vclusters` VALUES  (110,NULL,'jonny','2009-05-06 03:53:27','2009-05-06 03:53:27'),
- (111,NULL,'jonny2','2009-05-06 03:54:00','2009-05-06 03:54:00'),
- (112,NULL,'jonny4','2009-05-06 03:54:22','2009-05-06 03:54:22'),
- (113,NULL,'jonnytheking','2009-05-06 03:55:15','2009-05-06 03:55:15'),
- (114,NULL,'jonnytheking','2009-05-06 03:57:36','2009-05-06 03:57:36'),
- (115,NULL,'jonnytheking','2009-05-06 03:59:10','2009-05-06 03:59:10'),
- (116,NULL,'jonnytheking','2009-05-06 03:59:17','2009-05-06 03:59:17'),
- (117,NULL,'jonnytheking','2009-05-06 03:59:49','2009-05-06 03:59:49'),
- (118,NULL,'jonnytheking','2009-05-06 03:59:50','2009-05-06 03:59:50'),
- (119,NULL,'bigc','2009-05-06 04:00:28','2009-05-06 04:00:28'),
- (120,NULL,'bigc','2009-05-06 04:00:31','2009-05-06 04:00:31'),
- (121,NULL,'bigc','2009-05-06 04:00:32','2009-05-06 04:00:32'),
- (122,NULL,'bigc','2009-05-06 04:00:33','2009-05-06 04:00:33'),
- (123,NULL,'bigc','2009-05-06 04:00:34','2009-05-06 04:00:34'),
- (124,NULL,'bigc','2009-05-06 04:00:34','2009-05-06 04:00:34'),
- (125,NULL,'bigc','2009-05-06 04:00:35','2009-05-06 04:00:35');
-INSERT INTO `nova_core`.`vclusters` VALUES  (126,NULL,'bigc','2009-05-06 04:02:00','2009-05-06 04:02:00'),
- (127,NULL,'bigc','2009-05-06 04:02:26','2009-05-06 04:02:26'),
- (128,NULL,'bigc','2009-05-06 04:02:27','2009-05-06 04:02:27'),
- (129,NULL,'bigc','2009-05-06 04:02:27','2009-05-06 04:02:27'),
- (130,NULL,'bigc','2009-05-06 04:09:33','2009-05-06 04:09:33'),
- (131,NULL,'bigc1','2009-05-06 04:11:33','2009-05-06 04:11:33'),
- (132,NULL,'bigc1','2009-05-06 04:12:30','2009-05-06 04:12:30'),
- (133,NULL,'bigc1','2009-05-06 04:12:31','2009-05-06 04:12:31'),
- (134,NULL,'bigc1','2009-05-06 04:12:45','2009-05-06 04:12:45'),
- (135,NULL,'bigc1','2009-05-06 04:13:10','2009-05-06 04:13:10'),
- (136,NULL,'abccd','2009-05-06 04:16:35','2009-05-06 04:16:35');
+INSERT INTO `nova_core`.`vclusters` VALUES  (137,NULL,'My_Cluster_1','2009-05-06 06:50:16','2009-05-06 06:50:16'),
+ (138,NULL,'My_Cluster_1','2009-05-06 06:50:32','2009-05-06 06:50:32'),
+ (139,266,'My_Cluster_1','2009-05-06 06:52:27','2009-05-06 06:52:27');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `vclusters` ENABLE KEYS */;
 
@@ -339,9 +203,6 @@ CREATE TABLE  `nova_core`.`vimages` (
 
 /*!40000 ALTER TABLE `vimages` DISABLE KEYS */;
 LOCK TABLES `vimages` WRITE;
-INSERT INTO `nova_core`.`vimages` VALUES  (1,NULL,'Linux','Fedora 8',0,'ftp://localhost/f8.img','','2009-05-05 04:19:02','2009-05-05 04:19:02'),
- (2,NULL,'Linux','Ubuntu(Intrepid)',0,'ftp://localhost/intrepid2.img','','2009-05-05 04:19:53','2009-05-05 04:19:53'),
- (3,NULL,'Linux','Hadoop-Slave',0,'ftp://localhost/hadoop-slave.img','','2009-05-05 04:20:21','2009-05-05 04:20:21');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `vimages` ENABLE KEYS */;
 
@@ -363,7 +224,7 @@ CREATE TABLE  `nova_core`.`vmachines` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=124 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nova_core`.`vmachines`
@@ -371,126 +232,7 @@ CREATE TABLE  `nova_core`.`vmachines` (
 
 /*!40000 ALTER TABLE `vmachines` DISABLE KEYS */;
 LOCK TABLES `vmachines` WRITE;
-INSERT INTO `nova_core`.`vmachines` VALUES  (1,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:29:50','2009-04-21 16:29:50'),
- (2,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:29:52','2009-04-23 06:16:40'),
- (3,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:29:52','2009-04-21 16:29:52'),
- (4,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:29:52','2009-04-23 06:45:13'),
- (5,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:30:34','2009-04-23 06:45:17'),
- (6,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:30:36','2009-04-23 06:49:23'),
- (7,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:31:44','2009-04-23 06:55:56'),
- (8,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:31:50','2009-04-21 16:31:50'),
- (9,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:31:51','2009-04-21 16:31:51'),
- (10,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:31:51','2009-04-21 16:31:51'),
- (11,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:31:51','2009-04-21 16:31:51'),
- (12,NULL,NULL,64,NULL,NULL,'not running',NULL,'2009-04-21 16:31:51','2009-04-21 16:31:51');
-INSERT INTO `nova_core`.`vmachines` VALUES  (13,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:33:15','2009-04-23 06:39:47'),
- (14,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:33:44','2009-04-21 16:33:44'),
- (15,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:33:46','2009-04-21 16:33:46'),
- (16,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:33:47','2009-04-21 16:33:47'),
- (17,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:33:47','2009-04-21 16:33:47'),
- (18,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:33:50','2009-04-21 16:33:50'),
- (19,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:34:01','2009-04-21 16:34:01'),
- (20,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:34:02','2009-04-21 16:34:02'),
- (21,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:34:04','2009-04-21 16:34:04'),
- (22,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:34:06','2009-04-21 16:34:06'),
- (23,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:51:09','2009-04-21 16:51:09'),
- (24,NULL,NULL,79,NULL,NULL,'not running',NULL,'2009-04-21 16:51:14','2009-04-21 16:51:14');
-INSERT INTO `nova_core`.`vmachines` VALUES  (25,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:51:14','2009-04-21 16:51:14'),
- (26,NULL,NULL,79,NULL,NULL,'not running',NULL,'2009-04-21 16:51:15','2009-04-21 16:51:15'),
- (27,NULL,NULL,79,NULL,NULL,'not running',NULL,'2009-04-21 16:51:16','2009-04-21 16:51:16'),
- (28,NULL,NULL,NULL,NULL,'','not running',NULL,'2009-04-21 16:51:19','2009-04-26 17:23:16'),
- (29,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:51:20','2009-04-23 06:16:58'),
- (30,'10.0.3.1',NULL,NULL,NULL,'','not running',NULL,'2009-04-21 16:51:21','2009-04-26 17:23:19'),
- (31,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:51:22','2009-04-23 16:26:22'),
- (32,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:51:24','2009-04-21 16:51:24'),
- (33,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:51:28','2009-04-21 16:51:28'),
- (34,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-21 16:51:30','2009-04-23 16:31:51'),
- (35,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 02:10:17','2009-04-23 06:16:06'),
- (39,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 05:47:33','2009-04-22 05:47:33');
-INSERT INTO `nova_core`.`vmachines` VALUES  (40,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 05:47:33','2009-04-22 05:47:33'),
- (41,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 05:47:33','2009-04-22 05:47:33'),
- (42,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 06:12:16','2009-04-22 06:12:16'),
- (43,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 06:29:49','2009-04-22 06:29:49'),
- (44,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 14:27:50','2009-04-22 14:27:50'),
- (45,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 14:27:50','2009-04-22 14:27:50'),
- (46,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-22 14:27:50','2009-04-22 14:27:50'),
- (47,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-23 06:44:39','2009-04-23 06:44:39'),
- (48,NULL,1,NULL,NULL,NULL,'not running',NULL,'2009-04-24 05:16:50','2009-04-24 05:16:59'),
- (49,'10.0.3.1',NULL,NULL,NULL,'','not running',NULL,'2009-04-24 05:22:59','2009-04-26 17:25:00'),
- (50,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-24 05:26:36','2009-04-24 05:26:36'),
- (51,'10.0.3.1',NULL,NULL,NULL,'','not running',NULL,'2009-04-24 05:38:51','2009-04-26 17:25:04');
-INSERT INTO `nova_core`.`vmachines` VALUES  (52,'10.0.3.1',NULL,NULL,NULL,'','not running',NULL,'2009-04-24 05:42:29','2009-04-26 17:25:06'),
- (53,'10.0.3.1',NULL,NULL,NULL,'','not running',NULL,'2009-04-24 06:10:22','2009-04-26 17:23:23'),
- (54,'10.0.3.1',NULL,NULL,NULL,'','not running',NULL,'2009-04-24 06:33:43','2009-04-24 06:34:50'),
- (55,NULL,1,NULL,NULL,NULL,'not running',NULL,'2009-04-24 07:53:20','2009-04-24 07:53:24'),
- (56,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-24 07:53:21','2009-04-24 07:53:21'),
- (57,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-24 07:53:22','2009-04-24 07:53:22'),
- (58,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-24 07:53:22','2009-04-24 07:53:23'),
- (59,NULL,1,NULL,NULL,NULL,'not running',NULL,'2009-04-24 08:57:27','2009-04-24 08:57:31'),
- (60,NULL,1,NULL,NULL,NULL,'not running',NULL,'2009-04-24 11:56:09','2009-04-24 11:56:14'),
- (61,'10.0.3.1',NULL,NULL,NULL,'','not running',NULL,'2009-04-24 11:57:42','2009-04-26 17:21:43'),
- (62,NULL,NULL,NULL,NULL,NULL,'not running',NULL,'2009-04-25 14:32:36','2009-04-25 14:32:36');
-INSERT INTO `nova_core`.`vmachines` VALUES  (63,NULL,NULL,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\"}\n','2009-04-25 14:59:27','2009-04-25 14:59:27'),
- (64,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\"}\n','2009-04-25 15:05:09','2009-04-25 15:05:16'),
- (65,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\"}\n','2009-04-25 15:06:38','2009-04-25 15:06:45'),
- (66,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\"}\n','2009-04-25 15:08:38','2009-04-25 15:08:44'),
- (67,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"\",\"mac\":\"fuck\",\"vcpu\":1,\"mem\":512}','2009-04-25 15:09:23','2009-04-25 15:27:18'),
- (68,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:10:17','2009-04-25 15:10:21'),
- (69,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:12:00','2009-04-25 15:12:05'),
- (70,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:12:43','2009-04-25 15:12:48');
-INSERT INTO `nova_core`.`vmachines` VALUES  (71,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:13:07','2009-04-25 15:13:12'),
- (72,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:14:01','2009-04-25 15:14:05'),
- (73,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:14:37','2009-04-25 15:14:41'),
- (74,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:15:47','2009-04-25 15:15:52'),
- (75,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:16:45','2009-04-25 15:16:58'),
- (76,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:18:42','2009-04-25 15:18:46'),
- (77,NULL,1,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:20:14','2009-04-25 15:20:20'),
- (78,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"234\"}','2009-04-25 15:48:45','2009-04-25 15:56:16');
-INSERT INTO `nova_core`.`vmachines` VALUES  (79,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"322\"}','2009-04-25 15:50:12','2009-04-25 15:50:12'),
- (80,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"123\"}','2009-04-25 15:52:37','2009-04-25 15:52:52'),
- (81,NULL,NULL,NULL,NULL,NULL,'not running','{\"mem\":512, \"img\":\"\", \"vcpu\":1, \"mac\":\"\", \"ip\":\"\"}\n','2009-04-25 15:57:20','2009-04-25 15:57:20'),
- (82,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"234\"}','2009-04-25 15:57:32','2009-04-25 15:57:45'),
- (83,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"213\"}','2009-04-25 15:59:16','2009-04-25 15:59:22'),
- (84,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"111\"}','2009-04-25 16:00:12','2009-04-25 16:00:23'),
- (85,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"131\"}','2009-04-25 16:01:24','2009-04-25 16:02:16');
-INSERT INTO `nova_core`.`vmachines` VALUES  (86,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"141\"}','2009-04-25 16:04:07','2009-04-26 17:22:19'),
- (87,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"222\"}','2009-04-25 16:08:21','2009-04-25 16:08:26'),
- (88,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"134\"}','2009-04-25 16:09:11','2009-04-25 16:09:24'),
- (89,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"144\"}','2009-04-25 16:10:47','2009-04-26 17:22:34'),
- (90,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"3\",\"mem\":\"192\"}','2009-04-25 16:13:52','2009-04-26 17:22:37'),
- (91,'10.0.3.1',1,92,NULL,'cef3842f-f4c8-4ddd-889e-fb0aabf7baac','running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"3\",\"mem\":\"123\"}','2009-04-26 15:05:29','2009-04-26 15:05:38'),
- (92,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"3\",\"mem\":\"123\"}','2009-04-26 16:30:49','2009-04-26 16:30:49');
-INSERT INTO `nova_core`.`vmachines` VALUES  (93,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"\",\"mem\":\"\"}','2009-04-26 16:36:49','2009-04-26 16:36:49'),
- (94,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"\",\"mem\":\"\"}','2009-04-26 16:37:21','2009-04-26 16:37:21'),
- (95,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"\",\"mem\":\"\"}','2009-04-26 16:40:06','2009-04-26 16:40:06'),
- (96,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"512\"}','2009-04-26 17:04:06','2009-04-26 17:04:06'),
- (97,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"233\"}','2009-04-26 17:05:31','2009-04-26 17:05:31'),
- (98,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 03:57:22','2009-05-05 04:58:34'),
- (99,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 04:05:53','2009-05-05 04:58:44');
-INSERT INTO `nova_core`.`vmachines` VALUES  (100,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"256\"}','2009-04-27 04:10:31','2009-04-27 04:12:46'),
- (101,NULL,2,NULL,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 04:26:24','2009-04-27 04:26:32'),
- (102,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 05:34:54','2009-04-27 05:38:21'),
- (103,'10.0.3.1',2,94,NULL,'464e53a5-6da5-4af4-922f-99e2fdaaa8e8','running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 05:42:04','2009-04-27 05:47:24'),
- (104,NULL,NULL,94,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 05:48:31','2009-04-27 05:48:31'),
- (105,NULL,NULL,94,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 05:48:41','2009-04-27 05:48:41'),
- (106,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"hadoop-slave.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 05:49:24','2009-04-29 09:23:57');
-INSERT INTO `nova_core`.`vmachines` VALUES  (107,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-27 05:53:41','2009-04-29 09:23:53'),
- (108,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512000\"}','2009-04-27 05:54:42','2009-04-29 09:23:50'),
- (109,NULL,2,NULL,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"512000\"}','2009-04-27 05:55:40','2009-04-27 05:55:43'),
- (110,NULL,2,NULL,NULL,NULL,'not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"512000\"}','2009-04-27 06:04:12','2009-04-27 06:04:14'),
- (111,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"intrepid2.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"1\",\"mem\":\"512000\"}','2009-04-27 06:12:59','2009-04-29 09:23:29'),
- (112,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-04-29 09:10:57','2009-04-29 09:10:58'),
- (113,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512000\"}','2009-04-29 09:11:06','2009-05-05 04:58:12');
-INSERT INTO `nova_core`.`vmachines` VALUES  (114,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:20:06','2009-05-05 08:20:07'),
- (115,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:20:07','2009-05-05 08:20:07'),
- (116,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:20:08','2009-05-05 08:20:08'),
- (117,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:20:08','2009-05-05 08:20:08'),
- (118,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:20:33','2009-05-05 08:20:33'),
- (119,NULL,NULL,NULL,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:20:33','2009-05-05 08:20:33'),
- (120,NULL,NULL,105,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:22:13','2009-05-05 08:22:13');
-INSERT INTO `nova_core`.`vmachines` VALUES  (121,NULL,NULL,105,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:22:13','2009-05-05 08:22:13'),
- (122,NULL,NULL,105,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:22:13','2009-05-05 08:22:13'),
- (123,NULL,NULL,105,NULL,NULL,'not running','{\"img\":\"hadoop-a.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-05 08:22:13','2009-05-05 08:22:13');
+INSERT INTO `nova_core`.`vmachines` VALUES  (124,NULL,NULL,139,NULL,NULL,'not running','{\"img\":\"\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"\",\"mem\":\"\"}','2009-05-06 06:57:57','2009-05-06 06:57:57');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `vmachines` ENABLE KEYS */;
 
@@ -512,7 +254,7 @@ CREATE TABLE  `nova_front`.`currentlyloggedin` (
   `member_id` varchar(45) NOT NULL,
   `group_id` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=107 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`currentlyloggedin`
@@ -533,7 +275,8 @@ INSERT INTO `nova_front`.`currentlyloggedin` VALUES  (10,'6d51c3c6ec21dc91c5b488
  (100,'ce30f2d718ff254f2a5ca31f79b61d70','259','10000'),
  (101,'f06b3eefc00bbc163df86a0ed36eba79','259','10000'),
  (102,'d1b930747bc0645e251bcba1f511aad7','259','10000'),
- (103,'5b803c4de7388eb3933e07e4ddc61092','259','10000');
+ (103,'5b803c4de7388eb3933e07e4ddc61092','259','10000'),
+ (106,'d518bebf29a5add76b14af4bf526483f','266','10000');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `currentlyloggedin` ENABLE KEYS */;
 
@@ -784,7 +527,8 @@ INSERT INTO `nova_front`.`qo_groups_has_members` VALUES  (1,231,1,1),
  (10000,262,1,0),
  (10000,263,1,0),
  (10000,264,1,0),
- (10000,265,1,0);
+ (10000,265,1,0),
+ (10000,266,1,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_groups_has_members` ENABLE KEYS */;
 
@@ -828,7 +572,7 @@ CREATE TABLE  `nova_front`.`qo_members` (
   `language` varchar(5) default 'en',
   `active` tinyint(1) unsigned NOT NULL default '0' COMMENT 'Is the member currently active',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=266 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=267 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`qo_members`
@@ -840,6 +584,7 @@ INSERT INTO `nova_front`.`qo_members` VALUES  (200,'Santa','Zhang','santa','zhan
  (232,'debug','debug','debug','debug','en',1),
  (231,'admin','admin','admin','admin','en',1),
  (259,'misamisa','misamisa','misamisa','misamisa','en',1),
+ (266,'tomcat','tomcat','tomcat','tomcat','en',1),
  (265,'Zhang','Yang','zhyang','zhyang','en',1),
  (262,'madao','madao','madao','madao','en',1),
  (263,'mako1','mako1','mako1','mako1','en',1),
@@ -957,7 +702,12 @@ INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (248,10000,10
  (265,10000,106,4,0),
  (265,10000,104,4,0),
  (265,10000,103,4,0),
- (265,10000,1,4,0);
+ (265,10000,1,4,0),
+ (266,10000,105,4,0),
+ (266,10000,106,4,0),
+ (266,10000,104,4,0),
+ (266,10000,103,4,0);
+INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (266,10000,1,4,0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_members_has_module_launchers` ENABLE KEYS */;
 
@@ -1294,7 +1044,8 @@ INSERT INTO `nova_front`.`qo_sessions` VALUES  ('9bad84792d31930774f27d98df9a7b9
  ('ce30f2d718ff254f2a5ca31f79b61d70',259,10000,'10.0.0.216','2009-05-05 15:53:56'),
  ('f06b3eefc00bbc163df86a0ed36eba79',259,10000,'127.0.0.1','2009-05-05 18:00:07'),
  ('d1b930747bc0645e251bcba1f511aad7',259,10000,'10.0.0.216','2009-05-05 22:12:58'),
- ('5b803c4de7388eb3933e07e4ddc61092',259,10000,'10.0.0.216','2009-05-05 22:13:44');
+ ('5b803c4de7388eb3933e07e4ddc61092',259,10000,'10.0.0.216','2009-05-05 22:13:44'),
+ ('d518bebf29a5add76b14af4bf526483f',266,10000,'10.0.0.216','2009-05-06 14:52:20');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_sessions` ENABLE KEYS */;
 
@@ -1355,7 +1106,8 @@ INSERT INTO `nova_front`.`qo_styles` VALUES  (254,10000,1,10,'ffffff','fcf8f8',1
  (262,10000,1,10,'ffffff','fcf8f8',100,'center'),
  (263,10000,1,10,'ffffff','fcf8f8',100,'center'),
  (264,10000,1,10,'ffffff','fcf8f8',100,'center'),
- (265,10000,1,4,'ffffff','fcf8f8',100,'center');
+ (265,10000,1,4,'ffffff','fcf8f8',100,'center'),
+ (266,10000,1,10,'ffffff','fcf8f8',100,'center');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_styles` ENABLE KEYS */;
 

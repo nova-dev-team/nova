@@ -28,8 +28,8 @@ class NetPool < ActiveRecord::Base
 
   # 释放一个网络
   #   name, size =>
-  def NetPool.free(name, size)
-    net = find_first_by_name name
+  def NetPool.free(name)
+    net = find_by_name name
     net.used = 'false'
     net.save!
   end

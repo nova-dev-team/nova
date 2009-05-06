@@ -171,13 +171,12 @@ HERE
 
               kvm_xml.vcpu = setting["vcpu"]
 
-
               if setting["mac"] != nil
                 kvm_xml.mac = setting["mac"]
               elsif setting["ip"] != nil
                 kvm_xml.ip = setting["ip"]
               else
-                kvm_xml.ip = "10.0.3.3" # TODO allocate ip address
+                kvm_xml.ip = "10.0.3." + (1 + rand(251)) # TODO allocate ip address (randomly)
               end
 
               kvm_xml.image = setting["img"]  # TODO select image
