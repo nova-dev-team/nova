@@ -41,7 +41,9 @@ module BatchHelper
 HERE
 #        result[:vm_settings] << vmachine.settings
         vmachine.save
+        vcluster.vmachines << vmachine
       end
+      vcluster.save
 
       File.open("tmp/#{result[:vcluster_cid]}.nodelist.conf", "w") do |file|
         n_pool[1].each do |net_addr|

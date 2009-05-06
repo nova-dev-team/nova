@@ -7,17 +7,9 @@ class BatchController < ApplicationController
   def create_and_add_to
     r = BatchHelper::Helper.create params[:cname], params[:csize]
     r2 = UserHelper::Helper.add_vcluster params[:id], r[:vcluster_cid]
-    result = {}
-    result[:msg] = r2[:msg]
-    result[:vcluster_cid] = r[:vcluster_cid]
-    if (r2[:success] and r[:success]) then
-      result[:success] = true
-    else
-      result[:success] = false
-    end
+    result = r[:vcluster_cid]
     respond_to do |accept|
-      accept.html {render :text => result.to_json}
-      accept.json {render :json => result}
+      accept.html {render :text => result}
     end
   end
 
