@@ -1,7 +1,7 @@
 -- MySQL Administrator dump 1.4
 --
 -- ------------------------------------------------------
--- Server version	5.0.75-0ubuntu10
+-- Server version	5.0.75-0ubuntu10.1
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -45,8 +45,8 @@ CREATE TABLE  `nova_core`.`net_pools` (
 
 /*!40000 ALTER TABLE `net_pools` DISABLE KEYS */;
 LOCK TABLES `net_pools` WRITE;
-INSERT INTO `nova_core`.`net_pools` VALUES  (832494616,'neta','10.0.3.2','28',13,0,50,'2009-05-06 08:04:59','2009-05-06 12:28:41'),
- (832494617,'netb','10.0.3.18','28',13,0,20,'2009-05-06 08:04:59','2009-05-06 12:25:41'),
+INSERT INTO `nova_core`.`net_pools` VALUES  (832494616,'neta','10.0.3.2','28',13,0,62,'2009-05-06 08:04:59','2009-05-06 14:12:28'),
+ (832494617,'netb','10.0.3.18','28',13,0,22,'2009-05-06 08:04:59','2009-05-06 12:46:47'),
  (832494618,'netc','10.0.3.34','28',13,0,10,'2009-05-06 08:04:59','2009-05-06 11:43:01');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `net_pools` ENABLE KEYS */;
@@ -167,7 +167,7 @@ CREATE TABLE  `nova_core`.`vclusters` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nova_core`.`vclusters`
@@ -206,7 +206,10 @@ INSERT INTO `nova_core`.`vclusters` VALUES  (16,NULL,'misanet2',NULL,'2009-05-06
  (42,NULL,'Hadoop_Cluster','neta','2009-05-06 12:22:48','2009-05-06 12:22:49');
 INSERT INTO `nova_core`.`vclusters` VALUES  (43,NULL,'Hadoop_Cluster','netb','2009-05-06 12:24:29','2009-05-06 12:24:29'),
  (44,NULL,'Hadoop_Cluster','neta','2009-05-06 12:25:51','2009-05-06 12:25:51'),
- (45,NULL,'Hadoop_Cluster','neta','2009-05-06 12:27:38','2009-05-06 12:27:38');
+ (45,NULL,'Hadoop_Cluster','neta','2009-05-06 12:27:38','2009-05-06 12:27:38'),
+ (47,NULL,'Hadoop_Cluster','neta','2009-05-06 12:42:41','2009-05-06 12:42:41'),
+ (52,NULL,'Hadoop_Cluster','neta','2009-05-06 13:51:24','2009-05-06 13:51:24'),
+ (53,NULL,'Hadoop_Cluster','neta','2009-05-06 14:10:00','2009-05-06 14:10:01');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `vclusters` ENABLE KEYS */;
 
@@ -227,7 +230,7 @@ CREATE TABLE  `nova_core`.`vimages` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nova_core`.`vimages`
@@ -235,7 +238,8 @@ CREATE TABLE  `nova_core`.`vimages` (
 
 /*!40000 ALTER TABLE `vimages` DISABLE KEYS */;
 LOCK TABLES `vimages` WRITE;
-INSERT INTO `nova_core`.`vimages` VALUES  (1,NULL,'Windows','Fedora_8',0,'f8.img','','2009-05-06 08:12:18','2009-05-06 08:12:18');
+INSERT INTO `nova_core`.`vimages` VALUES  (1,NULL,'Windows','Fedora_8',0,'f8.img','','2009-05-06 08:12:18','2009-05-06 08:12:18'),
+ (2,NULL,'Other','os100m',0,'os100m.img','','2009-05-06 14:53:58','2009-05-06 14:53:58');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `vimages` ENABLE KEYS */;
 
@@ -257,7 +261,7 @@ CREATE TABLE  `nova_core`.`vmachines` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=202 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=234 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `nova_core`.`vmachines`
@@ -266,7 +270,13 @@ CREATE TABLE  `nova_core`.`vmachines` (
 /*!40000 ALTER TABLE `vmachines` DISABLE KEYS */;
 LOCK TABLES `vmachines` WRITE;
 INSERT INTO `nova_core`.`vmachines` VALUES  (195,NULL,NULL,45,NULL,NULL,'not running','{\"img\":null,\"mac\":\"54:7E:10:00:03:03\",\"ip\":\"10.0.3.3\",\"hostname\":\"neta_1\",\"vcpu\":\"4\",\"mem\":\"4001\"}','2009-05-06 12:27:38','2009-05-06 12:27:39'),
- (197,NULL,NULL,45,NULL,NULL,'not running','{\"img\":null,\"mac\":\"54:7E:10:00:03:05\",\"ip\":\"10.0.3.5\",\"hostname\":\"neta_3\",\"vcpu\":\"4\",\"mem\":\"4001\"}','2009-05-06 12:27:38','2009-05-06 12:27:39');
+ (197,NULL,NULL,45,NULL,NULL,'not running','{\"img\":null,\"mac\":\"54:7E:10:00:03:05\",\"ip\":\"10.0.3.5\",\"hostname\":\"neta_3\",\"vcpu\":\"4\",\"mem\":\"4001\"}','2009-05-06 12:27:38','2009-05-06 12:27:39'),
+ (218,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 13:43:17','2009-05-06 13:43:19'),
+ (219,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 13:45:03','2009-05-06 13:45:05'),
+ (230,NULL,NULL,53,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:19','2009-05-06 14:13:19'),
+ (231,NULL,NULL,53,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:25','2009-05-06 14:13:25'),
+ (232,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:45','2009-05-06 14:13:48');
+INSERT INTO `nova_core`.`vmachines` VALUES  (233,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"os100m.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"133\"}','2009-05-06 14:54:17','2009-05-06 14:54:32');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `vmachines` ENABLE KEYS */;
 
@@ -288,7 +298,7 @@ CREATE TABLE  `nova_front`.`currentlyloggedin` (
   `member_id` varchar(45) NOT NULL,
   `group_id` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`currentlyloggedin`
@@ -311,9 +321,8 @@ INSERT INTO `nova_front`.`currentlyloggedin` VALUES  (10,'6d51c3c6ec21dc91c5b488
  (102,'d1b930747bc0645e251bcba1f511aad7','259','10000'),
  (103,'5b803c4de7388eb3933e07e4ddc61092','259','10000'),
  (106,'d518bebf29a5add76b14af4bf526483f','266','10000'),
- (109,'ee1bb49c6aa9ea05b237a05dbc39a57c','267','10000'),
- (110,'aaffcbcf80a0b1562ce54710d03b52a2','267','10000'),
- (111,'91629119f3c8d609b626c2927f63a951','267','10000');
+ (115,'55b58ed32b174350a918bba8308bc196','200','1000'),
+ (116,'07adca99e527d08a668425d5cdf3d66d','267','10000');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `currentlyloggedin` ENABLE KEYS */;
 
@@ -782,9 +791,9 @@ INSERT INTO `nova_front`.`qo_modules` VALUES  (1,'Todd Murdock','1.0','http://ww
  (8,'Jack Slocum','1.0','http://www.qwikioffice.com','Demo of bogus window.','demo','demo-bogus',1,1),
  (90,'templateModule Author','0.0.1','http://www.qwikioffice.com','Basic Module Template.','templateModule','templateModule',1,1),
  (100,'Santa Zhang','0.0.1',NULL,NULL,'superadmin-user-manager','superadmin-user-manager',1,1),
- (101,'Santa Zhang','0.0.1',NULL,NULL,'superadmin-manual','superadmin-manual',1,1);
-INSERT INTO `nova_front`.`qo_modules` VALUES  (102,'Santa Zhang',NULL,NULL,NULL,'admin-manual','admin-manual',1,1),
- (103,'Santa Zhang',NULL,NULL,NULL,'user-manual','user-manual',1,1),
+ (101,'Santa Zhang','0.0.1',NULL,NULL,'superadmin-manual','superadmin-manual',0,1);
+INSERT INTO `nova_front`.`qo_modules` VALUES  (102,'Santa Zhang',NULL,NULL,NULL,'admin-manual','admin-manual',0,1),
+ (103,'Santa Zhang',NULL,NULL,NULL,'user-manual','user-manual',0,1),
  (104,'Santa Zhang',NULL,NULL,NULL,'account-setting','account-setting',1,1),
  (105,'Santa Zhang',NULL,NULL,NULL,'user-job-manager','user-job-manager',1,1),
  (106,'Santa Zhang','0.0.0',NULL,NULL,'hadoop-wizard','hadoop-wizard',1,1);
@@ -1084,9 +1093,12 @@ INSERT INTO `nova_front`.`qo_sessions` VALUES  ('9bad84792d31930774f27d98df9a7b9
  ('d1b930747bc0645e251bcba1f511aad7',259,10000,'10.0.0.216','2009-05-05 22:12:58'),
  ('5b803c4de7388eb3933e07e4ddc61092',259,10000,'10.0.0.216','2009-05-05 22:13:44'),
  ('d518bebf29a5add76b14af4bf526483f',266,10000,'10.0.0.216','2009-05-06 14:52:20'),
- ('ee1bb49c6aa9ea05b237a05dbc39a57c',267,10000,'10.0.0.216','2009-05-06 19:16:11'),
+ ('07adca99e527d08a668425d5cdf3d66d',267,10000,'10.0.0.216','2009-05-07 01:13:50'),
  ('aaffcbcf80a0b1562ce54710d03b52a2',267,10000,'10.0.0.216','2009-05-06 19:40:45');
-INSERT INTO `nova_front`.`qo_sessions` VALUES  ('91629119f3c8d609b626c2927f63a951',267,10000,'10.0.0.216','2009-05-06 19:47:35');
+INSERT INTO `nova_front`.`qo_sessions` VALUES  ('91629119f3c8d609b626c2927f63a951',267,10000,'10.0.0.216','2009-05-06 19:47:35'),
+ ('0d945b6213ca5b13a3b210affb08573d',267,10000,'10.0.0.216','2009-05-06 21:09:02'),
+ ('903f9ef96af83f5ac21587998ba5b5ec',267,10000,'10.0.0.216','2009-05-06 21:19:17'),
+ ('55b58ed32b174350a918bba8308bc196',200,1000,'127.0.0.1','2009-05-07 01:05:44');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_sessions` ENABLE KEYS */;
 
@@ -1116,7 +1128,7 @@ CREATE TABLE  `nova_front`.`qo_styles` (
 LOCK TABLES `qo_styles` WRITE;
 INSERT INTO `nova_front`.`qo_styles` VALUES  (232,9999,1,12,'ffffff','0',100,'center'),
  (231,1,1,12,'ffffff','0',100,'tile'),
- (200,1000,1,10,'f9f9f9','FCF8F8',100,'tile'),
+ (200,1000,1,4,'f9f9f9','FCF8F8',100,'tile'),
  (230,2,2,8,'ffffff','2D53DB',100,'center'),
  (233,2,1,1,'ffffff','0',100,'center'),
  (234,2,1,1,'ffffff','0',100,'center'),
