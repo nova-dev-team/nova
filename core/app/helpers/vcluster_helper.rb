@@ -1,5 +1,7 @@
 module VclusterHelper
 
+  require 'net_pool'
+
   class Helper
 
     # list all the vclusters
@@ -51,6 +53,13 @@ module VclusterHelper
         else # no body is using it
 
           if vcluster.vmachines.empty? # could delete empty vcluster
+
+            # test if vcluster is holding a net_pool
+            if vcluster.net_pool_name != ""
+              NetPool.free vcluster.net_pool_name
+              print "Free the net pool!"
+            end
+
             Vcluster.delete vcluster
             result[:success] = true
             result[:msg] = "Removed empty vcluster #{vcluster_cid}"
@@ -124,6 +133,9 @@ module VclusterHelper
           result[:msg] = "Vcluster #{vcluster_cid} does not have vmachine #{vmachine_vid}!"
 
         elsif vmachine.status == "not running" # vmachine not running, could be removed from a vcluster
+          
+          
+                    
           vcluster.vmachines.delete vmachine
           vcluster.save
           vmachine.save

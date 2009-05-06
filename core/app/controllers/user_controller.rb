@@ -1,10 +1,11 @@
 class UserController < ApplicationController
 
+  include VclusterHelper
   include UserHelper
 
   # show all the users' id (email)
   def list
-    result = Helper.list
+    result = UserHelper::Helper.list
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -17,7 +18,7 @@ class UserController < ApplicationController
 
   # add a new user
   def add
-    result = Helper.add params[:id], params[:arg]
+    result = UserHelper::Helper.add params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -28,7 +29,7 @@ class UserController < ApplicationController
 
   # show a certain user's detailed information
   def info
-    result = Helper.info params[:id]
+    result = UserHelper::Helper.info params[:id]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -40,7 +41,7 @@ class UserController < ApplicationController
   
   # port for front
   def info_vclusters
-    r = Helper.info params[:id]
+    r = UserHelper::Helper.info params[:id]
     result = []
     r[:vclusters].each { |clu|
       result << clu[:cid];
@@ -54,7 +55,7 @@ class UserController < ApplicationController
 
   # add a virtual cluster to a user. the vcluster is already created
   def add_vcluster
-    result = Helper.add_vcluster params[:id], params[:arg]
+    result = UserHelper::Helper.add_vcluster params[:id], params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -65,7 +66,9 @@ class UserController < ApplicationController
 
   # remove a virtual cluster from a user
   def remove_vcluster
-    result = Helper.remove_vcluster params[:id], params[:arg]
+    result = UserHelper::Helper.remove_vcluster params[:id], params[:arg]
+
+    sub_result = VclusterHelper::Helper.delete params[:arg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
