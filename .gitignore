@@ -7,6 +7,7 @@ core/public/
 core/vendor/
 core/script/
 core/log/
+core/tmp/
 
 # ignore database
 core/db/*.sqlite3
