@@ -70,6 +70,8 @@ class UserController < ApplicationController
 
     sub_result = VclusterHelper::Helper.delete params[:arg]
 
+    result[:sub_result] = sub_result
+
     respond_to do |accept|
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}

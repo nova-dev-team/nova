@@ -2,6 +2,8 @@ module VclusterHelper
 
   require 'net_pool'
 
+  include VmachineHelper
+
   class Helper
 
     # list all the vclusters
@@ -51,6 +53,14 @@ module VclusterHelper
           result[:msg] = "Cannot delete vcluster #{vcluster_cid} when it belongs to a user!"
 
         else # no body is using it
+
+
+          # forced to remove all vmachines
+          vcluster.vmachines.each do |vm|
+            VmachineHelper::Helper.delete "v#{vm.id}"
+          end
+          vcluster.vmachines = []
+          vcluster.save 
 
           if vcluster.vmachines.empty? # could delete empty vcluster
 
