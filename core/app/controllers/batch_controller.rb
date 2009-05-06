@@ -48,7 +48,7 @@ class BatchController < ApplicationController
 
     vcluster = Vcluster.find_by_id params[:id]  [1..-1]
     vcluster.vmachines.each do |vmachine|
-      print "*** Change settings of v#{vmachine.id}"
+     # print "*** Change settings of v#{vmachine.id}"
       VmachineHelper::Helper.change_setting "v#{vmachine.id}", item, value 
     end
     vcluster.save
@@ -68,6 +68,7 @@ class BatchController < ApplicationController
 
   def do_install
     result = BatchHelper::Helper.do_install params[:id]
+
     respond_to do |accept| 
       accept.html {render :text => result.to_json}
       accept.json {render :json => result}

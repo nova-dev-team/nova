@@ -1,6 +1,7 @@
 module VclusterHelper
 
   require 'net_pool'
+  require 'ftools'
 
   include VmachineHelper
 
@@ -68,6 +69,9 @@ module VclusterHelper
             if vcluster.net_pool_name != ""
               NetPool.free vcluster.net_pool_name
               print "Free the net pool!"
+              File.delete "tmp/c#{params[:id]}.install.conf"
+              File.delete "tmp/c#{params[:id]}.nodelist.conf"
+
             end
 
             Vcluster.delete vcluster

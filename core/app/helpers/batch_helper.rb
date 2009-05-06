@@ -56,11 +56,6 @@ HERE
       return result
     end
 
-    # change the settings of the whole cluster
-    def Helper.change_setting vcluster_cid, item, value
-      # TODO
-    end
-
     def Helper.add_soft vcluster_cid, soft_name
       result = {:success => true}
       File.open("tmp/#{vcluster_cid}.install.conf", "a") do |file|
