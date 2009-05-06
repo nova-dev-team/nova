@@ -66,6 +66,21 @@ module UserHelper
       return result
     end
 
+
+# for admin_monitor
+    def Helper.info_all
+      result = {}
+      result[:success] = true
+      result[:vclusters] = []
+      User.all.each do |user|
+        user.vclusters.each {|vc| result[:vclusters] << {:cid=>"c#{vc.id}",
+          :name => vc.vcluster_name,
+          :owner => user.email
+        }}
+      end
+      return result
+    end
+
     # add a vcluster to a user
     def Helper.add_vcluster user_email, vcluster_cid
       result = {}

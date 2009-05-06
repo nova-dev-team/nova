@@ -15,272 +15,6 @@
 
 
 --
--- Create schema nova_core
---
-
-CREATE DATABASE IF NOT EXISTS nova_core;
-USE nova_core;
-
---
--- Definition of table `nova_core`.`net_pools`
---
-
-DROP TABLE IF EXISTS `nova_core`.`net_pools`;
-CREATE TABLE  `nova_core`.`net_pools` (
-  `id` int(11) NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL,
-  `begin` varchar(255) NOT NULL,
-  `mask` varchar(255) NOT NULL,
-  `size` int(11) NOT NULL,
-  `used` tinyint(1) default '0',
-  `lock_version` int(11) default '0',
-  `created_at` datetime default NULL,
-  `updated_at` datetime default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=832494619 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`net_pools`
---
-
-/*!40000 ALTER TABLE `net_pools` DISABLE KEYS */;
-LOCK TABLES `net_pools` WRITE;
-INSERT INTO `nova_core`.`net_pools` VALUES  (832494616,'neta','10.0.3.2','28',13,0,62,'2009-05-06 08:04:59','2009-05-06 14:12:28'),
- (832494617,'netb','10.0.3.18','28',13,0,22,'2009-05-06 08:04:59','2009-05-06 12:46:47'),
- (832494618,'netc','10.0.3.34','28',13,0,10,'2009-05-06 08:04:59','2009-05-06 11:43:01');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `net_pools` ENABLE KEYS */;
-
-
---
--- Definition of table `nova_core`.`notifies`
---
-
-DROP TABLE IF EXISTS `nova_core`.`notifies`;
-CREATE TABLE  `nova_core`.`notifies` (
-  `id` int(11) NOT NULL auto_increment,
-  `notify_uuid` varchar(255) default NULL,
-  `notify_receiver_type` varchar(255) default NULL,
-  `notify_receiver_id` int(11) default NULL,
-  `notify_type` varchar(255) default NULL,
-  `created_at` datetime default NULL,
-  `updated_at` datetime default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`notifies`
---
-
-/*!40000 ALTER TABLE `notifies` DISABLE KEYS */;
-LOCK TABLES `notifies` WRITE;
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `notifies` ENABLE KEYS */;
-
-
---
--- Definition of table `nova_core`.`pmachines`
---
-
-DROP TABLE IF EXISTS `nova_core`.`pmachines`;
-CREATE TABLE  `nova_core`.`pmachines` (
-  `id` int(11) NOT NULL auto_increment,
-  `ip` varchar(255) default NULL,
-  `status` varchar(255) default 'working',
-  `created_at` datetime default NULL,
-  `updated_at` datetime default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`pmachines`
---
-
-/*!40000 ALTER TABLE `pmachines` DISABLE KEYS */;
-LOCK TABLES `pmachines` WRITE;
-INSERT INTO `nova_core`.`pmachines` VALUES  (1,'10.0.0.220','working','2009-05-06 08:12:57','2009-05-06 08:12:57');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `pmachines` ENABLE KEYS */;
-
-
---
--- Definition of table `nova_core`.`schema_migrations`
---
-
-DROP TABLE IF EXISTS `nova_core`.`schema_migrations`;
-CREATE TABLE  `nova_core`.`schema_migrations` (
-  `version` varchar(255) NOT NULL,
-  UNIQUE KEY `unique_schema_migrations` (`version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`schema_migrations`
---
-
-/*!40000 ALTER TABLE `schema_migrations` DISABLE KEYS */;
-LOCK TABLES `schema_migrations` WRITE;
-INSERT INTO `nova_core`.`schema_migrations` VALUES  ('20090331031132'),
- ('20090331031137'),
- ('20090331031142'),
- ('20090331031146'),
- ('20090413073037'),
- ('20090417054023'),
- ('20090420012138');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `schema_migrations` ENABLE KEYS */;
-
-
---
--- Definition of table `nova_core`.`users`
---
-
-DROP TABLE IF EXISTS `nova_core`.`users`;
-CREATE TABLE  `nova_core`.`users` (
-  `id` int(11) NOT NULL auto_increment,
-  `email` varchar(255) default NULL,
-  `created_at` datetime default NULL,
-  `updated_at` datetime default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=268 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`users`
---
-
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-LOCK TABLES `users` WRITE;
-INSERT INTO `nova_core`.`users` VALUES  (267,'tomcat2','2009-05-06 08:10:48','2009-05-06 08:10:48');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-
-
---
--- Definition of table `nova_core`.`vclusters`
---
-
-DROP TABLE IF EXISTS `nova_core`.`vclusters`;
-CREATE TABLE  `nova_core`.`vclusters` (
-  `id` int(11) NOT NULL auto_increment,
-  `user_id` int(11) default NULL,
-  `vcluster_name` varchar(255) default '#unnamed#',
-  `net_pool_name` varchar(255) default '',
-  `created_at` datetime default NULL,
-  `updated_at` datetime default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`vclusters`
---
-
-/*!40000 ALTER TABLE `vclusters` DISABLE KEYS */;
-LOCK TABLES `vclusters` WRITE;
-INSERT INTO `nova_core`.`vclusters` VALUES  (1,NULL,'My_Cluster_1','','2009-05-06 08:11:37','2009-05-06 08:11:37'),
- (2,NULL,'somecluster','','2009-05-06 10:25:15','2009-05-06 10:25:15'),
- (3,NULL,'link','','2009-05-06 10:27:42','2009-05-06 10:27:42'),
- (4,NULL,'link','','2009-05-06 10:27:42','2009-05-06 10:27:42'),
- (5,NULL,'misanet','','2009-05-06 10:32:10','2009-05-06 10:32:10'),
- (6,NULL,'misanet','','2009-05-06 10:32:27','2009-05-06 10:32:27'),
- (7,NULL,'misanet2','netb','2009-05-06 10:32:55','2009-05-06 10:32:55'),
- (8,NULL,'misanet2','netb','2009-05-06 10:50:51','2009-05-06 10:50:51'),
- (9,NULL,'misanet2','neta','2009-05-06 10:52:04','2009-05-06 10:52:04'),
- (10,NULL,'misanet2','netb','2009-05-06 10:52:51','2009-05-06 10:52:51'),
- (11,NULL,'misanet2','netc','2009-05-06 10:52:52','2009-05-06 10:52:52'),
- (12,NULL,'misanet2',NULL,'2009-05-06 10:52:53','2009-05-06 10:52:53'),
- (13,NULL,'misanet2','neta','2009-05-06 10:54:36','2009-05-06 10:54:36'),
- (14,NULL,'misanet2','netb','2009-05-06 10:55:39','2009-05-06 10:55:39'),
- (15,NULL,'misanet2','netc','2009-05-06 10:55:40','2009-05-06 10:55:40');
-INSERT INTO `nova_core`.`vclusters` VALUES  (16,NULL,'misanet2',NULL,'2009-05-06 10:55:41','2009-05-06 10:55:41'),
- (17,NULL,'misanet2','neta','2009-05-06 10:58:03','2009-05-06 10:58:03'),
- (18,NULL,'misanet2','netb','2009-05-06 10:59:17','2009-05-06 10:59:17'),
- (19,NULL,'misanet2','netc','2009-05-06 10:59:24','2009-05-06 10:59:24'),
- (20,NULL,'misanet2','neta','2009-05-06 11:02:06','2009-05-06 11:02:06'),
- (21,NULL,'cattyc','netb','2009-05-06 11:13:26','2009-05-06 11:13:26'),
- (22,NULL,'cattyc','netc','2009-05-06 11:15:52','2009-05-06 11:15:52'),
- (23,NULL,'cattyc','neta','2009-05-06 11:18:17','2009-05-06 11:18:17'),
- (24,NULL,'cattyc','neta','2009-05-06 11:20:09','2009-05-06 11:20:09'),
- (28,NULL,'Hadoop_Cluster_test','neta','2009-05-06 11:35:20','2009-05-06 11:35:21'),
- (29,NULL,'Hadoop_Cluster','netb','2009-05-06 11:40:50','2009-05-06 11:40:50'),
- (30,NULL,'cattyc','netc','2009-05-06 11:41:58','2009-05-06 11:41:59'),
- (41,NULL,'Hadoop_Cluster','neta','2009-05-06 12:19:41','2009-05-06 12:19:41'),
- (42,NULL,'Hadoop_Cluster','neta','2009-05-06 12:22:48','2009-05-06 12:22:49');
-INSERT INTO `nova_core`.`vclusters` VALUES  (43,NULL,'Hadoop_Cluster','netb','2009-05-06 12:24:29','2009-05-06 12:24:29'),
- (44,NULL,'Hadoop_Cluster','neta','2009-05-06 12:25:51','2009-05-06 12:25:51'),
- (45,NULL,'Hadoop_Cluster','neta','2009-05-06 12:27:38','2009-05-06 12:27:38'),
- (47,NULL,'Hadoop_Cluster','neta','2009-05-06 12:42:41','2009-05-06 12:42:41'),
- (52,NULL,'Hadoop_Cluster','neta','2009-05-06 13:51:24','2009-05-06 13:51:24'),
- (53,NULL,'Hadoop_Cluster','neta','2009-05-06 14:10:00','2009-05-06 14:10:01');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `vclusters` ENABLE KEYS */;
-
-
---
--- Definition of table `nova_core`.`vimages`
---
-
-DROP TABLE IF EXISTS `nova_core`.`vimages`;
-CREATE TABLE  `nova_core`.`vimages` (
-  `id` int(11) NOT NULL auto_increment,
-  `iid` int(11) default NULL,
-  `os_family` varchar(255) default NULL,
-  `os_name` varchar(255) default NULL,
-  `hidden` tinyint(1) default '0',
-  `location` varchar(255) default NULL,
-  `comment` varchar(255) default NULL,
-  `created_at` datetime default NULL,
-  `updated_at` datetime default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`vimages`
---
-
-/*!40000 ALTER TABLE `vimages` DISABLE KEYS */;
-LOCK TABLES `vimages` WRITE;
-INSERT INTO `nova_core`.`vimages` VALUES  (1,NULL,'Windows','Fedora_8',0,'f8.img','','2009-05-06 08:12:18','2009-05-06 08:12:18'),
- (2,NULL,'Other','os100m',0,'os100m.img','','2009-05-06 14:53:58','2009-05-06 14:53:58');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `vimages` ENABLE KEYS */;
-
-
---
--- Definition of table `nova_core`.`vmachines`
---
-
-DROP TABLE IF EXISTS `nova_core`.`vmachines`;
-CREATE TABLE  `nova_core`.`vmachines` (
-  `id` int(11) NOT NULL auto_increment,
-  `ip` varchar(255) default NULL,
-  `pmachine_id` int(11) default NULL,
-  `vcluster_id` int(11) default NULL,
-  `vimage_id` int(11) default NULL,
-  `pmon_vmachine_uuid` varchar(255) default NULL,
-  `status` varchar(255) default 'not running',
-  `settings` varchar(255) default NULL,
-  `created_at` datetime default NULL,
-  `updated_at` datetime default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=234 DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `nova_core`.`vmachines`
---
-
-/*!40000 ALTER TABLE `vmachines` DISABLE KEYS */;
-LOCK TABLES `vmachines` WRITE;
-INSERT INTO `nova_core`.`vmachines` VALUES  (195,NULL,NULL,45,NULL,NULL,'not running','{\"img\":null,\"mac\":\"54:7E:10:00:03:03\",\"ip\":\"10.0.3.3\",\"hostname\":\"neta_1\",\"vcpu\":\"4\",\"mem\":\"4001\"}','2009-05-06 12:27:38','2009-05-06 12:27:39'),
- (197,NULL,NULL,45,NULL,NULL,'not running','{\"img\":null,\"mac\":\"54:7E:10:00:03:05\",\"ip\":\"10.0.3.5\",\"hostname\":\"neta_3\",\"vcpu\":\"4\",\"mem\":\"4001\"}','2009-05-06 12:27:38','2009-05-06 12:27:39'),
- (218,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 13:43:17','2009-05-06 13:43:19'),
- (219,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 13:45:03','2009-05-06 13:45:05'),
- (230,NULL,NULL,53,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:19','2009-05-06 14:13:19'),
- (231,NULL,NULL,53,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:25','2009-05-06 14:13:25'),
- (232,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:45','2009-05-06 14:13:48');
-INSERT INTO `nova_core`.`vmachines` VALUES  (233,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"os100m.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"133\"}','2009-05-06 14:54:17','2009-05-06 14:54:32');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `vmachines` ENABLE KEYS */;
-
---
 -- Create schema nova_front
 --
 
@@ -298,7 +32,7 @@ CREATE TABLE  `nova_front`.`currentlyloggedin` (
   `member_id` varchar(45) NOT NULL,
   `group_id` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`currentlyloggedin`
@@ -321,7 +55,8 @@ INSERT INTO `nova_front`.`currentlyloggedin` VALUES  (10,'6d51c3c6ec21dc91c5b488
  (102,'d1b930747bc0645e251bcba1f511aad7','259','10000'),
  (103,'5b803c4de7388eb3933e07e4ddc61092','259','10000'),
  (106,'d518bebf29a5add76b14af4bf526483f','266','10000'),
- (119,'7440398b69d6018027236f24d9cd8c54','200','1000');
+ (119,'7440398b69d6018027236f24d9cd8c54','200','1000'),
+ (120,'a717c9d8ff4c5bab48a313be18bc393c','267','10000');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `currentlyloggedin` ENABLE KEYS */;
 
@@ -1109,7 +844,8 @@ INSERT INTO `nova_front`.`qo_sessions` VALUES  ('9bad84792d31930774f27d98df9a7b9
  ('aaffcbcf80a0b1562ce54710d03b52a2',267,10000,'10.0.0.216','2009-05-06 19:40:45');
 INSERT INTO `nova_front`.`qo_sessions` VALUES  ('91629119f3c8d609b626c2927f63a951',267,10000,'10.0.0.216','2009-05-06 19:47:35'),
  ('0d945b6213ca5b13a3b210affb08573d',267,10000,'10.0.0.216','2009-05-06 21:09:02'),
- ('903f9ef96af83f5ac21587998ba5b5ec',267,10000,'10.0.0.216','2009-05-06 21:19:17');
+ ('903f9ef96af83f5ac21587998ba5b5ec',267,10000,'10.0.0.216','2009-05-06 21:19:17'),
+ ('a717c9d8ff4c5bab48a313be18bc393c',267,10000,'127.0.0.1','2009-05-07 02:07:40');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_sessions` ENABLE KEYS */;
 
@@ -1267,6 +1003,275 @@ CREATE TABLE  `nova_front`.`templatemodule` (
 LOCK TABLES `templatemodule` WRITE;
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `templatemodule` ENABLE KEYS */;
+
+--
+-- Create schema nova_core
+--
+
+CREATE DATABASE IF NOT EXISTS nova_core;
+USE nova_core;
+
+--
+-- Definition of table `nova_core`.`net_pools`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`net_pools`;
+CREATE TABLE  `nova_core`.`net_pools` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) NOT NULL,
+  `begin` varchar(255) NOT NULL,
+  `mask` varchar(255) NOT NULL,
+  `size` int(11) NOT NULL,
+  `used` tinyint(1) default '0',
+  `lock_version` int(11) default '0',
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=832494619 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`net_pools`
+--
+
+/*!40000 ALTER TABLE `net_pools` DISABLE KEYS */;
+LOCK TABLES `net_pools` WRITE;
+INSERT INTO `nova_core`.`net_pools` VALUES  (832494616,'neta','10.0.3.2','28',13,0,62,'2009-05-06 08:04:59','2009-05-06 14:12:28'),
+ (832494617,'netb','10.0.3.18','28',13,0,22,'2009-05-06 08:04:59','2009-05-06 12:46:47'),
+ (832494618,'netc','10.0.3.34','28',13,0,10,'2009-05-06 08:04:59','2009-05-06 11:43:01');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `net_pools` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_core`.`notifies`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`notifies`;
+CREATE TABLE  `nova_core`.`notifies` (
+  `id` int(11) NOT NULL auto_increment,
+  `notify_uuid` varchar(255) default NULL,
+  `notify_receiver_type` varchar(255) default NULL,
+  `notify_receiver_id` int(11) default NULL,
+  `notify_type` varchar(255) default NULL,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`notifies`
+--
+
+/*!40000 ALTER TABLE `notifies` DISABLE KEYS */;
+LOCK TABLES `notifies` WRITE;
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `notifies` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_core`.`pmachines`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`pmachines`;
+CREATE TABLE  `nova_core`.`pmachines` (
+  `id` int(11) NOT NULL auto_increment,
+  `ip` varchar(255) default NULL,
+  `status` varchar(255) default 'working',
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`pmachines`
+--
+
+/*!40000 ALTER TABLE `pmachines` DISABLE KEYS */;
+LOCK TABLES `pmachines` WRITE;
+INSERT INTO `nova_core`.`pmachines` VALUES  (1,'10.0.0.220','working','2009-05-06 08:12:57','2009-05-06 08:12:57');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `pmachines` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_core`.`schema_migrations`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`schema_migrations`;
+CREATE TABLE  `nova_core`.`schema_migrations` (
+  `version` varchar(255) NOT NULL,
+  UNIQUE KEY `unique_schema_migrations` (`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`schema_migrations`
+--
+
+/*!40000 ALTER TABLE `schema_migrations` DISABLE KEYS */;
+LOCK TABLES `schema_migrations` WRITE;
+INSERT INTO `nova_core`.`schema_migrations` VALUES  ('20090331031132'),
+ ('20090331031137'),
+ ('20090331031142'),
+ ('20090331031146'),
+ ('20090413073037'),
+ ('20090417054023'),
+ ('20090420012138');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `schema_migrations` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_core`.`users`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`users`;
+CREATE TABLE  `nova_core`.`users` (
+  `id` int(11) NOT NULL auto_increment,
+  `email` varchar(255) default NULL,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=268 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`users`
+--
+
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+LOCK TABLES `users` WRITE;
+INSERT INTO `nova_core`.`users` VALUES  (267,'tomcat2','2009-05-06 08:10:48','2009-05-06 08:10:48');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_core`.`vclusters`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`vclusters`;
+CREATE TABLE  `nova_core`.`vclusters` (
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) default NULL,
+  `vcluster_name` varchar(255) default '#unnamed#',
+  `net_pool_name` varchar(255) default '',
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`vclusters`
+--
+
+/*!40000 ALTER TABLE `vclusters` DISABLE KEYS */;
+LOCK TABLES `vclusters` WRITE;
+INSERT INTO `nova_core`.`vclusters` VALUES  (1,NULL,'My_Cluster_1','','2009-05-06 08:11:37','2009-05-06 08:11:37'),
+ (2,NULL,'somecluster','','2009-05-06 10:25:15','2009-05-06 10:25:15'),
+ (3,NULL,'link','','2009-05-06 10:27:42','2009-05-06 10:27:42'),
+ (4,NULL,'link','','2009-05-06 10:27:42','2009-05-06 10:27:42'),
+ (5,NULL,'misanet','','2009-05-06 10:32:10','2009-05-06 10:32:10'),
+ (6,NULL,'misanet','','2009-05-06 10:32:27','2009-05-06 10:32:27'),
+ (7,NULL,'misanet2','netb','2009-05-06 10:32:55','2009-05-06 10:32:55'),
+ (8,NULL,'misanet2','netb','2009-05-06 10:50:51','2009-05-06 10:50:51'),
+ (9,NULL,'misanet2','neta','2009-05-06 10:52:04','2009-05-06 10:52:04'),
+ (10,NULL,'misanet2','netb','2009-05-06 10:52:51','2009-05-06 10:52:51'),
+ (11,NULL,'misanet2','netc','2009-05-06 10:52:52','2009-05-06 10:52:52'),
+ (12,NULL,'misanet2',NULL,'2009-05-06 10:52:53','2009-05-06 10:52:53'),
+ (13,NULL,'misanet2','neta','2009-05-06 10:54:36','2009-05-06 10:54:36'),
+ (14,NULL,'misanet2','netb','2009-05-06 10:55:39','2009-05-06 10:55:39'),
+ (15,NULL,'misanet2','netc','2009-05-06 10:55:40','2009-05-06 10:55:40');
+INSERT INTO `nova_core`.`vclusters` VALUES  (16,NULL,'misanet2',NULL,'2009-05-06 10:55:41','2009-05-06 10:55:41'),
+ (17,NULL,'misanet2','neta','2009-05-06 10:58:03','2009-05-06 10:58:03'),
+ (18,NULL,'misanet2','netb','2009-05-06 10:59:17','2009-05-06 10:59:17'),
+ (19,NULL,'misanet2','netc','2009-05-06 10:59:24','2009-05-06 10:59:24'),
+ (20,NULL,'misanet2','neta','2009-05-06 11:02:06','2009-05-06 11:02:06'),
+ (21,NULL,'cattyc','netb','2009-05-06 11:13:26','2009-05-06 11:13:26'),
+ (22,NULL,'cattyc','netc','2009-05-06 11:15:52','2009-05-06 11:15:52'),
+ (23,NULL,'cattyc','neta','2009-05-06 11:18:17','2009-05-06 11:18:17'),
+ (24,NULL,'cattyc','neta','2009-05-06 11:20:09','2009-05-06 11:20:09'),
+ (28,NULL,'Hadoop_Cluster_test','neta','2009-05-06 11:35:20','2009-05-06 11:35:21'),
+ (29,NULL,'Hadoop_Cluster','netb','2009-05-06 11:40:50','2009-05-06 11:40:50'),
+ (30,NULL,'cattyc','netc','2009-05-06 11:41:58','2009-05-06 11:41:59'),
+ (41,NULL,'Hadoop_Cluster','neta','2009-05-06 12:19:41','2009-05-06 12:19:41'),
+ (42,NULL,'Hadoop_Cluster','neta','2009-05-06 12:22:48','2009-05-06 12:22:49');
+INSERT INTO `nova_core`.`vclusters` VALUES  (43,NULL,'Hadoop_Cluster','netb','2009-05-06 12:24:29','2009-05-06 12:24:29'),
+ (44,NULL,'Hadoop_Cluster','neta','2009-05-06 12:25:51','2009-05-06 12:25:51'),
+ (45,NULL,'Hadoop_Cluster','neta','2009-05-06 12:27:38','2009-05-06 12:27:38'),
+ (47,NULL,'Hadoop_Cluster','neta','2009-05-06 12:42:41','2009-05-06 12:42:41'),
+ (52,NULL,'Hadoop_Cluster','neta','2009-05-06 13:51:24','2009-05-06 13:51:24'),
+ (53,NULL,'Hadoop_Cluster','neta','2009-05-06 14:10:00','2009-05-06 14:10:01'),
+ (56,267,'My_Cluster_1','','2009-05-06 18:07:47','2009-05-06 18:07:47'),
+ (57,267,'My_Cluster_2','','2009-05-06 18:07:49','2009-05-06 18:07:49'),
+ (58,267,'My_Cluster_3','','2009-05-06 18:07:51','2009-05-06 18:07:51');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `vclusters` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_core`.`vimages`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`vimages`;
+CREATE TABLE  `nova_core`.`vimages` (
+  `id` int(11) NOT NULL auto_increment,
+  `iid` int(11) default NULL,
+  `os_family` varchar(255) default NULL,
+  `os_name` varchar(255) default NULL,
+  `hidden` tinyint(1) default '0',
+  `location` varchar(255) default NULL,
+  `comment` varchar(255) default NULL,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`vimages`
+--
+
+/*!40000 ALTER TABLE `vimages` DISABLE KEYS */;
+LOCK TABLES `vimages` WRITE;
+INSERT INTO `nova_core`.`vimages` VALUES  (1,NULL,'Windows','Fedora_8',0,'f8.img','','2009-05-06 08:12:18','2009-05-06 08:12:18'),
+ (2,NULL,'Other','os100m',0,'os100m.img','','2009-05-06 14:53:58','2009-05-06 14:53:58');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `vimages` ENABLE KEYS */;
+
+
+--
+-- Definition of table `nova_core`.`vmachines`
+--
+
+DROP TABLE IF EXISTS `nova_core`.`vmachines`;
+CREATE TABLE  `nova_core`.`vmachines` (
+  `id` int(11) NOT NULL auto_increment,
+  `ip` varchar(255) default NULL,
+  `pmachine_id` int(11) default NULL,
+  `vcluster_id` int(11) default NULL,
+  `vimage_id` int(11) default NULL,
+  `pmon_vmachine_uuid` varchar(255) default NULL,
+  `status` varchar(255) default 'not running',
+  `settings` varchar(255) default NULL,
+  `created_at` datetime default NULL,
+  `updated_at` datetime default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=234 DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `nova_core`.`vmachines`
+--
+
+/*!40000 ALTER TABLE `vmachines` DISABLE KEYS */;
+LOCK TABLES `vmachines` WRITE;
+INSERT INTO `nova_core`.`vmachines` VALUES  (195,NULL,NULL,45,NULL,NULL,'not running','{\"img\":null,\"mac\":\"54:7E:10:00:03:03\",\"ip\":\"10.0.3.3\",\"hostname\":\"neta_1\",\"vcpu\":\"4\",\"mem\":\"4001\"}','2009-05-06 12:27:38','2009-05-06 12:27:39'),
+ (197,NULL,NULL,45,NULL,NULL,'not running','{\"img\":null,\"mac\":\"54:7E:10:00:03:05\",\"ip\":\"10.0.3.5\",\"hostname\":\"neta_3\",\"vcpu\":\"4\",\"mem\":\"4001\"}','2009-05-06 12:27:38','2009-05-06 12:27:39'),
+ (218,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 13:43:17','2009-05-06 13:43:19'),
+ (219,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 13:45:03','2009-05-06 13:45:05'),
+ (230,NULL,NULL,53,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:19','2009-05-06 14:13:19'),
+ (231,NULL,NULL,53,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:25','2009-05-06 14:13:25'),
+ (232,NULL,1,NULL,NULL,NULL,'not running','{\"img\":\"f8.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"512\"}','2009-05-06 14:13:45','2009-05-06 14:13:48');
+INSERT INTO `nova_core`.`vmachines` VALUES  (233,'10.0.3.1',NULL,NULL,NULL,'','not running','{\"img\":\"os100m.img\",\"mac\":\"\",\"ip\":\"\",\"vcpu\":\"2\",\"mem\":\"133\"}','2009-05-06 14:54:17','2009-05-06 14:54:32');
+UNLOCK TABLES;
+/*!40000 ALTER TABLE `vmachines` ENABLE KEYS */;
 
 
 

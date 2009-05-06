@@ -44,8 +44,23 @@ class UserController < ApplicationController
     r = UserHelper::Helper.info params[:id]
     result = []
     r[:vclusters].each { |clu|
-      result << clu[:cid];
-      result << clu[:name];
+      result << clu[:cid]
+      result << clu[:name]
+    }
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
+
+  def info_vclusters_ad
+    r = UserHelper::Helper.info_all
+    result = []
+
+    r[:vclusters].each { |clu|
+      result << clu[:cid]
+      result << clu[:name]
+      result << clu[:owner]
     }
     respond_to do |accept|
       accept.html {render :text => result.to_json}
