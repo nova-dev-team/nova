@@ -1,3 +1,6 @@
+
+* HOW TO ADD A NEW MODULE
+
 There is caching in os/privilege.php, so if you encounter problems,
 try logout and then login again.
 

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090417054023) do
+ActiveRecord::Schema.define(:version => 20090420012138) do
 
   create_table "net_pools", :force => true do |t|
     t.string   "name",                                          :null => false
@@ -47,6 +47,7 @@ ActiveRecord::Schema.define(:version => 20090417054023) do
   create_table "vclusters", :force => true do |t|
     t.integer  "user_id",       :limit => 11
     t.string   "vcluster_name",               :default => "#unnamed#"
+    t.string   "net_pool_name",               :default => ""
     t.datetime "created_at"
     t.datetime "updated_at"
   end
