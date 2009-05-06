@@ -19,6 +19,7 @@ module BatchHelper
       return result
     end
 
+    # change the settings of the whole cluster
     def Helper.change_setting vcluster_cid, item, value
       # TODO
     end
