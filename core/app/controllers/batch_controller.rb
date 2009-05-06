@@ -1,6 +1,7 @@
 class BatchController < ApplicationController
 
   include UserHelper
+  include VmachineHelper
   include BatchHelper
 
   # create a batch and add to an user
@@ -34,6 +35,26 @@ class BatchController < ApplicationController
 
   def change_setting
     # TODO
+
+    item = params[:item]
+    value = params[:value]
+    if item == "img":
+      img_map = {
+        :hadoop => "hadoop_img.img",
+        :mpi => "mpi_img.img"
+      }
+      value = img_map[value]
+    end
+
+    vcluster = Vcluster.find_by_id params[:id]  [1..-1]
+    vcluster.vmachines.each do |vmachine|
+      print "*** Change settings of v#{vmachine.id}"
+      VmachineHelper::Helper.change_setting "v#{vmachine.id}", item, value 
+    end
+    vcluster.save
+
+    render :text => "true"
+
   end
 
   def add_soft
