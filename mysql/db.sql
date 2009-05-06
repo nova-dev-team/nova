@@ -298,7 +298,7 @@ CREATE TABLE  `nova_front`.`currentlyloggedin` (
   `member_id` varchar(45) NOT NULL,
   `group_id` varchar(45) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`currentlyloggedin`
@@ -321,8 +321,7 @@ INSERT INTO `nova_front`.`currentlyloggedin` VALUES  (10,'6d51c3c6ec21dc91c5b488
  (102,'d1b930747bc0645e251bcba1f511aad7','259','10000'),
  (103,'5b803c4de7388eb3933e07e4ddc61092','259','10000'),
  (106,'d518bebf29a5add76b14af4bf526483f','266','10000'),
- (115,'55b58ed32b174350a918bba8308bc196','200','1000'),
- (116,'07adca99e527d08a668425d5cdf3d66d','267','10000');
+ (119,'7440398b69d6018027236f24d9cd8c54','200','1000');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `currentlyloggedin` ENABLE KEYS */;
 
@@ -396,7 +395,7 @@ CREATE TABLE  `nova_front`.`qo_domains_has_modules` (
   `qo_domains_id` int(11) unsigned default NULL,
   `qo_modules_id` int(11) unsigned default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`qo_domains_has_modules`
@@ -425,7 +424,10 @@ INSERT INTO `nova_front`.`qo_domains_has_modules` VALUES  (1,1,1),
  (37,1,105),
  (38,2,104),
  (39,1,106),
- (40,11,106);
+ (40,11,106),
+ (41,1,107),
+ (43,10,107),
+ (44,9,107);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_domains_has_modules` ENABLE KEYS */;
 
@@ -664,17 +666,17 @@ INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (230,10000,10
  (230,10000,2,4,2),
  (230,10000,103,4,5),
  (230,10000,8,4,1),
- (200,1000,8,4,1),
- (200,1000,4,4,0),
- (200,1000,2,4,2),
- (231,1,3,4,2),
- (200,1000,104,4,6),
- (231,1,5,4,4),
  (200,1000,3,4,4),
+ (200,1000,104,4,6),
+ (200,1000,1,4,8),
+ (231,1,3,4,2),
+ (200,1000,4,4,0),
+ (231,1,5,4,4),
  (200,1000,100,4,7),
- (200,1000,5,4,3),
- (200,1000,5,3,0),
+ (200,1000,2,4,2),
  (200,1000,90,4,5),
+ (200,1000,5,3,0),
+ (200,1000,5,4,3),
  (230,10000,4,4,0),
  (232,10,8,4,10),
  (230,10000,1,3,0),
@@ -735,8 +737,8 @@ INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (248,10000,10
  (264,10000,104,4,0),
  (264,10000,103,4,0),
  (264,10000,1,4,0),
- (200,1000,1,4,8),
  (200,1000,101,4,9),
+ (200,1000,8,4,1),
  (259,10000,104,4,2),
  (259,10000,1,4,3),
  (259,10000,103,4,4),
@@ -754,7 +756,8 @@ INSERT INTO `nova_front`.`qo_members_has_module_launchers` VALUES  (266,10000,1,
  (267,10000,106,4,0),
  (267,10000,104,4,0),
  (267,10000,103,4,0),
- (267,10000,1,4,0);
+ (267,10000,1,4,0),
+ (200,1000,107,4,10);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_members_has_module_launchers` ENABLE KEYS */;
 
@@ -775,7 +778,7 @@ CREATE TABLE  `nova_front`.`qo_modules` (
   `active` tinyint(1) unsigned NOT NULL default '0' COMMENT 'Is the module currently active',
   `load_on_demand` tinyint(1) unsigned NOT NULL default '1' COMMENT 'Preload this module at start up?',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=107 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=108 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`qo_modules`
@@ -796,7 +799,8 @@ INSERT INTO `nova_front`.`qo_modules` VALUES  (102,'Santa Zhang',NULL,NULL,NULL,
  (103,'Santa Zhang',NULL,NULL,NULL,'user-manual','user-manual',0,1),
  (104,'Santa Zhang',NULL,NULL,NULL,'account-setting','account-setting',1,1),
  (105,'Santa Zhang',NULL,NULL,NULL,'user-job-manager','user-job-manager',1,1),
- (106,'Santa Zhang','0.0.0',NULL,NULL,'hadoop-wizard','hadoop-wizard',1,1);
+ (106,'Santa Zhang','0.0.0',NULL,NULL,'hadoop-wizard','hadoop-wizard',1,1),
+ (107,'Santa Zhang','0.0.0',NULL,NULL,'admin-monitor','admin-monitor',1,1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_modules` ENABLE KEYS */;
 
@@ -812,7 +816,7 @@ CREATE TABLE  `nova_front`.`qo_modules_actions` (
   `name` varchar(35) default NULL,
   `description` text,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `nova_front`.`qo_modules_actions`
@@ -849,7 +853,11 @@ INSERT INTO `nova_front`.`qo_modules_actions` VALUES  (1,0,'loadModule','Allow t
 INSERT INTO `nova_front`.`qo_modules_actions` VALUES  (109,105,'listCluster',NULL),
  (110,106,'progress','Hadoop installing progress'),
  (111,106,'create','Create new hadoop cluster'),
- (112,105,'listImage',NULL);
+ (112,105,'listImage',NULL),
+ (113,107,NULL,NULL),
+ (114,107,'removeCluster',NULL),
+ (115,107,'removeVM',NULL),
+ (116,107,'listVM',NULL);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_modules_actions` ENABLE KEYS */;
 
@@ -923,7 +931,11 @@ INSERT INTO `nova_front`.`qo_modules_files` VALUES  (103,'user-manual/','user-ma
  (105,'user-job-manager/','user-job-manager.php',0,1,0,'UserJobManager'),
  (106,'hadoop-wizard/','hadoop-wizard.js',0,0,1,'QoDesk.HadoopWizard'),
  (106,'hadoop-wizard/','hadoop-wizard.php',0,1,0,'HadoopWizard'),
- (106,'hadoop-wizard/','hadoop-wizard.css',1,0,0,'');
+ (106,'hadoop-wizard/','hadoop-wizard.css',1,0,0,''),
+ (107,'admin-monitor/','admin-monitor-override.js',0,0,0,'');
+INSERT INTO `nova_front`.`qo_modules_files` VALUES  (107,'admin-monitor/','admin-monitor.js',0,0,1,'QoDesk.AdminMonitor'),
+ (107,'admin-monitor/','admin-monitor.php',0,1,0,'AdminMonitor'),
+ (107,'admin-monitor/','admin-monitor.css',1,0,0,'');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_modules_files` ENABLE KEYS */;
 
@@ -1093,12 +1105,11 @@ INSERT INTO `nova_front`.`qo_sessions` VALUES  ('9bad84792d31930774f27d98df9a7b9
  ('d1b930747bc0645e251bcba1f511aad7',259,10000,'10.0.0.216','2009-05-05 22:12:58'),
  ('5b803c4de7388eb3933e07e4ddc61092',259,10000,'10.0.0.216','2009-05-05 22:13:44'),
  ('d518bebf29a5add76b14af4bf526483f',266,10000,'10.0.0.216','2009-05-06 14:52:20'),
- ('07adca99e527d08a668425d5cdf3d66d',267,10000,'10.0.0.216','2009-05-07 01:13:50'),
+ ('7440398b69d6018027236f24d9cd8c54',200,1000,'10.0.0.216','2009-05-07 01:42:20'),
  ('aaffcbcf80a0b1562ce54710d03b52a2',267,10000,'10.0.0.216','2009-05-06 19:40:45');
 INSERT INTO `nova_front`.`qo_sessions` VALUES  ('91629119f3c8d609b626c2927f63a951',267,10000,'10.0.0.216','2009-05-06 19:47:35'),
  ('0d945b6213ca5b13a3b210affb08573d',267,10000,'10.0.0.216','2009-05-06 21:09:02'),
- ('903f9ef96af83f5ac21587998ba5b5ec',267,10000,'10.0.0.216','2009-05-06 21:19:17'),
- ('55b58ed32b174350a918bba8308bc196',200,1000,'127.0.0.1','2009-05-07 01:05:44');
+ ('903f9ef96af83f5ac21587998ba5b5ec',267,10000,'10.0.0.216','2009-05-06 21:19:17');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `qo_sessions` ENABLE KEYS */;
 
