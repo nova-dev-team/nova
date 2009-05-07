@@ -129,8 +129,14 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
       input_vcpu = Ext.get("hadoop-wiz-vcpu");
       clu_size = input_size.dom.value;
       clu_name = input_name.dom.value;
-      mem_size_val = input_mem_size.dom.value;
-      vcpu_count = input_vcpu.dom.value;
+      if (input_mem_size != null)
+        mem_size_val = input_mem_size.dom.value;
+      else
+        mem_size_val = 512;
+      if (input_vcpu != null)
+        vcpu_count = input_vcpu.dom.value;
+      else
+        vcpu_count = 1;
       
       
       if (clu_name.indexOf(" ") != -1 || clu_name.indexOf("\t") != -1) {
@@ -138,7 +144,7 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
         return;
       }
       
-      soft_list = ["hadoop", "ganglia"];
+      soft_list = ["hadoop"];   // XXX, "ganglia"];
       
       soft_list_req = "";
       for (i = 0; i < soft_list.length; i++) {

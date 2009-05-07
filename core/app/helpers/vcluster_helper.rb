@@ -72,8 +72,8 @@ module VclusterHelper
             if vcluster.net_pool_name != ""
               NetPool.free vcluster.net_pool_name
               print "Free the net pool!"
-              File.delete "tmp/c#{params[:id]}.install.conf"
-              File.delete "tmp/c#{params[:id]}.nodelist.conf"
+              File.delete "tmp/#{vcluster_cid}.install.conf"
+              File.delete "tmp/#{vcluster_cid}.nodelist.conf"
 
             end
 

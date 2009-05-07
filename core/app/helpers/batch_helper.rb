@@ -71,11 +71,13 @@ HERE
     def Helper.do_install vcluster_cid
       result = {}
       # TODO write node.list and call hg
+      `cp tmp/#{vcluster_cid}.install.conf /config && cp tmp/#{vcluster_cid}.nodelist.conf && cd /config && ./vnew #{vcluster_cid}.nodelist.conf #{vcluster_cid}.install.conf #{vcluster_cid}`
       return result
     end
 
     def Helper.progress vcluster_cid
       result = {}
+      `cd /config && ./vmon #{vcluster_cid}`
 # TODO call hg
       return result
     end
