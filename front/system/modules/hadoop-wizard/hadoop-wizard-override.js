@@ -54,9 +54,9 @@ Ext.override(QoDesk.HadoopWizard, {
       win = desktop.createWindow({
           autoScroll: true,
           id: 'hadoop-wizard-win',
-          title: 'Hadoop Wizard Window',
+          title: 'Cluster Wizard',
           width:480,
-          height:240,
+          height:260,
           iconCls: 'hadoop-wizard-icon',
           items: this.contentPanel,
           shim:false,
@@ -64,7 +64,7 @@ Ext.override(QoDesk.HadoopWizard, {
           animCollapse:false,
           constrainHeader:true,
           maximizable: false,
-          taskbuttonTooltip: '<b>HadoopWizard Window</b><br />A HadoopWizard window'
+          taskbuttonTooltip: '<b>Cluster Wizard</b><br />Create new clusters in a few clicks'
       });
       
       progressP = this.progressPane;
@@ -88,7 +88,7 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
 	this.basic_html = "<img src='/image/hadoop-logo.jpg'><p>\
 		  Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p>\
 		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
-		  <div align='right'><a id='advanced' href='#'>Show advanced options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
+		  <div align='center'><a id='advanced' href='#'>Show advanced options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
 		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
 		  
 	this.advanced_html = "<img src='/image/hadoop-logo.jpg'><p>\
@@ -96,7 +96,7 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
 		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
  		  Memory Size:<input id='hadoop-wiz-mem-size' value='512'></input><p>\
  		  Cpu Count:<input id='hadoop-wiz-vcpu' value='1'></input><p>\
-		  <div align='right'><a id='basic' href='#'>Show basic options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
+		  <div align='center'><a id='basic' href='#'>Show basic options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
 		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
 	
 	QoDesk.HadoopWizard.SettingPanel.superclass.constructor.call(this, {
@@ -109,17 +109,17 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
 	
 	helper = this;
 	
-  this.setHeight(240);
+  this.setHeight(260);
 	
 	this.actions = {
   	'basic' : function(owner) {
       helper.body.update(helper.basic_html);
-      owner.win.setHeight(240);
+      owner.win.setHeight(260);
     },
     
 	  'advanced' : function(owner) {
       helper.body.update(helper.advanced_html);
-      owner.win.setHeight(320);
+      owner.win.setHeight(340);
     },
 	
 		'next' : function(owner){

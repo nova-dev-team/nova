@@ -13,7 +13,7 @@ QoDesk.HadoopWizard = Ext.extend(Ext.app.Module, {
 	launcher : {
 		iconCls: 'hadoop-wizard-icon',
 		shortcutIconCls: 'hadoop-wizard-shortcut',
-		text: 'Hadoop Wizard',
-		tooltip: '<b>Hadoop Wizard</b><br />TODO'
+		text: 'Cluster Wizard',
+		tooltip: '<b>Cluster Wizard</b><br />Deploy new clusters in a few clicks'
 	}
 });

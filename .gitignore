@@ -19,3 +19,5 @@ core/db/*.sqlite3
 # ignore Rakefile
 Rakefile
 
+# ignore .* files
+.*
