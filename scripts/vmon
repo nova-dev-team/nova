@@ -1,0 +1,51 @@
+#! /bin/sh
+
+CONFIG_NAME=$1
+
+if [ -z "$CONFIG_NAME" ]
+then
+	echo "Give me a Config name"
+	exit 1
+fi
+
+CONFIG_SOURCE=/config
+SHARE_SOURCE=/share
+
+CONFIG_PATH=${CONFIG_SOURCE}/${CONFIG_NAME}
+SHARE_PATH=${SHARE_SOURCE}/${CONFIG_NAME}
+
+NODELIST=${CONFIG_PATH}/node.list
+INSTLIST=${CONFIG_PATH}/install.list
+
+unset FIRST
+
+echo -n "["
+while read IP NODE
+do
+	if [ -z "$FIRST" ]
+	then
+		FIRST=1
+	else
+		echo -n ", "
+	fi
+
+	echo -n "{ \"node_name\":\"${NODE}\", \"ip\":\"${IP}\", \"progress\": {"
+	unset APPFIRST
+	while read APP
+	do
+		if [ -z "$APPFIRST" ];then
+			APPFIRST=1
+		else
+			echo -n ", "
+		fi
+		if [ -r ${SHARE_PATH}/${APP}/finished/${NODE} ] 
+		then
+			echo -n "\"${APP}\":\"Finished\""
+		else
+			echo -n "\"${APP}\":\"Waiting\""
+		fi
+	done < ${INSTLIST}
+	echo -n "}}"
+done < ${NODELIST}
+echo "]"
+

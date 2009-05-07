@@ -20,7 +20,9 @@ class HadoopWizard {
     $soft_arr = split("\n", $_REQUEST["software_list"]);
 
     for ($i = 0; $i < sizeof($soft_arr); $i++) {
-      $core_reply = file_get_contents("http://localhost:3000/batch/add_soft/" . $cid."/".$soft_arr[$i]);
+      if ($soft_arr[$i] != "") {
+        $core_reply = file_get_contents("http://localhost:3000/batch/add_soft/" . $cid."/".$soft_arr[$i]);
+      }
     }
     
     // CHANGE Settings
@@ -31,16 +33,20 @@ class HadoopWizard {
     // image will be mapped
     $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=img&value=" . $_REQUEST["app_name"]);
     
+    
+    $core_reply = file_get_contents("http://localhost:3000/batch/do_install/" . $cid);
+    
 //    echo "http://localhost:3000/batch/change_setting/" . $cid."?item=vcpu&value=4";
     // TODO add soft list
     // TODO start cluster
-    echo "{success:true}";
+    echo "{success:true, cid:'" . $cid ."', cname:'" .$_REQUEST["vcluster_name"] ."'}";
   }
   
   
   public function progress() {
-    // TODO: input = cid
-    echo "{success:true}";
+    $core_reply = file_get_contents("http://localhost:3000/batch/progress/" . $_REQUEST["vcluster_cid"]);
+//    $core_reply = "[{\"node_name\":\"jon\", \"wowo\":{\"bibi\":\"1.0.2.2\"}}, {\"node_name\":\"mis\", \"wo1\":{\"jj\":\"wowow\"}}]";
+    echo $core_reply;
   }
   
 }

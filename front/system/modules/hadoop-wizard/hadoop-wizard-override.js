@@ -12,6 +12,9 @@ Ext.override(QoDesk.HadoopWizard, {
 	layout: null,
 	win : null,
 	
+	cid:null,
+	cname:null,
+	
 	bottomBar:null,
 	
 	
@@ -207,8 +210,10 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
         },
         
         success: function(o){
-          alert(o.responseText);
+          //alert(o.responseText);
           owner.viewCard('hadoop-wizard-2');
+          helper.owner.cid = Ext.decode(o.responseText).cid;
+          helper.owner.cname = Ext.decode(o.responseText).cname;
         },
         failure: function(){
           // TODO when connect failed
@@ -256,15 +261,62 @@ Ext.extend(QoDesk.HadoopWizard.SettingPanel, Ext.Panel, {
 QoDesk.HadoopWizard.ProgressPanel = function(config){
 	this.owner = config.owner;
 	
-
 	
 	QoDesk.HadoopWizard.ProgressPanel.superclass.constructor.call(this, {
 		autoScroll: true,
 		bodyStyle: 'padding:15px',
 		border: false,
 		html: '', // this will be updated automatically by the following function
-		id: config.id
+		id: config.id,
+		freshFunc: function() {
+		  alert("HI");
+    }
 	});
+	
+	
+	this.refresh_counter = 0;
+	
+	helper123 = this;
+
+	this.freshFunc2 = function () {
+	
+    if (helper123.owner.win.hidden) {
+      clearInterval(helper123.refreshing_proc_id);
+      return;
+    } else if (helper123.owner.currentCard != "hadoop-wizard-2") {
+      return;
+    }
+    
+    var vc_cid = helper123.owner.cid;
+    var vc_name = helper123.owner.cname;
+    
+    var htmltxt = "<div><h2>Deploying progress of " + vc_cid + "(" + vc_name + "):</h2></div><p>";
+
+    Ext.Ajax.request({
+      url: '/connect.php',
+      params: {
+        moduleId: 'hadoop-wizard',
+        action: "progress",
+        vcluster_cid: vc_cid
+      },
+      
+      success: function(o){
+        htmltxt += o.responseText;
+        htmltxt += "<p>";
+        resultObj = Ext.decode(o.responseText);
+        for (i = 0; i < resultObj.length; i++) {
+          htmltxt += resultObj[i].node_name + "<br>";
+        }
+        helper123.body.update(htmltxt);
+      },
+      failure: function(){
+        // TODO when connect failed
+      }
+    });
+    
+  },
+  
+	this.refreshing_proc_id = setInterval(this.freshFunc2, 3 * 1000);
 
 
 	this.actions = {
@@ -278,12 +330,13 @@ QoDesk.HadoopWizard.ProgressPanel = function(config){
 Ext.extend(QoDesk.HadoopWizard.ProgressPanel, Ext.Panel, {
 
   startAutorefresh: function() {
-    this.autorefreshProcId = setInterval(this.freshFunc,3 * 1000);
+    this.autorefreshProcId = setInterval(this.freshFunc1xxxxx,3 * 1000);
   },
-  
-  freshFunc: function () {
-    alert("TODO: autorefresh");
+    
+  freshFunc1xxxxx: function() {
+
   },
+
   
   autorefreshProcId:null,
   

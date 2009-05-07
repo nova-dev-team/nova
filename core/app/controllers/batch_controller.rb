@@ -78,8 +78,8 @@ class BatchController < ApplicationController
   def progress
     result = BatchHelper::Helper.progress params[:id]
     respond_to do |accept| 
-      accept.html {render :text => result.to_json}
-      accept.json {render :json => result}
+      accept.html {render :text => result}
+#      accept.json {render :json => result}
     end
   end
 
