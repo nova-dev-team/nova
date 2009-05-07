@@ -8,6 +8,10 @@ class HadoopWizard {
     $this->os = $os;
   }
   
+  public function soft_list() {
+    $core_reply = file_get_contents("http://localhost:3000/software/list");
+    echo $core_reply;
+  }
   
   public function create() {
     $email = $this->os->session->get_member_email();

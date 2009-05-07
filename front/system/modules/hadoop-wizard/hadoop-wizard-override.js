@@ -85,17 +85,48 @@ Ext.override(QoDesk.HadoopWizard, {
 QoDesk.HadoopWizard.SettingPanel = function(config){
 	this.owner = config.owner;
 	
-	this.basic_html = "<img src='/image/hadoop-logo.jpg'><p>\
-		  Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p>\
-		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
+ 	helper = this;
+	
+	Ext.Ajax.request({
+    url: '/connect.php',
+    params: {
+      moduleId: 'hadoop-wizard',
+      action: "soft_list"
+    },
+    
+    success: function(o){
+      
+      var list = Ext.decode(o.responseText);
+      
+      var html = "<div align='center'>Softwares to install: &nbsp;<input id='generated_soft_to_install_count' type='hidden' value='" + list.length + "'>";
+      
+      for (i = 0; i < list.length; i++) {
+        html += "<input type='checkbox' id='generated_soft_to_install_" + i + "'> &nbsp;" + list[i] + "</input> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        html += "<input type='hidden' id='generated_soft_name_" + i + "' value='" + list[i] +"'/>";
+      }
+      
+      html += '<p></div>';
+    
+      helper.basic_html = html  + helper.basic_html;
+      helper.advanced_html = html  + helper.advanced_html;
+      helper.body.update(helper.basic_html);
+    },
+    failure: function(){
+      // TODO when connect failed
+    }
+  });
+  
+
+	
+	this.basic_html = "<div align='center'>Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p></div>\
+		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p></div>\
 		  <div align='center'><a id='advanced' href='#'>Show advanced options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
 		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
 		  
-	this.advanced_html = "<img src='/image/hadoop-logo.jpg'><p>\
-		  Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p>\
-		  Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p>\
- 		  Memory Size:<input id='hadoop-wiz-mem-size' value='512'></input><p>\
- 		  Cpu Count:<input id='hadoop-wiz-vcpu' value='1'></input><p>\
+	this.advanced_html = "<div align='center'>Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p></div>\
+		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p></div>\
+ 		  <div align='center'>Memory Size:<input id='hadoop-wiz-mem-size' value='512'></input><p></div>\
+ 		  <div align='center'>Cpu Count:<input id='hadoop-wiz-vcpu' value='1'></input><p></div>\
 		  <div align='center'><a id='basic' href='#'>Show basic options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
 		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
 	
@@ -107,7 +138,7 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
 		id: config.id
 	});
 	
-	helper = this;
+
 	
   this.setHeight(260);
 	
@@ -138,13 +169,22 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
       else
         vcpu_count = 1;
       
-      
       if (clu_name.indexOf(" ") != -1 || clu_name.indexOf("\t") != -1) {
         alert("Space is not allowed in cluster name!");
         return;
       }
       
-      soft_list = ["hadoop"];   // XXX, "ganglia"];
+      soft_list = [];   // XXX, "ganglia"];
+      
+      chbox_count = Ext.get("generated_soft_to_install_count").dom.value;
+      alert(chbox_count);
+      
+      for (i = 0; i < chbox_count; i++) {
+        chbox = Ext.get("generated_soft_to_install_" + i);
+        if (chbox.dom.checked) {
+          soft_list.push(Ext.get("generated_soft_name_" + i).dom.value);
+        }
+      }
       
       soft_list_req = "";
       for (i = 0; i < soft_list.length; i++) {
@@ -279,4 +319,5 @@ Ext.extend(QoDesk.HadoopWizard.ProgressPanel, Ext.Panel, {
     	this.actions[t.id](this.owner);  // pass owner for scope
     }
 });
+
 
