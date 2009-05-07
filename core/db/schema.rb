@@ -9,15 +9,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090420012138) do
+ActiveRecord::Schema.define(:version => 20090507111637) do
 
   create_table "net_pools", :force => true do |t|
-    t.string   "name",                                          :null => false
-    t.string   "begin",                                         :null => false
-    t.string   "mask",                                          :null => false
-    t.integer  "size",         :limit => 11,                    :null => false
-    t.boolean  "used",                       :default => false
-    t.integer  "lock_version", :limit => 11, :default => 0
+    t.string   "name",                            :null => false
+    t.string   "begin",                           :null => false
+    t.string   "mask",                            :null => false
+    t.integer  "size",                            :null => false
+    t.boolean  "used",         :default => false
+    t.integer  "lock_version", :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(:version => 20090420012138) do
   create_table "notifies", :force => true do |t|
     t.string   "notify_uuid"
     t.string   "notify_receiver_type"
-    t.integer  "notify_receiver_id",   :limit => 11
+    t.integer  "notify_receiver_id"
     t.string   "notify_type"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -38,6 +38,12 @@ ActiveRecord::Schema.define(:version => 20090420012138) do
     t.datetime "updated_at"
   end
 
+  create_table "softwares", :force => true do |t|
+    t.string   "soft_name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "email"
     t.datetime "created_at"
@@ -45,18 +51,18 @@ ActiveRecord::Schema.define(:version => 20090420012138) do
   end
 
   create_table "vclusters", :force => true do |t|
-    t.integer  "user_id",       :limit => 11
-    t.string   "vcluster_name",               :default => "#unnamed#"
-    t.string   "net_pool_name",               :default => ""
+    t.integer  "user_id"
+    t.string   "vcluster_name", :default => "#unnamed#"
+    t.string   "net_pool_name", :default => ""
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "vimages", :force => true do |t|
-    t.integer  "iid",        :limit => 11
+    t.integer  "iid"
     t.string   "os_family"
     t.string   "os_name"
-    t.boolean  "hidden",                   :default => false
+    t.boolean  "hidden",     :default => false
     t.string   "location"
     t.string   "comment"
     t.datetime "created_at"
@@ -65,11 +71,11 @@ ActiveRecord::Schema.define(:version => 20090420012138) do
 
   create_table "vmachines", :force => true do |t|
     t.string   "ip"
-    t.integer  "pmachine_id",        :limit => 11
-    t.integer  "vcluster_id",        :limit => 11
-    t.integer  "vimage_id",          :limit => 11
+    t.integer  "pmachine_id"
+    t.integer  "vcluster_id"
+    t.integer  "vimage_id"
     t.string   "pmon_vmachine_uuid"
-    t.string   "status",                           :default => "not running"
+    t.string   "status",             :default => "not running"
     t.string   "settings"
     t.datetime "created_at"
     t.datetime "updated_at"

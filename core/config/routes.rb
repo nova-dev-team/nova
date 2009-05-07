@@ -36,7 +36,7 @@ ActionController::Routing::Routes.draw do |map|
   # See how all your routes lay out with "rake routes"
 
   # Install the notification routes
-  map.connect ':controller/notify/:id', :controller => 'notify', :action => 'notify'
+  map.connect '/notify/:id', :controller => 'notify', :action => 'notify'
 
   # Install the default routes as the lowest priority.
   map.connect ':controller/:action'
