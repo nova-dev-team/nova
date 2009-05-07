@@ -1,0 +1,35 @@
+body {
+  margin: 15px;
+  margin-bottom: 25px;
+  margin-top: 25px;
+  padding: 0;
+  background-color: #FFF;
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 13px;
+  color: #333;
+}
+
+h1 {
+  font-size: 3.5em;
+  color: #666;
+}
+
+input {
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 13px;
+}
+
+table {
+}
+
+.footer {
+  text-align: center;
+  color: #663;
+  background-color: #eea;
+  padding: 10px;
+}
+
+.footer a {
+  color: #440;
+}
+

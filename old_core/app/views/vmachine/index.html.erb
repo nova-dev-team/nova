@@ -1,0 +1,246 @@
+<html>
+  <head>
+    <title>Controls for Vmachine</title>
+  </head>
+  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <script src="/jquery.min.js" type="text/javascript"></script>
+  <body>
+    <center><h1>Controls for Vmachine</h1></center>
+    <hr>
+    <!--Content starts below this row-->
+    
+<style type="text/css">
+.error_msg {
+  color: red;
+}
+
+.success_msg {
+  color: green;
+}
+
+.add_link {
+  color : green;
+}
+
+.vm_link {
+  color : gray;
+}
+
+.vc_link {
+  color: blue
+}
+
+.remove_link {
+  color : red;
+}
+
+.refresh_vm_list {
+  color: gray;
+}
+</style>
+
+<script>
+
+function show_msg(msg, success) {
+  var notice_pane = $("#notice");
+  if (success) {
+    notice_pane.html("<div class='success_msg'>" + msg + "</div>");
+  } else {
+    notice_pane.html("<div class='error_msg'>" + msg + "</div>");
+  }
+}
+
+function real_create_vm() {
+
+  // TODO real create
+  
+  $.getJSON("/vmachine/create",
+    function(result) {
+      if (result.success) {
+        refresh_vm_list();
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+  
+  init_info_pane();
+}
+
+
+function create_vmachine() {
+  var info_pane = $("#info_pane");
+  var html = "";
+  
+  // TODO use real data
+  html += "Cpu: <input type='text'><p>";
+  html += "Memory: <input type='text'><p>";
+  html += "HD: <input type='text'><p>";
+  
+  html += "<a class='add_link' href='#' onclick='real_create_vm()'>Create new vmachine!</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+        + "<a class='remove_link' href='#' onclick='init_info_pane()'>Cancel</a>";
+  
+  info_pane.html(html);
+}
+
+function init_info_pane() {
+  var info_pane = $("#info_pane");
+  info_pane.html("Click a vmachine vid to show detail information");
+}
+
+
+function start_vm(vmachine_vid) {
+  $.getJSON("/vmachine/start/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function notify_deployed_vm(vmachine_vid) {
+  $.getJSON("/vmachine/notify_status_change/" + vmachine_vid + "/running",
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function suspend_vm(vmachine_vid) {
+  $.getJSON("/vmachine/suspend/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function resume_vm(vmachine_vid) {
+  $.getJSON("/vmachine/resume/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function stop_vm(vmachine_vid) {
+  $.getJSON("/vmachine/stop/" + vmachine_vid,
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);        
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function notify_undeployed_vm(vmachine_vid) {
+  $.getJSON("/vmachine/notify_status_change/" + vmachine_vid + "/not running",
+    function(result) {
+      if (result.success) {
+        show_info(vmachine_vid);
+      }
+      show_msg(result.msg, result.success);
+    }
+  );
+}
+
+function show_info(vmachine_vid) {
+  var info_pane = $("#info_pane");
+  $.getJSON("/vmachine/info/" + vmachine_vid,
+    function(result) {
+      var html = "Vmachine vid: " + result.vmachine_vid + "<p>";
+      
+      if (result.vcluster_cid == "") {
+        html += "Not belong to any vcluster<p>"
+      } else {
+        html += "Belong to vcluster <a class='vc_link' href='/vcluster#" + result.vcluster_cid + "'>" + result.vcluster_cid + "</a><p>";
+      }
+      
+      if (result.pmachine_ip == "") {
+        html += "Not hosted on any pmachine<p>";
+      } else {
+        html += "Hosted on pmachine <a class='pm_link' href='/pmachine#" + result.pmachine_ip + "'>" + result.pmachine_ip + "</a><p>";
+      }
+      
+      html += "Status: " + result.status + "<br>";
+      
+      html += "Available actions: ";
+      
+      if (result.status == "not running") {
+        html += "<a class='add_link' href='#' onclick='start_vm(\"" + vmachine_vid + "\")'>Start</a>";
+      } else if (result.status == "deploying") {
+        //html += "<a class='add_link' href='#' onclick='notify_deployed_vm(\"" + vmachine_vid + "\")'>Notify deployed</a>";
+      } else if (result.status == "running") {
+        html += "<a class='remove_link' href='#' onclick='suspend_vm(\"" + vmachine_vid + "\")'>Suspend</a>";
+        html += "&nbsp;&nbsp;&nbsp;&nbsp;"
+        html += "<a class='remove_link' href='#' onclick='stop_vm(\"" + vmachine_vid + "\")'>Stop</a>";
+      } else if (result.status == "suspended") {
+        html += "<a class='add_link' href='#' onclick='resume_vm(\"" + vmachine_vid + "\")'>Resume</a>";
+      } else if (result.status == "undeploying") {
+        //html += "<a class='add_link' href='#' onclick='notify_undeployed_vm(\"" + vmachine_vid + "\")'>Notify undeployed</a>";
+      }
+      
+      info_pane.html(html);
+    }
+  );
+}
+
+function refresh_vm_list() {
+  $.getJSON("/vmachine/list",
+    function(result) {
+      var vm_pane = $("#vm_list");
+      vm_pane.empty();
+      for (i = 0; i < result.length; i++) {
+        var html = "<a href='#' class='vm_link' onclick='show_info(\"" + result[i] + "\")'>" + result[i] + "</a><br>";
+        vm_pane.append(html);
+      }
+    }
+  );
+}
+
+$(document).ready(function() {
+  init_info_pane();
+  refresh_vm_list();
+  var loc = window.location.toString();
+  if (loc.indexOf('#') > 0) {
+    var vid = loc.split('#')[1];
+    if (vid.length > 0) {
+      show_info(vid);
+    }
+  }
+});
+</script>
+    
+<table cellpadding='10'>
+<tr>
+<td>
+<a class='add_link' href="#" onclick="create_vmachine()">Create new vmachine</a>
+</td>
+<td id="notice"></td>
+</tr>
+<tr>
+<td valign='top'>
+  <a href="#" class='refresh_vm_list' onclick="refresh_vm_list()">Refresh vmachine list</a><p>
+  <div id="vm_list"></div>
+</td>
+<td valign="top">
+  <div id="info_pane"></div></td>
+</tr>
+</table>
+
+    <!--Content ends above this row-->
+    <div class="footer">
+      This page belongs to the "Core" component of Nova project, hosted at <a href="http://www.github.com/santazhang/nova">http://www.github.com/santazhang/nova</a>.
+    </div>
+  </body>
+</html>
