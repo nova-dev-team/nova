@@ -104,7 +104,7 @@ module Utils
     end
 
     def mem=(mem)
-      @vm[:mem] = mem * 1024
+      @vm[:mem] = (mem.to_i * 1024).to_s
     end
 
     def vcpu

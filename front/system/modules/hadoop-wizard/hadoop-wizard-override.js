@@ -174,10 +174,9 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
         return;
       }
       
-      soft_list = [];   // XXX, "ganglia"];
+      soft_list = [];
       
       chbox_count = Ext.get("generated_soft_to_install_count").dom.value;
-      alert(chbox_count);
       
       for (i = 0; i < chbox_count; i++) {
         chbox = Ext.get("generated_soft_to_install_" + i);
