@@ -380,17 +380,18 @@ Ext.override(QoDesk.UserJobManager, {
             alert("You need to select a vmachine first");
           } else {
             vmid = rows[0].data.vm_id;
+            vm_image_name = rows[0].data.vm_image;
             rows2 = cluster_pane.getSelectionModel().getSelections();  
             cid = rows2[0].data.cluster_id;
 
 
       			// for the vnc displays, create a new vnc window			
-      			function createVNCwin(_cid, _vmid, _pmip, _vnc_port) {
+      			function createVNCwin(_cid, _vmid, _pmip, _vnc_port, win_width, win_height) {
       				desktop.createWindow({
 			      		id: 'vnc_vm_' + _cid + "_" + _vmid , // TODO  change the win name
       					title: "VNC of " + _cid + ", " + _vmid,
-      					width: 815,
-					      height: 633,
+      					width: win_width + 15,
+					      height: win_height + 33,
 					      minWidth: 640,
 					      minHeight: 400,
 					      shim: false,
@@ -412,7 +413,7 @@ Ext.override(QoDesk.UserJobManager, {
       					},
 
       					html : "<applet archive='http://" + _pmip + ":3000/vncviewer.jar' id='" + 'vnc_vm_' + _cid + "_" + _vmid +
-      					        "' code='VncViewer.class' width='800' height='600'><param name='PORT' value='" + _vnc_port + 
+      					        "' code='VncViewer.class' width='" + win_width + "' height='" + win_height + "'><param name='PORT' value='" + _vnc_port + 
       					        "' /><param name='ENCODING' value='tight' /><param name='PASSWORD' value='MacOSX10.5'><param name='HOST' value='" + _pmip +
       					        "'><param name='Show controls' value='no' /></applet>"
       				});
@@ -431,7 +432,13 @@ Ext.override(QoDesk.UserJobManager, {
                 success: function(o){
                   if (o && o.responseText && Ext.decode(o.responseText).success) {
                     // refresh
-                    createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port );
+                    
+                    // Different win size for different type of images (console-based, gui-based)
+                    if (vm_image_name.indexOf("os100")  != -1) {
+                      createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 640, 300);
+                    } else {
+                      createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 800, 600);
+                    }
                     vncwin = desktop.getWindow('vnc_vm_' + cid + "_" + vmid);
                     vncwin.show();
                   } else {
