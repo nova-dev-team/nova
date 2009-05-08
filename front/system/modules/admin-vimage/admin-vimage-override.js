@@ -82,13 +82,19 @@ Ext.override(QoDesk.AdminVimage, {
 				          iconCls:'admin-vimage-add',
 				          
 				          handler: function() {
-                    var new_ip = prompt("New Pmachine IP?");
+				          
+				            var os_family = prompt("OS Family?");
+				            var os_name = prompt("OS Name?");
+				            var imglocation = prompt("Image location?");
+				            
                     Ext.Ajax.request({
                       url: '/connect.php',
                       params: {
-                        moduleId: 'admin-pmachine',
-                        action: "addPM",
-                        pm_ip: new_ip
+                        moduleId: 'admin-vimage',
+                        action: "addImg",
+                        osfamily: os_family,
+                        osname: os_name,
+                        img_location: imglocation
                       },
                       success: function(o) {
                         if (o && o.responseText && Ext.decode(o.responseText).success)

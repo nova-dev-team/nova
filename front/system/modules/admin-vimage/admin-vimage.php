@@ -17,7 +17,9 @@ class AdminVimage
     }
 
     public function addImg() {
-      echo "{success:true}";
+      $core_reply = file_get_contents("http://localhost:3000/vimage/add?os_family=" . $_REQUEST["osfamily"] . "&os_name="
+             . $_REQUEST["osname"] . "&location=" . $_REQUEST["img_location"]);
+      echo $core_reply;
     }
 
     public function delImg() {
