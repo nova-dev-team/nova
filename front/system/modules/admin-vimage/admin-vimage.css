@@ -4,4 +4,13 @@
 .admin-vimage-shortcut img {
     background-image: url(images/grid48x48.png);
 }
+.admin-vimage-refresh {
+	background-image: url(images/refresh.gif) !important;
+}
+.admin-vimage-add {
+	background-image: url(images/add.gif) !important;
+}
+.admin-vimage-remove {
+	background-image: url(images/delete.gif) !important;
+}
 

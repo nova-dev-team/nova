@@ -21,6 +21,9 @@ module VimageHelper
     def Helper.short_list
       result = []
       Vimage.all.each do |vimage|
+        if vimage.hidden
+          next
+        end
         result << "#{vimage.os_family}: #{vimage.os_name}" # this is to be displayed for users
         img_name = "" # name of the image, for pmon
         if vimage.location.rindex "/"

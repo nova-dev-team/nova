@@ -12,7 +12,8 @@ class AdminVimage
     
     
     public function listImg() {
-      echo "{success:true}";
+      $core_reply = file_get_contents("http://localhost:3000/vimage/list/");
+      echo "{success:true, all_images:" . $core_reply ."}";
     }
 
     public function addImg() {
@@ -20,7 +21,14 @@ class AdminVimage
     }
 
     public function delImg() {
-      echo "{success:true}";
+      $iid = $_REQUEST["img_id"];
+      $hidden = $_REQUEST["hidden"];
+      if ($hidden == "true") {
+        $core_reply = file_get_contents("http://localhost:3000/vimage/hide/" . $iid);
+      } else {
+        $core_reply = file_get_contents("http://localhost:3000/vimage/unhide/" . $iid);
+      }
+      echo $core_reply;
     }
     
 

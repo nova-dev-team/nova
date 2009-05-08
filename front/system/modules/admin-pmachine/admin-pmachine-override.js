@@ -78,7 +78,8 @@ Ext.override(QoDesk.AdminPmachine, {
                     });
                   }
 				          
-                }, {
+                },
+                /* {
                   text:'Delete',
 				          tooltip:'Add a new Physical Machine',
 				          iconCls:'admin-pmachine-remove',
@@ -100,7 +101,9 @@ Ext.override(QoDesk.AdminPmachine, {
                     });
                   }
                   
-                },{
+                },*/
+                
+                {
                   text:'Refresh',
 				          iconCls:'admin-pmachine-refresh',
 				          
@@ -196,11 +199,11 @@ Ext.grid.CheckColumn.prototype = {
     
     renderer: function(value, p, record){
     
-        if (record.data.is_working == 1) {
+        if (record.data.is_working == "working") {
             record.data.is_working = true;
         }
         else 
-            if (record.data.is_working == 0) {
+            if (record.data.is_working == "pending remove") {
                 record.data.is_working = false;
             }
         
