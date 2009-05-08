@@ -13,7 +13,7 @@ QoDesk.AdminPclusterMon = Ext.extend(Ext.app.Module, {
 	launcher : {
         iconCls: 'superadmin-manual-icon',
         shortcutIconCls: 'superadmin-manual-shortcut',
-        text: 'Clusters',
+        text: 'Charts',
         tooltip: '<b>Clusters Mon</b><br />Collect detail info of the clusters'
     }
 });

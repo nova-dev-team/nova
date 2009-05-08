@@ -12,6 +12,23 @@ class PmachineController < ApplicationController
     end
   end
 
+  # only list the working pmachines
+  def list_working
+    result = {:success => true}
+    pm_list = []
+    Pmachine.all.each do |pm|
+      if pm.status == "working":
+        pm_list << { :pm_ip => pm.ip }
+      end
+    end
+    result[:pm_list] = pm_list
+    
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
+
   # also gives the working status
   def list_ex
     result = {:success => true}

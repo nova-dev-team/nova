@@ -14,6 +14,11 @@ class AdminPmachine
       $core_reply = file_get_contents("http://localhost:3000/pmachine/list_ex");
       echo $core_reply;
     }
+    
+    public function workingPM() {
+      $core_reply = file_get_contents("http://localhost:3000/pmachine/list_working");
+      echo $core_reply;
+    }
 
     public function addPM() {
       $core_reply = file_get_contents("http://localhost:3000/pmachine/add/" . $_REQUEST["pm_ip"]);
