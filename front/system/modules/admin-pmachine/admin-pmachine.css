@@ -1,0 +1,17 @@
+.admin-pmachine-icon {
+    background-image:url(images/grid16x16.png);
+}
+.admin-pmachine-shortcut img {
+    background-image: url(images/grid48x48.png);
+}
+
+.admin-pmachine-refresh {
+	background-image: url(images/refresh.gif) !important;
+}
+.admin-pmachine-add {
+	background-image: url(images/add.gif) !important;
+}
+.admin-pmachine-remove {
+	background-image: url(images/delete.gif) !important;
+}
+

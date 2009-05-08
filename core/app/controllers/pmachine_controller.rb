@@ -12,6 +12,24 @@ class PmachineController < ApplicationController
     end
   end
 
+  # also gives the working status
+  def list_ex
+    result = {:success => true}
+    pm_info = []
+    Pmachine.all.each do |pm|
+      pm_info << {
+        :pm_ip => pm.ip,
+        :is_working => pm.status
+      }
+    end
+    result[:pm_info] = pm_info
+    
+    respond_to do |accept|
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
+
   # add a new physical machine by ip address, eg: /pmachine/add/10.0.0.1
   def add
     result = Helper.add params[:id]

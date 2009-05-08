@@ -9,7 +9,7 @@ Ext.override(QoDesk.SuperAdminManagerWindow, {
         bigApp = this.app;
         
         var desktop = this.app.getDesktop();
-        var win = desktop.getWindow('superadmin-user-manager-win');
+        var win = desktop.getWindow('superadmin-user-manager-grid');
         
         function test1(){
             alert('hi');
