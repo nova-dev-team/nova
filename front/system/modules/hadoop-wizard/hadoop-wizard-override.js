@@ -301,13 +301,36 @@ QoDesk.HadoopWizard.ProgressPanel = function(config){
       },
       
       success: function(o){
-        htmltxt += o.responseText;
-        htmltxt += "<p>";
+//        htmltxt += o.responseText;
+//        htmltxt += "<p>";
+        // TODO pretty table
+        htmltxt += "<table><tr><td>Vmachine</td><td>Progress</td></tr>";
         resultObj = Ext.decode(o.responseText);
+        console.log(resultObj);
         for (i = 0; i < resultObj.length; i++) {
-          htmltxt += resultObj[i].node_name + "<br>";
+          htmltxt += "<tr>";
+          htmltxt += "<td>";
+          htmltxt += resultObj[i].node_name + " (ip =&gt; " + resultObj[i].ip + ")";
+          htmltxt += "</td>";
+          
+          htmltxt += "<td>";
+
+          for (j = 0; j < resultObj[i].progress.length; j++) {
+            if (resultObj[i].progress[j][1] == "Waiting") {
+              htmltxt += resultObj[i].progress[j][0] + " is <font color='red'>" + resultObj[i].progress[j][1] + "</font><br>";
+            } else {
+              htmltxt += resultObj[i].progress[j][0] + " is <font color='green'>" + resultObj[i].progress[j][1] + "</font><br>";
+            }
+          }
+          htmltxt += "</td>";
+          
+          htmltxt += "</tr>";
         }
+        
+        htmltxt += "</table>";
+        
         helper123.body.update(htmltxt);
+        
       },
       failure: function(){
         // TODO when connect failed
@@ -316,7 +339,7 @@ QoDesk.HadoopWizard.ProgressPanel = function(config){
     
   },
   
-	this.refreshing_proc_id = setInterval(this.freshFunc2, 3 * 1000);
+	this.refreshing_proc_id = setInterval(this.freshFunc2, 3000);
 
 
 	this.actions = {

@@ -29,7 +29,7 @@ do
 		echo -n ", "
 	fi
 
-	echo -n "{ \"node_name\":\"${NODE}\", \"ip\":\"${IP}\", \"progress\": {"
+	echo -n "{ \"node_name\":\"${NODE}\", \"ip\":\"${IP}\", \"progress\": ["
 	unset APPFIRST
 	while read APP
 	do
@@ -40,12 +40,12 @@ do
 		fi
 		if [ -r ${SHARE_PATH}/${APP}/finished/${NODE} ] 
 		then
-			echo -n "\"${APP}\":\"Finished\""
+			echo -n "[\"${APP}\",\"Finished\"]"
 		else
-			echo -n "\"${APP}\":\"Waiting\""
+			echo -n "[\"${APP}\",\"Waiting\"]"
 		fi
 	done < ${INSTLIST}
-	echo -n "}}"
+	echo -n "]}"
 done < ${NODELIST}
 echo "]"
 
