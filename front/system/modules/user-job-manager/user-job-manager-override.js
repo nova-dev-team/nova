@@ -435,7 +435,7 @@ Ext.override(QoDesk.UserJobManager, {
                     
                     // Different win size for different type of images (console-based, gui-based)
                     if (vm_image_name.indexOf("-console")  != -1) {
-                      createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 640, 300);
+                      createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 640, 384);
                     } else {
                       createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 800, 600);
                     }

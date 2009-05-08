@@ -306,7 +306,7 @@ QoDesk.HadoopWizard.ProgressPanel = function(config){
         // TODO pretty table
         htmltxt += "<table><tr><td>Vmachine</td><td>Progress</td></tr>";
         resultObj = Ext.decode(o.responseText);
-        console.log(resultObj);
+//        console.log(resultObj);
         for (i = 0; i < resultObj.length; i++) {
           htmltxt += "<tr>";
           htmltxt += "<td>";

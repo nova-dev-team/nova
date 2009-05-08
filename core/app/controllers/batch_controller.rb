@@ -39,11 +39,14 @@ class BatchController < ApplicationController
     item = params[:item]
     value = params[:value]
     if item == "img":
-      img_map = {
-        :hadoop => "hadoop_img.img",
-        :mpi => "mpi_img.img"
-      }
-      value = img_map[value]
+      #img_map = {
+       # :hadoop => "ubuntu-console-well.img",
+       # :mpi => "mpi_img.img"
+      #}
+      #value = img_map[value]
+      if value == "hadoop"
+        value = "ubuntu-console-well.img"
+      end
     end
 
     vcluster = Vcluster.find_by_id params[:id]  [1..-1]
@@ -84,3 +87,4 @@ class BatchController < ApplicationController
   end
 
 end
+
