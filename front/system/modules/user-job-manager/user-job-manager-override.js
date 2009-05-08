@@ -404,7 +404,7 @@ Ext.override(QoDesk.UserJobManager, {
       					  resize: {
 					          fn: function() {
         					    var vncapp = Ext.get('vnc_vm_' + _cid + "_" + _vmid);
-        					    console.log(vncapp);
+//        					    console.log(vncapp);
         					    var sz = this.getSize();
         					    vncapp.dom.height = sz.height - 33;
         					    vncapp.dom.width = sz.width - 15;
@@ -434,7 +434,7 @@ Ext.override(QoDesk.UserJobManager, {
                     // refresh
                     
                     // Different win size for different type of images (console-based, gui-based)
-                    if (vm_image_name.indexOf("os100")  != -1) {
+                    if (vm_image_name.indexOf("-console")  != -1) {
                       createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 640, 300);
                     } else {
                       createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 800, 600);
