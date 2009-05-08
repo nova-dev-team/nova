@@ -57,7 +57,7 @@ Ext.override(QoDesk.AdminVimage, {
                 dataIndex: 'os_name',
                 sortable: true
             }, {
-                header: "Location",
+                header: "Image Filename",
                 width: 200,
                 dataIndex: 'location',
                 sortable: true

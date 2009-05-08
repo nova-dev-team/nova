@@ -31,8 +31,8 @@ class HadoopWizard {
     $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=mem&value="  . $_REQUEST["mem_size"]);
     
     // image will be mapped
-    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=img&value=" . $_REQUEST["app_name"]);
-    
+    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=master_image&value=ubuntu-gui-well.img");
+    $core_reply = file_get_contents("http://localhost:3000/batch/change_setting/" . $cid."?item=slave_image&value=ubuntu-console-well.img");
     
     $core_reply = file_get_contents("http://localhost:3000/batch/do_install/" . $cid);
     

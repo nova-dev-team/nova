@@ -38,25 +38,46 @@ class BatchController < ApplicationController
 
     item = params[:item]
     value = params[:value]
-    if item == "img":
-      #img_map = {
-       # :hadoop => "ubuntu-console-well.img",
-       # :mpi => "mpi_img.img"
-      #}
-      #value = img_map[value]
-      if value == "hadoop"
-        value = "ubuntu-console-well.img"
+
+    vcluster = Vcluster.find_by_id params[:id][1..-1]
+
+# the image on the 1st vmachine
+    if item == "master_image"
+      min_id = nil # master has minimum id within the cluster
+      vcluster.vmachines.each do |vmachine|
+        if min_id == nil or min_id > vmachine.id
+          min_id = vmachine.id
+        end
       end
-    end
 
-    vcluster = Vcluster.find_by_id params[:id]  [1..-1]
-    vcluster.vmachines.each do |vmachine|
-     # print "*** Change settings of v#{vmachine.id}"
-      VmachineHelper::Helper.change_setting "v#{vmachine.id}", item, value 
-    end
-    vcluster.save
+      vcluster.vmachines.each do |vmachine|
+        if vmachine.id == min_id
+          VmachineHelper::Helper.change_setting "v#{vmachine.id}", "img", value
+        end
+      end
 
-    render :text => "true"
+    elsif item == "slave_image"
+      min_id = nil
+      vcluster.vmachines.each do |vmachine|
+        if min_id == nil or min_id > vmachine.id
+          min_id = vmachine.id
+        end
+      end
+
+      vcluster.vmachines.each do |vmachine|
+        if vmachine.id != min_id
+          VmachineHelper::Helper.change_setting "v#{vmachine.id}", "img", value
+        end
+      end
+
+    else # other settings
+      vcluster.vmachines.each do |vmachine|
+        VmachineHelper::Helper.change_setting "v#{vmachine.id}", item, value 
+      end
+      vcluster.save
+
+      render :text => "true"
+    end
 
   end
 

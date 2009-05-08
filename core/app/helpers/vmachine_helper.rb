@@ -42,7 +42,39 @@ HERE
       return result
     end
 
-    # delete a vmachine, this action will force running machines to halt
+
+  # delete a vmachine, this action will force running machines to halt
+    def Helper.delete_ex vmachine_vid
+      result = {}
+      vmachine = Vmachine.find_by_id vmachine_vid[1..-1] if vmachine_vid != nil
+
+      if vmachine == nil # vmachine not found
+        result[:success] = false
+        result[:msg] = "Vmachine #{vmachine_vid} not found!"
+
+      else # vmachine found
+
+        # tell pmachine to stop it
+       
+        if vmachine.pmachine != nil 
+          http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
+            http.put '/x/' + vmachine.pmon_vmachine_uuid + '/destroy', ""
+          end
+          pmon_msg = http_res.body
+        else
+          pmon_msg = "PMON_ERROR! FAILED TO DELETE VMACHINE"
+        end
+
+        Vmachine.delete vmachine
+        result[:success] = true
+        result[:msg] = "Vmachine #{vmachine_vid} is removed. Pmon Message:" + pmon_msg
+      end
+
+      return result
+    end
+
+
+    # delete a vmachine
     def Helper.delete vmachine_vid
       result = {}
       vmachine = Vmachine.find_by_id vmachine_vid[1..-1] if vmachine_vid != nil
@@ -404,7 +436,6 @@ HERE
         result[:pm_ip] = ""
         result[:pmon_uuid] = ""
         result[:vnc_port] = "-1"
-        result[:vm_image] = "Img"
         result[:vm_setting] = vmachine.settings
         if vmachine.pmachine
           result[:pm_ip] = vmachine.pmachine.ip

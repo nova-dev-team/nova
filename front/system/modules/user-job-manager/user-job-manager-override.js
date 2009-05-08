@@ -8,9 +8,10 @@ Ext.override(QoDesk.UserJobManager, {
 		// Infomation panel that located at bottom-right side
 		var info_pane = new Ext.Panel({
 			region : 'center',
-			margins : '3 0 3 3',
+			margins : '3 3 3 3',
 			cmargins : '3 3 3 3',
 			split : true,
+      autoScroll:true,
 			html: "Select a virtual cluster, and choose one of its virtual machines to show the detail information."
 		});
 		
@@ -287,7 +288,7 @@ Ext.override(QoDesk.UserJobManager, {
             success: function(o){
               if (o && o.responseText && Ext.decode(o.responseText).success) {
                 // refresh
-                alert(Ext.decode(o.responseText).msg);
+//                alert(Ext.decode(o.responseText).msg);
                 // TODO change the info pane
               } else {
                 // TODO when create failed
@@ -435,7 +436,7 @@ Ext.override(QoDesk.UserJobManager, {
                     
                     // Different win size for different type of images (console-based, gui-based)
                     if (vm_image_name.indexOf("-console")  != -1) {
-                      createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 640, 384);
+                      createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 660, 420);
                     } else {
                       createVNCwin(cid, vmid, Ext.decode(o.responseText).pm_ip, Ext.decode(o.responseText).vnc_port, 800, 600);
                     }
@@ -597,8 +598,8 @@ Ext.override(QoDesk.UserJobManager, {
         success: function(o){
           if (o && o.responseText && Ext.decode(o.responseText).success) {
             // refresh
-      			html = o.responseText;
-          	info_pane.body.update(html);            
+
+          	info_pane.body.update(render_info(o.responseText));
           } else {
             // TODO when create failed
           }
@@ -634,4 +635,63 @@ Ext.override(QoDesk.UserJobManager, {
 		win.show();
 	}
 });
+
+// map a ip address to hostname
+function hostname_mapping(ip_addr) {
+  if (ip_addr.indexOf(".12") != -1) {
+    return "node12";
+  } else if (ip_addr.indexOf(".13") != -1) {
+    return "node13";
+  } else if (ip_addr.indexOf(".16") != -1) {
+    return "node16";
+  } else {
+    return ip_addr;
+  }
+}
+
+function render_info(info_text) {
+  var html = "<div>";
+  
+  var munin_ip = "10.0.0.220";
+  var munin_src_header = "http://" + munin_ip + "/cgi-bin/munin-cgi-graph/localdomain/";
+  
+//  html += info_text;
+  
+  info = Ext.decode(info_text);
+  info_vm = Ext.decode(info.vm_setting);
+  
+  vnc_port = info.vnc_port;
+  pm_ip = info.pm_ip;
+  img = info_vm.img;
+  mac = info_vm.mac;
+  ip_addr = info_vm.ip;
+  vcpu = info_vm.vcpu;
+  mem = info_vm.mem;
+  
+  pm_host_name = hostname_mapping(pm_ip);
+  
+  html += "<br><table cellpadding='12'><tr><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td>VNC Port&nbsp;&nbsp;&nbsp;&nbsp;</td><td>Pmachine IP&nbsp;&nbsp;&nbsp;&nbsp;</td>\
+    <td>OS Image&nbsp;&nbsp;&nbsp;&nbsp;</td><td>MAC&nbsp;&nbsp;&nbsp;&nbsp;</td><td>Vmachine IP&nbsp;&nbsp;&nbsp;&nbsp;</td>\
+    <td>Cpu Count&nbsp;&nbsp;&nbsp;&nbsp;</td><td>Memory Size&nbsp;&nbsp;&nbsp;&nbsp;</td></tr><tr>";
+  
+  html += "<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";// spacing
+  html += "<td>" + (vnc_port == -1? "NOT READY" : vnc_port)  + "&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+  html += "<td>" + pm_ip + "&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+  html += "<td>" + img + "&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+  html += "<td>" + mac + "&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+  html += "<td>" + ip_addr + "&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+  html += "<td>" + vcpu + "&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+  html += "<td>" + mem + "&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+  
+  
+  html += "</tr></table>";
+  
+  html += "<p><img src='" + munin_src_header + pm_host_name + "/libvirt_cputime-day.png'>";
+  html += "<p><img src='" + munin_src_header + pm_host_name + "/libvirt_blkstat-day.png'>";
+  html += "<p><img src='" + munin_src_header + pm_host_name + "/libvirt_ifstat-day.png'>";
+  html += "<p><img src='" + munin_src_header + pm_host_name + "/libvirt_mem-day.png'>";
+  
+  html += "</div>";
+  return html;
+}
 

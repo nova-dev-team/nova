@@ -60,7 +60,7 @@ class VclusterController < ApplicationController
   def remove_vmachine_ex
     v = Vmachine.find_by_id params[:id][1..-1]
     result = VclusterHelper::Helper.remove_vmachine "c#{v.vcluster.id}", params[:id]
-    VmachineHelper::Helper.delete "v#{v.id}"
+    result[:pmon_result] = VmachineHelper::Helper.delete_ex "v#{v.id}"
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
@@ -77,7 +77,7 @@ class VclusterController < ApplicationController
       if vinfo[:ip]
         result << vinfo[:ip]
       else
-        result << "NOT DEPLOYED"
+        result << ""
       end
       result << vinfo[:vimage_name]
       result << vinfo[:status]
