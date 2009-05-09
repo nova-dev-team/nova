@@ -166,23 +166,18 @@ HERE
 
           # dispatch the vmachine to a pmachine with lowest load
           hosting_pmachine = nil # find a pmachine to host the vmachine
+          
+          hosting_pm_candidate = []
 
           Pmachine.all.each do |pmachine|
             if pmachine.status == "pending remove"
               next
             end
+            hosting_pm_candidate << pmachine
+          end
 
-            if hosting_pmachine == nil
-              hosting_pmachine = pmachine
-
-            elsif pmachine.vmachines.count < hosting_pmachine.vmachines.count
-              hosting_pmachine = pmachine
-              if hosting_pmachine.vmachines.count == 0
-                # if the hosting pmachine has a load of 0 vmachines, we could break out of the loop now
-                break
-              end
-
-            end
+          if hosting_pm_candidata.size > 0
+            hosting_pmachine = hosting_pm_candidate[rand(hosting_pm_candidate.size)]
           end
 
           if hosting_pmachine == nil # pmachine not found

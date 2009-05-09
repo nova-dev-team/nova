@@ -121,6 +121,7 @@ module Utils
 
     def ip=(ip)
       @vm[:ip] = ip
+      @vm[:mac] = Utils::IPCalc.gen_mac(ip)
     end
 
     def xml
@@ -187,6 +188,7 @@ xml += <<EOF
 '/>
     </interface>
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>
+    <input type='tablet' bus='usb'/>
   </devices>
 </domain>
 EOF

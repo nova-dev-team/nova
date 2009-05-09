@@ -103,7 +103,7 @@ class BatchController < ApplicationController
     result = BatchHelper::Helper.progress params[:id]
     respond_to do |accept| 
       accept.html {render :text => result}
-#      accept.json {render :json => result}
+      accept.json {render :json => result}
     end
   end
 
