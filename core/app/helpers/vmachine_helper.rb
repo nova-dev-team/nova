@@ -58,7 +58,7 @@ HERE
        
         if vmachine.pmachine != nil 
           http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
-            http.delete '/x/' + vmachine.pmon_vmachine_uuid + '/destroy', ""
+            http.delete '/x/' + vmachine.pmon_vmachine_uuid + '/destroy'
           end
           pmon_msg = http_res.body
         else
@@ -90,7 +90,7 @@ HERE
          
           if vmachine.pmachine != nil 
             http_res = Net::HTTP.start(vmachine.pmachine.ip, 3000) do |http|
-              http.delete '/x/' + vmachine.pmon_vmachine_uuid + '/destroy', ""
+              http.delete '/x/' + vmachine.pmon_vmachine_uuid + '/destroy'
             end
             pmon_msg = http_res.body
           else
