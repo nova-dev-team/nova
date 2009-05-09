@@ -176,7 +176,7 @@ HERE
             hosting_pm_candidate << pmachine
           end
 
-          if hosting_pm_candidata.size > 0
+          if hosting_pm_candidate.size > 0
             hosting_pmachine = hosting_pm_candidate[rand(hosting_pm_candidate.size)]
           end
 
