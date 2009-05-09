@@ -6,7 +6,7 @@ class NetPool < ActiveRecord::Base
     list = []
     ip = Utils::IPCalc.new(net.begin, net.mask)
     size.times do |n|
-      list << [net.name + "_#{n}", ip.value, ip.mac ]
+      list << [net.name + "#{n}", ip.value, ip.mac ]
       ip.next
     end
     return list

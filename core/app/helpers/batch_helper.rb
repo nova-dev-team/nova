@@ -14,7 +14,7 @@ module BatchHelper
       sub_result = VclusterHelper::Helper.create name
       result[:vcluster_cid] = sub_result[:vcluster_cid]
       File.open("tmp/#{result[:vcluster_cid]}.install.conf", "w") do |file|
-        file.write("common\nssh-nopass\n")
+        file.write("common\nsshnopass\n")
         #file.flush
         #file.close
       end

@@ -1,0 +1,70 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+# one:
+#   column: value
+#
+# two:
+#   column: value
+#0000  neta
+#0001  netb
+#0010  netc
+#0011  netd
+#
+#0100  nete
+#0101
+#0110
+#0111
+#
+#1000  netf
+#1001
+#1010
+#1011
+#
+#1100  netg
+#1101
+#1110
+#1111
+
+
+net0:
+  name: neta
+  begin: 10.0.3.2
+  mask: 28
+  size: 13
+
+net1:
+  name: netb
+  begin: 10.0.3.18
+  mask: 28
+  size: 13
+
+net2:
+  name: netc
+  begin: 10.0.3.34
+  mask: 28
+  size: 13
+
+# net3:
+#   name: netd
+#   begin: 10.0.3.66
+#   mask: 28
+#   size: 13
+# 
+# net4:
+#   name: nete
+#   begin: 10.0.3.66
+#   mask: 26
+#   size: 61
+# 
+# net5:
+#   name: netf
+#   begin: 10.0.3.130
+#   mask: 26
+#   size: 61
+# 
+# net6:
+#   name: netg
+#   begin: 10.0.3.194
+#   mask: 26
+#   size: 61
+
