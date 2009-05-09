@@ -1,3 +1,5 @@
+require 'json'
+
 class VclusterController < ApplicationController
 
   include VmachineHelper
@@ -74,8 +76,9 @@ class VclusterController < ApplicationController
     result = []
     r[:vmachines].each { |vinfo|
       result << vinfo[:vid]
+      vm = Vmachine.find_by_id vinfo[:vid][1..-1]
       if vinfo[:ip]
-        result << vinfo[:ip]
+        result << (JSON.parse(vm.settings))["ip"]
       else
         result << ""
       end
