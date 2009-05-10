@@ -5,6 +5,10 @@
     background-image: url(images/hadoop-logo-large.png);
 }
 
+.hadoop-wizard-bg img {
+    background-image: url(/image/wizard.png);
+}
+
 .hadoop-wizard-finished {
   background: #99ffcc
 }
