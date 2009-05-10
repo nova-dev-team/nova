@@ -121,6 +121,7 @@ Ext.override(QoDesk.AdminMonitor, {
                 // refresh
                 vm_store.reload();
                 // TODO change the info pane
+                info_pane.body.update("Select a virtual cluster, and choose one of its virtual machines to show the detail information.");
               } else {
                 // TODO when create failed
               }
@@ -171,7 +172,8 @@ Ext.override(QoDesk.AdminMonitor, {
             params: {
               moduleId: 'admin-monitor',
               action: "removeCluster",
-              vcluster_cid: cluster_cid
+              vcluster_cid: cluster_cid,
+              owner_email: rows[0].data.owner_email
             },
             success: function(o){
               if (o && o.responseText && Ext.decode(o.responseText).success) {
@@ -181,7 +183,7 @@ Ext.override(QoDesk.AdminMonitor, {
 
     			      vm_store.proxy = new Ext.data.HttpProxy({
     		    		  url: '/connect.php?action=listVM&moduleId=admin-monitor'
-          			});            
+          			});
               } else {
                 // TODO when create failed
               }

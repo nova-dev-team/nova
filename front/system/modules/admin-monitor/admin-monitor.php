@@ -33,8 +33,8 @@ class AdminMonitor {
   }
   
   public function removeCluster() {
-    $email = $this->os->session->get_member_email();
-    $core_reply = file_get_contents("http://localhost:3000/user/remove_vcluster/" . $email. '/' . $_REQUEST['vcluster_cid']);
+    //$email = $this->os->session->get_member_email();
+    $core_reply = file_get_contents("http://localhost:3000/user/remove_vcluster/" . $_REQUEST['owner_email'] . '/' . $_REQUEST['vcluster_cid']);
     echo $core_reply;
   }
   
