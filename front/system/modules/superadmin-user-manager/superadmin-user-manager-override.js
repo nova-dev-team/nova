@@ -369,7 +369,7 @@ Ext.grid.KickAssColumn.prototype = {
     },
     
     onMouseDown: function(e, t){
-        if (t.className && t.className.indexOf('x-grid3-cc-' + this.id) != -1) {
+        if (t.className && t.className.indexOf('x-grid3-cc-' + this.id) != -1  && t.id.indexOf('crapp_id2_') != -1) {
             e.stopEvent();
 			
             var index = this.grid.getView().findRowIndex(t);

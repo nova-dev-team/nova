@@ -1,14 +1,13 @@
-var bigApp;
+var bigDesktop;
 
-
+//var adminVimageStore;
 
 Ext.override(QoDesk.AdminVimage, {
 
     createWindow: function(){
     
-        bigApp = this.app;
-        
         var desktop = this.app.getDesktop();
+        bigDesktop = desktop;
         var win = desktop.getWindow('admin-vimage-win');
         
         function test1(){
@@ -33,8 +32,10 @@ Ext.override(QoDesk.AdminVimage, {
                 })
             });
 //            store.setDefaultSort('iid', 'asc');
+
+            //adminVimageStore = store;
             
-            var checkColumn = new Ext.grid.CheckColumn({
+            var checkColumn = new Ext.grid.CheckColumnVI({
                 header: "Is Active?",
                 dataIndex: 'hidden',
                 width: 60,
@@ -139,15 +140,15 @@ Ext.override(QoDesk.AdminVimage, {
     
 });
 
-Ext.grid.CheckColumn = function(config){
+Ext.grid.CheckColumnVI = function(config){
     Ext.apply(this, config);
     if (!this.id) {
-        this.id = Ext.id();
+        this.id = Ext.id() + "_gg";
     }
     this.renderer = this.renderer.createDelegate(this);
 };
 
-Ext.grid.CheckColumn.prototype = {
+Ext.grid.CheckColumnVI.prototype = {
     init: function(grid){
         this.grid = grid;
         this.grid.on('render', function(){
@@ -157,20 +158,20 @@ Ext.grid.CheckColumn.prototype = {
     },
     
     onMouseDown: function(e, t){
-        if (t.className && t.className.indexOf('x-grid3-cc-' + this.id) != -1) {
+        if (t.className && t.className.indexOf('x-grid3-cc-' + this.id) != -1 && t.id.indexOf('crapp_id199_') != -1) {
             e.stopEvent();
             var index = this.grid.getView().findRowIndex(t);
             var record = this.grid.store.getAt(index);
             record.set(this.dataIndex, !record.data[this.dataIndex]);
             
-            var desktop = bigApp.getDesktop();
+            var desktop = bigDesktop;
             var notifyWin = desktop.showNotification({
                 html: 'Sending request...',
                 title: 'Please wait'
             });
             
             Ext.Ajax.request({
-                url: bigApp.connection,
+                url: '/connect.php',
                 params: {
                     moduleId: 'admin-vimage',
                     action: "delImg",
@@ -180,6 +181,7 @@ Ext.grid.CheckColumn.prototype = {
                 success: function(o){
                     if (o && o.responseText && Ext.decode(o.responseText).success) {
                         saveComplete('Finished', 'Save complete.');
+                        //adminVimageStore.reload();
                     }
                     else {
                         saveComplete('Error', 'Errors encountered on the server.');

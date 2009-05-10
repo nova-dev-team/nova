@@ -197,6 +197,7 @@ HERE
               kvm_xml.mem = setting["mem"]  # TODO change parameters
 
               kvm_xml.vcpu = setting["vcpu"]
+              kvm_xml.name = "v#{vmachine.id}"
 
               if setting["mac"] != nil
                 kvm_xml.mac = setting["mac"]

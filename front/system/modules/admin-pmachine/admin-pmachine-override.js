@@ -1,14 +1,13 @@
-var bigApp;
+var bigDesktop;
 
-
+var AdminPmStore;
 
 Ext.override(QoDesk.AdminPmachine, {
 
     createWindow: function(){
     
-        bigApp = this.app;
-        
         var desktop = this.app.getDesktop();
+        bigDesktop = desktop;
         var win = desktop.getWindow('admin-pmachine-win');
         
         function test1(){
@@ -32,9 +31,13 @@ Ext.override(QoDesk.AdminPmachine, {
                     url: '/connect.php?action=listPm&moduleId=admin-pmachine'
                 })
             });
+            
+            AdminPmStore = store;
+            
+            
             store.setDefaultSort('pm_ip', 'desc');
 
-            var checkColumn = new Ext.grid.CheckColumn({
+            var checkColumn = new Ext.grid.CheckColumnPM({
                 header: "Is Working?",
                 dataIndex: 'is_working',
                 width: 80,
@@ -78,32 +81,7 @@ Ext.override(QoDesk.AdminPmachine, {
                     });
                   }
 				          
-                },
-                /* {
-                  text:'Delete',
-				          tooltip:'Add a new Physical Machine',
-				          iconCls:'admin-pmachine-remove',
-				          
-				          handler: function() {
-				            Ext.Ajax.request({
-                      url: '/connect.php',
-                      params: {
-                        moduleId: 'admin-pmachine',
-                        action: "changeVMstatus",
-                        is_working: "false"
-                      },
-                      success: function(o) {
-                        if (o && o.responseText && Ext.decode(o.responseText).success)
-                          store.reload();
-                      },
-                      failure: function(o) {
-                      }
-                    });
-                  }
-                  
-                },*/
-                
-                {
+                }, {
                   text:'Refresh',
 				          iconCls:'admin-pmachine-refresh',
 				          
@@ -135,7 +113,9 @@ Ext.override(QoDesk.AdminPmachine, {
     }
 });
 
-Ext.grid.CheckColumn = function(config){
+
+
+Ext.grid.CheckColumnPM = function(config){
     Ext.apply(this, config);
     if (!this.id) {
         this.id = Ext.id();
@@ -143,7 +123,7 @@ Ext.grid.CheckColumn = function(config){
     this.renderer = this.renderer.createDelegate(this);
 };
 
-Ext.grid.CheckColumn.prototype = {
+Ext.grid.CheckColumnPM.prototype = {
     init: function(grid){
         this.grid = grid;
         this.grid.on('render', function(){
@@ -153,20 +133,20 @@ Ext.grid.CheckColumn.prototype = {
     },
     
     onMouseDown: function(e, t){
-        if (t.className && t.className.indexOf('x-grid4-cc-' + this.id) != -1) {
+        if (t.className && t.className.indexOf('x-grid3-cc-' + this.id) != -1 && t.id.indexOf('crapp_id987_') != -1) {
             e.stopEvent();
             var index = this.grid.getView().findRowIndex(t);
             var record = this.grid.store.getAt(index);
             record.set(this.dataIndex, !record.data[this.dataIndex]);
             
-            var desktop = bigApp.getDesktop();
+            var desktop = bigDesktop;
             var notifyWin = desktop.showNotification({
                 html: 'Sending request...',
                 title: 'Please wait'
             });
             
             Ext.Ajax.request({
-                url: bigApp.connection,
+                url: '/connect.php',
                 params: {
                     moduleId: 'admin-pmachine',
                     action: "changePMstatus",
@@ -175,7 +155,8 @@ Ext.grid.CheckColumn.prototype = {
                 },
                 success: function(o){
                     if (o && o.responseText && Ext.decode(o.responseText).success) {
-                        saveComplete('Finished', 'Save complete.');
+                        saveComplete('Finished', Ext.decode(o.responseText).msg);
+                        AdminPmStore.reload();
                     }
                     else {
                         saveComplete('Error', 'Errors encountered on the server.');
@@ -207,7 +188,7 @@ Ext.grid.CheckColumn.prototype = {
                 record.data.is_working = false;
             }
         
-        var html = '<div class="x-grid3-check-col' + ((record.data.is_working) ? '-on' : '') + ' x-grid4-cc-' + this.id + '" id="crapp_id3_' + record.data.is_working + '">&#160;</div>';
+        var html = '<div class="x-grid3-check-col' + ((record.data.is_working) ? '-on' : '') + ' x-grid3-cc-' + this.id + '" id="crapp_id987_' + record.data.is_working + '">&#160;</div>';
         
         return html;
     }
