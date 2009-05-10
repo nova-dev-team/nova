@@ -1,0 +1,16 @@
+
+<label>cpu_time</lable>  <%= @d.info.cpu_time %> <br/>
+<label>max_mem </label>   <%= @d.info.max_mem %>   <br/>
+<label>memory  </label>	  <%= @d.info.memory  %>    <br/>
+<label>virt_cpu</label>  <%= @d.info.nr_virt_cpu %>  <br/>
+<label>state   </label>	  <%= @d.info.state   %>     <br/>
+<hr/>
+<applet archive="/vncviewer.jar"
+	code="VncViewer.class" width="800" height="640">
+  <param name="PORT" value="<%= @port %>" />
+  <param name="ENCODING" value="tight" />
+  <param name="PASSWORD" value="fit31222d01" />
+  <param name="Show controls" value="yes" />
+</applet>
+<hr/>
+<%= h(@d.xml_desc) %>

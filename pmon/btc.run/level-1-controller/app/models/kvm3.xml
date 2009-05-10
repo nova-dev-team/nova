@@ -1,0 +1,22 @@
+<domain type='kvm'>
+  <name>intrepid</name>
+  <uuid>4dea24b3-1d52-d8f3-2516-782e98a23fcc</uuid>
+  <memory>512072</memory>
+  <vcpu>1</vcpu>
+  <os>
+    <type arch="i686">hvm</type>
+  </os>
+  <clock sync="localtime"/>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+    <disk type='file' device='disk'>
+      <source file='/home/xin/virtualmachines/intrepid3.img'/>
+      <target dev='hda'/>
+    </disk>
+    <interface type='network'>
+      <source network='default'/>
+      <mac address='24:42:53:21:52:45'/>
+    </interface>
+    <graphics type='vnc' port='-1' keymap='de'/>
+  </devices>
+</domain>

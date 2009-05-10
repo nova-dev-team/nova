@@ -1,0 +1,24 @@
+
+<h3>Virtual Machines Services</h3>
+<hr/>
+
+<%= button_to "List all VMs", {:controller => :x, :action => :list}, :method => :get %>
+
+<h3>Update Engine Services</h3>
+<hr/>
+<table><tr>
+<td><%= button_to "List all update requests", {:controller => :s, :action => :list_ue}, :method => :get %> </td>
+<td><%= button_to "Restart Update Engine", {:controller => :s, :action => :restart_ue}, :method => :put %> </td>
+<td><%= button_to "Stop Update Engine", {:controller => :s, :action => :stop_ue}, :method => :put %>       </td>
+<td><%= button_to "Update Engine Status", {:controller => :s, :action => :check_ue}, :method => :get %>    </td>
+</tr></table>
+
+<h3>Storage Engine Services</h3>
+<hr/>
+<table><tr>
+<td><%= button_to "List all virtual disks", {:controller => :s, :action => :list_se}, :method => :get %>   </td>   
+<td><%= button_to "Restart Storage Engine", {:controller => :s, :action => :restart_se}, :method => :put %></td>
+<td><%= button_to "Stop Storage Engine", {:controller => :s, :action => :stop_se}, :method => :put %>      </td>
+<td><%= button_to "Storage Engine Status", {:controller => :s, :action => :check_se}, :method => :get %>   </td>  
+</tr></table>
+

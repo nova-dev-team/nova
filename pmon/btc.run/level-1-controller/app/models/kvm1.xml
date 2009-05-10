@@ -1,0 +1,20 @@
+<domain type='kvm'>
+  <name>kvm-demo</name>
+  <memory>512072</memory>
+  <vcpu>1</vcpu>
+  <os>
+    <type arch="i686">hvm</type>
+  </os>
+  <devices>
+    <emulator>/usr/bin/kvm</emulator>
+    <disk type='file' device='disk'>
+      <source file='/home/xin/virtualmachines/intrepid2.img'/>
+      <target dev='hda'/>
+    </disk>
+    <interface type='network'>
+      <source network='default'/>
+      <mac address='24:42:53:21:52:45'/>
+    </interface>
+    <graphics type='vnc' port='-1' keymap='de'/>
+  </devices>
+</domain>

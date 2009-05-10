@@ -1,0 +1,128 @@
+#!/bin/sh
+
+SERVER_ADDR=$1
+CONFIGURATION_NAME=$2
+IPADDR=`ifconfig eth0 | grep "inet addr" | awk '{print $2}' | awk -F: '{print $2}'`
+
+echo IPADDR=${IPADDR}
+
+SERVER_SCRIPT_PATH=/scripts
+SERVER_CONFIG_PATH=/config
+SERVER_SHARE_PATH=/share/${CONFIGURATION_NAME}
+
+ENTRY_NAME=entry.sh
+NOTE=`date "+%Y%m%d%H%M"`
+
+echo SERVER_ADDR=${SERVER_ADDR}
+echo CONFIGURATION_NAME=${CONFIGURATION_NAME}
+
+SCRIPT_PATH=/tmp/script_${NOTE}
+CONFIG_PATH=/tmp/config_${NOTE}
+
+echo SCRIPT_PATH=${SCRIPT_PATH}
+echo CONFIG_PATH=${CONFIG_PATH}
+
+rm -rf $SCRIPT_PATH
+rm -rf $CONFIG_PATH
+
+mkdir $SCRIPT_PATH
+mkdir $CONFIG_PATH
+
+SCRIPT_SOURCE=$SERVER_ADDR:${SERVER_SCRIPT_PATH}
+CONFIG_SOURCE=$SERVER_ADDR:${SERVER_CONFIG_PATH}/${CONFIGURATION_NAME}
+
+echo SCRIPT_SOURCE=${SCRIPT_SOURCE}
+echo CONFIG_SOURCE=${CONFIG_SOURCE}
+
+apt-get -y install nfs-common
+
+umount -f $SCRIPT_SOURCE
+umount -f $CONFIG_SOURCE
+
+mount $SCRIPT_SOURCE $SCRIPT_PATH
+mount $CONFIG_SOURCE $CONFIG_PATH
+
+NODELIST=${CONFIG_PATH}/node.list
+
+echo NODELIST=${NODELIST}
+unset MACHINE_NAME
+while read IP NAME
+do
+	echo IP=$IP, NAME=$NAME
+	if [ "$IP" = "$IPADDR" ]
+	then
+		MACHINE_NAME=$NAME
+		break
+	fi
+done < $NODELIST
+
+if [ -z "$MACHINE_NAME" ]
+then
+	echo invalid ip address!
+fi
+
+echo MACHINE_NAME=$MACHINE_NAME
+
+echo =======SHOW SCRIPT_PATH========
+ls $SCRIPT_PATH
+echo =============END===============
+echo =======SHOW CONFIG_PATH========
+ls $CONFIG_PATH
+echo =============END===============
+
+
+DLIST=`cat ${CONFIG_PATH}/install.list`
+
+for APP in $DLIST 
+do
+	echo Now processing ${APP}...
+	EXEC_PATH=/tmp/${APP}-${NOTE}
+	CONF_PATH=${EXEC_PATH}/config
+	SHARE_PATH=${EXEC_PATH}/share
+	SHARE_SOURCE=$SERVER_ADDR:${SERVER_SHARE_PATH}/${APP}
+	echo 	EXEC_PATH=${EXEC_PATH}
+	echo 	CONF_PATH=${CONF_PATH}
+	echo	SHARE_PATH=${SHARE_PATH}
+	echo	SHARE_SOURCE=${SHARE_SOURCE}
+
+	rm -rf $EXEC_PATH
+
+	mkdir $EXEC_PATH
+	mkdir $CONF_PATH
+	mkdir $SHARE_PATH
+	echo =========SHOW APP_PATH=========
+	ls ${SCRIPT_PATH}/${APP}/
+	echo =============END===============
+	cp -rf ${SCRIPT_PATH}/${APP}/* ${EXEC_PATH}/
+	echo =========SHOW CON_PATH=========
+	ls ${CONFIG_PATH}/${APP}/
+	echo =============END===============
+
+	cp -rf ${CONFIG_PATH}/${APP}/* ${CONF_PATH}/
+	cp ${CONFIG_PATH}/node.list ${CONF_PATH}/
+
+	umount -f $SHARE_SOURCE
+	mount $SHARE_SOURCE ${SHARE_PATH}
+
+	ENTRY=${EXEC_PATH}/${ENTRY_NAME}
+	cd ${EXEC_PATH}
+	/bin/sh $ENTRY ${MACHINE_NAME}
+
+	echo ========SHOW SHARE_PATH========
+	ls ${SHARE_PATH}
+	echo =============END===============
+	
+	touch ${SHARE_PATH}/finished/${MACHINE_NAME}
+
+	umount -f $SHARE_SOURCE
+	unset EXEC_PATH
+	unset CONF_PATH
+	unset SHARE_PATH
+	unset SHARE_SOURCE
+done
+
+echo install complete
+umount -f $SCRIPT_SOURCE
+umount -f $CONFIG_SOURCE
+exit 0
+

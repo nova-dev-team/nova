@@ -1,0 +1,38 @@
+<h1>S#list_uiq</h1>
+<p>Find me in app/views/s/list_uiq.html.erb</p>
+
+<table>
+  <tr>
+    <td align="center">id</td>
+    <td align="center">url</td>
+    <td align="center">priority</td>
+    <td align="center">size</td>
+    <td align="center">progress</td>
+  </tr>
+  <% @que.each do |vd| %>
+  <tr>
+    <td><%= vd.id %></td>
+    <td><%= vd.url %></td>
+    <td><%= vd.priority %></td>
+    <td><%= vd.size %></td>
+    <td><%= vd.progress %></td>
+  </tr>
+  <% end %>
+</table>
+
+Reqest Update
+<br/>
+
+<% form_for :update_image_queue, :url => {:action => :update_ue}, :html => {:method => :put} do |f| %>
+
+<lable>URL:</label>
+<%= f.text_field :url %><br />
+
+<lable>Priority:</label>
+<%= f.text_field :priority %><br />
+
+<lable>Size:</label>
+<%= f.text_field :size %><br />
+
+<%= submit_tag "Update Request", :class => :submit%>
+<% end %>
