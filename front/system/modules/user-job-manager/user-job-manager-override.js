@@ -1,8 +1,13 @@
+var ujDesktop;
+
+
+
 Ext.override(QoDesk.UserJobManager, {
 
 	createWindow : function(){
 	
 		var desktop = this.app.getDesktop();
+		ujDesktop = desktop;
 		var win = desktop.getWindow('user-job-manager-win');
 		
 		// Infomation panel that located at bottom-right side
@@ -216,6 +221,20 @@ Ext.override(QoDesk.UserJobManager, {
             return;
           }
           var vid = rows[0].data.vm_id;
+          
+          var notifyWin = ujDesktop.showNotification({
+              html: 'Sending request...',
+              title: 'Please wait'
+          });
+          
+          
+function saveCompleteX(title, msg){
+    notifyWin.setIconClass('x-icon-done');
+    notifyWin.setTitle(title);
+    notifyWin.setMessage(msg);
+    desktop.hideNotification(notifyWin);
+}
+          
           Ext.Ajax.request({
             url: '/connect.php',
             params: {
@@ -224,12 +243,14 @@ Ext.override(QoDesk.UserJobManager, {
               vm_vid: vid
             },
             success: function(o){
-              if (o && o.responseText && Ext.decode(o.responseText).success) {
+              if (o && o.responseText && o.responseText != ""  && Ext.decode(o.responseText).success) {
                 // refresh
                 vm_store.reload();
                 // TODO change the info pane
+                saveCompleteX("Finished", Ext.decode(o.responseText).msg);
               } else {
                 // TODO when create failed
+                saveCompleteX("Error", Ext.decode(o.responseText).msg);
               }
             },
             failure: function(){
@@ -249,6 +270,20 @@ Ext.override(QoDesk.UserJobManager, {
           }
           var vid = rows[0].data.vm_id;
 
+          var notifyWin = ujDesktop.showNotification({
+              html: 'Sending request...',
+              title: 'Please wait'
+          });
+          
+          
+function saveCompleteX(title, msg){
+    notifyWin.setIconClass('x-icon-done');
+    notifyWin.setTitle(title);
+    notifyWin.setMessage(msg);
+    desktop.hideNotification(notifyWin);
+}
+
+
           Ext.Ajax.request({
             url: '/connect.php',
             params: {
@@ -257,9 +292,12 @@ Ext.override(QoDesk.UserJobManager, {
               vm_vid: vid
             },
             success: function(o){
-              if (o && o.responseText && Ext.decode(o.responseText).success) {
-                alert(o.responseText);
-              } else {                alert(o.responseText);
+              if (o && o.responseText && o.responseText != "" && Ext.decode(o.responseText).success) {
+//                alert(o.responseText);
+                vm_store.reload();
+                saveCompleteX("Finished", Ext.decode(o.responseText).msg);
+              } else {
+                saveCompleteX("Error", Ext.decode(o.responseText).msg);//                alert(o.responseText);
               }
             },
             failure: function(){
@@ -277,6 +315,22 @@ Ext.override(QoDesk.UserJobManager, {
             return;
           }
           var vid = rows[0].data.vm_id;
+
+
+          var notifyWin = ujDesktop.showNotification({
+              html: 'Sending request...',
+              title: 'Please wait'
+          });
+          
+          
+function saveCompleteX(title, msg){
+    notifyWin.setIconClass('x-icon-done');
+    notifyWin.setTitle(title);
+    notifyWin.setMessage(msg);
+    desktop.hideNotification(notifyWin);
+}
+
+          
           
           Ext.Ajax.request({
             url: '/connect.php',
@@ -286,12 +340,15 @@ Ext.override(QoDesk.UserJobManager, {
               vm_vid: vid
             },
             success: function(o){
-              if (o && o.responseText && Ext.decode(o.responseText).success) {
+              if (o && o.responseText && o.responseText != ""  && Ext.decode(o.responseText).success) {
                 // refresh
 //                alert(Ext.decode(o.responseText).msg);
                 // TODO change the info pane
+                vm_store.reload();
+                saveCompleteX("Finished", Ext.decode(o.responseText).msg);
               } else {
                 // TODO when create failed
+                saveCompleteX("Error", Ext.decode(o.responseText).msg);
               }
             },
             failure: function(){
@@ -310,7 +367,23 @@ Ext.override(QoDesk.UserJobManager, {
             return;
           }
           var vid = rows[0].data.vm_id;
+
+
+          var notifyWin = ujDesktop.showNotification({
+              html: 'Sending request...',
+              title: 'Please wait'
+          });
           
+          
+function saveCompleteX(title, msg){
+    notifyWin.setIconClass('x-icon-done');
+    notifyWin.setTitle(title);
+    notifyWin.setMessage(msg);
+    desktop.hideNotification(notifyWin);
+}
+
+          
+
           Ext.Ajax.request({
             url: '/connect.php',
             params: {
@@ -319,12 +392,15 @@ Ext.override(QoDesk.UserJobManager, {
               vm_vid: vid
             },
             success: function(o){
-              if (o && o.responseText && Ext.decode(o.responseText).success) {
+              if (o && o.responseText && o.responseText != ""  && Ext.decode(o.responseText).success) {
                 // refresh
-                alert(Ext.decode(o.responseText).msg);
+//                alert(Ext.decode(o.responseText).msg);
                 // TODO change the info pane
+                vm_store.reload();
+                saveCompleteX("Finished", Ext.decode(o.responseText).msg);
               } else {
               // TODO when create failed
+                saveCompleteX("Error", Ext.decode(o.responseText).msg);
               }
             },
             failure: function(){
@@ -343,6 +419,21 @@ Ext.override(QoDesk.UserJobManager, {
             return;
           }
           var vid = rows[0].data.vm_id;
+          
+          
+          var notifyWin = ujDesktop.showNotification({
+              html: 'Sending request...',
+              title: 'Please wait'
+          });
+          
+          
+function saveCompleteX(title, msg){
+    notifyWin.setIconClass('x-icon-done');
+    notifyWin.setTitle(title);
+    notifyWin.setMessage(msg);
+    desktop.hideNotification(notifyWin);
+}
+
 
           Ext.Ajax.request({
             url: '/connect.php',
@@ -352,12 +443,16 @@ Ext.override(QoDesk.UserJobManager, {
               vm_vid: vid
             },
             success: function(o){
-              if (o && o.responseText && Ext.decode(o.responseText).success) {
+              if (o && o.responseText && o.responseText != ""  && Ext.decode(o.responseText).success) {
                 // refresh
-                alert(Ext.decode(o.responseText).msg);
+//                alert(Ext.decode(o.responseText).msg);
                 // TODO change the info pane
+                vm_store.reload();
+                
+                saveCompleteX("Finished", Ext.decode(o.responseText).msg);
               } else {
                 // TODO when create failed
+                saveCompleteX("Error", Ext.decode(o.responseText).msg);
               }
             },
             failure: function(){
@@ -390,7 +485,7 @@ Ext.override(QoDesk.UserJobManager, {
       			function createVNCwin(_cid, _vmid, _pmip, _vnc_port, win_width, win_height) {
       				desktop.createWindow({
 			      		id: 'vnc_vm_' + _cid + "_" + _vmid , // TODO  change the win name
-      					title: "VNC of " + _cid + ", " + _vmid,
+      					title: "VNC: Virtual Machine " + _vmid + " in  Virtual Cluster " + _cid,
       					width: win_width + 15,
 					      height: win_height + 33,
 					      minWidth: 640,
@@ -485,7 +580,9 @@ Ext.override(QoDesk.UserJobManager, {
 				
         // add new cluster
         handler:function() {
+          
           var cluster_name = prompt("", "My_Cluster_" + (cluster_store.getCount() + 1));
+          
           if (cluster_name == null || cluster_name.length < 1) {
             return;
           } else if (cluster_name.indexOf(" ") != -1 || cluster_name.indexOf("\t") != -1) {

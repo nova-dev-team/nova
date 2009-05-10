@@ -122,12 +122,12 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
 
 	
 	this.basic_html = "<div align='center'>Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p></div>\
-		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p></div>\
+		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Wizard_Generated_Cluster'></input><p></div>\
 		  <div align='center'><a id='advanced' href='#'>Show advanced options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
 		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
 		  
 	this.advanced_html = "<div align='center'>Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p></div>\
-		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Hadoop_Cluster'></input><p></div>\
+		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Wizard_Generated_Cluster'></input><p></div>\
  		  <div align='center'>Memory Size:<input id='hadoop-wiz-mem-size' value='512'></input><p></div>\
  		  <div align='center'>Cpu Count:<input id='hadoop-wiz-vcpu' value='1'></input><p></div>\
 		  <div align='center'><a id='basic' href='#'>Show basic options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\

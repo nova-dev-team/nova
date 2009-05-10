@@ -61,8 +61,10 @@ class VclusterController < ApplicationController
   # remove a vmachine from any vcluster
   def remove_vmachine_ex
     v = Vmachine.find_by_id params[:id][1..-1]
-    result = VclusterHelper::Helper.remove_vmachine "c#{v.vcluster.id}", params[:id]
-    result[:pmon_result] = VmachineHelper::Helper.delete_ex "v#{v.id}"
+    r = VclusterHelper::Helper.remove_vmachine "c#{v.vcluster.id}", params[:id]
+    r2 = VmachineHelper::Helper.delete_ex "v#{v.id}"
+    result = r2
+    result[:msg] = r[:msg] + "\n" + r2[:msg]
 
     respond_to do |accept|
       accept.html {render :text => result.to_json}
