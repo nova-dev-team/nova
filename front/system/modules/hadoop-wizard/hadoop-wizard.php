@@ -44,7 +44,8 @@ class HadoopWizard {
   
   
   public function progress() {
-    $core_reply = file_get_contents("http://localhost:3000/batch/progress/" . $_REQUEST["vcluster_cid"]);
+    $email = $this->os->session->get_member_email();
+    $core_reply = file_get_contents("http://localhost:3000/batch/progress_of_user/" . $email);
 //    $core_reply = "[{\"node_name\":\"jon\", \"wowo\":{\"bibi\":\"1.0.2.2\"}}, {\"node_name\":\"mis\", \"wo1\":{\"jj\":\"wowow\"}}]";
     echo $core_reply;
   }

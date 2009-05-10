@@ -1,200 +1,106 @@
 Ext.override(QoDesk.HadoopWizard, {
 
-	cards : [
-		'hadoop-wizard-1', // settings
-		'hadoop-wizard-2' // progress
-	],
-	
-	contentPanel : null,
-	
-	currentCard : "",
-	
-	layout: null,
-	win : null,
-	
-	cid:null,
-	cname:null,
+	tabWin: null,
 	
 	bottomBar:null,
 	
-	
-	progressPane: null,
-	
-	viewCard : function(card){
-		this.layout.setActiveItem(card);    this.currentCard = card;
-    
-    if (card == "hadoop-wizard-2" && this.win.isVisible()) {
-      this.progressPane.startAutorefresh();
-    } else {
-      this.progressPane.stopAutorefresh();
-    }
-	},
-	
 	hideWindow: function() {
-    this.win.close();
-    this.currentCardId = "";
+    //this.win.close();
+    this.tabWin.close();
   },
 	
 	createWindow : function(){
 		var desktop = this.app.getDesktop();
-		var win = desktop.getWindow('hadoop-wizard-win');
+		var tabWin = desktop.getWindow('hadoop-wizard-win');
 		
-		if(!win){
+		if(!tabWin){
 
-      this.progressPane = new QoDesk.HadoopWizard.ProgressPanel({owner: this, id: 'hadoop-wizard-2'});
-		
-	    this.contentPanel = new Ext.Panel({
-		    activeItem: 0,
+      tab_app = this;
+      
+      create_tab1 = new Ext.Panel({
+        region: 'west',
         border: false,
-		    id: 'pref-win-content',
-		    items: [
-        	new QoDesk.HadoopWizard.SettingPanel({owner: this, id: 'hadoop-wizard-1'}),
-        	this.progressPane
-        ],
-        layout: 'card',
-      });
-		
-      win = desktop.createWindow({
-          autoScroll: true,
-          id: 'hadoop-wizard-win',
-          title: 'Cluster Wizard',
-          width:480,
-          height:260,
-          iconCls: 'hadoop-wizard-icon',
-          items: this.contentPanel,
-          shim:false,
-          layout:"fit",
-          animCollapse:false,
-          constrainHeader:true,
-          maximizable: false,
-          taskbuttonTooltip: '<b>Cluster Wizard</b><br />Create new clusters in a few clicks'
+        html:'<img src="/image/wizard.png" />'
       });
       
-      progressP = this.progressPane;
-      win.on("hide", function() {progressP.stopAutorefresh()});
+      create_options = [{
+        fieldLabel: 'Cluster Size',
+        xtype:'textfield',
+        id: 'wizard_opt_csize',
+        value:'4'
+      }, {
+        fieldLabel: 'Cluster Name',
+        xtype:'textfield',
+        value:'Wizard_Cluster',
+        id: 'wizard_opt_cname'
+      }, {
+        fieldLabel: 'Cpu Count',
+        xtype:'textfield',
+        id: 'wizard_opt_vcpu',
+        value: "1"
+      }, {
+        fieldLabel: 'Memory Size',
+        xtype:'textfield',
+        id: 'wizard_opt_mem',
+        value: "512"
+      }, {
+        fieldLabel: 'Install Hadoop',
+        xtype:'checkbox',
+        soft_name: 'hadoop',
+        id: 'wizard_app_hadoop'
+      }, {
+        fieldLabel: 'Install MPI',
+        xtype:'checkbox',
+        soft_name: 'mpi',
+        id: 'wizard_app_mpi'
+      }, {
+        fieldLabel: 'Install Ganglia',
+        xtype:'checkbox',
+        soft_name: 'ganglia',
+        id: 'wizard_app_ganglia'
+      }];
       
- 			this.layout = this.contentPanel.getLayout();
- 			this.win = win;
-    }
+      create_tab2 = new Ext.FormPanel({
+        region: 'center',
+        margins : '3 3 3 3',
+        cmargins : '3 3 3 3',
+        autoScroll:true,
+        border: false,
         
-    win.show();
-    this.viewCard("hadoop-wizard-1");
-  }  
-});
+        items: create_options,
+        
+        buttons: [{
+          text: "Create",
+          handler: function() {
+            
+      clu_size = Ext.get("wizard_opt_csize").dom.value;
+      clu_name = Ext.get("wizard_opt_cname").dom.value;
 
-
-
-
-QoDesk.HadoopWizard.SettingPanel = function(config){
-	this.owner = config.owner;
-	
- 	helper = this;
-	
-	Ext.Ajax.request({
-    url: '/connect.php',
-    params: {
-      moduleId: 'hadoop-wizard',
-      action: "soft_list"
-    },
-    
-    success: function(o){
-      
-      var list = Ext.decode(o.responseText);
-      
-      var html = "<div align='center'>Softwares to install: &nbsp;<input id='generated_soft_to_install_count' type='hidden' value='" + list.length + "'>";
-      
-      for (i = 0; i < list.length; i++) {
-        html += "<input type='checkbox' id='generated_soft_to_install_" + i + "'> &nbsp;" + list[i] + "</input> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-        html += "<input type='hidden' id='generated_soft_name_" + i + "' value='" + list[i] +"'/>";
-      }
-      
-      html += '<p></div>';
-    
-      helper.basic_html = html  + helper.basic_html;
-      helper.advanced_html = html  + helper.advanced_html;
-      helper.body.update(helper.basic_html);
-    },
-    failure: function(){
-      // TODO when connect failed
-    }
-  });
-  
-
-	
-	this.basic_html = "<div align='center'>Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p></div>\
-		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Wizard_Generated_Cluster'></input><p></div>\
-		  <div align='center'><a id='advanced' href='#'>Show advanced options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
-		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
-		  
-	this.advanced_html = "<div align='center'>Cluster Size:<input id='hadoop-wiz-clu-size' value='4'></input><p></div>\
-		  <div align='center'>Cluster Name:<input id='hadoop-wiz-clu-name' value='Wizard_Generated_Cluster'></input><p></div>\
- 		  <div align='center'>Memory Size:<input id='hadoop-wiz-mem-size' value='512'></input><p></div>\
- 		  <div align='center'>Cpu Count:<input id='hadoop-wiz-vcpu' value='1'></input><p></div>\
-		  <div align='center'><a id='basic' href='#'>Show basic options</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\
-		  <a id='next' href='#'>Next</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a id='exit' href='#'>Exit</a></div>";
-	
-	QoDesk.HadoopWizard.SettingPanel.superclass.constructor.call(this, {
-		autoScroll: true,
-		bodyStyle: 'padding:15px',
-		border: false,
-		html: this.basic_html,
-		id: config.id
-	});
-	
-
-	
-  this.setHeight(260);
-	
-	this.actions = {
-  	'basic' : function(owner) {
-      helper.body.update(helper.basic_html);
-      owner.win.setHeight(260);
-    },
-    
-	  'advanced' : function(owner) {
-      helper.body.update(helper.advanced_html);
-      owner.win.setHeight(340);
-    },
-	
-		'next' : function(owner){
-      input_size = Ext.get("hadoop-wiz-clu-size");
-      input_name = Ext.get("hadoop-wiz-clu-name");
-      input_mem_size = Ext.get("hadoop-wiz-mem-size");
-      input_vcpu = Ext.get("hadoop-wiz-vcpu");
-      clu_size = input_size.dom.value;
-      clu_name = input_name.dom.value;
-      if (input_mem_size != null)
-        mem_size_val = input_mem_size.dom.value;
-      else
-        mem_size_val = 512;
-      if (input_vcpu != null)
-        vcpu_count = input_vcpu.dom.value;
-      else
-        vcpu_count = 1;
+        mem_size_val = Ext.get("wizard_opt_mem").dom.value;
+        vcpu_count = Ext.get("wizard_opt_vcpu").dom.value;
       
       if (clu_name.indexOf(" ") != -1 || clu_name.indexOf("\t") != -1) {
         alert("Space is not allowed in cluster name!");
         return;
       }
       
-      soft_list = [];
-      
-      chbox_count = Ext.get("generated_soft_to_install_count").dom.value;
-      
-      for (i = 0; i < chbox_count; i++) {
-        chbox = Ext.get("generated_soft_to_install_" + i);
-        if (chbox.dom.checked) {
-          soft_list.push(Ext.get("generated_soft_name_" + i).dom.value);
-        }
+      soft_list = "";
+      if (Ext.get("wizard_app_mpi").dom.checked) {
+        soft_list += "mpi\n";
       }
       
-      soft_list_req = "";
-      for (i = 0; i < soft_list.length; i++) {
-        soft_list_req += soft_list[i];
-        if (i < soft_list.length - 1) {
-          soft_list_req += '\n';
-        }
+      if (Ext.get("wizard_app_hadoop").dom.checked) {
+        soft_list += "hadoop\n";
       }
+      
+      if (Ext.get("wizard_app_ganglia").dom.checked) {
+        soft_list += "ganglia\n";
+      }
+      
+      var notifyWin = desktop.showNotification({
+          html: 'Sending request...',
+          title: 'Please wait'
+      });
       
       Ext.Ajax.request({
         url: '/connect.php',
@@ -203,196 +109,204 @@ QoDesk.HadoopWizard.SettingPanel = function(config){
           action: "create",
           vcluster_name: clu_name,
           vcluster_size: clu_size,
-          software_list: soft_list_req,
+          software_list: soft_list,
           mem_size: mem_size_val,
           vcpu: vcpu_count,
           app_name: "hadoop"
         },
         
         success: function(o){
-          //alert(o.responseText);
-          owner.viewCard('hadoop-wizard-2');
-          helper.owner.cid = Ext.decode(o.responseText).cid;
-          helper.owner.cname = Ext.decode(o.responseText).cname;
+          if (o && o.responseText &&  o.responseText != "" && Ext.decode(o.responseText).success) {
+              obj = Ext.decode(o.responseText);
+              saveComplete('Finished', "Created new cluster " + obj.cid + "(" + obj.cname + ")");
+          }
+          else {
+              saveComplete('Error', 'Errors encountered on the server.');
+          }
         },
         failure: function(){
-          // TODO when connect failed
+          saveComplete('Error', 'Lost connection to server.');
         }
       });
-      
-
-		},
-		
-		'exit' : function(owner){
-      owner.hideWindow();
-		}
-	};
-};
-
-Ext.extend(QoDesk.HadoopWizard.SettingPanel, Ext.Panel, {
-	afterRender : function(){
-		this.body.on({
-			'mousedown': {
-				fn: this.doAction,
-				scope: this,
-				delegate: 'a'
-			},
-			'click': {
-				fn: Ext.emptyFn,
-				scope: null,
-				delegate: 'a',
-				preventDefault: true
-			}
-		});
-		
-		QoDesk.HadoopWizard.SettingPanel.superclass.afterRender.call(this); // do sizing calcs last
-	},
-	
-	doAction : function(e, t){
-    	e.stopEvent();
-    	this.actions[t.id](this.owner);  // pass owner for scope
-    }
-});
 
 
 
-
-
-QoDesk.HadoopWizard.ProgressPanel = function(config){
-	this.owner = config.owner;
-	
-	
-	QoDesk.HadoopWizard.ProgressPanel.superclass.constructor.call(this, {
-		autoScroll: true,
-		bodyStyle: 'padding:15px',
-		border: false,
-		html: '', // this will be updated automatically by the following function
-		id: config.id,
-		freshFunc: function() {
-		  alert("HI");
-    }
-	});
-	
-	
-	this.refresh_counter = 0;
-	
-	helper123 = this;
-
-	this.freshFunc2 = function () {
-	
-    if (helper123.owner.win.hidden) {
-      clearInterval(helper123.refreshing_proc_id);
-      return;
-    } else if (helper123.owner.currentCard != "hadoop-wizard-2") {
-      return;
-    }
-    
-    var vc_cid = helper123.owner.cid;
-    var vc_name = helper123.owner.cname;
-    
-    var htmltxt = "<div><h2>Deploying progress of " + vc_cid + "(" + vc_name + "):</h2></div><p>";
-
-    Ext.Ajax.request({
-      url: '/connect.php',
-      params: {
-        moduleId: 'hadoop-wizard',
-        action: "progress",
-        vcluster_cid: vc_cid
-      },
-      
-      success: function(o){
-//        htmltxt += o.responseText;
-//        htmltxt += "<p>";
-        // TODO pretty table
-        htmltxt += "<table><tr><td>Vmachine</td><td>Progress</td></tr>";
-        resultObj = Ext.decode(o.responseText);
-//        console.log(resultObj);
-        for (i = 0; i < resultObj.length; i++) {
-          htmltxt += "<tr>";
-          htmltxt += "<td>";
-          htmltxt += resultObj[i].node_name + " (ip =&gt; " + resultObj[i].ip + ")";
-          htmltxt += "</td>";
-          
-          htmltxt += "<td>";
-
-          for (j = 0; j < resultObj[i].progress.length; j++) {
-            if (resultObj[i].progress[j][1] == "Waiting") {
-              htmltxt += resultObj[i].progress[j][0] + " is <font color='red'>" + resultObj[i].progress[j][1] + "</font><br>";
-            } else {
-              htmltxt += resultObj[i].progress[j][0] + " is <font color='green'>" + resultObj[i].progress[j][1] + "</font><br>";
-            }
+            function saveComplete(title, msg){
+                notifyWin.setIconClass('x-icon-done');
+                notifyWin.setTitle(title);
+                notifyWin.setMessage(msg);
+                desktop.hideNotification(notifyWin);
+            }            
+            
+            
           }
-          htmltxt += "</td>";
-          
-          htmltxt += "</tr>";
+        }, {
+          text: "Exit",
+          handler: function() {
+            tab_app.hideWindow();
+          }
+        }]
+      });
+      
+      
+      
+      create_tab = new Ext.Panel({
+        layout:'border',
+        title: "Create new cluster",
+        border: false,
+        items:[create_tab1, create_tab2]
+      });
+      
+      
+      var progressPane = new Ext.Panel({
+        title: "Deploy Progress",
+        html: "<div id='oh_my_crappy_div_should_work'><table align='center' valign='center' height=280><tr></tr>\
+              <tr><td ><font size=74 color=gray>Collecting data...</font></td></tr></table></div>",
+        margins : '3 3 3 3',
+        cmargins : '3 3 3 3',
+        autoScroll:true
+      });
+      
+      var refresh_pid;
+      
+      function progress_tab_refresh() {
+        my_div = Ext.get("oh_my_crappy_div_should_work");
+        
+        
+      Ext.Ajax.request({
+        url: '/connect.php',
+        params: {
+          moduleId: 'hadoop-wizard',
+          action: "progress"
+        },
+        
+        success: function(o){
+          if (o && o.responseText != null &&  o.responseText != "" && Ext.decode(o.responseText).success) {
+            var html = "<center><p><p>";
+            progress_list = Ext.decode(o.responseText).progress;
+            for (i = 0; i < progress_list.length; i++) {
+              cid = progress_list[i].vcluster_cid;
+              cname = progress_list[i].vcluster_cname;
+              html += "Progress of virtual cluster " + cid + "(" + cname + ")<br>";
+              html += "<table class='hadoop-wizard-progresstable'>";
+              
+              progrs_info = Ext.decode(progress_list[i].progress_info);
+              
+              vm_count = progrs_info.length;
+              app_count = progrs_info[0].progress.length;
+              
+              html += "<tr>";
+              cluster_progress = "finished";
+              for (vm_i = 0; vm_i < vm_count; vm_i++) {
+                vm_progress = "finished";
+                
+                for (k = 0; k < app_count; k++) {
+                  if (progrs_info[vm_i].progress[k].indexOf("Waiting") != -1) {
+                    vm_progress = "waiting";
+                    break;
+                  }
+                }
+                
+                if (vm_progress == "waiting") {
+                  cluster_progress = "waiting";
+                }
+              }
+              
+              html += "<td rowspan='" + (vm_count * app_count) + "' class='hadoop-wizard-" + cluster_progress + "'>"
+                  + "Vcluster ID: " + cid + "<br>Vcluster Name: " +  cname + "</td>";
+              
+              for (vm_i = 0; vm_i < vm_count; vm_i++) {
+                vm_progress = "finished";
+                
+                for (k = 0; k < app_count; k++) {
+                  if (progrs_info[vm_i].progress[k].indexOf("Waiting") != -1) {
+                    vm_progress = "waiting";
+                    break;
+                  }
+                }
+                
+                  html += "<td rowspan='" + (app_count) + "' class='hadoop-wizard-" + vm_progress + "'>" + 
+                     + "Vmachine IP: " + progrs_info[vm_i].ip + "<br>Vmachine Name: " + progrs_info[vm_i].node_name + "</td>";
+                
+                for (app_i = 0; app_i < app_count; app_i++) {
+                  status = progrs_info[vm_i].progress[app_i];
+                  status1 = "";
+                  if (status[1] == "Waiting") {
+                    status1 = "waiting";
+                  } else if (status[1] == "Finished") {
+                    status1 = "finished";
+                  }
+                  html += "<td class='hadoop-wizard-" + status1 + "'>";
+                  html += status[0];
+                  html += "</td>";
+                  html += "</tr>";
+                }
+              }
+              
+              
+              html += "</table><p><p>";
+            }
+            html += "</center>";
+            my_div.update(html);
+          }
+          else {            my_div.update("Error on server");
+          }
+        },
+        failure: function(){
+          my_div.update("Failed to connect server");
         }
+      });
         
-        htmltxt += "</table>";
-        
-        helper123.body.update(htmltxt);
-        
-      },
-      failure: function(){
-        // TODO when connect failed
       }
-    });
-    
-  },
-  
-	this.refreshing_proc_id = setInterval(this.freshFunc2, 3000);
+      
+      function progress_tab_start_auto_refresh() {
+        refresh_pid = setInterval(progress_tab_refresh, 1000);
+      }
+      
+      function progress_tab_stop_auto_refresh() {
+        clearInterval(refresh_pid);
+      }
+      
+      progressPane.on("show", progress_tab_start_auto_refresh);
+      
+      progressPane.on("hide", progress_tab_stop_auto_refresh);
+      
+      
+      tabPane = new Ext.TabPanel({
+        activeTab:0,
+        items:[create_tab, progressPane]
+      });
+      
+      
+      
+      tabWin = desktop.createWindow({
+          autoScroll: true,
+          id: 'hadoop-wizard-win1',
+          title: 'Cluster Wizard',
+          width:560,
+          height:360,
+          iconCls: 'hadoop-wizard-icon',
+          items: tabPane,
+          shim:false,
+          layout:"fit",
+          animCollapse:false,
+          constrainHeader:true,
+          maximizable: false,
+          taskbuttonTooltip: '<b>Cluster Wizard</b><br />Create new clusters in a few clicks'
+      });
+      
+      tabWin.show();
+      
+      this.tabWin = tabWin;
+      
+      tabWin.on("hide", progress_tab_stop_auto_refresh);
+      
 
-
-	this.actions = {
-		
-	};
-
-	
-};
-
-
-Ext.extend(QoDesk.HadoopWizard.ProgressPanel, Ext.Panel, {
-
-  startAutorefresh: function() {
-    this.autorefreshProcId = setInterval(this.freshFunc1xxxxx,3 * 1000);
-  },
-    
-  freshFunc1xxxxx: function() {
-
-  },
-
-  
-  autorefreshProcId:null,
-  
-  stopAutorefresh: function() {
-    if (this.autorefreshProcId) {
-      clearInterval(this.autorefreshProcId);
+ 			this.tabWin = tabWin;
     }
-    this.autorefreshProcId = null;
-  },
+    
+    tabWin.show();
 
-	afterRender : function(){
-		this.body.on({
-			'mousedown': {
-				fn: this.doAction,
-				scope: this,
-				delegate: 'a'
-			},
-			'click': {
-				fn: Ext.emptyFn,
-				scope: null,
-				delegate: 'a',
-				preventDefault: true
-			}
-		});
-		
-		QoDesk.HadoopWizard.ProgressPanel.superclass.afterRender.call(this); // do sizing calcs last
-		
-	},
-	
-	doAction : function(e, t){
-    	e.stopEvent();
-    	this.actions[t.id](this.owner);  // pass owner for scope
-    }
+  }  
 });
-
 

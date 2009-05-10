@@ -5,3 +5,15 @@
     background-image: url(images/hadoop-logo-large.png);
 }
 
+.hadoop-wizard-finished {
+  background: #99ffcc
+}
+
+.hadoop-wizard-waiting {
+  background: #ff99a3  
+}
+
+.hadoop-wizard-progresstable {
+  border: 1
+}
+

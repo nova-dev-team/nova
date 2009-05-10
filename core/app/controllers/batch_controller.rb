@@ -107,5 +107,25 @@ class BatchController < ApplicationController
     end
   end
 
+  def progress_of_user
+    user = User.find_by_email params[:id]
+    result = {:success => true}
+    result[:progress] = []
+    user.vclusters.all.each do |vc|
+      if vc.net_pool_name != ""
+        result[:progress] << {
+          :vcluster_cid => "c#{vc.id}",
+          :vcluster_cname => vc.vcluster_name,
+          :progress_info => (BatchHelper::Helper.progress "c#{vc.id}")
+        }
+      end
+    end
+
+    respond_to do |accept| 
+      accept.html {render :text => result.to_json}
+      accept.json {render :json => result}
+    end
+  end
+
 end
 
