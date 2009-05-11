@@ -235,7 +235,7 @@ Ext.override(QoDesk.HadoopWizard, {
                     }
                   }
                   
-                    html += "<td rowspan='" + (app_count) + "' class='hadoop-wizard-" + vm_progress + "'>" + 
+                    html += "<td rowspan='" + (app_count) + "' class='hadoop-wizard-" + vm_progress + "'>"
                        + "Vmachine IP: " + progrs_info[vm_i].ip + "<br>Vmachine Name: " + progrs_info[vm_i].node_name + "</td>";
                   
                   for (app_i = 0; app_i < app_count; app_i++) {

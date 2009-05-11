@@ -718,7 +718,7 @@ function saveCompleteX(title, msg){
 			win = desktop.createWindow({
 				id: 'user-job-manager-win',
 				title:'Cluster Manager',
-				width:750,
+				width:850,
 				height:480,
 				iconCls: 'user-job-manager-icon',
 				shim:false,
