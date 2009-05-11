@@ -6,6 +6,7 @@ module VmachineHelper
   require 'net/http'
   require 'uuidtools'
   require 'utils'
+  require 'pp'
 
   include PmachineHelper
 
@@ -191,7 +192,7 @@ HERE
              
               setting = JSON.parse(vmachine.settings)
 
-              pp setting
+#              pp setting
               
               kvm_xml = Utils::KvmXml.new
               kvm_xml.mem = setting["mem"]  # TODO change parameters

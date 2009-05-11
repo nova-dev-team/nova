@@ -241,13 +241,13 @@ Ext.override(QoDesk.HadoopWizard, {
                   for (app_i = 0; app_i < app_count; app_i++) {
                     status = progrs_info[vm_i].progress[app_i];
                     status1 = "";
-                    if (status[1] == "Waiting") {
+                    if (status.indexOf("Waiting") != -1) {
                       status1 = "waiting";
-                    } else if (status[1] == "Finished") {
+                    } else if (status.indexOf("Finished") != -1) {
                       status1 = "finished";
                     }
                     html += "<td class='hadoop-wizard-" + status1 + "'>";
-                    html += status[0];
+                    html += status;
                     html += "</td>";
                     html += "</tr>";
                   }

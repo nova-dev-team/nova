@@ -79,7 +79,7 @@ HERE
       vc = Vcluster.find_by_id vcluster_cid[1..-1]
       vc.vmachines.each do |vm|
         # XXX start the vmachines
-        #VmachineHelper::Helper.start "v#{vm.id}"
+        VmachineHelper::Helper.start "v#{vm.id}"
       end
 
       return result
