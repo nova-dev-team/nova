@@ -1,4 +1,11 @@
-make a new banner. it should now be "nova" instead of "vcluster"
+[open]
 
-add managing tools for administrator, provide image upload/remove utility,
-and management on user's virtual machines
+* implement pnode with ruby binding of libvirt
+
+
+[closed]
+
+* make a new banner. it should now be "nova" instead of "vcluster"
+
+* add managing tools for administrator, provide image upload/remove
+  utility, and management on user's virtual machines
