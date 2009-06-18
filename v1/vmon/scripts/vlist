@@ -1,5 +1,0 @@
-#! /bin/sh
-
-SCRIPTS_SOURCE=/scripts
-
-LIST=`ls ${SCRIPTS_SOURCE}\`

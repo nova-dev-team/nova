@@ -1,5 +1,0 @@
-prepare_folder.sh
-  Used to create folders for Vmon. Needs "sudo" privilege
-
-start_core.sh
-  Call "prepare_folder.sh", and start the rails server
