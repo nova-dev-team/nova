@@ -1,5 +1,11 @@
 NOVA - Manage virtual machines running on a cluster
 
+*** Document Convention ***
+
+difference between "delete" and "remove"
+  delete: destroy existing resource
+  remove: remove an item from a collection
+
 CORE
 ====
 
@@ -7,13 +13,67 @@ Models
 ------
 
 Group
+  special groups: root (developer), admin (administrators), applying (applying users)
+    root is more powerful than admin
+    admin could add groups
+  * has_many users
+
 
 User
+  special user: root
+  * has_many groups
+  * has_many vclusters
+  * has_many vmachines
 
 Vmachine
+  * belong_to a user
+  * belong_to many guest_users [experimental]
+  * belong_to a vcluster (or not)
 
 Vcluster
+  * has_many vmachines
 
 Pmachine
+  before adding a new pmachine, we should authenticate it
+  * has_may vmachines
 
+
+Controllers
+-----------
+
+Group
+  add_group
+  delete_group
+  add_member
+  remove_member
+  list_members (root?)
+
+User
+  add_user
+  delete_user
+  list_users (root?)
+
+Pmachine
+  add_pmachine (authentication required)
+  delete_pmachine ('pending remove')
+
+Vmachine
+  create_vmachine
+  delete_vmachine
+  start_vmachine
+  stop_vmachine
+  suspend_vmachine
+  hibernate_vmachine (send data back to storage center) [experimental]
+  resume_vmachine
+
+Vcluster
+  create_vcluster
+  delete_vcluster
+  start_vcluster
+  stop_vcluster
+  suspend_vcluster
+  hibernate_vcluster
+  resume_vcluster
+  add_vmachine
+  remove_vmachine
 
