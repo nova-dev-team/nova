@@ -1,0 +1,2 @@
+class PmachineController < ApplicationController
+end

@@ -1,2 +1,19 @@
 NOVA - Manage virtual machines running on a cluster
 
+CORE
+====
+
+Models
+------
+
+Group
+
+User
+
+Vmachine
+
+Vcluster
+
+Pmachine
+
+
