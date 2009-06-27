@@ -6,4 +6,7 @@ class UserController < ApplicationController
   def delete_user
   end
 
+  def login
+  end
+
 end

@@ -55,7 +55,8 @@ User
 
 Pmachine
   add_pmachine (authentication required)
-  delete_pmachine ('pending remove')
+  retire_pmachine ('pending remove')
+  remove_pmachine ('foreced to halt all vmachine instance on it')
 
 Vmachine
   create_vmachine
