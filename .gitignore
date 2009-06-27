@@ -1,0 +1,6 @@
+scripts/
+core/log
+core/doc
+core/config/database.yml
+*~
+core/db/*.sqlite3
