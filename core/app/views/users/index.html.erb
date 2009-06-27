@@ -1,4 +1,9 @@
-<h1><%= self.current_user.login %></h1>
+<h1><%= if current_user
+    current_user.login
+  else
+    "Not logged in!"
+  end
+ %></h1>
 
 <% require 'pp'
 pp self.current_user %>

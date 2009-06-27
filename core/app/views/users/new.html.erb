@@ -1,3 +1,22 @@
+<html>
+<%
+  groups = ""
+  Group.all.each {|g| groups += "'#{g.name}'," if g.name != 'applying'}
+  rindex = groups.rindex ','
+  if rindex
+    groups = groups[0...rindex]
+  end
+%>
+<head>
+<script type="text/javascript">
+  window.onload = function() {
+    var groups = [<%= groups %>];
+  }
+</script>
+<%= javascript_include_tag "prototype.js" %>
+<%= stylesheet_link_tag "default" %>
+</head>
+<body>
 <h1>Sign up as a new user</h1>
 <% @user.password = @user.password_confirmation = nil %>
 
@@ -15,5 +34,8 @@
 <p><%= label_tag 'password_confirmation', 'Confirm Password' %><br/>
 <%= f.password_field :password_confirmation %></p>
 
+
 <p><%= submit_tag 'Sign up' %></p>
+
 <% end -%>
+</body></html>

@@ -1,17 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-root_group:
-  name: root
-
-admin_group:
-  name: admin
-
-user_group:
-  name: user
-
-applying_group:
-  name: applying
-
 # one:
 #   column: value
 #

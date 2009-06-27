@@ -25,11 +25,8 @@ class User < ActiveRecord::Base
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :name, :password, :password_confirmation
 
-  has_many :roles
-
-  def role_symbols
-    (roles || []).map {|r| r.title.to_sym}
-  end
+  has_many :ugrelationships
+  has_many :groups, :through => :ugrelationships
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
