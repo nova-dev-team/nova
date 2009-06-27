@@ -28,6 +28,7 @@ class SessionsController < ApplicationController
       note_failed_signin
       @login       = params[:login]
       @remember_me = params[:remember_me]
+      params[:error_msg] = "Failed login for '#{params[:login]}'"
       render :action => 'new'
     end
   end

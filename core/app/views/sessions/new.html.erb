@@ -1,16 +1,71 @@
-<h1>Log In</h1>
+<html>
+<head>
+<%= javascript_include_tag 'prototype.js' %>
+<%= stylesheet_link_tag 'default' %>
+<style type="text/css" media="screen">
+#page {
+  background-color: gray;
+  width: 750px;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
 
-<% form_tag session_path do -%>
-<p><%= label_tag 'login' %><br />
-<%= text_field_tag 'login', @login %></p>
+.inputPlaceHolder {
+  color: gray;
+}
+ 
+</style>
+<script type="text/javascript">
 
-<p><%= label_tag 'password' %><br/>
-<%= password_field_tag 'password', nil %></p>
+  function do_login() {
+    $('login_form').submit();
+  }
 
-<p><%= label_tag 'remember_me', 'Remember me' %>
-<%= check_box_tag 'remember_me', '1', @remember_me %></p>
+  window.onload = function() {
+    var login_field = $('login');
+    login_field.value = "username";
 
-<%= link_to 'Sign up', signup_path %>
+    var password_field = $('password');
+    password_field.value = "password";
+    
+    function decorate_field(field) {
+      field.addClassName("inputPlaceHolder");
+      field.onclick = function () {
+        field.value = "";
+        field.removeClassName("inputPlaceHolder");
+        field.onkeydown = function(e) {
+          if (e.keyCode == 13) {
+            do_login();
+          }
+        }
+      }
+    }
 
-<p><%= submit_tag 'Log in' %></p>
-<% end -%>
+    decorate_field(login_field);
+    decorate_field(password_field);
+  }
+
+</script>
+</head>
+<body>
+<div id="page">
+  <h1>Nova Login <%=h params[:error_msg] %> </h1>
+
+  <% form_tag session_path, :id => 'login_form' do -%>
+
+  <%= text_field_tag 'login', @login %>
+
+  <%= password_field_tag 'password', nil %>
+<!--
+  <p><%= label_tag 'remember_me', 'Remember me' %>
+  <%= check_box_tag 'remember_me', '1', @remember_me %></p>
+-->
+  <a href='#' onclick="do_login(); return false">Login</a>
+  <%= link_to 'Sign up', signup_path %>
+
+  <% end -%>
+</div>
+</body></html>
