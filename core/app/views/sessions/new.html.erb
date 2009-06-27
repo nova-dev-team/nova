@@ -1,5 +1,8 @@
 <h1>Log In</h1>
 
+
+<%= stylesheet_link_tag "default" %>
+<%= javascript_include_tag "prototype.js" %>
 <% form_tag session_path do -%>
 <p><%= label_tag 'login' %><br />
 <%= text_field_tag 'login', @login %></p>
@@ -9,6 +12,8 @@
 
 <p><%= label_tag 'remember_me', 'Remember me' %>
 <%= check_box_tag 'remember_me', '1', @remember_me %></p>
+
+<%= link_to "Signup", "/signup" %>
 
 <p><%= submit_tag 'Log in' %></p>
 <% end -%>

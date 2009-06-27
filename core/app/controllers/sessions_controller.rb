@@ -5,10 +5,13 @@ class SessionsController < ApplicationController
 
   # render new.rhtml
   def new
+    if logged_in?
+      redirect_to :controller => :users, :action => :index
+    end
   end
 
   def create
-    logout_keeping_session!
+    # logout_keeping_session!
     user = User.authenticate(params[:login], params[:password])
     if user
       # Protects against session fixation attacks, causes request forgery
@@ -18,7 +21,8 @@ class SessionsController < ApplicationController
       self.current_user = user
       new_cookie_flag = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
-      redirect_back_or_default('/')
+      # redirect_back_or_default('/')
+      redirect_to :controller => :users, :action => :index
       flash[:notice] = "Logged in successfully"
     else
       note_failed_signin
@@ -31,7 +35,8 @@ class SessionsController < ApplicationController
   def destroy
     logout_killing_session!
     flash[:notice] = "You have been logged out."
-    redirect_back_or_default('/')
+    # redirect_back_or_default('/')
+    redirect_to '/'
   end
 
 protected
