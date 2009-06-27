@@ -1,0 +1,7 @@
+<% if logged_in? %>
+  You are logged in
+  <%= link_to_current_user%>
+<% else %>
+  You are not logged in
+  <%= link_to "Login in", login_path, { :title => "Login" } %>
+<% end %>

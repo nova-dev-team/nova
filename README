@@ -9,6 +9,14 @@ difference between "delete" and "remove"
 CORE
 ====
 
+Plugins
+-------
+used restful_authentication
+  script/plugin install git://github.com/technoweenie/restful-authentication.git
+  script/generate authenticated user sessions
+  rake db:migrate
+
+
 Models
 ------
 
