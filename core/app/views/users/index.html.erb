@@ -1,0 +1,12 @@
+<h1><%= self.current_user.login %></h1>
+
+<% require 'pp'
+pp self.current_user %>
+
+
+<% str = ""
+  self.methods.sort.each {|m| str += m.to_s + "<br>"}
+  %>
+
+<%= str %>
+
