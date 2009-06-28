@@ -7,11 +7,13 @@
 <link href="/stylesheets/prototype_window/default.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/prototype_window/alphacube.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/prototype_window/mac_os_x.css" rel="stylesheet" type="text/css" />
-<%= stylesheet_link_tag 'default' %>
+<link href="/stylesheets/iphone_checkbox/style.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/javascripts/prototype.js"> </script>
 <script type="text/javascript" src="/javascripts/effects.js"> </script>
 <script type="text/javascript" src="/javascripts/prototype_window/window.js"> </script>
 <script type="text/javascript" src="/javascripts/prototype_window/window_effects.js"> </script>
+<script type="text/javascript" src="/javascripts/iphone_checkbox/iphone_checkbox.js"> </script>
+<script type="text/javascript" src="/javascripts/js_progressbar/js_progressbar.js"> </script>
 <%= growl4rails_includes %>
 <style type="text/css" media="screen">
 
@@ -89,6 +91,47 @@ a:hover {
   }
 
   window.onload = function() {
+
+    // required to setup iphone-like checkbox
+    new iPhoneStyle('input[type=checkbox]', {
+      checkedLabel: "YES",  // default is "ON"
+      uncheckedLabel: "NO"  // default is "OFF"
+    });
+
+    // create custom progress bar
+    pbar1 = new JS_BRAMUS.jsProgressBar(
+      $('progressbar_custom1'),
+      75, {
+        showText: false,
+        animate:  true,
+        width:    154,
+        height:   11,
+        boxImage: 'images/bramus/custom1_box.gif',
+        barImage: 'images/bramus/custom1_bar.gif'
+      }
+    );
+
+    pbar2 = new JS_BRAMUS.jsProgressBar(
+      $('progressbar_custom2'),
+      52, {
+        barImage: Array(
+          'images/bramus/percentImage_back4.png',
+          'images/bramus/percentImage_back3.png',
+          'images/bramus/percentImage_back2.png',
+          'images/bramus/percentImage_back1.png'
+        ),
+        onTick: function(pb) {
+          switch (pb.getPercentage()) {
+            case 98:
+              alert("We are 98");
+            break;
+          }
+          return true;
+        }
+      }
+    );
+
+
     var login_field = $('login');
     login_field.value = "username";
 
@@ -131,9 +174,17 @@ a:hover {
 
   <a href="#" onclick="do_signup(); return false">Sign Up</a>
 
-  <%= link_to_prototype_dialog("hah", "say hi", 'alert', {:className => "mac_os_x", :width => 340, :height => 300}) %>
+
+  <input type="checkbox" />
+  <%= link_to_prototype_dialog("show a confirm win", "say hi", 'alert', {:title => "Demo win", :className => "mac_os_x", :width => 340, :height => 300}) %>
 
   <% end -%>
+</div>
+
+<div id="demos">
+  <span class="progressBar">15%</span>
+  <span id="progressbar_custom1"></span>
+  <span id="progressbar_custom2"></span>
 </div>
 
 <div id="signup_div" style="display: none;">
