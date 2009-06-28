@@ -8,6 +8,9 @@ class UsersController < ApplicationController
   def create
     logout_keeping_session!
     @user = User.new(params[:user])
+    @user.groups << (Group.find_by_name 'applying') # the user is still applying for the position
+    p params[:user]
+    params[:user][:groups].split.each {|g_name| @user.groups << (Group.find_by_name g_name)}
     success = @user && @user.save
     if success && @user.errors.empty?
             # Protects against session fixation attacks, causes request forgery

@@ -1,1 +1,8 @@
-<%= Group.list_without_applying %>
+<%= stylesheet_link_tag 'default' %>
+<%
+  groups = Group.list_without_applying
+  str = ""
+  groups.each {|g| str += g[:name] + '<br>'}
+%>
+<%= str %>
+

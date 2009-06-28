@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
   # render new.rhtml
   def new
     if logged_in?
-      redirect_to :controller => :users, :action => :index
+      redirect_to :controller => :home, :action => :index
     end
   end
 
@@ -14,16 +14,24 @@ class SessionsController < ApplicationController
     logout_keeping_session!
     user = User.authenticate(params[:login], params[:password])
     if user
-      # Protects against session fixation attacks, causes request forgery
-      # protection if user resubmits an earlier form using back
-      # button. Uncomment if you understand the tradeoffs.
-      # reset_session
-      self.current_user = user
-      new_cookie_flag = (params[:remember_me] == "1")
-      handle_remember_cookie! new_cookie_flag
-      # redirect_back_or_default('/')
-      redirect_to :controller => :users, :action => :index
-      flash[:notice] = "Logged in successfully"
+      p user.groups
+      if user.groups.include? (Group.find_by_name 'applying') == false # check if the user is not activated
+        # Protects against session fixation attacks, causes request forgery
+        # protection if user resubmits an earlier form using back
+        # button. Uncomment if you understand the tradeoffs.
+        # reset_session
+        self.current_user = user
+        new_cookie_flag = (params[:remember_me] == "1")
+        handle_remember_cookie! new_cookie_flag
+        redirect_back_or_default('/')
+        flash[:notice] = "Logged in successfully"
+      else # the user is activated
+        note_failed_signin
+        @login       = params[:login]
+        @remember_me = params[:remember_me]
+        params[:error_msg] = "Please wait for administrator's approval of '#{params[:login]}'"
+        render :action => 'new'
+      end
     else
       note_failed_signin
       @login       = params[:login]

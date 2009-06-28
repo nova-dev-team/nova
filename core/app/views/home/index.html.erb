@@ -1,12 +1,15 @@
 <h1><%= if current_user
-    current_user.login
+    current_user.login + "<br>" + current_user.groups.collect {|g| g.name + ", "}.to_s
   else
     "Not logged in!"
   end
  %></h1>
 
 <% require 'pp'
-pp self.current_user %>
+pp self.current_user
+%>
+
+<%= link_to 'logout', '/logout' %>
 
 
 <% str = ""
