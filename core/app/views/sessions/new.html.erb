@@ -1,10 +1,45 @@
 <html>
 <head>
-<%= javascript_include_tag 'prototype.js' %>
-<%= javascript_include_tag 'effects.js' %>
-<%= growl4rails_includes %>
+
+
+<title>Nova platform: Welcome!</title>
+
+<link href="/stylesheets/prototype_window/default.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/prototype_window/alphacube.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/prototype_window/mac_os_x.css" rel="stylesheet" type="text/css" />
 <%= stylesheet_link_tag 'default' %>
+<script type="text/javascript" src="/javascripts/prototype.js"> </script>
+<script type="text/javascript" src="/javascripts/effects.js"> </script>
+<script type="text/javascript" src="/javascripts/prototype_window/window.js"> </script>
+<script type="text/javascript" src="/javascripts/prototype_window/window_effects.js"> </script>
+<%= growl4rails_includes %>
 <style type="text/css" media="screen">
+
+body {
+  margin: 0;
+  margin-bottom: 25px;
+  padding: 0;
+  background-color: #f0f0f0;
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 13px;
+  color: #333;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+a {
+  color: #03c
+}
+
+a:hover {
+  background-color: #03c;
+  color: white;
+  text-decoration: none;
+}
+
 #page {
   background-color: gray;
   width: 750px;
@@ -28,10 +63,28 @@
   }
 
   function do_signup() {
+/*    Dialog.confirm($("signup_div").innerHTML, {
+      width: 240,
+      id: "signup_win",
+      className: "mac_os_x",
+      blurClassName: "blur_os_x",
+      title: "Sign up form"
+    });*/
+    var win = new Window({
+      className: "mac_os_x",
+      blurClassName: "blur_os_x",
+      title: "demo_win1",
+      width: 400,
+      height: 300,
+      top: 340,
+      left: 230
+    });
+    win.getContent().update("WTF!");
+    win.show();
     Growl4Rails.showGrowl({
       image_path: "/images/rails.png",
       title: "Registration data sent",
-      message: "Please wait for administrator's approval"
+      message: "Please <font color='red'><b>wait</b></font> for administrator's approval"
     });
   }
 
@@ -78,6 +131,15 @@
 
   <a href="#" onclick="do_signup(); return false">Sign Up</a>
 
+  <%= link_to_prototype_dialog("hah", "say hi", 'alert', {:className => "mac_os_x", :width => 340, :height => 300}) %>
+
   <% end -%>
+</div>
+
+<div id="signup_div" style="display: none;">
+  This is the text
+  <input type='text'></input>
+  <input type='button'></input>
+  <input type='checkbox'></input>
 </div>
 </body></html>
