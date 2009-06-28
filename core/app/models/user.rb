@@ -48,6 +48,10 @@ class User < ActiveRecord::Base
     write_attribute :email, (value ? value.downcase : nil)
   end
 
+  def in_group? group_name
+    groups.include?(Group.find_by_name group_name)
+  end
+
   protected
     
 

@@ -3,13 +3,17 @@
 
 class SystemController < ApplicationController
 
+  before_filter :root_required
+
   # show system information
-  def info
-    if current_user and current_user.groups.find_by_name "root"
-      render :text => "HI"
-    else # not root user
-      render :text => "YOUR ARE NOT ALLOWED TO USE THIS"
-    end
+  def index
+    render :text => "YOU are in root group, right?"
+  end
+
+private
+
+  def root_required
+    redirect_to login_url unless logged_in? and current_user.in_group? "root"
   end
   
 end

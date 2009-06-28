@@ -1,5 +1,40 @@
+<%= javascript_include_tag 'prototype.js' %>
+<script type='text/javascript'>
+  function toggle_activated(uid, actv) {
+    alert("" + uid + actv);
+    new Ajax.Request('/users/' + uid, {
+      method: 'put',
+      parameters: {activated: actv},
+      onSuccess: function(transport, json) {
+        alert(json);
+      }
+    });
+  }
+</script>
 <h1><%= if current_user
-    current_user.login + "<br>" + current_user.groups.collect {|g| g.name + ", "}.to_s
+    str = current_user.login + "<br>" + current_user.groups.collect {|g| g.name + ", "}.to_s + "<br>"
+## show list of users
+## root:root is not allowed to be de-activated
+## and current user is not allowed to be de-activated, too
+    str += "List of users:<p>"
+    if current_user.in_group? 'root'
+      User.all.each do |user|
+        require 'pp'
+        pp user
+        str += user.login + ": "
+        user.groups.each do |g|
+          str += g.name + ","
+        end
+        if (user.login == 'root' or user == current_user)
+          str += "------" + user.activated.to_s
+        else
+          str += "-----" + "<a href='#' onclick='toggle_activated(#{user.id}, #{!user.activated})'>" + user.activated.to_s + "</a>"
+        end
+        str += "<p>";
+      end
+    end
+
+    str
   else
     "Not logged in!"
   end

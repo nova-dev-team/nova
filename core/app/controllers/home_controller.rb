@@ -6,7 +6,8 @@ class HomeController < ApplicationController
   def index
   end
 
-  private
+private
+
   def login_required
     redirect_to login_url unless logged_in?
   end

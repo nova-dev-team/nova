@@ -26,4 +26,27 @@ class UsersController < ApplicationController
       render :action => 'new'
     end
   end
+
+  def update
+    root_or_admin_required
+    require 'pp'
+    pp params
+    if params[:activated]
+      u = User.find_by_id params[:id]
+      u.activated = (params[:activated] == 'true')
+      pp u.save
+    end
+    respond_to do |accept|
+      accept.json {
+        render :text => "hi".to_json
+      }
+    end
+  end
+
+private
+
+  def root_or_admin_required
+    redirect_to login_url unless logged_in? and (current_user.in_group? "admin" or current_user.in_group? "root")
+  end
+
 end

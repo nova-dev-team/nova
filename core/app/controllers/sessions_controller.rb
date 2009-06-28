@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
     logout_keeping_session!
     user = User.authenticate(params[:login], params[:password])
     if user
-      if user.activated ## check if the user is not activated
+      if user.activated ## check if the user is activated
         # Protects against session fixation attacks, causes request forgery
         # protection if user resubmits an earlier form using back
         # button. Uncomment if you understand the tradeoffs.
@@ -24,11 +24,11 @@ class SessionsController < ApplicationController
         handle_remember_cookie! new_cookie_flag
         redirect_back_or_default('/')
         flash[:notice] = "Logged in successfully"
-      else ## the user is activated
+      else ## the user is not activated
         note_failed_signin
         @login       = params[:login]
         @remember_me = params[:remember_me]
-        params[:error_msg] = "Please wait for administrator's approval of '#{params[:login]}'"
+        params[:error_msg] = "'#{params[:login]}' is not activated"
         render :action => 'new'
       end
     else
