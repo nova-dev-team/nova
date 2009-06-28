@@ -1,12 +1,11 @@
 <%= javascript_include_tag 'prototype.js' %>
 <script type='text/javascript'>
   function toggle_activated(uid, actv) {
-    alert("" + uid + actv);
     new Ajax.Request('/users/' + uid, {
       method: 'put',
       parameters: {activated: actv},
       onSuccess: function(transport, json) {
-        alert(json);
+        window.location.reload();
       }
     });
   }
@@ -19,13 +18,24 @@
     str += "List of users:<p>"
     if current_user.in_group? 'root'
       User.all.each do |user|
-        require 'pp'
-        pp user
         str += user.login + ": "
         user.groups.each do |g|
           str += g.name + ","
         end
         if (user.login == 'root' or user == current_user)
+          str += "------" + user.activated.to_s
+        else
+          str += "-----" + "<a href='#' onclick='toggle_activated(#{user.id}, #{!user.activated})'>" + user.activated.to_s + "</a>"
+        end
+        str += "<p>";
+      end
+    elsif current_user.in_group? "admin"
+      User.all.each do |user|
+        str += user.login + ": "
+        user.groups.each do |g|
+          str += g.name + ","
+        end
+        if user == current_user or user.in_group? "root"
           str += "------" + user.activated.to_s
         else
           str += "-----" + "<a href='#' onclick='toggle_activated(#{user.id}, #{!user.activated})'>" + user.activated.to_s + "</a>"
@@ -48,7 +58,7 @@ pp self.current_user
 
 
 <% str = ""
-  self.methods.sort.each {|m| str += m.to_s + "<br>"}
+  #self.methods.sort.each {|m| str += m.to_s + "<br>"}
   %>
 
 <%= str %>

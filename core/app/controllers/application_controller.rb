@@ -3,7 +3,8 @@
 
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
-  # XXX protect_from_forgery # See ActionController::RequestForgeryProtection for details
+  ## TODO find a way to replace protect_from_forgery
+  # protect_from_forgery # See ActionController::RequestForgeryProtection for details
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
