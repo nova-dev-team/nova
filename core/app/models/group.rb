@@ -9,14 +9,4 @@ class Group < ActiveRecord::Base
   has_many :ugrelationships
   has_many :users, :through => :ugrelationships
 
-  def Group.list_without_applying
-    groupList = []
-    Group.all.each do |g| groupList << {
-        :name => g.name,
-        :id => g.id
-      } if g.name != 'applying'
-    end
-    return groupList
-  end
-
 end

@@ -1,16 +1,19 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 root_group:
-  name: root
+  id:       1
+  name:     root
+  special:  true
 
 admin_group:
-  name: admin
+  id:       2
+  name:     admin
+  special:  true
 
 user_group:
-  name: user
-
-applying_group:
-  name: applying
+  id:       3
+  name:     user
+  special:  true
 
 # one:
 #   column: value

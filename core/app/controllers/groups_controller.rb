@@ -4,7 +4,7 @@ class GroupsController < ApplicationController
   def index
     respond_to do |accept|
       accept.json {
-        render :text => Group.list_without_applying.to_json
+        render :text => Group.all.collect{|g| g.name}.to_json
       }
       accept.html {
         # render index.html.erb

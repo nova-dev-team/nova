@@ -1,7 +1,7 @@
 <html>
 <%
   groups = ""
-  Group.all.each {|g| groups += "'#{g.name}'," if g.name != 'applying'}
+  Group.all.each {|g| groups += "'#{g.name}',"}
   rindex = groups.rindex ','
   if rindex
     groups = groups[0...rindex]

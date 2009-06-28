@@ -8,8 +8,6 @@ class UsersController < ApplicationController
   def create
     logout_keeping_session!
     @user = User.new(params[:user])
-    @user.groups << (Group.find_by_name 'applying') # the user is still applying for the position
-    p params[:user]
     params[:user][:groups].split.each {|g_name| @user.groups << (Group.find_by_name g_name)}
     success = @user && @user.save
     if success && @user.errors.empty?
@@ -17,7 +15,10 @@ class UsersController < ApplicationController
       # protection if visitor resubmits an earlier form using back
       # button. Uncomment if you understand the tradeoffs.
       # reset session
-      self.current_user = @user # !! now logged in
+
+      ## don't sign in the user immediately, since we need to activate it by admin
+      # self.current_user = @user # !! now logged in
+
       redirect_back_or_default('/')
       flash[:notice] = "Thanks for signing up!  We're sending you an email with your activation code."
     else

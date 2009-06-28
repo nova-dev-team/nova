@@ -1,5 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
+root_root:
+  user_id:  1
+  group_id: 1
+  
+admin_admin:
+  user_id:  2
+  group_id: 2
+
 # one:
 #   column: value
 #
