@@ -1,6 +1,8 @@
 <html>
 <head>
 <%= javascript_include_tag 'prototype.js' %>
+<%= javascript_include_tag 'effects.js' %>
+<%= growl4rails_includes %>
 <%= stylesheet_link_tag 'default' %>
 <style type="text/css" media="screen">
 #page {
@@ -23,6 +25,14 @@
 
   function do_login() {
     $('login_form').submit();
+  }
+
+  function do_signup() {
+    Growl4Rails.showGrowl({
+      image_path: "/images/rails.png",
+      title: "Registration data sent",
+      message: "Please wait for administrator's approval"
+    });
   }
 
   window.onload = function() {
@@ -65,7 +75,8 @@
   <%= check_box_tag 'remember_me', '1', @remember_me %></p>
 -->
   <a href='#' onclick="do_login(); return false">Login</a>
-  <%= link_to 'Sign up', signup_path %>
+
+  <a href="#" onclick="do_signup(); return false">Sign Up</a>
 
   <% end -%>
 </div>
