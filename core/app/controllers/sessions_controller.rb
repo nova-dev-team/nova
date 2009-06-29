@@ -22,21 +22,37 @@ class SessionsController < ApplicationController
         self.current_user = user
         new_cookie_flag = (params[:remember_me] == "1")
         handle_remember_cookie! new_cookie_flag
-        redirect_back_or_default('/')
-        flash[:notice] = "Logged in successfully"
+        
+        # TODO clear this routine, only json notation required
+        if request.request_method == :get
+          redirect_back_or_default('/')
+          flash[:notice] = "Logged in successfully"
+        else
+          respond_to do |accept|
+            accept.json {
+              render :text => {:success => true, :message => "You are logged in"}.to_json
+            }
+          end
+        end
       else ## the user is not activated
         note_failed_signin
         @login       = params[:login]
         @remember_me = params[:remember_me]
-        params[:error_msg] = "'#{params[:login]}' is not activated"
-        render :action => 'new'
+        respond_to do |accept|
+          accept.json {
+            render :text => {:success => false, :message => "'#{params[:login]}' is not activated"}.to_json
+          }
+        end
       end
     else
       note_failed_signin
       @login       = params[:login]
       @remember_me = params[:remember_me]
-      params[:error_msg] = "Failed login for '#{params[:login]}'"
-      render :action => 'new'
+      respond_to do |accept|
+        accept.json {
+          render :text => {:success => false, :message => "incorrect login for '#{params[:login]}', check your username and password"}.to_json
+        }
+      end
     end
   end
 

@@ -35,61 +35,61 @@
 	background:#FFF;
 	filter:alpha(opacity=60);
 	-moz-opacity:0.6;
-	opacity:0.6;	
+	opacity:0.6;
 }
 
 .bluelighting_nw {
-	background:transparent url(lighting/top-left-blue.png) no-repeat 0 0;			
+	background:transparent url(lighting/top-left-blue.png) no-repeat 0 0;
 	width:9px;
 	height:28px;
 }
 
 .bluelighting_n {
-	background:transparent url(lighting/top-middle-blue.png) repeat-x 0 0;			
+	background:transparent url(lighting/top-middle-blue.png) repeat-x 0 0;
 	height:28px;
 }
 
 .bluelighting_ne {
-	background:transparent url(lighting/top-right-blue.png) no-repeat 0 0;			
-	width:15px;	  
+	background:transparent url(lighting/top-right-blue.png) no-repeat 0 0;
+	width:15px;
 	height:28px;
 }
 
 .bluelighting_w {
-	background:transparent url(lighting/left-blue.png) repeat-y top left;			
+	background:transparent url(lighting/left-blue.png) repeat-y top left;
 	width:9px;
 }
 
 .bluelighting_e {
-	background:transparent url(lighting/right-blue.png) repeat-y top right;			
-	width:15px;	  
+	background:transparent url(lighting/right-blue.png) repeat-y top right;
+	width:15px;
 }
 
 .bluelighting_sw {
-	background:transparent url(lighting/bottom-left-blue.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-left-blue.png) no-repeat 0 0;
 	width:9px;
 	height:15px;
 }
 
 .bluelighting_s {
-	background:transparent url(lighting/bottom-middle-blue.png) repeat-x 0 0;			
+	background:transparent url(lighting/bottom-middle-blue.png) repeat-x 0 0;
 	height:15px;
 }
 
 .bluelighting_se, .bluelighting_sizer  {
-	background:transparent url(lighting/bottom-right-blue.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-right-blue.png) no-repeat 0 0;
 	width:15px;
 	height:15px;
 }
 
 .bluelighting_sizer {
-	cursor:se-resize;	
+	cursor:se-resize;
 }
 
 .bluelighting_close {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-close-blue.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-close-blue.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:10px;
@@ -100,7 +100,7 @@
 .bluelighting_maximize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-maximize-blue.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-maximize-blue.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:25px;
@@ -111,7 +111,7 @@
 .bluelighting_minimize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-minimize-blue.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-minimize-blue.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:40px;
@@ -141,7 +141,7 @@
 
 /* For alert/confirm dialog */
 .bluelighting_window {
-	border:1px solid #F00;	
+	border:1px solid #F00;
 	background:#FFF;
 	padding:20px;
 	margin-left:auto;
@@ -189,67 +189,67 @@
 * html .bluelighting_nw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-left-blue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-left-blue.png", sizingMethod="crop");
 }
 
 * html .bluelighting_n {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-middle-blue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-middle-blue.png", sizingMethod="scale");
 }
 
 * html .bluelighting_ne {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-right-blue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-right-blue.png", sizingMethod="crop");
 }
 
 * html .bluelighting_w {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/left-blue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/left-blue.png", sizingMethod="scale");
 }
 
 * html .bluelighting_e {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/right-blue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/right-blue.png", sizingMethod="scale");
 }
 
 * html .bluelighting_sw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-left-blue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-left-blue.png", sizingMethod="crop");
 }
 
 * html .bluelighting_s {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-middle-blue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-middle-blue.png", sizingMethod="scale");
 }
 
 * html .bluelighting_se, * html .bluelighting_sizer {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-right-blue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-right-blue.png", sizingMethod="crop");
 }
 
 * html .bluelighting_close {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-close-blue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-close-blue.png", sizingMethod="crop");
 }
 
 * html .bluelighting_minimize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-minimize-blue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-minimize-blue.png", sizingMethod="crop");
 }
 
 * html .bluelighting_maximize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-maximize-blue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-maximize-blue.png", sizingMethod="crop");
 }
 
 * html .bluelighting_content {
@@ -269,61 +269,61 @@
 	background:#FFF;
 	filter:alpha(opacity=60);
 	-moz-opacity:0.6;
-	opacity:0.6;	
+	opacity:0.6;
 }
 
 .greylighting_nw {
-	background:transparent url(lighting/top-left-grey.png) no-repeat 0 0;			
+	background:transparent url(lighting/top-left-grey.png) no-repeat 0 0;
 	width:9px;
 	height:28px;
 }
 
 .greylighting_n {
-	background:transparent url(lighting/top-middle-grey.png) repeat-x 0 0;			
+	background:transparent url(lighting/top-middle-grey.png) repeat-x 0 0;
 	height:28px;
 }
 
 .greylighting_ne {
-	background:transparent url(lighting/top-right-grey.png) no-repeat 0 0;			
-	width:15px;	  
+	background:transparent url(lighting/top-right-grey.png) no-repeat 0 0;
+	width:15px;
 	height:28px;
 }
 
 .greylighting_w {
-	background:transparent url(lighting/left-grey.png) repeat-y top left;			
+	background:transparent url(lighting/left-grey.png) repeat-y top left;
 	width:9px;
 }
 
 .greylighting_e {
-	background:transparent url(lighting/right-grey.png) repeat-y top right;			
-	width:15px;	  
+	background:transparent url(lighting/right-grey.png) repeat-y top right;
+	width:15px;
 }
 
 .greylighting_sw {
-	background:transparent url(lighting/bottom-left-grey.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-left-grey.png) no-repeat 0 0;
 	width:9px;
 	height:15px;
 }
 
 .greylighting_s {
-	background:transparent url(lighting/bottom-middle-grey.png) repeat-x 0 0;			
+	background:transparent url(lighting/bottom-middle-grey.png) repeat-x 0 0;
 	height:15px;
 }
 
 .greylighting_se, .greylighting_sizer  {
-	background:transparent url(lighting/bottom-right-grey.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-right-grey.png) no-repeat 0 0;
 	width:15px;
 	height:15px;
 }
 
 .greylighting_sizer {
-	cursor:se-resize;	
+	cursor:se-resize;
 }
 
 .greylighting_close {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-close-grey.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-close-grey.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:10px;
@@ -334,7 +334,7 @@
 .greylighting_maximize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-maximize-grey.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-maximize-grey.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:25px;
@@ -345,7 +345,7 @@
 .greylighting_minimize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-minimize-grey.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-minimize-grey.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:40px;
@@ -375,7 +375,7 @@
 
 /* For alert/confirm dialog */
 .greylighting_window {
-	border:1px solid #F00;	
+	border:1px solid #F00;
 	background:#FFF;
 	padding:20px;
 	margin-left:auto;
@@ -423,67 +423,67 @@
 * html .greylighting_nw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-left-grey.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-left-grey.png", sizingMethod="crop");
 }
 
 * html .greylighting_n {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-middle-grey.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-middle-grey.png", sizingMethod="scale");
 }
 
 * html .greylighting_ne {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-right-grey.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-right-grey.png", sizingMethod="crop");
 }
 
 * html .greylighting_w {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/left-grey.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/left-grey.png", sizingMethod="scale");
 }
 
 * html .greylighting_e {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/right-grey.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/right-grey.png", sizingMethod="scale");
 }
 
 * html .greylighting_sw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-left-grey.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-left-grey.png", sizingMethod="crop");
 }
 
 * html .greylighting_s {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-middle-grey.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-middle-grey.png", sizingMethod="scale");
 }
 
 * html greylighting_se, * html .greylighting_sizer {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-right-grey.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-right-grey.png", sizingMethod="crop");
 }
 
 * html .greylighting_close {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-close-grey.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-close-grey.png", sizingMethod="crop");
 }
 
 * html .greylighting_minimize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-minimize-grey.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-minimize-grey.png", sizingMethod="crop");
 }
 
 * html .greylighting_maximize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-maximize-grey.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-maximize-grey.png", sizingMethod="crop");
 }
 
 * html .greylighting_content {
@@ -503,61 +503,61 @@
 	background:#FFF;
 	filter:alpha(opacity=60);
 	-moz-opacity:0.6;
-	opacity:0.6;	
+	opacity:0.6;
 }
 
 .greenlighting_nw {
-	background:transparent url(lighting/top-left-green.png) no-repeat 0 0;			
+	background:transparent url(lighting/top-left-green.png) no-repeat 0 0;
 	width:9px;
 	height:28px;
 }
 
 .greenlighting_n {
-	background:transparent url(lighting/top-middle-green.png) repeat-x 0 0;			
+	background:transparent url(lighting/top-middle-green.png) repeat-x 0 0;
 	height:28px;
 }
 
 .greenlighting_ne {
-	background:transparent url(lighting/top-right-green.png) no-repeat 0 0;			
-	width:15px;	  
+	background:transparent url(lighting/top-right-green.png) no-repeat 0 0;
+	width:15px;
 	height:28px;
 }
 
 .greenlighting_w {
-	background:transparent url(lighting/left-green.png) repeat-y top left;			
+	background:transparent url(lighting/left-green.png) repeat-y top left;
 	width:9px;
 }
 
 .greenlighting_e {
-	background:transparent url(lighting/right-green.png) repeat-y top right;			
-	width:15px;	  
+	background:transparent url(lighting/right-green.png) repeat-y top right;
+	width:15px;
 }
 
 .greenlighting_sw {
-	background:transparent url(lighting/bottom-left-green.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-left-green.png) no-repeat 0 0;
 	width:9px;
 	height:15px;
 }
 
 .greenlighting_s {
-	background:transparent url(lighting/bottom-middle-green.png) repeat-x 0 0;			
+	background:transparent url(lighting/bottom-middle-green.png) repeat-x 0 0;
 	height:15px;
 }
 
 .greenlighting_se, .greenlighting_sizer  {
-	background:transparent url(lighting/bottom-right-green.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-right-green.png) no-repeat 0 0;
 	width:15px;
 	height:15px;
 }
 
 .greenlighting_sizer {
-	cursor:se-resize;	
+	cursor:se-resize;
 }
 
 .greenlighting_close {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-close-green.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-close-green.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:10px;
@@ -568,7 +568,7 @@
 .greenlighting_maximize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-maximize-green.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-maximize-green.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:25px;
@@ -579,7 +579,7 @@
 .greenlighting_minimize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-minimize-green.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-minimize-green.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:40px;
@@ -609,7 +609,7 @@
 
 /* For alert/confirm dialog */
 .greenlighting_window {
-	border:1px solid #F00;	
+	border:1px solid #F00;
 	background:#FFF;
 	padding:20px;
 	margin-left:auto;
@@ -657,67 +657,67 @@
 * html .greenlighting_nw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-left-green.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-left-green.png", sizingMethod="crop");
 }
 
 * html .greenlighting_n {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-middle-green.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-middle-green.png", sizingMethod="scale");
 }
 
 * html .greenlighting_ne {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-right-green.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-right-green.png", sizingMethod="crop");
 }
 
 * html .greenlighting_w {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/left-green.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/left-green.png", sizingMethod="scale");
 }
 
 * html .greenlighting_e {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/right-green.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/right-green.png", sizingMethod="scale");
 }
 
 * html .greenlighting_sw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-left-green.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-left-green.png", sizingMethod="crop");
 }
 
 * html .greenlighting_s {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-middle-green.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-middle-green.png", sizingMethod="scale");
 }
 
 * html greenlighting_se, * html .greenlighting_sizer {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-right-green.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-right-green.png", sizingMethod="crop");
 }
 
 * html .greenlighting_close {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-close-green.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-close-green.png", sizingMethod="crop");
 }
 
 * html .greenlighting_minimize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-minimize-green.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-minimize-green.png", sizingMethod="crop");
 }
 
 * html .greenlighting_maximize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-maximize-green.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-maximize-green.png", sizingMethod="crop");
 }
 
 * html .greenlighting_content {
@@ -737,61 +737,61 @@
 	background:#FFF;
 	filter:alpha(opacity=60);
 	-moz-opacity:0.6;
-	opacity:0.6;	
+	opacity:0.6;
 }
 
 .darkbluelighting_nw {
-	background:transparent url(lighting/top-left-darkblue.png) no-repeat 0 0;			
+	background:transparent url(lighting/top-left-darkblue.png) no-repeat 0 0;
 	width:9px;
 	height:28px;
 }
 
 .darkbluelighting_n {
-	background:transparent url(lighting/top-middle-darkblue.png) repeat-x 0 0;			
+	background:transparent url(lighting/top-middle-darkblue.png) repeat-x 0 0;
 	height:28px;
 }
 
 .darkbluelighting_ne {
-	background:transparent url(lighting/top-right-darkblue.png) no-repeat 0 0;			
-	width:15px;	  
+	background:transparent url(lighting/top-right-darkblue.png) no-repeat 0 0;
+	width:15px;
 	height:28px;
 }
 
 .darkbluelighting_w {
-	background:transparent url(lighting/left-darkblue.png) repeat-y top left;			
+	background:transparent url(lighting/left-darkblue.png) repeat-y top left;
 	width:9px;
 }
 
 .darkbluelighting_e {
-	background:transparent url(lighting/right-darkblue.png) repeat-y top right;			
-	width:15px;	  
+	background:transparent url(lighting/right-darkblue.png) repeat-y top right;
+	width:15px;
 }
 
 .darkbluelighting_sw {
-	background:transparent url(lighting/bottom-left-darkblue.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-left-darkblue.png) no-repeat 0 0;
 	width:9px;
 	height:15px;
 }
 
 .darkbluelighting_s {
-	background:transparent url(lighting/bottom-middle-darkblue.png) repeat-x 0 0;			
+	background:transparent url(lighting/bottom-middle-darkblue.png) repeat-x 0 0;
 	height:15px;
 }
 
 .darkbluelighting_se, .darkbluelighting_sizer  {
-	background:transparent url(lighting/bottom-right-darkblue.png) no-repeat 0 0;			
+	background:transparent url(lighting/bottom-right-darkblue.png) no-repeat 0 0;
 	width:15px;
 	height:15px;
 }
 
 .darkbluelighting_sizer {
-	cursor:se-resize;	
+	cursor:se-resize;
 }
 
 .darkbluelighting_close {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-close-darkblue.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-close-darkblue.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:10px;
@@ -802,7 +802,7 @@
 .darkbluelighting_maximize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-maximize-darkblue.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-maximize-darkblue.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:25px;
@@ -813,7 +813,7 @@
 .darkbluelighting_minimize {
 	width:15px;
 	height:9px;
-	background:transparent url(lighting/button-minimize-darkblue.png) no-repeat 0 0;			
+	background:transparent url(lighting/button-minimize-darkblue.png) no-repeat 0 0;
 	position:absolute;
 	top:11px;
 	right:40px;
@@ -843,7 +843,7 @@
 
 /* For alert/confirm dialog */
 .darkbluelighting_window {
-	border:1px solid #F00;	
+	border:1px solid #F00;
 	background:#FFF;
 	padding:20px;
 	margin-left:auto;
@@ -891,67 +891,67 @@
 * html .darkbluelighting_nw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-left-darkblue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-left-darkblue.png", sizingMethod="crop");
 }
 
 * html .darkbluelighting_n {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-middle-darkblue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-middle-darkblue.png", sizingMethod="scale");
 }
 
 * html .darkbluelighting_ne {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/top-right-darkblue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/top-right-darkblue.png", sizingMethod="crop");
 }
 
 * html .darkbluelighting_w {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/left-darkblue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/left-darkblue.png", sizingMethod="scale");
 }
 
 * html .darkbluelighting_e {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/right-darkblue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/right-darkblue.png", sizingMethod="scale");
 }
 
 * html .darkbluelighting_sw {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-left-darkblue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-left-darkblue.png", sizingMethod="crop");
 }
 
 * html .darkbluelighting_s {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-middle-darkblue.png", sizingMethod="scale");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-middle-darkblue.png", sizingMethod="scale");
 }
 
 * html darkbluelighting_se, * html .darkbluelighting_sizer {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/bottom-right-darkblue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/bottom-right-darkblue.png", sizingMethod="crop");
 }
 
 * html .darkbluelighting_close {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-close-darkblue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-close-darkblue.png", sizingMethod="crop");
 }
 
 * html .darkbluelighting_minimize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-minimize-darkblue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-minimize-darkblue.png", sizingMethod="crop");
 }
 
 * html .darkbluelighting_maximize {
 	background-color: transparent;
 	background-image: none;
-	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="../themes/lighting/button-maximize-darkblue.png", sizingMethod="crop");
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="/stylesheets/prototype_window//lighting/button-maximize-darkblue.png", sizingMethod="crop");
 }
 
 * html .darkbluelighting_content {
