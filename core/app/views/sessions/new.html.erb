@@ -59,6 +59,12 @@ a:hover {
   position: absolute;
 }
 
+#bottom_line {
+  position: absolute;
+  height: 30px;
+  color: #ddeeee;
+}
+
 .wait_for_input {
   color: gray;
 }
@@ -119,16 +125,30 @@ a:hover {
   }
 
   function do_signup() {
-    var win = new Window({
-      className: "mac_os_x",
-      blurClassName: "blur_os_x",
-      title: "demo_win1",
-      width: 400,
-      height: 300,
-      top: 340,
-      left: 230
-    });
-    win.getContent().update("WTF!");
+    var panel = $("page");
+    var left_origin = (getWindowWidth() - panel.getWidth()) / 2;
+    var top_origin = (getWindowHeight() - panel.getHeight()) / 2;
+    
+    var win = $("signup_window");
+    
+    // TODO adjust top & left according to different browsers
+    // TODO fix: when signup form was closed once, open it again, and then we cannot close it
+    if (win == null) {
+      var win = new Window({
+        id: "signup_window",
+        className: "mac_os_x",
+        blurClassName: "blur_os_x",
+        title: "Sign up form",
+        width: 400,
+        height: 300,
+        top: top_origin + 70,
+        left: left_origin + 320,
+        minimizable: false,
+        maximizable: false,
+        resizable: false
+      });
+      win.getContent().update($("signup_form").innerHTML);
+    }
     win.show();
     Growl4Rails.showGrowl({
       image_path: "/images/rails.png",
@@ -155,6 +175,13 @@ a:hover {
     var logo = $("logo_holder");
     logo.setStyle("left:" + (left_origin + 50));
     logo.setStyle("top:" + (top_origin + 30));
+    
+    var bottom = $("bottom_line");
+    var bottom_margin = 10;
+    bottom.setStyle("width:" + (panel.getWidth() - bottom_margin * 2));
+    var page_border_width = 15;
+    bottom.setStyle("left:" + (left_origin + page_border_width + bottom_margin));
+    bottom.setStyle("top:" + (top_origin + panel.getHeight() + page_border_width - bottom.getHeight()));
   }
   
   window.onload = function() {
@@ -164,6 +191,7 @@ a:hover {
     
     $("page").show(); // prevents blinking
     $("logo_holder").show();
+    $("bottom_line").show();
     
     if (Prototype.Browser.IE) {
       // warning for ie
@@ -188,16 +216,18 @@ a:hover {
         if (field.hasClassName(default_class)) {
           field.value = ""; // clear default data, wait for user's input
         }
-        field.onkeydown = function(e) {
-          if (e.keyCode == 13) {  // 'enter'
-            do_login();
-          }
-          if (field.value != "") {
-            field.removeClassName(default_class);
-            field.removeClassName("wrong_input");
-          }
+        
+      }
+      field.onkeydown = function(e) {
+        if (e.keyCode == 13) {  // 'enter'
+          do_login();
+        }
+        if (field.value != "") {
+          field.removeClassName(default_class);
+          field.removeClassName("wrong_input");
         }
       }
+      
       // on lost focus, check if has user input
       field.onblur = function() {
         if (field.value == "") {
@@ -236,11 +266,25 @@ a:hover {
   <img src="/images/logo-medium.png" />
 </div>
 
+<div id="bottom_line" style="display: none;">
+<div style="position: absolute">&copy;2009 <a href="mailto:santa.zh@gmail.com">Santa Zhang</a></div>
+<div align="right" >
+  <a href="#" onclick="alert('TODO')">Documenation</a> &nbsp;
+  <a href="#" onclick="alert('TODO')">Plain Version</a> &nbsp;
+  <a href="#" onclick="alert('TODO')">Forum</a> &nbsp;
+  <a href="#" onclick="alert('TODO')">Nova on Github</a>
+</div>
+</div>
+
 <div id="ie_warning" style="display: none;">
 <font style="font-size: 20px">Warning: IE browser is not fully supported!</font>
 <p align="center">
 <a href="#" onclick="Dialog.okCallback(); return false" style="color: red; font-size: 20px;">OK</a>
 </p>
+</div>
+
+<div id="signup_form" style="display: none;">
+TODO: signup form
 </div>
 
 </body></html>
