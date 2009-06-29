@@ -43,14 +43,10 @@ a:hover {
 }
 
 #page {
+  position: absolute;
   background-color: gray;
   width: 750px;
-  margin: 0;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 0;
-  margin-bottom: auto;
-  padding: 0;
+  height: 400px;
 }
 
 .inputPlaceHolder {
@@ -89,8 +85,28 @@ a:hover {
       message: "Please <font color='red'><b>wait</b></font> for administrator's approval"
     });
   }
-
+  
+  function getWindowWidth() {
+    return window.innerWidth || (window.document.documentElement.clientWidth || window.document.body.clientWidth);
+  }
+  
+  function getWindowHeight() {
+    return window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight);
+  }
+  
+  // put the login panel to the center
+  function centerPanel() {
+    var panel = $("page");
+    panel.setStyle("left:" + (getWindowWidth() - panel.getWidth()) / 2);
+    panel.setStyle("top:" + (getWindowHeight() - panel.getHeight()) / 2);
+  }
+  
   window.onload = function() {
+    
+    window.onresize = centerPanel;
+    centerPanel();
+    
+    $("page").show(); // prevents blinking
 
     // required to setup iphone-like checkbox
     new iPhoneStyle('input[type=checkbox]', {
@@ -106,8 +122,8 @@ a:hover {
         animate:  true,
         width:    154,
         height:   11,
-        boxImage: 'images/bramus/custom1_box.gif',
-        barImage: 'images/bramus/custom1_bar.gif'
+        boxImage: '/images/bramus/custom1_box.gif',
+        barImage: '/images/bramus/custom1_bar.gif'
       }
     );
 
@@ -115,10 +131,10 @@ a:hover {
       $('progressbar_custom2'),
       52, {
         barImage: Array(
-          'images/bramus/percentImage_back4.png',
-          'images/bramus/percentImage_back3.png',
-          'images/bramus/percentImage_back2.png',
-          'images/bramus/percentImage_back1.png'
+          '/images/bramus/percentImage_back4.png',
+          '/images/bramus/percentImage_back3.png',
+          '/images/bramus/percentImage_back2.png',
+          '/images/bramus/percentImage_back1.png'
         ),
         onTick: function(pb) {
           switch (pb.getPercentage()) {
@@ -158,7 +174,7 @@ a:hover {
 </script>
 </head>
 <body>
-<div id="page">
+<div id="page" style="display: none;">
   <h1>Nova Login <%=h params[:error_msg] %> </h1>
 
   <% form_tag session_path, :id => 'login_form' do -%>
