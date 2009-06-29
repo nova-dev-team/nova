@@ -29,19 +29,18 @@ var iPhoneStyle = function(selector_or_elem, options) {
         onlabel   = elem.adjacent('.' + options.labelOnClass).first(),
         container = elem.up('.' + options.containerClass),
         rightside = container.getWidth() - 39;
-        
     
     container.observe('mouseup', function() {
-      var is_onstate = (elem.checked);
-    
-      new Effect.Tween(null, (is_onstate) ? 1 : 0, (is_onstate) ? 0 : 1, { duration: 0.2 }, function(p) { handle.setStyle({ left: p * rightside + 'px' }) });
+      var is_onstate = elem.checked;
+      
+      new Effect.Tween(null, (is_onstate) ? 1 : 0, (is_onstate) ? 0 : 1, {duration: 0.1}, function(p) { handle.setStyle({ left: p * rightside + 'px' }) });
       
       if (is_onstate) {
-        offlabel.appear({ duration: 0.2 });
-        onlabel.fade({ duration: 0.2 });
+        offlabel.appear({ duration: 0.1 });
+        onlabel.fade({ duration: 0.1 });
       } else {
-        offlabel.fade({ duration: 0.2 });
-        onlabel.appear({ duration: 0.2 });
+        offlabel.fade({ duration: 0.1 });
+        onlabel.appear({ duration: 0.1 });
       }
       
       elem.writeAttribute('checked', !is_onstate);
