@@ -8,3 +8,15 @@ Hi, I am <%=h current_user.login %>.
   var current_user_login = '<%= current_user.login %>';
 
 <% end -%>
+
+
+
+<% content_for :layout_left_frame do %>
+LEFT
+<% end -%>
+
+
+
+<% content_for :layout_center_frame do %>
+CENTER
+<% end -%>

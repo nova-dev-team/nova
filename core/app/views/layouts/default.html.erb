@@ -31,24 +31,20 @@ table {
   border-spacing: 0 0;
 }
 
-#layout_frame_container {
-  margin: 0;
-  padding: 0;
-  border-spacing: 0 0;
-}
-
 #layout_frame_top {
-  height: 90px;
+  position: absolute;
   background-color: #bbaabb;
-/*  border-bottom: 1px solid #bb6666;*/
+  top: 0px;
 }
 
 #layout_frame_left {
-  width: 300px;
+  position: absolute;
   background-color: gray;
+  left: 0px;
 }
 
 #layout_frame_center {
+  position: absolute;
   background-color: #555577;
 }
 
@@ -58,14 +54,17 @@ table {
 
 #layout_top_toggler {
   height: 5px;
+  left: 0px;
 }
 
 .layout_toggler {
   cursor: hand;
+  position: absolute;
+  background-color: red;
 }
 
-.layout_toggler_mouseout {
-  background-color: #ddeeee;
+.layout_toggler_normal {
+  background-color: #6688bb;
 }
 
 .layout_toggler_hover {
@@ -75,44 +74,129 @@ table {
 </style>
 <script type="text/javascript">
 
+
+  function getWindowWidth() {
+    return window.innerWidth || (window.document.documentElement.clientWidth || window.document.body.clientWidth);
+  }
+  
+  function getWindowHeight() {
+    return window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight);
+  }
+
   /* variables to layout page */
-  var g_layout_left_width;
-  var g_layout_top_height;
+  var g_layout_left_width = 300;
+  var g_layout_top_height = 90;
+  var g_layout_show_left = true;
+  var g_layout_show_top = true;
+  var g_layout_toggler_size = 5;
+  
+  function do_layout() {
+    var left_frame = $("layout_frame_left");
+    var top_frame = $("layout_frame_top");
+    var center_frame = $("layout_frame_center");
+    
+    var left_toggler = $("layout_left_toggler");
+    var top_toggler = $("layout_top_toggler");
+    
+    var page_width = getWindowWidth();
+    var page_height = getWindowHeight();
+
+    if (g_layout_show_left) {
+      
+      var top_offset;
+      if (g_layout_show_top) {
+        top_offset = g_layout_top_height + g_layout_toggler_size;
+      } else {
+        top_offset = g_layout_toggler_size;
+      }
+      
+      left_frame.setStyle("top:" + top_offset);
+      left_frame.setStyle("width:" + g_layout_left_width);
+      left_frame.setStyle("height: " + (page_height - top_offset));
+
+      center_frame.setStyle("top:" + top_offset);
+      center_frame.setStyle("left:" + (g_layout_left_width + g_layout_toggler_size));
+      center_frame.setStyle("height: " + (page_height - top_offset));
+      center_frame.setStyle("width: " + (page_width - g_layout_left_width - g_layout_toggler_size));
+      
+      top_toggler.setStyle("top:" + (top_offset - g_layout_toggler_size));
+      top_toggler.setStyle("width:" + page_width);
+      
+      left_toggler.setStyle("top:" + top_offset);
+      left_toggler.setStyle("left:" + g_layout_left_width);
+      left_toggler.setStyle("height:" + (page_height - top_offset));
+      
+    } else {
+
+      var top_offset;
+      if (g_layout_show_top) {
+        top_offset = g_layout_top_height + g_layout_toggler_size;
+      } else {
+        top_offset = g_layout_toggler_size;
+
+      }
+
+      center_frame.setStyle("top:" + top_offset);
+      center_frame.setStyle("left:" + g_layout_toggler_size);
+      center_frame.setStyle("width:" + (page_width - g_layout_toggler_size));
+      center_frame.setStyle("height:" + (page_height - top_offset));
+
+      top_toggler.setStyle("top:" + (top_offset - g_layout_toggler_size));
+      top_toggler.setStyle("width:" + page_width);
+      
+      left_toggler.setStyle("top:" + top_offset);
+      left_toggler.setStyle("left:0px");
+      left_toggler.setStyle("height:" + (page_height - top_offset));
+    }
+    
+    if (g_layout_show_left) {
+      left_frame.show();
+    } else {
+      left_frame.hide();
+    }
+    
+    if (g_layout_show_top) {
+      top_frame.setStyle("width:" + page_width);
+      top_frame.setStyle("height:" + g_layout_top_height);
+      top_frame.show();
+    } else {
+      top_frame.hide();
+    }
+    
+    center_frame.show();
+    
+    left_toggler.show();
+    top_toggler.show();
+  }
   
   
   window.onload = function() {
-    g_layout_left_width = parseInt($("layout_frame_left").getStyle("width"));
-    g_layout_top_height = parseInt($("layout_frame_top").getStyle("height"));
+  
+    window.onresize = do_layout;
+    do_layout();
     
-    <%= yield :current_user_info %>
-    
-    function install_layout_toggler(toggler, toggle_callback) {
+    function install_layout_toggler(toggler, click_callback) {
       toggler.observe('mouseover', function(e) {
-        toggler.removeClassName("layout_toggler_mouseout");
+        toggler.removeClassName("layout_toggler_normal");
         toggler.addClassName("layout_toggler_hover");
       });
       
       toggler.observe('mouseout', function(e) {
         toggler.removeClassName("layout_toggler_hover");
-        toggler.addClassName("layout_toggler_mouseout");
+        toggler.addClassName("layout_toggler_normal");
       });
       
-      toggler.observe('click', toggle_callback);
+      toggler.observe('click', click_callback);
     };
-    
+
     install_layout_toggler($('layout_left_toggler'), function() {
-      current_width = parseInt($("layout_frame_left").getStyle("width"));
-      // TODO layout toggling
-      if (current_width == g_layout_left_width) {
-        $("layout_frame_left").setStyle("width", "0");
-        $("layout_frame_left").setStyle("display", "none");
-      } else {
-        $("layout_frame_left").setStyle("width", g_layout_left_width);
-      }
+      g_layout_show_left = !g_layout_show_left;
+      do_layout();
     });
     
     install_layout_toggler($('layout_top_toggler'), function() {
-      current_height = parseInt($("layout_top_toggler").getStyle("height"));
+      g_layout_show_top = !g_layout_show_top;
+      do_layout();
     });
   }
 
@@ -121,18 +205,12 @@ table {
 </head>
 </body>
 
-<table height="100%" width="100%" id="layout_frame_container"><tr><td colspan=3 id="layout_frame_top">
-  <!-- TOP FRAME -->
-  <table width="100%" height="100%"><tr>
-    <td width=170 height="100%" align="center"><img src="/images/logo-small.png"></img></td>
-    <td height="100%" style="background-color: #6688bb;" ><div id="div_current_user_info">TITLE</div></img></td>
-    <td width=170 style="background-color: #aabbbb;" height="100%"><div id="div_current_user_info">CURRENT USER INFO</div></img></td>
-  </tr></table>
-</td></tr><tr><td id="layout_top_toggler" class="layout_toggler layout_toggler_mouseout" colspan=3></td></tr><tr><td id="layout_frame_left">
-  LEFT
-</td><td id="layout_left_toggler" class="layout_toggler"></td><td id="layout_frame_center">
-  CENTER
-</td></tr></table>
+<div id="layout_top_toggler" style="display: none;" class="layout_toggler layout_toggler_normal"></div>
+<div id="layout_left_toggler" style="display: none;" class="layout_toggler layout_toggler_normal"></div>
+
+<div id="layout_frame_top" style="display: none;"></div>
+<div id="layout_frame_left" style="display: none;"><%= yield :layout_left_frame %></div>
+<div id="layout_frame_center" style="display: none;"><%= yield :layout_center_frame %></div>
 
 </body></html>
 
