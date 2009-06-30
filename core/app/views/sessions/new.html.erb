@@ -185,66 +185,72 @@ html>body #page {
     decorate_field($('signup_email'), "6~40 characters", "wait_for_input");
     decorate_field($('signup_fullname'), "<= 100 characters", "wait_for_input");
     decorate_field($('signup_verification'), "what's in the picture?", "wait_for_input");
-
-    var signup_password = $('signup_password');
-    var signup_password_confirm = $('signup_password_confirm');
     
-    signup_password.value = "6~40 characters";
-    signup_password.addClassName("wait_for_input");
+    if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
+      // if its not IE or Opera, try to make the signup UI more beautiful
     
-    signup_password.observe('focus', function() {
-      signup_password.setAttribute("type", "password");
-      if (signup_password.hasClassName("wait_for_input")) {
-        signup_password.value = ""; // clear default data, wait for user's input
-      }
-    });
-    
-    signup_password.observe('keypress', function(e) {
-      if (signup_password.value != "" || e.charCode != 0) {
-        signup_password.removeClassName("wait_for_input");
-        
-        signup_password.removeClassName("wrong_input");
-        signup_password_confirm.removeClassName("wrong_input");
-      }
-    });
-    
-    signup_password.observe('blur', function() {
-      if (signup_password.value == "") {
-        signup_password.setAttribute("type", "text");
-        signup_password.value = "6~40 characters";
-        signup_password.addClassName("wait_for_input");
-      }
-    });
-    
-    // =========================================================
-    
-    signup_password_confirm.value = "same as above";
-    signup_password_confirm.addClassName("wait_for_input");
-    
-    signup_password_confirm.observe('focus', function() {
-      signup_password_confirm.setAttribute("type", "password");
-      if (signup_password_confirm.hasClassName("wait_for_input")) {
-        signup_password_confirm.value = ""; // clear default data, wait for user's input
-      }
-    });
-    
-    signup_password_confirm.observe('keypress', function(e) {
-      if (signup_password_confirm.value != "" || e.charCode != 0) {
-        signup_password_confirm.removeClassName("wait_for_input");
-        
-        signup_password.removeClassName("wrong_input");
-        signup_password_confirm.removeClassName("wrong_input");
-      }
-    });
-    
-    signup_password_confirm.observe('blur', function() {
-      if (signup_password_confirm.value == "") {
-        signup_password_confirm.setAttribute("type", "text");
-        signup_password_confirm.value = "same as above";
-        signup_password_confirm.addClassName("wait_for_input");
-      }
-    });
-    
+      var signup_password = $('signup_password');
+      var signup_password_confirm = $('signup_password_confirm');
+      
+      signup_password.setAttribute("type", "text");
+      signup_password_confirm.setAttribute("type", "text");
+      
+      signup_password.value = "6~40 characters";
+      signup_password.addClassName("wait_for_input");
+      
+      signup_password.observe('focus', function() {
+        signup_password.setAttribute("type", "password");
+        if (signup_password.hasClassName("wait_for_input")) {
+          signup_password.value = ""; // clear default data, wait for user's input
+        }
+      });
+      
+      signup_password.observe('keypress', function(e) {
+        if (signup_password.value != "" || e.charCode != 0) {
+          signup_password.removeClassName("wait_for_input");
+          
+          signup_password.removeClassName("wrong_input");
+          signup_password_confirm.removeClassName("wrong_input");
+        }
+      });
+      
+      signup_password.observe('blur', function() {
+        if (signup_password.value == "") {
+          signup_password.setAttribute("type", "text");
+          signup_password.value = "6~40 characters";
+          signup_password.addClassName("wait_for_input");
+        }
+      });
+      
+      
+      
+      signup_password_confirm.value = "same as above";
+      signup_password_confirm.addClassName("wait_for_input");
+      
+      signup_password_confirm.observe('focus', function() {
+        signup_password_confirm.setAttribute("type", "password");
+        if (signup_password_confirm.hasClassName("wait_for_input")) {
+          signup_password_confirm.value = ""; // clear default data, wait for user's input
+        }
+      });
+      
+      signup_password_confirm.observe('keypress', function(e) {
+        if (signup_password_confirm.value != "" || e.charCode != 0) {
+          signup_password_confirm.removeClassName("wait_for_input");
+          
+          signup_password.removeClassName("wrong_input");
+          signup_password_confirm.removeClassName("wrong_input");
+        }
+      });
+      
+      signup_password_confirm.observe('blur', function() {
+        if (signup_password_confirm.value == "") {
+          signup_password_confirm.setAttribute("type", "text");
+          signup_password_confirm.value = "same as above";
+          signup_password_confirm.addClassName("wait_for_input");
+        }
+      });
+    }
   }
   
   function getWindowWidth() {
@@ -553,7 +559,7 @@ We suggest the following browsers:<br />
   <a class="ie_warning_style_ahref" href="http://firefox.com">Firefox</a>,
   <a class="ie_warning_style_ahref" href="http://google.com/chrome">Google Chrome</a>,
   <a class="ie_warning_style_ahref" href="http://apple.com/safari">Safari</a>,
-  <a class="ie_warning_style_ahref" href="http://opera.com">Opera</a>.
+  and <a class="ie_warning_style_ahref" href="http://opera.com">Opera</a>.
 <br />
 <button type="button" class="btn" onclick="Dialog.okCallback(); return false"><span><span>Close warning</span></span></button>
 </p>
@@ -570,12 +576,12 @@ We suggest the following browsers:<br />
     <tr>
       <td>Password *</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="text" id="signup_password" /></td>
+      <td><input type="password" id="signup_password" /></td>
     </tr>
     <tr>
       <td>Confirm Password *</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="text" id="signup_password_confirm" /></td>
+      <td><input type="password" id="signup_password_confirm" /></td>
     </tr>
     <tr>
       <td>Email Address *</td>
