@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>Welcome, <%=h current_user.name != "" ? current_user.name : current_user.login %></title>
+
+<link href="/stylesheets/prototype_window/default.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/prototype_window/mac_os_x.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/custom_buttons.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/javascripts/prototype.js"> </script>
+<script type="text/javascript" src="/javascripts/effects.js"> </script>
+<script type="text/javascript" src="/javascripts/prototype_window/window.js"> </script>
+<script type="text/javascript" src="/javascripts/prototype_window/window_effects.js"> </script>
+
+<%= growl4rails_includes %>
+<style type="text/css" media="screen">
+
+body {
+  position: absolute;
+  margin: 0;
+  margin-bottom: 25px;
+  padding: 0;
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 13px;
+  color: #333;
+  height: 100%;
+  width: 100%;
+}
+
+table {
+  margin: 0;
+  padding: 0;
+  border-spacing: 0 0;
+}
+
+#layout_frame_container {
+  margin: 0;
+  padding: 0;
+  border-spacing: 0 0;
+}
+
+#layout_frame_top {
+  height: 90px;
+  background-color: #bbaabb;
+/*  border-bottom: 1px solid #bb6666;*/
+}
+
+#layout_frame_left {
+  width: 300px;
+  background-color: gray;
+}
+
+#layout_frame_center {
+  background-color: #555577;
+}
+
+#layout_left_toggler {
+  width: 5px;
+}
+
+#layout_top_toggler {
+  height: 5px;
+}
+
+.layout_toggler {
+  cursor: hand;
+}
+
+.layout_toggler_mouseout {
+  background-color: #ddeeee;
+}
+
+.layout_toggler_hover {
+  background-color: #555577;
+}
+
+</style>
+<script type="text/javascript">
+
+  /* variables to layout page */
+  var g_layout_left_width;
+  var g_layout_top_height;
+  
+  
+  window.onload = function() {
+    g_layout_left_width = parseInt($("layout_frame_left").getStyle("width"));
+    g_layout_top_height = parseInt($("layout_frame_top").getStyle("height"));
+    
+    <%= yield :current_user_info %>
+    
+    function install_layout_toggler(toggler, toggle_callback) {
+      toggler.observe('mouseover', function(e) {
+        toggler.removeClassName("layout_toggler_mouseout");
+        toggler.addClassName("layout_toggler_hover");
+      });
+      
+      toggler.observe('mouseout', function(e) {
+        toggler.removeClassName("layout_toggler_hover");
+        toggler.addClassName("layout_toggler_mouseout");
+      });
+      
+      toggler.observe('click', toggle_callback);
+    };
+    
+    install_layout_toggler($('layout_left_toggler'), function() {
+      current_width = parseInt($("layout_frame_left").getStyle("width"));
+      // TODO layout toggling
+      if (current_width == g_layout_left_width) {
+        $("layout_frame_left").setStyle("width", "0");
+        $("layout_frame_left").setStyle("display", "none");
+      } else {
+        $("layout_frame_left").setStyle("width", g_layout_left_width);
+      }
+    });
+    
+    install_layout_toggler($('layout_top_toggler'), function() {
+      current_height = parseInt($("layout_top_toggler").getStyle("height"));
+    });
+  }
+
+</script>
+
+</head>
+</body>
+
+<table height="100%" width="100%" id="layout_frame_container"><tr><td colspan=3 id="layout_frame_top">
+  <!-- TOP FRAME -->
+  <table width="100%" height="100%"><tr>
+    <td width=170 height="100%" align="center"><img src="/images/logo-small.png"></img></td>
+    <td height="100%" style="background-color: #6688bb;" ><div id="div_current_user_info">TITLE</div></img></td>
+    <td width=170 style="background-color: #aabbbb;" height="100%"><div id="div_current_user_info">CURRENT USER INFO</div></img></td>
+  </tr></table>
+</td></tr><tr><td id="layout_top_toggler" class="layout_toggler layout_toggler_mouseout" colspan=3></td></tr><tr><td id="layout_frame_left">
+  LEFT
+</td><td id="layout_left_toggler" class="layout_toggler"></td><td id="layout_frame_center">
+  CENTER
+</td></tr></table>
+
+</body></html>
+

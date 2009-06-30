@@ -30,7 +30,7 @@ class SessionsController < ApplicationController
         else
           respond_to do |accept|
             accept.json {
-              render :text => {:success => true, :message => "You are logged in"}.to_json
+              render :json => {:success => true, :message => "You are logged in"}
             }
           end
         end
@@ -40,7 +40,7 @@ class SessionsController < ApplicationController
         @remember_me = params[:remember_me]
         respond_to do |accept|
           accept.json {
-            render :text => {:success => false, :message => "'#{params[:login]}' is not activated"}.to_json
+            render :json => {:success => false, :message => "'#{params[:login]}' is not activated"}
           }
         end
       end
@@ -50,7 +50,7 @@ class SessionsController < ApplicationController
       @remember_me = params[:remember_me]
       respond_to do |accept|
         accept.json {
-          render :text => {:success => false, :message => "incorrect login for '#{params[:login]}', check your username and password"}.to_json
+          render :json => {:success => false, :message => "incorrect login for '#{params[:login]}', check your username and password"}
         }
       end
     end

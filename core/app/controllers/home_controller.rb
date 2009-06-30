@@ -4,6 +4,7 @@ class HomeController < ApplicationController
 
   # enable index.html
   def index
+    render :template => 'home/user.html.erb', :layout => 'default'
   end
 
 private

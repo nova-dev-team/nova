@@ -21,7 +21,7 @@ class UsersController < ApplicationController
       
       respond_to do |accept|
         accept.json {
-          render :text => {:success => true, :message => "Your account has been registered. Please wait for administrator's approval."}.to_json
+          render :json => {:success => true, :message => "Your account has been registered. Please wait for administrator's approval."}
         }
       end
       
@@ -32,8 +32,9 @@ class UsersController < ApplicationController
       ## render :action => 'new'
       respond_to do |accept|
         accept.json {
-          render :text => {:success => false, :message => "Your account could not be created."}.to_json
+          render :json => {:success => false, :message => "Your account could not be created."}
         }
+      ## TODO add render :xml => {blah-blah-blah}
       end
     end
   end
@@ -50,7 +51,7 @@ class UsersController < ApplicationController
     end
     respond_to do |accept|
       accept.json {
-        render :text => "hi".to_json
+        render :json => "hi"
       }
     end
   end

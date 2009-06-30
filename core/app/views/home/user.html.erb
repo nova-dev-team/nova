@@ -1,0 +1,10 @@
+Hi, I am <%=h current_user.login %>.
+<%= link_to 'Logout', "/logout" %>
+
+<% content_for :current_user_info do %>
+
+  var current_user_email = '<%= current_user.email %>';
+  var current_user_fullname = '<%= current_user.name %>';
+  var current_user_login = '<%= current_user.login %>';
+
+<% end -%>
