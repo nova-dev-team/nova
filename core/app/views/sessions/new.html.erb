@@ -147,10 +147,10 @@ a:hover {
         className: "mac_os_x",
         blurClassName: "blur_os_x",
         title: "Sign up form",
-        width: 400,
+        width: 440,
         height: 350,
         top: parseInt(logo.getStyle("top")) + 30,
-        left: parseInt(logo.getStyle("left")) + 250,
+        left: parseInt(logo.getStyle("left")) + 220,
         minimizable: false,
         maximizable: false,
         resizable: false,
@@ -160,10 +160,24 @@ a:hover {
       win.show();
     }
     
-    decorate_field($('signup_user_id'), "3~40 chars", "wait_for_input");
-    decorate_field($('signup_email'), "6~40 chars", "wait_for_input");
-    decorate_field($('signup_fullname'), "<100 chars", "wait_for_input");
+    decorate_field($('signup_user_id'), "3~40 characters", "wait_for_input");
+    decorate_field($('signup_email'), "6~40 characters", "wait_for_input");
+    decorate_field($('signup_fullname'), "maximum 100 characters", "wait_for_input");
     decorate_field($('signup_verification'), "so what did you see?", "wait_for_input");
+    
+    $('signup_password').observe('keypress', function(e) {
+      if ($('signup_password').value != "" || e.charCode != 0) {
+        $('signup_password').removeClassName("wrong_input");
+        $('signup_password_confirm').removeClassName("wrong_input");
+      }
+    });
+    
+    $('signup_password_confirm').observe('keypress', function(e) {
+      if ($('signup_password_confirm').value != "" || e.charCode != 0) {
+        $('signup_password').removeClassName("wrong_input");
+        $('signup_password_confirm').removeClassName("wrong_input");
+      }
+    });
   }
   
   function getWindowWidth() {
@@ -181,7 +195,6 @@ a:hover {
   
   // put the login panel to the center
   function do_layout() {  
-    // TODO FIXME resize bug
 
     var page_border_width = 15;
 
@@ -227,7 +240,6 @@ a:hover {
       bottom.setStyle("left:" + (left_origin + page_border_width + bottom_margin));
       bottom.setStyle("top:" + (top_origin + panel.getHeight() + page_border_width - bottom.getHeight()));
     }
-//    alert((left_origin + page_border_width + bottom_margin) + " " +(top_origin + panel.getHeight() + page_border_width - bottom.getHeight()));
   }
   
   function decorate_field(field, default_text, default_class) {
@@ -241,10 +253,6 @@ a:hover {
     
     // field.onkeydown = funciton(e) {blah-blah-blah-} does not work on IE, so I have to use prototype.observe
     field.observe('keypress', function(e) {
-      if (e.keyCode == Event.KEY_RETURN) {
-        do_login();
-      }
-      
       if (field.value != "" || e.charCode != 0) {
         field.removeClassName(default_class);
         field.removeClassName("wrong_input");
@@ -261,6 +269,84 @@ a:hover {
   }
   
   function validate_signup() {
+    
+    var signup_user_id = $("signup_user_id");
+    var signup_password = $("signup_password");
+    var signup_password_confirm = $("signup_password_confirm");
+    var signup_email = $("signup_email");
+    var signup_verification = $("signup_verification");
+    var signup_fullname = $("signup_fullname");
+    
+    function signup_error(msg) {
+      Growl4Rails.showGrowl({
+        image_path: "/images/error.png",
+        title: "Incorrect signup information",
+        message: msg
+      });
+    }
+    
+    if (signup_user_id.hasClassName("wait_for_input")) {
+      signup_error("Please provide a user ID");
+      signup_user_id.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_user_id.value == "" || signup_user_id.value.length < 3 || signup_user_id.value.length > 40) {
+      signup_error("User ID should have 3~40 characters");
+      signup_user_id.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_password.hasClassName("wait_for_input")) {
+      signup_error("Please provide a password");
+      signup_password.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_password.value == "" || signup_password.value.length < 6 || signup_password.value.length > 40) {
+      signup_error("Password should have 6~40 characters");
+      signup_password.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_password.value != signup_password_confirm.value) {
+      signup_error("Your password does not match");
+      signup_password.addClassName("wrong_input");
+      signup_password_confirm.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_fullname.value != "" && signup_fullname.value.length > 100) {
+      signup_error("Full name cannot exceed 100 characters");
+      signup_fullname.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_verification.hasClassName("wait_for_input")) {
+      signup_error("Don't forget the verification code");
+      signup_verification.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_email.hasClassName("wait_for_input")) {
+      signup_error("Please provide your email address");
+      signup_email.addClassName("wrong_input");
+      return false;
+    }
+    
+    if (signup_email.value == "" || signup_email.value.length < 6 || signup_email.value.length > 40) {
+      signup_error("Email address should have 6~40 characters");
+      signup_email.addClassName("wrong_input");
+      return false;
+    }
+    
+    var email_regex = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+    if(email_regex.test(signup_email.value) == false) {
+      signup_error("Invalid email address");
+      signup_email.addClassName("wrong_input");
+      return false;
+    }
+    
     return true;
   }
   
@@ -268,10 +354,13 @@ a:hover {
     if (validate_signup() == false)
       return;
     
+    // prevent sending twice when user double-click "sign up" button
+    $("btn_send_signup").onclick = function() {};
+    
     Growl4Rails.showGrowl({
-      image_path: "/images/rails.png",
+      image_path: "/images/smile.png",
       title: "Registration data sent",
-      message: "Please <font color='red'><b>wait</b></font> for administrator's approval"
+      message: "Please wait for administrator's approval"
     });
     Windows.close("signup_window");
   }
@@ -297,6 +386,17 @@ a:hover {
 
     decorate_field($('login'), "User ID", "wait_for_input");
     decorate_field($('password'), "password", "wait_for_input");
+    
+    $('login').observe('keypress', function(e) {
+      if (e.keyCode == Event.KEY_RETURN) {
+        do_login();
+      }
+    });
+    $('password').observe('keypress', function(e) {
+      if (e.keyCode == Event.KEY_RETURN) {
+        do_login();
+      }
+    });
   }
 </script>
 </head>
@@ -378,20 +478,20 @@ We suggest the following browsers:<br />
       <td><input type="text" id="signup_fullname" /></td>
     </tr>
     <tr>
-      <td>Verification <img src="/misc/verification_image.png" /> * </td>
+      <td><img src="/misc/verification_image.png" /></td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
       <td><input type="text" id="signup_verification" /></td>
     </tr>
     <tr>
       <td colspan=3>
         <font style="font-size:10px">Fields with * is required<br />
-        Allowed user id chars include: a-z, 0-9, '.' and '_' (must start with a-z)</font>
+        Allowed user id characters include: a-z, 0-9, '.' and '_' (must start with a-z)</font>
       </td>
     </tr>
   </table>
   </p>
   <p align="center">
-  <button type="button" class="btn" onclick="send_signup()"><span><span>Sign up!</span></span></button>
+  <button id="btn_send_signup" type="button" class="btn" onclick="send_signup()"><span><span>Sign up!</span></span></button>
   </p>
 </div>
 

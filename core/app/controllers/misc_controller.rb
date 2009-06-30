@@ -1,12 +1,9 @@
 ## class that handles miscellaneous actions
 class MiscController < ApplicationController
 
-  # TODO creats a verification image
+  # TODO creat a verification image
   def verification_image
-    
-    send_file RAILS_ROOT + "/public/images/check10x10.gif", :type => "image/gif", :filename => "a.gif", :disposition => 'inline'
-
-
+    send_file RAILS_ROOT + "/tmp/v.jpg", :type => "image/jpeg", :filename => "v.jpg", :disposition => 'inline'
   end
 
   def hi

@@ -6,3 +6,4 @@ core/doc
 # core/config/database.yml
 *~
 core/db/*.sqlite3
+tmp/
