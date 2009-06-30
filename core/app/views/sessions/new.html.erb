@@ -6,6 +6,7 @@
 
 <link href="/stylesheets/prototype_window/default.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/prototype_window/mac_os_x.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/custom_buttons.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/javascripts/prototype.js"> </script>
 <script type="text/javascript" src="/javascripts/effects.js"> </script>
 <script type="text/javascript" src="/javascripts/prototype_window/window.js"> </script>
@@ -125,15 +126,9 @@ a:hover {
   }
 
   function do_signup() {
-    var panel = $("page");
-    var left_origin = (getWindowWidth() - panel.getWidth()) / 2;
-    var top_origin = (getWindowHeight() - panel.getHeight()) / 2;
+    var logo = $("logo_holder");
     
-    var win = $("signup_window");
-    
-    // TODO adjust top & left according to different browsers
-    // TODO fix: when signup form was closed once, open it again, and then we cannot close it
-    if (win == null) {
+    if ($("signup_window") == null) {
       var win = new Window({
         id: "signup_window",
         className: "mac_os_x",
@@ -141,20 +136,20 @@ a:hover {
         title: "Sign up form",
         width: 400,
         height: 300,
-        top: top_origin + 70,
-        left: left_origin + 320,
+        top: parseInt(logo.getStyle("top")) + 30,
+        left: parseInt(logo.getStyle("left")) + 250,
         minimizable: false,
         maximizable: false,
-        resizable: false
+        resizable: false,
+        destroyOnClose: true
       });
       win.getContent().update($("signup_form").innerHTML);
+      win.show();
     }
-    win.show();
-    Growl4Rails.showGrowl({
-      image_path: "/images/rails.png",
-      title: "Registration data sent",
-      message: "Please <font color='red'><b>wait</b></font> for administrator's approval"
-    });
+    
+    decorate_field($('signup_user_id'), "3~40 chars", "wait_for_input");
+    decorate_field($('signup_email'), "6~40 chars", "wait_for_input");
+    decorate_field($('signup_fullname'), "<100 chars", "wait_for_input");
   }
   
   function getWindowWidth() {
@@ -184,6 +179,49 @@ a:hover {
     bottom.setStyle("top:" + (top_origin + panel.getHeight() + page_border_width - bottom.getHeight()));
   }
   
+  function decorate_field(field, default_text, default_class) {
+    field.value = default_text;
+    field.addClassName(default_class);
+    field.onclick = function () {
+      if (field.hasClassName(default_class)) {
+        field.value = ""; // clear default data, wait for user's input
+      }
+    }
+    field.onkeydown = function(e) {
+      if (e.keyCode == 13) {  // 'enter'
+        do_login();
+      }
+      if (field.value != "") {
+        field.removeClassName(default_class);
+        field.removeClassName("wrong_input");
+      }
+    }
+    
+    // on lost focus, check if has user input
+    field.onblur = function() {
+      if (field.value == "") {
+        field.value = default_text;
+        field.addClassName(default_class);
+      }
+    }
+  }
+  
+  function validate_signup() {
+    return true;
+  }
+  
+  function send_signup() {
+    if (validate_signup() == false)
+      return;
+    
+    Growl4Rails.showGrowl({
+      image_path: "/images/rails.png",
+      title: "Registration data sent",
+      message: "Please <font color='red'><b>wait</b></font> for administrator's approval"
+    });
+    Windows.close("signup_window");
+  }
+  
   window.onload = function() {
     
     window.onresize = do_layout;
@@ -203,41 +241,8 @@ a:hover {
       });
     }
 
-    var login_field = $('login');
-    login_field.value = "username";
-
-    var password_field = $('password');
-    password_field.value = "password";
-    
-    function decorate_field(field, default_text, default_class) {
-      field.value = default_text;
-      field.addClassName(default_class);
-      field.onclick = function () {
-        if (field.hasClassName(default_class)) {
-          field.value = ""; // clear default data, wait for user's input
-        }
-        
-      }
-      field.onkeydown = function(e) {
-        if (e.keyCode == 13) {  // 'enter'
-          do_login();
-        }
-        if (field.value != "") {
-          field.removeClassName(default_class);
-          field.removeClassName("wrong_input");
-        }
-      }
-      
-      // on lost focus, check if has user input
-      field.onblur = function() {
-        if (field.value == "") {
-          field.value = default_text;
-          field.addClassName(default_class);
-        }
-      }
-    }
-    decorate_field(login_field, "username", "wait_for_input");
-    decorate_field(password_field, "password", "wait_for_input");
+    decorate_field($('login'), "User ID", "wait_for_input");
+    decorate_field($('password'), "password", "wait_for_input");
   }
 
 </script>
@@ -271,8 +276,10 @@ a:hover {
 <div align="right" >
   <a href="#" onclick="alert('TODO')">Documenation</a> &nbsp;
   <a href="#" onclick="alert('TODO')">Plain Version</a> &nbsp;
+<!--
   <a href="#" onclick="alert('TODO')">Forum</a> &nbsp;
-  <a href="#" onclick="alert('TODO')">Nova on Github</a>
+-->
+  <a href="http://github.com/santazhang/nova">Nova on Github</a>
 </div>
 </div>
 
@@ -284,7 +291,43 @@ a:hover {
 </div>
 
 <div id="signup_form" style="display: none;">
-TODO: signup form
+  <p align="center">
+  <table>
+    <tr>
+      <td>User ID *</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="signup_user_id" /></td>
+    </tr>
+    <tr>
+      <td>Password *</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="password" id="signup_password" /></td>
+    </tr>
+    <tr>
+      <td>Confirm Password *</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="password" id="signup_password_confirm" /></td>
+    </tr>
+    <tr>
+      <td>Email Address *</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="signup_email" /></td>
+    </tr>
+    <tr>
+      <td>Full Name</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="signup_fullname" /></td>
+    </tr>
+    <tr>
+    <td colspan=3>
+      <font style="font-size:10px">Fields with * is required</font>
+    </td>
+    </tr>
+  </table>
+  </p>
+  <p align="center">
+  <buttontype="button" class="btn" onclick="send_signup()"><span><span>Sign up!</span></span></button>
+  </p>
 </div>
 
 </body></html>
