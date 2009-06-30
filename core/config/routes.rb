@@ -17,6 +17,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.home '', :controller => 'home', :action => 'index'
 
+  map.connect 'misc/verification_image.:format', :controller => 'misc', :action => 'verification_image'
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

@@ -42,6 +42,19 @@ a:hover {
   background-color: #6688bb;
 }
 
+.ie_warning_style {
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 13px;
+}
+
+.ie_warning_style_ahref {
+  color: #667788
+}
+
+.ie_warning_style_ahref:hover {
+  color: white
+}
+
 #page {
   position: absolute;
   background-image: url(/images/bg.jpg);
@@ -135,7 +148,7 @@ a:hover {
         blurClassName: "blur_os_x",
         title: "Sign up form",
         width: 400,
-        height: 300,
+        height: 350,
         top: parseInt(logo.getStyle("top")) + 30,
         left: parseInt(logo.getStyle("left")) + 250,
         minimizable: false,
@@ -150,6 +163,7 @@ a:hover {
     decorate_field($('signup_user_id'), "3~40 chars", "wait_for_input");
     decorate_field($('signup_email'), "6~40 chars", "wait_for_input");
     decorate_field($('signup_fullname'), "<100 chars", "wait_for_input");
+    decorate_field($('signup_verification'), "so what did you see?", "wait_for_input");
   }
   
   function getWindowWidth() {
@@ -160,11 +174,41 @@ a:hover {
     return window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight);
   }
   
+  
+  /* a hack to fix resizing bug 090630 */
+  var _page_width;
+  var _page_height;
+  
   // put the login panel to the center
-  function do_layout() {
+  function do_layout() {  
+    // TODO FIXME resize bug
+
+    var page_border_width = 15;
+
     var panel = $("page");
+
+
+    /* a hack to fix resizing bug 090630 */    
+    var _resizing_fix_090630 = false;
+    
+    if (_page_width == null) {
+      _page_width = panel.getWidth();
+    }
+    if (_page_height == null) {
+      _page_height = panel.getHeight();
+    }
+    if (_page_width != panel.getWidth() || _page_height != panel.getHeight()) {
+      _resizing_fix_090630 = true;
+    }
+    
     var left_origin = (getWindowWidth() - panel.getWidth()) / 2;
     var top_origin = (getWindowHeight() - panel.getHeight()) / 2;
+    
+    if (_resizing_fix_090630) {
+      left_origin += page_border_width;
+      top_origin += page_border_width;
+    }
+    
     panel.setStyle("left:" + left_origin);
     panel.setStyle("top:" + top_origin);
     var logo = $("logo_holder");
@@ -173,10 +217,17 @@ a:hover {
     
     var bottom = $("bottom_line");
     var bottom_margin = 10;
-    bottom.setStyle("width:" + (panel.getWidth() - bottom_margin * 2));
-    var page_border_width = 15;
-    bottom.setStyle("left:" + (left_origin + page_border_width + bottom_margin));
-    bottom.setStyle("top:" + (top_origin + panel.getHeight() + page_border_width - bottom.getHeight()));
+    
+    if (_resizing_fix_090630) {
+      bottom.setStyle("width:" + (panel.getWidth() - (bottom_margin + page_border_width) * 2));
+      bottom.setStyle("left:" + (left_origin + page_border_width + bottom_margin));
+      bottom.setStyle("top:" + (top_origin + panel.getHeight() + page_border_width - bottom.getHeight() - 2 * page_border_width));
+    } else {
+      bottom.setStyle("width:" + (panel.getWidth() - bottom_margin * 2));
+      bottom.setStyle("left:" + (left_origin + page_border_width + bottom_margin));
+      bottom.setStyle("top:" + (top_origin + panel.getHeight() + page_border_width - bottom.getHeight()));
+    }
+//    alert((left_origin + page_border_width + bottom_margin) + " " +(top_origin + panel.getHeight() + page_border_width - bottom.getHeight()));
   }
   
   function decorate_field(field, default_text, default_class) {
@@ -186,16 +237,19 @@ a:hover {
       if (field.hasClassName(default_class)) {
         field.value = ""; // clear default data, wait for user's input
       }
-    }
-    field.onkeydown = function(e) {
-      if (e.keyCode == 13) {  // 'enter'
+    };
+    
+    // field.onkeydown = funciton(e) {blah-blah-blah-} does not work on IE, so I have to use prototype.observe
+    field.observe('keypress', function(e) {
+      if (e.keyCode == Event.KEY_RETURN) {
         do_login();
       }
-      if (field.value != "") {
+      
+      if (field.value != "" || e.charCode != 0) {
         field.removeClassName(default_class);
         field.removeClassName("wrong_input");
       }
-    }
+    });
     
     // on lost focus, check if has user input
     field.onblur = function() {
@@ -203,7 +257,7 @@ a:hover {
         field.value = default_text;
         field.addClassName(default_class);
       }
-    }
+    };
   }
   
   function validate_signup() {
@@ -230,11 +284,11 @@ a:hover {
     $("page").show(); // prevents blinking
     $("logo_holder").show();
     $("bottom_line").show();
-    
+
     if (Prototype.Browser.IE) {
       // warning for ie
       Dialog._openDialog($("ie_warning").innerHTML, {
-        width: 300,
+        width: 400,
         id: "ie_warning_win",
         className: "mac_os_x",
         blurClassName: "blur_os_x"
@@ -244,7 +298,6 @@ a:hover {
     decorate_field($('login'), "User ID", "wait_for_input");
     decorate_field($('password'), "password", "wait_for_input");
   }
-
 </script>
 </head>
 <body>
@@ -284,9 +337,15 @@ a:hover {
 </div>
 
 <div id="ie_warning" style="display: none;">
-<font style="font-size: 20px">Warning: IE browser is not fully supported!</font>
-<p align="center">
-<a href="#" onclick="Dialog.okCallback(); return false" style="color: red; font-size: 20px;">OK</a>
+<p align="center" class="ie_warning_style">
+Warning: IE browser is not fully supported!<br />
+We suggest the following browsers:<br />
+  <a class="ie_warning_style_ahref" href="http://firefox.com">Firefox</a>,
+  <a class="ie_warning_style_ahref" href="http://google.com/chrome">Google Chrome</a>,
+  <a class="ie_warning_style_ahref" href="http://apple.com/safari">Safari</a>,
+  <a class="ie_warning_style_ahref" href="http://opera.com">Opera</a>.
+<br />
+<button type="button" class="btn" onclick="Dialog.okCallback(); return false"><span><span>Close warning</span></span></button>
 </p>
 </div>
 
@@ -319,14 +378,20 @@ a:hover {
       <td><input type="text" id="signup_fullname" /></td>
     </tr>
     <tr>
-    <td colspan=3>
-      <font style="font-size:10px">Fields with * is required</font>
-    </td>
+      <td>Verification <img src="/misc/verification_image.png" /> * </td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="signup_verification" /></td>
+    </tr>
+    <tr>
+      <td colspan=3>
+        <font style="font-size:10px">Fields with * is required<br />
+        Allowed user id chars include: a-z, 0-9, '.' and '_' (must start with a-z)</font>
+      </td>
     </tr>
   </table>
   </p>
   <p align="center">
-  <buttontype="button" class="btn" onclick="send_signup()"><span><span>Sign up!</span></span></button>
+  <button type="button" class="btn" onclick="send_signup()"><span><span>Sign up!</span></span></button>
   </p>
 </div>
 
