@@ -1,7 +1,7 @@
 ## class that handles miscellaneous actions
 class MiscController < ApplicationController
 
-  # TODO creat a verification image, NOTE that opera's caching causes problems
+  # TODO create a verification image, NOTE that opera's caching causes problems
   def verification_image
     send_file RAILS_ROOT + "/tmp/v.jpg", :type => "image/jpeg", :filename => "v.jpg", :disposition => 'inline'
   end

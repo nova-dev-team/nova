@@ -501,7 +501,41 @@ html>body #page {
     }
 
     decorate_field($('login'), "User ID", "wait_for_input");
-    decorate_field($('password'), "password", "wait_for_input");
+    
+    if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
+      // add eye candy for password box
+      
+      var login_password = $("password");
+      login_password.setAttribute("type", "text");
+      
+      login_password.value = "Password";
+      login_password.addClassName("wait_for_input");
+      
+      login_password.observe('focus', function() {
+        login_password.setAttribute("type", "password");
+        if (login_password.hasClassName("wait_for_input")) {
+          login_password.value = ""; // clear default data, wait for user's input
+        }
+      });
+      
+      login_password.observe('keypress', function(e) {
+        if (login_password.value != "" || e.charCode != 0) {
+          login_password.removeClassName("wait_for_input");
+          login_password.removeClassName("wrong_input");
+        }
+      });
+      
+      login_password.observe('blur', function() {
+        if (login_password.value == "") {
+          login_password.setAttribute("type", "text");
+          login_password.value = "Password";
+          login_password.addClassName("wait_for_input");
+        }
+      });
+      
+    } else {
+      decorate_field($('password'), "password", "wait_for_input");
+    }
     
     $('login').observe('keypress', function(e) {
       if (e.keyCode == Event.KEY_RETURN) {
@@ -594,7 +628,7 @@ We suggest the following browsers:<br />
       <td><input type="text" id="signup_fullname" /></td>
     </tr>
     <tr>
-      <td><img src="/misc/verification_image.png" /></td>
+      <td><img src="/misc/verification_image.png" /> *</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
       <td><input type="text" id="signup_verification" /></td>
     </tr>
