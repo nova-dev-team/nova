@@ -61,12 +61,13 @@ table {
   position: absolute;
   left: 40px;
   top: 10px;
-  width: 200px;
+/*  width: 200px;  */   /* Got set in do_render_top_frame() */
+  height: 90px;
 }
 
 #layout_frame_top__user_info_holder {
   position: absolute;
-  width: 240px;
+/*  width: 240px; */    /* Got set in do_render_top_frame() */
   background-color: #667788;
 }
 
@@ -194,10 +195,10 @@ table {
     var page_height = getWindowHeight();
     
     var logo_holder = $("layout_frame_top__logo_holder");
-    var logo_holder_width = parseInt(logo_holder.getStyle("width"));
+    var logo_holder_width = 200;
     
     var user_info_holder = $("layout_frame_top__user_info_holder");
-    var user_info_holder_width = parseInt(user_info_holder.getStyle("width"));
+    var user_info_holder_width = 240;
     
     user_info_holder.setStyle("top:0px");
     user_info_holder.setStyle("left:" + (page_width - user_info_holder_width));
@@ -207,6 +208,7 @@ table {
     var top_navi = $("layout_frame_top__navigator");
     top_navi.setStyle("height:90px");
     top_navi.setStyle("top:0px");
+
     top_navi.setStyle("left:" + logo_holder_width);
     top_navi.setStyle("width:" + (page_width - logo_holder_width - user_info_holder_width));
   }
@@ -245,7 +247,7 @@ table {
 </script>
 
 </head>
-<body>
+<body scroll="no">
 
 <div id="layout_top_toggler" style="display: none;" class="layout_toggler layout_toggler_normal"></div>
 <div id="layout_left_toggler" style="display: none;" class="layout_toggler layout_toggler_normal"></div>
