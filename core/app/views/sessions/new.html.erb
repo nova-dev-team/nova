@@ -55,12 +55,21 @@ a:hover {
   color: white
 }
 
+/* NOTE IE has problems rendering the border, since its width is included in the div's width */
+/* I have to use some tricks to fix this */
+/* ref: http://www.webcredible.co.uk/user-friendly-resources/css/internet-explorer.shtml, 090630 */
+
 #page {
   position: absolute;
   background-image: url(/images/bg.jpg);
-  width: 750px;
-  height: 500px;
+  width: 780px; /* IE fix. Original value was 750. 780 = 750 + 2 * 15 (border width) */
+  height: 530px; /* IE fix. Original value was 500. 530 = 500 + 2 * 15 (border width) */
   border: 15px white solid;
+}
+
+html>body #page {
+  width: 750px; /* IE fix */
+  height: 500px; /* IE fix */
 }
 
 #login_panel {
@@ -174,22 +183,68 @@ a:hover {
     
     decorate_field($('signup_user_id'), "3~40 characters", "wait_for_input");
     decorate_field($('signup_email'), "6~40 characters", "wait_for_input");
-    decorate_field($('signup_fullname'), "maximum 100 characters", "wait_for_input");
-    decorate_field($('signup_verification'), "so what did you see?", "wait_for_input");
+    decorate_field($('signup_fullname'), "<= 100 characters", "wait_for_input");
+    decorate_field($('signup_verification'), "what's in the picture?", "wait_for_input");
+
+    var signup_password = $('signup_password');
+    var signup_password_confirm = $('signup_password_confirm');
     
-    $('signup_password').observe('keypress', function(e) {
-      if ($('signup_password').value != "" || e.charCode != 0) {
-        $('signup_password').removeClassName("wrong_input");
-        $('signup_password_confirm').removeClassName("wrong_input");
+    signup_password.value = "6~40 characters";
+    signup_password.addClassName("wait_for_input");
+    
+    signup_password.observe('focus', function() {
+      signup_password.setAttribute("type", "password");
+      if (signup_password.hasClassName("wait_for_input")) {
+        signup_password.value = ""; // clear default data, wait for user's input
       }
     });
     
-    $('signup_password_confirm').observe('keypress', function(e) {
-      if ($('signup_password_confirm').value != "" || e.charCode != 0) {
-        $('signup_password').removeClassName("wrong_input");
-        $('signup_password_confirm').removeClassName("wrong_input");
+    signup_password.observe('keypress', function(e) {
+      if (signup_password.value != "" || e.charCode != 0) {
+        signup_password.removeClassName("wait_for_input");
+        
+        signup_password.removeClassName("wrong_input");
+        signup_password_confirm.removeClassName("wrong_input");
       }
     });
+    
+    signup_password.observe('blur', function() {
+      if (signup_password.value == "") {
+        signup_password.setAttribute("type", "text");
+        signup_password.value = "6~40 characters";
+        signup_password.addClassName("wait_for_input");
+      }
+    });
+    
+    // =========================================================
+    
+    signup_password_confirm.value = "same as above";
+    signup_password_confirm.addClassName("wait_for_input");
+    
+    signup_password_confirm.observe('focus', function() {
+      signup_password_confirm.setAttribute("type", "password");
+      if (signup_password_confirm.hasClassName("wait_for_input")) {
+        signup_password_confirm.value = ""; // clear default data, wait for user's input
+      }
+    });
+    
+    signup_password_confirm.observe('keypress', function(e) {
+      if (signup_password_confirm.value != "" || e.charCode != 0) {
+        signup_password_confirm.removeClassName("wait_for_input");
+        
+        signup_password.removeClassName("wrong_input");
+        signup_password_confirm.removeClassName("wrong_input");
+      }
+    });
+    
+    signup_password_confirm.observe('blur', function() {
+      if (signup_password_confirm.value == "") {
+        signup_password_confirm.setAttribute("type", "text");
+        signup_password_confirm.value = "same as above";
+        signup_password_confirm.addClassName("wait_for_input");
+      }
+    });
+    
   }
   
   function getWindowWidth() {
@@ -257,11 +312,12 @@ a:hover {
   function decorate_field(field, default_text, default_class) {
     field.value = default_text;
     field.addClassName(default_class);
-    field.onclick = function () {
+    
+    field.observe('focus', function() {
       if (field.hasClassName(default_class)) {
         field.value = ""; // clear default data, wait for user's input
       }
-    };
+    });
     
     // field.onkeydown = funciton(e) {blah-blah-blah-} does not work on IE, so I have to use prototype.observe
     field.observe('keypress', function(e) {
@@ -272,12 +328,12 @@ a:hover {
     });
     
     // on lost focus, check if has user input
-    field.onblur = function() {
+    field.observe('blur', function() {
       if (field.value == "") {
         field.value = default_text;
         field.addClassName(default_class);
       }
-    };
+    });
   }
   
   function validate_signup() {
@@ -305,6 +361,13 @@ a:hover {
     
     if (signup_user_id.value == "" || signup_user_id.value.length < 3 || signup_user_id.value.length > 40) {
       signup_error("User ID should have 3~40 characters");
+      signup_user_id.addClassName("wrong_input");
+      return false;
+    }
+    
+    var user_id_regex = /^([a-z])+([a-z0-9_\.])*$/;
+    if (user_id_regex.test(signup_user_id.value) == false) {
+      signup_error("User ID should only contain a-z, 0-9, '.' and '_'. And it must start with a-z.");
       signup_user_id.addClassName("wrong_input");
       return false;
     }
@@ -352,7 +415,7 @@ a:hover {
       return false;
     }
     
-    var email_regex = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+    var email_regex = /^([A-Za-z0-9\-\.])+\@([A-Za-z0-9\-\.])+\.([A-Za-z]{2,4})$/;
     if(email_regex.test(signup_email.value) == false) {
       signup_error("Invalid email address");
       signup_email.addClassName("wrong_input");
@@ -368,25 +431,22 @@ a:hover {
     
     // prevent sending twice when user double-click "sign up" button
     $("btn_send_signup").onclick = function() {};
-    
-    Growl4Rails.showGrowl({
-      image_path: "/images/smile.png",
-      title: "Registration data sent",
-      message: "Please wait for server's processing"
-    });
+
     Windows.close("signup_window");
     
     var signup_user_id = $("signup_user_id");
     var signup_password = $("signup_password");
+    var signup_password_confirm = $("signup_password_confirm");
     var signup_email = $("signup_email");
     var signup_verification = $("signup_verification");
     var signup_fullname = $("signup_fullname");
     
-    new Ajax.Request('/users/create', {
+    new Ajax.Request('/users', {
       method: 'post',
       parameters: {
         'user[login]': signup_user_id.value,
         'user[password]': signup_password.value,
+        'user[password_confirmation]': signup_password_confirm.value,
         'user[email]': signup_email.value
       },
       onSuccess: function(transport){
@@ -510,12 +570,12 @@ We suggest the following browsers:<br />
     <tr>
       <td>Password *</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="password" id="signup_password" /></td>
+      <td><input type="text" id="signup_password" /></td>
     </tr>
     <tr>
       <td>Confirm Password *</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="password" id="signup_password_confirm" /></td>
+      <td><input type="text" id="signup_password_confirm" /></td>
     </tr>
     <tr>
       <td>Email Address *</td>
