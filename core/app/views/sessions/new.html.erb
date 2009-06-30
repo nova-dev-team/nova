@@ -129,11 +129,23 @@ a:hover {
         password: password_field.value
       },
       onSuccess: function(transport){
-        var response = transport.responseText;
-        alert(transport.responseText);
+        var json = transport.responseText.evalJSON(true);
+        if (json.success) {
+          window.location = '/';
+        } else {
+          Growl4Rails.showGrowl({
+            image_path: "/images/error.png",
+            title: "Login failed",
+            message: json.message
+          });
+        }
       },
       onFailure: function() {
-        alert("connection failed");
+        Growl4Rails.showGrowl({
+          image_path: "/images/error.png",
+          title: "Connection failed",
+          message: "Please check your network connection"
+        });
       }
     });
   }
@@ -360,9 +372,47 @@ a:hover {
     Growl4Rails.showGrowl({
       image_path: "/images/smile.png",
       title: "Registration data sent",
-      message: "Please wait for administrator's approval"
+      message: "Please wait for server's processing"
     });
     Windows.close("signup_window");
+    
+    var signup_user_id = $("signup_user_id");
+    var signup_password = $("signup_password");
+    var signup_email = $("signup_email");
+    var signup_verification = $("signup_verification");
+    var signup_fullname = $("signup_fullname");
+    
+    new Ajax.Request('/users/create', {
+      method: 'post',
+      parameters: {
+        'user[login]': signup_user_id.value,
+        'user[password]': signup_password.value,
+        'user[email]': signup_email.value
+      },
+      onSuccess: function(transport){
+        var json = transport.responseText.evalJSON(true);
+        if (json.success) {
+          Growl4Rails.showGrowl({
+            image_path: "/images/ok.png",
+            title: "Sign up successful",
+            message: json.message
+          });
+        } else {
+          Growl4Rails.showGrowl({
+            image_path: "/images/error.png",
+            title: "Sign up failed",
+            message: json.message
+          });
+        }
+      },
+      onFailure: function() {
+        Growl4Rails.showGrowl({
+          image_path: "/images/error.png",
+          title: "Connection failed",
+          message: "Please check your network connection"
+        });
+      }
+    });
   }
   
   window.onload = function() {

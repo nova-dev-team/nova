@@ -23,8 +23,8 @@ class SessionsController < ApplicationController
         new_cookie_flag = (params[:remember_me] == "1")
         handle_remember_cookie! new_cookie_flag
         
-        # TODO clear this routine, only json notation required
-        if request.request_method == :get
+        ## TODO clear this routine, only json notation required
+        if request.request_method == :get ## for browsers
           redirect_back_or_default('/')
           flash[:notice] = "Logged in successfully"
         else

@@ -8,7 +8,7 @@ class UsersController < ApplicationController
   def create
     logout_keeping_session!
     @user = User.new(params[:user])
-    params[:user][:groups].split.each {|g_name| @user.groups << (Group.find_by_name g_name)}
+    ## TODO ADD to user group @user.groups << (Group.find_by_name 'user') ## default user group
     success = @user && @user.save
     if success && @user.errors.empty?
             # Protects against session fixation attacks, causes request forgery
@@ -18,16 +18,28 @@ class UsersController < ApplicationController
 
       ## don't sign in the user immediately, since we need to activate it by admin
       # self.current_user = @user # !! now logged in
-
-      redirect_back_or_default('/')
-      flash[:notice] = "Thanks for signing up!  We're sending you an email with your activation code."
+      
+      respond_to do |accept|
+        accept.json {
+          render :text => {:success => true, :message => "Your account has been registered. Please wait for administrator's approval."}.to_json
+        }
+      end
+      
+      ## redirect_back_or_default('/')
+      ## flash[:notice] = "Thanks for signing up!  We're sending you an email with your activation code."
     else
-      flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
-      render :action => 'new'
+      ## flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
+      ## render :action => 'new'
+      respond_to do |accept|
+        accept.json {
+          render :text => {:success => false, :message => "Your account could not be created."}.to_json
+        }
+      end
     end
   end
 
   def update
+## test code, check the privilege system
     root_or_admin_required
     require 'pp'
     pp params
