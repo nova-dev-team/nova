@@ -34,8 +34,15 @@ body {
   width: 100%;
 }
 
+a {
+  color: #ddeeee
+}
+
+#user_info_holder a:hover {
+  background-color: #6688bb;
+}
+
 .ui-layout-pane { /* all 'panes' */ 
-/*	background: #FFF;  */
 	border: 1px solid #BBB; 
 	padding: 10px; 
 	overflow: auto;
@@ -81,6 +88,17 @@ body {
   right:0;
   width: 300;
   height: 90;
+}
+
+#layout_left_pane {
+/* another style: #e6e3ef */
+  background-color: #e6e3ef;
+}
+
+#layout_center_pane {
+/* another style: #656061 */
+/*  background-color: #656061; */
+
 }
 
 </style>
@@ -137,15 +155,35 @@ body {
 
   <img src="/images/logo-small.png" id="nova-logo"></img>
   <ul class="lavaLampWithImage" id="global_nav_bar">
-    <li class="current"><a href="#">Home</a></li>
-    <li><a href="/color.html">Machines</a></li>
-    <li><a href="#">Groups</a></li>
-    <li><a href="#">History</a></li>
-    <li><a href="#"><%= yield :header_nagivator %></a></li>
+  
+<%
+  header_bar_html = ""
+  if @navi_bar
+    0.upto(@navi_bar[:links].length - 1) do |i|
+      if i == @navi_bar[:current_index]
+        header_bar_html += '<li class="current">'
+      else
+        header_bar_html += '<li>'
+      end
+      header_bar_html += '<a href="' + @navi_bar[:links][i][:href] + '">' + @navi_bar[:links][i][:text] + "</a></li>"
+    end
+  end
+%>
+
+<%= header_bar_html %>
+    
   </ul>
   
   <div id="user_info_holder">
+  
+<% if current_user.in_group? "root" %>
+    <img src="/images/user_64_red.png" style="position:relative;top:13px"></img>
+<% elsif current_user.in_group? "admin" %>
+    <img src="/images/user_64_yellow.png" style="position:relative;top:13px"></img>
+<% else  %>
     <img src="/images/user_64_blue.png" style="position:relative;top:13px"></img>
+<% end %>
+
     <div style="position:relative;top:-50px;left:70px">
     Hi, <%=h current_user.login %>!<br />
     <%= link_to "Log out", logout_url %>
@@ -154,12 +192,12 @@ body {
   
 </div>
 
-<div class="ui-layout-west">
-  WEST
+<div class="ui-layout-west" id="layout_left_pane">
+  <%= yield :layout_left_frame %>
 </div>
 
-<div class="ui-layout-center">
-	CENTER
+<div class="ui-layout-center" id="layout_center_pane">
+  <%= yield :layout_center_frame %>
 </div>
 
 </body></html>

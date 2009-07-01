@@ -1,25 +1,59 @@
-Hi, I am <%=h current_user.login %>.
-<%= link_to 'Logout', "/logout" %>
+<%
 
-<% content_for :current_user_info do %>
+  if current_user.in_group? "root"
+    @navi_bar = {
+      :current_index => 0,
+      :links => [
+        {:text => "Home", :href => "/app/home"},
+        {:text => "Machines", :href => "/app/root_machines"},
+        {:text => "Users", :href => "/app/root_users"},
+        {:text => "System setting", :href => "/app/root_sys_setting"},
+        {:text => "My Account", :href => "/app/my_account"},
+      ]
+    }
+  elsif current_user.in_group? "admin"
+    @navi_bar = {
+      :current_index => 0,
+      :links => [
+        {:text => "Home", :href => "/app/home"},
+        {:text => "Machines", :href => "/app/admin_machines"},
+        {:text => "Users", :href => "/app/admin_users"},
+        {:text => "Hisotry", :href => "/app/history"},
+        {:text => "My Account", :href => "/app/my_account"}
+      ]
+    }
+  else
+    @navi_bar = {
+      :current_index => 0,
+      :links => [
+        {:text => "Home", :href => "/app/home"},
+        {:text => "Machines", :href => "/app/user_machines"},
+        {:text => "Hisotry", :href => "/app/history"},
+        {:text => "My Account", :href => "/app/my_account"}
+      ]
+    }
+  end
+%>
 
-  var current_user_email = '<%= current_user.email %>';
-  var current_user_fullname = '<%= current_user.name %>';
-  var current_user_login = '<%= current_user.login %>';
 
-<% end -%>
-
-<% content_for :header_nagivator do %>
-  blah-blah-blah
-<% end-%>
 
 <% content_for :layout_left_frame do %>
 
-LEFT
+  <% 30.times do |n| %>
+  <p> <%= n %>  LEFT is blah-blah-blah</p>
+  <% end -%>
 
 <% end -%>
+
+
 
 <% content_for :layout_center_frame do %>
-CENTER
+
+  <% 30.times do |n| %>
+  <p> <%= n %>  CENTER is blah-blah-blah</p>
+  <% end -%>
+
 <% end -%>
+
+
 
