@@ -15,9 +15,9 @@
    inkscape:version="0.46"
    sodipodi:docname="nova-logo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/home/santa/Workspace/nova/core/public/images/logo-medium.png"
-   inkscape:export-xdpi="44.947315"
-   inkscape:export-ydpi="44.947315">
+   inkscape:export-filename="/home/santa/Workspace/nova/core/public/images/logo-small.png"
+   inkscape:export-xdpi="21.402559"
+   inkscape:export-ydpi="21.402559">
   <defs
      id="defs4">
     <inkscape:perspective
@@ -38,9 +38,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="-379.55318"
-     inkscape:cy="698.30817"
+     inkscape:zoom="3.959798"
+     inkscape:cx="441.75479"
+     inkscape:cy="721.08994"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -65,7 +65,7 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Medium ITC;-inkscape-font-specification:Eras Medium ITC"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
        x="174.28572"
        y="449.50504"
        id="text2383"><tspan
@@ -73,50 +73,50 @@
          id="tspan2385"
          x="174.28572"
          y="449.50504"
-         style="font-size:144px;fill:#6688bb;fill-opacity:1">Nova</tspan></text>
+         style="font-size:144px;fill:#6688bb;fill-opacity:1;-inkscape-font-specification:Eras Demi ITC;font-family:Eras Demi ITC;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Nova</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Medium ITC;-inkscape-font-specification:Eras Medium ITC"
-       x="-224.76917"
-       y="606.7804"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="-219.77469"
+       y="622.15179"
        id="text3191"
        transform="matrix(0.309017,-0.9510565,0.9510565,0.309017,0,0)"><tspan
          sodipodi:role="line"
          id="tspan3193"
-         x="-224.76917"
-         y="606.7804">v</tspan></text>
+         x="-219.77469"
+         y="622.15179">v</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Medium ITC;-inkscape-font-specification:Eras Medium ITC"
-       x="-558.14417"
-       y="91.468155"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="-568.75391"
+       y="108.22906"
        id="text3203"
        transform="matrix(-0.809017,-0.5877853,0.5877853,-0.809017,0,0)"><tspan
          sodipodi:role="line"
          id="tspan3205"
-         x="-558.14417"
-         y="91.468155">v</tspan></text>
+         x="-568.75391"
+         y="108.22906">v</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Medium ITC;-inkscape-font-specification:Eras Medium ITC"
-       x="-171.34666"
-       y="-384.5311"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="-187.48039"
+       y="-382.51816"
        id="text3207"
        transform="matrix(-0.809017,0.5877852,-0.5877852,-0.809017,0,0)"><tspan
          sodipodi:role="line"
          id="tspan3209"
-         x="-171.34666"
-         y="-384.5311">v</tspan></text>
+         x="-187.48039"
+         y="-382.51816">v</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Medium ITC;-inkscape-font-specification:Eras Medium ITC"
-       x="401.10504"
-       y="-163.79439"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="396.6553"
+       y="-171.34749"
        id="text3211"
        transform="matrix(0.309017,0.9510565,-0.9510565,0.309017,0,0)"><tspan
          sodipodi:role="line"
          id="tspan3213"
-         x="401.10504"
-         y="-163.79439">v</tspan></text>
+         x="396.6553"
+         y="-171.34749">v</tspan></text>
   </g>
 </svg>
