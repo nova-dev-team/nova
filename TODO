@@ -1,6 +1,9 @@
 [open]
 
+* fix the display bug of growl4rails on IE 8
+
 * implement pnode with ruby binding of libvirt
 
 * add managing tools for administrator, provide image upload/remove
   utility, and management on user's virtual machines
+
