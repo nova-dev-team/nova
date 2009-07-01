@@ -157,20 +157,52 @@ a {
   <ul class="lavaLampWithImage" id="global_nav_bar">
   
 <%
-  header_bar_html = ""
-  if @navi_bar
-    0.upto(@navi_bar[:links].length - 1) do |i|
-      if i == @navi_bar[:current_index]
-        header_bar_html += '<li class="current">'
-      else
-        header_bar_html += '<li>'
-      end
-      header_bar_html += '<a href="' + @navi_bar[:links][i][:href] + '">' + @navi_bar[:links][i][:text] + "</a></li>"
+  ## a helper function to render navi-bar html text
+  def nav_bar_item text, link
+    html = "<li "
+    require 'pp'
+    if text == @nav_bar_current
+      html += 'class="current"'
     end
+    html += '><a href="' + link + '">' + text + "</a></li>"
+    return html
   end
 %>
 
-<%= header_bar_html %>
+<% if current_user.in_group? "root" %>
+  <%= nav_bar_item "Home", "/app/home" %>
+  <%= nav_bar_item "Users", "/app/users" %>
+  <%=
+    ## root user could manage both virutal machine and physical machine
+    nav_bar_item "Machines", "/app/root_machines"
+  %>
+  <%=
+    ## root user could manage networks and vm images, and browse KFS directory
+    nav_bar_item "Resources", "/app/root_resources"
+  %>
+  <%= 
+    ## system settings such as KFS settings, and shutting down server
+    nav_bar_item "System Settings", "/app/root_system_settings"
+  %>
+  
+<% elsif current_user.in_group? "admin" %>
+  <%= nav_bar_item "Home", "/app/home" %>
+  <%= nav_bar_item "Users", "/app/users" %>
+  <%=
+    ## admin user could manage all virutal machines, but no physical machines
+    nav_bar_item "Machines", "/app/admin_machines"
+  %>
+  <%=
+    ## admin user could manage public virtual machine images
+    nav_bar_item "Resources", "/app/admin_resources"
+  %>
+  
+<% else %>
+  <%= nav_bar_item "Home", "/app/home" %>
+  <%= nav_bar_item "Machines", "/app/user_machines" %>
+  <%= nav_bar_item "Resources", "/app/user_resources" %>
+  <%= nav_bar_item "Groups", "/app/user_groupss" %>
+<% end %>
     
   </ul>
   
@@ -185,7 +217,17 @@ a {
 <% end %>
 
     <div style="position:relative;top:-50px;left:70px">
-    Hi, <%=h current_user.login %>!<br />
+    
+<% if current_user.in_group? "root" %>
+  System Administrator
+<% elsif current_user.in_group? "admin" %>
+  Administrator
+<% else  %>
+  User
+<% end %>
+
+    '<%=h current_user.login %>'<br />
+    <a href="#" onclick="alert('TODO')">Account<br />
     <%= link_to "Log out", logout_url %>
     </div>
   </div>

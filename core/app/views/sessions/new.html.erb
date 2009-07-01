@@ -176,9 +176,9 @@ html>body #page {
       win.show();
     }
     
-    decorate_field($('signup_user_id'), "3~40 characters", "wait_for_input");
+    decorate_field($('signup_user_id'), "3~20 characters", "wait_for_input");
     decorate_field($('signup_email'), "6~40 characters", "wait_for_input");
-    decorate_field($('signup_fullname'), "<= 100 characters", "wait_for_input");
+    decorate_field($('signup_fullname'), "<= 40 characters", "wait_for_input");
     decorate_field($('signup_verification'), "what's in the picture?", "wait_for_input");
     
     var signup_password = $('signup_password');

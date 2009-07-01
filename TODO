@@ -1,6 +1,8 @@
 [open]
 
-* fix the display bug of growl4rails on IE 8
+* TEST long user id/name/password/email address
+
+* fix the display bug of growl4rails on IE
 
 * implement pnode with ruby binding of libvirt
 

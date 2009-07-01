@@ -1,0 +1,25 @@
+<%
+  @nav_bar_current = "Users"
+%>
+
+<% content_for :layout_left_frame do %>
+
+  <% 30.times do |n| %>
+  <p> <%= n %>  LEFT is blah-blah-blah, and you are ADMIN</p>
+  <% end -%>
+
+<% end -%>
+
+
+
+<% content_for :layout_center_frame do %>
+
+<%
+  user_list_html = ""
+  User.all.each {|u| user_list_html += u.login + "<br />"}
+%>
+
+<%= user_list_html %>
+
+<% end -%>
+
