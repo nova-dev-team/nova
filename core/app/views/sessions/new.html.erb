@@ -100,35 +100,37 @@ html>body #page {
 </style>
 <script type="text/javascript">
 
+  function do_message(type, title, msg) {
+    if (Prototype.Browser.IE) {
+      alert(title + ":\n" + msg);
+    } else {
+      var img = "";
+      if (type == "ok") {
+        img = "/images/ok.png";
+      } else if (type == "error") {
+        img = "/images/error.png";
+      }
+      Growl4Rails.showGrowl({
+        image_path: img,
+        title: title,
+        message: msg
+      });
+    }
+  }
+
   function do_login() {
     var login_field = $('login');
     var password_field = $('password');
     
     if (login_field.hasClassName("wait_for_input")) {
       login_field.addClassName("wrong_input");
-      if (Prototype.Browser.IE) {
-        alert("Please provide your user ID!");
-      } else {
-        Growl4Rails.showGrowl({
-          image_path: "/images/error.png",
-          title: "Not enough information",
-          message: "Please provide your user ID!"
-        });
-      }
+      do_message("error", "Not enough information", "Please provide your user ID!");
       return;
     }
     
     if (password_field.hasClassName("wait_for_input")) {
       password_field.addClassName("wrong_input");
-      if (Prototype.Browser.IE) {
-        alert("Please provide your password!");
-      } else {
-        Growl4Rails.showGrowl({
-          image_path: "/images/error.png",
-          title: "Not enough information",
-          message: "Please provide your password!"
-        });
-      }
+      do_message("error", "Not enough information", "Please provide your password!");
       return;
     }
     
@@ -143,19 +145,11 @@ html>body #page {
         if (json.success) {
           window.location = '/';
         } else {
-          Growl4Rails.showGrowl({
-            image_path: "/images/error.png",
-            title: "Login failed",
-            message: json.message
-          });
+          do_message("error", "Login failed", json.message);
         }
       },
       onFailure: function() {
-        Growl4Rails.showGrowl({
-          image_path: "/images/error.png",
-          title: "Connection failed",
-          message: "Please check your network connection!"
-        });
+        do_message("error", "Connection failed", "Please check your network connection!");
       }
     });
   }
@@ -187,71 +181,78 @@ html>body #page {
     decorate_field($('signup_fullname'), "<= 100 characters", "wait_for_input");
     decorate_field($('signup_verification'), "what's in the picture?", "wait_for_input");
     
-    if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
-      // if its not IE or Opera, try to make the signup UI more beautiful
+    var signup_password = $('signup_password');
+    var signup_password_confirm = $('signup_password_confirm');
     
-      var signup_password = $('signup_password');
-      var signup_password_confirm = $('signup_password_confirm');
-      
+    if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
       signup_password.setAttribute("type", "text");
       signup_password_confirm.setAttribute("type", "text");
       
       signup_password.value = "6~40 characters";
       signup_password.addClassName("wait_for_input");
       
-      signup_password.observe('focus', function() {
+      signup_password_confirm.value = "same as above";
+      signup_password_confirm.addClassName("wait_for_input");
+    }
+    
+    signup_password.observe('focus', function() {
+      if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
         signup_password.setAttribute("type", "password");
-        if (signup_password.hasClassName("wait_for_input")) {
-          signup_password.value = ""; // clear default data, wait for user's input
-        }
-      });
-      
-      signup_password.observe('keypress', function(e) {
-        if (signup_password.value != "" || e.charCode != 0) {
-          signup_password.removeClassName("wait_for_input");
-          
-          signup_password.removeClassName("wrong_input");
-          signup_password_confirm.removeClassName("wrong_input");
-        }
-      });
-      
-      signup_password.observe('blur', function() {
-        if (signup_password.value == "") {
+      }
+      if (signup_password.hasClassName("wait_for_input")) {
+        signup_password.value = ""; // clear default data, wait for user's input
+      }
+    });
+    
+    signup_password.observe('keypress', function(e) {
+      if (signup_password.value != "" || e.charCode != 0) {
+        signup_password.removeClassName("wait_for_input");
+        
+        signup_password.removeClassName("wrong_input");
+        signup_password_confirm.removeClassName("wrong_input");
+      }
+    });
+    
+    signup_password.observe('blur', function() {
+      if (signup_password.value == "") {
+        if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
           signup_password.setAttribute("type", "text");
           signup_password.value = "6~40 characters";
           signup_password.addClassName("wait_for_input");
         }
-      });
-      
-      
-      
-      signup_password_confirm.value = "same as above";
-      signup_password_confirm.addClassName("wait_for_input");
-      
-      signup_password_confirm.observe('focus', function() {
+      }
+    });
+    
+    
+    
+    signup_password_confirm.observe('focus', function() {
+      if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
         signup_password_confirm.setAttribute("type", "password");
-        if (signup_password_confirm.hasClassName("wait_for_input")) {
-          signup_password_confirm.value = ""; // clear default data, wait for user's input
-        }
-      });
-      
-      signup_password_confirm.observe('keypress', function(e) {
-        if (signup_password_confirm.value != "" || e.charCode != 0) {
-          signup_password_confirm.removeClassName("wait_for_input");
-          
-          signup_password.removeClassName("wrong_input");
-          signup_password_confirm.removeClassName("wrong_input");
-        }
-      });
-      
-      signup_password_confirm.observe('blur', function() {
-        if (signup_password_confirm.value == "") {
+      }
+      if (signup_password_confirm.hasClassName("wait_for_input")) {
+        signup_password_confirm.value = ""; // clear default data, wait for user's input
+      }
+    });
+    
+    signup_password_confirm.observe('keypress', function(e) {
+      if (signup_password_confirm.value != "" || e.charCode != 0) {
+        signup_password_confirm.removeClassName("wait_for_input");
+        
+        signup_password.removeClassName("wrong_input");
+        signup_password_confirm.removeClassName("wrong_input");
+      }
+    });
+    
+    signup_password_confirm.observe('blur', function() {
+      if (signup_password_confirm.value == "") {
+        if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
           signup_password_confirm.setAttribute("type", "text");
           signup_password_confirm.value = "same as above";
           signup_password_confirm.addClassName("wait_for_input");
         }
-      });
-    }
+      }
+    });
+    
   }
   
   function getWindowWidth() {
@@ -353,11 +354,7 @@ html>body #page {
     var signup_fullname = $("signup_fullname");
     
     function signup_error(msg) {
-      Growl4Rails.showGrowl({
-        image_path: "/images/error.png",
-        title: "Incorrect signup information",
-        message: msg
-      });
+      do_message("error", "Incorrect signup information", msg);
     }
     
     if (signup_user_id.hasClassName("wait_for_input")) {
@@ -459,25 +456,13 @@ html>body #page {
       onSuccess: function(transport){
         var json = transport.responseText.evalJSON(true);
         if (json.success) {
-          Growl4Rails.showGrowl({
-            image_path: "/images/ok.png",
-            title: "Sign up successful",
-            message: json.message
-          });
+          do_message("ok", "Sign up successful", json.message);
         } else {
-          Growl4Rails.showGrowl({
-            image_path: "/images/error.png",
-            title: "Sign up failed",
-            message: json.message
-          });
+          do_message("error", "Sign up failed", json.message);
         }
       },
       onFailure: function() {
-        Growl4Rails.showGrowl({
-          image_path: "/images/error.png",
-          title: "Connection failed",
-          message: "Please check your network connection"
-        });
+        do_message("error", "Connection failed", "Please check your network connection!");
       }
     });
   }
