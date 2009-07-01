@@ -78,12 +78,13 @@ body {
 		});
 		
 		
+		// TODO ENHANCE use apple style, like Google Chrome's inspector
 		$(function() {
-      $("#lavalamp-1").lavaLamp({
+      $("#global_nav_bar").lavaLamp({
         fx: "backout",
         speed: 700,
         click: function(event, menuItem) {
-          return false;
+//          return false;
         }
       });
     });
@@ -96,11 +97,11 @@ body {
 
 
 <div class="ui-layout-north layout_header">
-  <ul class="lavaLampWithImage" id="lavalamp-1">
+  <ul class="lavaLampWithImage" id="global_nav_bar" style="height: 90px;position:absolute;">
     <li class="current"><a href="#">Home</a></li>
-    <li><a href="#">Plant a tree</a></li>
+    <li><a href="/color.html">Plant a tree</a></li>
     <li><a href="#">Travel</a></li>
-    <li><a href="#">Ride an elephant</a></li>
+    <li><a href="#">TOOLONG</a></li>
   </ul>
 </div>
 
