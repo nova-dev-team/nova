@@ -1,10 +1,10 @@
-class HomeController < ApplicationController
+class AppController < ApplicationController
   
   before_filter :login_required
 
   # enable index.html
-  def index
-    render :template => 'home/home.html.erb', :layout => 'default'
+  def home
+    render :template => 'app/home.html.erb', :layout => 'default'
   end
 
 private

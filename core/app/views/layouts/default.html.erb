@@ -43,6 +43,37 @@ body {
 
 .layout_header {
   background-image: url('/images/header-bg.gif');
+  overflow: hidden;
+}
+
+#nova-logo {
+  margin: 0;
+  position: absolute;
+  padding: 0;
+  left: 50px;
+  top: 10px;
+}
+
+#global_nav_bar {
+  margin: 0;
+  position: absolute;
+  padding-top: 30px;  /* note that since lavalamp has height 30, setting padding-top to 30 makes the navi-bar in vertical center */
+  padding-left: 70px;
+  width: 500px;
+  height: 90px;
+  top: 0px;
+  left: 200px;
+}
+
+#user_info_holder {
+  margin: 0;
+  position: absolute;
+  display: block;
+  top: 0;
+  right:0;
+  width: 300;
+  height: 90;
+  background-color: red;
 }
 
 </style>
@@ -51,7 +82,7 @@ body {
 	var myLayout; // a var is required because this page utilizes: myLayout.allowOverflow() method
 
 	$(document).ready(function () {
-
+	  
 		// this layout could be created with NO OPTIONS - but showing some here just as a sample...
 		// myLayout = $('body').layout(); -- syntax with No Options
 		myLayout = $('body').layout({
@@ -77,7 +108,6 @@ body {
 //		,	east__maxSize:			Math.floor(screen.availWidth / 2) // 1/2 screen width
 		});
 		
-		
 		// TODO ENHANCE use apple style, like Google Chrome's inspector
 		$(function() {
       $("#global_nav_bar").lavaLamp({
@@ -97,12 +127,20 @@ body {
 
 
 <div class="ui-layout-north layout_header">
-  <ul class="lavaLampWithImage" id="global_nav_bar" style="height: 90px;position:absolute;">
+
+  <img src="/images/logo-small.png" id="nova-logo"></img>
+  <ul class="lavaLampWithImage" id="global_nav_bar">
     <li class="current"><a href="#">Home</a></li>
     <li><a href="/color.html">Plant a tree</a></li>
     <li><a href="#">Travel</a></li>
     <li><a href="#">TOOLONG</a></li>
+    <li><a href="#"><%= yield :header_nagivator %></a></li>
   </ul>
+  
+  <div id="user_info_holder">
+    HIHIHIHIIHIHIHIH
+  </div>
+  
 </div>
 
 <div class="ui-layout-west">

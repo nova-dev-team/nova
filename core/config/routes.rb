@@ -15,7 +15,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :session
 
-  map.home '', :controller => 'home', :action => 'index'
+  map.home '', :controller => 'app', :action => 'home'
 
   map.connect 'misc/verification_image.:format', :controller => 'misc', :action => 'verification_image'
   # The priority is based upon order of creation: first created -> highest priority.
