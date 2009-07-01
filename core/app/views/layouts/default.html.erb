@@ -12,6 +12,14 @@
 <script type="text/javascript" src="/javascripts/jquery.easing.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.lavalamp.js"></script>
 
+
+<!-- IE PNG bug fix -->
+<style type="text/css">
+img, div, a, input { behavior: url(/stylesheets/iepngfix.htc) }
+</style>
+<script type="text/javascript" src="/javascripts/iepngfix_tilebg.js"></script>
+
+
 <style type="text/css" media="screen">
 
 body {
@@ -59,7 +67,7 @@ body {
   position: absolute;
   padding-top: 30px;  /* note that since lavalamp has height 30, setting padding-top to 30 makes the navi-bar in vertical center */
   padding-left: 70px;
-  width: 500px;
+  width: 900px;
   height: 90px;
   top: 0px;
   left: 200px;
@@ -73,7 +81,6 @@ body {
   right:0;
   width: 300;
   height: 90;
-  background-color: red;
 }
 
 </style>
@@ -131,14 +138,18 @@ body {
   <img src="/images/logo-small.png" id="nova-logo"></img>
   <ul class="lavaLampWithImage" id="global_nav_bar">
     <li class="current"><a href="#">Home</a></li>
-    <li><a href="/color.html">Plant a tree</a></li>
-    <li><a href="#">Travel</a></li>
-    <li><a href="#">TOOLONG</a></li>
+    <li><a href="/color.html">Machines</a></li>
+    <li><a href="#">Groups</a></li>
+    <li><a href="#">History</a></li>
     <li><a href="#"><%= yield :header_nagivator %></a></li>
   </ul>
   
   <div id="user_info_holder">
-    HIHIHIHIIHIHIHIH
+    <img src="/images/user_64_blue.png" style="position:relative;top:13px"></img>
+    <div style="position:relative;top:-50px;left:70px">
+    Hi, <%=h current_user.login %>!<br />
+    <%= link_to "Log out", logout_url %>
+    </div>
   </div>
   
 </div>
