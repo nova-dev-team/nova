@@ -2,13 +2,29 @@
   @nav_bar_current = "Users"
 %>
 
+
+<%
+  ###################################################################################
+%>
+
+
+
+
 <% content_for :layout_left_frame do %>
 
+
+
   <% 30.times do |n| %>
-  <p> <%= n %>  LEFT is blah-blah-blah, and you are ADMIN</p>
+  <p> <%= n %>  LEFT is blah-blah-blah, and you are <%= current_user.login %></p>
   <% end -%>
 
 <% end -%>
+
+
+
+<%
+  ###################################################################################
+%>
 
 
 

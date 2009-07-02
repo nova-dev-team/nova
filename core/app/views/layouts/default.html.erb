@@ -44,8 +44,11 @@ a {
 
 .ui-layout-pane { /* all 'panes' */ 
 	border: 1px solid #BBB; 
-	padding: 10px; 
+	padding: 0px; 
+	
+	/* the following overflow style disables vertical scroll bar */
 	overflow: auto;
+	overflow-x: hidden;
 } 
 
 .ui-layout-resizer { /* all 'resizer-bars' */ 
@@ -128,6 +131,12 @@ a {
 		,	west__minSize:			200
 		, west__maxSize:      300
 		, west__size:         300
+		
+		<%=
+		  if @layout_resize_callback
+		    ", onresize_end: " + @layout_resize_callback
+		  end
+		%>
 //		,	east__size:				300
 //		,	east__minSize:			200
 //		,	east__maxSize:			Math.floor(screen.availWidth / 2) // 1/2 screen width
@@ -146,6 +155,8 @@ a {
 
  	});
 </script>
+
+<%= yield :layout_style_and_scripts %>
 
 </head>
 <body scroll="no">

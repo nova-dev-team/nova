@@ -1,22 +1,112 @@
 <%
   @nav_bar_current = "Machines"
+  @layout_resize_callback = "do_layout"
 %>
+
+
+<%
+  ###################################################################################
+%>
+
+
+
+<% content_for :layout_style_and_scripts do %>
+  
+<style type="text/css" media="screen">
+
+a.left_nav_button {
+  display: block;
+  width: 300;
+  height: 35;
+  color: black;
+/*  background-color: red;*/
+}
+
+a.left_nav_button:hover {
+  background-color: #bbaabb;
+}
+
+a.left_nav_current {
+  color: #ddeeee;
+  font-weight: bold;
+/*  border-top: 1px solid #555577; */
+/*  border-bottom: 1px solid #555577; */
+  background-image: url(/images/left-nav-btn-bg.gif);
+}
+
+#machines_holder {
+/* width & height set by js in do_layout */
+  background-color: red;
+  border-top: 1px solid #6688bb;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+</style>
+
+
+<script type="text/javascript">
+
+  function getWindowHeight() {
+    return window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight);
+  }
+
+  function do_layout() {
+  
+    /*
+      machines_holder's height = 2 * 35 (buttons' height) - 90 (top height) - 5 (border)
+    */
+    $("#machines_holder").css("height", getWindowHeight() - 2 * 35 - 90 - 10);
+    $("#machines_holder").css("width", $("#layout_left_pane").width());
+    
+  };
+  
+  window.onresize = do_layout;
+  
+  $(document).ready(function(){
+    do_layout();
+    
+    // override default left pane overflow settings
+    $("#layout_left_pane").css("overflow", "hidden");
+  });
+  
+</script>
+  
+<% end -%>
+
+
+<%
+  ###################################################################################
+%>
+
 
 <% content_for :layout_left_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  LEFT is blah-blah-blah, and you are ADMIN</p>
-  <% end -%>
+<a class="left_nav_button" href="#">
+  lkjjjkjsdfddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+</a>
+
+<a class="left_nav_button left_nav_current" href="#">
+  klasdfkasldf kjasdlf aslkdfj
+</a>
+
+<div id="machines_holder">
+<% 200.times do |n| %>
+ <%= n %> lkasflkjasldkjflasjf <br />
+<% end %>
+</div>
 
 <% end -%>
+
+
+<%
+  ###################################################################################
+%>
 
 
 
 <% content_for :layout_center_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  CENTER is blah-blah-blah, and you are ADMIN</p>
-  <% end -%>
 
 <% end -%>
 
