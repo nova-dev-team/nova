@@ -1,3 +1,5 @@
+require 'pp'
+
 class UsersController < ApplicationController
 
   # render new.rhtml
@@ -30,9 +32,12 @@ class UsersController < ApplicationController
     else
       ## flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
       ## render :action => 'new'
+      pp @user.errors
+      error_text = ""
+      @user.errors.each {|item, reason| error_text += item + " ==> " + reason}
       respond_to do |accept|
         accept.json {
-          render :json => {:success => false, :message => "Your account could not be created."}
+          render :json => {:success => false, :message => "Your account could not be created. Server error:\n#{error_text}"}
         }
       ## TODO add render :xml => {blah-blah-blah}
       end

@@ -2,7 +2,7 @@
 <head>
 <title>Welcome, <%=h current_user.name != "" ? current_user.name : current_user.login %></title>
 
-<link href="/stylesheets/custom_buttons.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/custom_buttons/custom_buttons.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/lavalamp/lavalamp.css" rel="stylesheet" type="text/css" />
 
 <link href="/stylesheets/jquery-ui/ui.all.css" rel="stylesheet" type="text/css" />
@@ -51,6 +51,16 @@ body {
 
 a {
   color: #ddeeee
+}
+
+/* Used by account dialog input verification */
+.wrong_input {
+  background-color: #ff4444;
+}
+
+
+.wait_for_input {
+  color: gray;
 }
 
 #user_info_holder a:hover {
@@ -177,12 +187,75 @@ a {
  	
  	var account_dialog;
  	
+ 	
  	function do_my_account() {
  	  if (account_dialog == null) {
+ 	    
+ 	    /* Initialize all settings fields, so nothing was saved when open the dialog again */
+ 	    function do_init_settings_fields() {
+ 	      
+ 	      // trick: unset the focus on fullname input, else the user name is not shown at beginning
+ 	      $("#account_setting_fullname").blur();
+ 	      
+     	  decorate_field($("#account_setting_fullname"), "<%= current_user.name %>", "wait_for_input");
+     	  decorate_field($("#account_setting_email"), "<%= current_user.email %>", "wait_for_input");
+     	  
+     	  // =============================================
+     	  
+ 	      var np = $("#account_setting_new_password");
+        var npc = $("#account_setting_new_password_confirm");
+        var oldpwd = $("#account_setting_old_password");
+        var opc = $(".account_setting_old_password_container");
+        
+        np.val("");
+        npc.val("");
+        oldpwd.val("");
+        opc.hide();
+        
+        function show_old_password_container() {
+          if ($.browser.mozilla || $.browser.msie) {
+            opc.fadeIn(300);
+          } else {
+            opc.show();
+          }
+          $(".account_setting_new_password_container").css("color", "black");
+        }
+        
+        function hide_old_password_container() {
+          if ($.browser.mozilla || $.browser.msie) {
+            opc.fadeOut(300);
+          } else {
+            opc.hide();
+          }
+          $(".account_setting_new_password_container").css("color", "gray");
+        }
+        
+        $("#account_setting_fullname").bind("focus", function() {
+     	    if (will_change_account_password() == false) {
+     	      hide_old_password_container()
+     	    }
+     	  });
+     	  
+     	  $("#account_setting_email").bind("focus", function() {
+     	    if (will_change_account_password() == false) {
+     	      hide_old_password_container()
+     	    }
+     	  });
+     	  
+     	  np.bind("focus", function() {
+     	    show_old_password_container();
+     	  });
+     	  
+     	  npc.bind("focus", function() {
+     	    show_old_password_container()
+     	  });
+     	  
+      }
+      
       account_dialog = $("#user_account_setting").dialog({
         modal: true,
-        width: 660,
-        height: 495,
+        width: 560,
+        height: 420,
         resizable: false,
         movable: false,
 
@@ -193,18 +266,74 @@ a {
         show: $.browser.mozilla ? null : "puff",
         
         title: "Account settings for " + "'<%= current_user.login %>'",
+        
+        close: do_init_settings_fields,
+        open: do_init_settings_fields,
+        
         buttons: {
           "OK": function() {
             alert("OK clicked"); // TODO
           },
           "Close": function() {
             $(this).dialog("close");
+            do_init_settings_fields();
           }
         }
       });
  	  }
  	  account_dialog.dialog("open");
+  }
+  
+  function will_change_account_password() {
+    // judge if going to change account password
+    var np = $("#account_setting_new_password");
+    var npc = $("#account_setting_new_password_confirm");
+    return (np.val() != null && np.val() != "") || (npc.val() != null && npc.val() != "");
+  }
+  
+  function do_account_setting_validate() {
+    
+    if (will_change_account_password) {
+      // do password checking
+    }
+  }
+  
+  function has_classname(elem, kls_name) {
+    var elem_kls_arr = elem.attr("class").split(" ");
+    for (i = 0; i < elem_kls_arr.length; i++) {
+      if (elem_kls_arr[i] == kls_name) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  
+  // jQuery version
+  function decorate_field(field, default_text, default_class) {
+    field.val(default_text);
+    field.addClass(default_class);
 
+    field.bind("focus", function() {
+      if (has_classname(field, default_class)) {
+        field.val(""); // clear default data, wait for user's input
+      }
+    });
+    
+    field.bind("keypress", function(e) {
+      if (field.val() != "" || e.charCode != 0) {
+        field.removeClass(default_class);
+        field.removeClass("wrong_input");
+      }
+    });
+    
+    field.bind("blur", function() {
+      if (field.val() == "") {
+        field.val(default_text);
+        field.addClass(default_class);
+      }
+    });
+    
   }
  	
 </script>
@@ -312,7 +441,51 @@ a {
 
 
 <div id="user_account_setting" style="display:none;">
-So the account settings are still to be done...
+<p align="center">
+  <table>
+    <tr>
+      <td>Full Name</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="account_setting_fullname" /></td>
+    </tr>
+
+    <tr>
+      <td>Email Address</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="account_setting_email" /></td>
+    </tr>
+    
+    <tr>
+      <td colspan=3 style="height:30px">
+        <hr>
+      </td>
+    </tr>
+    
+    <tr style="color:gray" class="account_setting_new_password_container">
+      <td>New Password</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="password" id="account_setting_new_password" /></td>
+    </tr>
+    
+    <tr style="color:gray" class="account_setting_new_password_container">
+      <td>Confirm New Password</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="password" id="account_setting_new_password_confirm" /></td>
+    </tr>
+
+    <tr style="display:none" class="account_setting_old_password_container">
+      <td>Old Password *</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="password" id="account_setting_old_password" /></td>
+    </tr>
+    
+    <tr style="display:none" class="account_setting_old_password_container">
+      <td colspan=3>
+        <font style="font-size:10px">Old password is required if you want to change it.</font>
+      </td>
+    </tr>
+  </table>
+  </p>
 </div>
 
 </body></html>
