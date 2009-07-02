@@ -36,9 +36,15 @@ a.left_nav_current {
 
 .machines_holder {
 /* width & height set by js in do_layout */
-  border-top: 1px solid #6688bb;
+  border-top: 1px solid #BBB;
   overflow: auto;
   overflow-x: hidden;
+}
+
+#left_nav_bottom {
+  height: 30px;
+  z-index: 100;
+  border-top: 1px solid #BBB;
 }
 
 </style>
@@ -51,10 +57,10 @@ a.left_nav_current {
   }
 
   function do_layout() {
-    $(".machines_holder").height($("#layout_left_pane").height() - 2 * $(".left_nav_button").height());
-    $(".machines_holder").css("height", $("#layout_left_pane").height() - 2 * $(".left_nav_button").height());
+    $(".machines_holder").height($("#layout_left_pane").height() - 2 * $(".left_nav_button").height() - $("#left_nav_bottom").height());
     $(".machines_holder").css("width", $("#layout_left_pane").width());
     $(".left_nav_button").css("width", $("#layout_left_pane").width());
+    $("#left_nav_bottom").css("width", $("#layout_left_pane").width());
   };
   
   window.onresize = do_layout;
@@ -113,6 +119,7 @@ a.left_nav_current {
 
 <% content_for :layout_left_frame do %>
 
+
 <a id="left_nav_btn_list_pmachine" class="left_nav_button left_nav_current" href="#" onclick="list_physical_machines()">
   Physical Machines
 </a>
@@ -124,6 +131,8 @@ a.left_nav_current {
 
 <div id="pmachine_list_holder" class="machines_holder"></div>
 <div id="vmachine_list_holder" class="machines_holder"></div>
+
+<div id="left_nav_bottom">HAHHAHA, I am the freaking bottom bar</div>
 
 <% end -%>
 
