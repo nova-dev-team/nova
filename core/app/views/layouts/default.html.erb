@@ -128,9 +128,14 @@ a {
 //		,	south__spacing_open:	0		// no resizer-bar when open (zero height)
 //		,	south__spacing_closed:	20		// big resizer-bar when open (zero height)
 		//	some pane-size settings
-		,	west__minSize:			200
-		, west__maxSize:      300
-		, west__size:         300
+
+    <% if not @skip_layout_left_pane %>
+
+		  ,	west__minSize:			200
+		  , west__maxSize:      300
+		  , west__size:         300
+	  
+	  <% end %>
 		
 		<%=
 		  if @layout_resize_callback
@@ -245,9 +250,13 @@ a {
   
 </div>
 
-<div class="ui-layout-west" id="layout_left_pane">
-  <%= yield :layout_left_frame %>
-</div>
+<% if not @skip_layout_left_pane %>
+
+  <div class="ui-layout-west" id="layout_left_pane">
+    <%= yield :layout_left_frame %>
+  </div>
+
+<% end %>
 
 <div class="ui-layout-center" id="layout_center_pane">
   <%= yield :layout_center_frame %>
