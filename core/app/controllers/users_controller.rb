@@ -108,7 +108,7 @@ class UsersController < ApplicationController
 private
 
   def deny_request
-    logger.warn "Request denied"
+    render :status => :forbidden
   end
 
   def assert_self user_id
