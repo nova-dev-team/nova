@@ -4,29 +4,26 @@
 %>
 
 
+
 <%
   ###################################################################################
 %>
 
 
-
-
-<% content_for :layout_left_frame do %>
+<% content_for :layout_style_and_scripts do %>
 
 
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  LEFT is blah-blah-blah, and you are <%= current_user.login %></p>
-  <% end -%>
+<script type="text/javascript">
+
+show_message("g");
+
+
+</script>
+
+
 
 <% end -%>
-
-
-
-<%
-  ###################################################################################
-%>
-
 
 
 <% content_for :layout_center_frame do %>
@@ -35,6 +32,9 @@
   user_list_html = ""
   User.all.each {|u| user_list_html += u.login + "<br />"}
 %>
+
+
+
 
 <%= user_list_html %>
 
