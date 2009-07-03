@@ -13,18 +13,17 @@
 <!-- For dialogs -->
 <link href="/stylesheets/jquery-ui/theme.my.mac.dialog.css" rel="stylesheet" type="text/css" />
 
-
 <!-- Older version of jQuery
 <script type="text/javascript" src="/javascripts/jquery-1.2.6.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.ui.all-1.5.2.js"></script>
 -->
+
+
 <script type="text/javascript" src="/javascripts/jquery-1.3.2.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.easing.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery-ui-1.7.2.custom.min.js"></script>
 
-
 <script type="text/javascript" src="/javascripts/jquery.layout.js"></script>
-
-<script type="text/javascript" src="/javascripts/jquery.easing.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.lavalamp.js"></script>
 
 
@@ -34,6 +33,9 @@ img, div, a, input { behavior: url(/stylesheets/iepngfix.htc) }
 </style>
 <script type="text/javascript" src="/javascripts/iepngfix_tilebg.js"></script>
 
+
+<script type="text/javascript" src="/javascripts/jquery.jgrowl.js"></script>
+<link href="/stylesheets/jgrowl/jquery.jgrowl.css" rel="stylesheet" type="text/css" />
 
 <style type="text/css" media="screen">
 
@@ -262,8 +264,12 @@ a {
         dialogClass: "mac",
 
         // firefox and IE has displaying bugs
-        hide: ($.browser.mozilla || $.browser.msie) ? "slide" : "puff",
-        show: ($.browser.mozilla || $.browser.msie) ? "slide" : "puff",
+        //hide: ($.browser.mozilla || $.browser.msie) ? "slide" : "puff",
+        //show: ($.browser.mozilla || $.browser.msie) ? "slide" : "puff",
+        
+        // "puff" effect will have wrong layout if opened again
+        hide: "slide",
+        show: "slide",
         
         title: "Account settings for " + "'<%= current_user.login %>'",
         
@@ -272,7 +278,7 @@ a {
         
         buttons: {
           "OK": function() {
-            alert("OK clicked"); // TODO
+            show_message("TODO...");
           },
           "Close": function() {
             $(this).dialog("close");
@@ -282,6 +288,14 @@ a {
       });
  	  }
  	  account_dialog.dialog("open");
+  }
+  
+  function show_message(message) {
+    if ($.browser.msie) {
+      alert(message);
+    } else {
+      $("#jGrowl-Notification").jGrowl(message);
+    }
   }
   
   function will_change_account_password() {
@@ -489,6 +503,8 @@ a {
   </table>
 </p>  
 </div>
+
+<div id="jGrowl-Notification" class="bottom-right"></div>
 
 </body></html>
 
