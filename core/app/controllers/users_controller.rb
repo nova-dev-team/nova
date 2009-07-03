@@ -10,6 +10,8 @@ class UsersController < ApplicationController
   def create
     logout_keeping_session!
     @user = User.new(params[:user])
+    ## TODO add into admin group?
+    @user.groups << (Group.find_by_name 'user') ## default user group
     ## TODO ADD to user group @user.groups << (Group.find_by_name 'user') ## default user group
     success = @user && @user.save
     if success && @user.errors.empty?

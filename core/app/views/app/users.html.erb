@@ -12,15 +12,68 @@
 
 <% content_for :layout_style_and_scripts do %>
 
+<link href="/stylesheets/table-style/styles.css" rel="stylesheet" type="text/css" />
 
+
+<link href="/stylesheets/iphone_checkbox.jquery/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/javascripts/iphone_checkbox/iphone_checkbox.jquery.js"></script>
+<!-- iPhone style check box has some problems -->
 
 <script type="text/javascript">
 
-show_message("g");
 
+  $(document).ready(function() {
+    // iphone style is not working correctly
+    $('.iphone_style_checkbox :checkbox').iphoneStyle({checkedLabel: "YES", uncheckedLabel : "NO"});
+    $('.iphone_style_checkbox :checkbox').bind("change", function(e){
 
+      user_id = e.target.id.split("-")[1];
+      user_login = $("#user_login_holder-" + user_id).val();
+      chkbox = $("#user_active_checker-" + user_id);
+
+      var active = !chkbox.attr('checked');
+      
+
+      
+      // tricks to move iPhone checkbox back to old status
+      var handle = chkbox.siblings('.iPhoneCheckHandle');
+      var onlabel = chkbox.siblings('.iPhoneCheckLabelOn');
+      var container = chkbox.parent('.iPhoneCheckContainer');
+      
+      // it is the internal value of iPhone checkbox
+      var is_onstate = (handle.position().left <= 0);
+      
+      $.ajax({
+        type: "POST",
+        url: "/users/" + user_id,
+        data: {
+          _method: "put", // NOTE crappy method to change a "POST" into "PUT"
+          activated: active
+        },
+        error: function(e) {
+          show_message("Connection error! Check your network connection!");
+          chkbox.attr('checked', !active);  // roll back to original state
+
+          var new_left = (!active) ? (container.width() - handle.width() - 8) : 0;
+          handle.animate({ left: new_left }, 200);
+          onlabel.animate({ width: new_left }, 200);
+
+        },
+        success: function(msg) {
+          if (active) {
+            show_message("Successfully activated user'" + user_login + "'");
+          } else {
+            show_message("Successfully deactivated user'" + user_login + "'");
+          }
+        }
+      });  
+      
+    });
+    
+  });
+  
+  
 </script>
-
 
 
 <% end -%>
@@ -28,15 +81,70 @@ show_message("g");
 
 <% content_for :layout_center_frame do %>
 
+<div class="iphone_style_checkbox">
+<table id="user_table" class="styled_table" cellspacing="0">
+<caption>List of all users, including 'root' and Administrators</caption>
+
+<!-- The header row -->
+<tr>
+  <th scope="col">
+    #
+  </th>
+  <th scope="col">
+    User ID
+  </th>
+  <th scope="col">
+    Full Name
+  </th>
+  <th scope="col">
+    Email Address
+  </th>
+  <th scope="col">
+    User Groups
+  </th>
+  <th scope="col">
+    Activated?
+  </th>
+</tr>
+
 <%
-  user_list_html = ""
-  User.all.each {|u| user_list_html += u.login + "<br />"}
+  0.upto(User.all.size - 1) do |i|
+    u = User.all[i]
 %>
 
+<tr>
+  <th scope="row" <%= "class='#{(i.odd?) ? "specalt" : "spec"}'" %>>
+    <%= u.id %>
+    <input type="hidden" id="user_login_holder-<%= u.id %>" value="<%= u.login %>"/>
+  </th>
+  <td <%= "class='alt'" if i.odd? %>>
+    <%= u.login %>
+  </td>
+  <td <%= "class='alt'" if i.odd? %>>
+    '<%= u.name %>'
+  </td>
+  <td <%= "class='alt'" if i.odd? %>>
+    <%= u.email %>
+  </td>
+  <td <%= "class='alt'" if i.odd? %>>
+    <%
+      user_groups = ""
+      u.groups.each do |g|
+        user_groups += ", " unless user_groups == ""
+        user_groups += g.name
+      end
+    %>
+    [<%= user_groups %>]
+  </td>
+  <td <%= "class='alt'" if i.odd? %>>
+    <input id='user_active_checker-<%= u.id %>' type="checkbox" <%= "disabled='disabled'" if u.login == 'root' %> <%= "checked='checked'" if u.activated %>></input>
+  </td>
+</tr>
 
+<% end -%>
 
-
-<%= user_list_html %>
+</table>
+</div>
 
 <% end -%>
 

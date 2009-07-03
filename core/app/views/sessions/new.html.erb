@@ -451,7 +451,8 @@ html>body #page {
         'user[login]': signup_user_id.value,
         'user[password]': signup_password.value,
         'user[password_confirmation]': signup_password_confirm.value,
-        'user[email]': signup_email.value
+        'user[email]': signup_email.value,
+        'user[name]': signup_fullname.value
       },
       onSuccess: function(transport){
         var json = transport.responseText.evalJSON(true);
