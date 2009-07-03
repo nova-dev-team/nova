@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Welcome, <%=h current_user.name != "" ? current_user.name : current_user.login %></title>
+<title>Welcome, '<%=h current_user.name != "" ? current_user.name : current_user.login %>'</title>
 
 <link href="/stylesheets/custom_buttons/custom_buttons.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/lavalamp/lavalamp.css" rel="stylesheet" type="text/css" />
@@ -255,15 +255,15 @@ a {
       account_dialog = $("#user_account_setting").dialog({
         modal: true,
         width: 560,
-        height: 420,
+        height: $.browser.msie ? 720 : 420, // IE has layout problems
         resizable: false,
-        movable: false,
+        draggable: $.browser.msie == false, // IE has layout problems
 
         dialogClass: "mac",
 
-        // firefox has displaying bugs
-        hide: $.browser.mozilla ? null : "puff",
-        show: $.browser.mozilla ? null : "puff",
+        // firefox and IE has displaying bugs
+        hide: ($.browser.mozilla || $.browser.msie) ? "slide" : "puff",
+        show: ($.browser.mozilla || $.browser.msie) ? "slide" : "puff",
         
         title: "Account settings for " + "'<%= current_user.login %>'",
         
@@ -473,19 +473,21 @@ a {
       <td><input type="password" id="account_setting_new_password_confirm" /></td>
     </tr>
 
-    <tr style="display:none" class="account_setting_old_password_container">
-      <td>Old Password *</td>
+    <tr>
+      <td><div class="account_setting_old_password_container">Old Password *</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="password" id="account_setting_old_password" /></td>
+      <td><input class="account_setting_old_password_container" type="password" id="account_setting_old_password" /></td>
     </tr>
     
-    <tr style="display:none" class="account_setting_old_password_container">
+    <tr>
       <td colspan=3>
-        <font style="font-size:10px">Old password is required if you want to change it.</font>
+        <div class="account_setting_old_password_container">
+          <font style="font-size:10px">Old password is required if you want to change it.</font>
+        </div>
       </td>
     </tr>
   </table>
-  </p>
+</p>  
 </div>
 
 </body></html>
