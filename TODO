@@ -1,5 +1,8 @@
 [open]
 
+* change logged_in? to logged_in_and_activated?
+  change respond_to {blah} to render_success/render_failure
+
 * TEST long user id/name/password/email address
 
 * fix the display bug of growl4rails on IE
@@ -8,4 +11,8 @@
 
 * add managing tools for administrator, provide image upload/remove
   utility, and management on user's virtual machines
+
+[closed]
+
+
 

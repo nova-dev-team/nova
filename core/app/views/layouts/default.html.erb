@@ -192,6 +192,10 @@ a {
  	var account_dialog;
  	
  	
+ 	var account_setting_fullname_val = "<%= current_user.name %>";
+ 	var account_setting_email_val = "<%= current_user.email %>";
+ 	
+ 	
  	function do_my_account() {
  	  if (account_dialog == null) {
  	    
@@ -201,8 +205,8 @@ a {
  	      // trick: unset the focus on fullname input, else the user name is not shown at beginning
  	      $("#account_setting_fullname").blur();
  	      
-     	  decorate_field($("#account_setting_fullname"), "<%= current_user.name %>", "wait_for_input");
-     	  decorate_field($("#account_setting_email"), "<%= current_user.email %>", "wait_for_input");
+     	  decorate_field($("#account_setting_fullname"), account_setting_fullname_val, "wait_for_input");
+     	  decorate_field($("#account_setting_email"), account_setting_email_val, "wait_for_input");
      	  
      	  // =============================================
      	  
@@ -298,11 +302,35 @@ a {
               return;
             }
             e.currentTarget.innerHTML = "Please wait";
-            show_message("Updating your account info");
-            
-            
-            // TODO send Ajax message to change user info
-            // close if success
+//            show_message("Updating your account info");
+          
+            $.ajax({
+              type: "POST",
+              url: "/users/<%= current_user.id %>",
+              data: {
+                _method: "put", // NOTE crappy method to change a "POST" into "PUT"
+                
+                fullname: $("#account_setting_fullname").val(),
+                email: $("#account_setting_email").val()
+                
+                /* TODO password */
+              },
+              dateType: 'json',
+              error: function(e) {
+                show_message("Connection error! Check your network connection!");
+              },
+              success: function(responseText) {
+                var result = $.evalJSON(responseText);
+                if (result.success) {
+                  show_message("Successfully updated information of '<%= current_user.login %>', please reload this page.<br /> Server message => " + result.message);
+                  account_setting_fullname_val = $("#account_setting_fullname").val();
+                  account_setting_email_val = $("#account_setting_email").val();
+                } else {
+                  show_message("Failed to update information of '<%= current_user.login %>'.<br /> Server message => " + result.message);
+                }
+                alert("PASSWORD changing is TODO");
+              }
+            });  
             
             $(this).dialog("close");
             e.currentTarget.innerHTML = "OK";

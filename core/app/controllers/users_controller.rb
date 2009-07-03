@@ -23,11 +23,8 @@ class UsersController < ApplicationController
       ## don't sign in the user immediately, since we need to activate it by admin
       # self.current_user = @user # !! now logged in
       
-      respond_to do |accept|
-        accept.json {
-          render :json => {:success => true, :message => "Your account has been registered. Please wait for administrator's approval."}
-        }
-      end
+      
+      render_success "Your account has been registered. Please wait for administrator's approval."
       
       ## redirect_back_or_default('/')
       ## flash[:notice] = "Thanks for signing up!  We're sending you an email with your activation code."
@@ -37,12 +34,9 @@ class UsersController < ApplicationController
       pp @user.errors
       error_text = ""
       @user.errors.each {|item, reason| error_text += item + " ==> " + reason}
-      respond_to do |accept|
-        accept.json {
-          render :json => {:success => false, :message => "Your account could not be created. Server error:\n#{error_text}"}
-        }
-      ## TODO add render :xml => {blah-blah-blah}
-      end
+
+      render_failure "Your account could not be created. Server error:\n#{error_text}"
+
     end
   end
 
@@ -53,8 +47,13 @@ class UsersController < ApplicationController
 ## For admin user, all normal users and him/herself was shown
 ## TODO
   def index
-    require_login # TODO when using curl, login with wrong password, and exception will be thrown
+  
+    if not logged_in_and_activated?
+      render_failure "You must be logged in to carry out this action"
+      return
+    end
     
+    # helper funciton to select fields to respond
     def user_data_in_hash u
       {:id => u.id, :login => u.login, :fullname => u.name, :email => u.email, :groups => u.groups.collect {|g| g.name}, :activated => u.activated}
     end
@@ -67,12 +66,9 @@ class UsersController < ApplicationController
     else
       users_list = [user_data_in_hash current_user]
     end
-    respond_to do |accept|
-      accept.json {
-        render :json => users_list
-      }
-    ## TODO add render :xml => {blah-blah-blah}
-    end
+    
+    render_success "Successfully retrieved list of users", {:users => users_list}
+    
   end
 
 ## Update a user's settings, such as fullname, password, email address.
@@ -82,74 +78,85 @@ class UsersController < ApplicationController
 ## When changing full username and email address, they must be well formatted as required by "User" model.
 ## TODO
   def update
+    
+    # require logged in
+    if not logged_in_and_activated?
+      render_failure "You are not logged in"
+      return
+    end
+  
     pp params
     
     information_updated = false # flag to denote a change in user's profile
     
+    user = User.find_by_id params[:id]
+    if user == nil
+      render_failure "User not found"
+      return
+    end
+    
     if params[:fullname]
-      assert_self params[:id] # only user him/herself could change these properties
-      # TODO
-      information_updated = true
-    end
-    
-    if params[:email]
-      assert_self params[:id] # only user him/herself could change these properties
-      # TODO
-      information_updated = true
-    end
-    
-    if params[:new_password] || params[:new_password_confirm] || params[:old_password]
-      assert_self params[:id] # only user him/herself could change these properties
-      # TODO
-      information_updated = true
-    end
-
-    if params[:activated]
-    
-      root_or_admin_required
-      u = User.find_by_id params[:id]
-      u.activated = (params[:activated] == 'true')
-      if u.save
+      # only user him/herself could change these properties
+      if logged_in_and_activated? and current_user.id == user.id
         information_updated = true
+        user.name = params[:fullname]
+        # length test is take when saving to database
       else
-        ## TODO alert saving error
+        render_failure "You are not allowd to do this"
+        return
       end
     end
     
-    reply_message = ""
-    reply_success = false
-    if information_updated
-      reply_message = "Successfully changed settings of '#{u.login}'"
-      reply_success = true
+    if params[:email]
+      if logged_in_and_activated? and current_user.id == user.id
+        information_updated = true
+        user.email = params[:email]
+      else
+        render_failure "You are not allowd to do this"
+        return
+      end
+    end
+    
+    if params[:new_password] || params[:new_password_confirm] || params[:old_password]
+      # TODO change user password
+      render_failure "Changing password is not implemented"
+      return
+    end
+
+    if params[:activated] # root or admin required
+      if current_user.is_root? # root could active anyone except itself
+      
+        if user.is_root? # trying to change settings of root itself, disallowed
+          render_failure "You cannot deactive yourself!"
+          return
+        end
+        
+      elsif current_user.is_admin?
+
+        if user.is_admin? # trying to change settings of root itself, disallowed
+          render_failure "Administrators cannot be deactivated"
+          return
+        elsif user.is_root? # cannot deactivate root
+          render_failure "You are not allowed to do this"
+          return
+        end
+        
+      else # normal user cannot do this
+        render_failure "You do not have enough priviledge for this action"
+        return
+      end
+      
+      user.activated = (params[:activated] == 'true')
+      information_updated = true
+    end
+    
+    if information_updated and user.save
+      render_success "Successfully changed settings of '#{user.login}'"
     else
-      reply_message = "Nothing updated for '#{u.login}'"
-      reply_success = false
+      render_failure "Nothing updated for '#{user.login}'"
     end
-    
-    respond_to do |accept|
-      accept.json {
-        render :json => {:success => reply_success, :message => reply_message}
-      }
-    end
-    
-  end
-
-private
-  
-  def deny_request
-    render :status => :forbidden
-  end
-
-  def assert_self user_id
-    deny_request unless current_user.login == (User.find user_id).login
-  end
-
-  def root_or_admin_required
-    redirect_to login_url unless logged_in? and (current_user.in_group? "admin" or current_user.in_group? "root")
-  end
-  
-  def require_login
-    redirect_to login_url unless logged_in?
+#  rescue
+ #   render_failure "Exception occured on server"
   end
 
 end

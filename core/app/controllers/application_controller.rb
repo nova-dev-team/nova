@@ -12,6 +12,35 @@ class ApplicationController < ActionController::Base
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
   
+
+
+protected
   ## TODO add some helper functions
+  
+  
+  def redirect_unless_logged_in
+    redirect_to login_url unless logged_in?
+  end
+  
+  def render_result success, message, option = {}
+    respond_to do |accept|
+      accept.json {
+        render :json => {:success => success, :message => message}.merge(option)
+      }
+      ## TODO add render :xml => {blah-blah-blah}
+    end    
+  end
+  
+  def render_failure message, option = {}
+    render_result false, message, option
+  end
+  
+  def render_success message, option = {}
+    render_result true, message, option
+  end
+  
+  def logged_in_and_activated?
+    logged_in? and current_user.activated?
+  end
 
 end

@@ -55,6 +55,14 @@ class User < ActiveRecord::Base
   def in_group? group_name
     groups.include?(Group.find_by_name group_name)
   end
+  
+  def is_root?
+    login == "root"
+  end
+  
+  def is_admin?
+    groups.include?(Group.find_by_name "admin")
+  end
 
   protected
     
