@@ -47,11 +47,40 @@ class UsersController < ApplicationController
   end
 
 
+## Show (partial) list of users
+## For normal user, only him/herself was shown
+## For root user, all users are shown, including "root"
+## For admin user, all normal users and him/herself was shown
+## TODO
+  def index
+    require_login # TODO when using curl, login with wrong password, and exception will be thrown
+    
+    def user_data_in_hash u
+      {:id => u.id, :login => u.login, :fullname => u.name, :email => u.email, :groups => u.groups.collect {|g| g.name}, :activated => u.activated}
+    end
+    
+    if current_user.in_group? "root"
+      users_list = User.all.collect {|u| user_data_in_hash u}
+    elsif current_user.in_group? "admin"
+      users_list = (User.all.select {|u| u.in_group? "user"}).collect {|u| user_data_in_hash u}
+      users_list << (user_data_in_hash current_user)
+    else
+      users_list = [user_data_in_hash current_user]
+    end
+    respond_to do |accept|
+      accept.json {
+        render :json => users_list
+      }
+    ## TODO add render :xml => {blah-blah-blah}
+    end
+  end
+
 ## Update a user's settings, such as fullname, password, email address.
 ## Also used to change activation and groups, which requires privileged user.
 ## A user cannot change his/her own activation flag and groups
 ## When changing password, old password is also required, along with a password confirmation.
 ## When changing full username and email address, they must be well formatted as required by "User" model.
+## TODO
   def update
     pp params
     
@@ -106,7 +135,7 @@ class UsersController < ApplicationController
   end
 
 private
-
+  
   def deny_request
     render :status => :forbidden
   end
@@ -117,6 +146,10 @@ private
 
   def root_or_admin_required
     redirect_to login_url unless logged_in? and (current_user.in_group? "admin" or current_user.in_group? "root")
+  end
+  
+  def require_login
+    redirect_to login_url unless logged_in?
   end
 
 end

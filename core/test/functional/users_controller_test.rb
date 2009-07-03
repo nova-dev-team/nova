@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require 'users_controller'
+require 'pp'
 
 # Re-raise errors caught by the controller.
 class UsersController; def rescue_action(e) raise e end; end
@@ -50,9 +51,6 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
   
-
-  
-
   protected
     def create_user(options = {})
       post :create, :user => { :login => 'quire', :email => 'quire@somewhere.com',
