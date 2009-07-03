@@ -252,6 +252,14 @@ a {
      	    show_old_password_container()
      	  });
      	  
+     	  np.bind("keypress", function() {
+     	    np.removeClass("wrong_input");
+     	  });
+     	  
+     	  npc.bind("keypress", function() {
+     	    np.removeClass("wrong_input");
+     	  });
+     	  
       }
       
       account_dialog = $("#user_account_setting").dialog({
@@ -277,8 +285,23 @@ a {
         open: do_init_settings_fields,
         
         buttons: {
-          "OK": function() {
-            show_message("TODO...");
+          "OK": function(e) {
+            if (will_change_account_info() == false) {
+              $(this).dialog("close");
+              return;
+            }
+            if (do_account_setting_validate() == false) {
+              return;
+            }
+            e.currentTarget.innerHTML = "Please wait";
+            show_message("Updating your account info");
+            
+            
+            // TODO send Ajax message to change user info
+            // close if success
+            
+            $(this).dialog("close");
+            e.currentTarget.innerHTML = "OK";
           },
           "Close": function() {
             $(this).dialog("close");
@@ -305,11 +328,65 @@ a {
     return (np.val() != null && np.val() != "") || (npc.val() != null && npc.val() != "");
   }
   
+  function will_change_account_info() {
+    return (will_change_account_password() || 
+            (has_classname($("#account_setting_fullname"), "wait_for_input") == false) || 
+            (has_classname($("#account_setting_email"), "wait_for_input") == false)
+           );
+  }
+  
   function do_account_setting_validate() {
+    var fullname = $("#account_setting_fullname");
+    var email = $("#account_setting_email");
     
-    if (will_change_account_password) {
-      // do password checking
+    if (fullname.val() != null && fullname.val().length > 100) {
+      show_message("Full name cannot exceed 100 characters");
+      fullname.addClass("wrong_input");
+      return false;
     }
+    
+    if (email.val() == null || email.val().length < 6 || email.val().length > 40) {
+      show_message("Email address should have 6~40 characters");
+      email.addClass("wrong_input");
+      return false;
+    }
+    
+    
+    var email_regex = /^([A-Za-z0-9\-\.])+\@([A-Za-z0-9\-\.])+\.([A-Za-z]{2,4})$/;
+    if (email_regex.test(email.val()) == false) {
+      show_message("Invalid email address");
+      email.addClass("wrong_input");
+      return false;
+    }
+    
+    if (will_change_account_password()) {
+      // do password checking
+      
+      var np = $("#account_setting_new_password");
+      var npc = $("#account_setting_new_password_confirm");
+      var op = $("#account_setting_old_password");
+      
+      if (np.val() == null || np.val().length < 6 || np.val().length > 40) {
+        show_message("Password should have 6~40 characters");
+        np.addClass("wrong_input");
+        return false;
+      }
+      
+      if (npc.val() != np.val()) {
+        show_message("Your password does not match");
+        npc.addClass("wrong_input");
+        return false;
+      }
+      
+      if (op.val() == null || op.val() == "") {
+        show_message("Old password is required");
+        op.addClass("wrong_input");
+        return false;
+      }
+      
+    }
+    
+    return true;
   }
   
   function has_classname(elem, kls_name) {
