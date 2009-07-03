@@ -1,4 +1,6 @@
 <%
+  ## user management page, only available for administrators and root
+  ## TODO Ajax paging of user list (useful when there is many users)
   @nav_bar_current = "Users"
   @skip_layout_left_pane = true
 %>
@@ -33,15 +35,19 @@
 
       var active = !chkbox.attr('checked');
       
-
-      
       // tricks to move iPhone checkbox back to old status
       var handle = chkbox.siblings('.iPhoneCheckHandle');
       var onlabel = chkbox.siblings('.iPhoneCheckLabelOn');
       var container = chkbox.parent('.iPhoneCheckContainer');
       
       // it is the internal value of iPhone checkbox
-      var is_onstate = (handle.position().left <= 0);
+      
+      function roll_back_checkbox() {
+        chkbox.attr('checked', !active);  // roll back to original state
+        var new_left = (!active) ? (container.width() - handle.width() - 8) : 0;
+        handle.animate({ left: new_left }, 200);
+        onlabel.animate({ width: new_left }, 200);        
+      }
       
       $.ajax({
         type: "POST",
@@ -50,20 +56,18 @@
           _method: "put", // NOTE crappy method to change a "POST" into "PUT"
           activated: active
         },
+        dateType: 'json',
         error: function(e) {
           show_message("Connection error! Check your network connection!");
-          chkbox.attr('checked', !active);  // roll back to original state
-
-          var new_left = (!active) ? (container.width() - handle.width() - 8) : 0;
-          handle.animate({ left: new_left }, 200);
-          onlabel.animate({ width: new_left }, 200);
-
+          roll_back_checkbox();
         },
-        success: function(msg) {
-          if (active) {
-            show_message("Successfully activated user'" + user_login + "'");
+        success: function(responseText) {
+          var result = $.evalJSON(responseText);
+          if (result.success) {
+            show_message("Successfully " + (active ? "" : "de") + "activated user'" + user_login + "'.<br /> Server message => " + result.message);
           } else {
-            show_message("Successfully deactivated user'" + user_login + "'");
+            show_message("Failed to " + (active ? "" : "de") + "activate user'" + user_login + "'.<br /> Server message => " + result.message);
+            roll_back_checkbox();
           }
         }
       });  
@@ -81,10 +85,11 @@
 
 <% content_for :layout_center_frame do %>
 
-<div class="iphone_style_checkbox">
+<div class="iphone_style_checkbox" align="center">
 <table id="user_table" class="styled_table" cellspacing="0">
+<!--
 <caption>List of all users, including 'root' and Administrators</caption>
-
+-->
 <!-- The header row -->
 <tr>
   <th scope="col">
@@ -110,6 +115,9 @@
 <%
   0.upto(User.all.size - 1) do |i|
     u = User.all[i]
+    if u.login == "root"  ## don't show root user to administrators
+      next unless current_user.login == "root"
+    end
 %>
 
 <tr>
@@ -137,13 +145,22 @@
     [<%= user_groups %>]
   </td>
   <td <%= "class='alt'" if i.odd? %>>
-    <input id='user_active_checker-<%= u.id %>' type="checkbox" <%= "disabled='disabled'" if u.login == 'root' %> <%= "checked='checked'" if u.activated %>></input>
+    <%
+      if (u.id == current_user.id) or ((current_user.login != "root") and (u.in_group? "admin"))
+      # you cannot deactive your self
+      # and admins cannot deactive each other, only root can do that
+    %>
+      <%= u.activated ? "YES" : "NO" %>
+    <% else %>
+      <input id='user_active_checker-<%= u.id %>' type="checkbox" <%= "disabled='disabled'" if u.login == 'root' %> <%= "checked='checked'" if u.activated %>></input>
+    <% end %>
   </td>
 </tr>
 
 <% end -%>
 
 </table>
+</div>
 </div>
 
 <% end -%>

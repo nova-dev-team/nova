@@ -11,5 +11,7 @@ class ApplicationController < ActionController::Base
 
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
+  
+  ## TODO add some helper functions
 
 end
