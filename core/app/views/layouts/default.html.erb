@@ -357,11 +357,11 @@ a {
   }
   
   function show_message(message) {
-    if ($.browser.msie) {
-      alert(message);
-    } else {
+//    if ($.browser.msie) {
+//      alert(message);
+//    } else {
       $("#jGrowl-Notification").jGrowl(message);
-    }
+//    }
   }
   
   function will_change_account_password() {
@@ -624,7 +624,8 @@ a {
 </p>  
 </div>
 
-<div id="jGrowl-Notification" class="bottom-right"></div>
+<!-- The style is for IE -->
+<div id="jGrowl-Notification" class="bottom-right" style="position:absolute;right:0;bottom:0"></div>
 
 </body></html>
 

@@ -53,6 +53,11 @@
       
       var rightside = container.width() - handle.width() - 8;
       
+      if ($.browser.msie) {
+        // ie displaying fix
+        rightside += 4;
+      }
+      
       if (elem.is(':checked')) {
         handle.css({   left: rightside });
         onlabel.css({ width: rightside });
