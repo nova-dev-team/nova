@@ -1,22 +1,76 @@
 <%
   @nav_bar_current = "Home"
+  @skip_layout_left_pane = true
 %>
 
-<% content_for :layout_left_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  LEFT is blah-blah-blah, and you are ADMIN</p>
-  <% end -%>
+<%
+  ###################################################################################
+%>
 
-<% end -%>
+<% content_for :layout_style_and_scripts do %>
+
+<% end-%>
 
 
+<%
+  ###################################################################################
+%>
 
 <% content_for :layout_center_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  CENTER is blah-blah-blah, and you are ADMIN</p>
-  <% end -%>
+<p align="center">
+System Overview
+</p>
+
+<p align="center">
+
+<table>
+<tr>
+<td>
+
+Currently, this system has <%= (User.all.select {|u| !u.is_admin? and !u.is_root? }).size %> normal users.
+
+<p />
+
+<%
+  inactive_users = (User.all.select {|u| u.activated == false and !u.is_admin? and !u.is_root? })
+  if inactive_users.size != 0
+    inactive_users_notice_text = "NOTICE: "
+    shown_count = 0
+    
+    inactive_users.each do |u|
+    
+      if shown_count > 3
+        unshown_count = inactive_users.size - shown_count
+        if unshown_count > 1
+          inactive_users_notice_text += ", and #{unshown_count} more users are not activated!"
+          break
+        end
+      end
+      
+      inactive_users_notice_text += ", " if shown_count > 0
+      inactive_users_notice_text += "#{u.login}"
+      
+      shown_count += 1
+      if shown_count == inactive_users.size
+        if shown_count > 1
+          inactive_users_notice_text += " are not activated!"
+        else
+          inactive_users_notice_text += " is not activated!"
+        end
+      end
+    end
+    
+%>
+  <%=h inactive_users_notice_text %>
+<% end %>
+
+
+<td>
+</tr>
+</table>
+</p>
 
 <% end -%>
 

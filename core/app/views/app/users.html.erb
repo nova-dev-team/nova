@@ -113,29 +113,29 @@
 </tr>
 
 <%
-  0.upto(User.all.size - 1) do |i|
-    u = User.all[i]
+  i = 0
+  User.all.each do |u|
     
     if current_user.is_admin? # admins can only see themselves and users
       next if u.is_root? or (u.is_admin? and u.id != current_user.id)
     end
+    i += 1
 %>
-
 <tr>
-  <th scope="row" <%= "class='#{(i.odd?) ? "specalt" : "spec"}'" %>>
+  <th scope="row" <%= "class='#{(i.even?) ? "specalt" : "spec"}'" %>>
     <%= u.id %>
     <input type="hidden" id="user_login_holder-<%= u.id %>" value="<%= u.login %>"/>
   </th>
-  <td <%= "class='alt'" if i.odd? %>>
+  <td <%= "class='alt'" if i.even? %>>
     <%= u.login %>
   </td>
-  <td <%= "class='alt'" if i.odd? %>>
+  <td <%= "class='alt'" if i.even? %>>
     '<%= u.name %>'
   </td>
-  <td <%= "class='alt'" if i.odd? %>>
+  <td <%= "class='alt'" if i.even? %>>
     <%= u.email %>
   </td>
-  <td <%= "class='alt'" if i.odd? %>>
+  <td <%= "class='alt'" if i.even? %>>
     <%
       user_groups = ""
       u.groups.each do |g|
@@ -145,7 +145,7 @@
     %>
     [<%= user_groups %>]
   </td>
-  <td <%= "class='alt'" if i.odd? %>>
+  <td <%= "class='alt'" if u.id.odd? %>>
     <%
       if (u.id == current_user.id) or ((current_user.login != "root") and (u.in_group? "admin"))
       # you cannot deactive your self
