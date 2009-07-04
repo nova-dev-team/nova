@@ -508,13 +508,10 @@ html>body #page {
     var signup_fullname = $("signup_fullname");
     
     var signup_admin = $("signup_admin");
-    console.log(signup_admin);
+
     var user_group = "user";
     if (signup_admin.checked) {
-      alert("ADMIN");
       user_group = "admin";
-    } else {
-      alert("USER");
     }
     
     new Ajax.Request('/users', {

@@ -80,7 +80,7 @@ class UsersController < ApplicationController
 ## When changing full username and email address, they must be well formatted as required by "User" model.
 ## TODO
   def update
-    
+  
     # require logged in
     if not logged_in_and_activated?
       render_failure "You are not logged in"
@@ -133,6 +133,7 @@ class UsersController < ApplicationController
       if User.authenticate current_user.login, params[:old_password]
         user.password = params[:new_password]
         user.password_confirmation = params[:new_password_confirm]
+        information_updated = true
       else
         render_failure "Wrong old password"
         return
