@@ -120,9 +120,23 @@ class UsersController < ApplicationController
     end
     
     if params[:new_password] || params[:new_password_confirm] || params[:old_password]
-      # TODO change user password
-      render_failure "Changing password is not implemented"
-      return
+      if !logged_in_and_activated? or current_user.id != user.id
+        render_failure "You are not allowd to do this"
+        return
+      end
+      
+      if !(params[:new_password] and params[:new_password_confirm] and params[:old_password])
+        render_failure "Please provide old password, new password and new password confirmation"
+        return
+      end
+
+      if User.authenticate current_user.login, params[:old_password]
+        user.password = params[:new_password]
+        user.password_confirmation = params[:new_password_confirm]
+      else
+        render_failure "Wrong old password"
+        return
+      end
     end
 
     if params[:activated] # root or admin required

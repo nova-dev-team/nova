@@ -70,7 +70,7 @@
             roll_back_checkbox();
           }
         }
-      });  
+      });
       
     });
     
@@ -115,8 +115,9 @@
 <%
   0.upto(User.all.size - 1) do |i|
     u = User.all[i]
-    if u.login == "root"  ## don't show root user to administrators
-      next unless current_user.login == "root"
+    
+    if current_user.is_admin? # admins can only see themselves and users
+      next if u.is_root? or (u.is_admin? and u.id != current_user.id)
     end
 %>
 

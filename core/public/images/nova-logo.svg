@@ -6,6 +6,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="744.09448819"
@@ -16,10 +17,22 @@
    sodipodi:docname="nova-logo.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/santa/Workspace/nova/core/public/images/logo-small.png"
-   inkscape:export-xdpi="21.402559"
-   inkscape:export-ydpi="21.402559">
+   inkscape:export-xdpi="21.487135"
+   inkscape:export-ydpi="21.487135">
   <defs
      id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3173">
+      <stop
+         style="stop-color:#ddddee;stop-opacity:1;"
+         offset="0"
+         id="stop3175" />
+      <stop
+         style="stop-color:#ddddee;stop-opacity:0;"
+         offset="1"
+         id="stop3177" />
+    </linearGradient>
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
        inkscape:vp_x="0 : 526.18109 : 1"
@@ -27,6 +40,42 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3173"
+       id="linearGradient3179"
+       x1="-567.48828"
+       y1="72.475151"
+       x2="-489.01953"
+       y2="72.475151"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3173"
+       id="linearGradient3181"
+       x1="-186.21477"
+       y1="-418.27206"
+       x2="-107.74602"
+       y2="-418.27206"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3173"
+       id="linearGradient3183"
+       x1="397.92093"
+       y1="-207.10139"
+       x2="476.38968"
+       y2="-207.10139"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3173"
+       id="linearGradient3185"
+       x1="-218.50906"
+       y1="586.39789"
+       x2="-140.04031"
+       y2="586.39789"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -38,16 +87,18 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.959798"
-     inkscape:cx="441.75479"
-     inkscape:cy="721.08994"
+     inkscape:zoom="0.9899495"
+     inkscape:cx="306.05762"
+     inkscape:cy="738.97534"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1280"
      inkscape:window-height="714"
      inkscape:window-x="0"
-     inkscape:window-y="22" />
+     inkscape:window-y="22"
+     showguides="true"
+     inkscape:guide-bbox="true" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -73,10 +124,10 @@
          id="tspan2385"
          x="174.28572"
          y="449.50504"
-         style="font-size:144px;fill:#6688bb;fill-opacity:1;-inkscape-font-specification:Eras Demi ITC;font-family:Eras Demi ITC;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Nova</tspan></text>
+         style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC">Nova</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC;fill-rule:evenodd"
        x="-219.77469"
        y="622.15179"
        id="text3191"
@@ -84,10 +135,11 @@
          sodipodi:role="line"
          id="tspan3193"
          x="-219.77469"
-         y="622.15179">v</tspan></text>
+         y="622.15179"
+         style="fill-opacity:1;fill:#ff0000">v</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC;fill-rule:evenodd"
        x="-568.75391"
        y="108.22906"
        id="text3203"
@@ -95,10 +147,11 @@
          sodipodi:role="line"
          id="tspan3205"
          x="-568.75391"
-         y="108.22906">v</tspan></text>
+         y="108.22906"
+         style="fill-opacity:1;fill:#ffff00">v</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC;fill-rule:evenodd"
        x="-187.48039"
        y="-382.51816"
        id="text3207"
@@ -106,10 +159,11 @@
          sodipodi:role="line"
          id="tspan3209"
          x="-187.48039"
-         y="-382.51816">v</tspan></text>
+         y="-382.51816"
+         style="fill-opacity:1;fill:#00ff00">v</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC;fill-rule:evenodd"
        x="396.6553"
        y="-171.34749"
        id="text3211"
@@ -117,6 +171,7 @@
          sodipodi:role="line"
          id="tspan3213"
          x="396.6553"
-         y="-171.34749">v</tspan></text>
+         y="-171.34749"
+         style="fill-opacity:1;fill:#0000ff">v</tspan></text>
   </g>
 </svg>

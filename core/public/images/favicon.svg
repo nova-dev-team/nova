@@ -38,9 +38,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="348.46603"
-     inkscape:cy="734.46698"
+     inkscape:zoom="1.4"
+     inkscape:cx="269.86826"
+     inkscape:cy="761.85372"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -63,71 +63,60 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <rect
-       style="fill:#555566;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:8, 8;stroke-dashoffset:0"
-       id="rect2391"
-       width="247.99245"
-       height="247.99245"
-       x="189.90868"
-       y="200.29851" />
-    <g
-       id="g2401"
-       transform="translate(-4.0406102,3.0304576)">
-      <text
-         id="text2383"
-         y="437.88828"
-         x="278.33145"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
-         xml:space="preserve"><tspan
-           style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#6688bb;fill-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
-           y="437.88828"
-           x="278.33145"
-           id="tspan2385"
-           sodipodi:role="line">v</tspan></text>
-      <text
-         transform="matrix(0.309017,-0.9510565,0.9510565,0.309017,0,0)"
-         id="text3191"
-         y="525.37292"
-         x="-239.00546"
-         style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
-         xml:space="preserve"><tspan
-           y="525.37292"
-           x="-239.00546"
-           id="tspan3193"
-           sodipodi:role="line">v</tspan></text>
-      <text
-         transform="matrix(-0.809017,-0.5877853,0.5877853,-0.809017,0,0)"
-         id="text3203"
-         y="60.089069"
-         x="-482.3017"
-         style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
-         xml:space="preserve"><tspan
-           y="60.089069"
-           x="-482.3017"
-           id="tspan3205"
-           sodipodi:role="line">v</tspan></text>
-      <text
-         transform="matrix(-0.809017,0.5877852,-0.5877852,-0.809017,0,0)"
-         id="text3207"
-         y="-315.26578"
-         x="-115.53837"
-         style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
-         xml:space="preserve"><tspan
-           y="-315.26578"
-           x="-115.53837"
-           id="tspan3209"
-           sodipodi:role="line">v</tspan></text>
-      <text
-         transform="matrix(0.309017,0.9510565,-0.9510565,0.309017,0,0)"
-         id="text3211"
-         y="-81.98835"
-         x="355.40616"
-         style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ddddee;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
-         xml:space="preserve"><tspan
-           y="-81.98835"
-           x="355.40616"
-           id="tspan3213"
-           sodipodi:role="line">v</tspan></text>
-    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="286.91776"
+       y="445.46442"
+       id="text2383"><tspan
+         sodipodi:role="line"
+         id="tspan2385"
+         x="286.91776"
+         y="445.46442"
+         style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC">v</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="-243.5575"
+       y="535.88013"
+       id="text3191"
+       transform="matrix(0.309017,-0.9510565,0.9510565,0.309017,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3193"
+         x="-243.5575"
+         y="535.88013">v</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="-493.70132"
+       y="59.006741"
+       id="text3203"
+       transform="matrix(-0.809017,-0.5877853,0.5877853,-0.809017,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3205"
+         x="-493.70132"
+         y="59.006741">v</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="-118.03168"
+       y="-326.44189"
+       id="text3207"
+       transform="matrix(-0.809017,0.5877852,-0.5877852,-0.809017,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3209"
+         x="-118.03168"
+         y="-326.44189">v</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:144px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Eras Demi ITC;-inkscape-font-specification:Eras Demi ITC"
+       x="365.2648"
+       y="-87.813248"
+       id="text3211"
+       transform="matrix(0.309017,0.9510565,-0.9510565,0.309017,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3213"
+         x="365.2648"
+         y="-87.813248">v</tspan></text>
   </g>
 </svg>
