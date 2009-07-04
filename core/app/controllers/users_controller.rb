@@ -10,9 +10,11 @@ class UsersController < ApplicationController
   def create
     logout_keeping_session!
     @user = User.new(params[:user])
-    ## TODO add into admin group?
-    @user.groups << (Group.find_by_name 'user') ## default user group
-    ## TODO ADD to user group @user.groups << (Group.find_by_name 'user') ## default user group
+    if params[:user][:group] != "admin"
+      @user.groups << (Group.find_by_name 'user') ## default user group
+    else
+      @user.groups << (Group.find_by_name 'admin')
+    end
     success = @user && @user.save
     if success && @user.errors.empty?
             # Protects against session fixation attacks, causes request forgery

@@ -30,7 +30,13 @@ var iPhoneStyle = function(selector_or_elem, options) {
         container = elem.up('.' + options.containerClass),
         rightside = container.getWidth() - 39;
     
+    /* bug fix for Nova */
+    if (options.rightside != null) {
+      rightside = options.rightside;
+    }
+        
     container.observe('mouseup', function() {
+
       var is_onstate = elem.checked;
       
       new Effect.Tween(null, (is_onstate) ? 1 : 0, (is_onstate) ? 0 : 1, {duration: 0.1}, function(p) { handle.setStyle({ left: p * rightside + 'px' }) });

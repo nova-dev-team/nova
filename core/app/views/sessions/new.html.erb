@@ -6,11 +6,15 @@
 <link href="/stylesheets/prototype_window/default.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/prototype_window/mac_os_x.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/custom_buttons/custom_buttons.css" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/iphone_checkbox/style.css" rel="stylesheet" type="text/css" />
+
 
 <script type="text/javascript" src="/javascripts/prototype.js"> </script>
 <script type="text/javascript" src="/javascripts/effects.js"> </script>
+<script type="text/javascript" src="/javascripts/iphone_checkbox/iphone_checkbox.js"> </script>
 <script type="text/javascript" src="/javascripts/prototype_window/window.js"> </script>
 <script type="text/javascript" src="/javascripts/prototype_window/window_effects.js"> </script>
+
 
 <%= growl4rails_includes %>
 
@@ -24,6 +28,7 @@ body {
   font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
   font-size: 13px;
   color: #333;
+  overflow: hidden;
 }
 
 input {
@@ -155,6 +160,7 @@ html>body #page {
   }
 
   function do_signup() {
+
     var logo = $("logo_holder");
     
     if ($("signup_window") == null) {
@@ -172,14 +178,70 @@ html>body #page {
         resizable: false,
         destroyOnClose: true
       });
-      win.getContent().update($("signup_form").innerHTML);
+      win.getContent().update("\
+<p align='center'>\
+  <table>\
+    <tr>\
+      <td>User ID *</td>\
+      <td><img src='/images/spacer.gif' width=40 height=40></td>\
+      <td><input type='text' id='signup_user_id' /></td>\
+    </tr>\
+    <tr>\
+      <td>Password *</td>\
+      <td><img src='/images/spacer.gif' width=40 height=40></td>\
+      <td><input type='password' id='signup_password' /></td>\
+    </tr>\
+    <tr>\
+      <td>Confirm Password *</td>\
+      <td><img src='/images/spacer.gif' width=40 height=40></td>\
+      <td><input type='password' id='signup_password_confirm' /></td>\
+    </tr>\
+    <tr>\
+      <td>Email Address *</td>\
+      <td><img src='/images/spacer.gif' width=40 height=40></td>\
+      <td><input type='text' id='signup_email' /></td>\
+    </tr>\
+    <tr>\
+      <td>Full Name</td>\
+      <td><img src='/images/spacer.gif' width=40 height=40></td>\
+      <td><input type='text' id='signup_fullname' /></td>\
+    </tr>\
+<!--    <tr>\
+      <td><img src='/misc/verification_image.png' /> *</td>\
+      <td><img src='/images/spacer.gif' width=40 height=40></td>\
+      <td><input type='text' id='signup_verification' /></td>\
+    </tr>\
+-->\
+    <tr>\
+      <td>Sign up as administrator?</td>\
+      <td><img src='/images/spacer.gif' width=40 height=40></td>\
+      <td><input type='checkbox' id='signup_admin' /></td>\
+    </tr>\
+    <tr>\
+      <td colspan=3>\
+        <font style='font-size:10px'>Fields with * is required<br />\
+        Allowed user id characters include: a-z, 0-9, '.' and '_' (must start with a-z)</font>\
+      </td>\
+    </tr>\
+  </table>\
+  </p>\
+  <p align='center'>\
+  <button id='btn_send_signup' type='button' class='btn' onclick='send_signup()'><span><span>Sign up!</span></span></button>\
+  </p>\
+      ");
+      
+    new iPhoneStyle('input[type=checkbox]', {
+      rightside: 46, // display bug fix
+      checkedLabel: "YES",  // default is "ON"
+      uncheckedLabel: "NO"  // default is "OFF"
+    });
       win.show();
     }
     
     decorate_field($('signup_user_id'), "3~20 characters", "wait_for_input");
     decorate_field($('signup_email'), "6~40 characters", "wait_for_input");
     decorate_field($('signup_fullname'), "<= 40 characters", "wait_for_input");
-    decorate_field($('signup_verification'), "what's in the picture?", "wait_for_input");
+//    decorate_field($('signup_verification'), "what's in the picture?", "wait_for_input");
     
     var signup_password = $('signup_password');
     var signup_password_confirm = $('signup_password_confirm');
@@ -289,8 +351,8 @@ html>body #page {
       _resizing_fix_090630 = true;
     }
     
-    var left_origin = (getWindowWidth() - panel.getWidth()) / 2;
-    var top_origin = (getWindowHeight() - panel.getHeight()) / 2;
+    var left_origin = (getWindowWidth() - panel.getWidth()) / 2 - page_border_width;
+    var top_origin = (getWindowHeight() - panel.getHeight()) / 2 - page_border_width;
     
     if (_resizing_fix_090630) {
       left_origin += page_border_width;
@@ -400,13 +462,13 @@ html>body #page {
       signup_fullname.addClassName("wrong_input");
       return false;
     }
-    
+/*
     if (signup_verification.hasClassName("wait_for_input")) {
       signup_error("Don't forget the verification code");
       signup_verification.addClassName("wrong_input");
       return false;
     }
-    
+*/
     if (signup_email.hasClassName("wait_for_input")) {
       signup_error("Please provide your email address");
       signup_email.addClassName("wrong_input");
@@ -445,6 +507,16 @@ html>body #page {
     var signup_verification = $("signup_verification");
     var signup_fullname = $("signup_fullname");
     
+    var signup_admin = $("signup_admin");
+    console.log(signup_admin);
+    var user_group = "user";
+    if (signup_admin.checked) {
+      alert("ADMIN");
+      user_group = "admin";
+    } else {
+      alert("USER");
+    }
+    
     new Ajax.Request('/users', {
       method: 'post',
       parameters: {
@@ -452,7 +524,8 @@ html>body #page {
         'user[password]': signup_password.value,
         'user[password_confirmation]': signup_password_confirm.value,
         'user[email]': signup_email.value,
-        'user[name]': signup_fullname.value
+        'user[name]': signup_fullname.value,
+        'user[group]': user_group
       },
       onSuccess: function(transport){
         var json = transport.responseText.evalJSON(true);
@@ -472,10 +545,16 @@ html>body #page {
     
     window.onresize = do_layout;
     do_layout();
+
     
     $("page").show(); // prevents blinking
     $("logo_holder").show();
     $("bottom_line").show();
+    
+    if (Prototype.Browser.IE) {
+      // for IE, layout twice to fix border-drawing bug  
+      do_layout();
+    }
 
 /*    if (Prototype.Browser.IE) {
       // warning for ie
@@ -582,50 +661,5 @@ We suggest the following browsers:<br />
 </p>
 </div>
 
-<div id="signup_form" style="display: none;">
-  <p align="center">
-  <table>
-    <tr>
-      <td>User ID *</td>
-      <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="text" id="signup_user_id" /></td>
-    </tr>
-    <tr>
-      <td>Password *</td>
-      <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="password" id="signup_password" /></td>
-    </tr>
-    <tr>
-      <td>Confirm Password *</td>
-      <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="password" id="signup_password_confirm" /></td>
-    </tr>
-    <tr>
-      <td>Email Address *</td>
-      <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="text" id="signup_email" /></td>
-    </tr>
-    <tr>
-      <td>Full Name</td>
-      <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="text" id="signup_fullname" /></td>
-    </tr>
-    <tr>
-      <td><img src="/misc/verification_image.png" /> *</td>
-      <td><img src="/images/spacer.gif" width=40 height=40></td>
-      <td><input type="text" id="signup_verification" /></td>
-    </tr>
-    <tr>
-      <td colspan=3>
-        <font style="font-size:10px">Fields with * is required<br />
-        Allowed user id characters include: a-z, 0-9, '.' and '_' (must start with a-z)</font>
-      </td>
-    </tr>
-  </table>
-  </p>
-  <p align="center">
-  <button id="btn_send_signup" type="button" class="btn" onclick="send_signup()"><span><span>Sign up!</span></span></button>
-  </p>
-</div>
 
 </body></html>
