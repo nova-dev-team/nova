@@ -303,20 +303,30 @@ a {
             }
             e.currentTarget.innerHTML = "Please wait";
 //            show_message("Updating your account info");
-          
-            $.ajax({
-              type: "POST",
-              url: "/users/<%= current_user.id %>",
-              data: {
+
+            
+            
+            if (will_change_account_password()) {
+              var ajax_data = {
                 _method: "put", // NOTE crappy method to change a "POST" into "PUT"
-                
                 fullname: $("#account_setting_fullname").val(),
                 email: $("#account_setting_email").val(),
                 old_password: $("#account_setting_old_password").val(),
                 new_password: $("#account_setting_new_password").val(),
-                new_password_confirm: $("#account_setting_new_password_confirm").val(),
-                
-              },
+                new_password_confirm: $("#account_setting_new_password_confirm").val()
+              }
+            } else {
+              var ajax_data = {
+                _method: "put", // NOTE crappy method to change a "POST" into "PUT"
+                fullname: $("#account_setting_fullname").val(),
+                email: $("#account_setting_email").val()
+              }
+            }
+          
+            $.ajax({
+              type: "POST",
+              url: "/users/<%= current_user.id %>",
+              data: ajax_data,
               dateType: 'json',
               error: function(e) {
                 show_message("Connection error! Check your network connection!");
