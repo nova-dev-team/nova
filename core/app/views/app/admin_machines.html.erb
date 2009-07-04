@@ -1,23 +1,156 @@
 <%
   @nav_bar_current = "Machines"
+  @layout_resize_callback = "do_layout"
+%>
+
+
+<%
+  ###################################################################################
+%>
+
+
+
+<% content_for :layout_style_and_scripts do %>
+  
+<style type="text/css" media="screen">
+
+a.left_nav_button {
+  display: block;
+  height: 35;
+  color: black;
+  overflow: hidden;
+  padding-left: 20px;
+  line-height: 35px;
+  text-decoration: none;
+}
+
+a.left_nav_button:hover {
+  background-color: #bbaabb;
+}
+
+a.left_nav_current {
+  color: #ddeeee;
+  font-weight: bold;
+  background-image: url(/images/left-nav-btn-bg.gif);
+}
+
+.machines_holder {
+/* width & height set by js in do_layout */
+  border-top: 1px solid #BBB;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+#left_nav_bottom {
+  height: 30px;
+  z-index: 100;
+  border-top: 1px solid #BBB;
+}
+
+</style>
+
+
+<script type="text/javascript">
+
+  function getWindowHeight() {
+    return window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight);
+  }
+
+  function do_layout() {
+    $(".machines_holder").height($("#layout_left_pane").height() - 2 * $(".left_nav_button").height() - $("#left_nav_bottom").height());
+    $(".machines_holder").css("width", $("#layout_left_pane").width());
+    $(".left_nav_button").css("width", $("#layout_left_pane").width());
+    $("#left_nav_bottom").css("width", $("#layout_left_pane").width());
+  };
+  
+  window.onresize = do_layout;
+  
+  $(document).ready(function(){
+    
+    // override default left pane overflow settings
+    $("#layout_left_pane").css("overflow", "hidden");
+    
+    // by default. show physical machines
+    list_physical_machines();
+  });
+  
+  
+  function list_virtual_machines() {
+    $("#left_nav_btn_list_pmachine").removeClass("left_nav_current");
+    $("#left_nav_btn_list_vmachine").addClass("left_nav_current");
+    $("#vmachine_list_holder").show();
+    $("#pmachine_list_holder").hide();
+    
+    var html_str = "";
+    
+    for (i = 0; i < 100; i++) {
+      html_str += "HELLO, this is VM " + i + "<br />";
+    }
+    
+    $("#vmachine_list_holder").html(html_str);
+    do_layout();
+  }
+  
+  function list_physical_machines() {
+    $("#left_nav_btn_list_vmachine").removeClass("left_nav_current");
+    $("#left_nav_btn_list_pmachine").addClass("left_nav_current");
+    $("#pmachine_list_holder").show();
+    $("#vmachine_list_holder").hide();
+    
+    var html_str = "";
+    
+    for (i = 0; i < 100; i++) {
+      html_str += "HELLO, this is PM " + i + "<br />";
+    }
+    
+    $("#pmachine_list_holder").html(html_str);
+    do_layout();
+  }
+  
+</script>
+  
+<% end -%>
+
+
+<%
+  ###################################################################################
 %>
 
 
 <% content_for :layout_left_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  LEFT is blah-blah-blah, and you are USER</p>
-  <% end -%>
+<!--
+<a id="left_nav_btn_list_pmachine" class="left_nav_button left_nav_current" href="#" onclick="list_physical_machines()">
+  Physical Machines
+</a>
+
+<a id="left_nav_btn_list_vmachine" class="left_nav_button" href="#" onclick="list_virtual_machines()">
+  Virtual Machines
+</a>
+-->
+
+<div id="pmachine_list_holder" class="machines_holder"></div>
+<div id="vmachine_list_holder" class="machines_holder"></div>
+
+<div id="left_nav_bottom">
+
+<div id="left_nav_add_btn_holder">
+  ADD
+</div>
+
+</div>
 
 <% end -%>
+
+
+<%
+  ###################################################################################
+%>
 
 
 
 <% content_for :layout_center_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  CENTER is blah-blah-blah, and you are USER</p>
-  <% end -%>
 
 <% end -%>
 
