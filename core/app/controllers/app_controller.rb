@@ -14,43 +14,35 @@ class AppController < ApplicationController
   
   
   def admin_machines
-    if current_user.in_group? "admin"
-      render :template => 'app/admin_machines.html.erb', :layout => 'default'
-    else
-      render_error "You do not have enough privilege for this action"
-    end
+    render_only_for "admin"
   end
   
   def admin_resources
-    if current_user.in_group? "admin"
-      render :template => 'app/admin_resources.html.erb', :layout => 'default'
-    else
-      render_error "You do not have enough privilege for this action"
-    end
+    render_only_for "admin"
   end
   
   def root_machines
-    if current_user.in_group? "root"
-      render :template => 'app/root_machines.html.erb', :layout => 'default'
-    else
-      render_error "You do not have enough privilege for this action"
-    end
+    render_only_for "root"
   end
   
   def root_resources
-    if current_user.in_group? "root"
-      render :template => 'app/root_resources.html.erb', :layout => 'default'
-    else
-      render_error "You do not have enough privilege for this action"
-    end
+    render_only_for "root"
   end
   
   def root_system_settings
-    if current_user.in_group? "root"
-      render :template => 'app/root_system_settings.html.erb', :layout => 'default'
-    else
-      render_error "You do not have enough privilege for this action"
-    end
+    render_only_for "root"
+  end
+  
+  def user_machines
+    render_only_for "user"
+  end
+  
+  def user_resources
+    render_only_for "user"
+  end
+  
+  def user_groups
+    render_only_for "user"
   end
 
   def home
@@ -58,14 +50,24 @@ class AppController < ApplicationController
       render :template => 'app/root_home.html.erb', :layout => 'default'
     elsif current_user.in_group? "admin"
       render :template => 'app/admin_home.html.erb', :layout => 'default'
-    else
+    elsif current_user.in_group? "user"
       render :template => 'app/user_home.html.erb', :layout => 'default'
+    else
+      render_error "You do not have enough privilege for this action"
     end
   end
-  
+
   
 
 private
+
+  def render_only_for group
+    if current_user.in_group? group
+      render :layout => "default"
+    else
+      render_error "You do not have enough privilege for this action"
+    end
+  end
 
   def render_error error_msg
     render :text => error_msg

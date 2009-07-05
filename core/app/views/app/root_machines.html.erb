@@ -37,7 +37,7 @@ button.fg-button { width:auto; overflow:visible; } /* removes extra button width
 .fg-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
 .fg-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
 
-.fg-button.ui-state-loading .ui-icon { background: url(spinner_bar.gif) no-repeat 0 0; }
+.fg-button.ui-state-loading .ui-icon { background: url(/images/spinner_bar.gif) no-repeat 0 0; }
 </style>
 
 <!-- style exceptions for IE 6 -->
@@ -110,7 +110,7 @@ a.left_nav_current {
     list_physical_machines();
     
     
-    $('#flat').menu({ 
+    $('#left_nav_bar_bottom_add_btn').menu({ 
 			content: $('#left_nav_add_btn_menu').html(), // grab content from this page
 			showSpeed: 400,
 			positionOpts: {
@@ -190,20 +190,18 @@ a.left_nav_current {
 
 <div id="left_nav_bottom">
 
-<!-- TODO add bg for nav_bottom -->
+  <div id="left_nav_add_btn_holder">
 
-<div id="left_nav_add_btn_holder">
-
-<a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flat"><span class="ui-icon ui-icon-triangle-1-s"></span>Add</a>
-<div id="left_nav_add_btn_menu" class="hidden">
-<ul>
-	<li><a href="#">Physical Machine</a></li>
-	<li><a href="#">Virtual Machine</a></li>
-	<li><a href="#">Virtual Cluster</a></li>
-</ul>
-</div>
-
-</div>
+    <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
+    <div id="left_nav_add_btn_menu" class="hidden">
+      <ul>
+	      <li><a href="#">Physical Machine</a></li>
+	      <li><a href="#">Virtual Machine</a></li>
+	      <li><a href="#">Virtual Cluster</a></li>
+      </ul>
+    </div>
+    <a href="#" class="fg-button ui-widget ui-state-default ui-corner-all" style="position:absolute;left:75">Refresh</a>
+  </div>
 
 </div>
 

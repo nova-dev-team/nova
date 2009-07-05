@@ -37,7 +37,7 @@ button.fg-button { width:auto; overflow:visible; } /* removes extra button width
 .fg-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
 .fg-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
 
-.fg-button.ui-state-loading .ui-icon { background: url(spinner_bar.gif) no-repeat 0 0; }
+.fg-button.ui-state-loading .ui-icon { background: url(/images/spinner_bar.gif) no-repeat 0 0; }
 </style>
 
 <!-- style exceptions for IE 6 -->
@@ -95,7 +95,7 @@ a.left_nav_current {
   }
 
   function do_layout() {
-    $(".machines_holder").height($("#layout_left_pane").height() - 2 * $(".left_nav_button").height() - $("#left_nav_bottom").height());
+    $(".machines_holder").height($("#layout_left_pane").height() - $("#left_nav_bottom").height());
     $(".machines_holder").css("width", $("#layout_left_pane").width());
     $(".left_nav_button").css("width", $("#layout_left_pane").width());
     $("#left_nav_bottom").css("width", $("#layout_left_pane").width());
@@ -108,10 +108,10 @@ a.left_nav_current {
     // override default left pane overflow settings
     $("#layout_left_pane").css("overflow", "hidden");
     
-    // by default. show physical machines
-    list_physical_machines();
+    // by default. show virtual machines
+    list_virtual_machines();
 
-    $('#flat').menu({ 
+    $('#left_nav_bar_bottom_add_btn').menu({ 
 			content: $('#left_nav_add_btn_menu').html(), // grab content from this page
 			showSpeed: 400,
 			positionOpts: {
@@ -132,10 +132,8 @@ a.left_nav_current {
   
   
   function list_virtual_machines() {
-    $("#left_nav_btn_list_pmachine").removeClass("left_nav_current");
     $("#left_nav_btn_list_vmachine").addClass("left_nav_current");
     $("#vmachine_list_holder").show();
-    $("#pmachine_list_holder").hide();
     
     var html_str = "";
     
@@ -146,23 +144,7 @@ a.left_nav_current {
     $("#vmachine_list_holder").html(html_str);
     do_layout();
   }
-  
-  function list_physical_machines() {
-    $("#left_nav_btn_list_vmachine").removeClass("left_nav_current");
-    $("#left_nav_btn_list_pmachine").addClass("left_nav_current");
-    $("#pmachine_list_holder").show();
-    $("#vmachine_list_holder").hide();
-    
-    var html_str = "";
-    
-    for (i = 0; i < 100; i++) {
-      html_str += "HELLO, this is PM " + i + "<br />";
-    }
-    
-    $("#pmachine_list_holder").html(html_str);
-    do_layout();
-  }
-  
+
 </script>
   
 <% end -%>
@@ -175,31 +157,22 @@ a.left_nav_current {
 
 <% content_for :layout_left_frame do %>
 
-<!--
-<a id="left_nav_btn_list_pmachine" class="left_nav_button left_nav_current" href="#" onclick="list_physical_machines()">
-  Physical Machines
-</a>
 
-<a id="left_nav_btn_list_vmachine" class="left_nav_button" href="#" onclick="list_virtual_machines()">
-  Virtual Machines
-</a>
--->
-
-<div id="pmachine_list_holder" class="machines_holder"></div>
 <div id="vmachine_list_holder" class="machines_holder"></div>
 
 <div id="left_nav_bottom">
 
-<div id="left_nav_add_btn_holder">
+  <div id="left_nav_add_btn_holder">
 
-<a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flat"><span class="ui-icon ui-icon-triangle-1-s"></span>Add</a>
-<div id="left_nav_add_btn_menu" class="hidden">
-<ul>
-	<li><a href="#">Physical Machine</a></li>
-	<li><a href="#">Virtual Machine</a></li>
-	<li><a href="#">Virtual Cluster</a></li>
-</ul>
-</div>
+    <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
+    <div id="left_nav_add_btn_menu" class="hidden">
+      <ul>
+	      <li><a href="#">Virtual Machine</a></li>
+	      <li><a href="#">Virtual Cluster</a></li>
+      </ul>
+    </div>
+    <a href="#" class="fg-button ui-widget ui-state-default ui-corner-all" style="position:absolute;left:75">Refresh</a>
+  </div>
 
 </div>
 

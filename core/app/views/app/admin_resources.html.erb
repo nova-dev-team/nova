@@ -1,23 +1,195 @@
 <%
   @nav_bar_current = "Resources"
+  @layout_resize_callback = "do_layout"
+%>
+
+
+<%
+  ###################################################################################
+%>
+
+
+
+<% content_for :layout_style_and_scripts do %>
+
+
+<script type="text/javascript" src="/javascripts/fg-menu/fg.menu.js"></script>
+<link href="/stylesheets/fg-menu/fg.menu.css" rel="stylesheet" type="text/css" />
+
+    
+<!-- styles for fg menu -->
+<style type="text/css">
+
+
+.fg-menu-container{ z-index:100;}
+
+
+.hidden { position:absolute; top:0; left:-9999px; width:1px; height:1px; overflow:hidden; }
+
+.fg-button { clear:left; margin:0 4px 40px 0px; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
+.fg-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
+a.fg-button { float:left;  }
+button.fg-button { width:auto; overflow:visible; } /* removes extra button width in IE */
+
+.fg-button-icon-left { padding-left: 2.1em; }
+.fg-button-icon-right { padding-right: 2.1em; }
+.fg-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; }
+.fg-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; }
+.fg-button-icon-solo { display:block; width:8px; text-indent: -9999px; }	 /* solo icon buttons must have block properties for the text-indent to work */	
+
+.fg-button.ui-state-loading .ui-icon { background: url(/images/spinner_bar.gif) no-repeat 0 0; }
+</style>
+
+<!-- style exceptions for IE 6 -->
+<!--[if IE 6]>
+<style type="text/css">
+	.fg-menu-ipod .fg-menu li { width: 95%; }
+	.fg-menu-ipod .ui-widget-content { border:0; }
+</style>
+<![endif]-->
+
+<style type="text/css" media="screen">
+
+a.left_nav_button {
+  display: block;
+  height: 35;
+  color: black;
+  overflow: hidden;
+  padding-left: 20px;
+  line-height: 35px;
+  text-decoration: none;
+}
+
+a.left_nav_button:hover {
+  background-color: #bbaabb;
+}
+
+a.left_nav_current {
+  color: #ddeeee;
+  font-weight: bold;
+  background-image: url(/images/left-nav-btn-bg.gif);
+}
+
+.nav_bar_list_holder {
+/* width & height set by js in do_layout */
+  border-top: 1px solid #BBB;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+#left_nav_bottom {
+  height: 30px;
+  z-index: 100;
+  border-top: 1px solid #BBB;
+}
+
+</style>
+
+
+<script type="text/javascript">
+
+  function getWindowHeight() {
+    return window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight);
+  }
+
+  function do_layout() {
+    $(".nav_bar_list_holder").height($("#layout_left_pane").height() - $(".left_nav_button").height() - $("#left_nav_bottom").height());
+    $(".nav_bar_list_holder").css("width", $("#layout_left_pane").width());
+    $(".left_nav_button").css("width", $("#layout_left_pane").width());
+    $("#left_nav_bottom").css("width", $("#layout_left_pane").width());
+  };
+  
+  window.onresize = do_layout;
+  
+  $(document).ready(function(){
+    
+    // override default left pane overflow settings
+    $("#layout_left_pane").css("overflow", "hidden");
+    
+    // by default. show vmachien images
+    list_vm_images();
+    
+    
+    $('#left_nav_bar_bottom_add_btn').menu({ 
+			content: $('#left_nav_add_btn_menu').html(), // grab content from this page
+			showSpeed: 400,
+			positionOpts: {
+			  directionV: "up",
+			  posX: 'left',
+			  posY: 'bottom',
+			  offsetX: 0,
+			  offsetY: 0
+			}
+		});
+		
+    
+    $('.fg-button').hover(
+  		function(){ $(this).removeClass('ui-state-default').addClass('ui-state-focus'); },
+  		function(){ $(this).removeClass('ui-state-focus').addClass('ui-state-default'); }
+  	);
+    
+  });
+  
+  
+  function list_vm_images() {
+    $("#left_nav_btn_list_vm_images").addClass("left_nav_current");
+    $("#vm_images_list_holder").show();
+    
+    var html_str = "";
+    
+    for (i = 0; i < 100; i++) {
+      html_str += "HELLO, this is VM image " + i + "<br />";
+    }
+    
+    $("#vm_images_list_holder").html(html_str);
+    do_layout();
+  }
+  
+</script>
+  
+<% end -%>
+
+
+<%
+  ###################################################################################
 %>
 
 
 <% content_for :layout_left_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  LEFT is blah-blah-blah, and you are USER</p>
-  <% end -%>
+<a id="left_nav_btn_list_vm_image" class="left_nav_button left_nav_current" href="#" onclick="list_vm_images()">
+  Virtual Machine Images
+</a>
+
+
+<div id="vm_images_list_holder" class="nav_bar_list_holder"></div>
+
+<div id="left_nav_bottom">
+
+  <div id="left_nav_add_btn_holder">
+
+    <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
+    <div id="left_nav_add_btn_menu" class="hidden">
+      <ul>
+	      <li><a href="#">Virtual Machine Image</a></li>
+      </ul>
+    </div>
+    <a href="#" class="fg-button ui-widget ui-state-default ui-corner-all" style="position:absolute;left:75">Refresh</a>
+  </div>
+
+</div>
 
 <% end -%>
+
+
+<%
+  ###################################################################################
+%>
 
 
 
 <% content_for :layout_center_frame do %>
 
-  <% 30.times do |n| %>
-  <p> <%= n %>  CENTER is blah-blah-blah, and you are USER</p>
-  <% end -%>
 
 <% end -%>
 
