@@ -7,3 +7,4 @@ core/doc
 *~
 core/db/*.sqlite3
 tmp/
+storage/
