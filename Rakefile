@@ -1,286 +1,5 @@
-
-############################################################################
-####  Settings section
-############################################################################
-
-
-# these are const values required for building KFS module
-
-
-
-############################################################################
-####  Helper class section
-############################################################################
-
-#
-# ini.rb - read and write ini files
-#
-# Copyright (C) 2007 Jeena Paradies
-# License: GPL
-# Author: Jeena Paradies (info@jeenaparadies.net)
-#
-# == Overview
-#
-# This file provides a read-wite handling for ini files.
-# The data of a ini file is represented by a object which
-# is populated with strings.
- 
-class Ini
-  
-  # Class with methods to read from and write into ini files.
-  #
-  # A ini file is a text file in a specific format,
-  # it may include several fields which are sparated by
-  # field headlines which are enclosured by "[]".
-  # Each field may include several key-value pairs.
-  #
-  # Each key-value pair is represented by one line and
-  # the value is sparated from the key by a "=".
-  #
-  # == Examples
-  #
-  # === Example ini file
-  #
-  #   # this is the first comment which will be saved in the comment attribute
-  #   mail=info@example.com
-  #   domain=example.com # this is a comment which will not be saved
-  #   [database]
-  #   db=example
-  #   user=john
-  #   passwd=very-secure
-  #   host=localhost
-  #   # this is another comment
-  #   [filepaths]
-  #   tmp=/tmp/example
-  #   lib=/home/john/projects/example/lib
-  #   htdocs=/home/john/projects/example/htdocs
-  #   [ texts ]
-  #   wellcome=Wellcome on my new website!
-  #   Website description = This is only a example. # and another comment
-  #
-  # === Example object
-  #
-  #   A Ini#comment stores:
-  #   "this is the first comment which will be saved in the comment attribute"
-  #
-  #   A Ini object stores:
-  #
-  #   {
-  #    "mail" => "info@example.com",
-  #    "domain" => "example.com",
-  #    "database" => {
-  #     "db" => "example",
-  #     "user" => "john",
-  #     "passwd" => "very-secure",
-  #     "host" => "localhost"
-  #    },
-  #    "filepaths" => {
-  #     "tmp" => "/tmp/example",
-  #     "lib" => "/home/john/projects/example/lib",
-  #     "htdocs" => "/home/john/projects/example/htdocs"
-  #    }
-  #    "texts" => {
-  #     "wellcome" => "Wellcome on my new website!",
-  #     "Website description" => "This is only a example."
-  #    }
-  #   }
-  #
-  # As you can see this module gets rid of all comments, linebreaks
-  # and unnecessary spaces at the beginning and the end of each
-  # field headline, key or value.
-  #
-  # === Using the object
-  #
-  # Using the object is stright forward:
-  #
-  #   ini = Ini.new("path/settings.ini")
-  #   ini["mail"] = "info@example.com"
-  #   ini["filepaths"] = { "tmp" => "/tmp/example" }
-  #   ini.comment = "This is\na comment"
-  #   puts ini["filepaths"]["tmp"]
-  #   # => /tmp/example
-  #   ini.write()
-  # 
-  
-  #
-  # :inihash is a hash which holds all ini data
-  # :comment is a string which holds the comments on the top of the file
-  #
-  attr_accessor :inihash, :comment
- 
-  #
-  # Creating a new Ini object
-  #
-  # +path+ is a path to the ini file
-  # +load+ if nil restores the data if possible
-  #        if true restores the data, if not possible raises an error
-  #        if false does not resotre the data
-  #
-  def initialize(path, load=nil)
-    @path = path
-    @inihash = {}
-    
-    if load or ( load.nil? and FileTest.readable_real? @path )
-      restore()
-    end
-  end
-  
-  #
-  # Retrive the ini data for the key +key+
-  #
-  def [](key)
-    @inihash[key]
-  end
-  
-  #
-  # Set the ini data for the key +key+
-  #
-  def []=(key, value)
-    raise TypeError, "String expected" unless key.is_a? String
-    raise TypeError, "String or Hash expected" unless value.is_a? String or value.is_a? Hash
-    
-    @inihash[key] = value
-  end
-  
-  #
-  # Restores the data from file into the object
-  #
-  def restore()
-    @inihash = Ini.read_from_file(@path)
-    @comment = Ini.read_comment_from_file(@path)
-  end
-  
-  #
-  # Store data from the object in the file
-  #
-  def update()
-    Ini.write_to_file(@path, @inihash, @comment)
-  end
- 
-  #
-  # Reading data from file
-  #
-  # +path+ is a path to the ini file
-  #
-  # returns a hash which represents the data from the file
-  #
-  def Ini.read_from_file(path)
-        
-    inihash = {}
-    headline = nil
-    
-    IO.foreach(path) do |line|
- 
-      line = line.strip.split(/#/)[0]
-
-      # bug fix by santa
-      next unless line
-      
-      # read it only if the line doesn't begin with a "=" and is long enough
-      unless line.length < 2 and line[0,1] == "="
-        
-        # it's a headline if the line begins with a "[" and ends with a "]"
-        if line[0,1] == "[" and line[line.length - 1, line.length] == "]"
-          
-          # get rid of the [] and unnecessary spaces
-          headline = line[1, line.length - 2 ].strip
-          inihash[headline] = {}
-        else
-        
-          key, value = line.split(/=/, 2)
-          
-          key = key.strip unless key.nil?
-          value = value.strip unless value.nil?
-          
-          unless headline.nil?
-            inihash[headline][key] = value
-          else
-            inihash[key] = value unless key.nil?
-          end
-        end        
-      end
-    end
-    
-    inihash
-  end
-  
-  #
-  # Reading comments from file
-  #
-  # +path+ is a path to the ini file
-  #
-  # Returns a string with comments from the beginning of the
-  # ini file.
-  #
-  def Ini.read_comment_from_file(path)
-    comment = ""
-    
-    IO.foreach(path) do |line|
-      line.strip!
-      break unless line[0,1] == "#" or line == ""
-      next unless line and line.length > 0
-      comment << "#{line[1, line.length ].strip}\n"
-    end
-    
-    comment
-  end
-  
-  #
-  # Writing a ini hash into a file
-  #
-  # +path+ is a path to the ini file
-  # +inihash+ is a hash representing the ini File. Default is a empty hash.
-  # +comment+ is a string with comments which appear on the
-  #           top of the file. Each line will get a "#" before.
-  #           Default is no comment.
-  #
-  def Ini.write_to_file(path, inihash={}, comment=nil)
-    raise TypeError, "String expected" unless comment.is_a? String or comment.nil?
-    
-    raise TypeError, "Hash expected" unless inihash.is_a? Hash
-    File.open(path, "w") { |file|
-      
-      unless comment.nil?
-        comment.each do |line|
-          file << "# #{line}"
-        end
-      end
-      
-      file << Ini.to_s(inihash)
-    }
-  end
-  
-  #
-  # Turn a hash (up to 2 levels deepness) into a ini string
-  #
-  # +inihash+ is a hash representing the ini File. Default is a empty hash.
-  #
-  # Returns a string in the ini file format.
-  #
-  def Ini.to_s(inihash={})
-    str = ""
-    
-    inihash.each do |key, value|
- 
-      if value.is_a? Hash
-        str << "[#{key.to_s}]\n"
-        
-        value.each do |under_key, under_value|
-          str << "#{under_key.to_s}=#{under_value.to_s unless under_value.nil?}\n"
-        end
- 
-      else
-        str << "#{key.to_s}=#{value.to_s unless value2.nil?}\n"
-      end
-    end
-    
-    str
-  end
-  
-end
-
-
-
+require 'pp'
+require 'xmlsimple'
 
 ############################################################################
 ####  Helper function section
@@ -310,6 +29,97 @@ def installed? tool
 end
 
 
+
+
+def xml_get
+  xml = XmlSimple.xml_in('nova_deploy.xml')
+  xml
+end
+
+
+def xml_core
+  xml = xml_get
+  core_xml = {}
+  xml["core"][0].each { |key, val| core_xml[key] = val[0] }
+  core_xml
+end
+
+
+
+def xml_pnodes
+  xml = xml_get
+  pnodes_xml = []
+  xml["pnodes"][0].each do |key, value|
+    value.each do |val|
+      item = {}
+      item["name"] = val["name"]
+      item["rundir"] = val["rundir"][0]
+      item["host"] = val["host"][0]
+      item["port"] = val["port"][0]
+      pnodes_xml << item
+    end
+  end
+  pnodes_xml
+end
+
+
+
+def xml_storages
+  xml = xml_get
+  xml["storages"][0]["storage"]
+end
+
+
+
+def xml_settings
+  xml = xml_get
+  settings = {}
+  xml["settings"][0]["setting"].each { |item| settings[item["name"]] = item["val"] }
+  settings
+end
+
+
+
+def xml_kfs
+  
+  def size_unit_conv str
+    val = str.to_i
+    if str["G"]
+      val *= 1000 * 1000 * 1000
+    elsif str["M"]
+      val *= 1000 * 1000
+    elsif str["K"]
+      val *= 1000
+    end
+    val
+  end
+
+  xml = []
+  xml_storages.each do |x|
+    if x["type"] == "kfs"
+      x["metaserver"] = x["metaserver"][0]
+      x["chunkserver"].each do |chunk|
+        chunk["rundir"] = chunk["rundir"][0]
+        chunk["clientport"] = chunk["clientport"][0]
+        chunk["space"] = size_unit_conv chunk["space"][0]
+        chunk["host"] = chunk["host"][0]
+        chunk["internalport"] = chunk["internalport"][0]
+      end
+      xml << x
+    end
+  end
+  xml
+end
+
+
+
+def need_kfs?
+  xml = xml_storages
+  xml.each { |x| return true if x["type"] == "kfs" }
+  false
+end
+
+
 ############################################################################
 ####  Task definition section
 ############################################################################
@@ -320,192 +130,423 @@ desc "Show information about the installer"
 task :about do
 puts <<ABOUT
 Hello, this is the Nova platform installer!
+Type the following command and drink a cup of coffee! :D
+rake start
 TODO add more detail info on this Rakefile
 ABOUT
 end
+
+desc "Show help information"
+task :help do
+puts <<HELP
+TODO HELP info
+HELP
+end
+
+
+desc "Clean all build files"
+task :clean => "clean:kfs" do
+end
+
 
 namespace :clean do
 
   desc "Clean the build files for KFS"
   task :kfs do
-    raise RuntimeError, "*** Tool 'make' was not installed!" unless installed? "make"
-    puts "Cleaning KFS build files..."
+    if need_kfs?
     
-    inihash = (Ini.new "kfs_deploy.ini").inihash
-    KFS_DIR = inihash["KFS_DIR"]
-    
-    system "cd #{KFS_DIR} && make clean"
-    
-    puts "Done cleaning KFS build files"
+      xml = xml_settings
+      
+      KFS_DIR = xml["KFS_DIR"]
+      
+      raise RuntimeError, "*** Tool 'make' was not installed!" unless installed? "make"
+      puts "Cleaning KFS build files..."
+      
+      system "cd #{KFS_DIR} && make clean"
+      puts "Done cleaning KFS build files"
+      
+    else
+      puts "KFS is not required according to your 'nova_deploy.xml'"
+    end
   end
   
 end
+
+
+desc "Compile all needed binaries"
+task :compile => "compile:kfs" do
+end
+
 
 namespace :compile do
   
   desc "Compile KFS for storage module"
   task :kfs do
-    inihash = (Ini.new "kfs_deploy.ini").inihash
+  
+    if need_kfs?
     
-    KFS_DIR = inihash["KFS_DIR"]
-    KFS_JAVA_INCLUDE_PATH = inihash["KFS_JAVA_INCLUDE_PATH"]
-    KFS_JAVA_INCLUDE_PATH2 = inihash["KFS_JAVA_INCLUDE_PATH2"]
-    
-    kfs_files = [
-      "chunk/chunkserver",
-      "chunk/chunkscrubber",
-      "emulator/rebalanceexecutor",
-      "emulator/rebalanceplanner",
-      "emulator/replicachecker",
-      "emulator/rereplicator",
-      "fuse/kfs_fuse",
-      "meta/logcompactor",
-      "meta/metaserver",
-      "tests/KfsDataGen",
-      "tests/KfsDirFileTester",
-      "tests/KfsDirScanTest",
-      "tests/KfsPerfReader",
-      "tests/KfsPerfWriter",
-      "tests/KfsReader",
-      "tests/KfsRW",
-      "tests/KfsSeekWrite",
-      "tests/KfsTrunc",
-      "tests/KfsWriter",
-      "tests/mkfstree",
-      "tools/cpfromkfs",
-      "tools/cptokfs",
-      "tools/kfsdataverify",
-      "tools/kfsfileenum",
-      "tools/kfsping",
-      "tools/kfsput",
-      "tools/kfsretire",
-      "tools/kfsshell",
-      "tools/kfsstats",
-      "tools/kfstoggleworm"
-    ]
-    
-    should_build = false
-    
-    kfs_files.each do |file|
-      unless File.exists? "#{KFS_DIR}/src/cc/#{file}"
-        should_build = true
-        break
-      end
-    end
-    
-    if should_build
-    
-      puts "Compiling KFS for storage module"
-      puts "Checking installed tools"
-      required_tools = ['cmake', 'g++', 'make']
-      required_tools.each do |tool|
-        unless installed? tool
-          raise RuntimeError, "*** Tool '#{tool}' was not installed!"
+      xml = xml_settings
+      
+      KFS_DIR = xml["KFS_DIR"]
+      KFS_JAVA_INCLUDE_PATH = xml["KFS_JAVA_INCLUDE_PATH"]
+      KFS_JAVA_INCLUDE_PATH2 = xml["KFS_JAVA_INCLUDE_PATH2"]
+      
+      kfs_files = [
+        "chunk/chunkserver",
+        "chunk/chunkscrubber",
+        "emulator/rebalanceexecutor",
+        "emulator/rebalanceplanner",
+        "emulator/replicachecker",
+        "emulator/rereplicator",
+        "fuse/kfs_fuse",
+        "meta/logcompactor",
+        "meta/metaserver",
+        "tests/KfsDataGen",
+        "tests/KfsDirFileTester",
+        "tests/KfsDirScanTest",
+        "tests/KfsPerfReader",
+        "tests/KfsPerfWriter",
+        "tests/KfsReader",
+        "tests/KfsRW",
+        "tests/KfsSeekWrite",
+        "tests/KfsTrunc",
+        "tests/KfsWriter",
+        "tests/mkfstree",
+        "tools/cpfromkfs",
+        "tools/cptokfs",
+        "tools/kfsdataverify",
+        "tools/kfsfileenum",
+        "tools/kfsping",
+        "tools/kfsput",
+        "tools/kfsretire",
+        "tools/kfsshell",
+        "tools/kfsstats",
+        "tools/kfstoggleworm"
+      ]
+      
+      already_built = true
+      
+      kfs_files.each do |file|
+        unless File.exists? "#{KFS_DIR}/src/cc/#{file}"
+          already_built = false
+          break
         end
       end
       
-      system "cmake -DJAVA_INCLUDE_PATH=#{KFS_JAVA_INCLUDE_PATH} -DJAVA_INCLUDE_PATH2=#{KFS_JAVA_INCLUDE_PATH2} #{KFS_DIR}"
-      system "cd #{KFS_DIR} && make"
-      system "mkdir #{KFS_DIR}/bin -p"
-    else
-      puts "KFS module is already compiled"
-    end
+      if already_built
+        puts "KFS module is already compiled"      
+        
+      else
+        puts "Compiling KFS for storage module"
+        puts "Checking installed tools"
+        
+        required_tools = ['cmake', 'g++', 'make']
+        required_tools.each do |tool|
+          unless installed? tool
+            raise RuntimeError, "*** Tool '#{tool}' was not installed!"
+          end
+        end
+        
+        system "cmake -DJAVA_INCLUDE_PATH=#{KFS_JAVA_INCLUDE_PATH} -DJAVA_INCLUDE_PATH2=#{KFS_JAVA_INCLUDE_PATH2} #{KFS_DIR}"
+        system "cd #{KFS_DIR} && make"
+        system "mkdir #{KFS_DIR}/bin -p"
+      end
 
+    else
+      puts "KFS is not required according to your 'nova_deploy.xml'"      
+    end
+    
   end
 end
 
 
+desc "Deploy the Nova system to a cluster"
+task :deploy => ["deploy:core", "deploy:pnode", "deploy:kfs"] do
+end
+
 namespace :deploy do
 
   desc "Deploy the 'core' component"  
-  task :core do
-    puts "TODO deploy core"
- end
+  task :core => "compile:kfs" do
+    xml = xml_core
+    puts "Deploying 'core' component to #{xml["host"]}:#{xml["rundir"]}"
+    
+    `mkdir tmp -p`
+    `cp -r core tmp/`
+    `rm tmp/core/log/*`
+    `rm tmp/core/tmp/* -R`
+    
+    f = File.new "tmp/core/start", "w"
+    f.write <<CORE_START
+ruby script/server -b #{xml["host"]} -p #{xml["port"]} -d
+CORE_START
+    f.close
+
+    f = File.new "tmp/core/stop", "w"
+    f.write <<CORE_STOP
+killall ruby
+CORE_STOP
+    f.close
+    
+    f = File.new "tmp/core/uninstall", "w"
+    f.write <<CORE_UNINSTALL
+killall ruby
+cd ..
+rm core -R
+CORE_UNINSTALL
+    f.close
+    
+    system "scp -C -r tmp/core #{xml["host"]}:#{xml["rundir"]}"
+    `rm tmp -R`
+  end
+
+
 
   desc "Deploy the 'pnode' component"
-  task :pnode do
-    puts "TODO deploy pnode"
+  task :pnode => "compile:kfs" do
+    xml_pnodes.each do |xml|
+      puts "Deploying 'pnode' component to #{xml["host"]}:#{xml["rundir"]}"
+      
+      `mkdir tmp/#{xml["name"]} -p`
+
+      f = File.new "tmp/#{xml["name"]}/start", "w"
+      f.write <<PNODE_START
+(ruby server.rb -s mongrel -p #{xml["port"]})&
+PNODE_START
+      f.close
+
+      f = File.new "tmp/#{xml["name"]}/stop", "w"
+      f.write <<PNODE_STOP
+killall ruby
+PNODE_STOP
+      f.close
+      
+      f = File.new "tmp/#{xml["name"]}/uninstall", "w"
+      f.write <<PNODE_UNINSTALL
+killall ruby
+cd ..
+rm #{xml["name"]} -R
+PNODE_UNINSTALL
+      f.close
+    
+      `cp -r pnode/* tmp/#{xml["name"]}`
+      system "scp -r tmp/#{xml["name"]} #{xml["host"]}:#{xml["rundir"]}"
+      `rm tmp -R`
+    end
   end
+
+
 
   desc "Deploy the KFS storage module"
   task :kfs => "compile:kfs" do
-    puts "Deploying the KFS storage module"
-    inihash = (Ini.new "kfs_deploy.ini").inihash
-
-    meta_server_node = nil
-    meta_server_port = nil
-
-    # first deploy the meta server
-    inihash.each do |key, val|
-      if val["type"] == "metaserver"
-        puts "Deploying #{key}..."
+    
+    if need_kfs?
+      puts "Deploying the KFS storage module"
+      KFS_DIR = (xml_settings)["KFS_DIR"]
+      
+      `mkdir tmp -p`
+      
+      xml_kfs.each do |xml|
+        puts "Deploying meta server '#{xml["metaserver"]["name"]}'..."
         
-        f = File.new "kfs_config_#{key}", "w"
+        `mkdir tmp/#{xml["metaserver"]["name"]}/kfslog -p`
+        `mkdir tmp/#{xml["metaserver"]["name"]}/kfscp -p`
+        `cp #{KFS_DIR}/src/cc/meta/metaserver tmp/#{xml["metaserver"]["name"]}/`
         
-        KFSLOGDIR = "./kfslog"
-        KFSCPDIR = "./kfscp"
-        
+        f = File.new "tmp/#{xml["metaserver"]["name"]}/kfs_config_#{xml["metaserver"]["name"]}", "w"
         f.write <<META_CONF
-metaServer.clientPort = #{val["clientport"]}
-metaServer.chunkServerPort = #{val["baseport"]}
-metaServer.logDir = #{KFSLOGDIR}
-metaServer.cpDir = #{KFSCPDIR}
+metaServer.clientPort = #{xml["metaserver"]["clientport"]}
+metaServer.chunkServerPort = #{xml["metaserver"]["internalport"]}
+metaServer.logDir = ./kfslog
+metaServer.cpDir = .kfscp
 META_CONF
         f.close
 
-        meta_server_node = val["node"]
-        meta_server_port = val["baseport"]
-        
-        puts "Copying files to node #{val["node"]}"
-        puts "Your password might be required"
-        system "scp #{KFS_DIR}/src/cc/meta/metaserver kfs_config_#{key} #{val["node"]}:#{val["rundir"]} \
-                && rm kfs_config_#{key}"
-
-        puts "Your password might be required again, after that, keep pressing ENTER :D"
-        system "ssh #{val["node"]} 'cd #{val["rundir"]} && mkdir #{KFSLOGDIR} -p \
-                && mkdir #{KFSCPDIR} -p && (./metaserver kfs_config_#{key})& exit'"
-      end
-    end
-
-    
-    def size_unit_conv str
-      base = str.to_i
-      if str["G"]
-        base *= 1000 * 1000 * 1000
-      elsif str["M"]
-        base *= 1000 * 1000
-      elsif str["K"]
-        base *= 1000
-      end
-      base
-    end
-
-    inihash.each do |key, val|
-      if val["type"] == "chunkserver"
-        puts "Deploying #{key}..."
-
-        f = File.new "kfs_config_#{key}", "w"
-        
-        f.write <<CHUNK_CONF
-chunkServer.metaServer.hostname = #{meta_server_node}
-chunkServer.metaServer.port = #{meta_server_port}
-chunkServer.clientPort = #{val["clientport"]}
-chunkServer.chunkDir = ./chunks
-chunkServer.logDir = ./logs
-chunkServer.totalSpace = #{size_unit_conv val["space"]}
-CHUNK_CONF
+        f = File.new "tmp/#{xml["metaserver"]["name"]}/start", "w"
+        f.write <<META_START
+./metaserver kfs_config_#{xml["metaserver"]["name"]}
+META_START
         f.close
 
-        puts "Copying files to node #{val["node"]}"
-        puts "Your password might be required"
-        system "scp #{KFS_DIR}/src/cc/chunk/chunkserver kfs_config_#{key} #{val["node"]}:#{val["rundir"]} \
-                && rm kfs_config_#{key}"
+        f = File.new "tmp/#{xml["metaserver"]["name"]}/stop", "w"
+        f.write <<META_STOP
+killall metaserver
+META_STOP
+        f.close
+
+        f = File.new "tmp/#{xml["metaserver"]["name"]}/uninstall", "w"
+        f.write <<META_UNINSTALL
+killall metaserver
+cd ..
+rm #{xml["metaserver"]["name"]} -R
+META_UNINSTALL
+        f.close
+
         
-        puts "Your password might be required again, after that, keep pressing ENTER :D"
-        system "ssh #{val["node"]} 'cd #{val["rundir"]} && mkdir chunks -p && (./chunkserver kfs_config_#{key})& exit'"
+        system "scp -r tmp/#{xml["metaserver"]["name"]} #{xml["metaserver"]["host"]}:#{xml["metaserver"]["rundir"]}"
+        `rm tmp/#{xml["metaserver"]["name"]} -R`
+        
+        xml["chunkserver"].each do |chunk|
+          puts "Deploying chunk server '#{chunk["name"]}'..."
+          
+          `mkdir tmp/#{chunk["name"]}/chunks -p`
+          `mkdir tmp/#{chunk["name"]}/logs -p`
+          `cp #{KFS_DIR}/src/cc/chunk/chunkserver tmp/#{chunk["name"]}/`
+          
+          f = File.new "tmp/#{chunk["name"]}/kfs_config_#{chunk["name"]}", "w"
+          f.write <<CHUNK_CONF
+chunkServer.metaServer.hostname = #{xml["metaserver"]["host"]}
+chunkServer.metaServer.port = #{xml["metaserver"]["internalport"]}
+chunkServer.clientPort = #{chunk["clientport"]}
+chunkServer.chunkDir = ./chunks
+chunkServer.logDir = ./logs
+chunkServer.totalSpace = #{chunk["space"]}
+CHUNK_CONF
+          f.close
+
+        f = File.new "tmp/#{chunk["name"]}/start", "w"
+        f.write <<CHUNK_START
+./chunkserver kfs_config_#{chunk["name"]}
+CHUNK_START
+        f.close
+
+        f = File.new "tmp/#{chunk["name"]}/stop", "w"
+        f.write <<CHUNK_STOP
+killall chunkserver
+CHUNK_STOP
+        f.close
+
+        f = File.new "tmp/#{chunk["name"]}/uninstall", "w"
+        f.write <<CHUNK_UNINSTALL
+killall chunkserver
+cd ..
+rm #{chunk["name"]} -R
+CHUNK_UNINSTALL
+        f.close
+                    
+          system "scp -r tmp/#{chunk["name"]} #{chunk["host"]}:#{chunk["rundir"]}"
+          `rm tmp/#{chunk["name"]} -R`
+        end
+      end
+      
+      `rm tmp -R`
+      
+    else
+      puts "KFS is not required according to your 'nova_deploy.xml'"
+    end
+    
+  end
+end
+
+desc "Start the Nova system"
+task :start => ["start:core", "start:pnode", "start:kfs"] do
+end
+
+namespace :start do
+  
+  desc "Start the 'core' component"
+  task :core do
+    puts "Starting the 'core' component. When started, you might need to press ENTER."
+    xml = xml_core
+    system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/core && bash start && exit'"
+  end
+  
+  desc "Start all 'pnode' component"
+  task :pnode do
+    xml_pnodes.each do |xml|
+      puts "Starting 'pnode' component on #{xml["host"]}:#{xml["port"]}"
+      puts "Please wait a few seconds and press ENTER."
+      system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/#{xml["name"]} && bash start && exit'"
+    end
+  end
+  
+  desc "Start the KFS module"
+  task :kfs do
+    xml_kfs.each do |xml|
+      puts "Starting meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
+      puts "Please wait a few seconds and press ENTER."
+      system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && (bash start)& exit'"
+      
+      xml["chunkserver"].each do |chunk|
+        puts "Starting chunk server '#{chunk["name"]}'..."
+        puts "Please wait a few seconds and press ENTER."
+        system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && (bash start)& exit'"
+      end
+    end  
+  end
+
+end
+
+desc "Stop the Nova system"
+task :stop => ["stop:core", "stop:pnode", "stop:kfs"] do
+end
+
+namespace :stop do
+  
+  desc "Stop the 'core' component"
+  task :core do
+    puts "Stopping the 'core' component"
+    xml = xml_core
+    system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/core && bash stop && exit'"
+  end
+
+  desc "Stop the 'pnode' components"
+  task :pnode do
+    xml_pnodes.each do |xml|
+      puts "Stopping 'pnode' component on #{xml["host"]}:#{xml["port"]}"
+      system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/#{xml["name"]} && bash stop && exit'"
+    end
+  end
+  
+  desc "Stop the 'kfs' component"
+  task :kfs do
+    xml_kfs.each do |xml|
+      puts "Stopping meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
+      system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && bash stop && exit'"
+      
+      xml["chunkserver"].each do |chunk|
+        puts "Stopping chunk server '#{chunk["name"]}'..."
+        system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && bash stop && exit'"
       end
     end
   end
+  
+end
 
+desc "Uninstall the Nova system"
+task :uninstall => ["uninstall:pnode", "uninstall:core", "uninstall:kfs"] do
+end
+
+
+namespace :uninstall do
+
+  desc "Uninstall the 'core' component"
+  task :core do
+    puts "Stopping the 'core' component"
+    xml = xml_core
+    system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/core && bash uninstall && exit'"
+  end
+
+  desc "Uninstall the 'pnode' components"
+  task :pnode do
+    xml_pnodes.each do |xml|
+      puts "Stopping 'pnode' component on #{xml["host"]}:#{xml["port"]}"
+      system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/#{xml["name"]} && bash uninstall && exit'"
+    end
+  end
+  
+  desc "Uninstall the 'kfs' component"
+  task :kfs do
+    xml_kfs.each do |xml|
+      puts "Uninstalling meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
+      system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && bash uninstall && exit'"
+      
+      xml["chunkserver"].each do |chunk|
+        puts "Uninstalling chunk server '#{chunk["name"]}'..."
+        system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && bash uninstall && exit'"
+      end
+    end  
+  end
+    
 end
 

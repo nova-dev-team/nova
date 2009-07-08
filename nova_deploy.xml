@@ -3,62 +3,76 @@
   <core>
     <host>10.0.0.223</host>
     <port>3000</port>
+    <rundir>/home/santa/Workspace/test</rundir>
   </core>
   <pnodes>
-    <pnode>
+    <pnode name="pnode1">
       <host>10.0.0.223</host>
       <port>3456</port>
+      <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
-    <pnode>
+    <pnode name="pnode2">
       <host>10.0.0.223</host>
       <port>4567</port>
+      <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
   </pnodes>
+  <settings>
+    <setting name="KFS_DIR" val="kfs-0.3" />
+    <setting name="KFS_JAVA_INCLUDE_PATH" val="/usr/lib/jvm/java-sun-6/include" />
+    <setting name="KFS_JAVA_INCLUDE_PATH2" val="/usr/lib/jvm/java-sun-6/include" />
+  </settings>
   <storages>
-    <storage type="kfs" id="kfs">
+    <storage type="kfs" name="kfs">
       <clusterkey>test-kfs-cluster</clusterkey>
-      <compilesettings>
-        <setting key="KFS_DIR" val="kfs-0.3" />
-        <setting key="KFS_JAVA_INCLUDE_PATH" val="/usr/lib/jvm/java-sun-6/include" />
-        <setting key="KFS_JAVA_INCLUDE_PATH2" val="/usr/lib/jvm/java-sun-6/include" />
-      </compilesettings>
-      <metaserver>
-        <host>localhost</host>
+      <metaserver name="kfsmeta">
+        <host>10.0.0.223</host>
         <clientport>20000</clientport>
         <internalport>30000</internalport>
+        <rundir>/home/santa/Workspace/test</rundir>
       </metaserver>
-      <chunkserver>
-        <host>localhost</host>
+      <chunkserver name="chunk1">
+        <host>10.0.0.223</host>
         <clientport>21000</clientport>
         <internalport>31000</internalport>
-        <space>30G</space>
+        <rundir>/home/santa/Workspace/test</rundir>
+        <space>3G</space>
       </chunkserver>
-      <chunkserver>
-        <host>localhost</host>
+      <chunkserver name="chunk2">
+        <host>10.0.0.223</host>
         <clientport>22000</clientport>
         <internalport>32000</internalport>
-        <space>10G</space>
+        <rundir>/home/santa/Workspace/test</rundir>
+        <space>780M</space>
+      </chunkserver>
+      <chunkserver name="chunk3">
+        <host>10.0.0.223</host>
+        <clientport>23000</clientport>
+        <internalport>33000</internalport>
+        <rundir>/home/santa/Workspace/test</rundir>
+        <space>2G</space>
       </chunkserver>
     </storage>
-    <storage type="nfs" id="nfs1">
+    <storage type="nfs" name="nfs1">
       <host>10.0.2.4</host>
       <path>/home/nova</path>
     </storage>
-    <storage type="nfs" id="nfs2">
+    <storage type="nfs" name="nfs2">
       <host>10.0.2.5</host>
       <path>/home/nova</path>
     </storage>
-    <storage type="ftp" id="ftp1">
+    <storage type="ftp" name="ftp1">
       <host>10.0.0.223</host>
       <port>8100</port>
       <user>santa</user>
       <password>test</password>
     </storage>
-    <storage type="ftp" id="ftp2">
-      <host>localhost</host>
+    <storage type="ftp" name="ftp2">
+      <host>10.0.0.223</host>
       <port>80</port>
       <user>santazh</user>
       <password>test</password>
     </storage>
   </storages>
 </nova>
+
