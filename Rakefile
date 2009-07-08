@@ -331,6 +331,9 @@ namespace :clean do
     raise RuntimeError, "*** Tool 'make' was not installed!" unless installed? "make"
     puts "Cleaning KFS build files..."
     
+    inihash = (Ini.new "kfs_deploy.ini").inihash
+    KFS_DIR = inihash["KFS_DIR"]
+    
     system "cd #{KFS_DIR} && make clean"
     
     puts "Done cleaning KFS build files"
@@ -355,6 +358,7 @@ namespace :compile do
       "emulator/rebalanceplanner",
       "emulator/replicachecker",
       "emulator/rereplicator",
+      "fuse/kfs_fuse",
       "meta/logcompactor",
       "meta/metaserver",
       "tests/KfsDataGen",
@@ -498,7 +502,7 @@ CHUNK_CONF
                 && rm kfs_config_#{key}"
         
         puts "Your password might be required again, after that, keep pressing ENTER :D"
-        system "ssh #{val["node"]} 'cd #{val["rundir"]} && (./chunkserver kfs_config_#{key})& exit'"
+        system "ssh #{val["node"]} 'cd #{val["rundir"]} && mkdir chunks -p && (./chunkserver kfs_config_#{key})& exit'"
       end
     end
   end

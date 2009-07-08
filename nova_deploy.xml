@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<nova>
+  <core>
+    <host>10.0.0.223</host>
+    <port>3000</port>
+  </core>
+  <pnodes>
+    <pnode>
+      <host>10.0.0.223</host>
+      <port>3456</port>
+    </pnode>
+    <pnode>
+      <host>10.0.0.223</host>
+      <port>4567</port>
+    </pnode>
+  </pnodes>
+  <storages>
+    <storage type="kfs" id="kfs">
+      <clusterkey>test-kfs-cluster</clusterkey>
+      <compilesettings>
+        <setting key="KFS_DIR" val="kfs-0.3" />
+        <setting key="KFS_JAVA_INCLUDE_PATH" val="/usr/lib/jvm/java-sun-6/include" />
+        <setting key="KFS_JAVA_INCLUDE_PATH2" val="/usr/lib/jvm/java-sun-6/include" />
+      </compilesettings>
+      <metaserver>
+        <host>localhost</host>
+        <clientport>20000</clientport>
+        <internalport>30000</internalport>
+      </metaserver>
+      <chunkserver>
+        <host>localhost</host>
+        <clientport>21000</clientport>
+        <internalport>31000</internalport>
+        <space>30G</space>
+      </chunkserver>
+      <chunkserver>
+        <host>localhost</host>
+        <clientport>22000</clientport>
+        <internalport>32000</internalport>
+        <space>10G</space>
+      </chunkserver>
+    </storage>
+    <storage type="nfs" id="nfs1">
+      <host>10.0.2.4</host>
+      <path>/home/nova</path>
+    </storage>
+    <storage type="nfs" id="nfs2">
+      <host>10.0.2.5</host>
+      <path>/home/nova</path>
+    </storage>
+    <storage type="ftp" id="ftp1">
+      <host>10.0.0.223</host>
+      <port>8100</port>
+      <user>santa</user>
+      <password>test</password>
+    </storage>
+    <storage type="ftp" id="ftp2">
+      <host>localhost</host>
+      <port>80</port>
+      <user>santazh</user>
+      <password>test</password>
+    </storage>
+  </storages>
+</nova>
