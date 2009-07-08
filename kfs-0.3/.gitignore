@@ -1,11 +1,8 @@
 CMake*
 cmake*
 build/
-doc/
 Makefile
-kfs-hadoop/
 *~
-scripts.solaris
 *.so
 *.o
 *.a
