@@ -1,3 +1,9 @@
+STATUS: STILL UNDER (ACTIVE) DEVELOPMENT!
+=========================================
+Currently, Nova (version 2) still cannot run with full function, only parts of it is working.
+I am (very) actively working on this project, and a milestone was intended to come out around September this year.
+
+
 Nova - Manage virtual machines running on a cluster
 ===================================================
 
