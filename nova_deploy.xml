@@ -21,6 +21,8 @@
     <setting name="KFS_DIR" val="kfs-0.3" />
     <setting name="KFS_JAVA_INCLUDE_PATH" val="/usr/lib/jvm/java-sun-6/include" />
     <setting name="KFS_JAVA_INCLUDE_PATH2" val="/usr/lib/jvm/java-sun-6/include" />
+    <setting name="CURLFTPFS_DIR" val="curlftpfs-0.9.2" />
+    <setting name="UNFS_DIR" val="unfs3-0.9.22" />
   </settings>
   <storages>
     <storage type="kfs" name="kfs">

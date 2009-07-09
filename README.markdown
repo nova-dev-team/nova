@@ -7,10 +7,9 @@ machines called as "Pnode" (Physical node). It uses KFS as storage system.
 
 
 
-How to get it running?
-======================
-See file 'INSTALL'.
-
+How to get it up and running?
+=============================
+Follow the instructions in 'INSTALL' document.
 
 
 Core component
@@ -47,8 +46,8 @@ RESTful API
 
 
 
-Storage system
-==============
+Storage component
+=================
 
 
 Content Addressable Storage
@@ -72,6 +71,9 @@ cmake -DJAVA_INCLUDE_PATH=/usr/lib/jvm/java-sun-6/include -DJAVA_INCLUDE_PATH2=/
 
 NOTICE: when building kfs, xfs development files might be necessary, so you should install xfslib-dev
 
+FTP storage
+-----------
+
 NFS storage
 -----------
 
@@ -82,8 +84,10 @@ Dependencies
 ============
 
 + libvirt
-+ kfs-0.3 (if you want to use KFS storage)
 + ruby-1.8.7
 + rails-2.3.2
 + libcurl
++ kfs-0.3 (included in source)
++ curlftpfs-0.9.2 (included in source)
++ unfs3-0.9.22 (included in source)
 

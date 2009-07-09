@@ -1,0 +1,16 @@
+Learn the demo deployment configuration file 'nova_deploy.xml'.
+It's really easy to understand.
+
+Modify the configuration according to your needs.
+
+Then type:
+  rake deploy
+  rake start
+
+And drink a cup of coffee! :D
+
+NOTE: When deploying, you might be asked for password. And be careful when
+      starting 'pnode' components, the deploy process will be BLOCKED after
+      starting each 'pnode' component, simply press ENTER to keep the process
+      going. (Sorry I havn't figured out why it blocks. I'll try to fix this.)
+
