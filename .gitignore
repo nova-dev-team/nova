@@ -1,5 +1,6 @@
 # .*
 *.swp
+*.log
 scripts/
 core/log
 core/doc

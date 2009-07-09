@@ -83,7 +83,7 @@ end
 def xml_kfs
   
   def size_unit_conv str
-    val = str.to_i
+    val = str.to_f
     if str["G"]
       val *= 1000 * 1000 * 1000
     elsif str["M"]
@@ -91,7 +91,7 @@ def xml_kfs
     elsif str["K"]
       val *= 1000
     end
-    val
+    val.to_i
   end
 
   xml = []
@@ -302,7 +302,7 @@ CORE_UNINSTALL
 
 
 
-  desc "Deploy the 'pnode' component"
+  desc "Deploy all 'pnode' components"
   task :pnode => "compile:kfs" do
     xml_pnodes.each do |xml|
       puts "Deploying 'pnode' component to #{xml["host"]}:#{xml["rundir"]}"
@@ -337,8 +337,8 @@ PNODE_UNINSTALL
 
 
 
-  desc "Deploy the KFS storage module"
-  task :kfs => "compile:kfs" do
+  desc "Deploy all 'storage' components"
+  task :storage => "compile" do
     
     if need_kfs?
       puts "Deploying the KFS storage module"
@@ -439,7 +439,7 @@ CHUNK_UNINSTALL
 end
 
 desc "Start the Nova system"
-task :start => ["start:core", "start:pnode", "start:kfs"] do
+task :start => ["start:core", "start:pnode", "start:storage"] do
 end
 
 namespace :start do
@@ -451,7 +451,7 @@ namespace :start do
     system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/core && bash start && exit'"
   end
   
-  desc "Start all 'pnode' component"
+  desc "Start all 'pnode' components"
   task :pnode do
     xml_pnodes.each do |xml|
       puts "Starting 'pnode' component on #{xml["host"]}:#{xml["port"]}"
@@ -460,8 +460,8 @@ namespace :start do
     end
   end
   
-  desc "Start the KFS module"
-  task :kfs do
+  desc "Start all 'storage' components"
+  task :storage do
     xml_kfs.each do |xml|
       puts "Starting meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
       puts "Please wait a few seconds and press ENTER."
@@ -472,13 +472,13 @@ namespace :start do
         puts "Please wait a few seconds and press ENTER."
         system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && (bash start)& exit'"
       end
-    end  
+    end
   end
 
 end
 
 desc "Stop the Nova system"
-task :stop => ["stop:core", "stop:pnode", "stop:kfs"] do
+task :stop => ["stop:core", "stop:pnode", "stop:storage"] do
 end
 
 namespace :stop do
@@ -490,7 +490,7 @@ namespace :stop do
     system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/core && bash stop && exit'"
   end
 
-  desc "Stop the 'pnode' components"
+  desc "Stop all 'pnode' components"
   task :pnode do
     xml_pnodes.each do |xml|
       puts "Stopping 'pnode' component on #{xml["host"]}:#{xml["port"]}"
@@ -498,14 +498,14 @@ namespace :stop do
     end
   end
   
-  desc "Stop the 'kfs' component"
-  task :kfs do
+  desc "Stop all 'storage' components"
+  task :storage do
     xml_kfs.each do |xml|
-      puts "Stopping meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
+      puts "Stopping KFS meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
       system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && bash stop && exit'"
       
       xml["chunkserver"].each do |chunk|
-        puts "Stopping chunk server '#{chunk["name"]}'..."
+        puts "Stopping KFS chunk server '#{chunk["name"]}'..."
         system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && bash stop && exit'"
       end
     end
@@ -527,7 +527,7 @@ namespace :uninstall do
     system "ssh #{xml["host"]} 'cd #{xml["rundir"]}/core && bash uninstall && exit'"
   end
 
-  desc "Uninstall the 'pnode' components"
+  desc "Uninstall all 'pnode' components"
   task :pnode do
     xml_pnodes.each do |xml|
       puts "Stopping 'pnode' component on #{xml["host"]}:#{xml["port"]}"
@@ -535,14 +535,14 @@ namespace :uninstall do
     end
   end
   
-  desc "Uninstall the 'kfs' component"
-  task :kfs do
+  desc "Uninstall all 'storage' components"
+  task :storage do
     xml_kfs.each do |xml|
-      puts "Uninstalling meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
+      puts "Uninstalling KFS meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
       system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && bash uninstall && exit'"
       
       xml["chunkserver"].each do |chunk|
-        puts "Uninstalling chunk server '#{chunk["name"]}'..."
+        puts "Uninstalling KFS chunk server '#{chunk["name"]}'..."
         system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && bash uninstall && exit'"
       end
     end  

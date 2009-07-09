@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <nova>
   <core>
-    <host>10.0.0.223</host>
+    <host>10.0.0.225</host>
     <port>3000</port>
     <rundir>/home/santa/Workspace/test</rundir>
   </core>
   <pnodes>
     <pnode name="pnode1">
-      <host>10.0.0.223</host>
+      <host>10.0.0.225</host>
       <port>3456</port>
       <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
     <pnode name="pnode2">
-      <host>10.0.0.223</host>
+      <host>10.0.0.225</host>
       <port>4567</port>
       <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
@@ -26,31 +26,31 @@
     <storage type="kfs" name="kfs">
       <clusterkey>test-kfs-cluster</clusterkey>
       <metaserver name="kfsmeta">
-        <host>10.0.0.223</host>
+        <host>10.0.0.225</host>
         <clientport>20000</clientport>
         <internalport>30000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
       </metaserver>
       <chunkserver name="chunk1">
-        <host>10.0.0.223</host>
+        <host>10.0.0.225</host>
         <clientport>21000</clientport>
         <internalport>31000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
         <space>3G</space>
       </chunkserver>
       <chunkserver name="chunk2">
-        <host>10.0.0.223</host>
+        <host>10.0.0.225</host>
         <clientport>22000</clientport>
         <internalport>32000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
         <space>780M</space>
       </chunkserver>
       <chunkserver name="chunk3">
-        <host>10.0.0.223</host>
+        <host>10.0.0.225</host>
         <clientport>23000</clientport>
         <internalport>33000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
-        <space>2G</space>
+        <space>2.15G</space>
       </chunkserver>
     </storage>
     <storage type="nfs" name="nfs1">
@@ -62,13 +62,13 @@
       <path>/home/nova</path>
     </storage>
     <storage type="ftp" name="ftp1">
-      <host>10.0.0.223</host>
+      <host>10.0.0.225</host>
       <port>8100</port>
       <user>santa</user>
       <password>test</password>
     </storage>
     <storage type="ftp" name="ftp2">
-      <host>10.0.0.223</host>
+      <host>10.0.0.225</host>
       <port>80</port>
       <user>santazh</user>
       <password>test</password>

@@ -7,6 +7,9 @@ machines called as "Pnode" (Physical node). It uses KFS as storage system.
 
 
 
+How to get it running?
+======================
+See file 'INSTALL'.
 
 
 
@@ -52,10 +55,8 @@ Content Addressable Storage
 ---------------------------
 
 
-
-
-KFS storage switch
-------------------
+KFS storage
+-----------
 
 
 *** How to build kfs-0.3 ***
@@ -71,20 +72,18 @@ cmake -DJAVA_INCLUDE_PATH=/usr/lib/jvm/java-sun-6/include -DJAVA_INCLUDE_PATH2=/
 
 NOTICE: when building kfs, xfs development files might be necessary, so you should install xfslib-dev
 
-NFS storage switch
-------------------
+NFS storage
+-----------
 
-Corsair Carrier FS switch
--------------------------
+Corsair Carrier storage
+-----------------------
 
 Dependencies
 ============
 
 + libvirt
-+ KFS-3.0 (if you want to use KFS storage switch)
-
-
-Ruby on Rails
--------------
-
++ kfs-0.3 (if you want to use KFS storage)
++ ruby-1.8.7
++ rails-2.3.2
++ libcurl
 
