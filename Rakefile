@@ -119,7 +119,6 @@ def need_kfs?
   false
 end
 
-
 ############################################################################
 ####  Task definition section
 ############################################################################
@@ -145,7 +144,7 @@ end
 
 
 desc "Clean all build files"
-task :clean => "clean:kfs" do
+task :clean => ["clean:kfs"] do
 end
 
 
@@ -166,7 +165,7 @@ namespace :clean do
       puts "Done cleaning KFS build files"
       
     else
-      puts "KFS is not required according to your 'nova_deploy.xml'"
+      puts "KFS is not required according to your configuration"
     end
   end
   
@@ -174,13 +173,13 @@ end
 
 
 desc "Compile all needed binaries"
-task :compile => "compile:kfs" do
+task :compile => ["compile:kfs"] do
 end
 
 
 namespace :compile do
   
-  desc "Compile KFS for storage module"
+  desc "Compile KFS for 'storage' components"
   task :kfs do
   
     if need_kfs?
@@ -249,11 +248,10 @@ namespace :compile do
         
         system "cmake -DJAVA_INCLUDE_PATH=#{KFS_JAVA_INCLUDE_PATH} -DJAVA_INCLUDE_PATH2=#{KFS_JAVA_INCLUDE_PATH2} #{KFS_DIR}"
         system "cd #{KFS_DIR} && make"
-        system "mkdir #{KFS_DIR}/bin -p"
       end
 
     else
-      puts "KFS is not required according to your 'nova_deploy.xml'"      
+      puts "KFS is not required according to your configuration"
     end
     
   end
@@ -261,20 +259,31 @@ end
 
 
 desc "Deploy the Nova system to a cluster"
-task :deploy => ["deploy:core", "deploy:pnode", "deploy:kfs"] do
+task :deploy => ["deploy:core", "deploy:pnode", "deploy:storage"] do
 end
 
 namespace :deploy do
 
   desc "Deploy the 'core' component"  
-  task :core => "compile:kfs" do
+  task :core => "compile" do
     xml = xml_core
     puts "Deploying 'core' component to #{xml["host"]}:#{xml["rundir"]}"
     
     `mkdir tmp -p`
     `cp -r core tmp/`
+    system "cd tmp/core && rake db:migrate:reset && rake db:fixtures:load"
     `rm tmp/core/log/*`
     `rm tmp/core/tmp/* -R`
+    
+    `mkdir tmp/core/storage/ftp -p`
+    `mkdir tmp/core/storage/nfs -p`
+    `mkdir tmp/core/storage/kfs -p`
+    
+    x = xml_settings
+    KFS_DIR = x["KFS_DIR"]
+    CURLFTPFS_DIR = x["CURLFTPFS_DIR"]
+    UNFS_DIR = x["UNFS_DIR"]    
+    `cp #{KFS_DIR}/src/cc/fuse/kfs_fuse tmp/core/storage/kfs`
     
     f = File.new "tmp/core/start", "w"
     f.write <<CORE_START
@@ -303,7 +312,7 @@ CORE_UNINSTALL
 
 
   desc "Deploy all 'pnode' components"
-  task :pnode => "compile:kfs" do
+  task :pnode => "compile" do
     xml_pnodes.each do |xml|
       puts "Deploying 'pnode' component to #{xml["host"]}:#{xml["rundir"]}"
       
@@ -330,6 +339,18 @@ PNODE_UNINSTALL
       f.close
     
       `cp -r pnode/* tmp/#{xml["name"]}`
+      
+      `mkdir tmp/#{xml["name"]}/storage/ftp -p`
+      `mkdir tmp/#{xml["name"]}/storage/nfs -p`
+      `mkdir tmp/#{xml["name"]}/storage/kfs -p`
+      
+      x = xml_settings  
+      KFS_DIR = x["KFS_DIR"]
+      CURLFTPFS_DIR = x["CURLFTPFS_DIR"]
+      UNFS_DIR = x["UNFS_DIR"]
+      `cp #{KFS_DIR}/src/cc/fuse/kfs_fuse tmp/#{xml["name"]}/storage/kfs`
+      
+      
       system "scp -r tmp/#{xml["name"]} #{xml["host"]}:#{xml["rundir"]}"
       `rm tmp -R`
     end
@@ -432,7 +453,7 @@ CHUNK_UNINSTALL
       `rm tmp -R`
       
     else
-      puts "KFS is not required according to your 'nova_deploy.xml'"
+      puts "KFS is not required according to your configuration"
     end
     
   end
@@ -514,7 +535,7 @@ namespace :stop do
 end
 
 desc "Uninstall the Nova system"
-task :uninstall => ["uninstall:pnode", "uninstall:core", "uninstall:kfs"] do
+task :uninstall => ["uninstall:pnode", "uninstall:core", "uninstall:storage"] do
 end
 
 
@@ -547,6 +568,6 @@ namespace :uninstall do
       end
     end  
   end
-    
+
 end
 

@@ -11,7 +11,7 @@
   rundir: Where will the files be put.
           eg. if rundir='/home/nova', then the 'core' files will be copied to '/home/nova/core'.
 -->
-    <host>10.0.0.225</host>
+    <host>10.0.0.235</host>
     <port>3000</port>
     <rundir>/home/santa/Workspace/test</rundir>
   </core>
@@ -34,12 +34,12 @@
   rundir: Where will the files be put.
           eg. if rundir='/home/nova', then the 'pnode' files will be copied to '/home/nova/${name_of_this_pnode}', in this case, '/home/nova/pnode1'.
 -->
-      <host>10.0.0.225</host>
+      <host>10.0.0.235</host>
       <port>3456</port>
       <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
     <pnode name="pnode2">
-      <host>10.0.0.225</host>
+      <host>10.0.0.235</host>
       <port>4567</port>
       <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
@@ -96,7 +96,7 @@
   rundir: Where will the files be put.
           eg. if rundir='/home/nova', then the meta server files will be copied to '/home/nova/${name_of_this_metaserver}', in this case, '/home/nova/kfsmeta'.
 -->
-        <host>10.0.0.225</host>
+        <host>10.0.0.235</host>
         <clientport>20000</clientport>
         <internalport>30000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
@@ -107,21 +107,21 @@
   
   internalport: On which port chunk servers connect to master servers. It is NOT intended for clients!
 -->
-        <host>10.0.0.225</host>
+        <host>10.0.0.235</host>
         <clientport>21000</clientport>
         <internalport>31000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
         <space>3G</space>
       </chunkserver>
       <chunkserver name="chunk2">
-        <host>10.0.0.225</host>
+        <host>10.0.0.235</host>
         <clientport>22000</clientport>
         <internalport>32000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
         <space>780M</space>
       </chunkserver>
       <chunkserver name="chunk3">
-        <host>10.0.0.225</host>
+        <host>10.0.0.235</host>
         <clientport>23000</clientport>
         <internalport>33000</internalport>
         <rundir>/home/santa/Workspace/test</rundir>
@@ -137,13 +137,13 @@
       <path>/home/nova</path>
     </storage>
     <storage type="ftp" name="ftp1">
-      <host>10.0.0.225</host>
+      <host>10.0.0.235</host>
       <port>8100</port>
       <user>santa</user>
       <password>test</password>
     </storage>
     <storage type="ftp" name="ftp2">
-      <host>10.0.0.225</host>
+      <host>10.0.0.235</host>
       <port>80</port>
       <user>santazh</user>
       <password>test</password>

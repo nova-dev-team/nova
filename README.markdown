@@ -56,8 +56,8 @@ Storage component
 =================
 
 
-Content Addressable Storage
----------------------------
+Philosophy: Content Addressable Storage
+---------------------------------------
 
 
 KFS storage
@@ -67,14 +67,18 @@ KFS storage
 
 kfs-0.3's cmake script needs the following variables:
 
-JAVA_INCLUDE_PATH
-JAVA_INCLUDE_PATH2
+    JAVA_INCLUDE_PATH
+    JAVA_INCLUDE_PATH2
 
-Run the command with (you might need to change the path to Java include files):
+Run the command with (you might need to change the path to Java include files and kfs source path):
 
     cmake -DJAVA_INCLUDE_PATH=/usr/lib/jvm/java-sun-6/include -DJAVA_INCLUDE_PATH2=/usr/lib/jvm/java-6-sun/inlclude/linux kfs-0.3/
 
-NOTICE: when building kfs, xfs development files might be necessary, so you should install xfslib-dev
+then, in kfs source path:
+
+    make
+
+NOTICE: when building kfs, xfs development files might be necessary, so you should install xfslib-dev.
 
 FTP storage
 -----------
@@ -91,9 +95,6 @@ Dependencies
 + libvirt
 + ruby-1.8.7
 + rails-2.3.2
-+ libcurl
 + xfslib-dev (xfs development files for compiling KFS)
 + kfs-0.3 (included in source)
-+ curlftpfs-0.9.2 (included in source)
-+ unfs3-0.9.22 (included in source)
 
