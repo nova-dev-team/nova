@@ -11,7 +11,7 @@
   rundir: Where will the files be put.
           eg. if rundir='/home/nova', then the 'core' files will be copied to '/home/nova/core'.
 -->
-    <host>10.0.0.235</host>
+    <host>127.0.0.1</host>
     <port>3000</port>
     <rundir>/home/santa/Workspace/test</rundir>
   </core>
@@ -34,120 +34,20 @@
   rundir: Where will the files be put.
           eg. if rundir='/home/nova', then the 'pnode' files will be copied to '/home/nova/${name_of_this_pnode}', in this case, '/home/nova/pnode1'.
 -->
-      <host>10.0.0.235</host>
+      <host>127.0.0.1</host>
       <port>3456</port>
       <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
     <pnode name="pnode2">
-      <host>10.0.0.235</host>
+      <host>127.0.0.1</host>
       <port>4567</port>
       <rundir>/home/santa/Workspace/test</rundir>
     </pnode>
   </pnodes>
   <settings>
-<!--
-  Settings for Nova.
-  
-  KFS_DIR: Where is the source folder of KFS. You don't need to change this.
-  
-  KFS_JAVA_INCLUDE_PATH & KFS_JAVA_INCLUDE_PATH2: KFS's Java JNI modules needs Java include path. You might need to change these values.
-  
-  CURLFTPFS_DIR: Where is the source folder of curlftpfs. You don't need to change this.
-  
-  UNFS_DIR: Where is the source folder of uNFS. You don't need to change this.
--->
-    <setting name="KFS_DIR" val="kfs-0.3" />
-    <setting name="KFS_JAVA_INCLUDE_PATH" val="/usr/lib/jvm/java-sun-6/include" />
-    <setting name="KFS_JAVA_INCLUDE_PATH2" val="/usr/lib/jvm/java-sun-6/include" />
-    <setting name="CURLFTPFS_DIR" val="curlftpfs-0.9.2" />
-    <setting name="UNFS_DIR" val="unfs3-0.9.22" />
+    <setting name="EXAMPLE" val="value" />
   </settings>
   <storages>
-<!--
-  Collection of the storage systems. Each storage system has the following 2 attributes:
-  
-  type: What's the under lying filesystem? 'kfs', 'ftp' and 'nfs' are supported.
-  
-  name: The unique name of this storage system. By 'unique' I mean it cannot be 'core', and cannot be used by any 'pnode'.
--->
-    <storage type="kfs" name="kfs">
-<!--
-  This is a demo KFS setting
-  
-  clusterkey: What's the secret word in this KFS group? It is used to keep marlicious 'pnode' away, and is optional (default value="").
-  
-  metaserver: The master server of the KFS group. A KFS group has only one metaserver.
-  
-  chunkserver: The storage servers of the KFS group. A KFS group could have multiple chunkservers.
-  
-  NOTICE: Every metaserver and chunkserver has a unique name.
--->
-      <clusterkey>test-kfs-cluster</clusterkey>
-      <metaserver name="kfsmeta">
-<!--
-  Meta server settings of a KFS group
-  
-  host: On which computer will this meta server run. Files will be copied to it. Provide IP address or hostname here.
-  
-  clientport: On which port clients (like the kfs_fuse) could connect.
-  
-  internalport: On which port chunkservers could connect. It is NOT intended for clients!
-  
-  rundir: Where will the files be put.
-          eg. if rundir='/home/nova', then the meta server files will be copied to '/home/nova/${name_of_this_metaserver}', in this case, '/home/nova/kfsmeta'.
--->
-        <host>10.0.0.235</host>
-        <clientport>20000</clientport>
-        <internalport>30000</internalport>
-        <rundir>/home/santa/Workspace/test</rundir>
-      </metaserver>
-      <chunkserver name="chunk1">
-<!--
-  Chunk server settings, similar to meta server settings, except:
-  
-  internalport: On which port chunk servers connect to master servers. It is NOT intended for clients!
--->
-        <host>10.0.0.235</host>
-        <clientport>21000</clientport>
-        <internalport>31000</internalport>
-        <rundir>/home/santa/Workspace/test</rundir>
-        <space>3G</space>
-      </chunkserver>
-      <chunkserver name="chunk2">
-        <host>10.0.0.235</host>
-        <clientport>22000</clientport>
-        <internalport>32000</internalport>
-        <rundir>/home/santa/Workspace/test</rundir>
-        <space>780M</space>
-      </chunkserver>
-      <chunkserver name="chunk3">
-        <host>10.0.0.235</host>
-        <clientport>23000</clientport>
-        <internalport>33000</internalport>
-        <rundir>/home/santa/Workspace/test</rundir>
-        <space>2.15G</space>
-      </chunkserver>
-    </storage>
-    <storage type="nfs" name="nfs1">
-      <host>10.0.2.4</host>
-      <path>/home/nova</path>
-    </storage>
-    <storage type="nfs" name="nfs2">
-      <host>10.0.2.5</host>
-      <path>/home/nova</path>
-    </storage>
-    <storage type="ftp" name="ftp1">
-      <host>10.0.0.235</host>
-      <port>8100</port>
-      <user>santa</user>
-      <password>test</password>
-    </storage>
-    <storage type="ftp" name="ftp2">
-      <host>10.0.0.235</host>
-      <port>80</port>
-      <user>santazh</user>
-      <password>test</password>
-    </storage>
   </storages>
 </nova>
 

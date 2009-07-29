@@ -1,8 +1,0 @@
-CMake*
-cmake*
-build/
-Makefile
-*~
-*.so
-*.o
-*.a

@@ -145,7 +145,7 @@
     %>
     [<%= user_groups %>]
   </td>
-  <td <%= "class='alt'" if u.id.odd? %>>
+  <td <%= "class='alt'" if i.even? %>>
     <%
       if (u.id == current_user.id) or ((current_user.login != "root") and (u.in_group? "admin"))
       # you cannot deactive your self

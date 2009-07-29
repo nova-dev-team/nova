@@ -79,46 +79,6 @@ def xml_settings
 end
 
 
-
-def xml_kfs
-  
-  def size_unit_conv str
-    val = str.to_f
-    if str["G"]
-      val *= 1000 * 1000 * 1000
-    elsif str["M"]
-      val *= 1000 * 1000
-    elsif str["K"]
-      val *= 1000
-    end
-    val.to_i
-  end
-
-  xml = []
-  xml_storages.each do |x|
-    if x["type"] == "kfs"
-      x["metaserver"] = x["metaserver"][0]
-      x["chunkserver"].each do |chunk|
-        chunk["rundir"] = chunk["rundir"][0]
-        chunk["clientport"] = chunk["clientport"][0]
-        chunk["space"] = size_unit_conv chunk["space"][0]
-        chunk["host"] = chunk["host"][0]
-        chunk["internalport"] = chunk["internalport"][0]
-      end
-      xml << x
-    end
-  end
-  xml
-end
-
-
-
-def need_kfs?
-  xml = xml_storages
-  xml.each { |x| return true if x["type"] == "kfs" }
-  false
-end
-
 ############################################################################
 ####  Task definition section
 ############################################################################
@@ -142,122 +102,6 @@ TODO HELP info
 HELP
 end
 
-
-desc "Clean all build files"
-task :clean => ["clean:kfs"] do
-end
-
-
-namespace :clean do
-
-  desc "Clean the build files for KFS"
-  task :kfs do
-    if need_kfs?
-    
-      xml = xml_settings
-      
-      KFS_DIR = xml["KFS_DIR"]
-      
-      raise RuntimeError, "*** Tool 'make' was not installed!" unless installed? "make"
-      puts "Cleaning KFS build files..."
-      
-      system "cd #{KFS_DIR} && make clean"
-      puts "Done cleaning KFS build files"
-      
-    else
-      puts "KFS is not required according to your configuration"
-    end
-  end
-  
-end
-
-
-desc "Compile all needed binaries"
-task :compile => ["compile:kfs"] do
-end
-
-
-namespace :compile do
-  
-  desc "Compile KFS for 'storage' components"
-  task :kfs do
-  
-    if need_kfs?
-    
-      xml = xml_settings
-      
-      KFS_DIR = xml["KFS_DIR"]
-      KFS_JAVA_INCLUDE_PATH = xml["KFS_JAVA_INCLUDE_PATH"]
-      KFS_JAVA_INCLUDE_PATH2 = xml["KFS_JAVA_INCLUDE_PATH2"]
-      
-      kfs_files = [
-        "chunk/chunkserver",
-        "chunk/chunkscrubber",
-        "emulator/rebalanceexecutor",
-        "emulator/rebalanceplanner",
-        "emulator/replicachecker",
-        "emulator/rereplicator",
-        "fuse/kfs_fuse",
-        "meta/logcompactor",
-        "meta/metaserver",
-        "tests/KfsDataGen",
-        "tests/KfsDirFileTester",
-        "tests/KfsDirScanTest",
-        "tests/KfsPerfReader",
-        "tests/KfsPerfWriter",
-        "tests/KfsReader",
-        "tests/KfsRW",
-        "tests/KfsSeekWrite",
-        "tests/KfsTrunc",
-        "tests/KfsWriter",
-        "tests/mkfstree",
-        "tools/cpfromkfs",
-        "tools/cptokfs",
-        "tools/kfsdataverify",
-        "tools/kfsfileenum",
-        "tools/kfsping",
-        "tools/kfsput",
-        "tools/kfsretire",
-        "tools/kfsshell",
-        "tools/kfsstats",
-        "tools/kfstoggleworm"
-      ]
-      
-      already_built = true
-      
-      kfs_files.each do |file|
-        unless File.exists? "#{KFS_DIR}/src/cc/#{file}"
-          already_built = false
-          break
-        end
-      end
-      
-      if already_built
-        puts "KFS module is already compiled"      
-        
-      else
-        puts "Compiling KFS for storage module"
-        puts "Checking installed tools"
-        
-        required_tools = ['cmake', 'g++', 'make']
-        required_tools.each do |tool|
-          unless installed? tool
-            raise RuntimeError, "*** Tool '#{tool}' was not installed!"
-          end
-        end
-        
-        system "cmake -DJAVA_INCLUDE_PATH=#{KFS_JAVA_INCLUDE_PATH} -DJAVA_INCLUDE_PATH2=#{KFS_JAVA_INCLUDE_PATH2} #{KFS_DIR}"
-        system "cd #{KFS_DIR} && make"
-      end
-
-    else
-      puts "KFS is not required according to your configuration"
-    end
-    
-  end
-end
-
-
 desc "Deploy the Nova system to a cluster"
 task :deploy => ["deploy:core", "deploy:pnode", "deploy:storage"] do
 end
@@ -265,7 +109,7 @@ end
 namespace :deploy do
 
   desc "Deploy the 'core' component"  
-  task :core => "compile" do
+  task :core do
     xml = xml_core
     puts "Deploying 'core' component to #{xml["host"]}:#{xml["rundir"]}"
     
@@ -274,16 +118,6 @@ namespace :deploy do
     system "cd tmp/core && rake db:migrate:reset && rake db:fixtures:load"
     `rm tmp/core/log/*`
     `rm tmp/core/tmp/* -R`
-    
-    `mkdir tmp/core/storage/ftp -p`
-    `mkdir tmp/core/storage/nfs -p`
-    `mkdir tmp/core/storage/kfs -p`
-    
-    x = xml_settings
-    KFS_DIR = x["KFS_DIR"]
-    CURLFTPFS_DIR = x["CURLFTPFS_DIR"]
-    UNFS_DIR = x["UNFS_DIR"]    
-    `cp #{KFS_DIR}/src/cc/fuse/kfs_fuse tmp/core/storage/kfs`
     
     f = File.new "tmp/core/start", "w"
     f.write <<CORE_START
@@ -312,7 +146,7 @@ CORE_UNINSTALL
 
 
   desc "Deploy all 'pnode' components"
-  task :pnode => "compile" do
+  task :pnode do
     xml_pnodes.each do |xml|
       puts "Deploying 'pnode' component to #{xml["host"]}:#{xml["rundir"]}"
       
@@ -340,17 +174,6 @@ PNODE_UNINSTALL
     
       `cp -r pnode/* tmp/#{xml["name"]}`
       
-      `mkdir tmp/#{xml["name"]}/storage/ftp -p`
-      `mkdir tmp/#{xml["name"]}/storage/nfs -p`
-      `mkdir tmp/#{xml["name"]}/storage/kfs -p`
-      
-      x = xml_settings  
-      KFS_DIR = x["KFS_DIR"]
-      CURLFTPFS_DIR = x["CURLFTPFS_DIR"]
-      UNFS_DIR = x["UNFS_DIR"]
-      `cp #{KFS_DIR}/src/cc/fuse/kfs_fuse tmp/#{xml["name"]}/storage/kfs`
-      
-      
       system "scp -r tmp/#{xml["name"]} #{xml["host"]}:#{xml["rundir"]}"
       `rm tmp -R`
     end
@@ -359,103 +182,8 @@ PNODE_UNINSTALL
 
 
   desc "Deploy all 'storage' components"
-  task :storage => "compile" do
-    
-    if need_kfs?
-      puts "Deploying the KFS storage module"
-      KFS_DIR = (xml_settings)["KFS_DIR"]
-      
-      `mkdir tmp -p`
-      
-      xml_kfs.each do |xml|
-        puts "Deploying meta server '#{xml["metaserver"]["name"]}'..."
-        
-        `mkdir tmp/#{xml["metaserver"]["name"]}/kfslog -p`
-        `mkdir tmp/#{xml["metaserver"]["name"]}/kfscp -p`
-        `cp #{KFS_DIR}/src/cc/meta/metaserver tmp/#{xml["metaserver"]["name"]}/`
-        
-        f = File.new "tmp/#{xml["metaserver"]["name"]}/kfs_config_#{xml["metaserver"]["name"]}", "w"
-        f.write <<META_CONF
-metaServer.clientPort = #{xml["metaserver"]["clientport"]}
-metaServer.chunkServerPort = #{xml["metaserver"]["internalport"]}
-metaServer.logDir = ./kfslog
-metaServer.cpDir = .kfscp
-META_CONF
-        f.close
-
-        f = File.new "tmp/#{xml["metaserver"]["name"]}/start", "w"
-        f.write <<META_START
-./metaserver kfs_config_#{xml["metaserver"]["name"]}
-META_START
-        f.close
-
-        f = File.new "tmp/#{xml["metaserver"]["name"]}/stop", "w"
-        f.write <<META_STOP
-killall metaserver
-META_STOP
-        f.close
-
-        f = File.new "tmp/#{xml["metaserver"]["name"]}/uninstall", "w"
-        f.write <<META_UNINSTALL
-killall metaserver
-cd ..
-rm #{xml["metaserver"]["name"]} -R
-META_UNINSTALL
-        f.close
-
-        
-        system "scp -r tmp/#{xml["metaserver"]["name"]} #{xml["metaserver"]["host"]}:#{xml["metaserver"]["rundir"]}"
-        `rm tmp/#{xml["metaserver"]["name"]} -R`
-        
-        xml["chunkserver"].each do |chunk|
-          puts "Deploying chunk server '#{chunk["name"]}'..."
-          
-          `mkdir tmp/#{chunk["name"]}/chunks -p`
-          `mkdir tmp/#{chunk["name"]}/logs -p`
-          `cp #{KFS_DIR}/src/cc/chunk/chunkserver tmp/#{chunk["name"]}/`
-          
-          f = File.new "tmp/#{chunk["name"]}/kfs_config_#{chunk["name"]}", "w"
-          f.write <<CHUNK_CONF
-chunkServer.metaServer.hostname = #{xml["metaserver"]["host"]}
-chunkServer.metaServer.port = #{xml["metaserver"]["internalport"]}
-chunkServer.clientPort = #{chunk["clientport"]}
-chunkServer.chunkDir = ./chunks
-chunkServer.logDir = ./logs
-chunkServer.totalSpace = #{chunk["space"]}
-CHUNK_CONF
-          f.close
-
-        f = File.new "tmp/#{chunk["name"]}/start", "w"
-        f.write <<CHUNK_START
-./chunkserver kfs_config_#{chunk["name"]}
-CHUNK_START
-        f.close
-
-        f = File.new "tmp/#{chunk["name"]}/stop", "w"
-        f.write <<CHUNK_STOP
-killall chunkserver
-CHUNK_STOP
-        f.close
-
-        f = File.new "tmp/#{chunk["name"]}/uninstall", "w"
-        f.write <<CHUNK_UNINSTALL
-killall chunkserver
-cd ..
-rm #{chunk["name"]} -R
-CHUNK_UNINSTALL
-        f.close
-                    
-          system "scp -r tmp/#{chunk["name"]} #{chunk["host"]}:#{chunk["rundir"]}"
-          `rm tmp/#{chunk["name"]} -R`
-        end
-      end
-      
-      `rm tmp -R`
-      
-    else
-      puts "KFS is not required according to your configuration"
-    end
-    
+  task :storage do
+   
   end
 end
 
@@ -483,17 +211,7 @@ namespace :start do
   
   desc "Start all 'storage' components"
   task :storage do
-    xml_kfs.each do |xml|
-      puts "Starting meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
-      puts "Please wait a few seconds and press ENTER."
-      system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && (bash start)& exit'"
-      
-      xml["chunkserver"].each do |chunk|
-        puts "Starting chunk server '#{chunk["name"]}'..."
-        puts "Please wait a few seconds and press ENTER."
-        system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && (bash start)& exit'"
-      end
-    end
+
   end
 
 end
@@ -521,15 +239,7 @@ namespace :stop do
   
   desc "Stop all 'storage' components"
   task :storage do
-    xml_kfs.each do |xml|
-      puts "Stopping KFS meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
-      system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && bash stop && exit'"
-      
-      xml["chunkserver"].each do |chunk|
-        puts "Stopping KFS chunk server '#{chunk["name"]}'..."
-        system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && bash stop && exit'"
-      end
-    end
+   
   end
   
 end
@@ -558,15 +268,7 @@ namespace :uninstall do
   
   desc "Uninstall all 'storage' components"
   task :storage do
-    xml_kfs.each do |xml|
-      puts "Uninstalling KFS meta server '#{xml["metaserver"]["name"]}' on #{xml["metaserver"]["host"]}..."
-      system "ssh #{xml["metaserver"]["host"]} 'cd #{xml["metaserver"]["rundir"]}/#{xml["metaserver"]["name"]} && bash uninstall && exit'"
-      
-      xml["chunkserver"].each do |chunk|
-        puts "Uninstalling KFS chunk server '#{chunk["name"]}'..."
-        system "ssh #{chunk["host"]} 'cd #{chunk["rundir"]}/#{chunk["name"]} && bash uninstall && exit'"
-      end
-    end  
+    
   end
 
 end
