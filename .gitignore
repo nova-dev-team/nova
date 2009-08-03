@@ -2,10 +2,13 @@
 *.swp
 *.log
 scripts/
-core/log
-core/doc
+master/log
+master/doc
 # core/config/database.yml
 *~
-core/db/*.sqlite3
+master/db/*.sqlite3
+worker/log
+worker/doc
+worker/db/*.sqlite3
 tmp/
 test/
