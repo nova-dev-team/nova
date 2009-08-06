@@ -1,0 +1,19 @@
+vmachine 模型：
+
+  uuid 用于对虚拟机进行标示，这是提供给 xen 和 kvm 的命令行使用的。这是一个 string
+  vmid 从 1 开始编号的虚拟机序列号，在系统内部使用这个编号标示虚拟机。这是一个 integer
+  settings 虚拟机的配置信息
+
+
+
+vcluster 模型：
+
+
+
+vsubnet 模型：
+
+
+
+vdisk 模型：
+  familiy 硬盘镜像类型，可以是 mswin, ubuntu 等
+  
