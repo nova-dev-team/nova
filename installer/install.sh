@@ -1,5 +1,10 @@
 #!/bin/sh
 
-dpkg -i debs/*.deb
-gem install -l gems/*.gem
+cd debs
+dpkg -i *.deb
+
+cd ..
+
+cd gems
+gem install --no-ri --no-rdoc -l *.gem
 
