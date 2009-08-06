@@ -1,0 +1,9 @@
+如何利用 apt-get 下载 deb 包
+========================
+可以使用这样的命令行下载 xxx 软件的 deb 包到 /home/santa/debs 位置：
+
+sudo apt-get install -d -o dir::cache=/home/santa/debs/ xxx
+
+注：需要在 /home/santa/debs 下建立新文件夹，保证存在 /home/santa/debs/archives/partial 路径。
+
+
