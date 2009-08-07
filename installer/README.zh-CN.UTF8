@@ -8,8 +8,8 @@
 ========================
 可以使用这样的命令行下载 xxx 软件的 deb 包到 /home/santa/debs 位置：
 
-sudo apt-get install -d -o dir::cache=/home/santa/debs/ xxx
+sudo apt-get install --reinstall -d -o dir::cache=/home/santa/debs/ xxx
 
 注：需要在 /home/santa/debs 下建立新文件夹，保证存在 /home/santa/debs/archives/partial 路径。
-
+注：--reinstall 可以使得在该软件已经被安装的情况下也能够正确下载软件包。
 
