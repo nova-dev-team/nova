@@ -1,3 +1,6 @@
+# this controller is intended for views
+
+
 class AppController < ApplicationController
   
   before_filter :login_required

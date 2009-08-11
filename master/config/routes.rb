@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :vdisks
+
   map.resources :vclusters
 
   map.resources :settings

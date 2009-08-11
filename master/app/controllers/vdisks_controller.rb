@@ -1,0 +1,2 @@
+class VdisksController < ApplicationController
+end
