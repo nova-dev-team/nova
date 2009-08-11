@@ -1,0 +1,2 @@
+class VclustersController < ApplicationController
+end
