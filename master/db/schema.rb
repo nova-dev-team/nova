@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090627160038) do
+ActiveRecord::Schema.define(:version => 20090812091810) do
 
   create_table "groups", :force => true do |t|
     t.string   "name",       :limit => 40
@@ -50,7 +50,28 @@ ActiveRecord::Schema.define(:version => 20090627160038) do
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
 
+  create_table "vclusters", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "vdisks", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "vmachine_infos", :force => true do |t|
+    t.integer  "vmachine_id"
+    t.string   "category",    :limit => 20
+    t.string   "message",     :limit => 256
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "vmachine_infos", ["vmachine_id"], :name => "index_vmachine_infos_on_vmachine_id"
+
   create_table "vmachines", :force => true do |t|
+    t.string   "uuid",       :limit => 40, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -1,0 +1,2 @@
+class VmachineInfosController < ApplicationController
+end
