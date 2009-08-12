@@ -5,10 +5,10 @@ module VmachinesHelper
     def Helper.emit_xml_spec params
       return <<XML_SPEC
 <domain type='qemu'>
-  <name>#{params[:name]}</name>
-  <uuid>#{params[:uuid]}</uuid>
-  <memory>#{params[:mem_size] * 1024}</memory>
-  <vcpu>#{params[:vcpu]}</vcpu>
+  <name>#{params["name"]}</name>
+  <uuid>#{params["uuid"]}</uuid>
+  <memory>#{params["mem_size"] * 1024}</memory>
+  <vcpu>#{params["vcpu"]}</vcpu>
   <os>
     <type arch='i686' machine='pc'>hvm</type>
     <boot dev='cdrom' />
