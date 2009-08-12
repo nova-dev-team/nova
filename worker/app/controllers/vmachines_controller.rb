@@ -2,7 +2,7 @@ require 'rubygems'
 require 'json'
 require 'libvirt'
 
-class VmachineController < ApplicationController
+class VmachinesController < ApplicationController
 
   # list all vmachines, and show their status
   def index
