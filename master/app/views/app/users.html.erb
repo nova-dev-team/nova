@@ -64,7 +64,8 @@
         success: function(responseText) {
           var result = $.evalJSON(responseText);
           if (result.success) {
-            show_message("Successfully " + (active ? "" : "de") + "activated user'" + user_login + "'.<br /> Server message => " + result.message);
+            //show_message("Successfully " + (active ? "" : "de") + "activated user'" + user_login + "'.<br /> Server message => " + result.message);
+            // We'd better don't show messages when succeeded, otherwise the screen will be a mess
           } else {
             show_message("Failed to " + (active ? "" : "de") + "activate user'" + user_login + "'.<br /> Server message => " + result.message);
             roll_back_checkbox();
