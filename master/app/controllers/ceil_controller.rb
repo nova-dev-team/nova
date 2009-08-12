@@ -1,0 +1,2 @@
+class CeilController < ApplicationController
+end
