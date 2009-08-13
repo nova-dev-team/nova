@@ -8,6 +8,8 @@ cd ..
 cd gems
 gem install --no-ri --no-rdoc -l *.gem
 
+cd ..
+
 cd src
 ./installer.sh
 
