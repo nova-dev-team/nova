@@ -17,8 +17,6 @@ public
 
   @@virt_conn = Libvirt::open("qemu:///system")
 
-  @@background_worker = Thread.new {create_worker}
-
   # list all vmachines, and show their status
   def index
     params[:show_active] ||= true
@@ -115,13 +113,12 @@ public
     logger.debug dom_xml
 
 
-      dom = @@virt_conn.define_domain_xml dom_xml
-      delayed_create dom.uuid
     begin
       # create vmachine domain, could fail
-      # TODO delay creating of vmachine, wait until resource is ready (could left this to daemon process?)
-      #dom.create
-      render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}."
+      # delay creating of vmachine, wait until resource is ready (powerred by backgroundrb)
+      dom = @@virt_conn.define_domain_xml dom_xml
+      MiddleMan.worker(:vmstart_worker).async_do_start(:arg => dom.uuid)
+      render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
     rescue
       # report error to calling server
       
@@ -214,19 +211,6 @@ private
 
   def state_has_vnc? state_id
     return [STATE_RUNNING, STATE_SUSPENDED].include? state_id
-  end
-
-  def create_worker
-    v = 1
-    loop do
-      Thread.sleep 1
-      `touch #{v}`
-      v = v + 1
-    end
-  end
-
-  def delayed_create uuid
-    puts "creation of #{uuid} is delayed"
   end
 
 end
