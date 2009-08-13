@@ -1,3 +1,5 @@
+require 'libvirt'
+
 module VmachinesHelper
 
   class Helper

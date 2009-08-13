@@ -4,7 +4,6 @@ require 'libvirt'
 require 'pp'
 require 'xmlsimple'
 require 'uuidtools'
-require 'dbus'
 
 class VmachinesController < ApplicationController
 
@@ -17,9 +16,6 @@ public
   STATE_SUSPENDED = 3
 
   @@virt_conn = Libvirt::open("qemu:///system")
-  @@bus = DBus::SystemBus.instance
-  @@vm_service = @@bus.service("thuhpc.datagrid.nova")
-  @@vm_starter = @@vm_service.object("thuhpc/datagrid/nova/vmstarter")
 
   # list all vmachines, and show their status
   def index
@@ -76,7 +72,7 @@ public
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
     rescue # would fail if dom not found
-      alert_domain_not_found
+      alert_domain_not_found params
       return
     end
     
@@ -120,7 +116,7 @@ public
       # create vmachine domain, could fail
       dom = @@virt_conn.define_domain_xml dom_xml
       # TODO delay creating of vmachine, wait until resource is ready (could left this to daemon process?)
-      dom.create
+      #dom.create
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}."
     rescue
       # report error to calling server
@@ -144,7 +140,7 @@ public
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
     rescue
-      alert_domain_not_found
+      alert_domain_not_found params
       return
     end
 
@@ -152,7 +148,6 @@ public
       name = dom.name
       dom.destroy
       dom.undefine
-      dom.free
       render_success "Successfully destroyed domain, name=#{name}, UUID=#{params[:uuid]}."
     rescue
       render_failure "Failed to destroy domain, UUID=#{params[:uuid]}!"
@@ -178,7 +173,7 @@ private
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
     rescue
-      alert_domain_not_found
+      alert_domain_not_found params
       return
     end
 
