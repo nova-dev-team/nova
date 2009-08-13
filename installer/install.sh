@@ -8,6 +8,11 @@ cd ..
 cd gems
 gem install --no-ri --no-rdoc -l *.gem
 
+cd src
+./installer.sh
+
+cd ..
+
 rm -f /usr/bin/rake
 rm -f /usr/bin/rails
 ln /var/lib/gems/1.8/bin/rake /usr/bin/rake -s

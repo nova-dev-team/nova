@@ -4,6 +4,7 @@ require 'libvirt'
 require 'pp'
 require 'xmlsimple'
 require 'uuidtools'
+require 'dbus'
 
 class VmachinesController < ApplicationController
 
@@ -11,10 +12,14 @@ class VmachinesController < ApplicationController
 
 public
 
+  # libvirt states
   STATE_RUNNING = 1
   STATE_SUSPENDED = 3
 
   @@virt_conn = Libvirt::open("qemu:///system")
+  @@bus = DBus::SystemBus.instance
+  @@vm_service = @@bus.service("thuhpc.datagrid.nova")
+  @@vm_starter = @@vm_service.object("thuhpc/datagrid/nova/vmstarter")
 
   # list all vmachines, and show their status
   def index
@@ -24,7 +29,7 @@ public
     doms_info = []
     all_domains = []
 
-    if params[:show_inactive] # inactive domains are listed by name
+    if params[:show_inactive] == "true" # inactive domains are listed by name
       @@virt_conn.list_defined_domains.each do |dom_name|
         begin
           all_domains << @@virt_conn.lookup_domain_by_name(dom_name)
@@ -34,7 +39,7 @@ public
       end
     end
 
-    if params[:show_active] # active domains are listed by id
+    if params[:show_active] == "true" # active domains are listed by id
       @@virt_conn.list_domains.each do |dom_id|
         begin
           all_domains << @@virt_conn.lookup_domain_by_id(dom_id)
@@ -114,6 +119,7 @@ public
     begin
       # create vmachine domain, could fail
       dom = @@virt_conn.define_domain_xml dom_xml
+      # TODO delay creating of vmachine, wait until resource is ready (could left this to daemon process?)
       dom.create
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}."
     rescue
@@ -135,7 +141,22 @@ public
 
   # stop and destroy an domain
   def destroy
-    libvirt_action "destroy", params
+    begin
+      dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
+    rescue
+      alert_domain_not_found
+      return
+    end
+
+    begin
+      name = dom.name
+      dom.destroy
+      dom.undefine
+      dom.free
+      render_success "Successfully destroyed domain, name=#{name}, UUID=#{params[:uuid]}."
+    rescue
+      render_failure "Failed to destroy domain, UUID=#{params[:uuid]}!"
+    end
   end
 
   def reboot
