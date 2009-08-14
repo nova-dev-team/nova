@@ -66,7 +66,7 @@ public
 
       doms_info << dom_info 
     end
-    
+
     respond_to do |accept|
       accept.json {render :json => doms_info}
       accept.html {render :text => doms_info.to_json}
@@ -142,6 +142,7 @@ public
     begin
       # creation is put into job queue, handled by backgroundrb
       MiddleMan.worker(:vmstart_worker).async_do_start(:args => params)
+      sleep 5
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
     rescue
       render_failure "Failed to add creation request into job queue!"

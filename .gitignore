@@ -1,14 +1,10 @@
-# .*
 *.swp
 *.log
+log/
+doc/
 scripts/
-master/log
-master/doc
-# core/config/database.yml
-*~
-master/db/*.sqlite3
-worker/log
-worker/doc
-worker/db/*.sqlite3
 tmp/
-test/
+*~
+*.sqlite3
+master/db/*.sqlite3
+worker/db/*.sqlite3
