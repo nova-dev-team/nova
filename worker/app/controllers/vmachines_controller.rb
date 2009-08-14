@@ -15,7 +15,13 @@ public
   STATE_RUNNING = 1
   STATE_SUSPENDED = 3
 
+  # specifies where the new 
+  VMACHINES_ROOT = RAILS_ROOT + "/tmp/vmachines/"
+
   @@virt_conn = Libvirt::open("qemu:///system")
+
+  # where the cdrom-iso, vdisks are stored
+  @@default_storage_server = "/home/santa/Downloads/"
 
   # list all vmachines, and show their status
   def index
@@ -95,11 +101,15 @@ public
 
     # those are default parameters
     default_params = {
-      "emulator" => "kvm",
-      "name" => "dummy_vm",
-      "vcpu" => 2,
-      "mem_size" => 128,
-      "uuid" => UUIDTools::UUID.random_create.to_s
+      :emulator => "kvm",
+      :name => "dummy_vm",
+      :vcpu => 2,
+      :mem_size => 128,
+      :uuid => UUIDTools::UUID.random_create.to_s,
+      :storage_server => @@default_storage_server,
+      :cdrom => "liveandroidv0.2.iso", # this is optional
+      :hda => "vdisk.img"
+      # TODO to be added: hdb...
     }
     
     # merge default parameters into real params, if corresponding item does not exist
@@ -107,18 +117,12 @@ public
       params[key] ||= value
     end
 
-    # emit virtual machine xml specification
-    dom_xml = VmachinesHelper::Helper.emit_xml_spec params
-    logger.debug "*** [create] Vmachine XML Specfication"
-    logger.debug dom_xml
-
-
     begin
-      # create vmachine domain, could fail
-      # delay creating of vmachine, wait until resource is ready (powerred by backgroundrb)
-      dom = @@virt_conn.define_domain_xml dom_xml
-      MiddleMan.worker(:vmstart_worker).async_do_start(:arg => dom.uuid)
-      render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
+      xml_desc = VmachinesHelper::Helper.emit_xml_desc params
+      logger.debug "*** [create] Vmachine XML Specfication"
+      logger.debug xml_desc
+
+      dom = @@virt_conn.define_domain_xml xml_desc 
     rescue
       # report error to calling server
       
@@ -132,6 +136,15 @@ public
       end
 
       render_failure "Failed to create vmachine domain!"
+      return
+    end
+
+    begin
+      # creation is put into job queue, handled by backgroundrb
+      MiddleMan.worker(:vmstart_worker).async_do_start(:args => params)
+      render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
+    rescue
+      render_failure "Failed to add creation request into job queue!"
     end
 
   end
