@@ -29,8 +29,8 @@ public
 
   # list all vmachines, and show their status
   def index
-    params[:show_active] ||= true
-    params[:show_inactive] ||= false
+    params[:show_active] ||= "true"
+    params[:show_inactive] ||= "false"
 
     doms_info = []
     all_domains = []

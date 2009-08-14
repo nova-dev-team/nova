@@ -76,19 +76,24 @@ private
       # local file copy
       
       local_from = resource_uri[7..-1]
-      
-      local_to = "#{cache_root}/#{resource_filename}.#{rand.to_s[2..-1]}"
+
+      if resource_readonly? resource_filename
+        # read only images, only one copy, no need to suffix rand number
+        local_to = "#{cache_root}/#{resource_filename}"
+      else
+        local_to = "#{cache_root}/#{resource_filename}.#{rand.to_s[2..-1]}"
+      end
 
       FileUtils.cp local_from, local_to 
 
       return local_to
 
     elsif resource_uri.start_with? "ftp://"
-      # TODO
+      # TODO get image by ftp
     elsif resource_uri.start_with? "scp://"
-      # TODO
+      # TODO get image by scp
     elsif resource_uri.start_with? "http://"
-      # TODO
+      # TODO get image by http
     end
   end
 
@@ -99,7 +104,8 @@ private
   end
   
   # TODO check if the resource is read only (eg. cdrom-iso)
-  def resource_readonly?
+  def resource_readonly? resource_uri
+    resource_uri.downcase.end_with? ".iso"
   end
 
 end
