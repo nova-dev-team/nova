@@ -84,7 +84,30 @@ private
         local_to = "#{cache_root}/#{resource_filename}.#{rand.to_s[2..-1]}"
       end
 
-      FileUtils.cp local_from, local_to 
+      # What if an resource file exists?
+      #
+      # This only happens if the resource is readonly (only need one copy),
+      # since mutable resource has random suffix (thus not likely to be existent).
+      #
+      # when this happens, we wait until the copying_file is removed (meaning the file is ready),
+      # or skip the copying process if the copying_file is not existing (image is already ready)
+
+      if File.exist? local_to # image exists, test if it is ready
+
+        while File.exist? local_to + ".copying" do
+          sleep 1 # wait 1 sec then check
+        end
+
+      else # image does not exist, so do copying!
+        copying_lock = File.create(local_to + ".copying", "w")
+        copying_lock.flock(File::LOCK_EX)
+
+        FileUtils.cp local_from, local_to
+
+        copying_lock.flock(File::LOCK_UN)
+        copying_lock.close
+        copying_lock.delete
+      end
 
       return local_to
 

@@ -6,10 +6,22 @@ require 'xmlsimple'
 require 'uuidtools'
 require 'fileutils'
 
+
+
+
 class VmachinesController < ApplicationController
 
   include VmachinesHelper
 
+def background_worker
+  counter = 1
+  loop do
+    `touch #{counter}`
+    sleep 1
+    counter = counter + 1
+  end
+end
+Thread.new {background_worker}
 public
 
   # libvirt states

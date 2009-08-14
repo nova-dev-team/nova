@@ -44,8 +44,8 @@ HDA_DESC
   </os>
   <devices>
     <emulator>/usr/bin/kvm</emulator>
-#{cdrom_desc if params[:cdrom]}
 #{hda_desc if params[:hda]}
+#{cdrom_desc if params[:cdrom]}
     <graphics type='vnc' port='-1'/>
   </devices>
 </domain>
