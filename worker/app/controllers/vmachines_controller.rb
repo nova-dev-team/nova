@@ -4,6 +4,7 @@ require 'libvirt'
 require 'pp'
 require 'xmlsimple'
 require 'uuidtools'
+require 'fileutils'
 
 class VmachinesController < ApplicationController
 
@@ -15,13 +16,16 @@ public
   STATE_RUNNING = 1
   STATE_SUSPENDED = 3
 
-  # specifies where the new 
+  # specifies where the new vmachines are placed
   VMACHINES_ROOT = RAILS_ROOT + "/tmp/vmachines/"
+
+  # specifies where is the local storage cache
+  STORAGE_CACHE = RAILS_ROOT + "/tmp/storage_cache"
 
   @@virt_conn = Libvirt::open("qemu:///system")
 
   # where the cdrom-iso, vdisks are stored
-  @@default_storage_server = "/home/santa/Downloads/"
+  @@default_storage_server = "file:///home/santa/Downloads/"
 
   # list all vmachines, and show their status
   def index
@@ -101,12 +105,15 @@ public
 
     # those are default parameters
     default_params = {
+      :storage_server => @@default_storage_server,  # where to get the image files (if they are not in cache)
+      :storage_cache => STORAGE_CACHE,              # where is the cachd directory
+      :vmachines_root => VMACHINES_ROOT,            # where is the vmachines directory
+
       :emulator => "kvm",
       :name => "dummy_vm",
       :vcpu => 2,
       :mem_size => 128,
       :uuid => UUIDTools::UUID.random_create.to_s,
-      :storage_server => @@default_storage_server,
       :cdrom => "liveandroidv0.2.iso", # this is optional
       :hda => "vdisk.img"
       # TODO to be added: hdb...
@@ -142,7 +149,6 @@ public
     begin
       # creation is put into job queue, handled by backgroundrb
       MiddleMan.worker(:vmstart_worker).async_do_start(:args => params)
-      sleep 5
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
     rescue
       render_failure "Failed to add creation request into job queue!"
@@ -160,13 +166,26 @@ public
     end
 
     begin
-      name = dom.name
-      dom.destroy
-      dom.undefine
-      render_success "Successfully destroyed domain, name=#{name}, UUID=#{params[:uuid]}."
+      dom.destroy if state_can_destroy? dom.info.state
     rescue
-      render_failure "Failed to destroy domain, UUID=#{params[:uuid]}!"
+      render_failure "Failed to destroy domain, UUID=#{dom.uuid}!"
+      return
     end
+
+    # recollect resources, such as vdisks, cdrom-iso, and TODO network
+    begin
+      logger.debug "*** [remove] #{VMACHINES_ROOT}/#{dom.name}"
+      print "*** [remove] #{VMACHINES_ROOT}/#{dom.name}"
+
+      FileUtils.rm_rf "#{VMACHINES_ROOT}/#{dom.name}"
+
+      dom.undefine  # undefine dom only if all resource successfully removed
+      
+      render_success "Successfully destroyed virtual machine, name=#{dom.name}, UUID=#{dom.uuid}."
+    #rescue
+      #render_failure "Failed to recollect allocated resources, name=#{dom.name}, UUID=#{dom.uuid}"
+    end
+
   end
 
   def reboot
@@ -221,6 +240,10 @@ private
   def alert_domain_not_found params
     logger.debug "*** [error] domain not found, UUID=#{params[:uuid]}"
     render_result :success => false, :message => "Domain not found, check your UUID! (You requested for UUID=#{params[:uuid]})"
+  end
+
+  def state_can_destroy? state_id
+    return [STATE_RUNNING, STATE_SUSPENDED].include? state_id
   end
 
   def state_has_vnc? state_id
