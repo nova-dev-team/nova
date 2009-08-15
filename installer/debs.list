@@ -11,7 +11,7 @@ git-core
 irb
 irb1.8
 kvm
-libc-dev
+libc6-dev
 libdaemons-ruby
 libdaemons-ruby1.8
 libdigest-sha1-perl
