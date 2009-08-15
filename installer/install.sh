@@ -1,8 +1,6 @@
 #!/bin/sh
 
 cd debs
-dpkg -i --dry-run *.deb
-
 dpkg -i *.deb
 
 cd ..
