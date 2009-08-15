@@ -19,7 +19,6 @@ liberror-perl
 libgemplugin-ruby
 libgemplugin-ruby1.8
 libgomp1
-libsqlite3
 libsqlite3-0
 libsqlite3-dev
 libsqlite3-ruby
