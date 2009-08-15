@@ -19,6 +19,7 @@ liberror-perl
 libgemplugin-ruby
 libgemplugin-ruby1.8
 libgomp1
+libreadline-ruby1.8
 libsqlite3-0
 libsqlite3-dev
 libsqlite3-ruby
@@ -31,7 +32,6 @@ libvirt-ruby
 libvirt-ruby1.8
 libxen3
 libxen3-dev
-libxml-simple-ruby
 linux-libc-dev
 make
 mongrel
