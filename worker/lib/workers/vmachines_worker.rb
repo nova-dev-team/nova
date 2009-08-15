@@ -66,7 +66,6 @@ require 'uri'
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
   
-  
   @@virt_conn = Libvirt::open("qemu:///system")
 
   set_worker_name :vmachines_worker
@@ -86,8 +85,9 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
       if params[:hda]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
-        if resource_copy_on_write?
-
+        if resource_copy_on_write? local_filename
+          # TODO deal with copy on write images
+          FileUtils.cp local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
         else  # not copy on write
           FileUtils.mv local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
         end
@@ -98,7 +98,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       # TODO report error by setting status
     
       # log backtarce to file
-      File.open("#{RAILS_ROOT}/log/vmachines.worker.err", "w") {|f| f.write(e.backtrace.pretty_inspect)}
+      log e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
   end
 
@@ -120,7 +120,7 @@ private
 
     resource_filename = resource_uri[(resource_uri.rindex '/') + 1..-1]
     if scheme == "file" # local file copy
-      local_from = resource_uri[7..-1]
+      local_from = path
 
       if resource_readonly? resource_filename or resource_copy_on_write? resource_filename
         # read only images/copy on write, only one copy, no need to suffix rand number
@@ -132,12 +132,15 @@ private
       if File.exist? local_to # image exists, test if it is ready
         sleep 1 while File.exist? local_to + ".copying" # wait 1 sec then check
       else # image does not exist, so do copying!
-        copying_lock = File.create(local_to + ".copying", "w")
+        copying_lock_filename = local_to + ".copying"
+        copying_lock = File.new(copying_lock_filename, "w")
         copying_lock.flock(File::LOCK_EX)
         FileUtils.cp local_from, local_to
         copying_lock.flock(File::LOCK_UN)
         copying_lock.close
-        copying_lock.delete
+
+        log "remving #{copying_lock_filename}"
+        FileUtils.rm copying_lock_filename
       end
 
       return local_to
@@ -163,6 +166,10 @@ private
 
   def resource_copy_on_write? resource_uri
     resource_uri.downcase.end_with? ".qcow2"
+  end
+
+  def log msg
+      File.open("#{RAILS_ROOT}/log/vmachines.worker.err", "a") {|f| f.write(Time.now.to_s + "\n" + msg.to_s + "\n\n")}
   end
 
 end

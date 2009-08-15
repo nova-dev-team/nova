@@ -115,7 +115,7 @@ public
       :mem_size => 128,
       :uuid => UUIDTools::UUID.random_create.to_s,
       :cdrom => "liveandroidv0.2.iso", # this is optional
-      :hda => "vdisk.img"
+      :hda => "vdisk.qcow2"
       # TODO to be added: hdb...
     }
     
@@ -198,6 +198,12 @@ public
 
   def resume
     libvirt_action "resume", params
+  end
+
+  def ensure_cached
+  end
+
+  def cache_status
   end
 
 private
