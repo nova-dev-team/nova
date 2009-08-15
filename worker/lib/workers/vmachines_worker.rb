@@ -59,14 +59,17 @@ require 'uri'
 #   Else (the image is "system-image", and not to be changed as "user-image"), the image
 #   is directly discarded.
 #
+#   F.save.to.uid.(uid)
+#   F.comment <- text file containing comments about the image file
+#
  
 
-class VmstartWorker < BackgrounDRb::MetaWorker
+class VmachinesWorker < BackgrounDRb::MetaWorker
   
   
   @@virt_conn = Libvirt::open("qemu:///system")
 
-  set_worker_name :vmstart_worker
+  set_worker_name :vmachines_worker
   def create(args = nil)
     # this method is called, when worker is loaded for the first time
   end
@@ -95,7 +98,7 @@ class VmstartWorker < BackgrounDRb::MetaWorker
       # TODO report error by setting status
     
       # log backtarce to file
-      File.open("#{RAILS_ROOT}/log/vmstart.err", "w") {|f| f.write(e.backtrace.pretty_inspect)}
+      File.open("#{RAILS_ROOT}/log/vmachines.worker.err", "w") {|f| f.write(e.backtrace.pretty_inspect)}
     end
   end
 

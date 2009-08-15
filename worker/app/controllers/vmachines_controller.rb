@@ -148,7 +148,7 @@ public
 
     begin
       # creation is put into job queue, handled by backgroundrb
-      MiddleMan.worker(:vmstart_worker).async_do_start(:args => params)
+      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params)
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
     rescue
       render_failure "Failed to add creation request into job queue!"
