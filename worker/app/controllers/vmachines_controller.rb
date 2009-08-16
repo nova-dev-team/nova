@@ -17,10 +17,10 @@ public
   STATE_SUSPENDED = 3
 
   # specifies where the new vmachines are placed
-  VMACHINES_ROOT = RAILS_ROOT + "/tmp/vmachines/"
+  VMACHINES_ROOT = "#{RAILS_ROOT}/tmp/vmachines/"
 
   # specifies where is the local storage cache
-  STORAGE_CACHE = RAILS_ROOT + "/tmp/storage_cache"
+  STORAGE_CACHE = "#{RAILS_ROOT}/tmp/storage_cache"
 
   @@virt_conn = Libvirt::open("qemu:///system")
 

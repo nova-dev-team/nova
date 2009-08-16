@@ -3,6 +3,7 @@ require 'fileutils'
 require 'ftools'
 require 'pp'
 require 'uri'
+require 'net/scp'
 
 # About the resource caching policy
 #
@@ -160,6 +161,10 @@ private
       FileUtils.cp path, to_file
     elsif scheme == "ftp"
     elsif scheme == "scp"
+      sep_index = userinfo.index ":"
+      username = userinfo[0...sep_index]  # notice, ... rather than ..
+      password = userinfo[(sep_index + 1)..-1]
+      Net::SCP.download! (host, username, path, to_file, :password => password)
     else
       raise "Resource scheme '#{scheme}' not known!"
     end
