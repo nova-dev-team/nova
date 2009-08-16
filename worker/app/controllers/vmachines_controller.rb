@@ -160,6 +160,7 @@ public
   def destroy
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
+      dom_name = dom.name
     rescue
       alert_domain_not_found params
       return
@@ -168,22 +169,21 @@ public
     begin
       dom.destroy if state_can_destroy? dom.info.state
     rescue
-      render_failure "Failed to destroy domain, UUID=#{dom.uuid}!"
+      render_failure "Failed to destroy domain, UUID=#{params[:uuid]}!"
       return
     end
 
     # recollect resources, such as vdisks, cdrom-iso, and TODO network
     begin
-      logger.debug "*** [remove] #{VMACHINES_ROOT}/#{dom.name}"
-      print "*** [remove] #{VMACHINES_ROOT}/#{dom.name}"
-
-      FileUtils.rm_rf "#{VMACHINES_ROOT}/#{dom.name}"
-
-      dom.undefine  # undefine dom only if all resource successfully removed
-      
-      render_success "Successfully destroyed virtual machine, name=#{dom.name}, UUID=#{dom.uuid}."
-    #rescue
-      #render_failure "Failed to recollect allocated resources, name=#{dom.name}, UUID=#{dom.uuid}"
+      cleanup_args = {
+        :vmachines_root => VMACHINES_ROOT,
+        :vmachine_name => dom_name
+      }
+      MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args)
+      dom.undefine
+      render_success "Successfully destroyed virtual machine, name=#{dom_name}, UUID=#{params[:uuid]}."
+    rescue
+      render_failure "Failed to recollect allocated resources, name=#{dom_name}, UUID=#{params[:uuid]}"
     end
 
   end

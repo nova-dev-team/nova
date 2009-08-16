@@ -62,6 +62,11 @@ require 'uri'
 #   F.save.to.uid.(uid)
 #   F.comment <- text file containing comments about the image file
 #
+# 
+# UPDATED (2009-08-16:
+#
+# * The system will use qcow2 format disk, so raw image files will NOT be used.
+#
  
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
@@ -77,16 +82,21 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   def do_start params
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
+      
+      vmachine_dir = "#{params[:vmachines_root]}/#{params[:name]}"
 
       if params[:cdrom]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:cdrom]}", params[:storage_cache]
-        FileUtils.ln_s local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:cdrom]}"
+        FileUtils.ln_s local_filename, "#{vmachine_dir}/#{params[:cdrom]}"
       end
 
       if params[:hda]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
         # TODO copy on write! qcow2
-        FileUtils.cp local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
+        FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hda]}"
+        qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hda]} -f qcow2 #{vmachine_dir}/#{params[:hda]}"
+        log "*** [cmd] #{qcow2_cmd}"
+        `#{qcow2_cmd}`
       end
 
       dom.create
@@ -94,6 +104,17 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       # TODO report error by setting status
     
       # log backtarce to file
+      log e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
+    end
+  end
+
+  # cleanup after a vmachine is destroyed
+  # Maybe it will upload disk image to server
+  def do_cleanup args
+    begin
+      log "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
+      FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
+    rescue Exception => e
       log e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
   end
@@ -131,6 +152,9 @@ private
   #             to_file does not exist
   def get_file from_uri, to_file
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split from_uri  # parse URI information
+  
+    log "Retrieving file from: #{from_uri}"
+
     FileUtils.mkdir_p (File.dirname to_file)  # assure existance of file directory
     if scheme == "file"
       FileUtils.cp path, to_file
