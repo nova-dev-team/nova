@@ -1,15 +1,10 @@
 ---
-title: Empty Index Page
+title: Overview
 in_menu: true
 routed_title: New webgen Website
 ---
-## Welcome to *webgen*!
+## Welcome to *nova*!
 
-This is just a place holder for the start page for your new website!
+The nova project is hosted on [GitHub]!
 
-You can start by adjusting the meta information for this page file and adding some real content and
-then adding some more page files!
-
-For more information about webgen have a look at the [documentation]!
-
-[documentation]: http://webgen.rubyforge.org/documentation/index.html
+[GitHub]: http://github.com/santazhang/nova

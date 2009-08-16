@@ -85,12 +85,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
       if params[:hda]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
-        if resource_copy_on_write? local_filename
-          # TODO deal with copy on write images
-          FileUtils.cp local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
-        else  # not copy on write
-          FileUtils.mv local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
-        end
+        # TODO copy on write! qcow2
+        FileUtils.cp local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
       end
 
       dom.create
@@ -102,74 +98,51 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     end
   end
 
-
 private
-
-  # TODO check if resource already in cache?
-  def already_cached? resource_uri, cache_root
-    false
-  end
 
   # TODO make sure resource is cached
   # returns the full path of cached file, and the file will be locked as "in use"
   def request_resource resource_uri, cache_root
-    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split resource_uri  # parse URI information
     FileUtils.mkdir_p cache_root  # assure existance of cache root dir
 
-    # TODO first, check if has local resource
+    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split resource_uri  # parse URI information
+    resource_filename = File.basename path
+    local_to = "#{cache_root}/#{resource_filename}"
+    copying_lock_filename = local_to + ".copying"
 
-    resource_filename = resource_uri[(resource_uri.rindex '/') + 1..-1]
-    if scheme == "file" # local file copy
-      local_from = path
+    if File.exist? local_to # has local file, probably under copying
+      sleep 1 while File.exist? copying_lock_filename # while if is under copying
+    else  # file does not exit, should copy
+      copying_lock = File.new(copying_lock_filename, "w")
+      copying_lock.flock File::LOCK_EX
 
-      if resource_readonly? resource_filename or resource_copy_on_write? resource_filename
-        # read only images/copy on write, only one copy, no need to suffix rand number
-        local_to = "#{cache_root}/#{resource_filename}"
-      else
-        local_to = "#{cache_root}/#{resource_filename}.#{rand.to_s[2..-1]}" # suffix by rand number, so one resource could have multiple copies
-      end
+      get_file resource_uri, local_to
 
-      if File.exist? local_to # image exists, test if it is ready
-        sleep 1 while File.exist? local_to + ".copying" # wait 1 sec then check
-      else # image does not exist, so do copying!
-        copying_lock_filename = local_to + ".copying"
-        copying_lock = File.new(copying_lock_filename, "w")
-        copying_lock.flock(File::LOCK_EX)
-        FileUtils.cp local_from, local_to
-        copying_lock.flock(File::LOCK_UN)
-        copying_lock.close
+      copying_lock.flock File::LOCK_UN
+      copying_lock.close
+      FileUtils.rm copying_lock_filename
+    end
+    return local_to
+  end
 
-        log "remving #{copying_lock_filename}"
-        FileUtils.rm copying_lock_filename
-      end
-
-      return local_to
+  # get a file from some uri, and save to a file
+  #
+  # assumption: from_uri accessable, in schemes of "ftp, scp, file, carrierfs?"
+  #             to_file does not exist
+  def get_file from_uri, to_file
+    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split from_uri  # parse URI information
+    FileUtils.mkdir_p (File.dirname to_file)  # assure existance of file directory
+    if scheme == "file"
+      FileUtils.cp path, to_file
     elsif scheme == "ftp"
-      # TODO get image by ftp
     elsif scheme == "scp"
-      # TODO get image by scp
-    elsif scheme == "http"
-      # TODO get image by http
+    else
+      raise "Resource scheme '#{scheme}' not known!"
     end
   end
 
-  # TODO try to lock resources
-  # local_resource_filename does not have full path
-  def lock_resource local_resoure_filename
-    return false # return false: lock failed, should download new file
-  end
-  
-  # TODO check if the resource is read only (eg. cdrom-iso)
-  def resource_readonly? resource_uri
-    resource_uri.downcase.end_with? ".iso"
-  end
-
-  def resource_copy_on_write? resource_uri
-    resource_uri.downcase.end_with? ".qcow2"
-  end
-
   def log msg
-      File.open("#{RAILS_ROOT}/log/vmachines.worker.err", "a") {|f| f.write(Time.now.to_s + "\n" + msg.to_s + "\n\n")}
+    File.open("#{RAILS_ROOT}/log/vmachines.worker.err", "a") {|f| f.write(Time.now.to_s + "\n" + msg.to_s + "\n\n")}
   end
 
 end
