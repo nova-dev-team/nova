@@ -115,7 +115,8 @@ public
       :mem_size => 128,
       :uuid => UUIDTools::UUID.random_create.to_s,
       :cdrom => "liveandroidv0.2.iso", # this is optional
-      :hda => "vdisk.qcow2"
+      :hda => "vdisk.qcow2",
+      :vnc_port => -1   # setting vnc_port to -1 means libvirt will automatically set the port
       # TODO to be added: hdb...
     }
     
@@ -148,7 +149,7 @@ public
 
     begin
       # creation is put into job queue, handled by backgroundrb
-      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params)
+      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params, :job_key => "#{dom.uuid}.create")
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
     rescue
       render_failure "Failed to add creation request into job queue!"
@@ -173,13 +174,13 @@ public
       return
     end
 
-    # recollect resources, such as vdisks, cdrom-iso, and TODO network
+    # TODO recollect resources, such as vdisks, cdrom-iso, and network
     begin
       cleanup_args = {
         :vmachines_root => VMACHINES_ROOT,
         :vmachine_name => dom_name
       }
-      MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args)
+      MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args, :job_key => "#{params[:uuid]}.cleanup")
       dom.undefine
       render_success "Successfully destroyed virtual machine, name=#{dom_name}, UUID=#{params[:uuid]}."
     rescue
@@ -204,6 +205,19 @@ public
   end
 
   def cache_status
+  end
+
+  def show_settings
+    settings = {
+      :default_storage_server => @@default_storage_server
+    }
+    respond_to do |accept|
+      accept.json {render :json => settings} 
+      accept.html {render :text => settings.to_json}
+    end
+  end
+
+  def edit_settings
   end
 
 private

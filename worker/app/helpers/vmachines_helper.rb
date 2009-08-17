@@ -7,7 +7,6 @@ module VmachinesHelper
 
     def Helper.emit_xml_desc params
 
-      # TODO figure out the local filename
       if params[:cdrom]
         FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
         cdrom_desc = <<CDROM_DESC
@@ -19,7 +18,6 @@ module VmachinesHelper
 CDROM_DESC
       end
  
-      # TODO figure out the disk filename
       if params[:hda]
         FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
         hda_desc = <<HDA_DESC
@@ -30,7 +28,6 @@ CDROM_DESC
 HDA_DESC
       end
 
-# TODO figure out what should be filled into the xml file
 # grpahics type=vnc port=-1: -1 means the system will automatically allocate an port for vnc
       xml_desc = <<XML_DESC
 <domain type='qemu'>
@@ -46,7 +43,7 @@ HDA_DESC
     <emulator>/usr/bin/kvm</emulator>
 #{hda_desc if params[:hda]}
 #{cdrom_desc if params[:cdrom]}
-    <graphics type='vnc' port='-1'/>
+    <graphics type='vnc' port='#{params[:vnc_port]}'/>
   </devices>
 </domain>
 XML_DESC

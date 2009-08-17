@@ -93,10 +93,9 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
       if params[:hda]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
-        # TODO copy on write! qcow2
         FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hda]}"
         qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hda]} -f qcow2 #{vmachine_dir}/#{params[:hda]}"
-        log "*** [cmd] #{qcow2_cmd}"
+        logger.debug "*** [cmd] #{qcow2_cmd}"
         `#{qcow2_cmd}`
       end
 
@@ -105,7 +104,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       # TODO report error by setting status
     
       # log backtarce to file
-      log e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
+      logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
   end
 
@@ -113,16 +112,15 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   # Maybe it will upload disk image to server
   def do_cleanup args
     begin
-      log "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
+      logger.debug "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
       FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
     rescue Exception => e
-      log e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
+      logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
   end
 
 private
 
-  # TODO make sure resource is cached
   # returns the full path of cached file, and the file will be locked as "in use"
   def request_resource resource_uri, cache_root
     FileUtils.mkdir_p cache_root  # assure existance of cache root dir
@@ -154,7 +152,7 @@ private
   def get_file from_uri, to_file
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split from_uri  # parse URI information
   
-    log "Retrieving file from: #{from_uri}"
+    logger.debug "Retrieving file from: #{from_uri}"
 
     FileUtils.mkdir_p (File.dirname to_file)  # assure existance of file directory
     if scheme == "file"
@@ -168,10 +166,6 @@ private
     else
       raise "Resource scheme '#{scheme}' not known!"
     end
-  end
-
-  def log msg
-    File.open("#{RAILS_ROOT}/log/vmachines.worker.err", "a") {|f| f.write(Time.now.to_s + "\n" + msg.to_s + "\n\n")}
   end
 
 end
