@@ -1,9 +1,22 @@
 require 'libvirt'
 require 'fileutils'
+require 'pp'
 
 module VmachinesHelper
 
   class Helper
+
+    # where the cdrom-iso, vdisks are stored
+    @@default_storage_server = "file:///home/santa/Downloads/"
+    
+    def Helper.default_storage_server
+      @@default_storage_server
+    end
+
+    def Helper.default_storage_server= new_default_storage_server
+      @@default_storage_server = new_default_storage_server
+    end
+
 
     def Helper.emit_xml_desc params
 
@@ -33,7 +46,7 @@ HDA_DESC
 <domain type='qemu'>
   <name>#{params[:name]}</name>
   <uuid>#{params[:uuid]}</uuid>
-  <memory>#{params[:mem_size] * 1024}</memory>
+  <memory>#{params[:mem_size].to_i * 1024}</memory>
   <vcpu>#{params[:vcpu]}</vcpu>
   <os>
     <type arch='i686' machine='pc'>hvm</type>

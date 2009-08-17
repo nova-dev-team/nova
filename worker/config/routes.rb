@@ -41,9 +41,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.home '', :controller => 'vmachines', :action => 'index'
 
-  map.connect 'vmachines/index', :controller => 'vmachines', :action => 'index'
-  map.connect 'vmachines/index.:format', :controller => 'vmachines', :action => 'index'
-
   map.connect 'vmachines/:action/:uuid', :controller => 'vmachines'
   map.connect 'vmachines/:action/:uuid.:format', :controller => 'vmachines'
 

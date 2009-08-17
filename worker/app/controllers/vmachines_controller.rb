@@ -15,20 +15,19 @@ public
   # libvirt states
   STATE_RUNNING = 1
   STATE_SUSPENDED = 3
+  STATE_NOT_RUNNING = 5
 
   # specifies where the new vmachines are placed
   VMACHINES_ROOT = "#{RAILS_ROOT}/tmp/vmachines/"
 
   # specifies where is the local storage cache
-  STORAGE_CACHE = "#{RAILS_ROOT}/tmp/storage_cache"
+  STORAGE_CACHE = "#{RAILS_ROOT}/tmp/storage_cache/"
 
   @@virt_conn = Libvirt::open("qemu:///system")
 
-  # where the cdrom-iso, vdisks are stored
-  @@default_storage_server = "file:///home/santa/Downloads/"
-
   # show the web UI
   def index
+    render :template => 'vmachines/index.html.erb', :layout => 'default'
   end
 
   # list all vmachines, and show their status
@@ -109,7 +108,7 @@ public
 
     # those are default parameters
     default_params = {
-      :storage_server => @@default_storage_server,  # where to get the image files (if they are not in cache)
+      :storage_server => VmachinesHelper::Helper.default_storage_server,  # where to get the image files (if they are not in cache)
       :storage_cache => STORAGE_CACHE,              # where is the cachd directory
       :vmachines_root => VMACHINES_ROOT,            # where is the vmachines directory
 
@@ -128,7 +127,7 @@ public
     default_params.each do |key, value|
       params[key] ||= value
     end
-
+    
     begin
       xml_desc = VmachinesHelper::Helper.emit_xml_desc params
       logger.debug "*** [create] Vmachine XML Specfication"
@@ -213,7 +212,7 @@ public
 
   def show_settings
     settings = {
-      :default_storage_server => @@default_storage_server
+      :default_storage_server => VmachinesHelper::Helper.default_storage_server
     }
     respond_to do |accept|
       accept.json {render :json => settings} 
@@ -222,6 +221,11 @@ public
   end
 
   def edit_settings
+    if params[:default_storage_server]
+      VmachinesHelper::Helper.default_storage_server = params[:default_storage_server]
+    end
+    
+    render_success "Settings changed."
   end
 
 private
