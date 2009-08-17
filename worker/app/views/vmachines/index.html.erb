@@ -56,7 +56,7 @@ function vm_ajax(url, uuid) {
 }
 
 function destroy_vmachine(name, uuid) {
-  if (confirm("Are you really going to destroy vmachine named '" + name + "', width UUID=" + uuid + "?")) {
+  if (confirm("Are you really going to destroy vmachine named '" + name + "', with UUID=" + uuid + "?")) {
     vm_ajax("/vmachines/destroy", uuid);
   }
 }
