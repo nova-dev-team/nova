@@ -23,7 +23,7 @@ public
   # specifies where is the local storage cache
   STORAGE_CACHE = "#{RAILS_ROOT}/tmp/storage_cache/"
 
-  @@virt_conn = Libvirt::open("qemu:///system")
+  @@virt_conn = VmachinesHelper::Helper.virt_conn
 
   # show the web UI
   def index

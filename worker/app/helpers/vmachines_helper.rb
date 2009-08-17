@@ -8,6 +8,12 @@ module VmachinesHelper
 
     # where the cdrom-iso, vdisks are stored
     @@default_storage_server = "file:///home/santa/Downloads/"
+
+    @@virt_conn = Libvirt::open("qemu:///system")
+
+    def Helper.virt_conn
+      @@virt_conn
+    end
     
     def Helper.default_storage_server
       @@default_storage_server

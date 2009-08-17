@@ -111,7 +111,7 @@ function change_default_storage_server() {
 <%=
 info_of_vmachines = ""
 
-virt_conn = Libvirt::open("qemu:///system")
+virt_conn = VmachinesHelper::Helper.virt_conn
 
 all_domains = []
 
@@ -171,7 +171,6 @@ all_domains.each do |dom|
   counter += 1
 end
 
-virt_conn.close
 
 info_of_vmachines
 %>
