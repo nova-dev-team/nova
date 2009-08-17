@@ -27,8 +27,12 @@ public
   # where the cdrom-iso, vdisks are stored
   @@default_storage_server = "file:///home/santa/Downloads/"
 
-  # list all vmachines, and show their status
+  # show the web UI
   def index
+  end
+
+  # list all vmachines, and show their status
+  def list
     params[:show_active] ||= "true"
     params[:show_inactive] ||= "false"
 
