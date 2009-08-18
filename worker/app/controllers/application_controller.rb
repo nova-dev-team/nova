@@ -7,4 +7,25 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
+
+protected
+
+  def render_success message
+    render_result :success => true, :message => message
+  end
+
+  def render_failure message
+    render_result :success => false, :message => message
+  end
+
+  # reply to client
+  def render_result result
+    logger.debug "*** [reply] success=#{result[:success]}, message=#{result[:message]}"
+    respond_to do |accept|
+      accept.json {render :json => result}
+      accept.html {render :text => result.pretty_inspect}
+    end
+  end
+
 end
+

@@ -9,11 +9,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090812091810) do
+ActiveRecord::Schema.define(:version => 20090817023057) do
 
   create_table "groups", :force => true do |t|
     t.string   "name",       :limit => 40
     t.boolean  "special",                  :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "net_segments", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -63,7 +68,7 @@ ActiveRecord::Schema.define(:version => 20090812091810) do
   create_table "vmachine_infos", :force => true do |t|
     t.integer  "vmachine_id"
     t.string   "category",    :limit => 20
-    t.string   "message",     :limit => 256
+    t.text     "message"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

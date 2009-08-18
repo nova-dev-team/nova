@@ -3,27 +3,15 @@ require 'fileutils'
 require 'pp'
 
 module VmachinesHelper
-
+  
   class Helper
-
-    # where the cdrom-iso, vdisks are stored
-    @@default_storage_server = "file:///home/santa/Downloads/"
-
+  
     @@virt_conn = Libvirt::open("qemu:///system")
 
     def Helper.virt_conn
       @@virt_conn
     end
     
-    def Helper.default_storage_server
-      @@default_storage_server
-    end
-
-    def Helper.default_storage_server= new_default_storage_server
-      @@default_storage_server = new_default_storage_server
-    end
-
-
     def Helper.emit_xml_desc params
 
       if params[:cdrom]
@@ -72,3 +60,4 @@ XML_DESC
 
   end
 end
+

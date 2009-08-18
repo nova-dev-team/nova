@@ -108,7 +108,7 @@ public
 
     # those are default parameters
     default_params = {
-      :storage_server => VmachinesHelper::Helper.default_storage_server,  # where to get the image files (if they are not in cache)
+      :storage_server => Setting.default_storage_server,  # where to get the image files (if they are not in cache)
       :storage_cache => STORAGE_CACHE,              # where is the cachd directory
       :vmachines_root => VMACHINES_ROOT,            # where is the vmachines directory
 
@@ -192,6 +192,7 @@ public
 
   end
 
+  # TODO check if this will work
   def reboot
     libvirt_action "reboot", params
   end
@@ -210,24 +211,6 @@ public
   def cache_status
   end
 
-  def show_settings
-    settings = {
-      :default_storage_server => VmachinesHelper::Helper.default_storage_server
-    }
-    respond_to do |accept|
-      accept.json {render :json => settings} 
-      accept.html {render :text => settings.to_json}
-    end
-  end
-
-  def edit_settings
-    if params[:default_storage_server]
-      VmachinesHelper::Helper.default_storage_server = params[:default_storage_server]
-    end
-    
-    render_success "Settings changed."
-  end
-
 private
 
   # general action for libvirt
@@ -244,24 +227,6 @@ private
       render_success "Successfully #{action_name}ed domain, name=#{dom.name}, UUID=#{dom.uuid}."
     rescue
       render_failure "Failed to #{action_name} domain, UUID=#{dom.uuid}!"
-    end
-  end
-
-
-  def render_success message
-    render_result :success => true, :message => message
-  end
-
-  def render_failure message
-    render_result :success => false, :message => message
-  end
-
-  # reply to client
-  def render_result result
-    logger.debug "*** [reply] success=#{result[:success]}, message=#{result[:message]}"
-    respond_to do |accept|
-      accept.json {render :json => result}
-      accept.html {render :text => result.pretty_inspect}
     end
   end
 

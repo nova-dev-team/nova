@@ -69,13 +69,14 @@ function suspend_vmachine(uuid) {
   vm_ajax("/vmachines/suspend", uuid);
 }
 
-function change_default_storage_server() {
-  new_address = prompt("Input the new storage server addresss.");
-  if (new_address && new_address != "") {
+function change_system_setting(key) {
+  new_value = prompt("Input the new value for key '" + key + "'.");
+  if (new_value && new_value != "") {
     $.ajax({
-      url: "/vmachines/edit_settings",
+      url: "/settings/edit",
       data: {
-        default_storage_server: new_address
+        key: key,
+        value: new_value
       },
       success: function() {
         window.location.reload();
@@ -188,7 +189,10 @@ info_of_vmachines
 spacing = ""
 8.times {spacing += "&nbsp;"}
 %>
-Name: <input type="text" id="new_vm_name"/><%= spacing %>
+Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name"/><%= spacing %>
+Architecture: <select>
+<option value='i686'>x86</option>
+</select><%= spacing %>
 CPU Count: <select id="new_vm_cpu_count">
 <%=
 html = ""
@@ -197,9 +201,14 @@ html
 %>
 </select><%= spacing %>
 Memory size: <input type="text" size="4" id="new_vm_mem_size"/> MB<br>
-HDA: <input type="text" id="new_vm_hda"/><%= spacing %>
-HDB: TODO <%= spacing %>
-CD Rom: <input type="text" id="new_vm_cdrom"/><br>
+Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
+Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
+CDROM (hdc, optional): <input type="text" id="new_vm_cdrom"/><%= spacing %>
+Boot Device: <select>
+<option value='hda'>Hard Disk 1</option>
+<option value='hdb'>Hard Disk 2</option>
+<option value='hdc'>CD ROM</option>
+</select><br>
 <button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
 
 <hr>
@@ -243,10 +252,24 @@ pipe.close
 <hr>
 
 <h2>System settings</h2>
-Default storage server: <b><%=h VmachinesHelper::Helper.default_storage_server %></b> <button onclick="change_default_storage_server()">Change</button><br>
+<%=
+  system_settings_html = "<table width='100%'><tr><td>Key</td><td>Value</td><td>Action</td></tr>"
+  
+  counter = 0
+  Setting.all.each do |setting|
+    system_settings_html += "<tr class='row_type_#{counter % 2}'><td>"
+    system_settings_html += setting.key
+    system_settings_html += "</td><td>"
+    system_settings_html += setting.value
+    system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>"
+    counter += 1
+  end
+  system_settings_html += "</table>"
+  system_settings_html
+%>
 <hr>
 
-This is the "worker" module of nova system. <b>Intended for administrators only</b>.<p>
+This is the "worker" module of the nova system. <b>Intended for administrators only</b>.<p>
 &copy;2009 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
 
 <% end -%>
