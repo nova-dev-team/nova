@@ -64,7 +64,7 @@ require 'net/scp'
 #   F.comment <- text file containing comments about the image file
 #
 # 
-# UPDATED (2009-08-16:
+# UPDATED (2009-08-16):
 #
 # * The system will use qcow2 format disk, so raw image files will NOT be used.
 #
@@ -72,7 +72,7 @@ require 'net/scp'
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
   
-  @@virt_conn = Libvirt::open("qemu:///system")
+  @@virt_conn = VmachinesHelper::Helper.virt_conn
 
   set_worker_name :vmachines_worker
   def create(args = nil)
