@@ -187,7 +187,7 @@ info_of_vmachines
 <h2>Add new vmachine</h2>
 <%
 spacing = ""
-8.times {spacing += "&nbsp;"}
+4.times {spacing += "&nbsp;"}
 %>
 Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name"/><%= spacing %>
 Architecture: <select>
@@ -216,7 +216,7 @@ Boot Device: <select>
 <h2>Local resource</h2>
 
 Vmachines directory structure:<br>
-<b>du -a -h -L <%=h VmachinesController::VMACHINES_ROOT %></b>
+<b>du -a -h <%=h VmachinesController::VMACHINES_ROOT %></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
 FileUtils.mkdir_p VmachinesController::VMACHINES_ROOT  # assure existance of vmachines directory
@@ -232,7 +232,7 @@ pipe.close
 <p>
 
 Cache directory structure:<br>
-<b>du -a -h -L <%=h VmachinesController::STORAGE_CACHE %></b>
+<b>du -a -h <%=h VmachinesController::STORAGE_CACHE %></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
 FileUtils.mkdir_p VmachinesController::STORAGE_CACHE  # assure existance of vmachines directory

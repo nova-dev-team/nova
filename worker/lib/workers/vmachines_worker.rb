@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'libvirt'
 require 'fileutils'
 require 'ftools'
