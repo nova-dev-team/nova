@@ -3,6 +3,7 @@ require 'fileutils'
 require 'ftools'
 require 'pp'
 require 'uri'
+require 'net/scp'
 
 # About the resource caching policy
 #
@@ -62,11 +63,16 @@ require 'uri'
 #   F.save.to.uid.(uid)
 #   F.comment <- text file containing comments about the image file
 #
+# 
+# UPDATED (2009-08-16):
+#
+# * The system will use qcow2 format disk, so raw image files will NOT be used.
+#
  
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
   
-  @@virt_conn = Libvirt::open("qemu:///system")
+  @@virt_conn = VmachinesHelper::Helper.virt_conn
 
   set_worker_name :vmachines_worker
   def create(args = nil)
@@ -77,20 +83,20 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   def do_start params
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
+      
+      vmachine_dir = "#{params[:vmachines_root]}/#{params[:name]}"
 
       if params[:cdrom]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:cdrom]}", params[:storage_cache]
-        FileUtils.ln_s local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:cdrom]}"
+        FileUtils.ln_s local_filename, "#{vmachine_dir}/#{params[:cdrom]}"
       end
 
       if params[:hda]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
-        if resource_copy_on_write? local_filename
-          # TODO deal with copy on write images
-          FileUtils.cp local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
-        else  # not copy on write
-          FileUtils.mv local_filename, "#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}"
-        end
+        FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hda]}"
+        qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hda]} -f qcow2 #{vmachine_dir}/#{params[:hda]}"
+        logger.debug "*** [cmd] #{qcow2_cmd}"
+        `#{qcow2_cmd}`
       end
 
       dom.create
@@ -98,78 +104,68 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       # TODO report error by setting status
     
       # log backtarce to file
-      log e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
+      logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
   end
 
+  # cleanup after a vmachine is destroyed
+  # Maybe it will upload disk image to server
+  def do_cleanup args
+    begin
+      logger.debug "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
+      FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
+    rescue Exception => e
+      logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
+    end
+  end
 
 private
 
-  # TODO check if resource already in cache?
-  def already_cached? resource_uri, cache_root
-    false
-  end
-
-  # TODO make sure resource is cached
   # returns the full path of cached file, and the file will be locked as "in use"
   def request_resource resource_uri, cache_root
-    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split resource_uri  # parse URI information
     FileUtils.mkdir_p cache_root  # assure existance of cache root dir
 
-    # TODO first, check if has local resource
+    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split resource_uri  # parse URI information
+    resource_filename = File.basename path
+    local_to = "#{cache_root}/#{resource_filename}"
+    copying_lock_filename = local_to + ".copying"
 
-    resource_filename = resource_uri[(resource_uri.rindex '/') + 1..-1]
-    if scheme == "file" # local file copy
-      local_from = path
+    if File.exist? local_to # has local file, probably under copying
+      sleep 1 while File.exist? copying_lock_filename # while if is under copying
+    else  # file does not exit, should copy
+      copying_lock = File.new(copying_lock_filename, "w")
+      copying_lock.flock File::LOCK_EX
 
-      if resource_readonly? resource_filename or resource_copy_on_write? resource_filename
-        # read only images/copy on write, only one copy, no need to suffix rand number
-        local_to = "#{cache_root}/#{resource_filename}"
-      else
-        local_to = "#{cache_root}/#{resource_filename}.#{rand.to_s[2..-1]}" # suffix by rand number, so one resource could have multiple copies
-      end
+      get_file resource_uri, local_to
 
-      if File.exist? local_to # image exists, test if it is ready
-        sleep 1 while File.exist? local_to + ".copying" # wait 1 sec then check
-      else # image does not exist, so do copying!
-        copying_lock_filename = local_to + ".copying"
-        copying_lock = File.new(copying_lock_filename, "w")
-        copying_lock.flock(File::LOCK_EX)
-        FileUtils.cp local_from, local_to
-        copying_lock.flock(File::LOCK_UN)
-        copying_lock.close
-
-        log "remving #{copying_lock_filename}"
-        FileUtils.rm copying_lock_filename
-      end
-
-      return local_to
-    elsif scheme == "ftp"
-      # TODO get image by ftp
-    elsif scheme == "scp"
-      # TODO get image by scp
-    elsif scheme == "http"
-      # TODO get image by http
+      copying_lock.flock File::LOCK_UN
+      copying_lock.close
+      FileUtils.rm copying_lock_filename
     end
+    return local_to
   end
 
-  # TODO try to lock resources
-  # local_resource_filename does not have full path
-  def lock_resource local_resoure_filename
-    return false # return false: lock failed, should download new file
-  end
+  # get a file from some uri, and save to a file
+  #
+  # assumption: from_uri accessable, in schemes of "ftp, scp, file, carrierfs?"
+  #             to_file does not exist
+  def get_file from_uri, to_file
+    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split from_uri  # parse URI information
   
-  # TODO check if the resource is read only (eg. cdrom-iso)
-  def resource_readonly? resource_uri
-    resource_uri.downcase.end_with? ".iso"
-  end
+    logger.debug "Retrieving file from: #{from_uri}"
 
-  def resource_copy_on_write? resource_uri
-    resource_uri.downcase.end_with? ".qcow2"
-  end
-
-  def log msg
-      File.open("#{RAILS_ROOT}/log/vmachines.worker.err", "a") {|f| f.write(Time.now.to_s + "\n" + msg.to_s + "\n\n")}
+    FileUtils.mkdir_p (File.dirname to_file)  # assure existance of file directory
+    if scheme == "file"
+      FileUtils.cp path, to_file
+    elsif scheme == "ftp"
+    elsif scheme == "scp"
+      sep_index = userinfo.index ":"
+      username = userinfo[0...sep_index]  # notice, ... rather than ..
+      password = userinfo[(sep_index + 1)..-1]
+      Net::SCP.download! (host, username, path, to_file, :password => password)
+    else
+      raise "Resource scheme '#{scheme}' not known!"
+    end
   end
 
 end

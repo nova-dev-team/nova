@@ -23,11 +23,10 @@ protected
   end
   
   def render_result success, message, option = {}
+    result = {:success => success, :message => message}.merge(option)
     respond_to do |accept|
-      accept.json {
-        render :json => {:success => success, :message => message}.merge(option)
-      }
-      ## TODO add render :xml => {blah-blah-blah}
+      accept.json {render :json => result}
+      accept.html {render :text => result.to_json}
     end    
   end
   

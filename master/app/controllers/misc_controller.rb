@@ -10,4 +10,8 @@ class MiscController < ApplicationController
     render :text => "HI"
   end
 
+  def whoami
+    render :text => "Master"
+  end
+
 end

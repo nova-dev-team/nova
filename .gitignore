@@ -1,10 +1,8 @@
 *.swp
-*.log
 log/
 doc/
 scripts/
 tmp/
 *~
 *.sqlite3
-master/db/*.sqlite3
-worker/db/*.sqlite3
+private/

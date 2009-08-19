@@ -15,20 +15,23 @@ public
   # libvirt states
   STATE_RUNNING = 1
   STATE_SUSPENDED = 3
+  STATE_NOT_RUNNING = 5
 
   # specifies where the new vmachines are placed
-  VMACHINES_ROOT = RAILS_ROOT + "/tmp/vmachines/"
+  VMACHINES_ROOT = "#{RAILS_ROOT}/tmp/vmachines/"
 
   # specifies where is the local storage cache
-  STORAGE_CACHE = RAILS_ROOT + "/tmp/storage_cache"
+  STORAGE_CACHE = "#{RAILS_ROOT}/tmp/storage_cache/"
 
-  @@virt_conn = Libvirt::open("qemu:///system")
+  @@virt_conn = VmachinesHelper::Helper.virt_conn
 
-  # where the cdrom-iso, vdisks are stored
-  @@default_storage_server = "file:///home/santa/Downloads/"
+  # show the web UI
+  def index
+    render :template => 'vmachines/index.html.erb', :layout => 'default'
+  end
 
   # list all vmachines, and show their status
-  def index
+  def list
     params[:show_active] ||= "true"
     params[:show_inactive] ||= "false"
 
@@ -105,7 +108,7 @@ public
 
     # those are default parameters
     default_params = {
-      :storage_server => @@default_storage_server,  # where to get the image files (if they are not in cache)
+      :storage_server => Setting.default_storage_server,  # where to get the image files (if they are not in cache)
       :storage_cache => STORAGE_CACHE,              # where is the cachd directory
       :vmachines_root => VMACHINES_ROOT,            # where is the vmachines directory
 
@@ -115,7 +118,8 @@ public
       :mem_size => 128,
       :uuid => UUIDTools::UUID.random_create.to_s,
       :cdrom => "liveandroidv0.2.iso", # this is optional
-      :hda => "vdisk.qcow2"
+      :hda => "vdisk.qcow2",
+      :vnc_port => -1   # setting vnc_port to -1 means libvirt will automatically set the port
       # TODO to be added: hdb...
     }
     
@@ -123,7 +127,7 @@ public
     default_params.each do |key, value|
       params[key] ||= value
     end
-
+    
     begin
       xml_desc = VmachinesHelper::Helper.emit_xml_desc params
       logger.debug "*** [create] Vmachine XML Specfication"
@@ -148,7 +152,7 @@ public
 
     begin
       # creation is put into job queue, handled by backgroundrb
-      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params)
+      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params, :job_key => "#{dom.uuid}.create")
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
     rescue
       render_failure "Failed to add creation request into job queue!"
@@ -160,6 +164,7 @@ public
   def destroy
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
+      dom_name = dom.name
     rescue
       alert_domain_not_found params
       return
@@ -168,26 +173,26 @@ public
     begin
       dom.destroy if state_can_destroy? dom.info.state
     rescue
-      render_failure "Failed to destroy domain, UUID=#{dom.uuid}!"
+      render_failure "Failed to destroy domain, UUID=#{params[:uuid]}!"
       return
     end
 
-    # recollect resources, such as vdisks, cdrom-iso, and TODO network
+    # TODO recollect resources, such as vdisks, cdrom-iso, and network
     begin
-      logger.debug "*** [remove] #{VMACHINES_ROOT}/#{dom.name}"
-      print "*** [remove] #{VMACHINES_ROOT}/#{dom.name}"
-
-      FileUtils.rm_rf "#{VMACHINES_ROOT}/#{dom.name}"
-
-      dom.undefine  # undefine dom only if all resource successfully removed
-      
-      render_success "Successfully destroyed virtual machine, name=#{dom.name}, UUID=#{dom.uuid}."
-    #rescue
-      #render_failure "Failed to recollect allocated resources, name=#{dom.name}, UUID=#{dom.uuid}"
+      cleanup_args = {
+        :vmachines_root => VMACHINES_ROOT,
+        :vmachine_name => dom_name
+      }
+      MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args, :job_key => "#{params[:uuid]}.cleanup")
+      dom.undefine
+      render_success "Successfully destroyed virtual machine, name=#{dom_name}, UUID=#{params[:uuid]}."
+    rescue
+      render_failure "Failed to recollect allocated resources, name=#{dom_name}, UUID=#{params[:uuid]}"
     end
 
   end
 
+  # TODO check if this will work
   def reboot
     libvirt_action "reboot", params
   end
@@ -222,24 +227,6 @@ private
       render_success "Successfully #{action_name}ed domain, name=#{dom.name}, UUID=#{dom.uuid}."
     rescue
       render_failure "Failed to #{action_name} domain, UUID=#{dom.uuid}!"
-    end
-  end
-
-
-  def render_success message
-    render_result :success => true, :message => message
-  end
-
-  def render_failure message
-    render_result :success => false, :message => message
-  end
-
-  # reply to client
-  def render_result result
-    logger.debug "*** [reply] success=#{result[:success]}, message=#{result[:message]}"
-    respond_to do |accept|
-      accept.json {render :json => result}
-      accept.html {render :text => result.pretty_inspect}
     end
   end
 

@@ -1,4 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
@@ -39,12 +40,12 @@ ActionController::Routing::Routes.draw do |map|
   # Note: These default routes make all actions in every controller accessible via GET requests. You should
   # consider removing or commenting them out if you're using named routes and resources.
 
-  map.connect 'vmachines/index', :controller => 'vmachines', :action => 'index'
-  map.connect 'vmachines/index.:format', :controller => 'vmachines', :action => 'index'
+  map.home '', :controller => 'vmachines', :action => 'index'
 
   map.connect 'vmachines/:action/:uuid', :controller => 'vmachines'
   map.connect 'vmachines/:action/:uuid.:format', :controller => 'vmachines'
 
   map.connect ':controller/:action/:id'
+  map.connect ':controller/:action.:format'
   map.connect ':controller/:action/:id.:format'
 end

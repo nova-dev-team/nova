@@ -1,0 +1,277 @@
+<%
+require 'fileutils'
+require 'pp'
+require 'libvirt'
+require 'cgi'
+require 'xmlsimple'
+%>
+
+<%
+content_for :header_scripts do
+%>
+
+$(document).ready(function () {
+  dp.SyntaxHighlighter.HighlightAll('xml_code');
+});
+
+function add_vmachine() {
+  var name = $("#new_vm_name").val();
+  var mem_size = $("#new_vm_mem_size").val();
+  var cpu_count = $("#new_vm_cpu_count").val();
+  var hda = $("#new_vm_hda").val();
+  var cdrom = $("#new_vm_cdrom").val();
+  
+  $.ajax({
+    url: "/vmachines/start",
+    data: {
+      name: name,
+      vcpu: cpu_count,
+      mem_size: mem_size,
+      hda: hda,
+      cdrom: cdrom
+    },
+    success: function() {
+      window.location.reload();
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+  
+}
+
+function vm_ajax(url, uuid) {
+  $.ajax({
+    url: url,
+    data: {
+      uuid: uuid
+    },
+    success: function() {
+      window.location.reload();
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+}
+
+function destroy_vmachine(name, uuid) {
+  if (confirm("Are you really going to destroy vmachine named '" + name + "', with UUID=" + uuid + "?")) {
+    vm_ajax("/vmachines/destroy", uuid);
+  }
+}
+
+function resume_vmachine(uuid) {
+  vm_ajax("/vmachines/resume", uuid);
+}
+
+function suspend_vmachine(uuid) {
+  vm_ajax("/vmachines/suspend", uuid);
+}
+
+function change_system_setting(key) {
+  new_value = prompt("Input the new value for key '" + key + "'.");
+  if (new_value && new_value != "") {
+    $.ajax({
+      url: "/settings/edit",
+      data: {
+        key: key,
+        value: new_value
+      },
+      success: function() {
+        window.location.reload();
+      },
+      error: function() {
+        alert("Request failed!");
+      }
+    });
+  }
+}
+
+<% end -%>
+
+################################################################################
+
+<% content_for :main_content do %>
+
+<h1>Nova.worker</h1>
+<hr>
+
+
+
+<h2>List of all vmachines</h2>
+
+<table width="100%">
+<tr>
+<td>Name</td>
+<td>UUID</td>
+<td>Status</td>
+<td>VNC port</td>
+<td>Actions</td>
+</tr>
+<%=
+info_of_vmachines = ""
+
+virt_conn = VmachinesHelper::Helper.virt_conn
+
+all_domains = []
+
+# inactive domains are listed by name
+virt_conn.list_defined_domains.each do |dom_name|
+  begin
+    all_domains << virt_conn.lookup_domain_by_name(dom_name)
+  rescue
+    next # ignore error, go on with next one
+  end
+end
+
+# active domains are listed by id
+virt_conn.list_domains.each do |dom_id|
+  begin
+    all_domains << virt_conn.lookup_domain_by_id(dom_id)
+  rescue
+    next
+  end
+end
+
+counter = 0
+
+all_domains.each do |dom|
+  info_of_vmachines += "<tr class='row_type_#{counter % 2}'><td>#{dom.name}</td>"
+  info_of_vmachines += "<td>#{dom.uuid}</td>"
+  
+  state_text = case dom.info.state
+  when VmachinesController::STATE_RUNNING
+    "Running"
+  when VmachinesController::STATE_SUSPENDED
+    "Suspended"
+  when VmachinesController::STATE_NOT_RUNNING
+    "Not running"
+  else
+    dom.info.state.to_s
+  end
+  
+  info_of_vmachines += "<td>#{state_text}</td>"
+  
+  xml_desc = XmlSimple.xml_in dom.xml_desc
+  info_of_vmachines += "<td>" + xml_desc['devices'][0]['graphics'][0]['port'] + "</td><td>"
+  
+  if dom.info.state == VmachinesController::STATE_RUNNING
+    info_of_vmachines += "<button onclick='suspend_vmachine(\"#{dom.uuid}\")'>Suspend</button>"
+  elsif dom.info.state == VmachinesController::STATE_SUSPENDED
+    info_of_vmachines += "<button onclick='resume_vmachine(\"#{dom.uuid}\")'>Resume</button>"
+  end
+  
+  info_of_vmachines += "<button onclick='destroy_vmachine(\"#{dom.name}\", \"#{dom.uuid}\")'>Destroy !!!</button>"
+  info_of_vmachines += "<button id='btn-toggle-xml-def-#{dom.uuid}' onclick='$(\"#xml-def-#{dom.uuid}\").toggle(\"fast\")'>Toggle XML Definition</button></td></tr>"
+
+  info_of_vmachines += "<tr><td colspan=5><table width='100%' class='code' id='xml-def-#{dom.uuid}' style='display:none;'><tr><td><pre class='xml' name='xml_code' cols='160'>"
+  info_of_vmachines += CGI.escapeHTML dom.xml_desc
+  info_of_vmachines += "</pre></td></tr></table></td></tr>"
+  
+  counter += 1
+end
+
+
+info_of_vmachines
+%>
+</table>
+
+<hr>
+
+<%
+################################################################################
+%>
+
+
+<h2>Add new vmachine</h2>
+<%
+spacing = ""
+8.times {spacing += "&nbsp;"}
+%>
+Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name"/><%= spacing %>
+Architecture: <select>
+<option value='i686'>x86</option>
+</select><%= spacing %>
+CPU Count: <select id="new_vm_cpu_count">
+<%=
+html = ""
+(1..4).each {|v| html += "<option>#{v}</option>"}
+html
+%>
+</select><%= spacing %>
+Memory size: <input type="text" size="4" id="new_vm_mem_size"/> MB<br>
+Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
+Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
+CDROM (hdc, optional): <input type="text" id="new_vm_cdrom"/><%= spacing %>
+Boot Device: <select>
+<option value='hda'>Hard Disk 1</option>
+<option value='hdb'>Hard Disk 2</option>
+<option value='hdc'>CD ROM</option>
+</select><br>
+<button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
+
+<hr>
+
+<h2>Local resource</h2>
+
+Vmachines directory structure:<br>
+<b>du -a -h -L <%=h VmachinesController::VMACHINES_ROOT %></b>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<%
+FileUtils.mkdir_p VmachinesController::VMACHINES_ROOT  # assure existance of vmachines directory
+dir_listing = ""
+pipe = IO.popen("cd #{VmachinesController::VMACHINES_ROOT} && du -a -h")
+dir_listing = pipe.readlines.join.chomp
+pipe.close
+%>
+<pre>
+<%=h dir_listing %>
+</pre>
+</td></tr></table>
+<p>
+
+Cache directory structure:<br>
+<b>du -a -h -L <%=h VmachinesController::STORAGE_CACHE %></b>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<%
+FileUtils.mkdir_p VmachinesController::STORAGE_CACHE  # assure existance of vmachines directory
+dir_listing = ""
+pipe = IO.popen("cd #{VmachinesController::STORAGE_CACHE} && du -a -h")
+dir_listing = pipe.readlines.join.chomp
+pipe.close
+%>
+<pre>
+<%=h dir_listing %>
+</pre>
+</td></tr></table>
+<hr>
+
+
+<h2>Background jobs</h2>
+TODO
+<hr>
+
+<h2>System settings</h2>
+<%=
+  system_settings_html = "<table width='100%'><tr><td>Key</td><td>Value</td><td>Action</td></tr>"
+  
+  counter = 0
+  Setting.all.each do |setting|
+    system_settings_html += "<tr class='row_type_#{counter % 2}'><td>"
+    system_settings_html += setting.key
+    system_settings_html += "</td><td>"
+    system_settings_html += setting.value
+    system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>"
+    counter += 1
+  end
+  system_settings_html += "</table>"
+  system_settings_html
+%>
+<hr>
+
+This is the "worker" module of the nova system. <b>Intended for administrators only</b>.<p>
+&copy;2009 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
+
+<% end -%>
+

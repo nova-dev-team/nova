@@ -1,9 +1,9 @@
 #!/bin/sh
 
-cd debs
+cd debs/archives
 dpkg -i *.deb
 
-cd ..
+cd ../..
 
 cd gems
 gem install --no-ri --no-rdoc -l *.gem
