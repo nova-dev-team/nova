@@ -155,7 +155,7 @@ private
   
     logger.debug "Retrieving file from: #{from_uri}"
 
-    FileUtils.mkdir_p (File.dirname to_file)  # assure existance of file directory
+    FileUtils.mkdir_p(File.dirname to_file)  # assure existance of file directory
     if scheme == "file"
       FileUtils.cp path, to_file
     elsif scheme == "ftp"
@@ -163,7 +163,7 @@ private
       sep_index = userinfo.index ":"
       username = userinfo[0...sep_index]  # notice, ... rather than ..
       password = userinfo[(sep_index + 1)..-1]
-      Net::SCP.download! (host, username, path, to_file, :password => password)
+      Net::SCP.download!(host, username, path, to_file, :password => password)
     else
       raise "Resource scheme '#{scheme}' not known!"
     end
