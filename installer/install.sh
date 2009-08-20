@@ -17,7 +17,8 @@ rm -r rubygems-1.3.5
 
 cd ..
 
-cd gems gem install --no-ri --no-rdoc -l *.gem
+cd gems
+gem install --no-ri --no-rdoc -l *.gem
 cd ..
 
 
