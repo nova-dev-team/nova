@@ -43,6 +43,7 @@ libvirt-ruby
 libvirt-ruby1.8
 libxen3
 libxen3-dev
+libxml-simple-ruby
 linux-libc-dev
 make
 mongrel
