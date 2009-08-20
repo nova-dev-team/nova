@@ -200,15 +200,15 @@ html = ""
 html
 %>
 </select><%= spacing %>
-Memory size: <input type="text" size="4" id="new_vm_mem_size"/> MB<br>
-Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
-Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
-CDROM (hdc, optional): <input type="text" id="new_vm_cdrom"/><%= spacing %>
+Memory size: <input type="text" size="4" id="new_vm_mem_size"/> MB<%= spacing %>
 Boot Device: <select>
 <option value='hda'>Hard Disk 1</option>
 <option value='hdb'>Hard Disk 2</option>
 <option value='hdc'>CD ROM</option>
 </select><br>
+Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
+Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
+CDROM (hdc, optional): <input type="text" id="new_vm_cdrom"/><br>
 <button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
 
 <hr>

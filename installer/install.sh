@@ -7,6 +7,8 @@ cd ../..
 
 cd gems
 gem install --no-ri --no-rdoc -l *.gem
+mkdir -p /usr/local/bin
+cp packet_worker_runner /usr/local/bin
 
 cd ..
 
