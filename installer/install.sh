@@ -5,10 +5,6 @@ dpkg -i *.deb
 
 cd ../..
 
-cd gems
-gem install --no-ri --no-rdoc -l *.gem
-cd ..
-
 cd more
 mkdir -p /usr/local/bin
 cp packet_worker_runner /usr/local/bin
@@ -19,6 +15,11 @@ ruby setup.rb
 cd ..
 
 cd ..
+
+cd gems
+gem install --no-ri --no-rdoc -l *.gem
+cd ..
+
 
 rm -f /usr/bin/rake
 rm -f /usr/bin/rails
