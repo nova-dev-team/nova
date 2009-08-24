@@ -83,27 +83,28 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
   # setup status, copy files, then start vm
   def do_start params
+
+    # updating 'progress' percentage is handled by scheduled supervisor
     progress = Progress.new
+    progress[:owner] = params[:name]
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
-      
       vmachine_dir = "#{params[:vmachines_root]}/#{params[:name]}"
 
-      progress[:type] = "start_vmachine"
-      progress[:owner] = params[:name]
-      progress[:info] = "downloading cdrom image"
-      progress[:status] = "starting"
-      progress.save
-
       if params[:cdrom]
+        progress[:info] = "downloading cdrom image: #{params[:cdrom]}"
+        progress[:status] = "in progress"
+        progress.save
+
         local_filename = request_resource "#{params[:storage_server]}/#{params[:cdrom]}", params[:storage_cache]
         FileUtils.ln_s local_filename, "#{vmachine_dir}/#{params[:cdrom]}"
       end
-      
-      progress[:info] = "downloading hda image"
-      progress.save
 
       if params[:hda]
+        progress[:info] = "downloading hda image: #{params[:hda]}"
+        progress[:status] = "in progress"
+        progress.save
+
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
         FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hda]}"
         qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hda]} -f qcow2 #{vmachine_dir}/#{params[:hda]}"
@@ -111,26 +112,36 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
         `#{qcow2_cmd}`
       end
 
-      progress[:info] = "starting vmachine"
+      progress[:info] = "starting vmachine '#{params[:name]}'"
+      progress[:status] = "in progress"
       progress.save
 
       dom.create
+
+      # delete the progress information, 'cause its no longer useful
+      Progress.delete progress
+
     rescue Exception => e
-      # TODO report error by setting status
-      # log backtarce to file
-      progress[:status] = "error"
+      progress[:info] = "error on server side, check log files"
+      progress[:status] = "error occured"
       progress.save
+
+      # log backtarce to file
       logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
   end
 
   # cleanup after a vmachine is destroyed
-  # Maybe it will upload disk image to server
+  # TODO upload image files onto storage server
   def do_cleanup args
     begin
       logger.debug "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
+
+      # remove dirty progress information, if exists (ususlly when the machine failed to start)
       progress = Progress.find_by_owner args[:vmachine_name]
-      Progress.delete progress
+      Progress.delete progress if progress
+
+      # remove local resource
       FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
     rescue Exception => e
       logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
@@ -184,6 +195,15 @@ private
     else
       raise "Resource scheme '#{scheme}' not known!"
     end
+  end
+
+  # TODO upload 'from_file' -> 'to_uri'
+  def put_file from_file, to_uri
+  end
+
+  # called every a few seconds, check if local files are in good health
+  def VmachinesWorker.supervise
+    `touch good`
   end
 
 end

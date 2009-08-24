@@ -3,3 +3,9 @@
   :ip: 0.0.0.0
   :port: 11006
   :environment: production
+:scheduled_task:
+  :class: :vmachines_worker
+  :worker_method: :supervise
+  :trigger_args:
+    :start: <%= Time.now + 5.seconds %>
+    :repeat_interval: <%= 5.seconds %>
