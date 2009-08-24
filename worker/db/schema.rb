@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090818030750) do
+ActiveRecord::Schema.define(:version => 20090824093750) do
 
   create_table "bdrb_job_queues", :force => true do |t|
     t.text     "args"
@@ -29,6 +29,14 @@ ActiveRecord::Schema.define(:version => 20090818030750) do
     t.string   "runner_info"
     t.string   "worker_key"
     t.datetime "scheduled_at"
+  end
+
+  create_table "progresses", :force => true do |t|
+    t.string   "owner"
+    t.string   "info"
+    t.string   "status"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "settings", :force => true do |t|

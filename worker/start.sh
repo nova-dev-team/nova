@@ -1,4 +1,4 @@
 #!/bin/sh
 
-script/backgroundrb start
+script/backgroundrb start -e development
 script/server $@

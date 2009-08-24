@@ -11,7 +11,7 @@ module VmachinesHelper
     def Helper.virt_conn
       @@virt_conn
     end
-    
+
     def Helper.emit_xml_desc params
 
       if params[:cdrom]

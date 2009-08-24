@@ -76,21 +76,32 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   @@virt_conn = VmachinesHelper::Helper.virt_conn
 
   set_worker_name :vmachines_worker
+
   def create(args = nil)
     # this method is called, when worker is loaded for the first time
   end
 
   # setup status, copy files, then start vm
   def do_start params
+    progress = Progress.new
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
       
       vmachine_dir = "#{params[:vmachines_root]}/#{params[:name]}"
 
+      progress[:type] = "start_vmachine"
+      progress[:owner] = params[:name]
+      progress[:info] = "downloading cdrom image"
+      progress[:status] = "starting"
+      progress.save
+
       if params[:cdrom]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:cdrom]}", params[:storage_cache]
         FileUtils.ln_s local_filename, "#{vmachine_dir}/#{params[:cdrom]}"
       end
+      
+      progress[:info] = "downloading hda image"
+      progress.save
 
       if params[:hda]
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
@@ -100,11 +111,15 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
         `#{qcow2_cmd}`
       end
 
+      progress[:info] = "starting vmachine"
+      progress.save
+
       dom.create
     rescue Exception => e
       # TODO report error by setting status
-    
       # log backtarce to file
+      progress[:status] = "error"
+      progress.save
       logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
   end
@@ -114,6 +129,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   def do_cleanup args
     begin
       logger.debug "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
+      progress = Progress.find_by_owner args[:vmachine_name]
+      Progress.delete progress
       FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
     rescue Exception => e
       logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s

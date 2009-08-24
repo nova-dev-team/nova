@@ -152,7 +152,7 @@ public
 
     begin
       # creation is put into job queue, handled by backgroundrb
-      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params, :job_key => "#{dom.uuid}.create")
+      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params)
       render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
     rescue
       render_failure "Failed to add creation request into job queue!"
@@ -183,7 +183,7 @@ public
         :vmachines_root => VMACHINES_ROOT,
         :vmachine_name => dom_name
       }
-      MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args, :job_key => "#{params[:uuid]}.cleanup")
+      MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args)
       dom.undefine
       render_success "Successfully destroyed virtual machine, name=#{dom_name}, UUID=#{params[:uuid]}."
     rescue
