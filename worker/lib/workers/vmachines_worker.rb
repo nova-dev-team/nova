@@ -144,8 +144,13 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       # remove local resource
       FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
     rescue Exception => e
-      logger.debug e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
+      logger.error e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
+  end
+
+  # called every a few seconds, check if local files are in good health
+  def supervise
+    logger.debug "Supervisor running at #{Time.now}"
   end
 
 private
@@ -199,11 +204,6 @@ private
 
   # TODO upload 'from_file' -> 'to_uri'
   def put_file from_file, to_uri
-  end
-
-  # called every a few seconds, check if local files are in good health
-  def VmachinesWorker.supervise
-    `touch good`
   end
 
 end
