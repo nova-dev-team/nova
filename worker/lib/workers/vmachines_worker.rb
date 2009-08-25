@@ -159,13 +159,6 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
     # supervise on stoarge cache (using .copying files)
     Dir.foreach(storage_cache_root) do |entry|
-
-      # remove useless supervise files
-      if entry =~ /\.supervise/
-        copying_lock_filename = "#{storage_cache_root}/#{entry[0...-10]}.copying" # notice this is the full path name
-        FileUtils.rm "#{storage_cache_root}/#{entry}" unless File.exist? copying_lock_filename
-      end
-
       next unless entry =~ /\.copying/
 
       logger.debug "supervising '#{entry}' as copying lock file"
@@ -205,6 +198,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
               try_count += 1
               FileUtils.rm resource_filename
               FileUtils.rm "#{resource_filename}.copying"
+              last_change_time = Time.now.to_i
             end
           end
 
@@ -222,7 +216,6 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
           supervise_file.write "last_change_time_i=#{Time.now.to_i}\n"
           supervise_file.close
         end
-
 
       else # no such resource file, report error
         logger.debug "resource file '#{resource_filename}' is not found! deleting copying lock file"
