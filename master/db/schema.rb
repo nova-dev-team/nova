@@ -19,9 +19,13 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
   end
 
   create_table "net_segments", :force => true do |t|
-    t.string   "head_ip",    :limit => 20
+    t.string   "name",         :limit => 20
+    t.string   "head_ip",      :limit => 20
     t.integer  "size"
-    t.string   "mask",       :limit => 20
+    t.string   "mask",         :limit => 20
+    t.integer  "vcluster_id"
+    t.boolean  "used",                       :default => false
+    t.integer  "lock_version",               :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -61,6 +65,8 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
 
   create_table "vclusters", :force => true do |t|
+    t.string   "cluster_name"
+    t.text     "package_list"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -81,7 +87,11 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
   add_index "vmachine_infos", ["vmachine_id"], :name => "index_vmachine_infos_on_vmachine_id"
 
   create_table "vmachines", :force => true do |t|
-    t.string   "uuid",       :limit => 40, :null => false
+    t.string   "uuid",        :limit => 40, :null => false
+    t.string   "ip",          :limit => 20
+    t.string   "mac",         :limit => 24
+    t.string   "hostname",    :limit => 40
+    t.integer  "vcluster_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

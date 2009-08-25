@@ -2,19 +2,32 @@
 # "ceil" is used to automatically install & configure vmachines
 
 class CeilController < ApplicationController
-	def retrieve
 
+	def retrieve
 		respond_to do |accept|
-			accept.json { render :json => request.remote_ip() }
-			accept.html { render :text => request.remote_ip().to_json }
+		  remote_ip = request.remote_ip
+		  
+		  vm = Vmachine.find_by_ip(remote_ip)
+		  node_list = ""
+		  package_list = ""
+		  if vm 
+		    node_list = vm.get_node_list
+		    package_list = vm.get_package_list
+		  end
+		  
+		  cjson = {"node_list" => node_list, "package_list" => package_list} 
+		  
+			accept.json { render :json => cjson }
+			accept.html { render :text => cjson.to_json }
 			
 			#accept.ip { render :text => request.remote_ip() }
 			#accept.config { render :text => request.remote_ip() }
 		end			
 
 	end
+	
 	def report
-				
+			
 
 
 	end

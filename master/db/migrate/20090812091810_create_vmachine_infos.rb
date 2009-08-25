@@ -13,3 +13,5 @@ class CreateVmachineInfos < ActiveRecord::Migration
     drop_table :vmachine_infos
   end
 end
+
+
