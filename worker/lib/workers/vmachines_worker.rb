@@ -75,6 +75,9 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   
   @@virt_conn = VmachinesHelper::Helper.virt_conn
 
+  MAX_COPYING_TRY_COUNT = 5 # after 5 failed tries, we stop copying resource
+  MAX_STALL_TIME = 30 # after stalling for 30 seconds, we think the resource has failed to download
+
   set_worker_name :vmachines_worker
 
   def create(args = nil)
@@ -151,6 +154,88 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   # called every a few seconds, check if local files are in good health
   def supervise
     logger.debug "Supervisor running at #{Time.now}"
+    
+    storage_cache_root = "#{RAILS_ROOT}/tmp/storage_cache"
+
+    # supervise on stoarge cache (using .copying files)
+    Dir.foreach(storage_cache_root) do |entry|
+
+      # remove useless supervise files
+      if entry =~ /\.supervise/
+        copying_lock_filename = "#{storage_cache_root}/#{entry[0...-10]}.copying" # notice this is the full path name
+        FileUtils.rm "#{storage_cache_root}/#{entry}" unless File.exist? copying_lock_filename
+      end
+
+      next unless entry =~ /\.copying/
+
+      logger.debug "supervising '#{entry}' as copying lock file"
+      resource_filename = "#{storage_cache_root}/#{entry[0...-8]}" # notice this is the full path name
+      logger.debug "checking status of resource file '#{resource_filename}'"
+      if File.exist? resource_filename # have resource file, create/update supervise file
+        supervise_filename = "#{resource_filename}.supervise"
+        if File.exist? supervise_filename # exists supervise file, update it
+          supervise_file = File.new(supervise_filename, "r")
+          old_last_check_size = -1
+          try_count = -1
+          last_change_time = -1
+          supervise_file.readlines.each do |line|
+            items = line.chomp.split '='
+            logger.debug "Split line=#{items.pretty_inspect}"
+            case items[0]
+            when "try_count"
+              try_count = items[1].to_i
+              logger.debug "in #{File.basename supervise_filename}: try_count = #{try_count}"
+            when "last_check_size"
+              old_last_check_size = items[1].to_i
+              logger.debug "in #{File.basename supervise_filename}: last_check_size = #{old_last_check_size}"
+            when "last_change_time_i"
+              last_change_time = items[1].to_i
+              logger.debug "in #{File.basename supervise_filename}: last_change_time_i = #{last_change_time}"
+            end
+          end
+          supervise_file.close
+
+          last_check_size = File.size resource_filename
+          if last_check_size != old_last_check_size # the file size is changed
+            last_change_time = Time.now.to_i
+          else # file size not changed, we should delete it if stalled for a long time
+            stall_time = Time.now.to_i - last_change_time
+            if stall_time > MAX_STALL_TIME # waited for too long, we think the resource failed to download
+              # simply delete both .coying file and resource file, they will be started downloading again
+              try_count += 1
+              FileUtils.rm resource_filename
+              FileUtils.rm "#{resource_filename}.copying"
+            end
+          end
+
+          supervise_file = File.new(supervise_filename, "w")
+          supervise_file.write "try_count=#{try_count}\n"
+          supervise_file.write "last_check_time=#{Time.now}\n"
+          supervise_file.write "last_check_size=#{last_check_size}\n"
+          supervise_file.write "last_change_time_i=#{last_change_time}\n"
+          supervise_file.close
+        else
+          supervise_file = File.new(supervise_filename, "w")
+          supervise_file.write "try_count=1\n"
+          supervise_file.write "last_check_time=#{Time.now}\n"
+          supervise_file.write "last_check_size=#{File.size resource_filename}\n"
+          supervise_file.write "last_change_time_i=#{Time.now.to_i}\n"
+          supervise_file.close
+        end
+
+
+      else # no such resource file, report error
+        logger.debug "resource file '#{resource_filename}' is not found! deleting copying lock file"
+        # TODO delete copying lock file, update supervise file (try_count)
+      end
+    end
+
+  end
+
+  # called every a few minutes, check if there is new resource on storage server
+  def update
+    # TODO updater
+    logger.debug "Updater runing at #{Time.now}"
   end
 
 private
@@ -164,18 +249,56 @@ private
     local_to = "#{cache_root}/#{resource_filename}"
     copying_lock_filename = local_to + ".copying"
 
-    if File.exist? local_to # has local file, probably under copying
-      sleep 1 while File.exist? copying_lock_filename # while if is under copying
-    else  # file does not exit, should copy
-      copying_lock = File.new(copying_lock_filename, "w")
-      copying_lock.flock File::LOCK_EX
+    loop do
+      if (File.exist? local_to) and (File.exist? copying_lock_filename)
+        # if both the lock and resource exists
+        # in this situation, the file is being downloaded, so we only need to wait
+        sleep (0.5 + rand)
+        # sleep with 'rand' is important. it is possible that 2 or more requests arrive at same time
+        # and are waiting for same resource. sleeping with 'rand' might reduce race condition
+      elsif (File.exist? local_to) and (not File.exist? copying_lock_filename)
+        # resource exists, but lock is not around, this means the resource is ready to be used
+        break # out of the loop
+      elsif (not File.exist? local_to) and (File.exist? copying_lock_filename)
+        # only lock file exists, this is an wrong condition, we should count on 'supervise' method
+        # do nothing but sleep a while
+        sleep (0.5 + rand)
+      else # both lock file and resource file does not exist, download them now (if try_count not > MAX TRY COUNT)
+        
+        # check if try_count is too big
+        supervise_filename = "#{resource_filename}.supervise"
+        if File.exist? supervise_filename
+          supervise_file = File.new(supervise_filename, "r")
+          supervise_file.readlines.each do |line|
+            items = line.split "="
+            try_count = items[1].to_i if items[0] == "try_count"
+            if try_count > MAX_COPYING_TRY_COUNT
+              break # out of the loop
+            end
+          end
+          supervise_file.close
+        end
 
-      get_file resource_uri, local_to
+        copying_lock = File.new(copying_lock_filename, "w")
+        begin # it is highly possible to have exception, so we have to handle it
+          # both the lock file and resource are not here, so we should start downloading now
+          # it is hightly possible to have excption, so we must handle that
+          copying_lock.flock File::LOCK_EX
 
-      copying_lock.flock File::LOCK_UN
-      copying_lock.close
-      FileUtils.rm copying_lock_filename
+          get_file resource_uri, local_to
+
+        rescue
+          sleep (0.5 + rand) # sleep a while, maybe the supervisor will handle errors
+        ensure
+          copying_lock.flock File::LOCK_UN
+          copying_lock.close
+          FileUtils.rm copying_lock_filename
+
+          break # out of the loop
+        end
+      end
     end
+
     return local_to
   end
 

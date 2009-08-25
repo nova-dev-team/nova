@@ -18,6 +18,7 @@ public
   STATE_NOT_RUNNING = 5
 
   # specifies where the new vmachines are placed
+  # TODO move this const into a settings file, like .yml
   VMACHINES_ROOT = "#{RAILS_ROOT}/tmp/vmachines/"
 
   # specifies where is the local storage cache

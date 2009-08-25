@@ -8,3 +8,5 @@
   :vmachines_worker:
     :supervise:
       :trigger_args: */5 * * * * * 
+    :update:
+      :trigger_args: 0 */2 * * * * 
