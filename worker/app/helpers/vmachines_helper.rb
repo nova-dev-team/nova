@@ -14,7 +14,7 @@ module VmachinesHelper
 
     def Helper.emit_xml_desc params
 
-      if params[:cdrom]
+      if params[:cdrom] and params[:cdrom] != ""
         FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
         cdrom_desc = <<CDROM_DESC
     <disk type='file' device='cdrom'>
@@ -25,7 +25,7 @@ module VmachinesHelper
 CDROM_DESC
       end
  
-      if params[:hda]
+      if params[:hda] and params[:hda] != ""
         FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
         hda_desc = <<HDA_DESC
     <disk type='file' device='disk'>
@@ -35,7 +35,25 @@ CDROM_DESC
 HDA_DESC
       end
 
+      if params[:hdb] and params[:hdb] != ""
+        FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
+        hdb_desc = <<HDB_DESC
+    <disk type='file' device='disk'>
+      <source file='#{params[:vmachines_root]}/#{params[:name]}/#{params[:hdb]}'/>
+      <target dev='hdb'/>
+    </disk>
+HDB_DESC
+      end
+
 # grpahics type=vnc port=-1: -1 means the system will automatically allocate an port for vnc
+
+      # TODO how to boot from different disks?
+      if params[:boot_dev] == "cdrom"
+        real_boot_dev = params[:boot_dev]
+      else
+        real_boot_dev = "hd"
+      end
+
       xml_desc = <<XML_DESC
 <domain type='qemu'>
   <name>#{params[:name]}</name>
@@ -43,13 +61,14 @@ HDA_DESC
   <memory>#{params[:mem_size].to_i * 1024}</memory>
   <vcpu>#{params[:vcpu]}</vcpu>
   <os>
-    <type arch='i686' machine='pc'>hvm</type>
-    <boot dev='cdrom' />
+    <type arch='#{params[:arch]}' machine='pc'>hvm</type>
+    <boot dev='#{real_boot_dev}' />
   </os>
   <devices>
     <emulator>/usr/bin/kvm</emulator>
-#{hda_desc if params[:hda]}
-#{cdrom_desc if params[:cdrom]}
+#{hda_desc if params[:hda] and params[:hda] != ""}
+#{hdb_desc if params[:hdb] and params[:hdb] != ""}
+#{cdrom_desc if params[:cdrom] and params[:cdrom] != ""}
     <graphics type='vnc' port='#{params[:vnc_port]}'/>
   </devices>
 </domain>

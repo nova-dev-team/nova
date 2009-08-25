@@ -94,7 +94,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
       vmachine_dir = "#{params[:vmachines_root]}/#{params[:name]}"
 
-      if params[:cdrom]
+      if params[:cdrom] and params[:cdrom] != ""
         progress[:info] = "downloading cdrom image: #{params[:cdrom]}"
         progress[:status] = "in progress"
         progress.save
@@ -103,7 +103,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
         FileUtils.ln_s local_filename, "#{vmachine_dir}/#{params[:cdrom]}"
       end
 
-      if params[:hda]
+      if params[:hda] and params[:hda] != ""
         progress[:info] = "downloading hda image: #{params[:hda]}"
         progress[:status] = "in progress"
         progress.save
@@ -111,6 +111,18 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
         local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
         FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hda]}"
         qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hda]} -f qcow2 #{vmachine_dir}/#{params[:hda]}"
+        logger.debug "*** [cmd] #{qcow2_cmd}"
+        `#{qcow2_cmd}`
+      end
+
+      if params[:hdb] and params[:hdb] != ""
+        progress[:info] = "downloading hdb image: #{params[:hdb]}"
+        progress[:status] = "in progress"
+        progress.save
+
+        local_filename = request_resource "#{params[:storage_server]}/#{params[:hdb]}", params[:storage_cache]
+        FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hdb]}"
+        qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hdb]} -f qcow2 #{vmachine_dir}/#{params[:hdb]}"
         logger.debug "*** [cmd] #{qcow2_cmd}"
         `#{qcow2_cmd}`
       end
@@ -156,6 +168,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     logger.debug "Supervisor running at #{Time.now}"
     
     storage_cache_root = "#{RAILS_ROOT}/tmp/storage_cache"
+    FileUtils.mkdir_p storage_cache_root
 
     # supervise on stoarge cache (using .copying files)
     Dir.foreach(storage_cache_root) do |entry|

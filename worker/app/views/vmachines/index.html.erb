@@ -19,16 +19,48 @@ function add_vmachine() {
   var mem_size = $("#new_vm_mem_size").val();
   var cpu_count = $("#new_vm_cpu_count").val();
   var hda = $("#new_vm_hda").val();
+  var hdb = $("#new_vm_hdb").val();
   var cdrom = $("#new_vm_cdrom").val();
+  var boot_dev = $("#new_vm_boot_dev").val();
+  
+  // check args
+  if (hda == null || hda == "") {
+    alert("You must pick an hda device!");
+    return;
+  }
+  
+  if (mem_size == null || mem_size == "") {
+    alert("You must provide memory size!");
+    return;
+  }
+  
+  vmachine_name_regex = /^([a-z])+([a-z0-9_\.])*$/;
+  if (name == null || name == "" || name.length > 20 || vmachine_name_regex.test(name) == false) {
+    alert("Invalid vmachine name!");
+    return;
+  }
+  
+  if (boot_dev == "hdb" && (hdb == null || hdb == "")) {
+    alert("You must provide hdb device, if you wanna boot from it!");
+    return;
+  }
+
+  if (boot_dev == "cdrom" && (cdrom == null || cdrom == "")) {
+    alert("You must provide a cdrom image, if you wanna boot from it!");
+    return;
+  }
   
   $.ajax({
     url: "/vmachines/start",
     data: {
+      arch: "i686",
       name: name,
       vcpu: cpu_count,
       mem_size: mem_size,
       hda: hda,
-      cdrom: cdrom
+      hdb: hdb,
+      cdrom: cdrom,
+      boot_dev: boot_dev
     },
     success: function() {
       window.location.reload();
@@ -90,7 +122,13 @@ function change_system_setting(key) {
 
 <% end -%>
 
-################################################################################
+
+
+
+
+
+
+
 
 <% content_for :main_content do %>
 
@@ -179,17 +217,12 @@ info_of_vmachines
 
 <hr>
 
-<%
-################################################################################
-%>
-
-
 <h2>Add new vmachine</h2>
 <%
 spacing = ""
 4.times {spacing += "&nbsp;"}
 %>
-Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name"/><%= spacing %>
+Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name" value="dummy_vm"/><%= spacing %>
 Architecture: <select>
 <option value='i686'>x86</option>
 </select><%= spacing %>
@@ -200,11 +233,11 @@ html = ""
 html
 %>
 </select><%= spacing %>
-Memory size: <input type="text" size="4" id="new_vm_mem_size"/> MB<%= spacing %>
-Boot Device: <select>
+Memory size: <input type="text" size="4" id="new_vm_mem_size" value="128"/> MB<%= spacing %>
+Boot Device: <select id="new_vm_boot_dev">
 <option value='hda'>Hard Disk 1</option>
 <option value='hdb'>Hard Disk 2</option>
-<option value='hdc'>CD ROM</option>
+<option value='cdrom'>CD ROM</option>
 </select><br>
 Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
 Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>

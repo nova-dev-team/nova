@@ -110,23 +110,29 @@ public
     # those are default parameters
     default_params = {
       :storage_server => Setting.default_storage_server,  # where to get the image files (if they are not in cache)
+
+      # TODO move the cache settings into a .yml file
       :storage_cache => STORAGE_CACHE,              # where is the cachd directory
       :vmachines_root => VMACHINES_ROOT,            # where is the vmachines directory
 
-      :emulator => "kvm",
+      :arch => "i686",
+      :emulator => "kvm", # ENHANCE currently we only support KVM
       :name => "dummy_vm",
-      :vcpu => 2,
+      :vcpu => 1,
       :mem_size => 128,
       :uuid => UUIDTools::UUID.random_create.to_s,
-      :cdrom => "liveandroidv0.2.iso", # this is optional
       :hda => "vdisk.qcow2",
+      :hdb => "", # this is optional, could be "" (means no such a device)
+      :cdrom => "", # this is optional, could be "" (means no such a device)
+      :boot_dev => "hda", # hda, hdb, cdrom
       :vnc_port => -1   # setting vnc_port to -1 means libvirt will automatically set the port
-      # TODO to be added: hdb...
     }
     
     # merge default parameters into real params, if corresponding item does not exist
     default_params.each do |key, value|
-      params[key] ||= value
+      if params[key] == nil or params[key] == ""
+        params[key] = value
+      end
     end
     
     begin
@@ -135,19 +141,19 @@ public
       logger.debug xml_desc
 
       dom = @@virt_conn.define_domain_xml xml_desc 
-    rescue
+    rescue Exception => e
       # report error to calling server
       
       # check if the domain already exists
       begin
         @@virt_conn.lookup_domain_by_name params[:name]
-        render_failure "Failed to create vmachine domain! Domain name #{params[:name]} already used!"
+        render_failure "Failed to create vmachine domain! Domain name #{params[:name]} already used! Raw error: #{e.pretty_inspect}"
         return
       rescue
         # domain name not used, do nothing
       end
 
-      render_failure "Failed to create vmachine domain!"
+      render_failure "Failed to create vmachine domain! Raw error: #{e.pretty_inspect}"
       return
     end
 
