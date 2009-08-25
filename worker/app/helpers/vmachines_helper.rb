@@ -47,13 +47,6 @@ HDB_DESC
 
 # grpahics type=vnc port=-1: -1 means the system will automatically allocate an port for vnc
 
-      # TODO how to boot from different disks?
-      if params[:boot_dev] == "cdrom"
-        real_boot_dev = params[:boot_dev]
-      else
-        real_boot_dev = "hd"
-      end
-
       xml_desc = <<XML_DESC
 <domain type='qemu'>
   <name>#{params[:name]}</name>
@@ -62,7 +55,7 @@ HDB_DESC
   <vcpu>#{params[:vcpu]}</vcpu>
   <os>
     <type arch='#{params[:arch]}' machine='pc'>hvm</type>
-    <boot dev='#{real_boot_dev}' />
+    <boot dev='#{params[:boot_dev]}' />
   </os>
   <devices>
     <emulator>/usr/bin/kvm</emulator>

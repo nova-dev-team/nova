@@ -15,6 +15,7 @@ $(document).ready(function () {
 });
 
 function add_vmachine() {
+  var arch = $("#new_vm_arch").val();
   var name = $("#new_vm_name").val();
   var mem_size = $("#new_vm_mem_size").val();
   var cpu_count = $("#new_vm_cpu_count").val();
@@ -39,11 +40,6 @@ function add_vmachine() {
     alert("Invalid vmachine name!");
     return;
   }
-  
-  if (boot_dev == "hdb" && (hdb == null || hdb == "")) {
-    alert("You must provide hdb device, if you wanna boot from it!");
-    return;
-  }
 
   if (boot_dev == "cdrom" && (cdrom == null || cdrom == "")) {
     alert("You must provide a cdrom image, if you wanna boot from it!");
@@ -53,7 +49,7 @@ function add_vmachine() {
   $.ajax({
     url: "/vmachines/start",
     data: {
-      arch: "i686",
+      arch: arch,
       name: name,
       vcpu: cpu_count,
       mem_size: mem_size,
@@ -223,8 +219,9 @@ spacing = ""
 4.times {spacing += "&nbsp;"}
 %>
 Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name" value="dummy_vm"/><%= spacing %>
-Architecture: <select>
-<option value='i686'>x86</option>
+Architecture: <select id="new_vm_arch">
+<option value='i686'>i686</option>
+<option value='x86_64'>x86_64</option>
 </select><%= spacing %>
 CPU Count: <select id="new_vm_cpu_count">
 <%=
@@ -235,9 +232,8 @@ html
 </select><%= spacing %>
 Memory size: <input type="text" size="4" id="new_vm_mem_size" value="128"/> MB<%= spacing %>
 Boot Device: <select id="new_vm_boot_dev">
-<option value='hda'>Hard Disk 1</option>
-<option value='hdb'>Hard Disk 2</option>
-<option value='cdrom'>CD ROM</option>
+<option value='hd'>Hard Disk (hda)</option>
+<option value='cdrom'>CDROM (hdc)</option>
 </select><br>
 Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
 Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
