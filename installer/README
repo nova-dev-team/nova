@@ -1,0 +1,7 @@
+Run 'make_installer.sh' first to download required packages.
+This process requires Internet connection. The computer
+running 'make_installer.sh' must have the same architecture
+as computers in the cluster.
+
+After download process finished, copy this folder to other
+computers, and run 'install.sh'.
