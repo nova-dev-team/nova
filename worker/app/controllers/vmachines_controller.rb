@@ -102,12 +102,6 @@ public
 
     # those are default parameters
     default_params = {
-      :storage_server => Setting.default_storage_server,  # where to get the image files (if they are not in cache)
-
-      # TODO move the cache settings into a .yml file
-      :storage_cache => Setting.storage_cache,              # where is the cachd directory
-      :vmachines_root => Setting.vmachines_root,            # where is the vmachines directory
-
       :arch => "i686",
       :emulator => "kvm", # ENHANCE currently we only support KVM
       :name => "dummy_vm",

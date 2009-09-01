@@ -8,8 +8,8 @@
 
 # where is the disk images, cdrom iso files stored
 # Could be changed in web ui
-default_storage_server:
-  key: default_storage_server
+storage_server:
+  key: storage_server
   value: file:///home/santa/Downloads/
   no_edit: false
 

@@ -92,14 +92,14 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     progress[:owner] = params[:name]
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
-      vmachine_dir = "#{params[:vmachines_root]}/#{params[:name]}"
+      vmachine_dir = "#{Setting.vmachines_root}/#{params[:name]}"
 
       if params[:cdrom] and params[:cdrom] != ""
         progress[:info] = "downloading cdrom image: #{params[:cdrom]}"
         progress[:status] = "in progress"
         progress.save
 
-        local_filename = request_resource "#{params[:storage_server]}/#{params[:cdrom]}", params[:storage_cache]
+        local_filename = request_resource "#{Setting.storage_server}/#{params[:cdrom]}", Setting.storage_cache
         FileUtils.ln_s local_filename, "#{vmachine_dir}/#{params[:cdrom]}"
       end
 
@@ -108,7 +108,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
         progress[:status] = "in progress"
         progress.save
 
-        local_filename = request_resource "#{params[:storage_server]}/#{params[:hda]}", params[:storage_cache]
+        local_filename = request_resource "#{Setting.storage_server}/#{params[:hda]}", Setting.storage_cache
         FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hda]}"
         qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hda]} -f qcow2 #{vmachine_dir}/#{params[:hda]}"
         logger.debug "*** [cmd] #{qcow2_cmd}"
@@ -120,7 +120,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
         progress[:status] = "in progress"
         progress.save
 
-        local_filename = request_resource "#{params[:storage_server]}/#{params[:hdb]}", params[:storage_cache]
+        local_filename = request_resource "#{Setting.storage_server}/#{params[:hdb]}", Setting.storage_cache
         FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hdb]}"
         qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hdb]} -f qcow2 #{vmachine_dir}/#{params[:hdb]}"
         logger.debug "*** [cmd] #{qcow2_cmd}"
@@ -242,9 +242,11 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   def update
     # TODO updater
     logger.debug "Updater runing at #{Time.now}"
+    VmachinesWorker.list_files Setting.storage_server
   end
 
-private
+
+ private
 
   # returns the full path of cached file, and the file will be locked as "in use"
   def request_resource resource_uri, cache_root
@@ -343,12 +345,6 @@ private
       FileUtils.cp from_file, path
     elsif scheme == "ftp"
       # TODO ftp
-# XXX Seems that scp sometimes fails
-#    elsif scheme == "scp"
-#      sep_index = userinfo.index ":"
-#      username = userinfo[0...sep_index]  # notice, ... rather than ..
-#      password = userinfo[(sep_index + 1)..-1]
-#      Net::SCP.upload!(host, username, path, to_file, :password => password)
     else
       raise "Resource scheme '#{scheme}' not known!"
     end

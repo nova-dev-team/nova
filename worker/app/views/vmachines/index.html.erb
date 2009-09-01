@@ -277,6 +277,19 @@ pipe.close
 <hr>
 
 <h2>Resource on Storage Server</h2>
+Refreshed on <%= Time.now %>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td><pre>
+<%=
+  list = VmachinesHelper::Helper.list_files Setting.storage_server
+  list_str = ""
+  list.each do |entry|
+    next if entry.start_with? "."
+    list_str += "\n" unless list_str == ""
+    list_str += entry
+  end
+  list_str
+%>
+</pre></td></tr></table>
 <hr>
 
 

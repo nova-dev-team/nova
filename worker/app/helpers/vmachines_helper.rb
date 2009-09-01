@@ -1,5 +1,6 @@
 require 'libvirt'
 require 'fileutils'
+require 'uri'
 require 'pp'
 
 module VmachinesHelper
@@ -15,10 +16,10 @@ module VmachinesHelper
     def Helper.emit_xml_desc params
 
       if params[:cdrom] and params[:cdrom] != ""
-        FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
+        FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
         cdrom_desc = <<CDROM_DESC
     <disk type='file' device='cdrom'>
-      <source file='#{params[:vmachines_root]}/#{params[:name]}/#{params[:cdrom]}'/>
+      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{params[:cdrom]}'/>
       <target dev='hdc'/>
       <readonly/>
     </disk>
@@ -26,20 +27,20 @@ CDROM_DESC
       end
  
       if params[:hda] and params[:hda] != ""
-        FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
+        FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
         hda_desc = <<HDA_DESC
     <disk type='file' device='disk'>
-      <source file='#{params[:vmachines_root]}/#{params[:name]}/#{params[:hda]}'/>
+      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{params[:hda]}'/>
       <target dev='hda'/>
     </disk>
 HDA_DESC
       end
 
       if params[:hdb] and params[:hdb] != ""
-        FileUtils.mkdir_p "#{params[:vmachines_root]}/#{params[:name]}" # assure path exists
+        FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
         hdb_desc = <<HDB_DESC
     <disk type='file' device='disk'>
-      <source file='#{params[:vmachines_root]}/#{params[:name]}/#{params[:hdb]}'/>
+      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{params[:hdb]}'/>
       <target dev='hdb'/>
     </disk>
 HDB_DESC
@@ -68,6 +69,22 @@ HDB_DESC
 XML_DESC
     
       return xml_desc
+    end
+
+    def Helper.list_files dir_uri
+      # TODO caching
+      scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split dir_uri  # parse URI information
+    
+      files_list = []
+      if scheme == "file"
+        Dir.new(path).entries.each do |entry|
+          files_list << entry
+        end
+      elsif scheme == "ftp"
+      else
+        raise "Resource scheme '#{scheme}' not known!"
+      end
+      return files_list
     end
 
   end
