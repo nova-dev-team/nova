@@ -71,6 +71,20 @@ XML_DESC
       return xml_desc
     end
 
+    def Helper.cached_storage_server_filelist
+      # showing cached results
+      lines = []
+      begin
+        File.open("#{Setting.storage_cache}/cached_storage_server_filelist", "r") do |file|
+          lines = file.readlines
+        end
+      rescue
+        lines << "The file list will be updated in a while."
+      ensure
+        return lines
+      end
+    end
+
     def Helper.list_files dir_uri
       # TODO caching
       scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split dir_uri  # parse URI information

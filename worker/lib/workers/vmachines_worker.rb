@@ -242,7 +242,13 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   def update
     # TODO updater
     logger.debug "Updater runing at #{Time.now}"
-    VmachinesWorker.list_files Setting.storage_server
+    # update file listing
+    list = VmachinesHelper::Helper.list_files Setting.storage_server
+    File.open("#{Setting.storage_cache}/cached_storage_server_filelist", "w") do |file|
+      file.write Time.now
+      file.write "\n"
+      list.each {|entry| file.write entry + "\n"}
+    end
   end
 
 
