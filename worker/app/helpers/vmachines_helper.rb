@@ -2,6 +2,7 @@ require 'libvirt'
 require 'fileutils'
 require 'uri'
 require 'pp'
+require 'pretty_file_size'
 
 module VmachinesHelper
   
@@ -46,8 +47,16 @@ HDA_DESC
 HDB_DESC
       end
 
-# grpahics type=vnc port=-1: -1 means the system will automatically allocate an port for vnc
+      if params[:mac] and params[:mac] != ""
+        mac_desc = <<MAC_DESC
+    <interface type='network'>
+      <source network='default'/>
+      <mac address='#{params[:mac]}'/>
+    </interface>
+MAC_DESC
+      end
 
+# grpahics type=vnc port=-1: -1 means the system will automatically allocate an port for vnc
       xml_desc = <<XML_DESC
 <domain type='qemu'>
   <name>#{params[:name]}</name>
@@ -63,6 +72,7 @@ HDB_DESC
 #{hda_desc if params[:hda] and params[:hda] != ""}
 #{hdb_desc if params[:hdb] and params[:hdb] != ""}
 #{cdrom_desc if params[:cdrom] and params[:cdrom] != ""}
+#{mac_desc if params[:mac] and params[:mac] != ""}
     <graphics type='vnc' port='#{params[:vnc_port]}'/>
   </devices>
 </domain>
@@ -79,7 +89,7 @@ XML_DESC
           lines = file.readlines
         end
       rescue
-        lines << "The file list will be updated in a while."
+        # do nothing
       end
       return lines
     end

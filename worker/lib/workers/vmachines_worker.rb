@@ -153,8 +153,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       logger.debug "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
 
       # remove dirty progress information, if exists (ususlly when the machine failed to start)
-      progress = Progress.find_by_owner args[:vmachine_name]
-      Progress.delete progress if progress
+      Progress.delete_all ["owner = ?", args[:vmachine_name]]
 
       # remove local resource
       FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
@@ -242,12 +241,22 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   def update
     # TODO updater
     logger.debug "Updater runing at #{Time.now}"
+
     # update file listing
+    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split Setting.storage_server  # parse URI information
     list = VmachinesHelper::Helper.list_files Setting.storage_server
-    File.open("#{Setting.storage_cache}/cached_storage_server_filelist", "w") do |file|
-      file.write Time.now
-      file.write "\n"
-      list.each {|entry| file.write entry + "\n"}
+    if scheme == "file"
+      File.open("#{Setting.storage_cache}/cached_storage_server_filelist", "w") do |file|
+        file.write Time.now.to_s + "\n"
+        list.each do |entry|
+          next if entry.start_with? "."
+          file.write File.size("#{path}/#{entry}").to_pretty_file_size + "\t#{entry}\n"
+        end
+      end
+    elsif scheme == "ftp"
+      # TODO
+    else
+      raise "Resource scheme '#{scheme}' not known!"
     end
   end
 

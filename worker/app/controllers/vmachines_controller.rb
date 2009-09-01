@@ -112,7 +112,8 @@ public
       :hdb => "", # this is optional, could be "" (means no such a device)
       :cdrom => "", # this is optional, could be "" (means no such a device)
       :boot_dev => "hda", # hda, hdb, cdrom
-      :vnc_port => -1   # setting vnc_port to -1 means libvirt will automatically set the port
+      :vnc_port => -1,   # setting vnc_port to -1 means libvirt will automatically set the port
+      :mac => "11:22:33:44:55:66"  # mac is required
     }
     
     # merge default parameters into real params, if corresponding item does not exist

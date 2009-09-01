@@ -276,18 +276,20 @@ pipe.close
 </td></tr></table>
 <hr>
 
-<h2>Resource on Storage Server</h2>
+<h2>Resource on storage server</h2>
 <%=
   list = VmachinesHelper::Helper.cached_storage_server_filelist
-  if list.length > 1
+  if list.length != 0
     list_html = "Refreshed on #{list[0]}"
   else
-    list_html = list[0]
+    list_html = "The file list will be updated in a while."
   end
   list_html += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>"
-  list[1..-1].each do |entry|
-    next if entry.start_with? "."
-    list_html += entry
+  if list.size != 0
+    list[1..-1].each do |entry|
+      next if entry.start_with? "."
+      list_html += entry
+    end
   end
   list_html.chomp
 %>
@@ -295,7 +297,7 @@ pipe.close
 <hr>
 
 
-<h2>Background jobs</h2>
+<h2>Background work</h2>
 <%=
   background_jobs_html = "<table width='100%'><tr><td>Owner</td><td>Info</td><td>Status</td></tr>"
   counter = 0
