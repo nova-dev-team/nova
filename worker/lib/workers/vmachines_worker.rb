@@ -152,6 +152,10 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     begin
       logger.debug "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
 
+      # TODO check dom status, if healthy (has been successfully running)
+      # then upload images marked with ".upload" flag back to storage
+      # server. Progress should be updated correctly
+
       # remove dirty progress information, if exists (ususlly when the machine failed to start)
       Progress.delete_all ["owner = ?", args[:vmachine_name]]
 

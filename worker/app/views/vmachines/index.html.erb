@@ -287,7 +287,6 @@ pipe.close
   list_html += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>"
   if list.size != 0
     list[1..-1].each do |entry|
-      next if entry.start_with? "."
       list_html += entry
     end
   end

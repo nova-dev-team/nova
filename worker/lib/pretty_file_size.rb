@@ -4,7 +4,7 @@ public
 
   def to_pretty_file_size
     def pretty_val val
-      if val > 100
+      if val > 10
         val.round
       else
         (val * 10.0).round / 10.0
