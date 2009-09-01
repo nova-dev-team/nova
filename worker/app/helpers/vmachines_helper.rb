@@ -80,9 +80,8 @@ XML_DESC
         end
       rescue
         lines << "The file list will be updated in a while."
-      ensure
-        return lines
       end
+      return lines
     end
 
     def Helper.list_files dir_uri

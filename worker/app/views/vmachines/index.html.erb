@@ -279,7 +279,11 @@ pipe.close
 <h2>Resource on Storage Server</h2>
 <%=
   list = VmachinesHelper::Helper.cached_storage_server_filelist
-  list_html = "Refreshed on #{list[0]}"
+  if list.length > 1
+    list_html = "Refreshed on #{list[0]}"
+  else
+    list_html = list[0]
+  end
   list_html += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>"
   list[1..-1].each do |entry|
     next if entry.start_with? "."
