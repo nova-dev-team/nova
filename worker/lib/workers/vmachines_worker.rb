@@ -4,7 +4,7 @@ require 'fileutils'
 require 'ftools'
 require 'pp'
 require 'uri'
-require 'net/scp'
+#require 'net/scp'
 
 # About the resource caching policy
 #
@@ -310,7 +310,7 @@ private
 
   # get a file from some uri, and save to a file
   #
-  # assumption: from_uri accessable, in schemes of "ftp, scp, file, carrierfs?"
+  # assumption: from_uri accessable, in schemes of "ftp, scp(usually fail, don't use it), file, carrierfs?"
   #             to_file does not exist
   def get_file from_uri, to_file
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split from_uri  # parse URI information
@@ -321,11 +321,13 @@ private
     if scheme == "file"
       FileUtils.cp path, to_file
     elsif scheme == "ftp"
-    elsif scheme == "scp"
-      sep_index = userinfo.index ":"
-      username = userinfo[0...sep_index]  # notice, ... rather than ..
-      password = userinfo[(sep_index + 1)..-1]
-      Net::SCP.download!(host, username, path, to_file, :password => password)
+      # TODO FTP
+# XXX Seems that scp sometimes fails
+#    elsif scheme == "scp"
+#      sep_index = userinfo.index ":"
+#      username = userinfo[0...sep_index]  # notice, ... rather than ..
+#      password = userinfo[(sep_index + 1)..-1]
+#      Net::SCP.download!(host, username, path, to_file, :password => password)
     else
       raise "Resource scheme '#{scheme}' not known!"
     end
@@ -333,6 +335,23 @@ private
 
   # TODO upload 'from_file' -> 'to_uri'
   def put_file from_file, to_uri
+    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split to_uri  # parse URI information
+  
+    logger.debug "Put file to #{to_uri}"
+
+    if scheme == "file"
+      FileUtils.cp from_file, path
+    elsif scheme == "ftp"
+      # TODO ftp
+# XXX Seems that scp sometimes fails
+#    elsif scheme == "scp"
+#      sep_index = userinfo.index ":"
+#      username = userinfo[0...sep_index]  # notice, ... rather than ..
+#      password = userinfo[(sep_index + 1)..-1]
+#      Net::SCP.upload!(host, username, path, to_file, :password => password)
+    else
+      raise "Resource scheme '#{scheme}' not known!"
+    end
   end
 
 end

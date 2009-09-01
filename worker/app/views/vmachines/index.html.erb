@@ -245,12 +245,12 @@ CDROM (hdc, optional): <input type="text" id="new_vm_cdrom"/><br>
 <h2>Local resource</h2>
 
 Vmachines directory structure:<br>
-<b>du -a -h <%=h VmachinesController::VMACHINES_ROOT %></b>
+<b>du -a -h <%=h Setting.vmachines_root %></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
-FileUtils.mkdir_p VmachinesController::VMACHINES_ROOT  # assure existance of vmachines directory
+FileUtils.mkdir_p Setting.vmachines_root  # assure existance of vmachines directory
 dir_listing = ""
-pipe = IO.popen("cd #{VmachinesController::VMACHINES_ROOT} && du -a -h")
+pipe = IO.popen("cd #{Setting.vmachines_root} && du -a -h")
 dir_listing = pipe.readlines.join.chomp
 pipe.close
 %>
@@ -261,12 +261,12 @@ pipe.close
 <p>
 
 Cache directory structure:<br>
-<b>du -a -h <%=h VmachinesController::STORAGE_CACHE %></b>
+<b>du -a -h <%=h Setting.storage_cache %></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
-FileUtils.mkdir_p VmachinesController::STORAGE_CACHE  # assure existance of vmachines directory
+FileUtils.mkdir_p Setting.storage_cache  # assure existance of vmachines directory
 dir_listing = ""
-pipe = IO.popen("cd #{VmachinesController::STORAGE_CACHE} && du -a -h")
+pipe = IO.popen("cd #{Setting.storage_cache} && du -a -h")
 dir_listing = pipe.readlines.join.chomp
 pipe.close
 %>
@@ -274,6 +274,9 @@ pipe.close
 <%=h dir_listing %>
 </pre>
 </td></tr></table>
+<hr>
+
+<h2>Resource on Storage Server</h2>
 <hr>
 
 
@@ -306,7 +309,11 @@ pipe.close
     system_settings_html += setting.key
     system_settings_html += "</td><td>"
     system_settings_html += setting.value
-    system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>"
+    if setting.no_edit == false
+      system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>"
+    else
+      system_settings_html += "</td><td>READ ONLY</td></tr>"
+    end
     counter += 1
   end
   system_settings_html += "</table>"

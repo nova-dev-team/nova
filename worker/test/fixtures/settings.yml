@@ -6,6 +6,24 @@
 # two:
 #   column: value
 
+# where is the disk images, cdrom iso files stored
+# Could be changed in web ui
 default_storage_server:
   key: default_storage_server
   value: file:///home/santa/Downloads/
+  no_edit: false
+
+# where is the local cache directory
+# for God's sake don't change it
+storage_cache:
+  key: storage_cache
+  value: <%= "#{RAILS_ROOT}" %>/tmp/storage_cache/
+  no_edit: true
+
+# where is the vmachines' running environment
+# again, for God's sake, don't change this crappy thing
+vmachines_root:
+  key: vmachines_root
+  value: <%= "#{RAILS_ROOT}" %>/tmp/vmachines/
+  no_edit: true
+

@@ -17,13 +17,6 @@ public
   STATE_SUSPENDED = 3
   STATE_NOT_RUNNING = 5
 
-  # specifies where the new vmachines are placed
-  # TODO move this const into a settings file, like .yml
-  VMACHINES_ROOT = "#{RAILS_ROOT}/tmp/vmachines/"
-
-  # specifies where is the local storage cache
-  STORAGE_CACHE = "#{RAILS_ROOT}/tmp/storage_cache/"
-
   @@virt_conn = VmachinesHelper::Helper.virt_conn
 
   # show the web UI
@@ -112,8 +105,8 @@ public
       :storage_server => Setting.default_storage_server,  # where to get the image files (if they are not in cache)
 
       # TODO move the cache settings into a .yml file
-      :storage_cache => STORAGE_CACHE,              # where is the cachd directory
-      :vmachines_root => VMACHINES_ROOT,            # where is the vmachines directory
+      :storage_cache => Setting.storage_cache,              # where is the cachd directory
+      :vmachines_root => Setting.vmachines_root,            # where is the vmachines directory
 
       :arch => "i686",
       :emulator => "kvm", # ENHANCE currently we only support KVM
@@ -187,7 +180,7 @@ public
     # TODO recollect resources, such as vdisks, cdrom-iso, and network
     begin
       cleanup_args = {
-        :vmachines_root => VMACHINES_ROOT,
+        :vmachines_root => Setting.vmachines_root,
         :vmachine_name => dom_name
       }
       MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args)
