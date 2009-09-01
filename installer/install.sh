@@ -21,18 +21,7 @@ cd gems
 gem install --no-ri --no-rdoc -l *.gem
 cd ..
 
-
-if ! [ -e /usr/bin/rake ]
-then
-	ln /var/lib/gems/1.8/bin/rake /usr/bin/rake -s
-fi
-
-if ! [ -e /usr/bin/rails ]
-then
-	ln /var/lib/gems/1.8/bin/rails /usr/bin/rails -s
-fi
-
-if ! [ -e /usr/local/bin/ruby ]
+if [ ! -e /usr/local/bin/ruby ]
 then
 	ln /usr/bin/ruby /usr/local/bin/ruby -s
 fi
