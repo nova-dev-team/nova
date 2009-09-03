@@ -188,20 +188,38 @@ all_domains.each do |dom|
   info_of_vmachines += "<td>#{state_text}</td>"
   
   xml_desc = XmlSimple.xml_in dom.xml_desc
-  info_of_vmachines += "<td>" + xml_desc['devices'][0]['graphics'][0]['port'] + "</td><td>"
+  vnc_port =xml_desc['devices'][0]['graphics'][0]['port']
+  info_of_vmachines += "<td>#{vnc_port}</td><td>"
   
   if dom.info.state == VmachinesController::STATE_RUNNING
-    info_of_vmachines += "<button onclick='suspend_vmachine(\"#{dom.uuid}\")'>Suspend</button>"
+    info_of_vmachines += "<button onclick='suspend_vmachine(\"#{dom.uuid}\")'>Suspend</button>\n"
   elsif dom.info.state == VmachinesController::STATE_SUSPENDED
-    info_of_vmachines += "<button onclick='resume_vmachine(\"#{dom.uuid}\")'>Resume</button>"
+    info_of_vmachines += "<button onclick='resume_vmachine(\"#{dom.uuid}\")'>Resume</button>\n"
   end
-  
-  info_of_vmachines += "<button onclick='destroy_vmachine(\"#{dom.name}\", \"#{dom.uuid}\")'>Destroy !!!</button>"
-  info_of_vmachines += "<button id='btn-toggle-xml-def-#{dom.uuid}' onclick='$(\"#xml-def-#{dom.uuid}\").toggle(\"fast\")'>Toggle XML Definition</button></td></tr>"
+
+  info_of_vmachines += <<CONTROLLS_HTML
+<button onclick="destroy_vmachine('#{dom.name}', '#{dom.uuid}')">Destroy !!!</button>
+<button onclick="$('#xml-def-#{dom.uuid}').toggle('fast')">XML</button>
+<button onclick="$('#vnc-view-#{dom.uuid}').toggle('fast')">VNC</button>
+</td></tr>
+CONTROLLS_HTML
 
   info_of_vmachines += "<tr><td colspan=5><table width='100%' class='code' id='xml-def-#{dom.uuid}' style='display:none;'><tr><td><pre class='xml' name='xml_code' cols='160'>"
   info_of_vmachines += CGI.escapeHTML dom.xml_desc
   info_of_vmachines += "</pre></td></tr></table></td></tr>"
+
+  info_of_vmachines += <<VNC_HTML
+<tr><td colspan=5>
+<table width='100%' id='vnc-view-#{dom.uuid}' style='display:none;'>
+<tr><td>
+<applet CODE=VncViewer.class ARCHIVE=vncviewer.jar WIDTH=800 HEIGHT=600>
+  <param name=PORT value=#{vnc_port}>
+  <param name=PASSWORD value="nopass">
+</applet>
+</td></tr>
+</table>
+</tr>
+VNC_HTML
   
   counter += 1
 end
