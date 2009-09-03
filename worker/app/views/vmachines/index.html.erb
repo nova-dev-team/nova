@@ -197,7 +197,7 @@ all_domains.each do |dom|
     info_of_vmachines += "<button onclick='resume_vmachine(\"#{dom.uuid}\")'>Resume</button>\n"
   end
 
-  vnc_html = "<button onclick=\"$('#vnc-view-#{dom.uuid}').toggle('fast')\">VNC</button>" if dom.info_state != VmachinesController::STATE_NOT_RUNNING
+  vnc_html = "<button onclick=\"$('#vnc-view-#{dom.uuid}').toggle('fast')\">VNC</button>" if dom.info.state != VmachinesController::STATE_NOT_RUNNING
 
   info_of_vmachines += <<CONTROLLS_HTML
 <button onclick="destroy_vmachine('#{dom.name}', '#{dom.uuid}')">Destroy !!!</button>
