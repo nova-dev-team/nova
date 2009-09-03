@@ -188,7 +188,10 @@ all_domains.each do |dom|
   info_of_vmachines += "<td>#{state_text}</td>"
   
   xml_desc = XmlSimple.xml_in dom.xml_desc
-  vnc_port =xml_desc['devices'][0]['graphics'][0]['port']
+  vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
+  if vnc_port == "-1"
+    vnc_port = "Not allocated"
+  end
   info_of_vmachines += "<td>#{vnc_port}</td><td>"
   
   if dom.info.state == VmachinesController::STATE_RUNNING
