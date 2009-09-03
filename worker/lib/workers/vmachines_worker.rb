@@ -4,72 +4,7 @@ require 'fileutils'
 require 'ftools'
 require 'pp'
 require 'uri'
-#require 'net/scp'
 
-# About the resource caching policy
-#
-# 1 Caching convention
-#
-#   Files are cached to "storage_cache" folder (params[:storage_cache]).
-#   Copy-on-Write and readonly files only need to have one copy, but raw
-#   files could have multiple copies. We appand an random number as
-#   suffix to the resource filename to prevent overwriting. So, put it
-#   in example:
-#
-#   Original files on image server:
-#
-#     i1-sys-ubuntu_904.raw (raw file)
-#     i2-usr-winxp_sp3.qcow2 (copy-on-write)
-#     i3-usr-winxp_sp3_setup.iso (readonly)
-#   
-#   Cached:
-#
-#     i1-sys-ubuntu_904.raw.23234234 (cache1)
-#     i1-sys-ubuntu_904.raw.1212312312 (cache2)
-#     i1-sys-ubuntu_904.raw.13123124 (cache3)
-#     i2-usr-winxp_sp3.qcow2 (copy-on-write, only 1 copy required)
-#     i3-usr-winxp_sp3_setup.iso (readonly, only 1 copy required)
-#
-#
-# 2 Caching status, locking of image files
-#
-#   Image files need to be copied from server, in the mean time it cannot
-#   be used (image not ready). We need to add a few "status flags" to the images.
-#   Because we are not using database to store the status flags, we would
-#   store the status flags as files.
-#
-#   For every image, we need to know if it is ready, or is under copying process.
-#   If an image file named "F" is being copied, we will create a new empty file
-#   named "F.copying" to mark "F" as "under copying process".
-#
-#   For copy-on-write and readonly resource, we need to know which vmachines are
-#   using them. If it is still under use, it cannot be removed (to make room
-#   for more frequently used images). So if "F" is under use by vmachine "vm(name)", 
-#   an file "F.using.by.vm(name)" is created.
-#
-#   For raw disks, when they are copied, they are either directly moved to vmachines folder,
-#   or remain to be used in the cache direcotry. If a file "F.(random_suffix).taken.by.vm(name)" exists,
-#   it means the file under copying "F.(random_suffix)" is already taken, and will be used when
-#   finished copying. Else if the ".taken.by.vm(name)" file does not exist, it means this files
-#   could be used by new vmachines.
-#
-# 3 After vmachines are destroyed
-#
-#   If the image file is "user-image", it is sent back to image server.
-#   Else if the image file is "system-image", and the user has requested it to be changed
-#   as user-image, it will also be uploaded, and change to "user-image".
-#   Else (the image is "system-image", and not to be changed as "user-image"), the image
-#   is directly discarded.
-#
-#   F.save.to.uid.(uid)
-#   F.comment <- text file containing comments about the image file
-#
-# 
-# UPDATED (2009-08-16):
-#
-# * The system will use qcow2 format disk, so raw image files will NOT be used.
-#
- 
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
   
@@ -150,7 +85,21 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   # TODO upload image files onto storage server
   def do_cleanup args
     begin
-      logger.debug "*** [remove] #{args[:vmachines_root]}/#{args[:vmachine_name]}"
+      vm_dir = "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
+      logger.debug "doing cleanup in #{vm_dir}!"
+
+      Dir.foreach(vm_dir) do |entry|
+        if entry.end_with? ".upload"
+          file_to_upload = entry[0...-7]
+          progress = Progress.new
+          progress[:owner] = args[:vmachine_name]
+          progress[:info] = "uploading image '#{file_to_upload}'"
+          progress[:status] = "in progress"
+          progress.save
+          put_file "#{vm_dir}/#{file_to_upload}", "#{Setting.storage_server}/#{file_to_upload}"
+          Progress.delete progress
+        end
+      end
 
       # TODO check dom status, if healthy (has been successfully running)
       # then upload images marked with ".upload" flag back to storage
@@ -160,7 +109,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       Progress.delete_all ["owner = ?", args[:vmachine_name]]
 
       # remove local resource
-      FileUtils.rm_rf "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
+      logger.debug "*** [remove] #{vm_dir}"
+      FileUtils.rm_rf vm_dir
     rescue Exception => e
       logger.error e.pretty_inspect.to_s + "\n" + e.backtrace.pretty_inspect.to_s
     end
