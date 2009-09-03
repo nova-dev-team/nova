@@ -1,14 +1,18 @@
 module VdiskNaming
 
-  # return a string representing the type of vdisk
-  # could be "iso", "empty", "system", "system.cow", "user", "user.cow"i
-  def vdisk_type filename
+  def VdiskNaming.vdisk_type filename
     begin
       split = filename.split "-"
       return split[1]
     rescue
       raise "'#{filename}' is not in correct form!"
     end
+  end
+
+  # return a string representing the type of vdisk
+  # could be "iso", "empty", "system", "system.cow", "user", "user.cow"i
+  def vdisk_type filename
+    VdiskNaming.vdisk_type filename
   end
 
   def vdisk_id filename

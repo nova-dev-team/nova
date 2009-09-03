@@ -7,6 +7,8 @@ require 'pretty_file_size'
 module VmachinesHelper
   
   class Helper
+
+    include VdiskNaming
   
     @@virt_conn = Libvirt::open("qemu:///system")
 
@@ -29,9 +31,14 @@ CDROM_DESC
  
       if params[:hda] and params[:hda] != ""
         FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
+        if VdiskNaming::vdisk_type(params[:hda]).start_with? "system"
+          real_hda_filename = "vd-notsaved-hda.qcow2"
+        else
+          real_hda_filename = params[:hda]
+        end
         hda_desc = <<HDA_DESC
     <disk type='file' device='disk'>
-      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{params[:hda]}'/>
+      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{real_hda_filename}'/>
       <target dev='hda'/>
     </disk>
 HDA_DESC
@@ -39,9 +46,14 @@ HDA_DESC
 
       if params[:hdb] and params[:hdb] != ""
         FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
+        if VdiskNaming::vdisk_type(params[:hdb]).start_with? "system"
+          real_hdb_filename = "vd-notsaved-hdb.qcow2"
+        else
+          real_hdb_filename = params[:hdb]
+        end
         hdb_desc = <<HDB_DESC
     <disk type='file' device='disk'>
-      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{params[:hdb]}'/>
+      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{real_hdb_filename}'/>
       <target dev='hdb'/>
     </disk>
 HDB_DESC

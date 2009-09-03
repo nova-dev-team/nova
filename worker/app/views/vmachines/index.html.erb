@@ -22,6 +22,7 @@ function add_vmachine() {
   var hda = $("#new_vm_hda").val();
   var hdb = $("#new_vm_hdb").val();
   var cdrom = $("#new_vm_cdrom").val();
+  var extra_depend = $("#extra_depend").val();
   var boot_dev = $("#new_vm_boot_dev").val();
   
   // check args
@@ -56,6 +57,7 @@ function add_vmachine() {
       hda: hda,
       hdb: hdb,
       cdrom: cdrom,
+      depend: extra_depend,
       boot_dev: boot_dev
     },
     success: function() {
@@ -261,6 +263,7 @@ Boot Device: <select id="new_vm_boot_dev">
 Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
 Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
 CDROM (hdc, optional): <input type="text" id="new_vm_cdrom"/><br>
+Extra Dependency(separate with space): <input type="text" id="extra_depend" size=80><br>
 <button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
 
 <hr>

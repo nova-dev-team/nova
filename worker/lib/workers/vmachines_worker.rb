@@ -7,6 +7,8 @@ require 'uri'
 
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
+
+  include VdiskNaming
   
   @@virt_conn = VmachinesHelper::Helper.virt_conn
 
@@ -27,40 +29,14 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     progress[:owner] = params[:name]
     begin
       dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
-      vmachine_dir = "#{Setting.vmachines_root}/#{params[:name]}"
 
-      if params[:cdrom] and params[:cdrom] != ""
-        progress[:info] = "downloading cdrom image: #{params[:cdrom]}"
-        progress[:status] = "in progress"
-        progress.save
-
-        local_filename = request_resource "#{Setting.storage_server}/#{params[:cdrom]}", Setting.storage_cache
-        FileUtils.ln_s local_filename, "#{vmachine_dir}/#{params[:cdrom]}"
+      params[:depend].split.each do |dep|
+        get_resource dep, params[:name], progress
       end
 
-      if params[:hda] and params[:hda] != ""
-        progress[:info] = "downloading hda image: #{params[:hda]}"
-        progress[:status] = "in progress"
-        progress.save
-
-        local_filename = request_resource "#{Setting.storage_server}/#{params[:hda]}", Setting.storage_cache
-        FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hda]}"
-        qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hda]} -f qcow2 #{vmachine_dir}/#{params[:hda]}"
-        logger.debug "*** [cmd] #{qcow2_cmd}"
-        `#{qcow2_cmd}`
-      end
-
-      if params[:hdb] and params[:hdb] != ""
-        progress[:info] = "downloading hdb image: #{params[:hdb]}"
-        progress[:status] = "in progress"
-        progress.save
-
-        local_filename = request_resource "#{Setting.storage_server}/#{params[:hdb]}", Setting.storage_cache
-        FileUtils.ln_s local_filename, "#{vmachine_dir}/base.#{params[:hdb]}"
-        qcow2_cmd = "qemu-img create -b #{vmachine_dir}/base.#{params[:hdb]} -f qcow2 #{vmachine_dir}/#{params[:hdb]}"
-        logger.debug "*** [cmd] #{qcow2_cmd}"
-        `#{qcow2_cmd}`
-      end
+      get_resource params[:cdrom], params[:name], progress
+      get_resource params[:hda], params[:name], progress, "hda"
+      get_resource params[:hdb], params[:name], progress, "hdb"
 
       progress[:info] = "starting vmachine '#{params[:name]}'"
       progress[:status] = "in progress"
@@ -318,6 +294,40 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       raise "Resource scheme '#{scheme}' not known!"
     end
   end
+
+
+  def get_resource resource_name, vmachine_name, progress, device = nil
+    return if resource_name == nil or resource_name == ""
+
+    vmachine_dir = "#{Setting.vmachines_root}/#{vmachine_name}"
+
+    return if File.exist? "#{vmachine_dir}/#{resource_name}" # skip, if file already exists
+
+    progress[:info] = "downloading: #{resource_name}"
+    progress[:status] = "in progress"
+    progress.save
+
+    local_filename = request_resource "#{Setting.storage_server}/#{resource_name}", Setting.storage_cache
+    # TODO change ln-s to sth else
+
+    case vdisk_type resource_name
+    when "system"
+      FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
+      cow_disk_name = "vd-notsaved-#{device}.qcow2"
+      qcow2_cmd = "qemu-img create -b #{vmachine_dir}/#{resource_name} -f qcow2 #{vmachine_dir}/#{cow_disk_name}"
+      logger.debug "*** [cmd] #{qcow2_cmd}"
+      `#{qcow2_cmd}`
+    when "system.cow"
+      FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
+    # TODO "user", "user.cow"
+    when "iso"
+      FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
+    else
+      raise "'#{resource_name}' is not a valid resource name!"
+    end
+
+  end
+
 
 end
 
