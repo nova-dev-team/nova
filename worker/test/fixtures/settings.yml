@@ -1,10 +1,6 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-# one:
-#   column: value
-#
-# two:
-#   column: value
+# We use the crappy name "no_edit", bacause 'readonly' was already used by ActiveRecord
 
 # where is the disk images, cdrom iso files stored
 # Could be changed in web ui
@@ -17,13 +13,20 @@ storage_server:
 # for God's sake don't change it
 storage_cache:
   key: storage_cache
-  value: <%= "#{RAILS_ROOT}" %>/tmp/storage_cache/
+  value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/storage_cache/
   no_edit: true
 
 # where is the vmachines' running environment
 # again, for God's sake, don't change this crappy thing
 vmachines_root:
   key: vmachines_root
-  value: <%= "#{RAILS_ROOT}" %>/tmp/vmachines/
+  value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/vmachines/
+  no_edit: true
+
+
+# the filename for cached resource listing
+resource_list_cache:
+  key: resource_list_cache
+  value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/resource_list_cache
   no_edit: true
 

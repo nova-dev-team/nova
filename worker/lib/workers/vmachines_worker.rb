@@ -170,7 +170,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   def supervise
     logger.debug "Supervisor running at #{Time.now}"
     
-    storage_cache_root = "#{RAILS_ROOT}/tmp/storage_cache"
+    storage_cache_root = Setting.storage_cache
     FileUtils.mkdir_p storage_cache_root
 
     # supervise on stoarge cache (using .copying files)
@@ -250,7 +250,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split Setting.storage_server  # parse URI information
     list = VmachinesHelper::Helper.list_files Setting.storage_server
     if scheme == "file"
-      File.open("#{Setting.storage_cache}/cached_storage_server_filelist", "w") do |file|
+      File.open(Setting.resource_list_cache, "w") do |file|
         file.write Time.now.to_s + "\n"
         list.each do |entry|
           next if entry.start_with? "."

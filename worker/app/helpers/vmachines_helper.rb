@@ -85,7 +85,7 @@ XML_DESC
       # showing cached results
       lines = []
       begin
-        File.open("#{Setting.storage_cache}/cached_storage_server_filelist", "r") do |file|
+        File.open(Setting.resource_list_cache, "r") do |file|
           lines = file.readlines
         end
       rescue
@@ -94,8 +94,8 @@ XML_DESC
       return lines
     end
 
+    # used by vmachines worker's "update"
     def Helper.list_files dir_uri
-      # TODO caching
       scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split dir_uri  # parse URI information
     
       files_list = []
