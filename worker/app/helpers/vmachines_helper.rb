@@ -85,7 +85,7 @@ MAC_DESC
 #{hdb_desc if params[:hdb] and params[:hdb] != ""}
 #{cdrom_desc if params[:cdrom] and params[:cdrom] != ""}
 #{mac_desc if params[:mac] and params[:mac] != ""}
-    <graphics type='vnc' port='#{params[:vnc_port]}'/>
+    <graphics type='vnc' port='#{params[:vnc_port]}' listen='0.0.0.0'/>
   </devices>
 </domain>
 XML_DESC
