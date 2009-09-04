@@ -4,11 +4,12 @@ require 'fileutils'
 require 'ftools'
 require 'pp'
 require 'uri'
-
+require 'net/ftp'
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
 
   include VdiskNaming
+  include Util
   
   @@virt_conn = VmachinesHelper::Helper.virt_conn
 
@@ -175,18 +176,20 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     # update file listing
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split Setting.storage_server  # parse URI information
     list = VmachinesHelper::Helper.list_files Setting.storage_server
-    if scheme == "file"
-      File.open(Setting.resource_list_cache, "w") do |file|
-        file.write Time.now.to_s + "\n"
+    File.open(Setting.resource_list_cache, "w") do |file|
+      file.write Time.now.to_s + "\n"
+      if scheme == "file"
         list.each do |entry|
           next if entry.start_with? "."
           file.write File.size("#{path}/#{entry}").to_pretty_file_size + "\t#{entry}\n"
         end
+      elsif scheme == "ftp"
+        list.each do |entry|
+          file.write entry + "\n"
+        end
+      else
+        raise "Scheme '#{scheme}' not known!"
       end
-    elsif scheme == "ftp"
-      # TODO
-    else
-      raise "Resource scheme '#{scheme}' not known!"
     end
   end
 
@@ -255,6 +258,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     return local_to
   end
 
+
   # get a file from some uri, and save to a file
   #
   # assumption: from_uri accessable, in schemes of "ftp, scp(usually fail, don't use it), file, carrierfs?"
@@ -268,7 +272,10 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     if scheme == "file"
       FileUtils.cp path, to_file
     elsif scheme == "ftp"
-      # TODO FTP
+      username, password = Util::split_userinfo userinfo
+      Net::FTP.open(host, username, password) do |ftp|
+        ftp.getbinaryfile(path, to_file)
+      end
     else
       raise "Resource scheme '#{scheme}' not known!"
     end
@@ -282,7 +289,10 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     if scheme == "file"
       FileUtils.cp from_file, path
     elsif scheme == "ftp"
-      # TODO ftp
+      username, password = Util::split_userinfo userinfo
+      Net::FTP.open(host, username, password) do |ftp|
+        ftp.putbinaryfile(from_file, path)
+      end
     else
       raise "Resource scheme '#{scheme}' not known!"
     end

@@ -9,6 +9,7 @@ module VmachinesHelper
   class Helper
 
     include VdiskNaming
+    include Util
   
     @@virt_conn = Libvirt::open("qemu:///system")
 
@@ -116,6 +117,10 @@ XML_DESC
           files_list << entry
         end
       elsif scheme == "ftp"
+        username, password = Util::split_userinfo userinfo
+        Net::FTP.open(host, username, password) do |ftp|
+          files_list = ftp.list("*")
+        end
       else
         raise "Resource scheme '#{scheme}' not known!"
       end
