@@ -35,8 +35,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       end
 
       get_resource params[:cdrom], params[:name], progress
-      get_resource params[:hda], params[:name], progress, "hda"
-      get_resource params[:hdb], params[:name], progress, "hdb"
+      get_resource params[:hda], params[:name], progress, "hda", params[:uuid]
+      get_resource params[:hdb], params[:name], progress, "hdb", params[:uuid]
 
       progress[:info] = "starting vmachine '#{params[:name]}'"
       progress[:status] = "in progress"
@@ -58,7 +58,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   end
 
   # cleanup after a vmachine is destroyed
-  # TODO upload image files onto storage server
+  # The vmachines must have been successfully ran (must be a healthy one)
   def do_cleanup args
     begin
       vm_dir = "#{args[:vmachines_root]}/#{args[:vmachine_name]}"
@@ -76,10 +76,6 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
           Progress.delete progress
         end
       end
-
-      # TODO check dom status, if healthy (has been successfully running)
-      # then upload images marked with ".upload" flag back to storage
-      # server. Progress should be updated correctly
 
       # remove dirty progress information, if exists (ususlly when the machine failed to start)
       Progress.delete_all ["owner = ?", args[:vmachine_name]]
@@ -269,18 +265,11 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       FileUtils.cp path, to_file
     elsif scheme == "ftp"
       # TODO FTP
-# XXX Seems that scp sometimes fails
-#    elsif scheme == "scp"
-#      sep_index = userinfo.index ":"
-#      username = userinfo[0...sep_index]  # notice, ... rather than ..
-#      password = userinfo[(sep_index + 1)..-1]
-#      Net::SCP.download!(host, username, path, to_file, :password => password)
     else
       raise "Resource scheme '#{scheme}' not known!"
     end
   end
 
-  # TODO upload 'from_file' -> 'to_uri'
   def put_file from_file, to_uri
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split to_uri  # parse URI information
   
@@ -296,7 +285,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   end
 
 
-  def get_resource resource_name, vmachine_name, progress, device = nil
+  def get_resource resource_name, vmachine_name, progress, device = nil, uuid = nil
     return if resource_name == nil or resource_name == ""
 
     vmachine_dir = "#{Setting.vmachines_root}/#{vmachine_name}"
@@ -308,18 +297,20 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     progress.save
 
     local_filename = request_resource "#{Setting.storage_server}/#{resource_name}", Setting.storage_cache
-    # TODO change ln-s to sth else
 
     case vdisk_type resource_name
-    when "system"
+    when "system", "system.cow"
       FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
-      cow_disk_name = "vd-notsaved-#{device}.qcow2"
-      qcow2_cmd = "qemu-img create -b #{vmachine_dir}/#{resource_name} -f qcow2 #{vmachine_dir}/#{cow_disk_name}"
-      logger.debug "*** [cmd] #{qcow2_cmd}"
-      `#{qcow2_cmd}`
-    when "system.cow"
-      FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
-    # TODO "user", "user.cow"
+      if device != nil # when using this disk as a device (not extra dependency), we must make a COW disk based on it
+        cow_disk_name = "vd-notsaved-#{uuid}-#{device}.qcow2"
+        qcow2_cmd = "qemu-img create -b #{vmachine_dir}/#{resource_name} -f qcow2 #{vmachine_dir}/#{cow_disk_name}"
+        logger.debug "*** [cmd] #{qcow2_cmd}"
+        `#{qcow2_cmd}`
+      end
+    when "user", "user.cow"
+      FileUtils.mv local_filename, "#{vmachine_dir}/#{resource_name}"
+      # create upload sign file, user's data is always uploaded
+      `touch #{vmachine_dir}/#{resource_name}.upload`
     when "iso"
       FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
     else

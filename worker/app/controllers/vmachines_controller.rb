@@ -173,7 +173,7 @@ public
       return
     end
 
-    # TODO recollect resources, such as vdisks, cdrom-iso, and network
+    # recollect resources, such as vdisks, cdrom-iso, and network
     begin
       cleanup_args = {
         :vmachines_root => Setting.vmachines_root,
@@ -188,10 +188,10 @@ public
 
   end
 
-  # TODO check if this will work
-  def reboot
-    libvirt_action "reboot", params
-  end
+  # reboot fails on kvm
+#  def reboot
+#    libvirt_action "reboot", params
+#  end
 
   def suspend
     libvirt_action "suspend", params
@@ -199,12 +199,6 @@ public
 
   def resume
     libvirt_action "resume", params
-  end
-
-  def ensure_cached
-  end
-
-  def cache_status
   end
 
 private
