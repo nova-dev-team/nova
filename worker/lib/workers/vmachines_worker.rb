@@ -41,11 +41,15 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       progress[:info] = "starting vmachine '#{params[:name]}'"
       progress[:status] = "in progress"
       progress.save
-
-      dom.create
-
-      # delete the progress information, 'cause its no longer useful
-      Progress.delete progress
+      
+      begin
+        dom.create
+        Progress.delete progress
+      rescue Libvirt::Error => e
+        progress[:info] = "create vmachine failed, possibly caused by lack of resource"
+        progress[:status] = "create failure"
+        progress.save
+      end
 
     rescue Exception => e
       progress[:info] = "error on server side, check log files"
@@ -157,7 +161,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
       else # no such resource file, report error
         logger.debug "resource file '#{resource_filename}' is not found! deleting copying lock file"
-        # TODO delete copying lock file, update supervise file (try_count)
+        FileUtils.rm "#{resource_filename}.copying"
       end
     end
 
