@@ -3,6 +3,7 @@ class CreateVmachineInfos < ActiveRecord::Migration
     create_table :vmachine_infos do |t|
       t.column :vmachine_id,        :integer
       t.column :category,           :string, :limit => 20 # set max length to 20
+      t.column :status,             :integer, :default => -1
       t.column :message,            :string
       t.timestamps
     end

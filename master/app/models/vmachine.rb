@@ -3,10 +3,9 @@ class Vmachine < ActiveRecord::Base
   has_many :vmachine_infos
   
   def get_node_list
-    vc = self.vcluster 
     list = ""
     self.vcluster.vmachines.each do |vm|
-      list += vm.hostname + "\t" + vm.ip + "\n" 
+      list += vm.ip + "\t" + vm.hostname + "\n" 
     end
     return list
   end
@@ -15,4 +14,9 @@ class Vmachine < ActiveRecord::Base
     vc = self.vcluster
     return vc.package_list
   end
+  
+  def get_progress
+    
+  end
+  
 end

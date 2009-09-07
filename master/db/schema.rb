@@ -79,6 +79,7 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
   create_table "vmachine_infos", :force => true do |t|
     t.integer  "vmachine_id"
     t.string   "category",    :limit => 20
+    t.integer  "status",                    :default => -1
     t.string   "message"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -87,11 +88,13 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
   add_index "vmachine_infos", ["vmachine_id"], :name => "index_vmachine_infos_on_vmachine_id"
 
   create_table "vmachines", :force => true do |t|
-    t.string   "uuid",        :limit => 40, :null => false
-    t.string   "ip",          :limit => 20
-    t.string   "mac",         :limit => 24
-    t.string   "hostname",    :limit => 40
+    t.string   "uuid",              :limit => 40,                 :null => false
+    t.string   "ip",                :limit => 20
+    t.string   "mac",               :limit => 24
+    t.string   "hostname",          :limit => 40
     t.integer  "vcluster_id"
+    t.integer  "ceil_progress",                   :default => -1
+    t.text     "last_ceil_message"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

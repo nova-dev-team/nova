@@ -16,7 +16,6 @@ class NetSegment < ActiveRecord::Base
   #req = { 4=>1, 7=>5, 200=>3 }
   #dev = "eth1"
   def NetSegment._reconstruct(segment_begin, global_net_mask, req, dev)
-    
     NetSegment.delete_all
     
 		segment_begin = IpV4Address.calc_prev(segment_begin)
@@ -93,9 +92,11 @@ class NetSegment < ActiveRecord::Base
     end
   end
 
+=begin
   def test
     IpV4Address.string_to_binary("10.0.0.5")
   end
+=end
   
   def free
     #self.vcluster.net_segment = nil
@@ -103,6 +104,5 @@ class NetSegment < ActiveRecord::Base
     self.used = false
     self.save!
   end
-  
 end
 
