@@ -11,10 +11,7 @@ class PmachinesController < ApplicationController
       result << "#{pmachine.ip}:#{pmachine.port}"
     end
 
-    respond_to do |accept|
-      accept.html {render :text => result.to_json}
-      accept.json {render :json => result}
-    end
+    render_data result
   end
 
   def create

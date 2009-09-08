@@ -138,14 +138,27 @@ a.left_nav_current {
     $("#vmachine_list_holder").show();
     $("#pmachine_list_holder").hide();
     
-    var html_str = "";
-    
-    for (i = 0; i < 100; i++) {
-      html_str += "HELLO, this is VM " + i + "<br />";
-    }
-    
-    $("#vmachine_list_holder").html(html_str);
     do_layout();
+    $("#vmachine_list_holder").block({message: "Loading..."});
+
+    $.ajax({
+      type: "GET",
+      url: "/vmachines",
+      dataType: "json",
+      error: function(e) {
+        show_message("Failed to download list of vmachines! Check your network connection!");
+        $("#vmachine_list_holder").unblock();
+      },
+      success: function(result) {
+        var html_str = "";
+        for (i = 0; i < result.length; i++) {
+          html_str += result[i] + "<br>";
+        }
+        $("#vmachine_list_holder").html(html_str);
+        $("#vmachine_list_holder").unblock();
+      }
+    });
+ 
   }
   
   function list_physical_machines() {
@@ -159,7 +172,7 @@ a.left_nav_current {
 
     $.ajax({
       type: "GET",
-      url: "/pmachines/index",
+      url: "/pmachines",
       dataType: "json",
       error: function(e) {
         show_message("Failed to download list of pmachines! Check your network connection!");

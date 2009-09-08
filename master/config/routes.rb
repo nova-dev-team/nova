@@ -13,7 +13,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :vmachines
 
-  map.connect 'pmachines/index', :controller => 'pmachines', :action => 'index' # stupid hack
   map.resources :pmachines
 
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'

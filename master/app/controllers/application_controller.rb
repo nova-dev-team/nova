@@ -20,6 +20,13 @@ protected
   def redirect_unless_logged_in
     redirect_to login_url unless logged_in?
   end
+
+  def render_data data
+    respond_to do |accept|
+      accept.html {render :text => data.to_json}
+      accept.json {render :json => data}
+    end
+  end
   
   def render_result success, message, option = {}
     result = {:success => success, :message => message}.merge(option)
