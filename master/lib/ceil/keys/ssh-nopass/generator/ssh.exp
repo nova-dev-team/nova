@@ -1,0 +1,6 @@
+spawn ssh-keygen -C "" -f id_rsa
+expect "*passphrase*"
+send "\n"
+expect "*passphrase*"
+send "\n"
+expect eof

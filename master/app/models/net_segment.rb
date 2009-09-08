@@ -1,4 +1,5 @@
-CEIL_ROOT = "#{RAILS_ROOT}/lib/ceil/"
+#CEIL_ROOT = "#{RAILS_ROOT}/lib/ceil/"
+require "ceil_conf"
 
 require "#{CEIL_ROOT}/common/ip"
 require "#{CEIL_ROOT}/server/dhcp_conf"
@@ -73,7 +74,12 @@ class NetSegment < ActiveRecord::Base
     list = []
     ip = self.head_ip
     self.size.times do |n|
-      list << [self.name + "-#{n}", ip, IpV4Address.generate_mac(ip) ]
+      node = {:hostname => self.name + "-#{n}", 
+              :ip => ip,
+              :mac => IpV4Address.generate_mac(ip)
+             }
+      #list << [self.name + "-#{n}", ip, IpV4Address.generate_mac(ip) ]
+      list << node
       ip = IpV4Address.calc_next(ip)
     end
     return list
@@ -81,8 +87,19 @@ class NetSegment < ActiveRecord::Base
 
   public
 
+
+  #return a list contains
+  #list = [a, b, c..]
+  #each element has 3 attrs
+  # list.each |e|
+  #   puts e[:hostname]
+  #   puts e[:ip]
+  #   puts e[:mac]
+  # end
+  #that's all
+  
   def NetSegment.alloc(size, vcluster_id)
-    find(:all, :conditions => { :used => false}).each do |net|
+    find(:all, :conditions => { :used => false }).each do |net|
       if net.size >= size
         net.vcluster = Vcluster.find(vcluster_id)
         net.used = true
@@ -90,6 +107,8 @@ class NetSegment < ActiveRecord::Base
         return net._list
       end
     end
+    
+    return nil
   end
 
 =begin
