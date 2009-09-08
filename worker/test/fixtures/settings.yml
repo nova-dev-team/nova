@@ -6,7 +6,7 @@
 # Could be changed in web ui
 storage_server:
   key: storage_server
-  value: file:///home/santa/Downloads/
+  value: ftp://user:passwd@somewhere.com/
   no_edit: false
 
 # where is the local cache directory

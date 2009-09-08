@@ -20,7 +20,7 @@ protected
 
   # reply to client
   def render_result result
-    logger.debug "*** [reply] success=#{result[:success]}, message=#{result[:message]}"
+    logger.debug "*** [reply] success=#{result[:success]}, message=#{result[:message]}" if result[:success] and result[:message]
     respond_to do |accept|
       accept.json {render :json => result}
       accept.html {render :text => result.pretty_inspect}

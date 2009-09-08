@@ -15,7 +15,6 @@ class ApplicationController < ActionController::Base
 
 
 protected
-  ## TODO add some helper functions
   
   
   def redirect_unless_logged_in
@@ -27,7 +26,7 @@ protected
     respond_to do |accept|
       accept.json {render :json => result}
       accept.html {render :text => result.to_json}
-    end    
+    end
   end
   
   def render_failure message, option = {}
@@ -42,4 +41,19 @@ protected
     logged_in? and current_user.activated?
   end
 
+  def render_only_for group
+    if current_user and current_user.in_group? group
+      render :layout => "default"
+    else
+      render_error_no_privilege
+    end
+  end
+
+  def render_error_no_privilege
+    render :text => "You do not have enough privilege for this action!", :status => :forbidden
+  end
+
+  def render_error error_msg
+    render :text => error_msg
+  end
 end

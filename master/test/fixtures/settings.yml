@@ -5,3 +5,8 @@
 #
 # two:
 #   column: value
+
+storage_server:
+  key: storage_server
+  value: ftp://user:passwd@somewhere.com/
+

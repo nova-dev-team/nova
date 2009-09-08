@@ -5,6 +5,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :vclusters
 
+  # this is a stupid hack, to make "settings/edit" work good
+  map.connect 'settings/edit', :controller => 'settings', :action => 'edit'
+
   map.resources :settings
 
   map.resources :groups

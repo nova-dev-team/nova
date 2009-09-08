@@ -60,21 +60,6 @@ class AppController < ApplicationController
 
 private
 
-  def render_only_for group
-    if current_user.in_group? group
-      render :layout => "default"
-    else
-      render_error_no_privilege
-    end
-  end
-
-  def render_error_no_privilege
-    render :text => "You do not have enough privilege for this action!", :status => :forbidden
-  end
-
-  def render_error error_msg
-    render :text => error_msg
-  end
 
   def login_required
     redirect_to login_url unless logged_in?
