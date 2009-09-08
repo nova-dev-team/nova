@@ -3,9 +3,7 @@
 
 class AppController < ApplicationController
   
-  before_filter :login_required
-  
-## TODO check user privilege for all actions
+  before_filter :redirect_unless_logged_in
 
   def users
     if (current_user.in_group? "root") or (current_user.in_group? "admin")
@@ -56,12 +54,9 @@ class AppController < ApplicationController
     end
   end
 
-  
-
 private
 
-
-  def login_required
+  def redirect_unless_logged_in
     redirect_to login_url unless logged_in?
   end
 

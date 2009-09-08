@@ -49,6 +49,10 @@ protected
     end
   end
 
+  def login_required
+    render_error_no_privilege unless logged_in?
+  end
+
   def render_error_no_privilege
     render :text => "You do not have enough privilege for this action!", :status => :forbidden
   end

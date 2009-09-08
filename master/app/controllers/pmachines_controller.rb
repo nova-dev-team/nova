@@ -3,6 +3,8 @@ require 'rest_client'
 
 class PmachinesController < ApplicationController
 
+  before_filter :login_required
+
   def index
     result = []
     Pmachine.all.each do |pmachine|
