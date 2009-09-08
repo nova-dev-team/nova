@@ -11,7 +11,7 @@ class AppController < ApplicationController
     if (current_user.in_group? "root") or (current_user.in_group? "admin")
       render :template => 'app/users.html.erb', :layout => 'default'
     else
-      render_error "You do not have enough privilege for this action"
+      render_error_no_privilege
     end
   end
   
@@ -32,7 +32,7 @@ class AppController < ApplicationController
     render_only_for "root"
   end
   
-  def root_system_settings
+  def root_settings
     render_only_for "root"
   end
   
@@ -41,10 +41,6 @@ class AppController < ApplicationController
   end
   
   def user_resources
-    render_only_for "user"
-  end
-  
-  def user_groups
     render_only_for "user"
   end
 
@@ -56,7 +52,7 @@ class AppController < ApplicationController
     elsif current_user.in_group? "user"
       render :template => 'app/user_home.html.erb', :layout => 'default'
     else
-      render_error "You do not have enough privilege for this action"
+      render_error_no_privilege
     end
   end
 
@@ -68,8 +64,12 @@ private
     if current_user.in_group? group
       render :layout => "default"
     else
-      render_error "You do not have enough privilege for this action"
+      render_error_no_privilege
     end
+  end
+
+  def render_error_no_privilege
+    render :text => "You do not have enough privilege for this action!", :status => :forbidden
   end
 
   def render_error error_msg

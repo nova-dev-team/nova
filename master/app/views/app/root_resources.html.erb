@@ -107,7 +107,7 @@ a.left_nav_current {
     $("#layout_left_pane").css("overflow", "hidden");
     
     // by default. show storage servers
-    list_storage_servers();
+    list_network_pools();
     
     
     $('#left_nav_bar_bottom_add_btn').menu({ 
@@ -132,7 +132,7 @@ a.left_nav_current {
   
   
   function list_vm_images() {
-    $("#left_nav_btn_list_storage_servers").removeClass("left_nav_current");
+    $("#left_nav_btn_list_network_pools").removeClass("left_nav_current");
     $("#left_nav_btn_list_vm_images").addClass("left_nav_current");
     $("#vm_images_list_holder").show();
     $("#storage_servers_list_holder").hide();
@@ -147,19 +147,19 @@ a.left_nav_current {
     do_layout();
   }
   
-  function list_storage_servers() {
+  function list_network_pools() {
     $("#left_nav_btn_list_vm_images").removeClass("left_nav_current");
-    $("#left_nav_btn_list_storage_servers").addClass("left_nav_current");
-    $("#storage_servers_list_holder").show();
+    $("#left_nav_btn_list_network_pools").addClass("left_nav_current");
+    $("#network_pools_list_holder").show();
     $("#vm_images_list_holder").hide();
     
     var html_str = "";
     
     for (i = 0; i < 10; i++) {
-      html_str += "HELLO, this is Storage server " + i + "<br />";
+      html_str += "HELLO, this is network pool " + i + "<br />";
     }
     
-    $("#storage_servers_list_holder").html(html_str);
+    $("#network_pools_list_holder").html(html_str);
     do_layout();
   }
   
@@ -176,17 +176,17 @@ a.left_nav_current {
 <% content_for :layout_left_frame do %>
 
 
-<a id="left_nav_btn_list_storage_servers" class="left_nav_button left_nav_current" href="#" onclick="list_storage_servers()">
-  Storage Servers
+<a id="left_nav_btn_list_network_pools" class="left_nav_button left_nav_current" href="#" onclick="list_network_pools()">
+  Network Pools
 </a>
 
-<a id="left_nav_btn_list_vm_image" class="left_nav_button" href="#" onclick="list_vm_images()">
+<a id="left_nav_btn_list_vm_images" class="left_nav_button" href="#" onclick="list_vm_images()">
   Virtual Machine Images
 </a>
 
 
 <div id="vm_images_list_holder" class="nav_bar_list_holder"></div>
-<div id="storage_servers_list_holder" class="nav_bar_list_holder"></div>
+<div id="network_pools_list_holder" class="nav_bar_list_holder"></div>
 
 <div id="left_nav_bottom">
 
@@ -195,7 +195,7 @@ a.left_nav_current {
     <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
     <div id="left_nav_add_btn_menu" class="hidden">
       <ul>
-	      <li><a href="#">Storage Server</a></li>
+	      <li><a href="#">Network Pool</a></li>
 	      <li><a href="#">Virtual Machine Image</a></li>
       </ul>
     </div>

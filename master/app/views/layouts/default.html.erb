@@ -519,7 +519,7 @@ input, select, textarea {
   %>
   <%= 
     ## system settings such as KFS settings, and shutting down server
-    nav_bar_item "System Settings", "/app/root_system_settings"
+    nav_bar_item "Settings", "/app/root_settings"
   %>
   
 <% elsif current_user.in_group? "admin" %>
@@ -538,7 +538,6 @@ input, select, textarea {
   <%= nav_bar_item "Home", "/app/home" %>
   <%= nav_bar_item "Machines", "/app/user_machines" %>
   <%= nav_bar_item "Resources", "/app/user_resources" %>
-  <%= nav_bar_item "Groups", "/app/user_groups" %>
 <% end %>
     
   </ul>
