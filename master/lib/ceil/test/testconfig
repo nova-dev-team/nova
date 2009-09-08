@@ -1,8 +1,0 @@
-require File.dirname(__FILE__) + "/../server/cluster_config_creator"
-
-#nl="192.168.0.116 ubuntu-c01\n192.168.0.121 ubuntu-c02"
-#il="common\nssh-nopass"
-#cn="vm2test"
-
-#ccc = ClusterConfigurationCreator.new(nl, il, cn)
-#ccc.create
