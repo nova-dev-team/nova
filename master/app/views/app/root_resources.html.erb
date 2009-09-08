@@ -106,8 +106,8 @@ a.left_nav_current {
     // override default left pane overflow settings
     $("#layout_left_pane").css("overflow", "hidden");
     
-    // by default. show storage servers
-    list_network_pools();
+    // by default. show vmachine images
+    list_vm_images();
     
     
     $('#left_nav_bar_bottom_add_btn').menu({ 
@@ -135,7 +135,7 @@ a.left_nav_current {
     $("#left_nav_btn_list_network_pools").removeClass("left_nav_current");
     $("#left_nav_btn_list_vm_images").addClass("left_nav_current");
     $("#vm_images_list_holder").show();
-    $("#storage_servers_list_holder").hide();
+    $("#network_pools_list_holder").hide();
     
     var html_str = "";
     
@@ -175,15 +175,13 @@ a.left_nav_current {
 
 <% content_for :layout_left_frame do %>
 
-
-<a id="left_nav_btn_list_network_pools" class="left_nav_button left_nav_current" href="#" onclick="list_network_pools()">
-  Network Pools
-</a>
-
 <a id="left_nav_btn_list_vm_images" class="left_nav_button" href="#" onclick="list_vm_images()">
   Virtual Machine Images
 </a>
 
+<a id="left_nav_btn_list_network_pools" class="left_nav_button left_nav_current" href="#" onclick="list_network_pools()">
+  Network Pools
+</a>
 
 <div id="vm_images_list_holder" class="nav_bar_list_holder"></div>
 <div id="network_pools_list_holder" class="nav_bar_list_holder"></div>

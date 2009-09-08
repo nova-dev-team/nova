@@ -29,7 +29,11 @@ System Overview
 <tr>
 <td>
 
-Currently, this system has <%= (User.all.select {|u| !u.is_admin? and !u.is_root? }).size %> normal users.
+<%
+  normal_user_count = (User.all.select {|u| !u.is_admin? and !u.is_root? }).size
+%>
+
+Currently, this system has <%= normal_user_count %> normal <%= normal_user_count > 1 ? "users" : "user" %>.
 
 <p />
 

@@ -34,9 +34,15 @@ System Overview
 <tr>
 <td>
 
-Currently, this system has <%= User.all.size %> members:
-that is <%= (User.all.select {|u| !u.is_admin? and !u.is_root? }).size %> normal users,
-<%= (User.all.select {|u| u.is_admin? }).size %> adminstrators, and you. 
+<%
+  all_user_count = User.all.size
+  admin_user_count = (User.all.select {|u| u.is_admin? }).size
+  normal_user_count = (User.all.select {|u| !u.is_admin? and !u.is_root? }).size
+%>    
+
+Currently, this system has <%= all_user_count %> <%= all_user_count > 1 ? "members" : "memeber" %>:
+that is <%= admin_user_count %> <%= admin_user_count > 1 ? "administrators" : "administrator" %>,
+<%= normal_user_count %> normal <%= normal_user_count > 1 ? "users" : "user" %>, and you. 
 
 <p />
 
