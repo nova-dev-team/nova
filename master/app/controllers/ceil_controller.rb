@@ -7,28 +7,17 @@ class CeilController < ApplicationController
 		respond_to do |accept|
 		  remote_ip = request.remote_ip
 		  
-		  vc = Vcluster.new
-		  vc.cluster_name = "gundam"
-		  vc.package_list = "common\nssh-nopass\n"
-		  vc.save
-		  
-		  vm = Vmachine.new
-		  vm.uuid = "12312"
-		  vm.hostname = "ubun-nfs"
-		  vm.ip = "192.168.0.110"
-		  vm.vcluster = vc
-		  vm.save
-		  
 		  vm = Vmachine.find_by_ip(remote_ip)
 		  #logger.debug "found: " + vm.to_s
 		  host_name = ""
 		  node_list = ""
+		  server_addr = ""
 		  package_list = ""
 		  cluster_name = ""
-		  
 		  if vm
 		    host_name = vm.hostname
 		    node_list = vm.get_node_list
+		    server_addr = vm.vcluster.net_segment.head_ip
 		    package_list = vm.get_package_list
 		    cluster_name = vm.vcluster.cluster_name
 		  end
@@ -37,9 +26,9 @@ class CeilController < ApplicationController
 		           "cluster_name" => cluster_name, 
 		           "node_list" => node_list, 
 		           "package_list" => package_list,
-		           "package_server" => CEIL_PACKAGE_SERVER,
+		           "package_server" => server_addr,
 		           "package_server_type" => CEIL_PACKAGE_SERVER_TYPE,
-		           "key_server" => CEIL_KEY_SERVER,
+		           "key_server" => server_addr,
 		           "key_server_type" => CEIL_KEY_SERVER_TYPE} 
 		  
 			accept.json { render :json => cjson }

@@ -9,7 +9,6 @@ class CreateNetSegments < ActiveRecord::Migration
       t.column :used, :boolean, :default => false
       t.column :lock_version, :integer, :default => 0
       t.timestamps
-        
     end
   end
 

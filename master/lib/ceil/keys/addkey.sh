@@ -1,0 +1,1 @@
+/root/ceil/v2/server/addkey.sh
