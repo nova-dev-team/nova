@@ -5,7 +5,7 @@ class VmachinesController < ApplicationController
   def index
     result = []
     Vmachine.all.each do |vmachine|
-      result << "v#{vmachine.id}:#{vmachine.name}"
+      result << "v#{vmachine.id}:#{vmachine.uuid}"
     end
 
     render_data result
