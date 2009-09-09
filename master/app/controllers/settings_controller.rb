@@ -1,5 +1,10 @@
 # system settings, determines system behavior
 
+require 'rubygems'
+require 'rest_client'
+require 'json'
+require 'pp'
+
 class SettingsController < ApplicationController
 
   before_filter :render_only_for_root
@@ -33,11 +38,23 @@ class SettingsController < ApplicationController
           old_value = setting.value
           new_value = params[:value]
           setting.value = new_value
+
+          # save new setting into database
           if setting.save
             render_result true, "Successfully changed setting.", :old_value => old_value, :new_value => new_value
           else
             render_failure "Failed to save new setting!"
+            return
           end
+
+          # then all settings will be sent to pmachine workers
+          Pmachine.all.each do |pmachine|
+            pmachine_addr = "http://#{pmachine.ip}:#{pmachine.port}"
+            reply = RestClient.post "#{pmachine_addr}/settings/edit.json", :key => params[:key], :value => params[:value]
+            #result = JSON.parse(reply)
+            #pp result
+          end
+
         else
           render_failure "Key '#{params[:key]}' is readonly!"
         end

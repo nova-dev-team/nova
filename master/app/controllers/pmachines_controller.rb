@@ -64,6 +64,12 @@ private
           render_failure "Failed to authenticate by 'whoami' on '#{pmachine_addr}', check if it is running as an worker!"
           return
         end
+
+        #and then update all settings for that pmachine
+        Setting.all.each do |setting|
+          RestClient.post "#{pmachine_addr}/settings/edit.json", :key => setting.key, :value => setting.value
+        end
+
       rescue Errno::EHOSTUNREACH => e
         render_failure "Failed to connect '#{pmachine_addr}'!"
         return
