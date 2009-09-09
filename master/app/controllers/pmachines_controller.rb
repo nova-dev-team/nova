@@ -8,7 +8,12 @@ class PmachinesController < ApplicationController
   def index
     result = []
     Pmachine.all.each do |pmachine|
-      result << "#{pmachine.ip}:#{pmachine.port}"
+      result << {
+        :ip => pmachine.ip,
+        :port => pmachine.port,
+        :vnc_first => pmachine.vnc_first,
+        :vnc_last => pmachine.vnc_last
+      }
     end
 
     render_data result

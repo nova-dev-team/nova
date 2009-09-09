@@ -137,6 +137,7 @@ a.left_nav_current {
     $("#left_nav_btn_list_vmachine").addClass("left_nav_current");
     $("#vmachine_list_holder").show();
     $("#pmachine_list_holder").hide();
+    $("#pmachines_overview").hide();
     
     do_layout();
     refresh_vmachines();
@@ -147,6 +148,7 @@ a.left_nav_current {
     $("#left_nav_btn_list_pmachine").addClass("left_nav_current");
     $("#pmachine_list_holder").show();
     $("#vmachine_list_holder").hide();
+    $("#pmachines_overview").show();
 
     do_layout();
     refresh_pmachines(); 
@@ -154,6 +156,7 @@ a.left_nav_current {
 
   function refresh_pmachines() {
     $("#pmachine_list_holder").block({message: "Loading..."});
+    $("#layout_center_pane").block({message: "Loading..."});
 
     $.ajax({
       type: "GET",
@@ -162,14 +165,42 @@ a.left_nav_current {
       error: function(e) {
         show_message("Failed to download list of pmachines! Check your network connection!");
         $("#pmachine_list_holder").unblock();
+        $("#layout_center_pane").unblock();
       },
       success: function(result) {
-        var html_str = "";
+        var list_html = "";
         for (i = 0; i < result.length; i++) {
-          html_str += result[i] + "<br>";
+          pm = result[i];
+          list_html += pm.ip + ":" + pm.port + ", vnc=" + pm.vnc_first + "-" + pm.vnc_last + "<br>";
         }
-        $("#pmachine_list_holder").html(html_str);
+        $("#pmachine_list_holder").html(list_html);
         $("#pmachine_list_holder").unblock();
+
+        var iptable_cmd = "";
+        <%
+          master_internet_ip = (Setting.find_by_key "master_internet_ip").value
+          master_intranet_ip = (Setting.find_by_key "master_intranet_ip").value
+
+          def not_blank? value
+            value and value != ""
+          end
+        %>
+        <% if not_blank? master_internet_ip and not_blank? master_intranet_ip %>
+        for (i = 0; i < result.length; i++) {
+          pm = result[i];
+          for (p = pm.vnc_first; p <= pm.vnc_last; p++) {
+            iptable_cmd += "iptables -t nat -A PREROUTING -d <%= master_internet_ip %> -p tcp --dport " + p + " -j DNAT --to-destination " + pm.ip +  ":" + p + "\n";
+            iptable_cmd += "iptables -t nat -A POSTROUTING -d " + pm.ip + " -p tcp --dport " + p +  " -j SNAT -to <%= master_intranet_ip %>\n";
+          }
+          iptable_cmd += "\n";
+        }
+        iptable_cmd += "iptables-save";
+        <% else %>
+          // master ip not set
+          iptable_cmd = "You should set 'master_internet_ip', 'master_intranet_ip' in 'Settings' page.";
+        <% end-%>
+        $("#iptable_cmd_holder").html(iptable_cmd);
+        $("#layout_center_pane").unblock();
       }
     }); 
   }
@@ -362,6 +393,27 @@ a.left_nav_current {
 %>
 
 <% content_for :layout_center_frame do %>
+
+
+<div id="pmachines_overview" style="display:none;">
+<p align="center">
+iptables setting: Ensure the following commands have been executed on master node.
+<table>
+  <tr>
+    <td>
+      <pre>
+        <div id="iptable_cmd_holder" />
+      </pre>
+    </td>
+  </tr>
+</table>
+
+<hr>
+
+</p>
+</div>
+
+
 
 <div id="add_pmachine_dialog" style="display:none;">
 <p align="center">

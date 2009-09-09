@@ -10,3 +10,11 @@ storage_server:
   key: storage_server
   value: ftp://user:passwd@somewhere.com/
 
+master_intranet_ip:
+  key: master_intranet_ip
+  value: 
+
+master_internet_ip:
+  key: master_internet_ip
+  value:
+
