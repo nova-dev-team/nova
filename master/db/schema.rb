@@ -75,6 +75,9 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
   end
 
   create_table "vdisks", :force => true do |t|
+    t.string   "raw_name",     :limit => 100
+    t.string   "display_name"
+    t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

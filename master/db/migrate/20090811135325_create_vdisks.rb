@@ -1,7 +1,9 @@
 class CreateVdisks < ActiveRecord::Migration
   def self.up
     create_table :vdisks do |t|
-
+      t.column :raw_name, :string, :limit => 100
+      t.column :display_name, :string
+      t.column :description, :string
       t.timestamps
     end
   end

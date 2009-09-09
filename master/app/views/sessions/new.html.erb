@@ -360,6 +360,13 @@ html>body #page {
     
     var left_origin = (getWindowWidth() - panel.getWidth()) / 2 - page_border_width;
     var top_origin = (getWindowHeight() - panel.getHeight()) / 2 - page_border_width;
+
+    // FIX on 090909: when browser window is too small, don't do center layout
+    if (left_origin < 0 || top_origin < 0) {
+      left_origin = Math.max(0, left_origin);
+      top_origin = Math.max(0, top_origin);
+      // TODO show scrollbars
+    }
     
     if (_resizing_fix_090630) {
       left_origin += page_border_width;

@@ -204,6 +204,34 @@ a.left_nav_current {
       refresh_vmachines();
     }
   }
+
+  var new_pmachine_dialog;
+
+  function add_pmachine() {
+    if (new_pmachine_dialog == null) {
+      new_pmachine_dialog = $("#add_pmachine_dialog").dialog({
+        modal: true,
+        width: 500,
+        height: $.browser.msie ? 520 : 250, // IE has layout problems
+        resizable: false,
+        draggable: $.browser.msie == false, // IE has layout problems
+        hide: "slide",
+        show: "slide",
+        title: "Add new pmachine",
+        buttons: {
+          "OK": function(e) {
+            // TODO check IP format
+            list_physical_machines();
+            $(this).dialog("close");
+          },
+          "Cancel": function(e) {
+            $(this).dialog("close");
+          }
+        }
+      });
+    }
+    new_pmachine_dialog.dialog("open");
+  }
   
 </script>
   
@@ -237,7 +265,7 @@ a.left_nav_current {
     <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
     <div id="left_nav_add_btn_menu" class="hidden">
       <ul>
-	      <li><a href="#">Physical Machine</a></li>
+	      <li><a href="#" onclick="add_pmachine()">Physical Machine</a></li>
 	      <li><a href="#">Virtual Machine</a></li>
 	      <li><a href="#">Virtual Cluster</a></li>
       </ul>
@@ -257,6 +285,24 @@ a.left_nav_current {
 
 
 <% content_for :layout_center_frame do %>
+
+<div id="add_pmachine_dialog" style="display:none;">
+<p align="center">
+  <table>
+    <tr>
+      <td>Pmachine IP</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="new_pmachine_ip" /></td>
+    </tr>
+    <tr>
+      <td>Port</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="new_pmachine_port" value="3000" /></td>
+    </tr>
+  </table>
+</p>
+</div>
+
 
 
 <% end -%>
