@@ -70,11 +70,14 @@ private
       rescue Errno::ECONNREFUSED => e
         render_failure "Connection to '#{pmachine_addr}' was refused!"
         return
+      rescue Errno::ETIMEDOUT => e
+        render_failure "Request to '#{pmachine_addr}' timeout!"
+        return
       rescue RestClient::ResourceNotFound => e
         render_failure "Failed to authenticate '#{pmachine_addr}', check if it is running as an worker!"
         return
       rescue RestClient::RequestTimeout
-        render_failure "Request timeout!"
+        render_failure "Requet to '#{pmachine_addr}' timeout!"
         return
       end
 
