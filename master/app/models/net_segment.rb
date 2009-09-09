@@ -11,11 +11,18 @@ class NetSegment < ActiveRecord::Base
   #protected
   #public
   
+  #rewrite dhcp/nic configuration file on master, and sync to database
+  #before call this method, execute first_run.sh once to get configuration file template
+  # eg. 
+  #     cp /etc/dhcp3/dhcpd.conf CEIL_ROOT/server/template/
+  #     cp /etc/network/interfaces CEIL_ROOT/server/template/
   #example
   #segment_begin = "10.0.10.0"
   #global_net_mask = "255.255.0.0"
   #req = { 4=>1, 7=>5, 200=>3 }
   #dev = "eth1"
+  #
+  
   def NetSegment._reconstruct(segment_begin, global_net_mask, req, dev)
     NetSegment.delete_all
     
@@ -70,23 +77,21 @@ class NetSegment < ActiveRecord::Base
 		dhcp.write_to_system
 	end 
   
-  def _list
-    list = []
+  
+  def list
+    ls = []
     ip = self.head_ip
     self.size.times do |n|
+      ip = IpV4Address.calc_next(ip)
       node = {:hostname => self.name + "-#{n}", 
               :ip => ip,
               :mac => IpV4Address.generate_mac(ip)
              }
-      #list << [self.name + "-#{n}", ip, IpV4Address.generate_mac(ip) ]
-      list << node
-      ip = IpV4Address.calc_next(ip)
+      #ls << [self.name + "-#{n}", ip, IpV4Address.generate_mac(ip) ]
+      ls << node
     end
-    return list
+    return ls
   end
-
-  public
-
 
   #return a list contains
   #list = [a, b, c..]
@@ -98,13 +103,12 @@ class NetSegment < ActiveRecord::Base
   # end
   #that's all
   
-  def NetSegment.alloc(size, vcluster_id)
+  def NetSegment.alloc(size)
     find(:all, :conditions => { :used => false }).each do |net|
       if net.size >= size
-        net.vcluster = Vcluster.find(vcluster_id)
         net.used = true
         net.save! rescue next
-        return net._list
+        return net
       end
     end
     

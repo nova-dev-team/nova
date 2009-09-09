@@ -1,4 +1,4 @@
-CEIL_ROOT = "#{RAILS_ROOT}/lib/ceil/"
+CEIL_ROOT = "#{RAILS_ROOT}/lib/ceil"
 
 #which nic of master handles ceil
 CEIL_NETWORK_INTERFACE = "eth1"

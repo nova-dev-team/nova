@@ -1,4 +1,4 @@
-
+require "ceil_conf"
 require "uuidtools"
 
 require "#{CEIL_ROOT}/server/cluster_config_creator"
@@ -24,19 +24,24 @@ class Vcluster < ActiveRecord::Base
   #     puts vm.last_ceil_message # <--last message from ceil client on vmachine
   #   end
   #
-  
-  def Vcluster.allocate(cluster_name, package_list, machine_count)
+ 
+  def Vcluster.alloc(cluster_name, package_list, machine_count)
     vc = Vcluster.new
     vc.cluster_name = cluster_name
     vc.package_list = package_list
     vc.save
     
-    list = NetSegment.alloc(machine_count, vc.id)
-    if (!list)
+    net = NetSegment.alloc(machine_count)
+    
+    if (!net)
       vc.delete
       return nil
     end
     
+    net.vcluster = vc
+    net.save
+
+    list = net.list
     node_list = ""
     
     list.each do |node|
@@ -49,6 +54,8 @@ class Vcluster < ActiveRecord::Base
       vm.save
       
       node_list = node_list + "#{vm.ip}\t#{vm.hostname}\n"
+      machine_count -= 1
+      break if machine_count <= 0
     end
     
     ccc = ClusterConfigurationCreator.new(node_list, package_list, cluster_name)
@@ -57,7 +64,6 @@ class Vcluster < ActiveRecord::Base
     return vc
   end
 end
-
 
 
 

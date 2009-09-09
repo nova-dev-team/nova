@@ -30,7 +30,7 @@ class NetworkInterfaceConfigFile
 	end
 
 	def write_to_system
-		ServerSettings.write(@content, SEREVR_NETWORK_INTERFACE_FILE_PATH)
+		ServerSettings.write(@content, SERVER_NETWORK_INTERFACE_FILE_PATH)
 	end
 end
 

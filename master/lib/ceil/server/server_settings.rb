@@ -17,6 +17,7 @@ module ServerSettings
 		content << ""
 		note = `date "+%Y%m%d%H%M"`.chomp
 		#system "mv #{config_file} #{config_file}.backup.#{note}"
+		
 		config_file = "/tmp/" + File.basename(config_file)
 
 		begin

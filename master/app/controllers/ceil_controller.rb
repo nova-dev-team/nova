@@ -6,6 +6,10 @@ class CeilController < ApplicationController
 
   # TODO by santa: login required? what about the safety of ceil controller? If anonymous user could controll Ceil, there might be security problems
 
+  # login not required, if virtual machine has fixed IP
+  #	see: remote_ip = request.remote_ip
+  
+  
 	def retrieve
 		respond_to do |accept|
 		  remote_ip = request.remote_ip
