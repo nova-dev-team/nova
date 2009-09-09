@@ -1,15 +1,11 @@
 class GroupsController < ApplicationController
 
+  before_filter :require_admin_privilege
+
   include GroupsHelper
   def index
-    respond_to do |accept|
-      accept.json {
-        render :text => Group.all.collect{|g| g.name}.to_json
-      }
-      accept.html {
-        # render index.html.erb
-      }
-    end
+    result = Group.all.collect{|g| g.name}
+    render_data result
   end
 
 end

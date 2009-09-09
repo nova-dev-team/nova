@@ -60,6 +60,10 @@ protected
     render_error_no_privilege unless logged_in?
   end
 
+  def require_admin_privilege
+    render_error_no_privilege unless current_user and (current_user.in_group? "root" or current_user.in_group? "admin")
+  end
+
   def render_error_no_privilege
     render :text => "You do not have enough privilege for this action!", :status => :forbidden
   end

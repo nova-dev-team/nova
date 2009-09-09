@@ -6,14 +6,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :vclusters
 
   # this is a stupid hack, to make "settings/edit" work good
-  map.connect 'settings/edit', :controller => 'settings', :action => 'edit'
-  map.resources :settings
+#  map.connect 'settings/edit', :controller => 'settings', :action => 'edit'
+#  map.resources :settings
 
   map.resources :groups
 
   map.resources :vmachines
-
-  map.resources :pmachines
 
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'
   map.login '/login', :controller => 'sessions', :action => 'new'
