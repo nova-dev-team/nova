@@ -229,6 +229,24 @@ a.left_nav_current {
     return true;
   }
 
+  function validate_vnc_range(text) {
+    if (text == null || text.length < 3) {
+      return false;
+    }
+    splt = text.split("-");
+    if (splt.length != 2) {
+      return false;
+    }
+    for (i = 0; i < text.length; i++) {
+      var ch = text[i];
+      if (ch == '-')
+        continue;
+      if (ch < '0' || ch > '9')
+        return false;
+    }
+    return true;
+  }
+
   var new_pmachine_dialog;
 
   function add_pmachine() {
@@ -236,7 +254,7 @@ a.left_nav_current {
       new_pmachine_dialog = $("#add_pmachine_dialog").dialog({
         modal: true,
         width: 500,
-        height: $.browser.msie ? 520 : 250, // IE has layout problems
+        height: $.browser.msie ? 570 : 300, // IE has layout problems
         resizable: false,
         draggable: $.browser.msie == false, // IE has layout problems
         hide: "slide",
@@ -245,33 +263,44 @@ a.left_nav_current {
         buttons: {
           "OK": function(e) {
             var ip_text = $("#new_pmachine_ip").val();
-            if (validate_ip_addr(ip_text)) {
-              var port_text = $("#new_pmachine_port").val();
-              this_dialog = $(this);
-              
-              $.ajax({
-                type: "POST",
-                url: "/pmachines/create",
-                data: {
-                  ip: ip_text,
-                  port: port_text
-                },
-                dataType: 'json',
-                error: function(e) {
-                  this_dialog.dialog("close");
-                  show_message("Failed to connect server! Check your network connection!");
-                },
-                success: function(result) {
-                  this_dialog.dialog("close");
-                  if (result.success) {
-                    list_physical_machines();
-                  } else {
-                    show_message("Failed to add new pmachine! Server error message => " + result.message);
-                  }
-                }
-              });
-
+            if (validate_ip_addr(ip_text) == false) {
+              $("#new_pmachine_ip").val("INVALID IP ADDRESS!");
+              return;
             }
+
+            var vnc_text = $("#new_pmachine_vnc").val();
+            if (validate_vnc_range(vnc_text) == false) {
+              $("#new_pmachine_vnc").val("INVALID VNC PORTS RANGE");
+              return;
+            }
+            vnc_splt = vnc_text.split("-");
+
+            var port_text = $("#new_pmachine_port").val();
+            this_dialog = $(this);
+            
+            $.ajax({
+              type: "POST",
+              url: "/pmachines/create",
+              data: {
+                ip: ip_text,
+                port: port_text,
+                vnc_first: vnc_splt[0],
+                vnc_last: vnc_splt[1]
+              },
+              dataType: 'json',
+              error: function(e) {
+                this_dialog.dialog("close");
+                show_message("Failed to connect server! Check your network connection!");
+              },
+              success: function(result) {
+                this_dialog.dialog("close");
+                if (result.success) {
+                  list_physical_machines();
+                } else {
+                  show_message("Failed to add new pmachine! Server error message => " + result.message);
+                }
+              }
+            });
 
           },
           "Cancel": function(e) {
@@ -332,8 +361,6 @@ a.left_nav_current {
   ###################################################################################
 %>
 
-
-
 <% content_for :layout_center_frame do %>
 
 <div id="add_pmachine_dialog" style="display:none;">
@@ -345,9 +372,14 @@ a.left_nav_current {
       <td><input type="text" id="new_pmachine_ip" /></td>
     </tr>
     <tr>
-      <td>Port</td>
+      <td>Pmachine port</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
       <td><input type="text" id="new_pmachine_port" value="3000" /></td>
+    </tr>
+    <tr>
+      <td>VNC ports range</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="new_pmachine_vnc" value="<%= PmachinesHelper::Helper.vnc_recommendation %>"/></td>
     </tr>
   </table>
 </p>

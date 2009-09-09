@@ -37,10 +37,23 @@ class PmachinesController < ApplicationController
 private
 
   def register_pmachine params
+    # require vnc port information
+    if params[:vnc_first] == nil || params[:vnc_last] == nil
+      render_failure "Please provide VNC port range!"
+      return
+    end
+
+    if PmachinesHelper::Helper.vnc_collision? params[:vnc_first], params[:vnc_last]
+      render_failure "VNC ports range #{params[:vnc_first]}-#{params[:vnc_last]} has already been used! You should try this range: #{PmachinesHelper::Helper.vnc_recommendation}"
+      return
+    end
+
     if params[:ip] # check if ip is provided
       pmachine = Pmachine.new
       pmachine.ip = params[:ip]
       pmachine.port = params[:port] if params[:port]  # could specify pmachine service port
+      pmachine.vnc_first = params[:vnc_first]
+      pmachine.vnc_last = params[:vnc_last]
       pmachine_addr = "http://#{pmachine.ip}:#{pmachine.port}"
 
       pmachines_on_this_ip = Pmachine.find_all_by_ip params[:ip]

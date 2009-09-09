@@ -33,6 +33,8 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
   create_table "pmachines", :force => true do |t|
     t.string   "ip",         :limit => 20
     t.integer  "port",                     :default => 3000
+    t.integer  "vnc_first"
+    t.integer  "vnc_last"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
