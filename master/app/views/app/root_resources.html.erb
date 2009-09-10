@@ -154,16 +154,34 @@ a.left_nav_current {
     do_layout();
   }
 
+<%
+  @@netpool_listing_count = 5
+%>
+
   function netpool_regen() {
+
+    size_array = "";
+    count_array = "";
+    for (i = 1; i < <%= @@netpool_listing_count %>; i++) {
+      size_array += $("#network_pools_size_" + i).val() + " ";
+      count_array += $("#network_pools_count_" + i).val() + " ";
+    }
+    
     $.ajax({
       type: "POST",
       url: "/system/reconstruct_netpool.json",
-      dateType: "json",
-      error: function(e) {
-              
+      data: {
+        first_ip: $("#network_pools_first_ip").val(),
+        subnet_mask: $("#network_pools_mask").val(),
+        intranet_device: $("#network_pools_device").val(),
+        size_array: size_array,
+        count_array: count_array
       },
-      success: function(response) {
-        result = $.evalJSON(response);
+      dataType: "json",
+      error: function(e) {
+        show_message(e); 
+      },
+      success: function(result) {
         $("#regenerated_netpool_dhcpdconf").text(result.dhcpdconf);
         $("#regenerated_netpool_interfaces").text(result.interfaces);
         $("#regenerated_netpool_settings").show();
@@ -290,13 +308,13 @@ a.left_nav_current {
 <p align="center">
 <table>
   <tr>
-    <td>First available IP for allocation: <input type="text" /></td>
+    <td>First available IP for allocation: <input type="text" id="network_pools_first_ip" /></td>
   </tr>
   <tr>
-    <td>Subnet mask: <input type="text" value="255.255.255.0" /></td>
+    <td>Subnet mask: <input type="text" value="255.255.255.0" id="network_pools_mask" /></td>
   </tr>
   <tr>
-    <td>Intranet Device: <input type="text" size=5></td>
+    <td>Intranet Device: <input type="text" size=5 id="network_pools_device" /></td>
   </tr>
 
   <tr>
@@ -306,13 +324,13 @@ a.left_nav_current {
           <th>Net pool size</th>
           <th>Count</th>
         </tr>
-        <% 1.upto(5) do |n| %>
+        <% 1.upto(@@netpool_listing_count) do |n| %>
           <tr>
             <td>
-              <input type="text" />
+              <input type="text" id="network_pools_size_<%= n %>" />
             </td>
             <td>
-              <input type="text" />
+              <input type="text" id="network_pools_count_<%= n %>" />
             </td>
           </tr>
         <% end-%>
@@ -355,27 +373,7 @@ a.left_nav_current {
       <table width=300>
         <tr>
           <td>
-            Line 1
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Line 1.5
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Line 2
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Line 3
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Line 4
+            TODO
           </td>
         </tr>
       </table>

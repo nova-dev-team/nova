@@ -21,7 +21,7 @@ module ServerSettings
 		config_file = "#{RAILS_ROOT}/tmp/" + File.basename(config_file)
 
 		begin
-			File.open(config_file, 'w') do |file|
+			File.open(config_file, 'wb') do |file|
 				content.each do |line|
 					file.puts(line)
 					puts(line)

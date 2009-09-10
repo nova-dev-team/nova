@@ -11,15 +11,19 @@ class SystemController < ApplicationController
   end
 
   def reconstruct_netpool
-    first_ip = "10.0.2.3"
-    subnet_mask = "255.255.255.0"
-    size_mapping = {
-      # size => count
-      3 => 4,
-      2 => 2,
-      17 => 3
-    }
-    intranet_device = "eth0"
+    first_ip = params[:first_ip]
+    subnet_mask = params[:subnet_mask]
+    intranet_device = params[:intranet_device]
+    size_mapping = {} # size => count mapping
+    pp size_mapping
+    size_array = params[:size_array].split.map {|v| v.to_i}
+    count_array = params[:count_array].split.map {|v| v.to_i}
+    pp size_array
+    pp count_array
+    (0...size_array.size).each do |i|
+      size_mapping[size_array[i]] = count_array[i]
+    end
+    pp size_mapping
     NetSegment._reconstruct(first_ip, subnet_mask, size_mapping, intranet_device)
     result = {
       :dhcpdconf => (whole_file_content "#{RAILS_ROOT}/tmp/dhcpd.conf"),
