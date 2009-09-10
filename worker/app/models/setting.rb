@@ -1,8 +1,8 @@
 class Setting < ActiveRecord::Base
 
   # where all the image files are located
-  def Setting.storage_server
-    (Setting.find_by_key "storage_server").value
+  def Setting.storage_server_vdisks
+    (Setting.find_by_key "storage_server").value + "/vdisks"
   end
 
   # where should the cached files be stored

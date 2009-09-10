@@ -120,6 +120,7 @@ XML_DESC
       elsif scheme == "ftp"
         username, password = Util::split_userinfo userinfo
         Net::FTP.open(host, username, password) do |ftp|
+          ftp.chdir path
           files_list = ftp.list("*")
         end
       else

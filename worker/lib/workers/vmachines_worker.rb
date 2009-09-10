@@ -77,7 +77,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
           progress[:info] = "uploading image '#{file_to_upload}'"
           progress[:status] = "in progress"
           progress.save
-          put_file "#{vm_dir}/#{file_to_upload}", "#{Setting.storage_server}/#{file_to_upload}"
+          put_file "#{vm_dir}/#{file_to_upload}", "#{Setting.storage_server_vdisks}/#{file_to_upload}"
           Progress.delete progress
         end
       end
@@ -174,8 +174,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     logger.debug "Updater runing at #{Time.now}"
 
     # update file listing
-    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split Setting.storage_server  # parse URI information
-    list = VmachinesHelper::Helper.list_files Setting.storage_server
+    scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split Setting.storage_server_vdisks  # parse URI information
+    list = VmachinesHelper::Helper.list_files Setting.storage_server_vdisks
     File.open(Setting.resource_list_cache, "w") do |file|
       file.write Time.now.to_s + "\n"
       if scheme == "file"
@@ -310,7 +310,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     progress[:status] = "in progress"
     progress.save
 
-    local_filename = request_resource "#{Setting.storage_server}/#{resource_name}", Setting.storage_cache
+    local_filename = request_resource "#{Setting.storage_server_vdisks}/#{resource_name}", Setting.storage_cache
 
     case vdisk_type resource_name
     when "system", "system.cow"

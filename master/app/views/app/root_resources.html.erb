@@ -14,9 +14,9 @@
 
 
 <script type="text/javascript" src="/javascripts/fg-menu/fg.menu.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
 <link href="/stylesheets/fg-menu/fg.menu.css" rel="stylesheet" type="text/css" />
 
-    
 <!-- styles for fg menu -->
 <style type="text/css">
 
@@ -109,7 +109,6 @@ a.left_nav_current {
     // by default. show vmachine images
     list_vm_images();
     
-    
     $('#left_nav_bar_bottom_add_btn').menu({ 
 			content: $('#left_nav_add_btn_menu').html(), // grab content from this page
 			showSpeed: 400,
@@ -132,35 +131,61 @@ a.left_nav_current {
   
   
   function list_vm_images() {
+    $("#network_pools_overview").hide();
     $("#left_nav_btn_list_network_pools").removeClass("left_nav_current");
     $("#left_nav_btn_list_vm_images").addClass("left_nav_current");
     $("#vm_images_list_holder").show();
     $("#network_pools_list_holder").hide();
     
-    var html_str = "";
-    
-    for (i = 0; i < 100; i++) {
-      html_str += "HELLO, this is VM image " + i + "<br />";
-    }
-    
-    $("#vm_images_list_holder").html(html_str);
+
+    refresh_vm_images();
+
     do_layout();
   }
   
   function list_network_pools() {
+    $("#network_pools_overview").show();
     $("#left_nav_btn_list_vm_images").removeClass("left_nav_current");
     $("#left_nav_btn_list_network_pools").addClass("left_nav_current");
     $("#network_pools_list_holder").show();
     $("#vm_images_list_holder").hide();
     
-    var html_str = "";
-    
-    for (i = 0; i < 10; i++) {
-      html_str += "HELLO, this is network pool " + i + "<br />";
-    }
-    
-    $("#network_pools_list_holder").html(html_str);
+    $("#network_pools_list_holder").html("");
     do_layout();
+  }
+
+  function do_refresh() {
+    if ($("#vm_images_list_holder").is(':visible')) {
+      refresh_vm_images();
+    }
+  }
+
+  function refresh_vm_images() {
+    $("#vm_images_list_holder").block({message: "Loading..."});
+    $("layout_center_pane").block({message: "Loading..."});
+
+    $.ajax({
+      type: "GET",
+      url: "/vdisks",
+      dataType: "json",
+      error: function(e) {
+        show_message("Failed to download list of vdisks! Check your network connection!");
+        $("#vm_images_list_holder").unblock();
+        $("layout_center_pane").unblock();
+      },
+      success: function(result) {
+        
+        var html_str = "";
+        for (i = 0; i < result.length; i++) {
+          html_str += result[i].display_name + "<br>"
+        }
+        $("#vm_images_list_holder").html(html_str);
+
+        $("#vm_images_list_holder").unblock();
+        $("layout_center_pane").unblock();
+      }
+    });
+    
   }
   
 </script>
@@ -193,11 +218,13 @@ a.left_nav_current {
     <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
     <div id="left_nav_add_btn_menu" class="hidden">
       <ul>
-	      <li><a href="#">Virtual Machine Image</a></li>
-	      <li><a href="#">Network Pool</a></li>
+        <li><a href="#">Virtual Machine Image</a></li>
+        <!--
+        <li><a href="#">Network Pool</a></li>
+        -->
       </ul>
     </div>
-    <a href="#" class="fg-button ui-widget ui-state-default ui-corner-all" style="position:absolute;left:75">Refresh</a>
+    <a href="#" class="fg-button ui-widget ui-state-default ui-corner-all" style="position:absolute;left:75" onclick="do_refresh()">Refresh</a>
   </div>
 
 </div>
@@ -212,6 +239,58 @@ a.left_nav_current {
 
 
 <% content_for :layout_center_frame do %>
+
+<div id="network_pools_overview" style="display:none;">
+<p align="center">
+  Net pool definition: Make sure you know what you are doing!
+</p>
+<p align="center">
+<table>
+  <tr>
+    <td>First available IP for allocation: <input type="text" /></td>
+  </tr>
+  <tr>
+    <td>Subnet mask: <input type="text" value="255.255.255.0" /></td>
+  </tr>
+
+  <tr>
+    <td align="center">
+      <table>
+        <tr>
+          <th>Net pool size</th>
+          <th>Count</th>
+        </tr>
+        <% 1.upto(5) do |n| %>
+          <tr>
+            <td>
+              <input type="text" />
+            </td>
+            <td>
+              <input type="text" />
+            </td>
+          </tr>
+        <% end-%>
+      </table>
+    </td>
+  </tr>
+
+  <tr>
+    <td align="center">
+      <button>Generate settings</button>
+    </td>
+  </tr>
+</table>
+
+<hr>
+
+<div>
+  <!-- TODO: generate net pool settings -->
+</div>
+
+</p>
+</div>
+
+
 
 
 <% end -%>

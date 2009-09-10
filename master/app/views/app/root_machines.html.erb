@@ -17,7 +17,6 @@
 <script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
 <link href="/stylesheets/fg-menu/fg.menu.css" rel="stylesheet" type="text/css" />
 
-    
 <!-- styles for fg menu -->
 <style type="text/css">
 
@@ -484,6 +483,33 @@ iptables setting: Ensure the following commands have been executed on master nod
       <td>Vcluster size</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
       <td><input type="text" id="vcwiz_vcluster_size" value="4" /></td>
+    </tr>
+    <tr>
+      <td>System image</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td>
+        <select>
+          <% Vdisk.all.each do |vdisk| %>
+            <option><%= vdisk.display_name %>></option>
+          <% end-%>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Memory size</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="vcwiz_memory_size" value="512"> MB</td>
+    </tr>
+    <tr>
+      <td>CPU count</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td>
+        <select>
+          <option>1</option>
+          <option>2</option>
+          <option>4</option>
+        </select>
+      </td>
     </tr>
   </table>
   </div>
