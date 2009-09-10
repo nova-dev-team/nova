@@ -367,11 +367,11 @@ input, select, textarea {
   }
   
   function show_message(message) {
-//    if ($.browser.msie) {
-//      alert(message);
-//    } else {
+    if ($("#jGrowl-Notification").jGrowl == null) {
+      alert(message);
+    } else {
       $("#jGrowl-Notification").jGrowl(message);
-//    }
+    }
   }
   
   function will_change_account_password() {
