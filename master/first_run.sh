@@ -1,7 +1,9 @@
 #! /bin/sh
 
 # triggers 'first_run.sh' script for Ceil component
-lib/ceil/server/first_run.sh
+cd lib/ceil/server
+./first_run.sh
+cd ../../..
 
 rake db:migrate RAILS_ENV=production
 rake db:migrate RAILS_ENV=development

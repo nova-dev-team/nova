@@ -18,7 +18,7 @@ module ServerSettings
 		note = `date "+%Y%m%d%H%M"`.chomp
 		#system "mv #{config_file} #{config_file}.backup.#{note}"
 		
-		config_file = "/tmp/" + File.basename(config_file)
+		config_file = "#{RAILS_ROOT}/tmp/" + File.basename(config_file)
 
 		begin
 			File.open(config_file, 'w') do |file|
@@ -31,5 +31,6 @@ module ServerSettings
 			puts "Cannot write content to system config file #{config_file}!"
 		end
 	end
+
 end
 

@@ -154,6 +154,23 @@ a.left_nav_current {
     do_layout();
   }
 
+  function netpool_regen() {
+    $.ajax({
+      type: "POST",
+      url: "/system/reconstruct_netpool.json",
+      dateType: "json",
+      error: function(e) {
+              
+      },
+      success: function(response) {
+        result = $.evalJSON(response);
+        $("#regenerated_netpool_dhcpdconf").text(result.dhcpdconf);
+        $("#regenerated_netpool_interfaces").text(result.interfaces);
+        $("#regenerated_netpool_settings").show();
+      }
+    });
+  }
+
   function do_refresh() {
     if ($("#vm_images_list_holder").is(':visible')) {
       refresh_vm_images();
@@ -187,6 +204,31 @@ a.left_nav_current {
     });
     
   }
+
+  var add_vdisk_dialog;
+
+  function add_vdisk() {
+    if (add_vdisk_dialog == null) {
+      add_vdisk_dialog = $("#add_vdisk_dialog").dialog({
+        modal: true,
+        width: 700,
+        height: $.browser.msie ? 720 : 450, // IE has layout problems
+        resizable: true,
+        draggable: $.browser.msie == false, // IE has layout problems
+        hide: "slide",
+        show: "slide",
+        title: "Add new vdisk",
+        buttons: {
+          "OK": function(e) {
+          },
+          "Cancel": function(e) {
+            $(this).dialog("close");
+          }
+        }
+      });
+    }
+    add_vdisk_dialog.dialog("open");
+  }
   
 </script>
   
@@ -218,7 +260,7 @@ a.left_nav_current {
     <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
     <div id="left_nav_add_btn_menu" class="hidden">
       <ul>
-        <li><a href="#">Virtual Machine Image</a></li>
+        <li><a href="#" onclick="add_vdisk()">Virtual Machine Image</a></li>
         <!--
         <li><a href="#">Network Pool</a></li>
         -->
@@ -242,7 +284,8 @@ a.left_nav_current {
 
 <div id="network_pools_overview" style="display:none;">
 <p align="center">
-  Net pool definition: Make sure you know what you are doing!
+  Net pool definition: Make sure you know what you are doing!<br>
+  (Also, make sure you have executed 'first_run.sh' in the master folder once and ONLY ONCE)
 </p>
 <p align="center">
 <table>
@@ -251,6 +294,9 @@ a.left_nav_current {
   </tr>
   <tr>
     <td>Subnet mask: <input type="text" value="255.255.255.0" /></td>
+  </tr>
+  <tr>
+    <td>Intranet Device: <input type="text" size=5></td>
   </tr>
 
   <tr>
@@ -276,22 +322,67 @@ a.left_nav_current {
 
   <tr>
     <td align="center">
-      <button>Generate settings</button>
+      <button onclick="netpool_regen()">Re-Generate settings</button>
     </td>
   </tr>
 </table>
 
-<hr>
-
-<div>
-  <!-- TODO: generate net pool settings -->
+<div id="regenerated_netpool_settings" style="display:none;">
+  <hr>
+  <pre id="regenerated_netpool_interfaces"></pre>
+  <hr>
+  <pre id="regenerated_netpool_dhcpdconf"></pre>
 </div>
 
 </p>
 </div>
 
 
-
+<div id="add_vdisk_dialog" style="display:none;">
+<table>
+  <tr>
+    <td>
+      <table>
+        <tr>
+          <td>
+            <textarea>
+            </textarea>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td>
+      <table width=300>
+        <tr>
+          <td>
+            Line 1
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Line 1.5
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Line 2
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Line 3
+          </td>
+        </tr>
+        <tr>
+          <td>
+            Line 4
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<div>
 
 <% end -%>
 

@@ -35,6 +35,7 @@ ActiveRecord::Schema.define(:version => 20090817023057) do
     t.integer  "port",                     :default => 3000
     t.integer  "vnc_first"
     t.integer  "vnc_last"
+    t.string   "health",                   :default => "healthy"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
