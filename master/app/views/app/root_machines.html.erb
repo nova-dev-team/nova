@@ -188,6 +188,8 @@ a.left_nav_current {
         <% if not_blank? master_internet_ip and not_blank? master_intranet_ip %>
         for (i = 0; i < result.length; i++) {
           pm = result[i];
+          if (pm.ip == "<%= master_internet_ip %>" || pm.ip == "<%= master_intranet_ip %>")
+            continue;
           for (p = pm.vnc_first; p <= pm.vnc_last; p++) {
             iptable_cmd += "iptables -t nat -A PREROUTING -d <%= master_internet_ip %> -p tcp --dport " + p + " -j DNAT --to-destination " + pm.ip +  ":" + p + "\n";
             iptable_cmd += "iptables -t nat -A POSTROUTING -d " + pm.ip + " -p tcp --dport " + p +  " -j SNAT -to <%= master_intranet_ip %>\n";
