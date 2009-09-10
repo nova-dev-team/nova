@@ -87,6 +87,7 @@ MAC_DESC
 #{cdrom_desc if params[:cdrom] and params[:cdrom] != ""}
 #{mac_desc if params[:mac] and params[:mac] != ""}
     <graphics type='vnc' port='#{params[:vnc_port]}' listen='0.0.0.0'/>
+    <input type='tablet' bus='usb' />
   </devices>
 </domain>
 XML_DESC
