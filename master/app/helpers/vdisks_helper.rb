@@ -15,7 +15,7 @@ module VdisksHelper
         username, password = Util::split_userinfo userinfo
         list = []
         Net::FTP.open(host, username, password) do |ftp|
-          ftp.chdir (File.dirname path)
+          ftp.chdir(File.dirname path)
           list = ftp.list(File.basename path)
         end
         return list.size != 0

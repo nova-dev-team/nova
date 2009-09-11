@@ -239,6 +239,28 @@ a.left_nav_current {
         title: "Add new vdisk",
         buttons: {
           "OK": function(e) {
+            this_dialog = $(this);
+            $.ajax({
+              type: "POST",
+              url: "/vdisks/register",
+              data: {
+                upload_name: $("#add_vdisk_filename").val(),
+                display_name: $("#add_vdisk_display_name").val(),
+                internal_name: $("#add_vdisk_internal_name").val(),
+                type: $("#add_vdisk_type").val(),
+                comment: $("#add_vdisk_comment").val()
+              },
+              dataType: "json",
+              error: function(e) {
+                show_message(e);
+                this_dialog.dialog("close");
+              },
+              success: function(result) {
+                this_dialog.dialog("close");
+                list_vm_images();
+                show_message(result.message);
+              }
+            });
           },
           "Cancel": function(e) {
             $(this).dialog("close");
@@ -380,17 +402,17 @@ a.left_nav_current {
     </td>
     <td valign="top">
       <table width=380>
-        <tr><td>File name: <input type="text" /></td></tr>
-        <tr><td>Diaplay name: <input type="text" /></td></tr>
-        <tr><td>Internal name: <input type="text" /></td></tr>
-        <tr><td>Image type: <select>
+        <tr><td>File name: <input type="text" id="add_vdisk_filename"/></td></tr>
+        <tr><td>Diaplay name: <input type="text" id="add_vdisk_display_name"/></td></tr>
+        <tr><td>Internal name: <input type="text" id="add_vdisk_internal_name"/></td></tr>
+        <tr><td>Image type: <select id="add_vdisk_type">
           <option>iso</option>
           <option>sys</option>
           <option>sys.cow</option>
           <option>user</option>
           <option>user.cow</option>
         </select></td></tr>
-        <tr><td>Comment: <br> <textarea rows=4 cols=32></textarea></td></tr>
+        <tr><td>Comment: <br> <textarea rows=4 cols=32 id="add_vdisk_comment"></textarea></td></tr>
       </table>
     </td>
   </tr>

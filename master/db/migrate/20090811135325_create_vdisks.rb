@@ -4,6 +4,8 @@ class CreateVdisks < ActiveRecord::Migration
       t.column :raw_name, :string, :limit => 100
       t.column :display_name, :string
       t.column :description, :string
+      t.column :type, :string
+      t.column :base_upon, :integer
       t.timestamps
     end
   end

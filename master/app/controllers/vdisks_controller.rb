@@ -19,6 +19,7 @@ class VdisksController < ApplicationController
   end
 
   def register
+    # TODO add "base_upon" parameter
     if params[:upload_name] and params[:display_name] and params[:type]
       if params[:internal_name]
         internal_name = params[:internal_name]

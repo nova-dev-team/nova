@@ -98,7 +98,7 @@ function dont_save_setting(key) {
       <input id="setting-newvalue-input-<%= s.key %>" type="text" value="<%= s.value %>" size=64/>
     </div>
   </td>
-  <td>
+  <td <%= "class='alt'" if i.even? %>>
     <div id="setting-edit-<%= s.key %>">
       <a href="#" onclick="edit_setting('<%= s.key %>')">Edit</a>
     </div>
