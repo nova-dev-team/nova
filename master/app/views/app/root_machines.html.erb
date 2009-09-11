@@ -361,7 +361,29 @@ a.left_nav_current {
         title: "Add new vcluster",
         buttons: {
           "OK": function(e) {
-            
+            this_dialog = $(this);
+            // create cluster using wizard
+            $.ajax({
+              type: "POST",
+              url: "/vclusters/create",
+              dataType: "json",
+              data: {
+                size: $("#vcwiz_vcluster_size").val(), 
+                name: $("#vcwiz_vcluster_name").val(),
+                start_now: true,
+                soft_list: "",
+                memory_size: $("#vcwiz_memory_size").val(),
+                cpu_cout: $("#vcwiz_cpu_count").val()
+              },
+              error: function(e) {
+                show_message(e);
+                this_dialog.dialog("close");
+              },
+              success: function(result) {
+                this_dialog.dialog("close");
+                list_virtual_clusters();
+              }
+            });
           },
           "Cancel": function(e) {
             $(this).dialog("close");
@@ -509,7 +531,7 @@ iptables setting: Ensure the following commands have been executed on master nod
       <td>CPU count</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
       <td>
-        <select>
+        <select id="vcwiz_cpu_count">
           <option>1</option>
           <option>2</option>
           <option>4</option>

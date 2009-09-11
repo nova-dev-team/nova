@@ -28,6 +28,8 @@ class VclustersController < ApplicationController
       # TODO advanced settings, each machines could have different hardware setting
       vc.vmachines.each do |vm|
         vm.cpu_count = params[:cpu_count].to_i || vm.cpu_count
+        vm.cpu_count = 1 if vm.cpu_count == 0
+
         vm.memory_size = params[:memory_size].to_i || vm.memory_size
         vm.hda = params[:hda] || "vd1-sys-empty10g.qcow2"
         vm.hdb = params[:hdb]
