@@ -120,20 +120,21 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
   add_index "vmachine_infos", ["vmachine_id"], :name => "index_vmachine_infos_on_vmachine_id"
 
   create_table "vmachines", :force => true do |t|
-    t.string   "uuid",              :limit => 40,                  :null => false
+    t.string   "uuid",              :limit => 40,                     :null => false
     t.integer  "cpu_count",                       :default => 1
     t.integer  "memory_size",                     :default => 256
-    t.integer  "hda"
-    t.integer  "hdb"
-    t.integer  "cdrom"
+    t.string   "hda",               :limit => 40
+    t.string   "hdb",               :limit => 40
+    t.string   "cdrom",             :limit => 40
     t.string   "boot_device",       :limit => 10
-    t.string   "architecture",      :limit => 10
+    t.string   "arch",              :limit => 10, :default => "i686"
     t.string   "ip",                :limit => 20
     t.string   "mac",               :limit => 24
     t.string   "hostname",          :limit => 40
     t.integer  "vcluster_id"
     t.integer  "ceil_progress",                   :default => -1
     t.text     "last_ceil_message"
+    t.integer  "pmachine_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -1,5 +1,6 @@
 class Vmachine < ActiveRecord::Base
   belongs_to :vcluster
+  belongs_to :pmachine
   has_many :vmachine_infos
   
   def get_node_list

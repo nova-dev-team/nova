@@ -21,25 +21,33 @@ class VclustersController < ApplicationController
       vc = Vcluster.alloc(params[:name], soft_list, size)
 
       if vc == nil
-        render_failure "Not enough resource!"
+        render_failure "Not enough net pool left!"
         return
       end
 
       # TODO advanced settings, each machines could have different hardware setting
       vc.vmachines.each do |vm|
-        vm.cpu_count = params[:cpu_count]
-        vm.memory_size = params[:memeory_size]
-        vm.hda = params[:hda]
+        vm.cpu_count = params[:cpu_count].to_i || vm.cpu_count
+        vm.memory_size = params[:memory_size].to_i || vm.memory_size
+        vm.hda = params[:hda] || "vd1-sys-empty10g.qcow2"
         vm.hdb = params[:hdb]
         vm.cdrom = params[:cdrom]
-        vm.boot_device = params[:boot_device]
-        vm.architecture = params[:architecture]
+        vm.boot_device = params[:boot_device] || "hd"
+        vm.arch = params[:arch]
         vm.save
       end
 
-      vc.user = current_user # mark vcluster ownership
-      vc.save
-      render_data vc
+      if params[:start_now]
+        pm_messages = []
+        vc.vmachines.each do |vm|
+          pm_messages << (Pmachine.first.start_vm vm)
+        end
+        render_data [pm_messages, vc.vmachines]
+      else
+        vc.user = current_user # mark vcluster ownership
+        vc.save
+        render_data vc
+      end
     else
       render_failure "Please provide 'size', 'name', 'soft_list' parameters"
     end

@@ -274,7 +274,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     elsif scheme == "ftp"
       username, password = Util::split_userinfo userinfo
       Net::FTP.open(host, username, password) do |ftp|
-        ftp.getbinaryfile(path, to_file)
+        ftp.chdir(File.dirname path)
+        ftp.getbinaryfile((File.basename path), to_file)
       end
     else
       raise "Resource scheme '#{scheme}' not known!"
@@ -291,7 +292,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     elsif scheme == "ftp"
       username, password = Util::split_userinfo userinfo
       Net::FTP.open(host, username, password) do |ftp|
-        ftp.putbinaryfile(from_file, path)
+        ftp.chdir(File.dirname path)
+        ftp.putbinaryfile(from_file, (File.basename path))
       end
     else
       raise "Resource scheme '#{scheme}' not known!"
@@ -313,7 +315,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     local_filename = request_resource "#{Setting.storage_server_vdisks}/#{resource_name}", Setting.storage_cache
 
     case vdisk_type resource_name
-    when "system", "system.cow"
+    when "sys", "sys.cow"
       FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
       if device != nil # when using this disk as a device (not extra dependency), we must make a COW disk based on it
         cow_disk_name = "vd-notsaved-#{uuid}-#{device}.qcow2"
