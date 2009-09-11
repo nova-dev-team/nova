@@ -6,3 +6,5 @@ scripts/
 tmp/
 *~
 *.sqlite3
+.hg/
+.hgignore
