@@ -136,7 +136,7 @@ a.left_nav_current {
     $("#left_nav_btn_list_vm_images").addClass("left_nav_current");
     $("#vm_images_list_holder").show();
     $("#network_pools_list_holder").hide();
-    
+    $("#vdisk_overview").show();
 
     refresh_vm_images();
 
@@ -149,6 +149,7 @@ a.left_nav_current {
     $("#left_nav_btn_list_network_pools").addClass("left_nav_current");
     $("#network_pools_list_holder").show();
     $("#vm_images_list_holder").hide();
+    $("#vdisk_overview").hide();
     
     $("#network_pools_list_holder").html("");
     do_layout();
@@ -230,7 +231,7 @@ a.left_nav_current {
       add_vdisk_dialog = $("#add_vdisk_dialog").dialog({
         modal: true,
         width: 700,
-        height: $.browser.msie ? 720 : 450, // IE has layout problems
+        height: $.browser.msie ? 750 : 480, // IE has layout problems
         resizable: true,
         draggable: $.browser.msie == false, // IE has layout problems
         hide: "slide",
@@ -355,27 +356,41 @@ a.left_nav_current {
 </p>
 </div>
 
+<div id="vdisk_overview" style="diaply:none;">
+  How to add new vdisks?<br>
+  First of all, upload your vdisk image to the storage server (in the 'vdisks_upload' directory). The filename cannot contain whitespace! Then click the "Add" button, choose "Virtual Machine Image". In the "add" dialog, find you filename on the left list. You should provide the image filename, display name (will be shown to users), and internal (lower case, descriptive filename), and image type. And you can add comments, too.
+</div>
 
 <div id="add_vdisk_dialog" style="display:none;">
 <table>
   <tr>
-    <td>
-      <table>
+    <td valign="top">
+      <table width=270>
         <tr>
           <td>
-            <textarea>
-            </textarea>
+            List of uploaded vdisks:
+            <textarea cols=24 rows=12><%=
+              text = ""
+              VdisksHelper::Helper.upload_list.each {|f| text += f + "\n\n"}
+              text
+            %></textarea>
           </td>
         </tr>
       </table>
     </td>
-    <td>
-      <table width=300>
-        <tr>
-          <td>
-            TODO
-          </td>
-        </tr>
+    <td valign="top">
+      <table width=380>
+        <tr><td>File name: <input type="text" /></td></tr>
+        <tr><td>Diaplay name: <input type="text" /></td></tr>
+        <tr><td>Internal name: <input type="text" /></td></tr>
+        <tr><td>Image type: <select>
+          <option>iso</option>
+          <option>sys</option>
+          <option>sys.cow</option>
+          <option>user</option>
+          <option>user.cow</option>
+        </select></td></tr>
+        <tr><td>Comment: <br> <textarea rows=4 cols=32></textarea></td></tr>
       </table>
     </td>
   </tr>

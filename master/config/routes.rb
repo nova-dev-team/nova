@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :vmachine_infos
 
-  map.resources :vdisks
+#  map.resources :vdisks
 
   map.resources :vclusters
 
