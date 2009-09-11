@@ -3,6 +3,7 @@ class CreateVclusters < ActiveRecord::Migration
     create_table :vclusters do |t|
       t.column :cluster_name,                     :string
       t.column :package_list,                     :text
+      t.column :user_id,                          :integer
       t.timestamps
     end
   end

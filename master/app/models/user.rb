@@ -31,6 +31,7 @@ class User < ActiveRecord::Base
 
   has_many :ugrelationships
   has_many :groups, :through => :ugrelationships
+  has_many :vclusters
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #

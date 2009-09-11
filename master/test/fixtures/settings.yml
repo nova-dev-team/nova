@@ -8,13 +8,13 @@
 
 storage_server:
   key: storage_server
-  value: ftp://user:passwd@somewhere.com/
+  value: ftp://nova:novaftp@166.111.131.32/
 
 master_intranet_ip:
   key: master_intranet_ip
-  value: 
+  value: 10.0.5.254
 
 master_internet_ip:
   key: master_internet_ip
-  value:
+  value: 166.111.131.32
 

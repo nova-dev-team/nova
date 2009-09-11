@@ -5,6 +5,7 @@ require "#{CEIL_ROOT}/server/cluster_config_creator"
 
 class Vcluster < ActiveRecord::Base
   has_one :net_segment
+  belongs_to :user
   has_many :vmachines
   
   
