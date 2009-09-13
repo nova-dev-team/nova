@@ -100,11 +100,12 @@ class Vcluster < ActiveRecord::Base
   end
 
   ## TODO create a new vcluster, and also starts all vmachines of it
-  def Vcluster.create_and_start
+  def Vcluster.create_and_start params
   end
 
   ## TODO destroy this vcluster, and also all vmachines inside it (no going back)
   def destroy!
+    ## TODO release net segment & allcated vnc
   end
 
   def Vcluster.all_not_destroyed

@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'rest_client'
+require 'pp'
+require 'json'
 
 class Pmachine < ActiveRecord::Base
 
@@ -37,6 +39,18 @@ class Pmachine < ActiveRecord::Base
     pm_sched.start_vm vm
   end
 
+  def destroy_vm vm
+    json_rest_request "http://#{self.ip}:#{self.port}/vmachines/destory.json", :uuid => vm.uuid
+    self.vmachines.delete vm
+  end
+
+  def suspend_vm vm
+    json_rest_request "http://#{self.ip}:#{self.port}/vmachines/suspend.json", :uuid => vm.uuid
+  end
+
+  def resume_vm vm
+    json_rest_request "http://#{self.ip}:#{self.port}/vmachines/resume.json", :uuid => vm.uuid
+  end
 
   ## return all pmachines that are not 'retired'
   def Pmachine.all_not_retired
@@ -46,6 +60,16 @@ class Pmachine < ActiveRecord::Base
   ## return all pmachines that are 'retired'
   def Pmachine.all_retired
     Pmachine.find_all_by_retired true
+  end
+
+  # send a request to this pmachine, and will also record 'health' condition of this pmachine
+  def json_rest_request url, args
+    begin
+      result = RestClient.post url, args, :timeout => 1
+    rescue
+      # TODO
+    end
+    JSON.parse result
   end
 
   ## check if a pmachine is marked as 'retired'
@@ -74,6 +98,11 @@ class Pmachine < ActiveRecord::Base
 
   ## TODO check if a pmachine is working healthily
   def healthy?
+    begin
+      pp "requesting " + "http://#{self.ip}:#{self.port}/misc/hi.json"
+      rest_request "http://#{self.ip}:#{self.port}/misc/hi.json", {}
+      return true
+    end
   end
 
 

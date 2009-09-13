@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090911061436) do
+ActiveRecord::Schema.define(:version => 20090913023752) do
 
   create_table "bdrb_job_queues", :force => true do |t|
     t.text     "args"
@@ -53,6 +53,7 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
   create_table "pmachines", :force => true do |t|
     t.string   "ip",         :limit => 20
     t.integer  "port",                     :default => 3000
+    t.string   "addr"
     t.integer  "vnc_first"
     t.integer  "vnc_last"
     t.string   "health",                   :default => "healthy"
@@ -102,6 +103,8 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
     t.string   "cdrom"
     t.string   "boot_device"
     t.string   "arch"
+    t.integer  "net_segment_id"
+    t.boolean  "destroyed",      :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -121,6 +124,7 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
     t.string   "category",    :limit => 20
     t.integer  "status",                    :default => -1
     t.string   "message"
+    t.integer  "vnc_port"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -143,6 +147,14 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
     t.integer  "ceil_progress",                   :default => -1
     t.text     "last_ceil_message"
     t.integer  "pmachine_id"
+    t.boolean  "destroyed",                       :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "vnc_ports", :force => true do |t|
+    t.integer  "port"
+    t.integer  "lock_versino"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

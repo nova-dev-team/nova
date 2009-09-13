@@ -25,13 +25,20 @@ class Vmachine < ActiveRecord::Base
   def start
     pm = Pmachine.start_vm self # let Pmachine class do the scheduling
     if pm != nil
-    else
+      # if pm returned success
+      #   self.status = "running"
+    else # no available pmachine
     end
     # TODO remember vmachine status
   end
 
   # TODO stop vmachine
   def stop
+    if self.status == "running"
+      self.pmachine.stop_vm self
+      self.destroyed = true
+      self.save
+    end
   end
 
   # TODO suspend vmachine

@@ -18,6 +18,7 @@ class CreateVmachines < ActiveRecord::Migration
       t.column :vcluster_id,       :integer
       t.column :pmachine_id,       :integer
       t.column :destroyed,         :boolean, :default => false  # whether this vmachine has been destroyed
+      t.column :status,            :string, :default => "not running" # could be "running", "not running", "suspended", "unknown". set to "unknown" when hosting pmachine is down
       t.timestamps
     end
   end
