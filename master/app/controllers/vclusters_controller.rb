@@ -42,17 +42,19 @@ class VclustersController < ApplicationController
       if params[:start_now]
         pm_messages = []
         vc.vmachines.each do |vm|
-          pm_messages << (Pmachine.first.start_vm vm)
+          pm_messages << vm.start
         end
-        render_data [pm_messages, vc.vmachines]
-      else
-        vc.user = current_user # mark vcluster ownership
-        vc.save
-        render_data vc
+        # TODO render additional data, such as success rate..etc
       end
+      vc.user = current_user # mark vcluster ownership
+      vc.save
+      render_data vc
     else
       render_failure "Please provide 'size', 'name', 'soft_list' parameters"
     end
+  end
+
+  def modify
   end
 
 end

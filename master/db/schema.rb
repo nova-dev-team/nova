@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
     t.integer  "vnc_first"
     t.integer  "vnc_last"
     t.string   "health",                   :default => "healthy"
+    t.boolean  "retired",                  :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -94,6 +95,13 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
     t.string   "cluster_name"
     t.text     "package_list"
     t.integer  "user_id"
+    t.integer  "cpu_count"
+    t.integer  "memory_size"
+    t.string   "hda"
+    t.string   "hdb"
+    t.string   "cdrom"
+    t.string   "boot_device"
+    t.string   "arch"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

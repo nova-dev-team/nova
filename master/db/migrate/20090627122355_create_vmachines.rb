@@ -17,6 +17,7 @@ class CreateVmachines < ActiveRecord::Migration
       t.column :last_ceil_message, :text
       t.column :vcluster_id,       :integer
       t.column :pmachine_id,       :integer
+      t.column :destroyed,         :boolean, :default => false  # whether this vmachine has been destroyed
       t.timestamps
     end
   end

@@ -5,6 +5,7 @@ class CreateVmachineInfos < ActiveRecord::Migration
       t.column :category,           :string, :limit => 20 # set max length to 20
       t.column :status,             :integer, :default => -1
       t.column :message,            :string
+      t.column :vnc_port,           :integer
       t.timestamps
     end
     add_index :vmachine_infos, :vmachine_id, :unique => false

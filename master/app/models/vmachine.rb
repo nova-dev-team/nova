@@ -1,6 +1,7 @@
 class Vmachine < ActiveRecord::Base
   belongs_to :vcluster
   belongs_to :pmachine
+  has_one :vnc_port
   has_many :vmachine_infos
   
   def get_node_list
@@ -18,6 +19,31 @@ class Vmachine < ActiveRecord::Base
   
   def get_progress
     
+  end
+
+  # return false if faled to allocate the vm to some pmachine
+  def start
+    pm = Pmachine.start_vm self # let Pmachine class do the scheduling
+    if pm != nil
+    else
+    end
+    # TODO remember vmachine status
+  end
+
+  # TODO stop vmachine
+  def stop
+  end
+
+  # TODO suspend vmachine
+  def suspend
+  end
+
+  # TODO resume vmachine
+  def resume
+  end
+
+  def Vmachine.all_not_destroyed
+    Vmachine.find_all_by_destroyed true
   end
   
 end
