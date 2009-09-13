@@ -1,11 +1,11 @@
 class MiscController < ApplicationController
 
   def hi
-    render :text => "HI"
+    render_result :success => true, :message => "HI"
   end
 
   def whoami
-    render :text => "Worker"
+    render_result :success => true, :message => "I'm worker", :role => "worker"
   end
 
 end

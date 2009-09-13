@@ -55,18 +55,15 @@ private
 
     if params[:ip] # check if ip is provided
       pmachine = Pmachine.new
-      pmachine.ip = params[:ip]
-      pmachine.port = params[:port] if params[:port]  # could specify pmachine service port
+      port = params[:port] | 3000 # default port is 3000
+      pmachine.addr = "#{params[:ip]}:#{port}"
       pmachine.vnc_first = params[:vnc_first]
       pmachine.vnc_last = params[:vnc_last]
-      pmachine_addr = "http://#{pmachine.ip}:#{pmachine.port}"
+      pmachine_addr = "http://#{pmachine.addr}"
 
-      pmachines_on_this_ip = Pmachine.find_all_by_ip params[:ip]
-      pmachines_on_this_ip.each do |pmachine_on_this_ip|
-        if pmachine.port == pmachine_on_this_ip.port
-          render_success "Pmachine at #{pmachine_addr} is already added!" # already registered, not error
-          return
-        end
+      if Pmachine.find_by_addr pmachine.addr
+        render_success "Pmachine at #{pmachine_addr} is already added!" # already registered, not error
+        return
       end
 
       # check connection, and do simple authentication

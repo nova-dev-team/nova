@@ -4,6 +4,7 @@ class CreateSettings < ActiveRecord::Migration
       t.column :key, :string, :limit => 40
       t.column :value, :string
       t.column :no_edit, :boolean, :default => false # "readonly" is used by ActiveRecord, so I have to user this miserable name
+      t.column :for_worker, :boolean, :default => false # whether this setting should be synced to worker
       t.timestamps
     end
   end

@@ -51,13 +51,11 @@ ActiveRecord::Schema.define(:version => 20090913023752) do
   end
 
   create_table "pmachines", :force => true do |t|
-    t.string   "ip",         :limit => 20
-    t.integer  "port",                     :default => 3000
     t.string   "addr"
     t.integer  "vnc_first"
     t.integer  "vnc_last"
-    t.string   "health",                   :default => "healthy"
-    t.boolean  "retired",                  :default => false
+    t.string   "status"
+    t.boolean  "retired",    :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -66,6 +64,7 @@ ActiveRecord::Schema.define(:version => 20090913023752) do
     t.string   "key",        :limit => 40
     t.string   "value"
     t.boolean  "no_edit",                  :default => false
+    t.boolean  "for_worker",               :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -132,7 +131,7 @@ ActiveRecord::Schema.define(:version => 20090913023752) do
   add_index "vmachine_infos", ["vmachine_id"], :name => "index_vmachine_infos_on_vmachine_id"
 
   create_table "vmachines", :force => true do |t|
-    t.string   "uuid",              :limit => 40,                     :null => false
+    t.string   "uuid",              :limit => 40,                            :null => false
     t.integer  "cpu_count",                       :default => 1
     t.integer  "memory_size",                     :default => 256
     t.string   "hda",               :limit => 40
@@ -148,6 +147,7 @@ ActiveRecord::Schema.define(:version => 20090913023752) do
     t.text     "last_ceil_message"
     t.integer  "pmachine_id"
     t.boolean  "destroyed",                       :default => false
+    t.string   "status",                          :default => "not running"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -9,6 +9,7 @@
 storage_server:
   key: storage_server
   value: ftp://nova:novaftp@166.111.131.32/
+  for_worker: true
 
 master_intranet_ip:
   key: master_intranet_ip
