@@ -172,7 +172,7 @@ a.left_nav_current {
         var list_html = "";
         for (i = 0; i < result.length; i++) {
           pm = result[i];
-          list_html += pm.ip + ":" + pm.port + ", vnc=" + pm.vnc_first + "-" + pm.vnc_last + "<br>";
+          list_html += pm.addr + ", vnc=" + pm.vnc_first + "-" + pm.vnc_last + "<br>";
         }
         $("#pmachine_list_holder").html(list_html);
         $("#pmachine_list_holder").unblock();

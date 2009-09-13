@@ -72,7 +72,7 @@ class Pmachine < ActiveRecord::Base
     else
       # already registered this pmachine, so we do nothing here, not even 'undo_retire' the pmachine!
       # this could be used as heartbeat message
-      puts "[Pmachine.register] Pmachine already registered: #{pm.addr}."
+      puts "[Pmachine.register] Pmachine already registered: #{params[:addr]}."
       return true
     end
   end
