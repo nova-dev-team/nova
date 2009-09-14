@@ -65,36 +65,6 @@ class Vcluster < ActiveRecord::Base
     return vc
   end
 
-  ## ensure the vcluster has already requested a network segment.
-  ## the request process SHOULD be TRANSACTIONAL
-  ## 
-  ## if the request fails, raise "no more segment"
-  def ensure_net_segment!
-    unless self.net_segment
-      # TODO allocate net segment
-      net_segment = NetSegment.alloc machine_count
-      unless net_segment
-        raise "no more segment"
-      end
-      
-      node_list = ""
-      self.net_segment = net_segment
-      (0...self.size).each do |i|
-        vm = self.vmachines[i]
-        node = net_segment.list[i]
-
-        vm.hostname = node[:hostname]
-        vm.ip = node[:ip]
-        vm.mac = node[:mac]
-        vm.save
-
-        node_list += "#{vm.ip}\t#{vm.hostname}\n"
-      end
-
-      ccc = ClusterConfigurationCreator.new node_list, self.package_list, self.name
-    end
-  end
-
   ## TODO create a new vcluster according to the params
   def Vcluster.create params
   end
