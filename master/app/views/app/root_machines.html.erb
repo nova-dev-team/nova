@@ -13,6 +13,7 @@
 <% content_for :layout_style_and_scripts do %>
 
 
+<link href="/stylesheets/table-style/styles.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/javascripts/fg-menu/fg.menu.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
 <link href="/stylesheets/fg-menu/fg.menu.css" rel="stylesheet" type="text/css" />
@@ -139,6 +140,7 @@ a.left_nav_current {
     $("#vcluster_list_holder").show();
     $("#pmachine_list_holder").hide();
     $("#pmachines_overview").hide();
+    $("#pm_detail_holder").hide();
     
     do_layout();
     refresh_vclusters();
@@ -150,9 +152,55 @@ a.left_nav_current {
     $("#pmachine_list_holder").show();
     $("#vcluster_list_holder").hide();
     $("#pmachines_overview").show();
+    $("#pm_detail_holder").hide();
 
     do_layout();
     refresh_pmachines(); 
+  }
+
+  function pm_detail(pm_addr) {
+    // pm_addr 192.168.0.104:4000 will be replaced to 192_168_0_104-4000
+    $("#pmachines_overview").hide();
+
+    $("#layout_center_pane").block({message: "Loading..."});
+    $.ajax({
+      type: "POST",
+      url: "/pmachines/show",
+      data: {
+        addr: pm_addr
+      },
+      dataType: "json",
+      error: function(e) {
+        show_message("Failed to download detailed information of this pmachine! Check your network connection!");
+        $("#layout_center_pane").unblock();
+      },
+      success: function(result) {
+        var html_str = "";
+        html_str += "ID: " + result.id + "<br>";
+        html_str += "Address: " + result.addr + "<br>";
+        html_str += "Retired: " + result.retired + "<br>";
+        html_str += "VNC range: " + result.vnc_first + "-" + result.vnc_last + "<br>";
+
+        html_str += "<hr>";
+        html_str += "<table class='styled_table' cellspacing=0>";
+        html_str += "<tr><th scope='col'>ID</th><th scope='col'>CPU count</th><th scope='col'>Memory size</th><th scope='col'>HDA</th><th scope='col'>Arch</th><th scope='col'>Status</th></tr>";
+        for (i = 0; i < result.vm_info.length; i++) {
+          vm = result.vm_info[i];
+          html_str += "<tr>";
+          html_str += "<th scope='row' class='" + ((i % 2 == 0) ? "specalt" : "spec") + "'>" + vm.id + "</th>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.cpu_count + " CPU" + ((vm.cpu_count > 1) ? "s" : "") + "</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.mem_size + " MB</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.hda + "</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.arch + "</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.status + "</td>";
+          html_str += "</tr>";
+        }
+        html_str += "</table>";
+        $("#layout_center_pane").unblock();
+        $("#pm_detail_holder").html(html_str);
+        $("#pm_detail_holder").show();
+      }
+    });
   }
 
   function refresh_pmachines() {
@@ -172,7 +220,7 @@ a.left_nav_current {
         var list_html = "";
         for (i = 0; i < result.length; i++) {
           pm = result[i];
-          list_html += pm.addr + ", vnc=" + pm.vnc_first + "-" + pm.vnc_last + "<br>";
+          list_html += "<a class='dark_link' href='#' onclick='pm_detail(\"" + pm.addr + "\")'>" + pm.addr + "</a>, vnc=" + pm.vnc_first + "-" + pm.vnc_last + "<br>";
         }
         $("#pmachine_list_holder").html(list_html);
         $("#pmachine_list_holder").unblock();
@@ -470,6 +518,8 @@ iptables setting: Ensure the following commands have been executed on master nod
 </p>
 </div>
 
+<div id="pm_detail_holder" style="display:none;">
+</div>
 
 
 <div id="add_pmachine_dialog" style="display:none;">

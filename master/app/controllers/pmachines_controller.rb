@@ -30,6 +30,27 @@ class PmachinesController < ApplicationController
   end
 
   def show
+    pm = Pmachine.find_by_addr params[:addr]
+    vm_info = pm.vmachines.collect do |vm|
+      {
+        :id => vm.id,
+        :mem_size => vm.memory_size,
+        :cpu_count => vm.cpu_count,
+        :arch => vm.arch,
+        :hda => vm.hda,
+        :status => vm.status
+      }
+    end
+    result = {
+      :id => pm.id,
+      :addr => pm.addr,
+      :retired => pm.retired,
+      :vm_info => vm_info,
+      :vnc_first => pm.vnc_first,
+      :vnc_last => pm.vnc_last
+    }
+
+    render_data result
   end
 
   def update
