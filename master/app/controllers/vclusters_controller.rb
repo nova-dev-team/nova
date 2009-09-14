@@ -16,36 +16,15 @@ class VclustersController < ApplicationController
 
   def create
     if params[:name] and params[:size] and params[:soft_list]
-      size = params[:size].to_i
-      soft_list = "common\nssh-nopass\n" + params[:soft_list]
-      vc = Vcluster.alloc(params[:name], soft_list, size)
-
-      if vc == nil
-        render_failure "Not enough net pool left!"
-        return
-      end
-
-      # TODO advanced settings, each machines could have different hardware setting
-      vc.vmachines.each do |vm|
-        vm.cpu_count = params[:cpu_count].to_i || vm.cpu_count
-        vm.cpu_count = 1 if vm.cpu_count == 0
-
-        vm.memory_size = params[:memory_size].to_i || vm.memory_size
-        vm.hda = params[:hda] || "vd1-sys-empty10g.qcow2"
-        vm.hdb = params[:hdb]
-        vm.cdrom = params[:cdrom]
-        vm.boot_device = params[:boot_device] || "hd"
-        vm.arch = params[:arch]
-        vm.save
-      end
+      params[:soft_list] = "common\nssh-nopass\n" + params[:soft_list] unless params[:soft_list].start_with? "common\nssh-nopass\n"
 
       if params[:start_now]
-        pm_messages = []
-        vc.vmachines.each do |vm|
-          pm_messages << vm.start
-        end
-        # TODO render additional data, such as success rate..etc
+        pp "[start_now]"
+        vc = Vcluster.create_and_start params
+      else
+        vc = Vcluster.create params
       end
+
       vc.user = current_user # mark vcluster ownership
       vc.save
       render_data vc

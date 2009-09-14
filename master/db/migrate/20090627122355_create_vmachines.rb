@@ -7,7 +7,7 @@ class CreateVmachines < ActiveRecord::Migration
       t.column :hda,               :string, :limit => 40
       t.column :hdb,               :string, :limit => 40
       t.column :cdrom,             :string, :limit => 40
-      t.column :boot_device,       :string, :limit => 10 # hd, cdrom
+      t.column :boot_device,       :string, :limit => 10, :default => "hd" # hd, cdrom
       t.column :arch,              :string, :limit => 10, :default => "i686" # x86_64, i686...
       t.column :ip,                :string, :limit => 20, :unique => true
       t.column :mac,               :string, :limit => 24

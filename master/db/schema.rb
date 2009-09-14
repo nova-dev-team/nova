@@ -137,7 +137,7 @@ ActiveRecord::Schema.define(:version => 20090913023752) do
     t.string   "hda",               :limit => 40
     t.string   "hdb",               :limit => 40
     t.string   "cdrom",             :limit => 40
-    t.string   "boot_device",       :limit => 10
+    t.string   "boot_device",       :limit => 10, :default => "hd"
     t.string   "arch",              :limit => 10, :default => "i686"
     t.string   "ip",                :limit => 20
     t.string   "mac",               :limit => 24

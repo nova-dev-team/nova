@@ -65,12 +65,35 @@ class Vcluster < ActiveRecord::Base
     return vc
   end
 
-  ## TODO create a new vcluster according to the params
+  ## create a new vcluster according to the params
   def Vcluster.create params
+    vc = Vcluster.alloc params[:name], params[:soft_list], params[:size].to_i
+    vc.vmachines.each do |vm|
+      vm.cpu_count = params[:cpu_count].to_i if params[:cpu_count]
+      vm.cpu_count = 1 if vm.cpu_count == 0
+
+      vm.memory_size = params[:memory_size].to_i if params[:memory_size]
+      vm.hda = params[:hda] || "vd1-sys-empty10g.qcow2"
+      vm.hdb = params[:hdb]
+      vm.cdrom = params[:cdrom]
+      vm.boot_device = params[:boot_device] if params[:boot_device]
+      vm.arch = params[:arch] if params[:arch]
+      vm.save
+    end
+    vc.save
+    return vc
   end
 
-  ## TODO create a new vcluster, and also starts all vmachines of it
+  ## create a new vcluster, and also starts all vmachines of it
   def Vcluster.create_and_start params
+    pm_message = []
+    vc = Vcluster.create params
+    vc.vmachines.each do |vm|
+      pm_message << vm.start
+    end
+    pp pm_message
+    vc.save
+    return vc
   end
 
   ## TODO destroy this vcluster, and also all vmachines inside it (no going back)
