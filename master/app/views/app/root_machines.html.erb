@@ -240,6 +240,11 @@ a.left_nav_current {
         html_str += "vnc_port: " + vm.vnc_port + "<br>";
         html_str += "<hr>";
 
+        html_str += "<applet CODE=VncViewer.class ARCHIVE=vncviewer.jar WIDTH=800 HEIGHT=600>";
+        html_str += "<param name=PORT value=5900>";
+        html_str += "<param name=PASSWORD value='All your base are belong to us'>";
+        html_str += "</applet>";
+
         $("#vm_detail_holder").html(html_str);
       }
     });
