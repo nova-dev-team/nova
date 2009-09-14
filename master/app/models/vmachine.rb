@@ -48,10 +48,12 @@ class Vmachine < ActiveRecord::Base
 
   # TODO suspend vmachine
   def suspend
+    self.pmachine.suspend_vm self
   end
 
   # TODO resume vmachine
   def resume
+    self.pmachine.resume_vm self
   end
 
   def Vmachine.all_not_destroyed
