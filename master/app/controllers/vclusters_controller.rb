@@ -5,9 +5,16 @@ class VclustersController < ApplicationController
   def index
     result = []
     Vcluster.all.each do |vcluster|
+      vm_list = vcluster.vmachines.collect do |vm|
+        {
+          :id => vm.id,
+          :pm_addr => (vm.pmachine ? vm.pmachine.addr : nil)
+        }
+      end
       result << {
         :id => vcluster.id,
-        :name => vcluster.cluster_name
+        :name => vcluster.cluster_name,
+        :vm_list => vm_list
       }
     end
 
@@ -31,6 +38,11 @@ class VclustersController < ApplicationController
     else
       render_failure "Please provide 'size', 'name', 'soft_list' parameters"
     end
+  end
+
+  def show
+    vc = Vcluster.find params[:id]
+    render_data vc
   end
 
   def modify

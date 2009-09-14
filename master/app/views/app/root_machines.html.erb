@@ -272,7 +272,14 @@ a.left_nav_current {
       success: function(result) {
         var html_str = "";
         for (i = 0; i < result.length; i++) {
-          html_str += "id:" + result[i].id + ", name:'" + result[i].name + "'<br>";
+          vc = result[i];
+          html_str += "id:" + vc.id + ", name:<a href='#' class='dark_link' onclick='vc_detail(" + vc.id + ")'>'" + vc.name + "'</a><br>";
+          html_str += "vmachines: ";
+          for (j = 0; j < vc.vm_list.length; j++) {
+            vm = vc.vm_list[j];
+            html_str += " <a href='#' class='dark_link' onclick='vm_detail(" + vm.id + ")'>vm-" + vm.id + "</a>";
+          }
+          html_str += "<br><br>";
         }
         $("#vcluster_list_holder").html(html_str);
         $("#vcluster_list_holder").unblock();
@@ -521,6 +528,11 @@ iptables setting: Ensure the following commands have been executed on master nod
 <div id="pm_detail_holder" style="display:none;">
 </div>
 
+<div id="vc_detail_holder" style="display:none;">
+</div>
+
+<div id="vm_detail_holder" style="display:none;">
+</div>
 
 <div id="add_pmachine_dialog" style="display:none;">
 <p align="center">
