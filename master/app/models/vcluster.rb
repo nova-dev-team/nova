@@ -25,7 +25,7 @@ class Vcluster < ActiveRecord::Base
   #     puts vm.last_ceil_message # <--last message from ceil client on vmachine
   #   end
   #
- 
+ 	
   def Vcluster.alloc(cluster_name, package_list, machine_count)
     vc = Vcluster.new
     vc.cluster_name = cluster_name
@@ -105,6 +105,8 @@ class Vcluster < ActiveRecord::Base
 
   ## TODO destroy this vcluster, and also all vmachines inside it (no going back)
   def destroy!
+		self.net_segment.free
+		self.destroy
     ## TODO release net segment & allcated vnc
   end
 
