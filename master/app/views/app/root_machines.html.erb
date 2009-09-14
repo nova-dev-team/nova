@@ -158,6 +158,93 @@ a.left_nav_current {
     refresh_pmachines(); 
   }
 
+  function vc_detail(vc_id) {
+    $("#vc_detail_holder").show();
+    $("#vm_detail_holder").hide();
+    $("#layout_center_pane").block({message: "Loading..."});
+
+    $.ajax({
+      type: "GET",
+      url: "/vclusters/show",
+      data: {
+        id: vc_id
+      },
+      dataType: "json",
+      error: function(e) {
+        show_message("Failed to download vcluster information!");
+        $("#layout_center_pane").unblock();
+      },
+      success: function(result) {
+        var html_str = "";
+        html_str += "id: " + result.id + "<br>";
+        html_str += "name: " + result.name + "<br>";
+        html_str += "size: " + result.size + "<br>";
+        html_str += "soft_list: " + result.soft_list;
+
+        html_str += "<hr>";
+        html_str += "<table class='styled_table' cellspacing=0>";
+        html_str += "<tr><th scope='col'>ID</th><th scope='col'>CPU count</th><th scope='col'>Memory size</th><th scope='col'>HDA</th><th scope='col'>Arch</th><th scope='col'>Status</th></tr>";
+        for (i = 0; i < result.vm_info.length; i++) {
+          vm = result.vm_info[i];
+          html_str += "<tr>";
+          html_str += "<th scope='row' class='" + ((i % 2 == 0) ? "specalt" : "spec") + "'>" + vm.id + "</th>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.cpu_count + " CPU" + ((vm.cpu_count > 1) ? "s" : "") + "</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.mem_size + " MB</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.hda + "</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.arch + "</td>";
+          html_str += "<td " + ((i % 2 == 0) ? "class='alt'" : "") + ">" + vm.status + "</td>";
+          html_str += "</tr>";
+        }
+        html_str += "</table>";
+ 
+        $("#vc_detail_holder").html(html_str);
+        $("#layout_center_pane").unblock();
+      }
+    });
+  }
+
+  function vm_detail(vm_id) {
+    $("#vm_detail_holder").show();
+    $("#vc_detail_holder").hide();
+    $("#layout_center_pane").block({message: "Loading..."});
+
+    $.ajax({
+      type: "GET",
+      url: "/vmachines/show",
+      data: {
+        id: vm_id
+      },
+      dataType: "json",
+      error: function(e) {
+        show_message("Failed to download vmachine information!");
+        $("#layout_center_pane").unblock();
+      },
+      success: function(result) {
+        $("#layout_center_pane").unblock();
+        var html_str = "";
+        vm = result;
+        html_str += "id: " + vm.id + "<br>";
+        html_str += "uuid: " + vm.uuid + "<br>";
+        html_str += "mem_size: " + vm.mem_size + "<br>";
+        html_str += "cpu_count: " + vm.cpu_count + "<br>";
+        html_str += "hda: " + vm.hda + "<br>";
+        html_str += "hdb: " + vm.hdb + "<br>";
+        html_str += "cdrom: " + vm.cdrom + "<br>";
+        html_str += "boot_device: " + vm.boot_device + "<br>";
+        html_str += "arch: " + vm.arch + "<br>";
+        html_str += "pmachine_addr: " + vm.pmachine_addr + "<br>";
+        html_str += "vcluster_id: " + vm.vcluster_id + "<br>";
+        html_str += "vcluster_name: " + vm.vcluster_name + "<br>";
+        html_str += "status: " + vm.status + "<br>";
+        html_str += "soft_list: " + vm.soft_list + "<br>";
+        html_str += "vnc_port: " + vm.vnc_port + "<br>";
+        html_str += "<hr>";
+
+        $("#vm_detail_holder").html(html_str);
+      }
+    });
+  }
+
   function pm_detail(pm_addr) {
     // pm_addr 192.168.0.104:4000 will be replaced to 192_168_0_104-4000
     $("#pmachines_overview").hide();
@@ -273,7 +360,7 @@ a.left_nav_current {
         var html_str = "";
         for (i = 0; i < result.length; i++) {
           vc = result[i];
-          html_str += "id:" + vc.id + ", name:<a href='#' class='dark_link' onclick='vc_detail(" + vc.id + ")'>'" + vc.name + "'</a><br>";
+          html_str += "<a href='#' class='dark_link' onclick='vc_detail(" + vc.id + ")'>id: " + vc.id + ", name:'" + vc.name + "'</a><br>";
           html_str += "vmachines: ";
           for (j = 0; j < vc.vm_list.length; j++) {
             vm = vc.vm_list[j];

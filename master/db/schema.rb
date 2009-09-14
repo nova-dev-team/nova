@@ -148,6 +148,7 @@ ActiveRecord::Schema.define(:version => 20090913023752) do
     t.integer  "pmachine_id"
     t.boolean  "destroyed",                       :default => false
     t.string   "status",                          :default => "not running"
+    t.integer  "vnc_port"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

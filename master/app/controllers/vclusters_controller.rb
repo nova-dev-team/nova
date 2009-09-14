@@ -42,7 +42,24 @@ class VclustersController < ApplicationController
 
   def show
     vc = Vcluster.find params[:id]
-    render_data vc
+    vm_info = vc.vmachines.collect do |vm|
+      {
+        :id => vm.id,
+        :mem_size => vm.memory_size,
+        :cpu_count => vm.cpu_count,
+        :arch => vm.arch,
+        :hda => vm.hda,
+        :status => vm.status
+      }
+    end
+    result = {
+      :id => vc.id,
+      :soft_list => vc.package_list,
+      :name => vc.cluster_name,
+      :size => vc.vmachines.size,
+      :vm_info => vm_info
+    }
+    render_data result
   end
 
   def modify
