@@ -21,6 +21,8 @@ class CeilController < ApplicationController
 		  server_addr = ""
 		  package_list = ""
 		  cluster_name = ""
+			character = []
+
 		  if vm
 		    host_name = vm.hostname
 		    node_list = vm.get_node_list
@@ -28,7 +30,10 @@ class CeilController < ApplicationController
 		    package_list = vm.get_package_list
 		    cluster_name = vm.vcluster.cluster_name
 		  end
-		  
+
+		  character << "worker"
+			character << "master" if vm.master?
+
 		  cjson = {"host_name" => host_name, 
 		           "cluster_name" => cluster_name, 
 		           "node_list" => node_list, 
@@ -36,7 +41,8 @@ class CeilController < ApplicationController
 		           "package_server" => server_addr,
 		           "package_server_type" => CEIL_PACKAGE_SERVER_TYPE,
 		           "key_server" => server_addr,
-		           "key_server_type" => CEIL_KEY_SERVER_TYPE} 
+		           "key_server_type" => CEIL_KEY_SERVER_TYPE,
+							 "character" => character} 
 		  
 			accept.json { render :json => cjson }
 			accept.html { render :text => cjson.to_json }

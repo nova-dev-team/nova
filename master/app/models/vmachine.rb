@@ -4,6 +4,11 @@ class Vmachine < ActiveRecord::Base
   has_one :vnc_port
   has_many :vmachine_infos
   
+
+  def master?
+		return self == self.vcluster.vmachines.first
+  end
+
   def get_node_list
     list = ""
     self.vcluster.vmachines.each do |vm|
