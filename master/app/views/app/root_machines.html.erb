@@ -189,6 +189,8 @@ a.left_nav_current {
         <% if not_blank? master_internet_ip and not_blank? master_intranet_ip %>
         for (i = 0; i < result.length; i++) {
           pm = result[i];
+          pm.ip = (pm.addr.split(":"))[0];
+          pm.port = (pm.addr.split(":"))[1];
           if (pm.ip == "<%= master_internet_ip %>" || pm.ip == "<%= master_intranet_ip %>")
             continue;
           for (p = pm.vnc_first; p <= pm.vnc_last; p++) {
