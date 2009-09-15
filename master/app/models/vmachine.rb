@@ -40,31 +40,25 @@ class Vmachine < ActiveRecord::Base
 
   # TODO stop vmachine
   def stop
-    if self.status == "running"
-      self.pmachine.stop_vm self
-      self.destroyed = true
-      self.status = "not running"
-      self.vnc_port = nil
-      self.save
-    end
+    self.pmachine.destroy_vm self if self.pmachine
+    self.destroyed = true
+    self.status = "not running"
+    self.vnc_port = nil
+    self.save
   end
 
   # TODO suspend vmachine
   def suspend
-    if self.status == "running"
-      self.status = "suspended"
-      self.pmachine.suspend_vm self
-      self.save
-    end
+    self.status = "suspended"
+    self.pmachine.suspend_vm self
+    self.save
   end
 
   # TODO resume vmachine
   def resume
-    if self.status == "suspended"
-      self.status = "running"
-      self.pmachine.resume_vm self
-      self.save
-    end
+    self.status = "running"
+    self.pmachine.resume_vm self
+    self.save
   end
 
   def Vmachine.all_not_destroyed

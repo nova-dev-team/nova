@@ -65,4 +65,15 @@ class VclustersController < ApplicationController
   def modify
   end
 
+  # delete a whole cluster
+  def destroy
+    vc = Vcluster.find params[:id]
+    vc.vmachines.each do |vm|
+      vm.stop
+    end
+    render_success "Successfully destroyed vcluster named '#{vc.cluster_name}'"
+    vc.destroy!
+    Vcluster.delete vc
+  end
+
 end

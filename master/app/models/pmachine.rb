@@ -53,7 +53,7 @@ class Pmachine < ActiveRecord::Base
   end
 
   def destroy_vm vm
-    json_rest_request "vmachines/destory", :uuid => vm.uuid
+    json_rest_request "vmachines/destroy", :uuid => vm.uuid
     self.vmachines.delete vm
   end
 
@@ -142,19 +142,20 @@ private
   end
 
   def mark_connected
-    if self.status == "unconnected"
+    was_connected = (self.status == "unconnected")
+    self.status = "connected"
+    self.save if self.id != nil # prevent prematurely creating new pmachine records in database, as in 'register' function
+    if was_connected
       # the pmachine was unconnected, on re-connection, sync settings and vm status to it
       update_settings
       update_vm_status
     end
-    self.status = "connected"
-    self.save if self.id != nil # prevent prematurely creating new pmachine records in database, as in 'register' function
   end
 
   # sync settings on master to pmachines
   def update_settings
     Setting.all_for_worker.each do |setting|
-      json_rest_request "settings/edit", :key => setting.key, :value => setting.value
+      json_rest_request "settings/edit", :key => setting.key, :value => setting.value, :test_connection => false
     end
   end
 
@@ -163,18 +164,20 @@ private
   end
 
   # send a request to this pmachine, and will also record 'health' condition of this pmachine
-  def json_rest_request method, args = nil
+  def json_rest_request method, args = nil, test_connection = true
+
+    pp "json request, method=#{method}, args=#{args.pretty_inspect}"
     begin
       method += ".json" unless method.end_with? ".json" # make sure this is a json call
       url = "http://#{self.addr}/#{method}"
       result = nil # forward declaration of the 'result' variable
       timeout(5) { result = args ? (RestClient.post url, args) : (RestClient.get url) }
-      mark_connected
+      mark_connected if test_connection
       JSON.parse result
     rescue => e
       puts e.message
       puts e.backtrace.join("\n")
-      mark_unconnected
+      mark_unconnected if test_connection
       raise e
     end
   end

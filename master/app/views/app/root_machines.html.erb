@@ -141,6 +141,8 @@ a.left_nav_current {
     $("#pmachine_list_holder").hide();
     $("#pmachines_overview").hide();
     $("#pm_detail_holder").hide();
+    $("#vm_detail_holder").hide();
+    $("#vc_detail_holder").hide();
     
     do_layout();
     refresh_vclusters();
@@ -156,6 +158,23 @@ a.left_nav_current {
 
     do_layout();
     refresh_pmachines(); 
+  }
+
+  function vc_destroy(vc_id) {
+    $.ajax({
+      type: "POST",
+      url: "/vclusters/destroy",
+      dataType: "json",
+      data: {
+        id: vc_id
+      },
+      error: function(e) {
+        show_message(e);
+      },
+      success: function(result) {
+        list_virtual_clusters();
+      }
+    });
   }
 
   function vc_detail(vc_id) {
@@ -179,7 +198,8 @@ a.left_nav_current {
         html_str += "id: " + result.id + "<br>";
         html_str += "name: " + result.name + "<br>";
         html_str += "size: " + result.size + "<br>";
-        html_str += "soft_list: " + result.soft_list;
+        html_str += "soft_list: " + result.soft_list + "<br>";
+        html_str += "<a href='#' class='dark_link' onclick='vc_destroy(" + result.id + ")'>Destroy!</a>";
 
         html_str += "<hr>";
         html_str += "<table class='styled_table' cellspacing=0>";
@@ -240,9 +260,35 @@ a.left_nav_current {
         html_str += "vnc_port: " + vm.vnc_port + "<br>";
         html_str += "<hr>";
 
-        html_str += "<a href='#' class='dark_link' onclick='window.open(\"/vmachines/observe/" + vm.id + "\")'>Observe with VNC</a>";
+        html_str += "<a href='#' class='dark_link' onclick='window.open(\"/vmachines/observe/" + vm.id + "\")'>Observe with VNC</a> ";
+        if (vm.status == "not running") {
+          html_str += "<a href='#' class='dark_link' onclick='vm_action(\"" + vm.uuid + "\", \"start\")'>Start</a> ";
+        } else if (vm.status == "running") {
+          html_str += "<a href='#' class='dark_link' onclick='vm_action(\"" + vm.uuid + "\", \"suspend\")'>Suspend</a> ";
+          html_str += "<a href='#' class='dark_link' onclick='vm_action(\"" + vm.uuid + "\", \"stop\")'>Stop</a> ";
+        } else if (vm.status == "suspended") {
+          html_str += "<a href='#' class='dark_link' onclick='vm_action(\"" + vm.uuid + "\", \"resume\")'>Resume</a> ";
+          html_str += "<a href='#' class='dark_link' onclick='vm_action(\"" + vm.uuid + "\", \"stop\")'>Stop</a> ";
+        }
 
         $("#vm_detail_holder").html(html_str);
+      }
+    });
+  }
+
+  function vm_action(vm_uuid, action) {
+    $.ajax({
+      type: "POST",
+      url: "/vmachines/" + action,
+      dataType: "json",
+      data: {
+        uuid: vm_uuid
+      },
+      error: function(e) {
+        show_message(e);
+      },
+      success: function(result) {
+        vm_detail(vm_uuid);
       }
     });
   }
