@@ -11,6 +11,16 @@ class Pmachine < ActiveRecord::Base
   # start an vmachine on this pmachine
   # TODO error handling
   def start_vm vm
+    print "Starting:"
+    pp vm
+    used_vnc = self.vmachines.collect {|vm| vm.vnc_port}
+    print "Used_vnc = "
+    pp used_vnc
+    usable_vnc = (self.vnc_first..self.vnc_last).reject {|port| used_vnc.include? port}
+    print "Candidate Vnc = "
+    pp usable_vnc
+    vm.vnc_port = usable_vnc[0]
+    vm.save
     result = json_rest_request "vmachines/start", {
       :arch => vm.arch,
       :name => "vm#{vm.id}",
@@ -20,11 +30,13 @@ class Pmachine < ActiveRecord::Base
       :uuid => vm.uuid,
       :boot_dev => vm.boot_device,
       :hda => "vd1-sys-empty10g.qcow2",#(Vdisk.find_raw_name vm.hda),
-      #:hdb => (Vdisk.find_raw_name vm.hdb),
-      #:cdrom => (vm.cdrom)
+      :hdb => vm.hdb,
+      :cdrom => vm.cdrom,
+      :vnc_port => vm.vnc_port
     }
     self.vmachines << vm
     self.save
+    return self
   end
 
   # do scheduling and start a vmachine

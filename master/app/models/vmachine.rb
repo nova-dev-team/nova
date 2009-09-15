@@ -1,7 +1,6 @@
 class Vmachine < ActiveRecord::Base
   belongs_to :vcluster
   belongs_to :pmachine
-  has_one :vnc_port
   has_many :vmachine_infos
   
 
@@ -28,10 +27,12 @@ class Vmachine < ActiveRecord::Base
 
   # return false if faled to allocate the vm to some pmachine
   def start
-    pm = Pmachine.start_vm self # let Pmachine class do the scheduling
-    if pm != nil
+    pm = Pmachine.start_vm self
+    if pm # let Pmachine class do the scheduling
       # if pm returned success
-      #   self.status = "running"
+      self.status = "running"
+      self.pmachine = pm
+      self.save
     else # no available pmachine
     end
     # TODO remember vmachine status
@@ -42,18 +43,28 @@ class Vmachine < ActiveRecord::Base
     if self.status == "running"
       self.pmachine.stop_vm self
       self.destroyed = true
+      self.status = "not running"
+      self.vnc_port = nil
       self.save
     end
   end
 
   # TODO suspend vmachine
   def suspend
-    self.pmachine.suspend_vm self
+    if self.status == "running"
+      self.status = "suspended"
+      self.pmachine.suspend_vm self
+      self.save
+    end
   end
 
   # TODO resume vmachine
   def resume
-    self.pmachine.resume_vm self
+    if self.status == "suspended"
+      self.status = "running"
+      self.pmachine.resume_vm self
+      self.save
+    end
   end
 
   def Vmachine.all_not_destroyed

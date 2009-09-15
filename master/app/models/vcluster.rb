@@ -88,7 +88,10 @@ class Vcluster < ActiveRecord::Base
   def Vcluster.create_and_start params
     pm_message = []
     vc = Vcluster.create params
+    pp vc
     vc.vmachines.each do |vm|
+      pp vm
+      vm.save
       pm_message << vm.start
     end
     pp pm_message

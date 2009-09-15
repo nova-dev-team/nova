@@ -33,4 +33,11 @@ class VmachinesController < ApplicationController
     render_data result
   end
 
+  # vnc view
+  def observe
+    respond_to do |accept|
+      accept.html {render :template => 'vmachines/observe'}
+    end
+  end
+
 end
