@@ -12,8 +12,7 @@ class Pmachine < ActiveRecord::Base
   # TODO error handling
   def start_vm vm
     print "Starting:"
-    pp vm
-    used_vnc = self.vmachines.collect {|vm| vm.vnc_port}
+    used_vnc = self.vmachines.collect {|v| v.vnc_port}
     print "Used_vnc = "
     pp used_vnc
     usable_vnc = (self.vnc_first..self.vnc_last).reject {|port| used_vnc.include? port}
