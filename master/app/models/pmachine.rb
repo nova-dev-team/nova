@@ -170,7 +170,7 @@ private
       method += ".json" unless method.end_with? ".json" # make sure this is a json call
       url = "http://#{self.addr}/#{method}"
       result = nil # forward declaration of the 'result' variable
-      timeout(5) { result = args ? (RestClient.post url, args) : (RestClient.get url) }
+      timeout(20) { result = args ? (RestClient.post url, args) : (RestClient.get url) }
       mark_connected if test_connection
       JSON.parse result
     rescue => e

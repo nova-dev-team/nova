@@ -73,7 +73,7 @@ class Vcluster < ActiveRecord::Base
       vm.cpu_count = 1 if vm.cpu_count == 0
 
       vm.memory_size = params[:memory_size].to_i if params[:memory_size]
-      vm.hda = params[:hda] || "vd1-sys-empty10g.qcow2"
+      vm.hda = params[:hda] || "vd1-sysfedora8.qcow2"
       vm.hdb = params[:hdb]
       vm.cdrom = params[:cdrom]
       vm.boot_device = params[:boot_device] if params[:boot_device]
