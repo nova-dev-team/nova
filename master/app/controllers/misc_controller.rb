@@ -14,4 +14,8 @@ class MiscController < ApplicationController
     render :text => "Master"
   end
 
+  def browser_detect
+    render :text => (ApplicationHelper::client_browser_name request)
+  end
+
 end
