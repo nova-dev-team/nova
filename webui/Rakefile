@@ -7,11 +7,11 @@ if !ENV['CONFIG']
 end
 
 ObjectiveJ::BundleTask.new(:webui) do |t|
-    t.name          = 'webui'
-    t.identifier    = 'com.yourcompany.webui'
-    t.version       = '1.0'
-    t.author        = 'Your Company'
-    t.email         = 'feedback @nospam@ yourcompany.com'
+    t.name          = 'Nova WebUI'
+    t.identifier    = 'cn.edu.tsinghua.cs.hpcgrid.nova.webui'
+    t.version       = '2.0'
+    t.author        = 'Tsinghua University'
+    t.email         = 'santa1987@gmail.com'
     t.summary       = 'webui'
     t.sources       = FileList['*.j']
     t.resources     = FileList['Resources/*']
