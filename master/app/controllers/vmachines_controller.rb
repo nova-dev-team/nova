@@ -31,6 +31,7 @@ class VmachinesController < ApplicationController
       :vcluster_name => vm.vcluster.cluster_name,
       :soft_list => vm.vcluster.package_list,
       :status => vm.status,
+      :mac_addr => vm.mac,
       :vnc_port => vm.vnc_port
     }
     render_data result

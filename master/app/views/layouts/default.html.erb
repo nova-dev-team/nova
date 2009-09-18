@@ -35,9 +35,11 @@ img, div, a, input { behavior: url(/stylesheets/iepngfix.htc) }
 </style>
 <script type="text/javascript" src="/javascripts/iepngfix_tilebg.js"></script>
 
-
+<% if (ApplicationHelper::client_browser_name request) != "Internet Explorer" %>
+<!-- jGrowl cause troubles in IE, so they should be disabled under ie -->
 <script type="text/javascript" src="/javascripts/jquery.jgrowl.js"></script>
 <link href="/stylesheets/jgrowl/jquery.jgrowl.css" rel="stylesheet" type="text/css" />
+<% end-%>
 
 <style type="text/css" media="screen">
 
@@ -371,11 +373,11 @@ input, select, textarea {
   }
   
   function show_message(message) {
-    if ($("#jGrowl-Notification").jGrowl == null) {
-      alert(message);
-    } else {
-      $("#jGrowl-Notification").jGrowl(message);
-    }
+<%if (ApplicationHelper::client_browser_name request) == "Internet Explorer" %>
+    alert(message);
+<%else%>
+    $("#jGrowl-Notification").jGrowl(message);
+<%end-%>
   }
   
   function will_change_account_password() {

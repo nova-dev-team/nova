@@ -1,11 +1,23 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
 auto lo
 iface lo inet loopback
-
 auto eth0
-iface eth0 inet dhcp
 
+iface eth0 inet static
+address 10.0.5.254
+netmask 255.255.255.0
+network 10.0.5.0
+broadcast 10.0.5.255
+dns-nameservers 166.111.8.28
 
-auto dsl-provider
-iface dsl-provider inet ppp
-pre-up /sbin/ifconfig eth0 up # line maintained by pppoeconf
-provider dsl-provider
+# The primary network interface
+auto eth1
+iface eth1 inet static
+address 166.111.131.32
+netmask 255.255.255.0
+gateway 166.111.131.1
+#dns-nameservers 166.111.8.28
+
