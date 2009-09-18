@@ -563,7 +563,7 @@ a.left_nav_current {
                 size: $("#vcwiz_vcluster_size").val(), 
                 name: $("#vcwiz_vcluster_name").val(),
                 start_now: true,
-                soft_list: "",
+                soft_list: $("#vcwiz_soft_list").val(),
                 memory_size: $("#vcwiz_memory_size").val(),
                 cpu_count: $("#vcwiz_cpu_count").val()
               },
@@ -692,10 +692,12 @@ iptables setting: Ensure the following commands have been executed on master nod
 </div>
 
 <div id="add_vcluster_dialog" style="display:none;">
+  <!-- currently, "advanced" tab page is still under development
   <ul>
     <li><a href="#add_vcluster_tab_wizard">Wizard</a></li>
     <li><a href="#add_vcluster_tab_advanced">Advanced Options</a></li>
   </ul>
+  -->
 
   <!-- Vcluster wizard -->
   <div id="add_vcluster_tab_wizard">
@@ -737,10 +739,19 @@ iptables setting: Ensure the following commands have been executed on master nod
         </select>
       </td>
     </tr>
+    <tr>
+      <td>Software list</td>
+      <td><img src="/images/spacer.gif" width=40 height=40></td>
+      <td><input type="text" id="vcwiz_soft_list" value="hadoop mpich2"></td>
+    </tr>
+    <tr>
+      <td colspan=3>Available softwares: hadoop mpich2 apache2 mysql</td>
+    </td>
   </table>
   </div>
 
   <!-- Advanced options -->
+  <!--
   <div id="add_vcluster_tab_advanced">
   <table>
     <tr>
@@ -750,6 +761,8 @@ iptables setting: Ensure the following commands have been executed on master nod
     </tr>
   </table>
   </div>
+  -->
+
 </div>
 
 
