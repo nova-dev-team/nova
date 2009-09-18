@@ -10,7 +10,7 @@
   <body>
     You are observing vm-<%= vm.id %> via VNC on port <%= vm.vnc_port %>.<br>
     <hr>
-    <applet CODE=VncViewer.class ARCHIVE=/vncviewer.jar WIDTH=800 HEIGHT=600>
+    <applet CODE=VncViewer.class ARCHIVE=/vncviewer.jar WIDTH=800 HEIGHT=640>
       <param name=PORT value=<%= vm.vnc_port%>>
       <param name=PASSWORD value='All your base are belong to us'>
     </applet>
