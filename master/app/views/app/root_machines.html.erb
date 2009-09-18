@@ -197,7 +197,7 @@ a.left_nav_current {
         var html_str = "";
         html_str += "id: " + result.id + "<br>";
         html_str += "name: " + result.name + "<br>";
-        html_str += "size: " + result.size + "<br>";
+	html_str += "size: " + result.size + "<br>";
         html_str += "soft_list: " + result.soft_list + "<br>";
         html_str += "<a href='#' class='dark_link' onclick='vc_destroy(" + result.id + ")'>Destroy!</a>";
 
@@ -256,7 +256,8 @@ a.left_nav_current {
         html_str += "vcluster_id: " + vm.vcluster_id + "<br>";
         html_str += "vcluster_name: " + vm.vcluster_name + "<br>";
         html_str += "status: " + vm.status + "<br>";
-        html_str += "soft_list: " + vm.soft_list + "<br>";
+	html_str += "soft_list: " + vm.soft_list + "<br>";
+	html_str += "mac_addr: " + vm.mac_addr + "<br>";
         html_str += "vnc_port: " + vm.vnc_port + "<br>";
         html_str += "<hr>";
 
