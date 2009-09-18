@@ -293,6 +293,40 @@ a.left_nav_current {
     });
   }
 
+  function pm_retire(pm_addr) {
+    $.ajax({
+      type: "POST",
+      url: "/pmachines/retire",
+      data: {
+        addr: pm_addr
+      },
+      dataType: "json",
+      error: function(e) {
+        show_message("Failed to retire pmachine! Check your network connetion!");
+      },
+      success: function(e) {
+        pm_detail(pm_addr);
+      }
+    });
+  }
+
+  function pm_undo_retire(pm_addr) {
+    $.ajax({
+      type: "POST",
+      url: "/pmachines/undo_retire",
+      data: {
+        addr: pm_addr
+      },
+      dataType: "json",
+      error: function(e) {
+        show_message("Failed to retire pmachine! Check your network connetion!");
+      },
+      success: function(e) {
+        pm_detail(pm_addr);
+      }
+    });
+  }
+
   function pm_detail(pm_addr) {
     // pm_addr 192.168.0.104:4000 will be replaced to 192_168_0_104-4000
     $("#pmachines_overview").hide();
@@ -313,7 +347,14 @@ a.left_nav_current {
         var html_str = "";
         html_str += "ID: " + result.id + "<br>";
         html_str += "Address: " + result.addr + "<br>";
-        html_str += "Retired: " + result.retired + "<br>";
+        html_str += "Retired: " + result.retired + " ";
+
+        if (result.retired == false) {
+          html_str += "<a href='#' class='dark_link' onclick='pm_retire(\"" + result.addr + "\")'>Retire!</a><br>";
+        } else {
+          html_str += "<a href='#' class='dark_link' onclick='pm_undo_retire(\"" + result.addr + "\")'>Undo retire!</a><br>";
+        }
+
         html_str += "VNC range: " + result.vnc_first + "-" + result.vnc_last + "<br>";
 
         html_str += "<hr>";

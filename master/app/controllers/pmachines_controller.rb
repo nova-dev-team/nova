@@ -29,6 +29,18 @@ class PmachinesController < ApplicationController
   def edit
   end
 
+  def retire
+    pm = Pmachine.find_by_addr params[:addr]
+    pm.retire
+    render_success "Successfully retired pmachine at #{pm.addr}!"
+  end
+
+  def undo_retire
+    pm = Pmachine.find_by_addr params[:addr]
+    pm.undo_retire
+    render_success "Successfully undo retire pmachine at #{pm.addr}!"
+  end
+
   def show
     pm = Pmachine.find_by_addr params[:addr]
     vm_info = pm.vmachines.collect do |vm|

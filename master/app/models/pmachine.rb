@@ -47,7 +47,7 @@ class Pmachine < ActiveRecord::Base
     end
 
     # simple scheduling method, find pmachine with lowest load
-    pm_sched = (Pmachine.all.sort {|pm1, pm2| pm1.vmachines.count <=> pm2.vmachines.count}).first
+    pm_sched = (Pmachine.all_usable.sort {|pm1, pm2| pm1.vmachines.count <=> pm2.vmachines.count}).first
     pm_sched.start_vm vm
   end
 
