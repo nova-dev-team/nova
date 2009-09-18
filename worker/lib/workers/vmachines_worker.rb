@@ -320,8 +320,6 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
       if device != nil # when using this disk as a device (not extra dependency), we must make a COW disk based on it
         cow_disk_name = "vd-notsaved-#{uuid}-#{device}.qcow2"
         qcow2_cmd = "qemu-img create -b #{vmachine_dir}/#{resource_name} -f qcow2 #{vmachine_dir}/#{cow_disk_name}"
-# XXX temp fix for qcow2 corruption, copy images, instead of creating new vmachine
-	qcow2_cmd = "cp #{vmachine_dir}/#{resource_name} #{vmachine_dir}/#{cow_disk_name}"
         logger.debug "*** [cmd] #{qcow2_cmd}"
         `#{qcow2_cmd}`
       end
