@@ -16,8 +16,8 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   MAX_COPYING_TRY_COUNT = 5 # after 5 failed tries, we stop copying resource
   MAX_STALL_TIME = 30 # after stalling for 30 seconds, we think the resource has failed to download
 
-  IMAGE_POOLING = false # XXX stupid work around for qcow2 image corrpution
-  IMAGE_POOLING_COUNT = 5 # XXX stupid work around for qcow2 image corrpution
+  IMAGE_POOLING = true # XXX stupid work around for qcow2 image corrpution
+  IMAGE_POOLING_COUNT = 8 # XXX stupid work around for qcow2 image corrpution
 
   set_worker_name :vmachines_worker
 
@@ -102,6 +102,20 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     
     storage_cache_root = Setting.storage_cache
     FileUtils.mkdir_p storage_cache_root
+
+    # remove stale supervise files, if .supervise exists, but .copying does not exists
+    Dir.foreach(storage_cache_root) do |entry|
+      next unless entry =~ /\.supervise/
+      logger.debug "[supervise] checking if #{entry} is stale"
+      supervise_fullpath = "#{storage_cache_root}/#{entry}"
+      copying_fullpath = supervise_fullpath[0...-10] + ".copying"
+      logger.debug "[supervise] testing existance of #{copying_fullpath}"
+      unless File.exist? copying_fullpath
+        FileUtils.rm supervise_fullpath
+        logger.debug "[supervise] remove stale .supervise file #{entry}"
+      end
+    end
+
 
     # supervise on stoarge cache (using .copying files)
     Dir.foreach(storage_cache_root) do |entry|
@@ -196,14 +210,16 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     end
 
     # XXX stupid work around for qcow2 image corrpution bug
-    if IMAGE_POOLING
-      Dir.entries(Setting.storage_cache).each do |entry|
-        next unless entry.end_with? ".qcow2" # only handles qcow2 images
-        (1..IMAGE_POOLING_COUNT).each do |id|
-          copy_pooling_image entry, id
-        end
-      end
-    end
+# these function was moved into UpdateWorker's do_pooling method
+#    if IMAGE_POOLING
+#      Dir.entries(Setting.storage_cache).each do |entry|
+#        next unless entry.end_with? ".qcow2" # only handles qcow2 images
+#        (1..IMAGE_POOLING_COUNT).each do |id|
+#          copy_pooling_image "#{Setting.storage_cache}/#{entry}", id
+#        end
+#      end
+#    end
+
   end
 
 
@@ -403,7 +419,16 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
   # pick a local pooled image file, if there is no such a file, copy one
   def pick_pooling_image local_filename
-
+    pooling_dir = File.dirname local_filename
+    local_basename = File.basename local_filename
+   	
+    Dir.entries(pooling_dir).each do |entry|
+      next unless entry.start_with? local_basename
+      next if entry.end_with? ".copying" or File.exist? "#{pooling_dir}/#{entry}.copying" # skip copy lock and files under copying
+      if entry =~ /pool\.[0-9]+$/
+        return "#{pooling_dir}/#{entry}"
+      end
+    end
 
     copy_pooling_image local_filename
   end
@@ -412,6 +437,16 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   # if pooling_id is not given, automatically determines an id
   # if image already copied, return the existing image name
   def copy_pooling_image local_filename, pooling_id = nil
+    logger.debug "[pooling] #{local_filename}, #{pooling_id}"
+    VmachinesWorker::copy_pooling_image local_filename, pooling_id
+  end
+
+public
+
+  # copy a pooling image, and return the pooled image name
+  # if pooling_id is not given, automatically determines an id
+  # if image already copied, return the existing image name
+  def VmachinesWorker::copy_pooling_image local_filename, pooling_id = nil
     pooling_dir = File.dirname local_filename
     
     if pooling_id == nil
@@ -432,7 +467,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     pooling_name = "#{local_filename}.pool.#{pooling_id}"
     unless File.exist? pooling_name
       copying_lock_fname = "#{pooling_name}.copying"
-      copying_lock_file = File.new(copying_lock_fname, "r")
+      copying_lock_file = File.new(copying_lock_fname, "w")
       File.cp local_filename, pooling_name 
       copying_lock_file.close
       FileUtils.rm copying_lock_fname
