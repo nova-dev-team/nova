@@ -331,6 +331,8 @@ a.left_nav_current {
   function pm_detail(pm_addr) {
     // pm_addr 192.168.0.104:4000 will be replaced to 192_168_0_104-4000
     $("#pmachines_overview").hide();
+    $("#vc_detail_holder").hide();
+    $("#vm_detail_holder").hide();
 
     $("#layout_center_pane").block({message: "Loading..."});
     $.ajax({
