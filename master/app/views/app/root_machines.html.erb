@@ -333,6 +333,7 @@ a.left_nav_current {
     $("#pmachines_overview").hide();
     $("#vc_detail_holder").hide();
     $("#vm_detail_holder").hide();
+    $("#pm_detail_holder").show();
 
     $("#layout_center_pane").block({message: "Loading..."});
     $.ajax({
@@ -377,7 +378,6 @@ a.left_nav_current {
         html_str += "</table>";
         $("#layout_center_pane").unblock();
         $("#pm_detail_holder").html(html_str);
-        $("#pm_detail_holder").show();
       }
     });
   }
