@@ -101,8 +101,8 @@ class Vcluster < ActiveRecord::Base
 
   ## TODO destroy this vcluster, and also all vmachines inside it (no going back)
   def destroy!
-		self.net_segment.free
-		self.destroy
+    self.net_segment.free if self.net_segment
+    self.destroy
     ## TODO release net segment & allcated vnc
   end
 
