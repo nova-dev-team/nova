@@ -48,7 +48,7 @@ class SettingsController < ApplicationController
           end
 
           # then all settings will be sent to pmachine workers
-          Pmachine.all.each do |pmachine|
+          Pmachine.all_usable.each do |pmachine|
             pmachine_addr = "http://#{pmachine.addr}"
             reply = RestClient.post "#{pmachine_addr}/settings/edit.json", :key => params[:key], :value => params[:value]
             #result = JSON.parse(reply)

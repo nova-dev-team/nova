@@ -99,6 +99,7 @@ class Pmachine < ActiveRecord::Base
   # undo retiring of pmachine
   def undo_retire
     self.retired = false
+    update_settings # update settings to it
     self.save
   end
 
