@@ -16,6 +16,9 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   MAX_COPYING_TRY_COUNT = 5 # after 5 failed tries, we stop copying resource
   MAX_STALL_TIME = 30 # after stalling for 30 seconds, we think the resource has failed to download
 
+  IMAGE_POOLING = false # XXX stupid work around for qcow2 image corrpution
+  IMAGE_POOLING_COUNT = 5 # XXX stupid work around for qcow2 image corrpution
+
   set_worker_name :vmachines_worker
 
   def create(args = nil)
@@ -191,6 +194,16 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
         raise "Scheme '#{scheme}' not known!"
       end
     end
+
+    # XXX stupid work around for qcow2 image corrpution bug
+    if IMAGE_POOLING
+      Dir.entries(Setting.storage_cache).each do |entry|
+        next unless entry.end_with? ".qcow2" # only handles qcow2 images
+        (1..IMAGE_POOLING_COUNT).each do |id|
+          copy_pooling_image entry, id
+        end
+      end
+    end
   end
 
 
@@ -301,6 +314,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   end
 
 
+  # this function ensures that the 'resource_name' exists on disk, and is ready to be used by vmachines
   def get_resource resource_name, vmachine_name, progress, device = nil, uuid = nil
     return if resource_name == nil or resource_name == ""
 
@@ -313,11 +327,21 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     progress.save
 
     local_filename = request_resource "#{Setting.storage_server_vdisks}/#{resource_name}", Setting.storage_cache
-    `chmod 400 #{Setting.storage_cache}/#{resource_name}` # make sure the image file is readonly
+
+    if IMAGE_POOLING
+      # XXX work around for qcow2 corruption
+      local_filename = get_resource_qcow2_pooling local_filename
+    end
 
     case vdisk_type resource_name
     when "sys", "sys.cow"
-      FileUtils.ln local_filename, "#{vmachine_dir}/#{resource_name}"
+
+      if IMAGE_POOLING
+        FileUtils.mv local_filename, "#{vmachine_dir}/#{resource_name}"
+      else
+        FileUtils.ln local_filename, "#{vmachine_dir}/#{resource_name}"
+      end
+
       if device != nil # when using this disk as a device (not extra dependency), we must make a COW disk based on it
         cow_disk_name = "vd-notsaved-#{uuid}-#{device}.qcow2"
         qcow2_cmd = "qemu-img create -b #{vmachine_dir}/#{resource_name} -f qcow2 #{vmachine_dir}/#{cow_disk_name}"
@@ -333,6 +357,87 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     else
       raise "'#{resource_name}' is not a valid resource name!"
     end
+
+  end
+
+  # XXX stupid work around for qcow2 corrpution
+  #
+  # extending get_resource by enabling pooling of images, that is, we preserve a number of copies of each image,
+  # and 'mv' them to vm dir when needed.
+  #
+  # if there exists a pooled image, return it
+  # if there is no pooled image, copy one, and return it
+  #
+  # pooled images are named with suffix like 'pool.X', where X is the pooled count.
+  # e.g. template image is "vd1.qcow2", it will never be used directly, instead, we copy several images (in update function):
+  #   vd1.qcow2.pool.1
+  #   vd1.qcow2.pool.2
+  #   vd1.qcow2.pool.3
+  #   ....
+  #   vd1.qcow2.pool.6 (when IMAGE_POOL_COUNT=6)
+  #
+  # and in this case, we return largest pooled image (pool.6), and it will be moved to vm dir, consumed.
+  # 
+  # 'update' function detects the consumption of pool6, and it will copy a new image pool.6, make sure there is enough images around.
+  #
+  # when copying images, we add a 'copying' lock file for it, such as:
+  #   vd1.qcow2.pool.6.copying
+  #
+  # this will inform the update of the copying process, and prevent the confliction of copying pool.6 twice
+  #
+  # it is possible that when this function is triggered, 'update' function is also copying pooling images,
+  # and there is no pooling image available. in this case, we don't wait for 'update' to copy pooling image,
+  # but copies new image by ourselves.
+  def get_resource_qcow2_pooling local_filename
+
+    # pooling only works for qcow2 images
+    return local_filename unless local_filename.end_with? ".qcow2"
+
+    # TODO return a pooled image
+    
+    pooled_image_name = pick_pooling_image local_filename
+    
+    logger.debug "*** [stupid pooling] using pooled image #{pooled_image_name}"
+    pooled_image_name
+  end
+
+  # pick a local pooled image file, if there is no such a file, copy one
+  def pick_pooling_image local_filename
+
+
+    copy_pooling_image local_filename
+  end
+
+  # copy a pooling image, and return the pooled image name
+  # if pooling_id is not given, automatically determines an id
+  # if image already copied, return the existing image name
+  def copy_pooling_image local_filename, pooling_id = nil
+    pooling_dir = File.dirname local_filename
+    
+    if pooling_id == nil
+      local_basename = File.basename local_filename
+      pooling_list = Dir.entries(pooling_dir).select {|e| e.start_with? "#{local_basename}.pool."}
+
+      pooling_id = 1 # detect pooling id from 1
+      loop do
+
+        pooling_name = "#{local_filename}.pool.#{pooling_id}"
+
+        break unless File.exist? pooling_name
+
+        pooling_id += 1 # try next pooling id
+      end
+    end
+
+    pooling_name = "#{local_filename}.pool.#{pooling_id}"
+    unless File.exist? pooling_name
+      copying_lock_fname = "#{pooling_name}.copying"
+      copying_lock_file = File.new(copying_lock_fname, "r")
+      File.cp local_filename, pooling_name 
+      copying_lock_file.close
+      FileUtils.rm copying_lock_fname
+    end
+    return pooling_name
 
   end
 
