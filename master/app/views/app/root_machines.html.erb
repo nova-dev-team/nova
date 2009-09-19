@@ -110,7 +110,7 @@ a.left_nav_current {
     // by default. show physical machines
     list_physical_machines();
     
-    
+   /* 
     $('#left_nav_bar_bottom_add_btn').menu({ 
 			content: $('#left_nav_add_btn_menu').html(), // grab content from this page
 			showSpeed: 400,
@@ -122,7 +122,7 @@ a.left_nav_current {
 			  offsetY: 0
 			}
 		});
-		
+*/		
     
     $('.fg-button').hover(
   		function(){ $(this).removeClass('ui-state-default').addClass('ui-state-focus'); },
@@ -657,18 +657,9 @@ a.left_nav_current {
 <div id="left_nav_bottom">
 
   <div id="left_nav_add_btn_holder">
-
-    <a tabindex="0" href="#" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="left_nav_bar_bottom_add_btn"><span class="ui-icon ui-icon-circle-plus"></span>Add</a>
-    <div id="left_nav_add_btn_menu" class="hidden">
-      <ul>
-	      <li><a href="#" onclick="add_pmachine()">Physical Machine</a></li>
-        <li><a href="#" onclick="add_vcluster()">Virtual Cluster</a></li>
-        <!--
-        <li><a href="#">Virtual Machine</a></li>
-        -->
-      </ul>
-    </div>
-    <a href="#" class="fg-button ui-widget ui-state-default ui-corner-all" style="position:absolute;left:75" onclick="do_refresh()">Refresh</a>
+      <a href="#" class="fg-button fg-button-icon-left ui-widget ui-state-default ui-corner-all" style="position:absolute;left:0" onclick="add_pmachine()"><span class="ui-icon ui-icon-circle-plus"></span>Pmachine</a>
+      <a href="#" class="fg-button fg-button-icon-left ui-widget ui-state-default ui-corner-all" style="position:absolute;left:110" onclick="add_vcluster()"><span class="ui-icon ui-icon-circle-plus"></span>Vcluster</a>
+    <a href="#" class="fg-button ui-widget ui-state-default ui-corner-all" style="position:absolute;left:210" onclick="do_refresh()">Refresh</a>
   </div>
 
 </div>
