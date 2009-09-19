@@ -313,7 +313,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     progress.save
 
     local_filename = request_resource "#{Setting.storage_server_vdisks}/#{resource_name}", Setting.storage_cache
-    `chmod 400 #{Setting.storage_server_vdisks}/#{resource_name}` # make sure the image file is readonly
+    `chmod 400 #{Setting.storage_cache}/#{resource_name}` # make sure the image file is readonly
 
     case vdisk_type resource_name
     when "sys", "sys.cow"
