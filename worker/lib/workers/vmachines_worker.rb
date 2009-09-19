@@ -316,10 +316,10 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
     case vdisk_type resource_name
     when "sys", "sys.cow"
-      FileUtils.ln_s local_filename, "#{vmachine_dir}/#{resource_name}"
+      FileUtils.ln local_filename, "#{vmachine_dir}/#{resource_name}"
       if device != nil # when using this disk as a device (not extra dependency), we must make a COW disk based on it
         cow_disk_name = "vd-notsaved-#{uuid}-#{device}.qcow2"
-        qcow2_cmd = "qemu-img create -b #{vmachine_dir}/#{resource_name} -f qcow2 #{vmachine_dir}/#{cow_disk_name}"
+        qcow2_cmd = "chmod 400 #{vmachine_dir}/#{resource_name} && qemu-img create -b #{vmachine_dir}/#{resource_name} -f qcow2 #{vmachine_dir}/#{cow_disk_name}"
         logger.debug "*** [cmd] #{qcow2_cmd}"
         `#{qcow2_cmd}`
       end
