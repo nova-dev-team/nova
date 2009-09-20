@@ -28,7 +28,7 @@ class Pmachine < ActiveRecord::Base
       :mac => vm.mac,
       :uuid => vm.uuid,
       :boot_dev => vm.boot_device,
-      :hda => "vd1-sys-fedora8.qcow2",#(Vdisk.find_raw_name vm.hda),
+      :hda => vm.hda,
       :hdb => vm.hdb,
       :cdrom => vm.cdrom,
       :vnc_port => vm.vnc_port
