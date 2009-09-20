@@ -187,7 +187,6 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
   # called every a few minutes, check if there is new resource on storage server
   def update
-    # TODO updater
     logger.debug "Updater runing at #{Time.now}"
 
     # update file listing
@@ -409,7 +408,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     # pooling only works for qcow2 images
     return local_filename unless local_filename.end_with? ".qcow2"
 
-    # TODO return a pooled image
+    # return a pooled image
     
     pooled_image_name = pick_pooling_image local_filename
     
