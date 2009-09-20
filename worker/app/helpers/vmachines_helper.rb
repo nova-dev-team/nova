@@ -62,8 +62,8 @@ HDB_DESC
 
       if params[:mac] and params[:mac] != ""
         mac_desc = <<MAC_DESC
-    <interface type='network'>
-      <source network='default'/>
+    <interface type='bridge'>
+      <source network='br0'/>
       <mac address='#{params[:mac]}'/>
     </interface>
 MAC_DESC
