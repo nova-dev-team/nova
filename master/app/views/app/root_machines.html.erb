@@ -606,6 +606,7 @@ a.left_nav_current {
               data: {
                 size: $("#vcwiz_vcluster_size").val(), 
                 name: $("#vcwiz_vcluster_name").val(),
+                had: $("#vcwiz_vdisk_hda").val(),
                 start_now: true,
                 soft_list: $("#vcwiz_soft_list").val(),
                 memory_size: $("#vcwiz_memory_size").val(),
@@ -751,9 +752,9 @@ iptables setting: Ensure the following commands have been executed on master nod
       <td>System image</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
       <td>
-        <select>
+        <select id="vcwiz_vdisk_hda">
           <% Vdisk.all.each do |vdisk| %>
-            <option><%= vdisk.display_name %></option>
+            <option value="<%= vdisk.raw_name %>" ><%= vdisk.display_name %></option>
           <% end-%>
         </select>
       </td>
