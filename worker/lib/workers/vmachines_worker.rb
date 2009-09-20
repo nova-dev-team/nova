@@ -17,7 +17,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   MAX_STALL_TIME = 30 # after stalling for 30 seconds, we think the resource has failed to download
 
   IMAGE_POOLING = true # XXX stupid work around for qcow2 image corrpution
-  IMAGE_POOLING_COUNT = 8 # XXX stupid work around for qcow2 image corrpution
+  IMAGE_POOLING_COUNT = 5 # XXX stupid work around for qcow2 image corrpution
 
   set_worker_name :vmachines_worker
 
