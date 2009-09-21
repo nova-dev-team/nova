@@ -13,20 +13,33 @@ class CeilController < ApplicationController
 	    remote_ip = remote_ip.chomp
 	    vm = Vmachine.all #find_by_ip(remote_ip)
 	    miao = Vmachine.find_by_ip(remote_ip)
+  	     
 	    context = ""
-	    ppl = Vcluster.all
-	    ppl.each do |p|
-		context += "#{p.id} #{p.cluster_name} #{p.package_list} <br> "
-	    end
-	
+	    context += "your ip = #{remote_ip}<br>"
+
 	    if miao
-		context = context + miao.hostname + " " + miao.ip + " " + "<br>"
+		context += "vmachine found! id = #{miao.id}<br>"
+		context = context + miao.hostname + " " + miao.ip + " " + miao.vcluster_id.to_s + "<br>"
+
+		vc = miao.vcluster
+		if vc
+		    context += "good , vcluster name = #{vc.cluster_name}, list = #{vc.package_list}<br>"
+		else
+		    context += "oh shit the vm do not have a vcluster<br>"
+		end
 	    else
 		context = context + "fucked ! nil !!!<br>"
 	    end
 
+	    context += "now list all vms<br>"
 	    vm.each do |blah|
-		context = context + " " + blah.ip + " " + blah.hostname+ " " + " " + "<br>"
+		context = context + " " + blah.id.to_s + " " + blah.ip + " " + blah.hostname+ " " + blah.vcluster_id.to_s + " " + "<br>"
+	    end
+
+	    context += "now list all clusters<br>"
+	    vcc = Vcluster.all
+	    vcc.each do |bla|
+		context += " " + bla.id.to_s + " " + bla.cluster_name + " " + bla.package_list + "<br>"
 	    end
 	    respond_to do |accept|
 		accept.html { render :text => context }
