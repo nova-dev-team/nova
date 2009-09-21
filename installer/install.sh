@@ -31,9 +31,3 @@ then
 	ln /usr/bin/ruby /usr/local/bin/ruby -s
 fi
 
-# install readline for ruby
-cd more/readline-for-ruby
-ruby extconf.rb
-make
-make install
-cd ../..

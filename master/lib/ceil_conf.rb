@@ -11,8 +11,8 @@ CEIL_PACKAGE_SERVER = "10.0.0.1"
 CEIL_KEY_SERVER = "10.0.0.1"
 
 #server type for client
-CEIL_PACKAGE_SERVER_TYPE = "nfs"
-CEIL_KEY_SERVER_TYPE = "nfs"
+CEIL_PACKAGE_SERVER_TYPE = "ftp"
+CEIL_KEY_SERVER_TYPE = "ftp"
 
 
 #client progress id
