@@ -1,14 +1,37 @@
 # controller for the "ceil" submodule by Huang Gang
 # "ceil" is used to automatically install & configure vmachines
 require "ceil_conf"
-
+require "pp"
 class CeilController < ApplicationController
 
   # TODO by santa: login required? what about the safety of ceil controller? If anonymous user could controll Ceil, there might be security problems
 
   # login not required, if virtual machine has fixed IP
   #	see: remote_ip = request.remote_ip
-  
+	def test
+	    remote_ip = request.remote_ip
+	    remote_ip = remote_ip.chomp
+	    vm = Vmachine.all #find_by_ip(remote_ip)
+	    miao = Vmachine.find_by_ip(remote_ip)
+	    context = ""
+	    ppl = Vcluster.all
+	    ppl.each do |p|
+		context += "#{p.id} #{p.cluster_name} #{p.package_list} <br> "
+	    end
+	
+	    if miao
+		context = context + miao.hostname + " " + miao.ip + " " + "<br>"
+	    else
+		context = context + "fucked ! nil !!!<br>"
+	    end
+
+	    vm.each do |blah|
+		context = context + " " + blah.ip + " " + blah.hostname+ " " + " " + "<br>"
+	    end
+	    respond_to do |accept|
+		accept.html { render :text => context }
+	    end
+	end
   
 	def retrieve
 		respond_to do |accept|
