@@ -144,22 +144,22 @@ class UsersController < ApplicationController
       if current_user.is_root? # root could active anyone except itself
       
         if user.is_root? # trying to change settings of root itself, disallowed
-          render_failure "You cannot deactive yourself!"
+          render_failure "Root user cannot be deactivated!"
           return
         end
         
       elsif current_user.is_admin?
 
-        if user.is_admin? # trying to change settings of root itself, disallowed
-          render_failure "Administrators cannot be deactivated"
+        if user.is_admin? # trying to change settings of admins, disallowed
+          render_failure "Administrators cannot be deactivated!"
           return
         elsif user.is_root? # cannot deactivate root
-          render_failure "You are not allowed to do this"
+          render_failure "You are not allowed to do this!"
           return
         end
         
       else # normal user cannot do this
-        render_failure "You do not have enough priviledge for this action"
+        render_failure "You do not have enough priviledge for this action!"
         return
       end
       

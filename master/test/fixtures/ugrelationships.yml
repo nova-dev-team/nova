@@ -3,6 +3,14 @@
 root_root:
   user_id:  1
   group_id: 1
+
+santa_root:
+  user_id:  3
+  group_id: 1
+
+hxm_root:
+  user_id:  4
+  group_id: 1
   
 admin_admin:
   user_id:  2

@@ -16,3 +16,22 @@ admin:
   created_at:                 <%= 1.days.ago.to_s :db %>
   activated:                  true
 
+# for debugging
+santa:
+  id:                         3
+  login:                      santa
+  email:                      santa1987@gmail.com
+  salt:                       da4b9237bacccdf19c0760cab7aec4a8359010b0 # SHA1('1')
+  crypted_password:           3096bce0027d0ec9026ba948c32ae388e619168f # 'monkey'
+  created_at:                 <%= 1.days.ago.to_s :db %>
+  activated:                  true
+
+hxm:
+  id:                         4
+  login:                      hxm
+  email:                      huangxiaomeng@gmail.com
+  salt:                       da4b9237bacccdf19c0760cab7aec4a8359010b0 # SHA1('1')
+  crypted_password:           3096bce0027d0ec9026ba948c32ae388e619168f # 'monkey'
+  created_at:                 <%= 1.days.ago.to_s :db %>
+  activated:                  true
+

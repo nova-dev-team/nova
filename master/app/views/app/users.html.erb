@@ -148,9 +148,10 @@
   </td>
   <td <%= "class='alt'" if i.even? %>>
     <%
-      if (u.id == current_user.id) or ((current_user.login != "root") and (u.in_group? "admin"))
+      if (u.login == current_user.login) or ((current_user.is_root? ==false) and u.is_admin?) or u.is_root?
       # you cannot deactive your self
       # and admins cannot deactive each other, only root can do that
+      # root users cannot be deactivated
     %>
       <%= u.activated ? "YES" : "NO" %>
     <% else %>
