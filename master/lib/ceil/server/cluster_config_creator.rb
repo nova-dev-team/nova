@@ -16,18 +16,17 @@ class ClusterConfigurationCreator
 		node_list_file = "#{config_path}/node.list"
 		inst_list_file = "#{config_path}/inst.list"
 
-=begin
 # old code for NFS configuration server
     begin
-      DirTool.make_clean_dir(config_path)
+      #DirTool.make_clean_dir(config_path)
       DirTool.make_clean_dir(disp_path)
     
-      File.open(node_list_file, "w") do |file|
-        file.puts(@node_list)
-      end
-      File.open(inst_list_file, "w") do |file|
-        file.puts(@inst_list)
-      end
+      #File.open(node_list_file, "w") do |file|
+      #  file.puts(@node_list)
+      #end
+      #File.open(inst_list_file, "w") do |file|
+      #  file.puts(@inst_list)
+      #end
       
       @inst_list.each_line do |line|
         app_name = line.chomp
@@ -38,7 +37,6 @@ class ClusterConfigurationCreator
       print "Error writing NFS settings in Ceil component!"
       # not a serious error if you are not using NFS to aid installation
     end
-=end
 
 	end
 end
