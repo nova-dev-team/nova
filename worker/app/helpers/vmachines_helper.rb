@@ -80,6 +80,10 @@ MAC_DESC
     <type arch='#{params[:arch]}' machine='pc'>hvm</type>
     <boot dev='#{params[:boot_dev]}' />
   </os>
+  <features>
+    <pae />
+    <acpi />
+  </features>
   <devices>
     <emulator>/usr/bin/kvm</emulator>
 #{hda_desc if params[:hda] and params[:hda] != ""}
