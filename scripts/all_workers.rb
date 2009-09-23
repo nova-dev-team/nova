@@ -17,7 +17,7 @@ when "diskfree" then each_node "df -h"
 when "firstrun" then each_node "cd /root/v2/worker && ./first_run.sh -d"
 when "start" then each_node "cd /root/v2/worker && ./start.sh -d"
 when "stop" then each_node "cd /root/v2/worker && ./stop.sh -d"
-when "update" then each_node "cd /root/v2/worker && git pull && ./stop.sh && ./start/sh -d"
+when "update" then each_node "cd /root/v2/worker && git pull"
 else
     puts "usage:"
     puts "[clear|diskfree|start|stop|update|firstrun]"
