@@ -8,5 +8,5 @@ cp ../master/tmp/interfaces /etc/network/
 cp ../master/tmp/dhcpd.conf /etc/dhcp3/
 
 /etc/init.d/dhcp3-server restart
-echo "networking need restart, type \"/etc/init.d/networking restart\""
+echo "networking need restart, type \"/etc/init.d/networking restart\"!!!!!"
 
