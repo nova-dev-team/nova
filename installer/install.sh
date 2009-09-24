@@ -14,7 +14,7 @@ cd more
 mkdir -p /usr/local/bin
 cp packet_worker_runner /usr/local/bin
 
-yes A | unzip rubygems-1.3.5.zip
+yes A | unzip -q rubygems-1.3.5.zip
 cd rubygems-1.3.5
 ruby setup.rb --no-rdoc --no-ri
 cd ..
