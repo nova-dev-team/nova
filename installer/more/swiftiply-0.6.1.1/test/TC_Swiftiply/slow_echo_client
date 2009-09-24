@@ -1,0 +1,26 @@
+require 'swiftcore/Swiftiply/swiftiply_client'
+
+class SlowEchoClient < SwiftiplyClientProtocol
+
+	def post_init
+		@httpdata = ''
+		@timer_set = false
+		super
+	end
+			
+	def receive_data data
+		@httpdata << data
+      		
+		unless @timer_set
+			EventMachine.add_timer(2) {self.send_http_data(@httpdata); self.close_connection_after_writing}
+			@timer_set = true
+		end
+	end
+end
+
+if ARGV[0] and ARGV[0].index(/:/) > 0
+	h,p = ARGV[0].split(/:/,2)
+	EventMachine.run { SlowEchoClient.connect(h,p.to_i) }
+else
+	puts "slow_echo_client HOST:PORT"
+end
