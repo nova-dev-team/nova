@@ -90,7 +90,8 @@ class CeilController < ApplicationController
 	end
 	
 	def report
-	  # log_type & log_msg
+	  return
+	# log_type & log_msg
 	  pp = params
 	  log_status = pp[:log_status].chomp.to_i
 	  log_category = pp[:log_category].chomp

@@ -121,7 +121,7 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
   create_table "vmachine_infos", :force => true do |t|
     t.integer  "vmachine_id"
     t.string   "category",    :limit => 20
-    t.integer  "status"
+    t.integer  "status",                    :default => -1
     t.string   "message"
     t.integer  "vnc_port"
     t.datetime "created_at"
@@ -143,7 +143,7 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
     t.string   "mac",               :limit => 24
     t.string   "hostname",          :limit => 40
     t.integer  "vcluster_id"
-    t.integer  "ceil_progress"
+    t.integer  "ceil_progress",                   :default => -1
     t.text     "last_ceil_message"
     t.integer  "pmachine_id"
     t.boolean  "destroyed",                       :default => false

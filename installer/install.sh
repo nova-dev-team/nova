@@ -18,12 +18,12 @@ yes A | unzip rubygems-1.3.5.zip
 cd rubygems-1.3.5
 ruby setup.rb --no-rdoc --no-ri
 cd ..
+rm -r rubygems-1.3.5
 
 # install swiftiply
 cd swiftiply-0.6.1.1
-ruby setup.rb --no-rdoc --no-ri
+ruby setup.rb
 cd ..
-rm -r rubygems-1.3.5
 
 cd ..
 
