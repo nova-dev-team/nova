@@ -8,5 +8,7 @@ echo
 echo "*** NOTICE: Please make sure you have run 'first_run.sh' once"
 echo
 
-script/backgroundrb start -e development
-script/server $@
+#script/backgroundrb start -e development
+swiftiply -c config/swiftiply.conf
+swiftiply_mongrel_rails -n 10 -p 4000 -d
+#script/server $@

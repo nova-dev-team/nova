@@ -8,3 +8,7 @@ then
   kill ${hg}
 fi
 
+killall ruby
+killall mongrel
+killall swiftiply
+rm -rf log/*.pid
