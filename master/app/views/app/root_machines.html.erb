@@ -598,7 +598,9 @@ a.left_nav_current {
         buttons: {
           "OK": function(e) {
             this_dialog = $(this);
-            // create cluster using wizard
+	    var package_list = "common ssh-nopass"
+	    $("#vcwiz_soft_checkbox").find("input").filter(":checked").each(function() { package_list = package_list + " " + this.value; });
+	    // create cluster using wizard
             $.ajax({
               type: "POST",
               url: "/vclusters/create",
@@ -608,7 +610,7 @@ a.left_nav_current {
                 name: $("#vcwiz_vcluster_name").val(),
                 hda: $("#vcwiz_vdisk_hda").val(),
                 start_now: true,
-                soft_list: $("#vcwiz_soft_list").val(),
+                soft_list: package_list,
                 memory_size: $("#vcwiz_memory_size").val(),
                 cpu_count: $("#vcwiz_cpu_count").val()
               },
@@ -775,14 +777,25 @@ iptables setting: Ensure the following commands have been executed on master nod
         </select>
       </td>
     </tr>
+    <!-- 
+    
     <tr>
       <td>Software list</td>
       <td><img src="/images/spacer.gif" width=40 height=40></td>
       <td><input type="text" id="vcwiz_soft_list" value="hadoop mpich2"></td>
-    </tr>
+  </tr>
+   -->
     <tr>
-      <td colspan=3>Available softwares: hadoop mpich2 apache2 mysql</td>
-    </td>
+      <td id="vcwiz_soft_checkbox" colspan=3>
+	  <fieldset>
+	    <legend>Available Softwares</legend>
+         	<input type="checkbox" value="mpich2-1.1.1p1"> mpich2-1.1.1p1 </input>
+		<input type="checkbox" value="ganglia-3.0.7"> ganglia-monitor </input>
+		<input type="checkbox" value="hadoop-0.20.0"> hadoop-0.20.0 </input>
+		<input type="checkbox" value="apache2"> apache2 </input>
+		<input type="checkbox" value="mysql"> mysql </input>
+          </fieldset>
+      </td>
   </table>
   </div>
 

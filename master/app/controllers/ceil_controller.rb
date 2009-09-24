@@ -9,12 +9,12 @@ class CeilController < ApplicationController
   # login not required, if virtual machine has fixed IP
   #	see: remote_ip = request.remote_ip
 	def test
-	    remote_ip = request.remote_ip
+	    remote_ip = params[:rip] 
 	    remote_ip = remote_ip.chomp
 	    vm = Vmachine.all #find_by_ip(remote_ip)
 	    miao = Vmachine.find_by_ip(remote_ip)
   	     
-	    context = ""
+	    context = "new tag"
 	    context += "your ip = #{remote_ip}<br>"
 
 	    if miao
@@ -48,8 +48,9 @@ class CeilController < ApplicationController
   
 	def retrieve
 		respond_to do |accept|
-		  remote_ip = request.remote_ip
-		  
+		  #remote_ip = request.remote_ip
+		  remote_ip = params[:rip]
+
 		  vm = Vmachine.find_by_ip(remote_ip)
 		  #logger.debug "found: " + vm.to_s
 		  host_name = ""

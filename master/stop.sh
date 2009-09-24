@@ -11,4 +11,6 @@ fi
 killall ruby
 killall mongrel
 killall swiftiply
+killall swiftiply_mongrel_rails
+killall mongrel_rails
 rm -rf log/*.pid
