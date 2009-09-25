@@ -24,4 +24,8 @@ class MiscController < ApplicationController
     render :text => request.pretty_inspect
   end
 
+  def show_ip
+    render :text => request[:ip]
+  end
+
 end

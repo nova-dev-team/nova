@@ -49,6 +49,10 @@ class Vcluster < ActiveRecord::Base
       vm = Vmachine.new
       vm.uuid = UUIDTools::UUID.random_create.to_s
       vm.hostname = node[:hostname]
+
+      dup_vms = Vmachine.find_all_by_ip node[:ip]  # FIX avoid ip duplication
+      dup_vms.each {|dup_vm| Vmachine.delete dup_vm}
+
       vm.ip = node[:ip]
       vm.mac = node[:mac]
       vm.vcluster = vc
