@@ -20,11 +20,6 @@ ruby setup.rb --no-rdoc --no-ri
 cd ..
 rm -r rubygems-1.3.5
 
-# install swiftiply
-cd swiftiply-0.6.1.1
-ruby setup.rb
-cd ..
-
 cd ..
 
 cd gems
