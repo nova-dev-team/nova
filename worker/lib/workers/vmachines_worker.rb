@@ -16,9 +16,6 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
   MAX_COPYING_TRY_COUNT = 5 # after 5 failed tries, we stop copying resource
   MAX_STALL_TIME = 30 # after stalling for 30 seconds, we think the resource has failed to download
 
-  IMAGE_POOLING = true # XXX stupid work around for qcow2 image corrpution
-  IMAGE_POOLING_COUNT = 5 # XXX stupid work around for qcow2 image corrpution
-
   set_worker_name :vmachines_worker
 
   def create(args = nil)
@@ -343,7 +340,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
     local_filename = request_resource "#{Setting.storage_server_vdisks}/#{resource_name}", Setting.storage_cache
 
-    if IMAGE_POOLING
+    if Setting.image_polling?
       # XXX work around for qcow2 corruption
       local_filename = get_resource_qcow2_pooling local_filename
     end
@@ -351,7 +348,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     case vdisk_type resource_name
     when "sys", "sys.cow"
 
-      if IMAGE_POOLING
+      if Setting.image_polling?
         FileUtils.mv local_filename, "#{vmachine_dir}/#{resource_name}"
       else
         FileUtils.ln local_filename, "#{vmachine_dir}/#{resource_name}"
