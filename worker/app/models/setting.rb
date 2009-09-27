@@ -6,7 +6,7 @@ class Setting < ActiveRecord::Base
   end
 
   # where should the cached files be stored
-  @@STORAGE_CACHE = nil # cache for readonly value
+  @@STORAGE_CACHE # cached for readonly value
   def Setting.storage_cache
     return @@STORAGE_CACHE if @@STORAGE_CACHE
     @@STORAGE_CACHE = (Setting.find_by_key "storage_cache").value
@@ -26,4 +26,14 @@ class Setting < ActiveRecord::Base
     @@RESOURCE_LIST_CACHE = (Setting.find_by_key "resource_list_cache").value
   end
 
+  # whether we should do image polling
+  def Setting.image_pooling?
+    (Setting.find_by_key "image_polling").value
+  end
+
+  def Setting.image_polling_count
+    (Setting.find_by_key "image_polling_count").value.to_i
+  end
+
 end
+

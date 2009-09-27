@@ -30,3 +30,14 @@ resource_list_cache:
   value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/resource_list_cache
   no_edit: true
 
+
+image_polling:
+  key: image_polling
+  value: true
+  no_edit: false
+
+image_polling_count:
+  key: image_polling_count
+  value: 5
+  no_edit: false
+
