@@ -9,7 +9,7 @@ ActionController::Routing::Routes.draw do |map|
 #  map.connect 'settings/edit', :controller => 'settings', :action => 'edit'
 #  map.resources :settings
 
-  map.resources :groups
+#  map.resources :groups
 
 #  map.resources :vmachines
 
@@ -17,7 +17,7 @@ ActionController::Routing::Routes.draw do |map|
   map.login '/login', :controller => 'sessions', :action => 'new'
   #map.register '/register', :controller => 'users', :action => 'create'
   #map.signup '/signup', :controller => 'users', :action => 'new'
-  map.resources :users
+#  map.resources :users
 
   map.resource :session
 

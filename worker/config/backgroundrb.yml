@@ -12,4 +12,4 @@
       :trigger_args: 0 */2 * * * * 
   :update_worker:
     :do_pooling:
-      :trigger_args: 0 */1 * * * *
+      :trigger_args: 0 */5 * * * *
