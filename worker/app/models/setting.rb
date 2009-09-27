@@ -6,7 +6,7 @@ class Setting < ActiveRecord::Base
   end
 
   # where should the cached files be stored
-  @@STORAGE_CACHE # cached for readonly value
+  @@STORAGE_CACHE = nil # cached for readonly value
   def Setting.storage_cache
     return @@STORAGE_CACHE if @@STORAGE_CACHE
     @@STORAGE_CACHE = (Setting.find_by_key "storage_cache").value
