@@ -33,7 +33,7 @@ resource_list_cache:
 
 image_polling:
   key: image_polling
-  value: true
+  value: "true"
   no_edit: false
 
 image_polling_count:
