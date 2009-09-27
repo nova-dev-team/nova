@@ -31,7 +31,7 @@ class Setting < ActiveRecord::Base
     (Setting.find_by_key "image_polling").value == "true"
   end
 
-  def Setting.image_polling_count
+  def Setting.image_pooling_count
     (Setting.find_by_key "image_polling_count").value.to_i
   end
 

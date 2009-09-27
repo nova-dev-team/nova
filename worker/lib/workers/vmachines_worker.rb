@@ -340,7 +340,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
 
     local_filename = request_resource "#{Setting.storage_server_vdisks}/#{resource_name}", Setting.storage_cache
 
-    if Setting.image_polling?
+    if Setting.image_pooling?
       # XXX work around for qcow2 corruption
       local_filename = get_resource_qcow2_pooling local_filename
     end
@@ -348,7 +348,7 @@ class VmachinesWorker < BackgrounDRb::MetaWorker
     case vdisk_type resource_name
     when "sys", "sys.cow"
 
-      if Setting.image_polling?
+      if Setting.image_pooling?
         FileUtils.mv local_filename, "#{vmachine_dir}/#{resource_name}"
       else
         FileUtils.ln local_filename, "#{vmachine_dir}/#{resource_name}"
