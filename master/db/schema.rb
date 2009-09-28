@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090911061436) do
+ActiveRecord::Schema.define(:version => 20090928061702) do
 
   create_table "bdrb_job_queues", :force => true do |t|
     t.text     "args"
@@ -69,6 +69,20 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
     t.datetime "updated_at"
   end
 
+  create_table "software_categories", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "softwares", :force => true do |t|
+    t.string   "software_name",        :limit => 20
+    t.text     "description"
+    t.boolean  "available"
+    t.integer  "software_category_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "ugrelationships", :force => true do |t|
     t.integer  "user_id"
     t.integer  "group_id"
@@ -109,11 +123,12 @@ ActiveRecord::Schema.define(:version => 20090911061436) do
   end
 
   create_table "vdisks", :force => true do |t|
-    t.string   "raw_name",     :limit => 100
+    t.string   "raw_name",             :limit => 100
     t.string   "display_name"
     t.string   "description"
     t.string   "type"
     t.integer  "base_upon"
+    t.integer  "software_category_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

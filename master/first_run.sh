@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # triggers 'first_run.sh' script for Ceil component
-cd lib/ceil/server
-./first_run.sh
-cd ../../..
+#cd lib/ceil/server
+#./first_run.sh
+#cd ../../..
 
 rake backgroundrb:setup
 

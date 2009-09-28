@@ -27,3 +27,8 @@ image_polling_count:
   key: image_polling_count
   value: 5
 
+software_package_storage:
+  key: software_package_storage
+  value: /home/ftp/packages
+
+
