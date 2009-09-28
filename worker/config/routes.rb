@@ -40,7 +40,7 @@ ActionController::Routing::Routes.draw do |map|
   # Note: These default routes make all actions in every controller accessible via GET requests. You should
   # consider removing or commenting them out if you're using named routes and resources.
 
-  map.home '', :controller => 'vmachines', :action => 'index'
+  map.home '', :controller => 'webui', :action => 'index'
 
   map.connect 'vmachines/:action/:uuid', :controller => 'vmachines'
   map.connect 'vmachines/:action/:uuid.:format', :controller => 'vmachines'

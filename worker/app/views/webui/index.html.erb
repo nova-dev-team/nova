@@ -351,7 +351,7 @@ pipe.close
     system_settings_html += setting.key
     system_settings_html += "</td><td>"
     system_settings_html += setting.value
-    if setting.no_edit == false
+    if setting.editable
       system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>"
     else
       system_settings_html += "</td><td>READ ONLY</td></tr>"

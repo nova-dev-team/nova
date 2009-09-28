@@ -7,37 +7,38 @@
 storage_server:
   key: storage_server
   value: ftp://user:passwd@somewhere.com/
-  no_edit: false
+  editable: true
 
 # where is the local cache directory
 # for God's sake don't change it
 storage_cache:
   key: storage_cache
   value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/storage_cache/
-  no_edit: true
+  editable: false
 
 # where is the vmachines' running environment
 # again, for God's sake, don't change this crappy thing
 vmachines_root:
   key: vmachines_root
   value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/vmachines/
-  no_edit: true
+  editable: false
 
 
 # the filename for cached resource listing
 resource_list_cache:
   key: resource_list_cache
   value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/resource_list_cache
-  no_edit: true
+  editable: false
 
-
+# stupid work around for qcow2 format images
 image_polling:
   key: image_polling
   value: "true"
-  no_edit: false
+  editable: true
 
+# stupid work around for qcow2 format images
 image_polling_count:
   key: image_polling_count
   value: 5
-  no_edit: false
+  editable: true
 
