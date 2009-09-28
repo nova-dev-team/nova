@@ -41,8 +41,8 @@ class KeyDispatcher
 			system "cp -r #{@keys_path}/attach/* #{@disp_path}"
 			node_list.each_line do |line|
 				ip, host_name = line.split
-				puts ip
-				puts host_name
+				#puts ip
+				#puts host_name
 				system "rm -r #{@disp_path}/#{host_name}"
 				key = key_list.pop
 				system "cp -r #{@keys_path}/available/#{key}/key #{@disp_path}/#{host_name}"
@@ -51,7 +51,7 @@ class KeyDispatcher
 					file.puts(log)
 				end
 				remain = `cat #{key_path}/#{key}/remain`.chomp.to_i - 1
-        puts "Remains = #{remain}"
+        #puts "Remains = #{remain}"
 			
 				#system "mv -r #{@keys_path}/available/#{key} #{@keys_path}/used/"
 			end
