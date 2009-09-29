@@ -74,32 +74,8 @@ public
     end
   end
 
-  # show detail info of a machine
-  def detail_info
-    begin
-      dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
-    rescue # would fail if dom not found
-      alert_domain_not_found params
-      return
-    end
-    
-    result = {
-      :success => true,
-      :message => "Query succeeded.",
-      :name => dom.name,
-      :uuid => dom.uuid
-      # TODO add more detail info
-    }
-
-    respond_to do |accept|
-      accept.json {render :json => result}
-      accept.json {render :text => result}
-    end
-  end
-
   # create & start an domain
   def start
-
     # those are default parameters
     default_params = {
       :arch => "i686",
@@ -116,113 +92,32 @@ public
       :vnc_port => -1,   # setting vnc_port to -1 means libvirt will automatically set the port
       :mac => "11:22:33:44:55:66"  # mac is required
     }
-    
-    # merge default parameters into real params, if corresponding item does not exist
+
     default_params.each do |key, value|
-      if params[key] == nil or params[key] == ""
-        params[key] = value
-      end
-    end
-    
-    begin
-      xml_desc = VmachinesHelper::Helper.emit_xml_desc params
-      logger.debug "*** [create] Vmachine XML Specfication"
-      logger.debug xml_desc
-
-      dom = @@virt_conn.define_domain_xml xml_desc 
-    rescue Exception => e
-      # report error to calling server
-      
-      # check if the domain already exists
-      begin
-        @@virt_conn.lookup_domain_by_name params[:name]
-        render_failure "Failed to create vmachine domain! Domain name #{params[:name]} already used! Raw error: #{e.pretty_inspect}"
-        return
-      rescue
-        # domain name not used, do nothing
-      end
-
-      render_failure "Failed to create vmachine domain! Raw error: #{e.pretty_inspect}"
-      return
+      params[key] = value unless valid_param? params[key]
     end
 
-    begin
-      # creation is put into job queue, handled by backgroundrb
-      MiddleMan.worker(:vmachines_worker).async_do_start(:args => params)
-      render_success "Successfully created vmachine domain, name=#{dom.name}, UUID=#{dom.uuid}. It is being started right now."
-    rescue
-      render_failure "Failed to add creation request into job queue!"
-    end
-
+    action_request "start", params
   end
 
   # stop and destroy an domain
   def destroy
-    begin
-      dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
-      dom_name = dom.name
-    rescue
-      alert_domain_not_found params
-      return
-    end
-
-    begin
-      dom.destroy if state_can_destroy? dom.info.state
-    rescue
-      render_failure "Failed to destroy domain, UUID=#{params[:uuid]}!"
-      return
-    end
-
-    # recollect resources, such as vdisks, cdrom-iso, and network
-    begin
-      cleanup_args = {
-        :vmachines_root => Setting.vmachines_root,
-        :vmachine_name => dom_name
-      }
-      MiddleMan.worker(:vmachines_worker).async_do_cleanup(:args => cleanup_args)
-      dom.undefine
-      render_success "Successfully destroyed virtual machine, name=#{dom_name}, UUID=#{params[:uuid]}."
-    rescue
-      render_failure "Failed to recollect allocated resources, name=#{dom_name}, UUID=#{params[:uuid]}"
-    end
-
+    action_request "destroy", params[:uuid]
   end
 
-  # reboot fails on kvm
-#  def reboot
-#    libvirt_action "reboot", params
-#  end
-
   def suspend
-    libvirt_action "suspend", params
+    action_request "suspend", params[:uuid]
   end
 
   def resume
-    libvirt_action "resume", params
+    action_request "resume", params[:uuid]
   end
 
 private
 
-  # general action for libvirt
-  def libvirt_action action_name, params
-    begin
-      dom = @@virt_conn.lookup_domain_by_uuid params[:uuid]
-    rescue
-      alert_domain_not_found params
-      return
-    end
-
-    begin
-      dom.send action_name
-      render_success "Successfully #{action_name}ed domain, name=#{dom.name}, UUID=#{dom.uuid}."
-    rescue
-      render_failure "Failed to #{action_name} domain, UUID=#{dom.uuid}!"
-    end
-  end
-
-  def alert_domain_not_found params
-    logger.debug "*** [error] domain not found, UUID=#{params[:uuid]}"
-    render_result :success => false, :message => "Domain not found, check your UUID! (You requested for UUID=#{params[:uuid]})"
+  def action_request action_name, args
+    result = Vmachine.send action_name, args
+    render_result result[:success], result[:message]
   end
 
   def state_can_destroy? state_id

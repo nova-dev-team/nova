@@ -10,11 +10,9 @@ module VmachinesHelper
 
     include VdiskNaming
     include Util
-  
-    @@virt_conn = Libvirt::open("qemu:///system")
 
     def Helper.virt_conn
-      @@virt_conn
+      Vmachine.virt_conn
     end
 
     def Helper.emit_xml_desc params

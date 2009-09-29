@@ -10,6 +10,14 @@
       :trigger_args: */5 * * * * * 
     :update:
       :trigger_args: 0 */2 * * * * 
-  :update_worker:
-    :do_pooling:
-      :trigger_args: 0 */5 * * * *
+
+  :image_pool_worker:
+    :ensure_image_pool_size:
+      :trigger_args: 0 */1 * * * *
+
+  :supervisor_worker:
+    :remove_stale_files:
+      :trigger_args: */5 * * * * *
+    :check_copying:
+      :trigger_args: 0 */1 * * * *
+

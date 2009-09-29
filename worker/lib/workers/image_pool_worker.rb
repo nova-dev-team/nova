@@ -1,18 +1,12 @@
-require 'vmachines_worker'
+require "vmachines_worker"
 
-
-# this is a helper worker for vmachines_worker, actually, for its "update" method.
-# it takes care of image pooling, make sure that there is enough images being pooled.
-class UpdateWorker < BackgrounDRb::MetaWorker
-  set_worker_name :update_worker
+class ImagePoolWorker < BackgrounDRb::MetaWorker
+  set_worker_name :image_pool_worker
   def create(args = nil)
     # this method is called, when worker is loaded for the first time
   end
 
-
-  # image pooling as a work around for qcow2 images
-  def do_pooling
-    logger.debug "[updater] pooling"
+  def ensure_image_pool_size
     if Setting.image_pooling?
       Dir.entries(Setting.storage_cache).each do |entry|
         next unless Setting.image_pooling? # stop pooling as soon as possible, if required
