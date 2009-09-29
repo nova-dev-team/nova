@@ -1,4 +1,5 @@
 class Software < ActiveRecord::Base
+	belongs_to :software_category
 	def Software.update_from_local
 		localpath_setting = Setting.find_by_key("software_package_storage")
 		
