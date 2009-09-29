@@ -19,12 +19,12 @@ public
 
   @@virt_conn = VmachinesHelper::Helper.virt_conn
 
-  # show the web UI
   def index
-    render :template => 'vmachines/index.html.erb', :layout => 'default'
+    list
   end
 
   # list all vmachines, and show their status
+  # TODO deprecate this function
   def list
     params[:show_active] ||= "true"
     params[:show_inactive] ||= "false"

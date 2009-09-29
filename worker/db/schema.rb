@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(:version => 20090824093750) do
   create_table "settings", :force => true do |t|
     t.string   "key",        :limit => 40
     t.string   "value"
-    t.boolean  "no_edit",                  :default => false
+    t.boolean  "editable",                 :default => true
     t.datetime "created_at"
     t.datetime "updated_at"
   end

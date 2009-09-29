@@ -3,7 +3,7 @@ class CreateSettings < ActiveRecord::Migration
     create_table :settings do |t|
       t.column :key, :string, :limit => 40
       t.column :value, :string
-      t.column :no_edit, :boolean, :default => false # "readonly" is used by ActiveRecord, so I have to use this miserable name instead
+      t.column :editable, :boolean, :default => true # "readonly" is used by ActiveRecord, so I have to use this miserable name instead
       t.timestamps
     end
   end
