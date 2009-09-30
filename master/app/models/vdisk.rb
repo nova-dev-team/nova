@@ -1,3 +1,6 @@
 class Vdisk < ActiveRecord::Base
-	belongs_to :software_category
+  #has_many :ugrelationships
+	#has_many :groups, :through => :ugrelationships
+	has_many :vsrelationships
+	has_many :software_categories, :through => :vsrelationships
 end

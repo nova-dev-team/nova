@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090928061702) do
+ActiveRecord::Schema.define(:version => 20090929110217) do
 
   create_table "bdrb_job_queues", :force => true do |t|
     t.text     "args"
@@ -164,6 +164,13 @@ ActiveRecord::Schema.define(:version => 20090928061702) do
     t.boolean  "destroyed",                       :default => false
     t.string   "status",                          :default => "not running"
     t.integer  "vnc_port"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "vsrelationships", :force => true do |t|
+    t.integer  "software_category_id"
+    t.integer  "vdisk_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
