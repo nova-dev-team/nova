@@ -1,3 +1,5 @@
+require "utils.rb"
+
 # a helper module for both master & worker module
 module ControllerUtility
 
@@ -55,7 +57,7 @@ module ControllerUtility
   end
 
   def valid_param? param
-    param != nil and param.length != 0
+    param != nil and param != ""
   end
 
 end

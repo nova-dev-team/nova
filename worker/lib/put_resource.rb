@@ -1,0 +1,3 @@
+module PutResource
+
+end

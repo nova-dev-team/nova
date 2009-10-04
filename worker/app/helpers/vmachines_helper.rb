@@ -2,7 +2,6 @@ require 'libvirt'
 require 'fileutils'
 require 'uri'
 require 'pp'
-require 'pretty_file_size'
 
 module VmachinesHelper
   

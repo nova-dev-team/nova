@@ -28,31 +28,8 @@ public
   def list
     params[:show_active] ||= "true"
     params[:show_inactive] ||= "false"
-
     doms_info = []
-    all_domains = []
-
-    if params[:show_inactive] == "true" # inactive domains are listed by name
-      @@virt_conn.list_defined_domains.each do |dom_name|
-        begin
-          all_domains << @@virt_conn.lookup_domain_by_name(dom_name)
-        rescue
-          next # ignore error, go on with next one
-        end
-      end
-    end
-
-    if params[:show_active] == "true" # active domains are listed by id
-      @@virt_conn.list_domains.each do |dom_id|
-        begin
-          all_domains << @@virt_conn.lookup_domain_by_id(dom_id)
-        rescue
-          next
-        end
-      end
-    end
-
-    all_domains.each do |dom|
+    Vmachine.all_domains.each do |dom|
       dom_info = {}
 
       ["name", "uuid", "info"].each do |property|
@@ -76,24 +53,7 @@ public
 
   # create & start an domain
   def start
-    # those are default parameters
-    default_params = {
-      :arch => "i686",
-      :emulator => "kvm", # ENHANCE currently we only support KVM
-      :name => "dummy_vm",
-      :vcpu => 1,
-      :mem_size => 128,
-      :uuid => UUIDTools::UUID.random_create.to_s,
-      :hda => "vdisk.qcow2",
-      :hdb => "", # this is optional, could be "" (means no such a device)
-      :cdrom => "", # this is optional, could be "" (means no such a device)
-      :depend => "", # additional dependency on COW disks
-      :boot_dev => "hda", # hda, hdb, cdrom
-      :vnc_port => -1,   # setting vnc_port to -1 means libvirt will automatically set the port
-      :mac => "11:22:33:44:55:66"  # mac is required
-    }
-
-    default_params.each do |key, value|
+    Vmachine.default_params.each do |key, value|
       params[key] = value unless valid_param? params[key]
     end
 

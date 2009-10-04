@@ -29,5 +29,10 @@ class SupervisorWorker < BackgrounDRb::MetaWorker
   def check_md5sum
     # TODO
   end
+
+  # check if there is new file on server
+  def update_server_image_list
+    # TODO 
+  end
 end
 

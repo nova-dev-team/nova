@@ -306,6 +306,7 @@ pipe.close
 <%=
   background_jobs_html = "<table width='100%'><tr><td>Owner</td><td>Info</td><td>Status</td></tr>"
   counter = 0
+=begin
   Progress.all.each do |progress|
     background_jobs_html += "<tr class='row_type_#{counter % 2}'><td>"
     background_jobs_html += progress.owner.to_s
@@ -316,6 +317,7 @@ pipe.close
     background_jobs_html += "</td></tr>"
     counter += 1
   end
+=end
   background_jobs_html += "</table>"
   background_jobs_html
 %>
