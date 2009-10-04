@@ -5,6 +5,7 @@ require 'ftools'
 require 'pp'
 require 'uri'
 require 'net/ftp'
+require "utils"
 
 class VmachinesWorker < BackgrounDRb::MetaWorker
 

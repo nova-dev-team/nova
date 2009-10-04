@@ -284,7 +284,15 @@ pipe.close
 
 <h2>Vdisks on storage server</h2>
 <%=
-  list = VmachinesHelper::Helper.cached_storage_server_filelist
+  list = []
+  begin
+    File.open(Setting.resource_list_cache, "r") do |file|
+      list = file.readlines
+    end
+  rescue
+    # do nothing
+  end
+
   if list.length != 0
     list_html = "Refreshed on #{list[0]}"
   else
@@ -302,10 +310,11 @@ pipe.close
 <hr>
 
 
-<h2>Background work</h2>
+<h2>Vmachines log</h2>
 <%=
-  background_jobs_html = "<table width='100%'><tr><td>Owner</td><td>Info</td><td>Status</td></tr>"
+  vmachines_log_html = "<table width='100%'><tr><td>Vmachine</td><td>Log</td></tr>"
   counter = 0
+  # TODO write vmachines logs
 =begin
   Progress.all.each do |progress|
     background_jobs_html += "<tr class='row_type_#{counter % 2}'><td>"
@@ -318,8 +327,8 @@ pipe.close
     counter += 1
   end
 =end
-  background_jobs_html += "</table>"
-  background_jobs_html
+  vmachines_log_html += "</table>"
+  vmachines_log_html
 %>
 <hr>
 

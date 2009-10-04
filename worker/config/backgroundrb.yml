@@ -20,4 +20,6 @@
       :trigger_args: */5 * * * * *
     :check_copying:
       :trigger_args: 0 */1 * * * *
+    :update_server_image_list:
+      :trigger_args: 0 */2 * * * *
 
