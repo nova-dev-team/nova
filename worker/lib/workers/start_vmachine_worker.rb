@@ -3,5 +3,11 @@ class StartVmachineWorker < BackgrounDRb::MetaWorker
   def create(args = nil)
     # this method is called, when worker is loaded for the first time
   end
+
+  def start_vmachine args
+    uuid = args[:uuid]
+    resource_list = args[:resource_list]
+    # TODO
+  end
 end
 

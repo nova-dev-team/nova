@@ -5,11 +5,12 @@
   :environment: production
 
 :schedules:
-  :vmachines_worker:
-    :supervise:
-      :trigger_args: */5 * * * * * 
-    :update:
-      :trigger_args: 0 */2 * * * * 
+
+#  :vmachines_worker:
+#    :supervise:
+#      :trigger_args: */5 * * * * * 
+#    :update:
+#      :trigger_args: 0 */2 * * * * 
 
   :image_pool_worker:
     :ensure_image_pool_size:
@@ -20,6 +21,8 @@
       :trigger_args: */5 * * * * *
     :check_copying:
       :trigger_args: 0 */1 * * * *
+    :check_md5sum:
+      :trigger_args: 0 0 0 */1 * *
     :update_server_image_list:
       :trigger_args: 0 */2 * * * *
 

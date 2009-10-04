@@ -5,4 +5,3 @@ module VmachinesHelper
     end
   end
 end
-

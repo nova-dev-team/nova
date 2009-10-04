@@ -54,6 +54,8 @@ class Vmachine
         next
       end
     end
+
+    return all_domains
   end
 
   def Vmachine.find_domain_by_uuid uuid
@@ -149,6 +151,7 @@ XML_DESC
 
   def Vmachine.define params
     xml_desc = Vmachine.emit_domain_xml params
+    puts xml_desc
     dom = Vmachine.define_domain_xml xml_desc
   end
 
@@ -168,7 +171,8 @@ XML_DESC
   def Vmachine.start params
     # create a new domain
     begin
-      dom = Vmachine.defind_domain params
+      dom = Vmachine.define params
+      Vmachine.log params[:name], "Created vmachine domain"
     rescue
       # check if the domain is already used
       begin
@@ -182,11 +186,20 @@ XML_DESC
 
     resource_list = [params[:hda], params[:hdb], params[:cdrom]].concat params[:depend].split
     resource_list = resource_list.collect {|r| r != nil and r != ""}
+    resource_list = resource_list.uniq
+
+    Vmachine.log params[:name], "Required resource: #{resource_list.join ','}"
 
     begin
-      MiddleMan.worker(:start_vmachine_worker).async_start_vmachine(dom.uuid, resource_list)
+      args = {
+        :uuid => dom.uuid,
+        :resource_list => resource_list
+      }
+      MiddleMan.worker(:start_vmachine_worker).async_start_vmachine(:arg => args)
+      Vmachine.log params[:name], "Preparing to start vmachine"
       return {:success => true, :message => "Successfully created vmachine domain with name='#{dom.name}' and UUID=#{dom.uuid}. It is starting right now."}
     rescue
+      Vmachine.log params[:name], "Failed to start vmachine"
       return {:success => false, :message => "Failed to push 'start vmachine' request into job queue! Vmachine UUID=#{dom.uuid}."}
     end
   end
@@ -209,7 +222,9 @@ XML_DESC
 
   # blocking method
   def Vmachine.destroy uuid
+    # TODO destroy is a complicated process
     Vmachine.libvirt_action "destroy", uuid
+    Vmachine.libvirt_action "undefine", uuid
     # cleanup work is left for supervisor_worker, we just destroy the domain
   end
 
@@ -217,7 +232,7 @@ private
 
   def Vmachine.libvirt_action action_name, uuid
     begin
-      dom = Vmachine.find_domain uuid
+      dom = Vmachine.find_domain_by_uuid uuid
     rescue
       return {:success => false, :message => "Cannot find vmachine with UUID=#{uuid}!"}
     end
@@ -226,7 +241,7 @@ private
       dom.send action_name
       return {:success => true, :message => "Successfully processed action '#{action_name}' on vmachine with UUID=#{uuid}."}
     rescue
-      return {:success => true, :message => "Failed to process action '#{action_name}' on vmachine with UUID=#{uuid}!"}
+      return {:success => false, :message => "Failed to process action '#{action_name}' on vmachine with UUID=#{uuid}!"}
     end
   end
   

@@ -60,8 +60,12 @@ function add_vmachine() {
       depend: extra_depend,
       boot_dev: boot_dev
     },
-    success: function() {
-      window.location.reload();
+    success: function(result) {
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message:" + result.message);
+      }
     },
     error: function() {
       alert("Request failed!");
@@ -76,8 +80,12 @@ function vm_ajax(url, uuid) {
     data: {
       uuid: uuid
     },
-    success: function() {
-      window.location.reload();
+    success: function(result) {
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message:" + result.message);
+      }
     },
     error: function() {
       alert("Request failed!");
@@ -314,19 +322,23 @@ pipe.close
 <%=
   vmachines_log_html = "<table width='100%'><tr><td>Vmachine</td><td>Log</td></tr>"
   counter = 0
-  # TODO write vmachines logs
-=begin
-  Progress.all.each do |progress|
-    background_jobs_html += "<tr class='row_type_#{counter % 2}'><td>"
-    background_jobs_html += progress.owner.to_s
-    background_jobs_html += "</td><td>"
-    background_jobs_html += progress.info.to_s
-    background_jobs_html += "</td><td>"
-    background_jobs_html += progress.status.to_s
-    background_jobs_html += "</td></tr>"
+  # read vmachines logs
+  
+  vmachines_root = Setting.vmachines_root
+  Dir.entries(vmachines_root).each do |entry|
+    next if entry.start_with? "."
+    vm_logfile = File.open("#{vmachines_root}/#{entry}/log", "r")
+
+    vmachines_log_html += "<tr class='row_type_#{counter % 2}'><td>"
+    vmachines_log_html += entry
+    vmachines_log_html += "</td><td><pre>"
+    vmachines_log_html += vm_logfile.readlines.join.chomp
+    vmachines_log_html += "</pre></td></tr>"
+
+    vm_logfile.close
     counter += 1
   end
-=end
+
   vmachines_log_html += "</table>"
   vmachines_log_html
 %>
