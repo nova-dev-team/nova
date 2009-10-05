@@ -53,6 +53,10 @@ end
 
 module VdiskNaming
 
+  def VdiskNaming.system_disk? filename
+    (VdiskNaming.vdisk_type filename) == "sys" or (VdiskNaming.vdisk_type filename) == "sys.cow"
+  end
+
   def VdiskNaming.vdisk_type filename
     begin
       split = filename.split "-"
@@ -63,7 +67,7 @@ module VdiskNaming
   end
 
   # return a string representing the type of vdisk
-  # could be "iso", "empty", "system", "system.cow", "user", "user.cow"i
+  # could be "iso", "sys", "sys.cow", "usr", "usr.cow"
   def vdisk_type filename
     VdiskNaming.vdisk_type filename
   end

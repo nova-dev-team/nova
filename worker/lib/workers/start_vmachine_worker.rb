@@ -1,3 +1,5 @@
+require "pp"
+
 class StartVmachineWorker < BackgrounDRb::MetaWorker
   set_worker_name :start_vmachine_worker
   def create(args = nil)
@@ -5,9 +7,27 @@ class StartVmachineWorker < BackgrounDRb::MetaWorker
   end
 
   def start_vmachine args
+    vm_name = args[:name]
     uuid = args[:uuid]
     resource_list = args[:resource_list]
-    # TODO
+    begin
+      dom = Vmachine.find_domain_by_uuid uuid
+      
+      resource_list.each do |resource|
+        if resource == args[:hda]
+          ImageResource.prepare_vdisk vm_name, resource, "hda", uuid
+        elsif resource == args[:hdb]
+          ImageResource.prepare_vdisk vm_name, resource, "hdb", uuid
+        else
+          ImageResource.prepare_vdisk vm_name, resource
+        end
+      end
+
+      dom.create
+    rescue Exception => e
+      Vmachine.log vm_name, "Create vmachine failed"
+      Vmachine.log vm_name, e.to_s + "\n" + (e.backtrace.join "\n")
+    end
   end
 end
 

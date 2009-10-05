@@ -8,7 +8,7 @@ module ControllerUtility
     if (option.keys.include? :success) or (option.keys.include? :message)
       raise "DO NOT use ':success' or ':message', they are preserved keys!"
     end
-    result = {:success => true, :message => message}.merge(option)
+    result = {:success => success, :message => message}.merge(option)
     respond_to do |accept|
       accept.json {render :json => result}
       accept.html {render :text => result.to_json} # TODO escape html characters?

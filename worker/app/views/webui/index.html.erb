@@ -49,6 +49,8 @@ function add_vmachine() {
   
   $.ajax({
     url: "/vmachines/start",
+    type: "POST",
+    dataType: "json",
     data: {
       arch: arch,
       name: name,
@@ -77,6 +79,8 @@ function add_vmachine() {
 function vm_ajax(url, uuid) {
   $.ajax({
     url: url,
+    type: "POST",
+    dataType: "json",
     data: {
       uuid: uuid
     },
@@ -95,16 +99,16 @@ function vm_ajax(url, uuid) {
 
 function destroy_vmachine(name, uuid) {
   if (confirm("Are you really going to destroy vmachine named '" + name + "', with UUID=" + uuid + "?")) {
-    vm_ajax("/vmachines/destroy", uuid);
+    vm_ajax("/vmachines/destroy.json", uuid);
   }
 }
 
 function resume_vmachine(uuid) {
-  vm_ajax("/vmachines/resume", uuid);
+  vm_ajax("/vmachines/resume.json", uuid);
 }
 
 function suspend_vmachine(uuid) {
-  vm_ajax("/vmachines/suspend", uuid);
+  vm_ajax("/vmachines/suspend.json", uuid);
 }
 
 function change_system_setting(key) {
@@ -112,6 +116,8 @@ function change_system_setting(key) {
   if (new_value && new_value != "") {
     $.ajax({
       url: "/settings/edit",
+      type: "POST",
+      dataType: "json",
       data: {
         key: key,
         value: new_value

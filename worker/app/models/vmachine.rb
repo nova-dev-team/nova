@@ -19,13 +19,13 @@ class Vmachine
       :vcpu => 1,
       :mem_size => 128,
       :uuid => UUIDTools::UUID.random_create.to_s,
-      :hda => "vd1-sys-empty10g.qcow2",
-      :hdb => "vd4-sys-empty1g.qcow2", # this is optional, could be "" (means no such a device)
-      :cdrom => "vd5-iso-empty.qcow2", # this is optional, could be "" (means no such a device)
-      :depend => "vd2-sys-empty2g.qcow2 vd3-sys-empty3g.qcow2", # additional dependency on COW disks, separate with space
+      :hda => "",
+      :hdb => "", # this is optional, could be "" (means no such a device)
+      :cdrom => "", # this is optional, could be "" (means no such a device)
+      :depend => "", # additional dependency on COW disks, separate with space
       :boot_dev => "hd", # hd, cdrom
       :vnc_port => -1,   # setting vnc_port to -1 means libvirt will automatically set the port
-      :mac => "11:22:33:44:55:66"  # mac is required
+      :mac => ""  # mac is required, such as "11:22:33:44:55:66"
     }
   end
 
@@ -172,6 +172,8 @@ XML_DESC
     # create a new domain
     begin
       dom = Vmachine.define params
+      # remove any possible existing files
+      FileUtils.rm_rf "#{Setting.vmachines_root}/#{params[:name]}"
       Vmachine.log params[:name], "Created vmachine domain"
     rescue
       # check if the domain is already used
@@ -185,14 +187,18 @@ XML_DESC
     end
 
     resource_list = [params[:hda], params[:hdb], params[:cdrom]].concat params[:depend].split
-    resource_list = resource_list.collect {|r| r != nil and r != ""}
+    resource_list = resource_list.select {|r| r != nil and r != ""}
     resource_list = resource_list.uniq
 
     Vmachine.log params[:name], "Required resource: #{resource_list.join ','}"
 
     begin
       args = {
+        :name => params[:name],
         :uuid => dom.uuid,
+        :hda => params[:hda],
+        :hdb => params[:hdb],
+        :cdrom => params[:cdrom],
         :resource_list => resource_list
       }
       MiddleMan.worker(:start_vmachine_worker).async_start_vmachine(:arg => args)
