@@ -158,7 +158,7 @@ module ImageResource
       return "#{Setting.storage_cache}/#{entry}" if entry =~ /pool\.[0-9]+$/
     end
 
-    ImageResource.copy_pool_image "#{Setting.storage_cache}/#{entry}"
+    ImageResource.copy_pool_image "#{Setting.storage_cache}/#{vdisk_name}"
   end
 
   
