@@ -28,11 +28,11 @@ class Setting < ActiveRecord::Base
 
   # whether we should do image polling
   def Setting.image_pooling?
-    (Setting.find_by_key "image_polling").value == "true"
+    (Setting.find_by_key "image_pooling").value == "true"
   end
 
   def Setting.image_pooling_count
-    (Setting.find_by_key "image_polling_count").value.to_i
+    (Setting.find_by_key "image_pooling_count").value.to_i
   end
 
 end
