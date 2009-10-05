@@ -174,7 +174,7 @@ XML_DESC
       dom = Vmachine.define params
       # remove any possible existing files
       FileUtils.rm_rf "#{Setting.vmachines_root}/#{params[:name]}"
-      Vmachine.log params[:name], "Created vmachine domain"
+      Vmachine.log params[:name], "Defined vmachine domain"
     rescue
       # check if the domain is already used
       begin

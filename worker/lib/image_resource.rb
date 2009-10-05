@@ -155,6 +155,7 @@ module ImageResource
   def ImageResource.prepare_vdisk_by_pooling vm_name, vdisk_name
     Dir.entries(Setting.storage_cache).each do |entry|
       next unless entry.start_with? vdisk_name
+      next if File.exist? "#{entry}.copying"
       return "#{Setting.storage_cache}/#{entry}" if entry =~ /pool\.[0-9]+$/
     end
 
