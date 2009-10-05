@@ -15,7 +15,7 @@ class ImagePoolWorker < BackgrounDRb::MetaWorker
         next if File.exist? "#{entry_fullpath}.copying" # skip files if they are under copying
         (1..Setting.image_pooling_count).each do |id|
           next unless Setting.image_pooling? # stop pooling as soon as possible, if required
-          ImageResource.copy_pooling_image "#{Setting.storage_cache}/#{entry}", id
+          ImageResource.copy_pool_image "#{Setting.storage_cache}/#{entry}", id
         end 
       end
     end
