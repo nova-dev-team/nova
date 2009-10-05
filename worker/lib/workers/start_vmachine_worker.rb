@@ -15,7 +15,7 @@ class StartVmachineWorker < BackgrounDRb::MetaWorker
       
       resource_list.each do |resource|
         if resource == args[:hda]
-          ImageResource.prepare_vdisk vm_name, resource, "hda", uuid
+          ImageResource.prepare_vdisk vm_name, resource, "hda", uuid # might need to generate new qcow2 disks
         elsif resource == args[:hdb]
           ImageResource.prepare_vdisk vm_name, resource, "hdb", uuid
         else
