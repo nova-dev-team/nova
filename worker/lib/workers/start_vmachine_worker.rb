@@ -23,7 +23,9 @@ class StartVmachineWorker < BackgrounDRb::MetaWorker
         end
       end
 
+      Vmachine.log vm_name, "All resource prepared, creating vmachine domain"
       dom.create
+      Vmachine.log vm_name, "Successfully created vmachine domain"
     rescue Exception => e
       Vmachine.log vm_name, "Create vmachine failed"
       Vmachine.log vm_name, e.to_s + "\n" + (e.backtrace.join "\n")

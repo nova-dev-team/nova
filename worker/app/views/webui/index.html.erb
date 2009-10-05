@@ -333,8 +333,11 @@ pipe.close
   vmachines_root = Setting.vmachines_root
   Dir.entries(vmachines_root).each do |entry|
     next if entry.start_with? "."
-    vm_logfile = File.open("#{vmachines_root}/#{entry}/log", "r")
-
+    begin
+      vm_logfile = File.open("#{vmachines_root}/#{entry}/log", "r")
+    rescue
+      next
+    end
     vmachines_log_html += "<tr class='row_type_#{counter % 2}'><td>"
     vmachines_log_html += entry
     vmachines_log_html += "</td><td><pre>"
