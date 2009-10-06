@@ -233,7 +233,7 @@ XML_DESC
     return result unless result[:success]
 
     vm_model = Vmachine.find_by_uuid uuid
-    vm_model.destroy!
+    vm_model.destroy
 
     return {:success => true, :message => "Successfully destroyed vmachine with UUID=#{uuid}."}
     
