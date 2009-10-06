@@ -88,6 +88,7 @@ a.left_nav_current {
 
 
 <script type="text/javascript">
+	
 
   function getWindowHeight() {
     return window.innerHeight || (window.document.documentElement.clientHeight || window.document.body.clientHeight);
@@ -130,6 +131,35 @@ a.left_nav_current {
   	);
 
     $("#add_vcluster_dialog").tabs();
+
+
+		var vdisk_softlist = {};
+		vdisk_softlist["11"] = "miao!!";
+
+		<% Vdisk.all.each do |vdisk| 
+				 vd_html_str = ""      
+				 vd_html_str += "<fieldset>" 
+				 vd_html_str += "	<legend>Available Softwares</legend>" 
+
+			   vdisk.software_categories.each do |sc| 
+           sc.softwares.each do |app| 
+							vd_html_str += "<input type=\"checkbox\" value=\"#{app.software_name}\"> #{app.software_name} <\/input>" 
+					 end 
+				 end														
+				 vd_html_str += "</fieldset>" %>
+    
+	    vdisk_softlist["<%= vdisk.raw_name %>"] = '<%= vd_html_str %>';
+
+		<% end-%>
+    <% vd = Vdisk.all.first 
+       first_rawname = vd.raw_name %>
+
+		$("#vcwiz_soft_checkbox").html(vdisk_softlist["<%= first_rawname%>"]);
+
+
+		$("#vcwiz_vdisk_hda").change(function() {
+			$("#vcwiz_soft_checkbox").html(vdisk_softlist[this.value]);
+		});
 
   });
   
@@ -787,14 +817,7 @@ iptables setting: Ensure the following commands have been executed on master nod
    -->
     <tr>
       <td id="vcwiz_soft_checkbox" colspan=3>
-	  <fieldset>
-	    <legend>Available Softwares</legend>
-         	<input type="checkbox" value="mpich2-1.1.1p1"> mpich2-1.1.1p1 </input>
-		<input type="checkbox" value="ganglia-3.0.7"> ganglia-monitor </input>
-		<input type="checkbox" value="hadoop-0.20.0"> hadoop-0.20.0 </input>
-		<input type="checkbox" value="apache2"> apache2 </input>
-		<input type="checkbox" value="mysql"> mysql </input>
-          </fieldset>
+
       </td>
   </table>
   </div>

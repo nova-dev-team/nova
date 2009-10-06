@@ -1,7 +1,7 @@
 class CreateSoftwareCategories < ActiveRecord::Migration
   def self.up
     create_table :software_categories do |t|
-
+			
       t.timestamps
     end
   end
