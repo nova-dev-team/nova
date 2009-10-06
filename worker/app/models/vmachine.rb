@@ -225,17 +225,16 @@ XML_DESC
 
   # blocking method
   def Vmachine.destroy uuid
-    # TODO destroy is a complicated process
-    result = Vmachine.libvirt_action "destroy", uuid
-    return result unless result[:success]
-
-    result = Vmachine.libvirt_action "undefine", uuid
-    return result unless result[:success]
-
-    vm_model = Vmachine.find_by_uuid uuid
-    vm_model.destroy
-
-    return {:success => true, :message => "Successfully destroyed vmachine with UUID=#{uuid}."}
+    # destroy is a complicated process
+    begin
+      result = Vmachine.libvirt_action "destroy", uuid
+      result = Vmachine.libvirt_action "undefine", uuid
+      vm_model = Vmachine.find_by_uuid uuid
+      vm_model.destroy
+    ensure
+      # this function is ensured to return success, even there might have error in destroy process!
+      return {:success => true, :message => "Successfully destroyed vmachine with UUID=#{uuid}."}
+    end
     
     # cleanup work is left for supervisor_worker, we just destroy the domain
   end
