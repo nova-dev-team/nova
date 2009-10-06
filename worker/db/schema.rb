@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090818030750) do
+ActiveRecord::Schema.define(:version => 20091006045143) do
 
   create_table "bdrb_job_queues", :force => true do |t|
     t.text     "args"
@@ -35,6 +35,13 @@ ActiveRecord::Schema.define(:version => 20090818030750) do
     t.string   "key",        :limit => 40
     t.string   "value"
     t.boolean  "editable",                 :default => true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "vmachines", :force => true do |t|
+    t.string   "name"
+    t.string   "uuid"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -3,7 +3,7 @@ require "libvirt"
 require "fileutils"
 require "uuidtools"
 
-class Vmachine
+class Vmachine < ActiveRecord::Base
 
   @@virt_conn = Libvirt::open("qemu:///system")
 
@@ -37,19 +37,9 @@ class Vmachine
     virt_conn = Vmachine.virt_conn
 
     all_domains = []
-    # inactive domains are listed by name
-    virt_conn.list_defined_domains.each do |dom_name|
+    Vmachine.all.each do |vm_model|
       begin
-        all_domains << virt_conn.lookup_domain_by_name(dom_name)
-      rescue
-        next # ignore error, go on with next one
-      end
-    end
-
-    # active domains are listed by id
-    virt_conn.list_domains.each do |dom_id|
-      begin
-        all_domains << virt_conn.lookup_domain_by_id(dom_id)
+        all_domains << virt_conn.lookup_domain_by_uuid(vm_model.uuid)
       rescue
         next
       end
@@ -175,6 +165,13 @@ XML_DESC
       # remove any possible existing files
       FileUtils.rm_rf "#{Setting.vmachines_root}/#{params[:name]}"
       Vmachine.log params[:name], "Defined vmachine domain"
+
+      # create the vmachine model, this is a stupid work around
+      # for ruby-libvirt's bug: list_defined_domain causes crash
+      vm_model = Vmachine.new
+      vm_model.uuid = params[:uuid]
+      vm_model.name = params[:name]
+      vm_model.save
     rescue
       # check if the domain is already used
       begin
@@ -229,8 +226,17 @@ XML_DESC
   # blocking method
   def Vmachine.destroy uuid
     # TODO destroy is a complicated process
-    Vmachine.libvirt_action "destroy", uuid
-    Vmachine.libvirt_action "undefine", uuid
+    result = Vmachine.libvirt_action "destroy", uuid
+    return result unless result.success
+
+    result = Vmachine.libvirt_action "undefine", uuid
+    return result unless result.success
+
+    vm_model = Vmachine.find_by_uuid uuid
+    vm_model.destroy!
+
+    return {:success => true, :message => "Successfully destroyed vmachine with UUID=#{uuid}."}
+    
     # cleanup work is left for supervisor_worker, we just destroy the domain
   end
 
