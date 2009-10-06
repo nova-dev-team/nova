@@ -227,12 +227,12 @@ XML_DESC
   def Vmachine.destroy uuid
     # destroy is a complicated process
     begin
-      result = Vmachine.libvirt_action "destroy", uuid
-      result = Vmachine.libvirt_action "undefine", uuid
-      vm_model = Vmachine.find_by_uuid uuid
-      vm_model.destroy
+      Vmachine.libvirt_action "destroy", uuid
+      Vmachine.libvirt_action "undefine", uuid
     ensure
       # this function is ensured to return success, even there might have error in destroy process!
+      vm_model = Vmachine.find_by_uuid uuid
+      vm_model.destroy if vm_model != nil
       return {:success => true, :message => "Successfully destroyed vmachine with UUID=#{uuid}."}
     end
     
