@@ -183,7 +183,7 @@ module ImageResource
     pooling_name = "#{local_filename}.pool.#{pooling_id}"
     unless File.exist? pooling_name
       copying_lock_fname = "#{pooling_name}.copying"
-      copying_lock_file = File.new(copying_lock_fname, "w")
+      copying_lock_file = File.open(copying_lock_fname, "w")
       FileUtils.cp local_filename, pooling_name 
       copying_lock_file.close
       FileUtils.rm copying_lock_fname

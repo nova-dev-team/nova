@@ -227,10 +227,10 @@ XML_DESC
   def Vmachine.destroy uuid
     # TODO destroy is a complicated process
     result = Vmachine.libvirt_action "destroy", uuid
-    return result unless result.success
+    return result unless result[:success]
 
     result = Vmachine.libvirt_action "undefine", uuid
-    return result unless result.success
+    return result unless result[:success]
 
     vm_model = Vmachine.find_by_uuid uuid
     vm_model.destroy!
