@@ -155,8 +155,9 @@ module ImageResource
   def ImageResource.prepare_vdisk_by_pooling vm_name, vdisk_name
     Dir.entries(Setting.storage_cache).each do |entry|
       next unless entry.start_with? vdisk_name
-      next if File.exist? "#{entry}.copying"
-      return "#{Setting.storage_cache}/#{entry}" if entry =~ /pool\.[0-9]+$/
+      entry_fullpath = "#{Setting.storage_cache}/#{entry}"
+      next if File.exist? "#{entry_fullpath}.copying"
+      return entry_fullpath if entry =~ /pool\.[0-9]+$/
     end
 
     ImageResource.copy_pool_image "#{Setting.storage_cache}/#{vdisk_name}"
@@ -183,12 +184,11 @@ module ImageResource
     pooling_name = "#{local_filename}.pool.#{pooling_id}"
     unless File.exist? pooling_name
       copying_lock_fname = "#{pooling_name}.copying"
-      copying_lock_file = File.open(copying_lock_fname, "w")
+      copying_lock_file = File.new(copying_lock_fname, "w")
       FileUtils.cp local_filename, pooling_name 
       copying_lock_file.close
       FileUtils.rm copying_lock_fname
     end
     return pooling_name
-
   end
 end

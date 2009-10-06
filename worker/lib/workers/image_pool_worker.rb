@@ -9,7 +9,7 @@ class ImagePoolWorker < BackgrounDRb::MetaWorker
   def ensure_image_pool_size
     if Setting.image_pooling?
       Dir.entries(Setting.storage_cache).each do |entry|
-        next unless Setting.image_pooling? # stop pooling as soon as possible, if required
+        break unless Setting.image_pooling? # stop pooling as soon as possible, if required
         next unless entry.end_with? ".qcow2" # only takes care of qcow2 images
         entry_fullpath = "#{Setting.storage_cache}/#{entry}"
         next if File.exist? "#{entry_fullpath}.copying" # skip files if they are under copying (being downloaded)
