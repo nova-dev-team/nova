@@ -139,10 +139,14 @@ a.left_nav_current {
 				 vd_html_str = ""      
 				 vd_html_str += "<fieldset>" 
 				 vd_html_str += "	<legend>Available Softwares</legend>" 
+	
 
+				 count = 0
 			   vdisk.software_categories.each do |sc| 
-           sc.softwares.each do |app| 
-	       vd_html_str += "<input type=\"checkbox\" value=\"#{app.software_name}\"> #{app.display_name} <\/input>" 
+			       sc.softwares.each do |app| 
+				   count = 1 - count
+				   vd_html_str += "<input type=\"checkbox\" value=\"#{app.software_name}\"> #{app.display_name} <\/input>" 
+				   vd_html_str += "<br>" if count == 0
 					 end 
 				 end														
 				 vd_html_str += "</fieldset>" %>
@@ -627,7 +631,7 @@ a.left_nav_current {
         buttons: {
           "OK": function(e) {
             this_dialog = $(this);
-	    var package_list = "ubuntu_common ubuntu_ssh-nopass"
+	    var package_list = ""
 	    $("#vcwiz_soft_checkbox").find("input").filter(":checked").each(function() { package_list = package_list + " " + this.value; });
 	    // create cluster using wizard
             $.ajax({
