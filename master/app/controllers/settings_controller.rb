@@ -7,7 +7,7 @@ require 'pp'
 
 class SettingsController < ApplicationController
 
-  before_filter :render_only_for_root
+#  before_filter :render_only_for_root
 
   def index
     settings = {}

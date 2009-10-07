@@ -91,7 +91,7 @@ class CeilController < ApplicationController
 	end
 	
 	def report
-	  return
+	#  return
 	# log_type & log_msg
 	  pp = params
 	  log_status = pp[:log_status].chomp.to_i
@@ -101,7 +101,8 @@ class CeilController < ApplicationController
 	  #logger.debug "#{log_type} : #{log_msg}"
 	  #logger.debug "-----END-----"
 	  
-	  remote_ip = request.remote_ip
+	  remote_ip = pp[:rip].chomp
+	 # request.remote_ip
 	  vm = Vmachine.find_by_ip(remote_ip)
 	  if vm 
 	    log = VmachineInfo.new
@@ -127,7 +128,7 @@ class CeilController < ApplicationController
 	        vm.ceil_progress = 1
 	      when 100
 	        vm.ceil_progress = 100
-	      when [1..99]
+	      else
 	        full = 2 + count * CEIL_APP_INSTALL_STEPS
 	        current = 1 + order * CEIL_APP_INSTALL_STEPS
 	        step = CEIL_APP_INSTALL_STEPS * log_status / CEIL_APP_STATUS_MAX
@@ -136,8 +137,8 @@ class CeilController < ApplicationController
 	        logger.debug "order = #{order}"
 	        logger.debug "log_status = #{log_status}"
 	        logger.debug "vm.ceil_progress = #{vm.ceil_progress}"
-	      else
-	        logger.debug "error"
+	      
+	       # logger.debug "error"
 	    end
 	    vm.last_ceil_message = CeilMessage.message(log_status, log_category)
 	    logger.debug vm.last_ceil_message
@@ -146,7 +147,7 @@ class CeilController < ApplicationController
 	  
     respond_to do |accept|
       #accept.json { render :json => "[#{log_type}]#{log_msg}" }
-      accept.html { render :text => "[#{log_category}]#{log_message}\n#{vm.ceil_progress}%\n#{vm.last_ceil_message}" }
+      accept.html { render :text => "[#{log_category}]#{log_message}\n#{vm.ceil_progress}%\n#{vm.last_ceil_message}, " }
     end
 	end
 end

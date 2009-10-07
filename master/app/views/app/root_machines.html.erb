@@ -627,7 +627,7 @@ a.left_nav_current {
         buttons: {
           "OK": function(e) {
             this_dialog = $(this);
-	    var package_list = "common ssh-nopass"
+	    var package_list = "ubuntu_common ubuntu_ssh-nopass"
 	    $("#vcwiz_soft_checkbox").find("input").filter(":checked").each(function() { package_list = package_list + " " + this.value; });
 	    // create cluster using wizard
             $.ajax({

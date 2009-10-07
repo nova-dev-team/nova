@@ -3,7 +3,7 @@ require 'rest_client'
 
 class PmachinesController < ApplicationController
 
-  before_filter :require_admin_privilege
+#  before_filter :require_admin_privilege
 
   def index
     result = []

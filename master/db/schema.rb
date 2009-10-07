@@ -70,12 +70,14 @@ ActiveRecord::Schema.define(:version => 20090929110217) do
   end
 
   create_table "software_categories", :force => true do |t|
+    t.string   "software_category_name", :limit => 40
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "softwares", :force => true do |t|
-    t.string   "software_name",        :limit => 20
+    t.string   "software_name",        :limit => 40
+    t.string   "display_name",         :limit => 40
     t.text     "description"
     t.boolean  "available"
     t.integer  "software_category_id"
