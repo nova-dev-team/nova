@@ -142,7 +142,7 @@ a.left_nav_current {
 
 			   vdisk.software_categories.each do |sc| 
            sc.softwares.each do |app| 
-							vd_html_str += "<input type=\"checkbox\" value=\"#{app.software_name}\"> #{app.software_name} <\/input>" 
+							vd_html_str += "<input type=\"checkbox\" value=\"#{app.software_name}\"> #{app.display_name} <\/input>" 
 					 end 
 				 end														
 				 vd_html_str += "</fieldset>" %>
