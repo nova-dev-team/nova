@@ -1,6 +1,0 @@
-#! /bin/sh
-
-mv development.sqlite3 development.sqlite3.old
-
-mv production.sqlite3 development.sqlite3
-
