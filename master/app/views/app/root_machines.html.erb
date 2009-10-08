@@ -138,18 +138,21 @@ a.left_nav_current {
 		<% Vdisk.all.each do |vdisk| 
 				 vd_html_str = ""      
 				 vd_html_str += "<fieldset>" 
-				 vd_html_str += "	<legend>Available Softwares</legend>" 
+				 vd_html_str += "<legend>Available Softwares</legend><table>" 
 	
 
 				 count = 0
 			   vdisk.software_categories.each do |sc| 
 			       sc.softwares.each do |app| 
 				   count = 1 - count
-				   vd_html_str += "<input type=\"checkbox\" value=\"#{app.software_name}\"> #{app.display_name} <\/input>" 
-				   vd_html_str += "<br>" if count == 0
+				   if count == 1 
+				       vd_html_str += "<tr>"
+				   end
+				   vd_html_str += "<td><input type=\"checkbox\" value=\"#{app.software_name}\"> #{app.display_name} <\/input></td>" 
+				   vd_html_str += "</tr>" if count == 0
 					 end 
 				 end														
-				 vd_html_str += "</fieldset>" %>
+			       vd_html_str += "</table></fieldset>" %>
     
 	    vdisk_softlist["<%= vdisk.raw_name %>"] = '<%= vd_html_str %>';
 
@@ -621,8 +624,8 @@ a.left_nav_current {
     if (new_vcluster_dialog == null) {
       new_vcluster_dialog = $("#add_vcluster_dialog").dialog({
         modal: true,
-        width: 500,
-        height: $.browser.msie ? 720 : 450, // IE has layout problems
+        width: 420,
+        height: $.browser.msie ? 800 : 550, // IE has layout problems
         resizable: true,
         draggable: $.browser.msie == false, // IE has layout problems
         hide: "slide",
