@@ -73,6 +73,20 @@ class UsersController < ApplicationController
     
   end
 
+  def whoami
+    if not logged_in_and_activated?
+      render_failure "You must be logged in to carry out this action"
+      return
+    end
+
+    render_success "Successfully retrieved your information", {
+      :name => current_user.name,
+      :email => current_user.email,
+      :login_id => current_user.login,
+      :groups => current_user.groups.collect {|g| g.name}
+    }
+  end
+
 ## Update a user's settings, such as fullname, password, email address.
 ## Also used to change activation and groups, which requires privileged user.
 ## A user cannot change his/her own activation flag and groups
