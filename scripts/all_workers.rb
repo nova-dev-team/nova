@@ -18,6 +18,12 @@ when "firstrun" then each_node "cd /root/v2/worker && ./first_run.sh -d"
 when "start" then each_node "cd /root/v2/worker && ./start.sh -d"
 when "stop" then each_node "cd /root/v2/worker && ./stop.sh -d"
 when "update" then each_node "cd /root/v2/worker && git pull"
+when "install" then
+    sys_exec "cd ../installer && ./make_installer.sh && cd .."
+    all_node_name do |n|
+	sys_exec "scp -r ../installer #{n}:/root"
+    end
+    each_node "cd /root/installer && ./install.sh"
 else
     if ARGV[0] == nil
         puts "usage:"
