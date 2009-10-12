@@ -18,6 +18,22 @@ class VdisksController < ApplicationController
     render_data VdisksHelper::Helper.upload_list
   end
 
+	def soft_list
+	  vd = Vdisk.find params[:id]
+		result = []
+		vd.software_categories.all.each do |sc|
+			sc.softwares.all.each do |app|
+			result << {
+				:id => app.id,
+				:category_id => sc.id,
+				:display_name => app.display_name,
+				:software_name => app.software_name
+      }
+			end
+		end
+		render_data result
+	end
+
   def register
     # TODO add "base_upon" parameter
     if params[:upload_name] and params[:display_name] and params[:type]
