@@ -12,11 +12,11 @@ def each_node cmd
 end
 
 case ARGV[0]
-when "rmcache" then each_node "rm -r /root/v2/worker/tmp/work_site/storage_cache"
-when "rmlog" then each_node "rm -r /root/v2/worker/log"
-when "firstrun" then each_node "cd /root/v2/worker && ./first_run.sh -d"
+when "rm_cache" then each_node "rm -r /root/v2/worker/tmp/work_site/storage_cache"
+when "rm_log" then each_node "rm -r /root/v2/worker/log"
+when "first_run" then each_node "cd /root/v2/worker && ./first_run.sh"
 when "start" then each_node "cd /root/v2/worker && ./start.sh -d"
-when "stop" then each_node "cd /root/v2/worker && ./stop.sh -d"
+when "stop" then each_node "cd /root/v2/worker && ./stop.sh"
 when "update" then each_node "cd /root/v2/worker && git pull"
 when "create_br" then
     each_node "bash /root/v2/worker/scripts/create_br.sh"
@@ -30,7 +30,7 @@ when "install" then
 else
     if ARGV[0] == nil
         puts "usage:"
-	puts "[clear|diskfree|start|stop|update|firstrun]"
+	puts "Just check the source code!"
     else
 	each_node(ARGV.join " ")
     end
