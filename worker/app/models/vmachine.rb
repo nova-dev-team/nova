@@ -210,6 +210,8 @@ XML_DESC
   # non-blocking, most work is delegated to stop_vmachine_worker
   def Vmachine.stop uuid
     # TODO stop a domain, and inform the update_vmachine_worker to upload it, if necessary
+    vm_model = Vmachine.find_by_uuid uuid
+    Vmachine.delete vm_model if vm_model != nil
     Vmachine.libvirt_action "stop", uuid
   end
 
@@ -232,7 +234,7 @@ XML_DESC
     ensure
       # this function is ensured to return success, even there might have error in destroy process!
       vm_model = Vmachine.find_by_uuid uuid
-      vm_model.destroy if vm_model != nil
+      Vmachine.delete vm_model if vm_model != nil
       return {:success => true, :message => "Successfully destroyed vmachine with UUID=#{uuid}."}
     end
     

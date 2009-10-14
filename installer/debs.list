@@ -8,7 +8,6 @@ dpkg-dev
 esound-common
 g++
 g++-4.3
-ganglia-monitor
 gcc
 gcc-4.3
 git-core
