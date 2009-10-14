@@ -18,6 +18,8 @@ when "firstrun" then each_node "cd /root/v2/worker && ./first_run.sh -d"
 when "start" then each_node "cd /root/v2/worker && ./start.sh -d"
 when "stop" then each_node "cd /root/v2/worker && ./stop.sh -d"
 when "update" then each_node "cd /root/v2/worker && git pull"
+when "create_br" then
+    each_node "bash /root/v2/worker/scripts/create_br.sh && /etc/init.d/networking restart"
 when "install" then
     sys_exec "cd ../installer && ./make_installer.sh && cd .."
     all_node_name do |n|
