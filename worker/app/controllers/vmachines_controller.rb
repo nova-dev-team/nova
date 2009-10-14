@@ -8,16 +8,12 @@ require 'fileutils'
 
 class VmachinesController < ApplicationController
 
-  include VmachinesHelper
-
 public
 
   # libvirt states
   STATE_RUNNING = 1
   STATE_SUSPENDED = 3
   STATE_NOT_RUNNING = 5
-
-  @@virt_conn = VmachinesHelper::Helper.virt_conn
 
   def index
     list
@@ -78,14 +74,6 @@ private
   def action_request action_name, args
     result = Vmachine.send action_name, args
     render_result result[:success], result[:message]
-  end
-
-  def state_can_destroy? state_id
-    return [STATE_RUNNING, STATE_SUSPENDED].include? state_id
-  end
-
-  def state_has_vnc? state_id
-    return [STATE_RUNNING, STATE_SUSPENDED].include? state_id
   end
 
 end

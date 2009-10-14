@@ -18,7 +18,7 @@
 
   :supervisor_worker:
     :remove_stale_files:
-      :trigger_args: */5 * * * * *
+      :trigger_args: 0 */1 * * * *
     :check_copying:
       :trigger_args: 0 */1 * * * *
     :check_md5sum:
