@@ -18,6 +18,7 @@ when "first_run" then each_node "cd /root/v2/worker && ./first_run.sh"
 when "start" then each_node "cd /root/v2/worker && ./start.sh -d"
 when "stop" then each_node "cd /root/v2/worker && ./stop.sh"
 when "update" then each_node "cd /root/v2/worker && git pull"
+when "list_vm" then each_node "virsh list"
 when "create_br" then
     each_node "bash /root/v2/worker/scripts/create_br.sh"
     each_node "/etc/init.d/networking restart"
