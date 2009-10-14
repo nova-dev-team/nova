@@ -10,5 +10,5 @@ echo
 
 #script/backgroundrb start -e development
 swiftiply -c config/swiftiply.conf
-swiftiply_mongrel_rails -n 10 -p 4000 -d
+swiftiply_mongrel_rails -n 10 -p 3100 -d
 #script/server $@
