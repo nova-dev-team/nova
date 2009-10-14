@@ -29,7 +29,7 @@ when "install" then
 else
     if ARGV[0] == nil
         puts "usage:"
-	puts "[clear|diskfree|start|stop|update|firstrun]"
+	puts "Just check the source code!"
     else
 	each_node(ARGV.join " ")
     end
