@@ -2,6 +2,16 @@ class VdisksController < ApplicationController
 
   before_filter :login_required
 
+=begin
+	def backdoor
+		miao = Vdisk.new
+		miao.raw_name = "internal name"
+		miao.display_name = "FOR TEST ONLY"
+		miao.description = "not available"
+		miao.save
+	end
+=end
+
   def index
     result = []
     Vdisk.all.each do |vdisk|
@@ -17,6 +27,40 @@ class VdisksController < ApplicationController
   def upload_list
     render_data VdisksHelper::Helper.upload_list
   end
+
+	def add_category
+		vd = Vdisk.find params[:id]
+		sc = SoftwareCategory.find params[:cid]
+		if vd && sc
+			vd.software_categories << sc
+			render_success 'Added SoftwareCategory #{sc.software_category_name} to Vdisk #{vd.raw_name}'
+		else
+			render_failure 'Vdisk/Category not found'
+		end
+	end
+
+	def rm_category
+		vd = Vdisk.find params[:id]
+		sc = SoftwareCategory.find params[:cid]
+		if vd && sc
+			vd.software_categories.delete sc
+			render_success 'Removed SoftwareCategory #{sc.software_category_name} from Vdisk #{vd.raw_name}'
+		else
+			render_failure 'Vdisk/Category not found'
+		end
+	end
+
+	def soft_cate_list
+	  vd = Vdisk.find params[:id]
+		result = []		
+		vd.software_categories.all.each do |sc|
+			result << {
+				:id => sc.id,
+				:category_name => sc.software_category_name
+      }
+		end
+		render_data result
+	end
 
 	def soft_list
 	  vd = Vdisk.find params[:id]

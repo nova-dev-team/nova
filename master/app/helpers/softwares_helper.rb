@@ -11,7 +11,7 @@ module SoftwaresHelper
 				else
 					if File.directory?(fullpath) && File.exists?(description_file)
 						des = `cat #{description_file}`
-						list << {"software_name" => dirname, "description" => des}
+						list << { :software_name => dirname, :description => des}
 					end
 			end
 		end			

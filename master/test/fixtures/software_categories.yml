@@ -5,3 +5,7 @@
 #
 # two:
 #   column: value
+
+default:
+  software_category_name: incoming
+
