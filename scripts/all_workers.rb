@@ -3,12 +3,12 @@
 require 'nodelist'
 
 def each_node cmd
-    all_node_name do |n|
-	puts "=====================================  #{n}  ======================================="
-	sys_exec "ssh #{n} '#{cmd}'"
-	puts "-------------------------------------  #{n}  ---------------------------------------"
-	puts "\n\n"
-    end
+  all_node_name do |n|
+    puts "=====================================  #{n}  ======================================="
+    sys_exec "ssh #{n} '#{cmd}'"
+    puts "-------------------------------------  #{n}  ---------------------------------------"
+    puts "\n\n"
+  end
 end
 
 case ARGV[0]
@@ -20,20 +20,20 @@ when "stop" then each_node "cd /root/v2/worker && ./stop.sh"
 when "update" then each_node "cd /root/v2/worker && git pull"
 when "list_vm" then each_node "virsh list"
 when "create_br" then
-    each_node "bash /root/v2/worker/scripts/create_br.sh"
-    each_node "/etc/init.d/networking restart"
+  each_node "bash /root/v2/worker/scripts/create_br.sh"
+  each_node "/etc/init.d/networking restart"
 when "install" then
-    sys_exec "cd ../installer && ./make_installer.sh && cd .."
-    all_node_name do |n|
-	sys_exec "scp -r ../installer #{n}:/root"
-    end
-    each_node "cd /root/installer && ./install.sh"
+  sys_exec "cd ../installer && ./make_installer.sh && cd .."
+  all_node_name do |n|
+    sys_exec "scp -r ../installer #{n}:/root"
+  end
+  each_node "cd /root/installer && ./install.sh"
 else
-    if ARGV[0] == nil
-        puts "usage:"
-	puts "Just check the source code!"
-    else
-	each_node(ARGV.join " ")
-    end
+  if ARGV[0] == nil
+    puts "usage:"
+	  puts "Just check the source code!"
+  else
+	  each_node(ARGV.join " ")
+  end
 end
 
