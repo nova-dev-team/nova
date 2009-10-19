@@ -12,7 +12,9 @@ class ApplicationController < ActionController::Base
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
   
-
+  def version
+    render_data :success => true, :message => "Version: 1.0"
+  end
 
 protected
   
@@ -71,4 +73,5 @@ protected
   def render_error error_msg
     render :text => error_msg
   end
+
 end

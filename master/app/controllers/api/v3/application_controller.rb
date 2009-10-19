@@ -10,6 +10,10 @@ class Api::V3::ApplicationController < ActionController::Base
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
 
+  def version
+    render_success "Version: 3.0"
+  end
+
 protected
 
   include ControllerUtility

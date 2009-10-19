@@ -72,6 +72,11 @@ ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action.:format', :path_prefix => '/'
   map.connect ':controller/:action/:id.:format', :path_prefix => '/'
 
+  map.connect ':controller/:action', :path_prefix => '/api/v1'
+  map.connect ':controller/:action/:id', :path_prefix => '/api/v1'
+  map.connect ':controller/:action.:format', :path_prefix => '/api/v1'
+  map.connect ':controller/:action/:id.:format', :path_prefix => '/api/v1'
+
   # versioned api
   map.namespace :api, :path_prefix => '/' do |api|
 

@@ -28,12 +28,5 @@ class MiscController < ApplicationController
     render :text => request[:ip]
   end
 
-  def version
-    result = {:success => true, :message => "Version: 1.0"}
-    respond_to do |accept|
-      accept.json {render :json => result}
-      accept.html {render :text => result.to_json}
-    end
-  end
 
 end
