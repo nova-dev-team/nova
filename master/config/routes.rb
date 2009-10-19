@@ -23,7 +23,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.home '', :controller => 'app', :action => 'home'
 
-  map.connect 'misc/verification_image.:format', :controller => 'misc', :action => 'verification_image'
+#  map.connect 'misc/verification_image.:format', :controller => 'misc', :action => 'verification_image'
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
@@ -64,13 +64,30 @@ ActionController::Routing::Routes.draw do |map|
   # Note: These default routes make all actions in every controller accessible via GET requests. You should
   # consider removing the them or commenting them out if you're using named routes and resources.
 
-  map.namespace :api do |api|
+
+  # default routing, also includes the first version of nova api
+  # we have to use :path_prefix, so that the old api does not overshadow newer version api
+  map.connect ':controller/:action', :path_prefix => '/'
+  map.connect ':controller/:action/:id', :path_prefix => '/'
+  map.connect ':controller/:action.:format', :path_prefix => '/'
+  map.connect ':controller/:action/:id.:format', :path_prefix => '/'
+
+  # versioned api
+  map.namespace :api, :path_prefix => '/' do |api|
+
     api.namespace :v2 do |v2|
+      v2.connect ':controller/:action'
       v2.connect ':controller/:action/:id'
+      v2.connect ':controller/:action.:format'
+      v2.connect ':controller/:action/:id.:format'
+    end
+
+    api.namespace :v3 do |v3|
+      v3.connect ':controller/:action'
+      v3.connect ':controller/:action/:id'
+      v3.connect ':controller/:action.:format'
+      v3.connect ':controller/:action/:id.:format'
     end
   end
-
-  map.connect ':controller/:action/:id'
-  map.connect ':controller/:action.:format'
-  map.connect ':controller/:action/:id.:format'
+  
 end
