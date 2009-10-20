@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :vmachine_infos
+#  map.resources :vmachine_infos
 
 #  map.resources :vdisks
 
@@ -19,7 +19,7 @@ ActionController::Routing::Routes.draw do |map|
   #map.signup '/signup', :controller => 'users', :action => 'new'
 #  map.resources :users
 
-  map.resource :session
+#  map.resource :session
 
   map.home '', :controller => 'app', :action => 'home'
 
@@ -64,36 +64,32 @@ ActionController::Routing::Routes.draw do |map|
   # Note: These default routes make all actions in every controller accessible via GET requests. You should
   # consider removing the them or commenting them out if you're using named routes and resources.
 
-
   # default routing, also includes the first version of nova api
   # we have to use :path_prefix, so that the old api does not overshadow newer version api
-  map.connect ':controller/:action', :path_prefix => '/'
   map.connect ':controller/:action/:id', :path_prefix => '/'
   map.connect ':controller/:action.:format', :path_prefix => '/'
   map.connect ':controller/:action/:id.:format', :path_prefix => '/'
 
   # alias for old version api, call them "v1" branch
-  map.connect ':controller/:action', :path_prefix => '/api/v1'
-  map.connect ':controller/:action/:id', :path_prefix => '/api/v1'
-  map.connect ':controller/:action.:format', :path_prefix => '/api/v1'
-  map.connect ':controller/:action/:id.:format', :path_prefix => '/api/v1'
+#  map.connect ':controller/:action/:id', :path_prefix => '/api/v1'
+#  map.connect ':controller/:action.:format', :path_prefix => '/api/v1'
+#  map.connect ':controller/:action/:id.:format', :path_prefix => '/api/v1'
 
   # versioned api
-  map.namespace :api, :path_prefix => '/' do |api|
+  map.namespace :api do |api|
 
     api.namespace :v2 do |v2|
-      v2.connect ':controller/:action'
       v2.connect ':controller/:action/:id'
       v2.connect ':controller/:action.:format'
       v2.connect ':controller/:action/:id.:format'
     end
 
-    api.namespace :v3 do |v3|
-      v3.connect ':controller/:action'
-      v3.connect ':controller/:action/:id'
-      v3.connect ':controller/:action.:format'
-      v3.connect ':controller/:action/:id.:format'
-    end
+#    api.namespace :v3 do |v3|
+#      v3.connect ':controller/:action/:id'
+#      v3.connect ':controller/:action.:format'
+#      v3.connect ':controller/:action/:id.:format'
+#    end
   end
+
   
 end

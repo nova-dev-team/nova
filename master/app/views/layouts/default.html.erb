@@ -341,7 +341,7 @@ input, select, textarea {
           
             $.ajax({
               type: "POST",
-              url: "/users/<%= current_user.id %>",
+              url: "/users/edit/<%= current_user.id %>",
               data: ajax_data,
               dateType: 'json',
               error: function(e) {

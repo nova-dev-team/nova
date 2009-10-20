@@ -9,8 +9,8 @@ class UsersController < ApplicationController
  
   def create
     logout_keeping_session!
-    @user = User.new(params[:user])
-    if params[:user][:group] != "admin"
+    @user = User.new(params)
+    if params[:group] != "admin"
       @user.groups << (Group.find_by_name 'user') ## default user group
     else
       @user.groups << (Group.find_by_name 'admin')
@@ -33,10 +33,8 @@ class UsersController < ApplicationController
     else
       ## flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
       ## render :action => 'new'
-      pp @user.errors
-      error_text = ""
-      @user.errors.each {|item, reason| error_text += item + " ==> " + reason}
 
+      error_text = @user.errors.collect {|item, reason| "#{item}: #{reason}\n"}
       render_failure "Your account could not be created. Server error:\n#{error_text}"
 
     end
@@ -92,8 +90,7 @@ class UsersController < ApplicationController
 ## A user cannot change his/her own activation flag and groups
 ## When changing password, old password is also required, along with a password confirmation.
 ## When changing full username and email address, they must be well formatted as required by "User" model.
-## TODO
-  def update
+  def edit
   
     # require logged in
     if not logged_in_and_activated?
@@ -101,8 +98,6 @@ class UsersController < ApplicationController
       return
     end
   
-    pp params
-    
     information_updated = false # flag to denote a change in user's profile
     
     user = User.find_by_id params[:id]

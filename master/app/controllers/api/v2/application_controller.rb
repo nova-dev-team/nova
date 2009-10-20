@@ -9,6 +9,8 @@ class Api::V2::ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
+  
+  include AuthenticatedSystem
 
   def version
     render_success "Version: 2.0"

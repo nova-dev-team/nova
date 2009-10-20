@@ -528,15 +528,15 @@ html>body #page {
       user_group = "admin";
     }
     
-    new Ajax.Request('/users', {
+    new Ajax.Request('/users/create', {
       method: 'post',
       parameters: {
-        'user[login]': signup_user_id.value,
-        'user[password]': signup_password.value,
-        'user[password_confirmation]': signup_password_confirm.value,
-        'user[email]': signup_email.value,
-        'user[name]': signup_fullname.value,
-        'user[group]': user_group
+        'login': signup_user_id.value,
+        'password': signup_password.value,
+        'password_confirmation': signup_password_confirm.value,
+        'email': signup_email.value,
+        'name': signup_fullname.value,
+        'group': user_group
       },
       onSuccess: function(transport){
         var json = transport.responseText.evalJSON(true);
