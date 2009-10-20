@@ -3,6 +3,8 @@ require "utils.rb"
 # a helper module for both master & worker module
 module ControllerUtility
 
+private
+
   # report request result, either successful or failure
   def render_result success, message, option = {}
     if (option.keys.include? :success) or (option.keys.include? :message)
