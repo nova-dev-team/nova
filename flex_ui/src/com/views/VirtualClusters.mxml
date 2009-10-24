@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" paddingLeft="10" paddingRight="10" creationComplete="refreshPage()">
+	<mx:VBox id="vcluster_box" width="30%" height="90%">
+		<!--<mx:Label text="Machine List"/>!-->
+		<mx:List id="vClustersList" height="90%" width="100%" change="refreshVMachineList()">
+			
+		</mx:List>
+		<mx:HBox id="vcluster_buttons" height="10%">
+			<mx:Button label="Add VCluster" click="openAddWindow()"/>
+			<mx:Button label="Destroy" click="destroyVCluster()"/>
+			<mx:Button label="Refresh" click="refreshPage()"/>
+		</mx:HBox>
+	</mx:VBox>
+	<mx:VBox width ="70%" height = "100%">
+		<!-- <mx:Label text="Details"/> !-->
+		<mx:DataGrid id="vMachinesList" height="40%" width="100%" change="refreshVMachineDetails()">
+			<mx:columns>
+						<mx:DataGridColumn headerText="ID" dataField="id"/>
+						<mx:DataGridColumn headerText="CPU COUNT" dataField="cpu_count"/>
+						<mx:DataGridColumn headerText="MEMORY SIZE" dataField="mem_size"/>
+						<mx:DataGridColumn headerText="HDA" dataField="hda"/>
+						<mx:DataGridColumn headerText="ARCH" dataField="arch"/>
+						<mx:DataGridColumn headerText="STATUS" dataField="status"/>
+            </mx:columns>
+		</mx:DataGrid>
+		<mx:HBox width="100%" height = "30" horizontalAlign="right">
+			<mx:Button id="observe_button" label="Observe via VNC" enabled="false" click="observeInVNC()"/>
+			<mx:Button id="suspend_resume_button" enabled="false" label="Suspend" click="suspend_resume()"/>
+			<mx:Button id="start_stop_button" enabled="false" label="Stop" click="start_stop()"/>
+		</mx:HBox>
+		<mx:HBox width="100%" height="35%">
+			<mx:TextArea id="vMachineDetails" text="Here We show you some details" width="50%" height="100%"/>
+			<mx:Image id="vMachinePreview" width="50%" height="100%"/>
+		</mx:HBox>
+	</mx:VBox>
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import com.adobe.serialization.json.JSON;
+			import mx.rpc.http.mxml.HTTPService;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			
+			private function show(e:ResultEvent):void
+			{
+				var rawData:String = String(e.result); 
+        		vClusters = JSON.decode(rawData);
+        		var vLists:Array = new Array(vClusters.length);
+        		var i:int;
+        		for(i=0; i<vClusters.length; i++)
+        		{
+        			vLists[i] = vClusters[i].name;
+        		}
+        		vClustersList.dataProvider = vLists;
+//        		refreshMachineDetails();
+			}
+			
+			private function handleVClusterFault():void
+			{
+				Alert.show(Environment.NETWORK_ERROR, "VCluster Error", Alert.OK);
+			}
+			
+			//此函数只应当在Cluster列表被单击时调用
+			private function refreshVMachineList():void
+			{
+				var i:int = vClustersList.selectedIndex;
+				var id:int = vClusters[i].id;
+				
+				//清除现有显示
+				vMachinesList.dataProvider = null;
+				
+				vMachineListService.cancel();
+				vMachineListService.url = Environment.VCLUSTER_VMACHINES + id;
+				vMachineListService.send();
+				
+//				vm_list_id = vClusters[i].vm_list;
+				
+//				vMachines = new Array();
+				
+				
+//				
+//				mI = 0;
+//				vMachineDetailsService.url = Environment.VMACHINE_DETAILS + vm_list_id[mI++].id;
+//				vMachineDetailsService.send();
+				
+//				for(i=0; i<vm_list_id.length; i++)
+//				{
+//					vMachineDetailsService.url = Environment.VMACHINE_DETAILS + vm_list_id[i].id;
+//					vMachineDetailsService.send();
+//				}
+				
+//				vMachinesList.dataProvider = vm_list_id;
+				
+//				var s:String = "?addr="+decData[i].addr; 
+				
+//				machineDetailsService.url = Environment.PMACHINE_DETAILS + s;
+//				machineDetailsService.send();
+			}
+			
+			//响应HttpService，获取某Cluster的Virtual Machine List
+			private function handleVMachineList(e:ResultEvent):void
+			{
+				//当用户单击别的Cluster时停止递归
+//				if(vm_list_id != vClusters[vClustersList.selectedIndex].vm_list)
+//					return;
+//				var vm_list:Array = vm_list_id; 
+				
+				var rawData:String = String(e.result);
+				vMachines = JSON.decode(rawData);
+															
+				vMachinesList.dataProvider = vMachines;
+			}
+			
+			private function handleVMachineListFault():void
+			{
+				
+			}
+			
+			private function refreshVMachineDetails():void
+			{
+				var vMachine = vMachinesList.selectedItem;
+				var text:String;
+				
+				var softString:String =  vMachine.soft_list;
+				var s:String;
+				if(softString =="[object\nObject]")
+				{
+					s = "null\n";
+				}
+				else
+				{
+					var softs:Array;
+					softs = softString.split("\n")
+					s = softs[0] +"\n";
+					var i:int = 0;
+					for(i=1; i<softs.length; i++)
+					{
+						s= s + "\t\t\t" + softs[i] + "\n";				
+					}
+				}
+				
+				
+				text = "uuid: \t\t"+ vMachine.uuid +"\n"
+					+ "hdb: \t\t" + vMachine.hdb +"\n"
+					+ "cdrom: \t\t" + vMachine.cdrom +"\n"
+					+ "boot_device:\t"+vMachine.boot_device+"\n"
+					+ "pm_addr:\t"+ vMachine.pmachine_addr+"\n"
+					+ "vcluster_id:\t"+ vMachine.vcluster_id+"\n"
+					+ "soft_list:\t\t" + s
+					+ "mac_addr:\t" + vMachine.mac_addr+"\n"
+					+ "vnc_port:\t" + vMachine.vnc_port+"\n";
+				vMachineDetails.text = text;
+				
+				//Reset the start/stop suspend/resume button
+				var status:String = vMachine.status;
+				
+				if(status == "running")
+				{
+					start_stop_button.enabled = true;
+					suspend_resume_button.enabled = true;
+					observe_button.enabled = true;
+					
+					start_stop_button.label = "stop";
+					suspend_resume_button.label = "suspend";
+				}
+				
+				else if(status == "suspended")
+				{
+					start_stop_button.enabled = true;
+					suspend_resume_button.enabled = true;
+					observe_button.enabled = false;
+					
+					start_stop_button.label = "stop";
+					suspend_resume_button.label = "resume";
+					
+				}
+				
+				else if(status == "not running")
+				{
+					start_stop_button.enabled = true;
+					suspend_resume_button.enabled = false;
+					observe_button.enabled = false;					
+					
+					start_stop_button.label = "start";					
+				}								
+			}
+			
+			private function start_stop():void
+			{
+				var vMachine = vMachinesList.selectedItem;
+				if(vMachine==null)
+					return;
+				var l:String = start_stop_button.label;
+				
+				if(l == "start")
+				{
+					stest.url = Environment.VMACHINE_START + vMachine.uuid;
+				}
+				else
+				{
+					stest.url = Environment.VMACHINE_STOP + vMachine.uuid;
+				}
+				
+				stest.send();					
+			}
+			
+			private function suspend_resume():void
+			{
+				var vMachine = vMachinesList.selectedItem;
+				if(vMachine==null)
+					return;
+				var l:String = suspend_resume_button.label;
+				
+				if(l == "suspend")
+				{
+					stest.url = Environment.VMACHINE_SUSPEND + vMachine.uuid;
+				}
+				else
+				{
+					stest.url = Environment.VMACHINE_RESUME + vMachine.uuid;
+				}
+				
+				stest.send();
+			}
+						
+			public function refreshPage():void
+			{
+				vClusterService.url = Environment.VCLUSTER;
+				vClusterService.send();
+			}
+			
+			
+			
+			private function operationFinished():void
+			{
+				refreshVMachineList();
+			}
+			
+			private function openAddWindow():void
+			{
+				PopUpManager.createPopUp(this,AddVirtualCluster,true);
+			}
+			
+			private function observeInVNC():void
+			{
+				var vMachine = vMachinesList.selectedItem;
+				if(vMachine==null)
+					return;
+				var url:String = Environment.VMACHINE_VNC + vMachine.id;
+				ExternalInterface.call('window.open',url,'title','target=_blank');
+			}
+			
+			private function destroyVCluster():void
+			{
+				var i:int = vClustersList.selectedIndex;
+				if(i<0)
+					return;
+				destroyService.url = Environment.VCLUSTER_DESTROY + vClusters[i].id;
+				destroyService.send();
+				vcluster_buttons.enabled = false;
+				vcluster_box.enabled = false;
+			}
+			
+			private function handleDestroyVCluster():void
+			{
+				
+				Alert.show("Successfully Destroy VCluster!","Tip",Alert.OK);
+				vcluster_buttons.enabled = true;
+				vcluster_box.enabled = true;
+				
+				refreshPage();
+			}
+			
+			private function handleDestroyVClusterFault():void
+			{
+				Alert.show("Failed to Destroy VCluster!","Tip",Alert.OK);
+				vcluster_buttons.enabled = true;
+				vcluster_box.enabled = true;
+				
+				refreshPage();
+			}
+						
+			private var decData:Array;
+			private var vClusters:Array;
+			private var vm_list_id:Array;
+			private var vMachines:Array;
+			private var mI:int;
+		]]>
+	</mx:Script>
+	<mx:HTTPService id="vClusterService" requestTimeout="5" resultFormat="text" result="show(event)" fault="handleVClusterFault()"/>
+	<mx:HTTPService id="vMachineListService" requestTimeout="5" resultFormat="text" result="handleVMachineList(event)" fault="handleVMachineListFault()"/>
+	<mx:HTTPService id="vMachineDetailsService" resultFormat="text" result="handleVMachineList(event)"/>
+	<mx:HTTPService id="stest" requestTimeout="5000" result="operationFinished()"/>
+	<mx:HTTPService id="destroyService" requestTimeout="3000" result="handleDestroyVCluster()" fault="handleDestroyVClusterFault()"/>
+</mx:HBox>

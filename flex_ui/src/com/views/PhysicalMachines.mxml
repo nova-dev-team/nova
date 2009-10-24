@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" paddingLeft="10" paddingRight="10"  creationComplete="pMachinesService.send()">
+	<mx:VBox width="30%" height="90%">
+		<!--<mx:Label text="Machine List"/>!-->
+		<mx:List id="pMachinesList" height="90%" width="100%" change="refreshMachineDetails()">
+			
+		</mx:List>
+		<mx:HBox height="10%">
+			<mx:Button label="Add PMachine" click="openAddWindow()"/>
+			<mx:Button label="Refresh"/>
+		</mx:HBox>
+	</mx:VBox>
+	<mx:VBox width ="70%" height = "100%">
+		<!-- <mx:Label text="Details"/> !-->
+		<mx:DataGrid id="machineDetails" height="40%" width="100%" >
+			<mx:columns>
+				<mx:DataGridColumn headerText="ID" dataField="id"/>
+				<mx:DataGridColumn headerText="CPU COUNT" dataField="cpu_count"/>
+				<mx:DataGridColumn headerText="MEMORY SIZE" dataField="mem_size"/>
+				<mx:DataGridColumn headerText="HDA" dataField="hda"/>
+				<mx:DataGridColumn headerText="ARCH" dataField="arch"/>
+				<mx:DataGridColumn headerText="STATUS" dataField="status"/>
+            </mx:columns>
+		</mx:DataGrid>
+		
+		<mx:TextArea id="machineSummary" height="40%"  text="Here We show you some details" width="50%">
+			
+		</mx:TextArea>
+	</mx:VBox>
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import com.adobe.serialization.json.JSON;
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			
+			private function show(e:ResultEvent):void
+			{
+				var rawData:String = String(e.result); 
+        		decData = JSON.decode(rawData);
+        		var pMachines:Array = new Array(decData.length);
+        		var i:int;
+        		for(i=0; i<decData.length; i++)
+        		{
+        			pMachines[i] = "" + decData[i].addr + "\tvnc=" + decData[i].vnc_first + "~" + decData[i].vnc_last;
+        		}
+        		pMachinesList.dataProvider = pMachines;
+//        		refreshMachineDetails();
+			}
+			
+			private function refreshMachineDetails():void
+			{
+				var i:int = pMachinesList.selectedIndex;
+				var s:String = "?addr="+decData[i].addr; 
+				
+				machineDetailsService.url = Environment.PMACHINE_DETAILS + s;
+				machineDetailsService.send();
+			}
+			
+			private function showMachine(e:ResultEvent):void
+			{
+				var rawData:String = String(e.result);
+				var decData:* = JSON.decode(rawData);
+				var vm_info:Array = decData.vm_info;
+				machineDetails.dataProvider = vm_info; 
+				
+				var id:int = decData.id;
+				var vnc_first:int = decData.vnc_first;
+				var vnc_last:int = decData.vnc_last;
+				var addr:String = decData.addr;
+				var retired:Boolean = decData.retired;
+				var s:String = "ID:\t\t\t"+id+"\n"+"Retired:\t\t"+retired+"\n"+"Address:\t\t"+addr+ "\n"+"VNC range:\t"+vnc_first+"-"+vnc_last;
+				machineSummary.text = s;
+			}
+			
+			private function handleShowMachineFault():void
+			{
+				Alert.show(Environment.NETWORK_ERROR,"PMachine Error!",Alert.OK);
+			}
+			
+			private function openAddWindow():void
+			{
+				PopUpManager.createPopUp(this,AddPhysicalMachine,true);
+			}
+			
+			private function handlePMachineFault():void
+			{
+				Alert.show(Environment.NETWORK_ERROR,"PMachine Error!",Alert.OK);	
+			}
+			
+			private var decData:Array;
+		]]>
+	</mx:Script>
+	<mx:HTTPService id="pMachinesService" url="http://166.111.131.32:3000/pmachines" requestTimeout="{Environment.TIME_OUT}" resultFormat="text" result="show(event)" fault="handlePMachineFault()"/>
+	<mx:HTTPService id="machineDetailsService" requestTimeout="{Environment.TIME_OUT}" resultFormat="text" result="showMachine(event)" fault="handleShowMachineFault()"/>
+</mx:HBox>
+
+

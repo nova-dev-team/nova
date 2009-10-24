@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:Label text="System Overview" width="175" height="27" fontSize="17" fontWeight="bold" horizontalCenter="0" verticalCenter="-200"/>
+	<mx:Text id="hitext" text="Currently, this system has 4 members: that is 1 administrator, 0 normal user, and you. " height="90" fontSize="15" width="538" horizontalCenter="17" verticalCenter="-72"/>
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import mx.controls.Alert;
+			private function sayHi(e:ResultEvent):void
+			{
+				hitext.text = e.result as String;
+//				Alert.show(e.result as String);
+			}
+			
+			private function fresh():void
+			{
+			}
+			
+			private function test():void
+			{
+				test_label.text = String(Environment.test);
+				test_width.text = String(Environment.width);
+				test_height.text = String(Environment.height);
+			}
+		]]>
+	</mx:Script>
+	<mx:Button  x="330" y="382" label="Button" click="test()"/>
+	<mx:Label id="test_label" x="256" y="384" text="Label"/>
+	<mx:Label id="test_width" x="256" y="436" text="Label"/>
+	<mx:Label id="test_height" x="330" y="436" text="Label"/>
+</mx:Canvas>
