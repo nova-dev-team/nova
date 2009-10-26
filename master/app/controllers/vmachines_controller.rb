@@ -32,7 +32,9 @@ class VmachinesController < ApplicationController
       :soft_list => vm.vcluster.package_list,
       :status => vm.status,
       :mac_addr => vm.mac,
-      :vnc_port => vm.vnc_port
+      :vnc_port => vm.vnc_port,
+      :ceil_progress => vm.ceil_progress,
+      :last_ceil_message => vm.last_ceil_message
     }
     render_data result
   end
