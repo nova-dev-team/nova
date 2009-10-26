@@ -7,7 +7,7 @@
 		</mx:List>
 		<mx:HBox height="10%">
 			<mx:Button label="Add PMachine" click="openAddWindow()"/>
-			<mx:Button label="Refresh"/>
+			<mx:Button label="Refresh" click="pMachinesService.send()"/>
 		</mx:HBox>
 	</mx:VBox>
 	<mx:VBox width ="70%" height = "100%">

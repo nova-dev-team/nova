@@ -18,16 +18,6 @@
 			{
 			}
 			
-			private function test():void
-			{
-				test_label.text = String(Environment.test);
-				test_width.text = String(Environment.width);
-				test_height.text = String(Environment.height);
-			}
 		]]>
 	</mx:Script>
-	<mx:Button  x="330" y="382" label="Button" click="test()"/>
-	<mx:Label id="test_label" x="256" y="384" text="Label"/>
-	<mx:Label id="test_width" x="256" y="436" text="Label"/>
-	<mx:Label id="test_height" x="330" y="436" text="Label"/>
 </mx:Canvas>

@@ -201,6 +201,8 @@
 					stest.url = Environment.VMACHINE_STOP + vMachine.uuid;
 				}
 				
+				Environment.mouseCursorCount++;
+				Environment.refreshMouseCursor();
 				stest.send();					
 			}
 			
@@ -220,9 +222,26 @@
 					stest.url = Environment.VMACHINE_RESUME + vMachine.uuid;
 				}
 				
+				Environment.mouseCursorCount++;
+				Environment.refreshMouseCursor();
+				
 				stest.send();
 			}
-						
+			
+			public function handleStartStop():void
+			{
+				Environment.mouseCursorCount--;
+				Environment.refreshMouseCursor();
+				refreshVMachineList();
+			}
+				
+			public function handleStartStopFault():void
+			{
+				Environment.mouseCursorCount--;
+				Environment.refreshMouseCursor();
+				refreshVMachineList();
+			}	
+					
 			public function refreshPage():void
 			{
 				vClusterService.url = Environment.VCLUSTER;
@@ -230,11 +249,6 @@
 			}
 			
 			
-			
-			private function operationFinished():void
-			{
-				refreshVMachineList();
-			}
 			
 			private function openAddWindow():void
 			{
@@ -290,6 +304,6 @@
 	<mx:HTTPService id="vClusterService" requestTimeout="5" resultFormat="text" result="show(event)" fault="handleVClusterFault()"/>
 	<mx:HTTPService id="vMachineListService" requestTimeout="5" resultFormat="text" result="handleVMachineList(event)" fault="handleVMachineListFault()"/>
 	<mx:HTTPService id="vMachineDetailsService" resultFormat="text" result="handleVMachineList(event)"/>
-	<mx:HTTPService id="stest" requestTimeout="5000" result="operationFinished()"/>
+	<mx:HTTPService id="stest" result="handleStartStop()" fault="handleStartStopFault()" requestTimeout="5000"/>
 	<mx:HTTPService id="destroyService" requestTimeout="3000" result="handleDestroyVCluster()" fault="handleDestroyVClusterFault()"/>
 </mx:HBox>

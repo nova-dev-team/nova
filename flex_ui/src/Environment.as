@@ -1,22 +1,33 @@
 
 package
 {
-	import mx.rpc.http.mxml.HTTPService;
-
-	
+	import mx.rpc.http.mxml.HTTPService; 
+	import mx.managers.CursorManager; 
+	   
 	public class Environment
 	{
 		
-		
-		public function Environment()
+		public static function refreshMouseCursor():void
 		{
+			if(mouseCursorCount == 0)
+			{
+				CursorManager.removeBusyCursor();
+			}	
+			else
+			{
+				CursorManager.setBusyCursor();
+			}
 		}
-//		public static var URL:String = "http://166.111.131.32:3000/";
-		public static var URL:String = "http://192.168.0.125:3000/";
+		
+		public static var mouseCursorCount:int = 0;		
+		
+		public static var URL:String = "http://166.111.131.32:3000/";
+//		public static var URL:String = "http://192.168.0.125:3000/";
 		public static var USER_URL:String = URL + "users";
 		
 		public static var PMACHINE:String = URL + "pmachines";
-		public static var PMACHINE_DETAILS:String = URL + "pmachines/show";
+		public static var PMACHINE_NEW:String = PMACHINE + "/new";
+		public static var PMACHINE_DETAILS:String = PMACHINE + "/show";
 		
 		public static var VCLUSTER:String = URL + "vclusters/";
 		public static var VCLUSTER_VMACHINES:String = VCLUSTER + "vm_list/";
@@ -39,6 +50,12 @@ package
 		public static var NETWORK_ERROR:String = "Network no response, please check your network settings!";
 		
 		public static var TIME_OUT:int = 5;
+		
+		
+		
+		
+		
+		
 		
 		public static var OverallService:HTTPService = new HTTPService();
 		
