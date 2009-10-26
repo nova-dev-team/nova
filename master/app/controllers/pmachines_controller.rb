@@ -11,7 +11,8 @@ class PmachinesController < ApplicationController
       result << {
         :addr => pmachine.addr,
         :vnc_first => pmachine.vnc_first,
-        :vnc_last => pmachine.vnc_last
+        :vnc_last => pmachine.vnc_last,
+        :machine_name => pmachine.machine_name
       }
     end
 
@@ -27,6 +28,13 @@ class PmachinesController < ApplicationController
   end
 
   def edit
+    if params[:addr] != nil
+      pm = Pmachine.find_by_addr params[:addr]
+      if params[:machine_name] != nil
+        pm.machine_name = params[:machine_name]
+        pm.save
+      end
+    end
   end
 
   def retire
@@ -88,7 +96,7 @@ private
     if params[:ip] # check if ip is provided
       port = params[:port] || "3000" # default port is 3000
       addr = "#{params[:ip]}:#{port}"
-      if (Pmachine.register :addr => addr, :vnc_first => params[:vnc_first], :vnc_last => params[:vnc_last])
+      if (Pmachine.register :addr => addr, :machine_name => params[:machine_name], :vnc_first => params[:vnc_first], :vnc_last => params[:vnc_last])
         render_success "Successfully registered pmachine: #{addr}."
       else
         render_failure "Failed to register pmachine: #{addr}."

@@ -55,7 +55,8 @@ ActiveRecord::Schema.define(:version => 20090929110217) do
     t.integer  "vnc_first"
     t.integer  "vnc_last"
     t.string   "status"
-    t.boolean  "retired",    :default => false
+    t.string   "machine_name"
+    t.boolean  "retired",      :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
