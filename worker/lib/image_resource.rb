@@ -2,6 +2,11 @@ require "net/ftp"
 require "uri"
 require "utils"
 
+def local_file_copy from, to
+  FileUtils.cp from, to
+end
+
+
 module ImageResource
 
   # get a list of resource at given URI
@@ -55,7 +60,7 @@ module ImageResource
           copying_lock.flock File::LOCK_EX
     
           if scheme == "file"
-            FileUtils.cp path, to_file
+            local_file_copy path, to_file
           elsif scheme == "ftp"
             username, password = Util::split_userinfo userinfo
             Net::FTP.open(host, username, password) do |ftp|
@@ -89,7 +94,7 @@ module ImageResource
       uploading_lock.flock File::LOCK_EX
 
       if scheme == "file"
-        FileUtils.cp from_file, path
+        local_file_copy from_file, path
       elsif scheme == "ftp"
         username, password = Util::split_userinfo userinfo
         Net::FTP.open(host, username, password) do |ftp|
@@ -109,7 +114,7 @@ module ImageResource
     return to_uri
   end
 
-  # TODO prepare resource for vmachine
+  # prepare resource for vmachine
   # make sure the vmachine can access the resource
   def ImageResource.prepare_vdisk vm_name, vdisk_name, device = nil, uuid = nil
     return if vdisk_name == nil or vdisk_name == "" # skip invalid arguments
@@ -185,7 +190,7 @@ module ImageResource
     unless File.exist? pooling_name
       copying_lock_fname = "#{pooling_name}.copying"
       copying_lock_file = File.new(copying_lock_fname, "w")
-      FileUtils.cp local_filename, pooling_name 
+      local_file_copy local_filename, pooling_name 
       copying_lock_file.close
       FileUtils.rm copying_lock_fname
     end
