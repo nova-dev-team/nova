@@ -13,10 +13,10 @@ class NetSegmentTest < ActiveSupport::TestCase
     dev = "eth1"
     segment_begin = "10.0.15.0"
     segment_mask = "255.255.255.0"
-    
-    
+
+
     NetSegment._reconstruct(segment_begin, segment_mask, req, dev)
-    
+
     #blah = Vcluster.new
     #nn = NetSegment.new
     #blah.net_segment = nn
@@ -28,9 +28,9 @@ class NetSegmentTest < ActiveSupport::TestCase
     #pp blah
     #pp blah.net_segment
     #pp "OH CRAPPY TEST"
-    
+
     #pp nn.test
 =end
-    
+
   end
 end

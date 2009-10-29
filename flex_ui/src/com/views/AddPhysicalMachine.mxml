@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="600" height="400" creationComplete="centerWindow()" title="Add Physical Machine" showCloseButton="true" close="closeWindow()">
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.http.mxml.HTTPService;
+			import com.adobe.serialization.json.JSON;
+			import mx.controls.Alert;
+			
+			public function centerWindow():void
+            {
+            	PopUpManager.centerPopUp(this);
+            }
+            
+            public function closeWindow():void
+            {
+            	PopUpManager.removePopUp(this);
+            }
+            
+            public function addPhysicalMachine():void
+            {
+            	canvas.enabled = false;
+            	
+            	addPMachineService.url = Environment.PMACHINE_NEW;
+            	addPMachineService.send();
+            }
+            
+            public function handleAddPMachine(e:ResultEvent):void
+            {
+            	var rawData:String = String(e.result); 
+        		var decData:* = JSON.decode(rawData);
+        		
+        		var b:Boolean = decData.success;
+        		
+        		if(b)
+        		{
+        			Alert.show(decData.message,"Success!",Alert.OK);
+        		}
+				else
+				{
+					Alert.show(decData.message,"Failed!",Alert.OK);
+				}
+        		
+            	closeWindow();
+            }
+            
+            public function handleAddPMachineFault():void
+            {
+            	Alert.show("Unkown reason!","Failed!",Alert.OK);
+            	closeWindow();	
+            }
+		]]>
+	</mx:Script>
+	
+	
+	<mx:Canvas id="canvas" x="0" y="0" width="100%" height="100%">
+		<mx:Grid y="45" horizontalCenter="0" width="300" height="120">
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="PMachine IP" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:TextInput id="pmachine_ip" width="100%" text="10.0.5.10"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="PMachine port" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:TextInput id="pmachine_port" width="100%" text="3000"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="VNC first port" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:TextInput id="vnc_first" width="100%" text="5980"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="VNC last range" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:TextInput id="vnc_last" width="100%" text="5989"/>
+				</mx:GridItem>
+			</mx:GridRow>
+		</mx:Grid>
+		<mx:Button y="195" label="OK" horizontalCenter="-45" click="addPhysicalMachine()"/>
+		<mx:Button y="195" label="Cancel" horizontalCenter="41" click="closeWindow()"/>
+	
+	</mx:Canvas>
+	<mx:HTTPService id="addPMachineService" url="{Environment.PMACHINE_NEW}" result="handleAddPMachine(event)" fault="handleAddPMachineFault()" method="POST" >
+		<mx:request xmlns="">
+			<ip>
+				{pmachine_ip.text}
+			</ip>
+			<port>
+				{pmachine_port.text}
+			</port>
+			<vnc_first>
+				{vnc_first.text}
+			</vnc_first>
+			<vnc_last>
+				{vnc_last.text}
+			</vnc_last>
+		</mx:request>
+	</mx:HTTPService>
+</mx:TitleWindow>

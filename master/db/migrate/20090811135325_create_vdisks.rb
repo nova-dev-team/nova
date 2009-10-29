@@ -6,7 +6,7 @@ class CreateVdisks < ActiveRecord::Migration
       t.column :description, :string
       t.column :type, :string
       t.column :base_upon, :integer
-			t.column :software_category_id, :integer
+      t.column :software_category_id, :integer
 
       t.timestamps
     end

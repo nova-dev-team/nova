@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="600" height="450" creationComplete="show()" title="Add Virtual Cluster" showCloseButton="true" close="closeWindow()">
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import com.adobe.serialization.json.JSON;
+		
+			public function centerWindow():void
+            {
+            	PopUpManager.centerPopUp(this);
+            }
+            
+            public function closeWindow():void
+            {
+            	PopUpManager.removePopUp(this);
+            }
+            
+            private function show():void
+            {
+            	centerWindow();
+            	
+            	refreshImageList();
+            }
+            
+            private function refreshImageList():void
+            {
+            	imageListService.url = Environment.VDISK_INDEX;
+            	imageListService.send();
+            }
+            
+            private function handleImageList(e:ResultEvent):void
+            {
+            	mVdisk = JSON.decode(String(e.result));
+            	var l:Array = new Array(mVdisk.length);
+            	var i:int;
+            	for(i=0; i<mVdisk.length; i++)
+            	{
+            		l[i] = mVdisk[i].display_name;
+            	}
+            	vdisk_image_list.dataProvider = l;
+            	
+            	refreshSoftList();	
+            }
+            
+            private function refreshSoftList():void
+            {
+//            	var softwares:Array = (String)e;
+            	var i:int, id:int;
+            	i = vdisk_image_list.selectedIndex;
+            	id = mVdisk[i].id;
+            	softListService.cancel();
+            	softListService.url = Environment.VDISK_SOFT + id;
+            	softListService.send();
+            }
+            
+            private function handleSoftList(e:ResultEvent):void
+            {
+            	mSoft = JSON.decode(String(e.result));
+            	mSoft_Show = new Array(mSoft.length);
+            	mSelectedSoft_Show = new Array();
+            	var i:int;
+            	for(i=0; i<mSoft.length; i++)
+            	{
+            		mSoft_Show[i] = mSoft[i].display_name;
+            	}
+            	soft_ready_list.dataProvider = mSoft_Show;
+            	soft_selected_list.dataProvider = mSelectedSoft_Show;
+            }
+            
+           	private function addSoft():void
+           	{
+           		var i:int = soft_ready_list.selectedIndex;
+           		if(i<0)
+           			return;
+           		var s:String = mSoft_Show[i];
+           		mSoft_Show.splice(i,1);
+           		mSelectedSoft_Show.push(s);
+           		
+           		soft_ready_list.dataProvider = mSoft_Show;
+            	soft_selected_list.dataProvider = mSelectedSoft_Show;
+           	}
+           	
+           	private function removeSoft():void
+           	{
+           		var i:int = soft_selected_list.selectedIndex;
+           		if(i<0)
+           			return;
+           		var s:String = mSelectedSoft_Show[i];
+           		mSelectedSoft_Show.splice(i,1);
+           		mSoft_Show.push(s);
+           		
+           		soft_ready_list.dataProvider = mSoft_Show;
+            	soft_selected_list.dataProvider = mSelectedSoft_Show;
+           	}
+           	
+           	private function addVCluster():void
+           	{
+           		addVClusterService.url = Environment.VCLUSTER_CREATE;
+           		
+           		var i:int = vdisk_image_list.selectedIndex;
+           		var hda:String = mVdisk[i].raw_name;
+           		
+           		addVClusterService.request.hda = hda;
+           		
+           		addVClusterService.send();
+           		
+           		canvas.enabled = false;
+           	}
+           	
+           	private function handleAddVCluster():void
+           	{   
+           		canvas.enabled = true;   		
+           		closeWindow();
+           	}
+            
+            private var mVdisk:Array;
+            private var mSoft:Array;
+            private var mSoft_Show:Array;
+            private var mSelectedSoft:Array;
+            private var mSelectedSoft_Show:Array;
+            
+		]]>
+	</mx:Script>
+	
+	
+	<mx:Canvas id="canvas" x="0" y="0" width="100%" height="100%">
+		<mx:Grid y="45" horizontalCenter="0" width="300" height="165" label="Helloworld">
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="VCluster name" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:TextInput id="VCluster_Name"  width="100%"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="VCluster size" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:TextInput id="VCluster_Size" text="4" width="100%"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="System Image" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:ComboBox id="vdisk_image_list" width="100%" change="refreshSoftList()">
+					</mx:ComboBox>		
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="Memory(MB)" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:TextInput id="Memory_Size" text="512" width="100%"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%">
+					<mx:Label text="CPU Count" width="100%"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%">
+					<mx:ComboBox id="CPU_Count" width="100%">
+						<mx:dataProvider>
+							<mx:Array>
+								<mx:String>1</mx:String>
+								<mx:String>2</mx:String>
+								<mx:String>4</mx:String>
+							</mx:Array>
+						</mx:dataProvider>
+					</mx:ComboBox>		
+				</mx:GridItem>
+			</mx:GridRow>
+		</mx:Grid>
+		<mx:Button label="OK" horizontalCenter="57" click="addVCluster()" bottom="35"/>
+		<mx:Button label="Cancel" horizontalCenter="150" click="closeWindow()" bottom="35"/>
+		<mx:Canvas y="207" width="472" height="161" horizontalCenter="0">
+			<mx:List id="soft_ready_list" x="21" y="23" height="102" width="40%"></mx:List>
+			<mx:List id="soft_selected_list" x="260" y="23" height="102" width="40%"></mx:List>
+			<mx:Button x="214" y="43" label="&gt;&gt;" click="addSoft()"/>
+			<mx:Button x="214" y="84" label="&lt;&lt;" click="removeSoft()"/>
+		</mx:Canvas>
+	
+	</mx:Canvas>
+	
+	<mx:HTTPService id = "imageListService" resultFormat="text" requestTimeout="5000" result="handleImageList(event)" />
+	<mx:HTTPService id="softListService" resultFormat="text" requestTimeout="5000" result="handleSoftList(event)"/>
+	<mx:HTTPService id="addVClusterService" resultFormat="text" requestTimeout="30000" method="POST" result="handleAddVCluster()">
+		<mx:request xmlns="">
+			<size>
+				{VCluster_Size.text}
+			</size>
+			<name>
+				{VCluster_Name.text}
+			</name>
+			<hda/>
+			<start_now>
+				{true}
+			</start_now>
+			<soft_list/>
+			<memory_size>
+				{Memory_Size.text}
+			</memory_size>
+			<cpu_count>
+				{CPU_Count.selectedLabel}
+			</cpu_count>
+		</mx:request>
+	</mx:HTTPService>
+</mx:TitleWindow>

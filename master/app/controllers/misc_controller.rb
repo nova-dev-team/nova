@@ -28,4 +28,5 @@ class MiscController < ApplicationController
     render :text => request[:ip]
   end
 
+
 end

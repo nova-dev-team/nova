@@ -1,7 +1,10 @@
 require "utils.rb"
+require 'cgi'
 
 # a helper module for both master & worker module
 module ControllerUtility
+
+private
 
   # report request result, either successful or failure
   def render_result success, message, option = {}
@@ -11,7 +14,7 @@ module ControllerUtility
     result = {:success => success, :message => message}.merge(option)
     respond_to do |accept|
       accept.json {render :json => result}
-      accept.html {render :text => result.to_json} # TODO escape html characters?
+      accept.html {render :text => CGI.escapeHTML(result.to_json)}
     end
   end
 

@@ -43,7 +43,7 @@ module PmachinesHelper
       used_vnc.sort!
 
       vnc_candidate = vnc_start # the candidate for vnc port 
-     
+
       # find a segment which has not been used
       used_vnc.each do |used|
         candidate_range = vnc_candidate..(vnc_candidate + vnc_segment_size)
@@ -52,7 +52,7 @@ module PmachinesHelper
           candidate_range = vnc_candidate..(vnc_candidate + vnc_segment_size)
         end
       end
-      
+
       "#{vnc_candidate}-#{vnc_candidate + vnc_segment_size - 1}"
     end
   end

@@ -8,7 +8,6 @@ then
   kill ${hg}
 fi
 
-killall ruby
 killall mongrel
 killall swiftiply
 killall swiftiply_mongrel_rails

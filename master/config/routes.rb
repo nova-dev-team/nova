@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :vmachine_infos
+#  map.resources :vmachine_infos
 
 #  map.resources :vdisks
 
@@ -19,13 +19,13 @@ ActionController::Routing::Routes.draw do |map|
   #map.signup '/signup', :controller => 'users', :action => 'new'
 #  map.resources :users
 
-  map.resource :session
+#  map.resource :session
 
   map.home '', :controller => 'app', :action => 'home'
 
   map.connect 'flexui', :controller => 'app', :action => 'flexui'
 
-  map.connect 'misc/verification_image.:format', :controller => 'misc', :action => 'verification_image'
+  # map.connect 'misc/verification_image.:format', :controller => 'misc', :action => 'verification_image'
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
@@ -44,7 +44,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # Sample resource route with sub-resources:
   #   map.resources :products, :has_many => [ :comments, :sales ], :has_one => :seller
-  
+
   # Sample resource route with more complex sub-resources
   #   map.resources :products do |products|
   #     products.resources :comments
@@ -65,7 +65,33 @@ ActionController::Routing::Routes.draw do |map|
   # Install the default routes as the lowest priority.
   # Note: These default routes make all actions in every controller accessible via GET requests. You should
   # consider removing the them or commenting them out if you're using named routes and resources.
-  map.connect ':controller/:action/:id'
-  map.connect ':controller/:action.:format'
-  map.connect ':controller/:action/:id.:format'
+
+  # default routing, also includes the first version of nova api
+  # we have to use :path_prefix, so that the old api does not overshadow newer version api
+  map.connect ':controller/:action/:id', :path_prefix => '/'
+  map.connect ':controller/:action.:format', :path_prefix => '/'
+  map.connect ':controller/:action/:id.:format', :path_prefix => '/'
+
+  # alias for old version api, call them "v1" branch
+#  map.connect ':controller/:action/:id', :path_prefix => '/api/v1'
+#  map.connect ':controller/:action.:format', :path_prefix => '/api/v1'
+#  map.connect ':controller/:action/:id.:format', :path_prefix => '/api/v1'
+
+  # versioned api
+  map.namespace :api do |api|
+
+    api.namespace :v2 do |v2|
+      v2.connect ':controller/:action/:id'
+      v2.connect ':controller/:action.:format'
+      v2.connect ':controller/:action/:id.:format'
+    end
+
+#    api.namespace :v3 do |v3|
+#      v3.connect ':controller/:action/:id'
+#      v3.connect ':controller/:action.:format'
+#      v3.connect ':controller/:action/:id.:format'
+#    end
+  end
+
+
 end

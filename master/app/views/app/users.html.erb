@@ -51,9 +51,8 @@
       
       $.ajax({
         type: "POST",
-        url: "/users/" + user_id,
+        url: "/users/edit/" + user_id,
         data: {
-          _method: "put", // NOTE crappy method to change a "POST" into "PUT"
           activated: active
         },
         dateType: 'json',

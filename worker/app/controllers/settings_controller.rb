@@ -16,7 +16,7 @@ class SettingsController < ApplicationController
     end
     render_model Setting, :items => params[:items]
   end
- 
+
   # edit a setting
   #
   # * params[:key]: key for the item to be edited

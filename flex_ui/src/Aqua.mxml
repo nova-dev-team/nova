@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:views="com.views.*" horizontalAlign="center" verticalAlign="middle">
+
+	<mx:Script>
+        <![CDATA[
+        	import mx.events.ResizeEvent;
+        	import com.SampleTitleWindow;
+            import mx.events.MenuEvent;
+            import mx.controls.Alert;
+            import mx.collections.*;
+            import mx.managers.PopUpManager;
+            import mx.controls.Alert;
+            
+            public function openWindow():void
+            {
+            	PopUpManager.createPopUp(this,SampleTitleWindow,true);
+            }
+            
+            [Bindable]
+            public var menuBarCollection:XMLListCollection;
+            
+         ]]>
+    </mx:Script>
+    
+    <mx:Style source="assets/css/Main.css" />
+
+	<mx:Panel width="90%" height="85%" layout="horizontal" horizontalCenter="0" titleIcon="@Embed('assets/icons/logo-medium.png')" verticalCenter="0">
+		<mx:TabNavigator x="0" y="0" width="100%" height="100%">
+			<views:Overview  icon="@Embed('assets/icons/overview.png')" label="Overview" width="100%" height="100%"/>
+			<views:PhysicalMachines icon="@Embed('assets/icons/phisicalmachine.png')" label="Physical Machines" width="100%" height="100%"/>
+			<views:VirtualClusters icon="@Embed('assets/icons/virtualcluster.png')" label="Virtual Clusters" width="100%" height="100%"/>
+			<views:User icon="@Embed('assets/icons/user.png')" label="User Management" width="100%" height="100%"/>
+			<views:VirtualImages icon="@Embed('assets/icons/imagemanagement.png')" label="Images Management" width="100%" height="100%"/>
+			<views:NetworkPools icon="@Embed('assets/icons/network.png')" label="Network Management" width="100%" height="100%"/>
+			<views:Preference icon="@Embed('assets/icons/preference.png')" label="Preference" width="100%" height="100%"/>
+		</mx:TabNavigator>
+		
+		<mx:ControlBar>
+			<mx:Label text="Welcome to Nova!" width="100%"/>
+			<mx:TextInput styleName="searchInput"/>
+			<mx:Button label="About" click="openWindow()"/>
+		</mx:ControlBar>
+	</mx:Panel>
+</mx:Application>

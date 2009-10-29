@@ -26,9 +26,9 @@ class VclustersController < ApplicationController
       # format params list
       params[:soft_list] = params[:soft_list].split.join "\n"
       #params[:soft_list] = " + params[:soft_list] unless params[:soft_list].start_with? "common\nssh-nopass\n" # make sure common & ssh-nopass is selected
-      
 
-      
+
+
       puts "Soft to be installed:\n#{params[:soft_list]}\n"
       if params[:start_now]
         pp "[start_now]"
@@ -67,36 +67,36 @@ class VclustersController < ApplicationController
     render_data result
   end
 
-	def vm_list
-		list = []
+  def vm_list
+    list = []
     vc = Vcluster.find_by_id params[:id]
-		#vm = Vmachine.find_by_id params[:id]
+    #vm = Vmachine.find_by_id params[:id]
     #if vm == nil
     #  vm = Vmachine.find_by_uuid params[:id] # try finding by uuid
     #end
-		vc.vmachines.all.each do |vm|
-		  result = {
-		    :id => vm.id,
-		    :mem_size => vm.memory_size,
-		    :cpu_count => vm.cpu_count,
-		    :uuid => vm.uuid,
-		    :hda => vm.hda,
-		    :hdb => vm.hdb,
-		    :cdrom => vm.cdrom,
-		    :boot_device => vm.boot_device,
-		    :arch => vm.arch,
-		    :pmachine_addr => (vm.pmachine ? vm.pmachine.addr : nil),
-		    :vcluster_id => vm.vcluster.id,
-		    :vcluster_name => vm.vcluster.cluster_name,
-		    :soft_list => vm.vcluster.package_list,
-		    :status => vm.status,
-		    :mac_addr => vm.mac,
-		    :vnc_port => vm.vnc_port
-		  }
-			list << result
-		end
-		render_data list
-	end
+    vc.vmachines.all.each do |vm|
+      result = {
+        :id => vm.id,
+        :mem_size => vm.memory_size,
+        :cpu_count => vm.cpu_count,
+        :uuid => vm.uuid,
+        :hda => vm.hda,
+        :hdb => vm.hdb,
+        :cdrom => vm.cdrom,
+        :boot_device => vm.boot_device,
+        :arch => vm.arch,
+        :pmachine_addr => (vm.pmachine ? vm.pmachine.addr : nil),
+        :vcluster_id => vm.vcluster.id,
+        :vcluster_name => vm.vcluster.cluster_name,
+        :soft_list => vm.vcluster.package_list,
+        :status => vm.status,
+        :mac_addr => vm.mac,
+        :vnc_port => vm.vnc_port
+      }
+      list << result
+    end
+    render_data list
+  end
 
   def modify
   end

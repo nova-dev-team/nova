@@ -7,8 +7,8 @@ class Vcluster < ActiveRecord::Base
   has_one :net_segment
   belongs_to :user
   has_many :vmachines
-  
-  
+
+
   #usage
   #
   #   vc = Vcluster.allocate("nova-test-1", "common\nssh-nopass\nmpich2\nhadoop\n", 4)
@@ -25,26 +25,26 @@ class Vcluster < ActiveRecord::Base
   #     puts vm.last_ceil_message # <--last message from ceil client on vmachine
   #   end
   #
- 	
+
   def Vcluster.alloc(cluster_name, package_list, machine_count)
     vc = Vcluster.new
     vc.cluster_name = cluster_name
     vc.package_list = package_list
     vc.save
-    
+
     net = NetSegment.alloc(machine_count)
-    
+
     if (!net)
       vc.delete
       return nil
     end
-    
+
     net.vcluster = vc
     net.save
 
     list = net.list
     node_list = ""
-    
+
     list.each do |node|
       vm = Vmachine.new
       vm.uuid = UUIDTools::UUID.random_create.to_s
@@ -57,15 +57,15 @@ class Vcluster < ActiveRecord::Base
       vm.mac = node[:mac]
       vm.vcluster = vc
       vm.save
-      
+
       node_list = node_list + "#{vm.ip}\t#{vm.hostname}\n"
       machine_count -= 1
       break if machine_count <= 0
     end
-    
+
     ccc = ClusterConfigurationCreator.new(node_list, package_list, cluster_name)
     ccc.create
-    
+
     return vc
   end
 

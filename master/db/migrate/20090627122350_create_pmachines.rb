@@ -5,6 +5,7 @@ class CreatePmachines < ActiveRecord::Migration
       t.column :vnc_first, :integer # the first usable vnc port
       t.column :vnc_last, :integer   # the last usable vnc port
       t.column :status, :string # whether the pmachine is connected
+      t.column :machine_name, :string # helper, naming the pmachine
       t.column :retired, :boolean, :default => false # 'retire' mark, whether the new vms should be allocated to this pmachine
       t.timestamps
     end

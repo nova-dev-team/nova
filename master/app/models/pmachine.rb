@@ -72,6 +72,7 @@ class Pmachine < ActiveRecord::Base
       pm.addr = params[:addr]
       pm.vnc_first = params[:vnc_first]
       pm.vnc_last = params[:vnc_last]
+      pm.machine_name = params[:machine_name]
 
       if pm.connected? # pm.connected? will not create premature database record. save it manually and safely
         pm.save
