@@ -9,4 +9,4 @@ echo "*** NOTICE: Please make sure you have run 'first_run.sh' once"
 echo
 
 script/backgroundrb start -e development
-script/server $@
+script/server $@ -d
