@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'nodelist.rb' # for sys_exec function
+require File.join File.dirname(__FILE__), 'nodelist.rb' # for sys_exec function
 
 def empty_line? s
   s =~ /^[ \t]*$/
