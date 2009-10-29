@@ -11,26 +11,26 @@ SERVER_NETWORK_INTERFACE_FILE_PATH = "/etc/network/interfaces"
 #FUCKING CONST
 
 module ServerSettings
-	def ServerSettings.write(content, config_file)
-		content << ""
-		content << "# #{`date`}"
-		content << ""
-		note = `date "+%Y%m%d%H%M"`.chomp
-		#system "mv #{config_file} #{config_file}.backup.#{note}"
+  def ServerSettings.write(content, config_file)
+    content << ""
+    content << "# #{`date`}"
+    content << ""
+    note = `date "+%Y%m%d%H%M"`.chomp
+    #system "mv #{config_file} #{config_file}.backup.#{note}"
 
-		config_file = "#{RAILS_ROOT}/tmp/" + File.basename(config_file)
+    config_file = "#{RAILS_ROOT}/tmp/" + File.basename(config_file)
 
-		begin
-			File.open(config_file, 'wb') do |file|
-				content.each do |line|
-					file.puts(line)
-					puts(line)
-				end
-			end
-		rescue
-			puts "Cannot write content to system config file #{config_file}!"
-		end
-	end
+    begin
+      File.open(config_file, 'wb') do |file|
+        content.each do |line|
+          file.puts(line)
+          puts(line)
+        end
+      end
+    rescue
+      puts "Cannot write content to system config file #{config_file}!"
+    end
+  end
 
 end
 

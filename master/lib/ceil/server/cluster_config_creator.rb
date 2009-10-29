@@ -3,18 +3,18 @@ require File.dirname(__FILE__) + '/server_settings'
 require File.dirname(__FILE__) + '/dispatch_key'
 
 class ClusterConfigurationCreator
-	def initialize(node_list, inst_list, cluster_name)
-		@node_list = node_list
-		@inst_list = inst_list
-		@cluster_name = cluster_name
-	end
+  def initialize(node_list, inst_list, cluster_name)
+    @node_list = node_list
+    @inst_list = inst_list
+    @cluster_name = cluster_name
+  end
 
-	def create
-		config_path = "#{SERVER_CONFIG_STORE_PATH}/#{@cluster_name}"
-		disp_path = "#{SERVER_KEY_DISPATCH_PATH}/#{@cluster_name}"
+  def create
+    config_path = "#{SERVER_CONFIG_STORE_PATH}/#{@cluster_name}"
+    disp_path = "#{SERVER_KEY_DISPATCH_PATH}/#{@cluster_name}"
 
-		node_list_file = "#{config_path}/node.list"
-		inst_list_file = "#{config_path}/inst.list"
+    node_list_file = "#{config_path}/node.list"
+    inst_list_file = "#{config_path}/inst.list"
 
 # old code for NFS configuration server
     begin
@@ -38,7 +38,7 @@ class ClusterConfigurationCreator
       # not a serious error if you are not using NFS to aid installation
     end
 
-	end
+  end
 end
 
 # usage

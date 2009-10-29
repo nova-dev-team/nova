@@ -26,56 +26,56 @@ class NetSegment < ActiveRecord::Base
   def NetSegment._reconstruct(segment_begin, global_net_mask, req, dev)
     NetSegment.delete_all
 
-		segment_begin = IpV4Address.calc_prev(segment_begin)
-		nic = NetworkInterfaceConfigFile.new(dev)
-		global_net_id = 0
-		global_net_segment = IpV4Address.calc_network(segment_begin, global_net_mask)		
-		dhcp = DHCPConfigFile.new(global_net_segment, global_net_mask)
+    segment_begin = IpV4Address.calc_prev(segment_begin)
+    nic = NetworkInterfaceConfigFile.new(dev)
+    global_net_id = 0
+    global_net_segment = IpV4Address.calc_network(segment_begin, global_net_mask)		
+    dhcp = DHCPConfigFile.new(global_net_segment, global_net_mask)
 
-		req.sort.each do |seg_len, seg_num| 
-			puts "seglen=#{seg_len}"
-			puts "segnum=#{seg_num}"
+    req.sort.each do |seg_len, seg_num| 
+      puts "seglen=#{seg_len}"
+      puts "segnum=#{seg_num}"
 
-			seg_net_mask = IpV4Address.calc_net_mask(seg_len)				
+      seg_net_mask = IpV4Address.calc_net_mask(seg_len)				
 
-			seg_num.times {
-				segment_machine_id = 0
-				segment_begin = IpV4Address.calc_next_segment(segment_begin, seg_len)
+      seg_num.times {
+        segment_machine_id = 0
+        segment_begin = IpV4Address.calc_next_segment(segment_begin, seg_len)
 
-				puts "allocate #{segment_begin}/#{seg_net_mask}, length = #{seg_len}"
+        puts "allocate #{segment_begin}/#{seg_net_mask}, length = #{seg_len}"
         segment_begin = IpV4Address.calc_next(segment_begin)
 
-				nic.add(IpV4Address.calc_gateway(segment_begin, seg_net_mask), seg_net_mask)
+        nic.add(IpV4Address.calc_gateway(segment_begin, seg_net_mask), seg_net_mask)
 
-				segment_name = "nova-#{global_net_id}"
-  			global_net_id += 1
+        segment_name = "nova-#{global_net_id}"
+        global_net_id += 1
 
-				net = NetSegment.new(:name    => segment_name, 
-				                     :head_ip => segment_begin,
-				                     :size    => seg_len,
-				                     :mask    => seg_net_mask)
-		    if !net.save
-		      puts "FUCKED!!"
-		    end
+        net = NetSegment.new(:name    => segment_name, 
+                             :head_ip => segment_begin,
+                             :size    => seg_len,
+                             :mask    => seg_net_mask)
+        if !net.save
+          puts "FUCKED!!"
+        end
 
-				seg_len.times {
+        seg_len.times {
 
-  				segment_begin = IpV4Address.calc_next(segment_begin)
+          segment_begin = IpV4Address.calc_next(segment_begin)
 
-	  			dhcp.add("#{segment_name}-#{segment_machine_id}", 
-        					 IpV4Address.generate_mac(segment_begin), 
-	  		           segment_begin,
-  						     seg_net_mask)
-  				segment_machine_id += 1
-				}
+          dhcp.add("#{segment_name}-#{segment_machine_id}", 
+                   IpV4Address.generate_mac(segment_begin), 
+                   segment_begin,
+                   seg_net_mask)
+          segment_machine_id += 1
+        }
 
-				segment_begin = IpV4Address.calc_next(segment_begin)
-			}
+        segment_begin = IpV4Address.calc_next(segment_begin)
+      }
 
-		end
-		nic.write_to_system
-		dhcp.write_to_system
-	end 
+    end
+    nic.write_to_system
+    dhcp.write_to_system
+  end 
 
 
   def list

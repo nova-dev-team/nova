@@ -31,9 +31,9 @@ when "install" then
 else
   if ARGV[0] == nil
     puts "usage:"
-	  puts "Just check the source code!"
+    puts "Just check the source code!"
   else
-	  each_node(ARGV.join " ")
+    each_node(ARGV.join " ")
   end
 end
 

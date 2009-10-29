@@ -12,12 +12,12 @@ class LogReporter
     log_message = log_message.gsub(/\s/, '_')
 
     begin
-  		resp, data = conn.post("/ceil/report?log_status=#{log_status}&log_category=#{log_category}&log_message=#{log_message}", nil)    
-  	rescue => e
-  	  puts "Error during sending log to nova/ceil server, #{e.to_s}"
-  	  #return nil
-  	end
-  	return 0
+      resp, data = conn.post("/ceil/report?log_status=#{log_status}&log_category=#{log_category}&log_message=#{log_message}", nil)    
+    rescue => e
+      puts "Error during sending log to nova/ceil server, #{e.to_s}"
+      #return nil
+    end
+    return 0
   end
 end
 

@@ -5,7 +5,7 @@ class Vmachine < ActiveRecord::Base
 
 
   def master?
-		return self == self.vcluster.vmachines.first
+    return self == self.vcluster.vmachines.first
   end
 
   def get_node_list
