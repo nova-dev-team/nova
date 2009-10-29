@@ -11,3 +11,4 @@ tmp/
 *.sqlite3-journal
 .hg/
 .hgignore
+*.orig.*
