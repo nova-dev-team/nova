@@ -5,3 +5,7 @@ as computers in the cluster.
 
 After download process finished, copy this folder to other
 computers, and run 'install.sh'.
+
+You could run script 'scripts/all_nodes.rb install' to do
+automatical installation. Make sure you have modified
+'scripts/nodelist.rb' according to cluster layout.

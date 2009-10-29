@@ -5,3 +5,9 @@
 #
 # two:
 #   column: value
+
+<%
+  yaml_text = ""
+%>
+
+<%= yaml_text %>

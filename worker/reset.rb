@@ -4,7 +4,7 @@ require 'rubygems'
 require 'libvirt'
 require 'pp'
 
-require '../scripts/nodelist.rb' # for sys_exec function
+require File.join File.dirname(__FILE__), '../scripts/nodelist.rb' # for sys_exec function
 
 sys_exec "bash stop.sh"
 
