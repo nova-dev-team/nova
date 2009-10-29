@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require File.join File.dirname(__FILE__), 'nodelist.rb' # for sys_exec function
+require 'nodelist.rb' # for sys_exec function
 
 def empty_line? s
   s =~ /^[ \t]*$/
@@ -24,7 +24,7 @@ def leading_tab_to_space str
   is_leading = true
   str.each_char do |c|
     if is_leading
-      if c == '\t'
+      if c == '	'
         str2 += "  "
       elsif c != ' '
         is_leading = false
@@ -60,7 +60,7 @@ def format_file file, backup_file
       end
     end
   end
-  sys_exec "diff #{file} #{backup_file}"
+  sys_exec "diff #{backup_file} #{file}"
 
   if nothing_changed? file, backup_file
     `mv #{backup_file} #{file}`
