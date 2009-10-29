@@ -10,6 +10,10 @@ class SystemController < ApplicationController
     render :text => "YOU are in root group, right?"
   end
 
+  def overview
+    
+  end
+
   def reconstruct_netpool
     first_ip = params[:first_ip]
     subnet_mask = params[:subnet_mask]

@@ -12,6 +12,14 @@ class AppController < ApplicationController
       render_error_no_privilege
     end
   end
+
+  def flexui
+    if (current_user.in_group? "root") or (current_user.in_group? "admin")
+      render :template => 'app/flexui.html.erb'
+    else
+      render_error_no_privilege
+    end
+  end
   
   
   def admin_machines
