@@ -7,7 +7,7 @@ module AuthenticatedTestHelper
   def authorize_as(<%= file_name %>)
     @request.env["HTTP_AUTHORIZATION"] = <%= file_name %> ? ActionController::HttpAuthentication::Basic.encode_credentials(<%= table_name %>(<%= file_name %>).login, 'monkey') : nil
   end
-  
+
 <% if options[:rspec] -%>
   # rspec
   def mock_<%= file_name %>

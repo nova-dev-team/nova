@@ -8,7 +8,7 @@ def action_name() end
 
 describe <%= controller_class_name %>Controller do
   fixtures :<%= table_name %>
-  
+
   before do
     # FIXME -- <%= controller_file_name %> controller not testing xml logins 
     stub!(:authenticate_with_http_basic).and_return nil
@@ -56,7 +56,7 @@ describe <%= controller_class_name %>Controller do
       <%= class_name %>.find(1).remember_token.should     be_nil; <%= class_name %>.find(1).remember_token_expires_at.should     be_nil
     end
   end
-  
+
   describe 'When logged out' do 
     it "should not be authorized?" do
       authorized?().should be_false
@@ -80,23 +80,23 @@ describe <%= controller_class_name %>Controller do
       stub!(:cookies).and_return({ :auth_token => 'hello!' })
       logged_in?.should be_true
     end
-    
+
     it 'fails cookie login with bad cookie' do
       should_receive(:cookies).at_least(:once).and_return({ :auth_token => 'i_haxxor_joo' })
       logged_in?.should_not be_true
     end
-    
+
     it 'fails cookie login with no cookie' do
       set_remember_token nil, nil
       should_receive(:cookies).at_least(:once).and_return({ })
       logged_in?.should_not be_true
     end
-    
+
     it 'fails expired cookie login' do
       set_remember_token 'hello!', 5.minutes.ago
       stub!(:cookies).and_return({ :auth_token => 'hello!' })
       logged_in?.should_not be_true
     end
   end
-  
+
 end

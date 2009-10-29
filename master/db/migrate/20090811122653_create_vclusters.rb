@@ -16,7 +16,7 @@ class CreateVclusters < ActiveRecord::Migration
       t.column :boot_device,    :string
       t.column :arch,           :string
       t.column :net_segment_id, :integer
-      
+
       t.column :destroyed,      :boolean, :default => false # whether this vcluster has been destroyed
       t.timestamps
     end

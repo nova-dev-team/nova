@@ -43,5 +43,5 @@ private
   def root_required
     redirect_to login_url unless logged_in? and current_user.in_group? "root"
   end
-  
+
 end

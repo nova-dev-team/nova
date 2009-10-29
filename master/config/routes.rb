@@ -42,7 +42,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # Sample resource route with sub-resources:
   #   map.resources :products, :has_many => [ :comments, :sales ], :has_one => :seller
-  
+
   # Sample resource route with more complex sub-resources
   #   map.resources :products do |products|
   #     products.resources :comments
@@ -91,5 +91,5 @@ ActionController::Routing::Routes.draw do |map|
 #    end
   end
 
-  
+
 end

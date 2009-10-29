@@ -13,7 +13,7 @@ class CeilController < ApplicationController
       remote_ip = remote_ip.chomp
       vm = Vmachine.all #find_by_ip(remote_ip)
       miao = Vmachine.find_by_ip(remote_ip)
-         
+
       context = "new tag"
       context += "your ip = #{remote_ip}<br>"
 
@@ -45,7 +45,7 @@ class CeilController < ApplicationController
         accept.html { render :text => context }
       end
   end
-  
+
   def retrieve
     respond_to do |accept|
       #remote_ip = request.remote_ip
@@ -80,16 +80,16 @@ class CeilController < ApplicationController
                "key_server" => server_addr,
                "key_server_type" => CEIL_KEY_SERVER_TYPE,
                "character" => character} 
-      
+
       accept.json { render :json => cjson }
       accept.html { render :text => cjson.to_json }
-      
+
       #accept.ip { render :text => request.remote_ip() }
       #accept.config { render :text => request.remote_ip() }
     end      
 
   end
-  
+
   def report
   #  return
   # log_type & log_msg
@@ -100,19 +100,19 @@ class CeilController < ApplicationController
     #logger.debug "----BEGIN----"
     #logger.debug "#{log_type} : #{log_msg}"
     #logger.debug "-----END-----"
-    
+
     remote_ip = pp[:rip].chomp
    # request.remote_ip
     vm = Vmachine.find_by_ip(remote_ip)
     if vm 
       log = VmachineInfo.new
-      
+
       log.status = log_status
       log.category = log_category
       log.message = log_message
       log.vmachine = vm
       log.save
-      
+
       count = 0
       order = 0
       found = false
@@ -122,7 +122,7 @@ class CeilController < ApplicationController
         found = true if (package == log_category)
         order += 1 if !found
       end
-      
+
       case log_status
         when 0
           vm.ceil_progress = 1
@@ -137,14 +137,14 @@ class CeilController < ApplicationController
           logger.debug "order = #{order}"
           logger.debug "log_status = #{log_status}"
           logger.debug "vm.ceil_progress = #{vm.ceil_progress}"
-        
+
          # logger.debug "error"
       end
       vm.last_ceil_message = CeilMessage.message(log_status, log_category)
       logger.debug vm.last_ceil_message
       vm.save
     end
-    
+
     respond_to do |accept|
       #accept.json { render :json => "[#{log_type}]#{log_msg}" }
       accept.html { render :text => "[#{log_category}]#{log_message}\n#{vm.ceil_progress}%\n#{vm.last_ceil_message}, " }

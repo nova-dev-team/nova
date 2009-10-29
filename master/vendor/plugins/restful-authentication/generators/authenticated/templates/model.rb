@@ -70,7 +70,7 @@ class <%= class_name %> < ActiveRecord::Base
   end
 
   protected
-    
+
 <% if options[:include_activation] -%>
     def make_activation_code
   <% if options[:stateful] -%>

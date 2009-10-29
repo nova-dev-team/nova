@@ -114,7 +114,7 @@ module AuthenticatedSystem
         self.current_user = User.authenticate(login, password)
       end
     end
-    
+
     #
     # Logout
     #
@@ -149,7 +149,7 @@ module AuthenticatedSystem
       logout_keeping_session!
       reset_session
     end
-    
+
     #
     # Remember_me Tokens
     #
@@ -164,7 +164,7 @@ module AuthenticatedSystem
       (@current_user.remember_token?) && 
         (cookies[:auth_token] == @current_user.remember_token)
     end
-    
+
     # Refresh the cookie auth token if it exists, create it otherwise
     def handle_remember_cookie!(new_cookie_flag)
       return unless @current_user
@@ -175,11 +175,11 @@ module AuthenticatedSystem
       end
       send_remember_cookie!
     end
-  
+
     def kill_remember_cookie!
       cookies.delete :auth_token
     end
-    
+
     def send_remember_cookie!
       cookies[:auth_token] = {
         :value   => @current_user.remember_token,

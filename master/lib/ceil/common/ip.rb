@@ -18,7 +18,7 @@ module IpV4Address
 	def IpV4Address.calc_segment_length(count)
 		return 2 ** calc_segment_bits(count)
 	end
-	
+
 	def IpV4Address.string_to_integer(ip_addr)
 		res = 0
 		ip_addr.split(".").each do |seg|

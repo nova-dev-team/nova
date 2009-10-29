@@ -58,7 +58,7 @@ module ImageResource
         copying_lock = File.new(copying_lockfile, "w")
         begin
           copying_lock.flock File::LOCK_EX
-    
+
           if scheme == "file"
             local_file_copy path, to_file
           elsif scheme == "ftp"
@@ -86,7 +86,7 @@ module ImageResource
   # save resource from local file to given remote URI
   def ImageResource.put_resource from_file, to_uri
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split to_uri  # parse URI information
-  
+
     uploading_lockfile = "#{from_file}.uploading"
     uploading_lock = File.new(uploading_lockfile, "w")
 
@@ -144,7 +144,7 @@ module ImageResource
 
     when "usr", "usr.cow"
       FileUtils.mv local_filename, "#{vm_dir}/#{vdisk_name}"
-      
+
       # create an upload sign, so the user's data is always uploaded
       `touch #{vm_dir}/#{vdisk_name}.upload`
     when "iso"
@@ -168,13 +168,13 @@ module ImageResource
     ImageResource.copy_pool_image "#{Setting.storage_cache}/#{vdisk_name}"
   end
 
-  
+
   # copy a pooling image, and return the pooled image name
   # if pooling_id is not given, automatically determines an id
   # if image already copied, return the existing image name
   def ImageResource.copy_pool_image local_filename, pooling_id = nil
     pooling_dir = File.dirname local_filename
-    
+
     if pooling_id == nil
       local_basename = File.basename local_filename
       pooling_list = Dir.entries(pooling_dir).select {|e| e.start_with? "#{local_basename}.pool."}

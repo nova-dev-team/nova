@@ -12,7 +12,7 @@ class StartVmachineWorker < BackgrounDRb::MetaWorker
     resource_list = args[:resource_list]
     begin
       dom = Vmachine.find_domain_by_uuid uuid
-      
+
       resource_list.each do |resource|
         if resource == args[:hda]
           ImageResource.prepare_vdisk vm_name, resource, "hda", uuid # might need to generate new qcow2 disks

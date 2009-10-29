@@ -28,7 +28,7 @@ class NetworkSegment
 			seg_num.times {
 				segment_machine_id = 0
 				segment_begin = IpV4Address.calc_next_segment(segment_begin, seg_len)
-				
+
 				puts "allocate #{segment_begin}/#{seg_net_mask}, length = #{seg_len}"
 
 				segment_begin = IpV4Address.calc_next(segment_begin)
@@ -53,11 +53,11 @@ class NetworkSegment
 	end
 
 	def allocate(segment_length)
-		
+
 	end
 
 	def free(segment_name)
-		
+
 	end
 end
 

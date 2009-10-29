@@ -1,6 +1,6 @@
 module ActionView::Helpers
   module Growl4RailsHelper
-    
+
     # Add this to your layout
     # <%= growl4rails_includes %> or
     # <%= growl4rails_includes(5000, 5) %> 
@@ -13,7 +13,7 @@ module ActionView::Helpers
       "<![endif]-->"
 
     end
-    
+
     def asset_path
       "growl4rails/"
     end

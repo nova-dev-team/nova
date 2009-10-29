@@ -39,6 +39,6 @@ class VdiskNamingTest < ActiveSupport::TestCase
     rescue Exception => e
       print e
     end
-    
+
   end
 end

@@ -10,7 +10,7 @@ class Ceil
 		@install_list = nil
 		@downloader = nil
 	end
-	
+
 	def check
 		begin
 			#@cc.fetch_by_nfs(@env.server_addr)
@@ -22,7 +22,7 @@ class Ceil
 			nil
 		end
 	end
-	
+
 	def start
 		@install_list.each do |app_name|
 			begin

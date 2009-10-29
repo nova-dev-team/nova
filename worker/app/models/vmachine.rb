@@ -237,7 +237,7 @@ XML_DESC
       Vmachine.delete vm_model if vm_model != nil
       return {:success => true, :message => "Successfully destroyed vmachine with UUID=#{uuid}."}
     end
-    
+
     # cleanup work is left for supervisor_worker, we just destroy the domain
   end
 
@@ -257,6 +257,6 @@ private
       return {:success => false, :message => "Failed to process action '#{action_name}' on vmachine with UUID=#{uuid}!"}
     end
   end
-  
+
 end
 

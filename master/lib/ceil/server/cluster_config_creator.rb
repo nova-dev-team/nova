@@ -8,7 +8,7 @@ class ClusterConfigurationCreator
 		@inst_list = inst_list
 		@cluster_name = cluster_name
 	end
-	
+
 	def create
 		config_path = "#{SERVER_CONFIG_STORE_PATH}/#{@cluster_name}"
 		disp_path = "#{SERVER_KEY_DISPATCH_PATH}/#{@cluster_name}"
@@ -20,14 +20,14 @@ class ClusterConfigurationCreator
     begin
       #DirTool.make_clean_dir(config_path)
       DirTool.make_clean_dir(disp_path)
-    
+
       #File.open(node_list_file, "w") do |file|
       #  file.puts(@node_list)
       #end
       #File.open(inst_list_file, "w") do |file|
       #  file.puts(@inst_list)
       #end
-      
+
       @inst_list.each_line do |line|
         app_name = line.chomp
         kd = KeyDispatcher.new(@cluster_name, app_name)

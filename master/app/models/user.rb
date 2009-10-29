@@ -22,7 +22,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of   :email
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
 
-  
+
 
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
@@ -56,17 +56,17 @@ class User < ActiveRecord::Base
   def in_group? group_name
     groups.include?(Group.find_by_name group_name)
   end
-  
+
   def is_root?
     in_group? "root"
   end
-  
+
   def is_admin?
     in_group? "admin"
   end
 
   protected
-    
+
 
 
 end

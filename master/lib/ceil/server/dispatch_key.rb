@@ -7,14 +7,14 @@ class KeyDispatcher
 
 		@disp_path = "#{SERVER_KEY_DISPATCH_PATH}/#{@cluster_name}/#{@app_name}"
 		@keys_path = "#{SERVER_KEY_STORE_PATH}/#{@app_name}"
-		
+
 		system "mkdir #{SERVER_KEY_DISPATCH_PATH}/#{@cluster_name}"
 		system "mkdir #{SERVER_KEY_DISPATCH_PATH}/#{@cluster_name}/#{@app_name}"
 	end
-	
+
 	def dispatch(node_list)
 		#node_list = `cat #{node_list_file}`.chomp
-		
+
  		node_count = 0
  		master = ""
 	  node_list.each_line do |line|
@@ -27,7 +27,7 @@ class KeyDispatcher
 	    node_count = 1
 	    node_list = master
 	  end
-	  
+
 		available_count = 0
 		key_path = SERVER_KEY_STORE_PATH + "/#{@app_name}/available"
 		key_list = `ls #{key_path}`.chomp.split
@@ -36,7 +36,7 @@ class KeyDispatcher
 			available_count += 1
 			#+=remain
 		end	
-		
+
 		if available_count >= node_count
 			system "cp -r #{@keys_path}/attach/* #{@disp_path}"
 			node_list.each_line do |line|
@@ -52,7 +52,7 @@ class KeyDispatcher
 				end
 				remain = `cat #{key_path}/#{key}/remain`.chomp.to_i - 1
         #puts "Remains = #{remain}"
-			
+
 				#system "mv -r #{@keys_path}/available/#{key} #{@keys_path}/used/"
 			end
 		else

@@ -8,14 +8,14 @@ class ClusterConfiguration
 	            :host_name, :cluster_name, 
 	            :package_server, :package_server_type,
 	            :key_server, :key_server_type
-	
+
 	def initialize(local_addr)
 		@node_list = nil
 		@inst_list = nil
 		@host_name = nil
 		@cluster_name = nil
 		@local_addr = local_addr
-		
+
 		#default server..
 		@package_server = "localhost"
 		@key_server = "localhost"
@@ -74,14 +74,14 @@ class ClusterConfiguration
 		  puts "Error during fetch configuration through HTTP, #{e.to_s}"
 		  return nil
 		end
-  
+
     begin		
   	  conf = JSON.parse(cjson)
   	rescue => e
   	  puts "Error during parsing JSON TEXT, #{e.to_s}"
   	  return nil
     end
-		
+
 		@package_server = conf["package_server"] if conf["package_server"] 
 		@package_server_type = conf["package_server_type"] if conf["package_server_type"]
 		@key_server = conf["key_server"] if conf["key_server"]
@@ -91,7 +91,7 @@ class ClusterConfiguration
 		return nil if !(@node_list = conf["node_list"])
 		return nil if !(@inst_list = conf["package_list"])
 		return nil if !(@cluster_name = conf["cluster_name"])
-		
+
 		@cluster_name
 	end
 end

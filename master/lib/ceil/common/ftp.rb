@@ -15,7 +15,7 @@ class Net::FTP
 		end
 		return files
 	end
-	
+
 	def cd(dir)
   	begin
   	  self.chdir(dir)
@@ -32,14 +32,14 @@ class FTPTransfer
 		BasicSocket.do_not_reverse_lookup = true
 		@server_addr = server_addr
 	end
-	
+
 	def download_file(remote_path, file_name, local_path)
 		#puts "		DOWNLOAD #{remote_path}/#{file_name} #{local_path}"
 		Rescue.ignore {
 			@conn.getbinaryfile(remote_path + "/" + file_name, local_path + "/" + file_name)
 		}
 	end
-	
+
 	def download_recursive(remote_path, local_path)
 		#puts "DIR #{remote_path}"
 		DirTool.mkdir(local_path)
@@ -61,13 +61,13 @@ class FTPTransfer
 	def download_dir(remote_path, local_path)
 		puts "DOWN DIR #{remote_path}"
 		@conn = Net::FTP.new(@server_addr)
-		
+
 		Rescue.ignore {
   		@conn.login("anonymous", "ceil_client")
   	}
-  	
+
 		@conn.passive = true
-		
+
 		Rescue.ignore {
 			download_recursive(remote_path, local_path)
 		}

@@ -42,7 +42,7 @@ class SoftwareCategoriesController < ApplicationController
 			end
 		end
 	end	
-	
+
 	def destroy
 		sc = SoftwareCategory.find_by_id params[:id]
 		sc.softwares.each do |app|

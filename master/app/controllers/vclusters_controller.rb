@@ -26,9 +26,9 @@ class VclustersController < ApplicationController
       # format params list
       params[:soft_list] = params[:soft_list].split.join "\n"
       #params[:soft_list] = " + params[:soft_list] unless params[:soft_list].start_with? "common\nssh-nopass\n" # make sure common & ssh-nopass is selected
-      
 
-      
+
+
       puts "Soft to be installed:\n#{params[:soft_list]}\n"
       if params[:start_now]
         pp "[start_now]"

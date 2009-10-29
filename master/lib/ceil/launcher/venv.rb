@@ -12,7 +12,7 @@ class Environment
 	def check
 		local_addr = `ifconfig eth0 | grep "inet addr" | awk \'{print $2}\' | awk -F: \'{print $2}\'`;
 		local_mask = `ifconfig eth0 | grep Mask | awk \'{print $4}' | awk -F: '{print $2}\'`;
-	
+
 		local_addr = local_addr.chomp
 		local_mask = local_mask.chomp
 
