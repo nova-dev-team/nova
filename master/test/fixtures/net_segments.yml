@@ -7,7 +7,19 @@
 #   column: value
 
 <%
-  yaml_text = ""
+
+def net_segments_in_networking_interfaces
+    File.open("/etc/network/interfaces", "r") do |f|
+        lines = f.readlines
+        puts lines
+    end
+end
+
+segs = net_segments_in_networking_interfaces
+
+yaml_text = ""
+
+
 %>
 
 <%= yaml_text %>
