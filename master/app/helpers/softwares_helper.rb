@@ -9,7 +9,7 @@ module SoftwaresHelper
       case dirname
         when ".", ".."
         else
-          if File.directory?(fullpath) && File.exists?(description_file)
+          if File.directory?(fullpath)
             des = `cat #{description_file}`
             list << { :software_name => dirname, :description => des}
           end
