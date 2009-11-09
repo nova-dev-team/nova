@@ -21,8 +21,7 @@ when "update" then each_node "cd /root/v2/worker && git pull"
 when "list_vm" then each_node "virsh list"
 when "list_cache" then each_node "ls -lh /root/v2/worker/tmp/work_site/storage_cache"
 when "create_br" then
-  each_node "bash /root/v2/worker/scripts/create_br.sh"
-  each_node "/etc/init.d/networking restart"
+  each_node "bash /root/v2/scripts/create_br.rb"
 when "install" then
   sys_exec "cd ../installer && ./make_installer.sh && cd .."
   all_node_name do |n|
