@@ -1,0 +1,3 @@
+* rename "common_lib" to "shared_lib"
+
+* merge "install" & "scripts" folder
