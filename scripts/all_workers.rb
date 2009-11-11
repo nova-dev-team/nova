@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'nodelist'
+require File.join(File.dirname(__FILE__), 'nodelist')
 
 def each_node cmd
   all_node_name do |n|
@@ -11,17 +11,20 @@ def each_node cmd
   end
 end
 
+NOVA_ROOT = File.join File.dirname(File.expand_path(__FILE__)), "../"
+puts "Working with NOVA_ROOT=#{NOVA_ROOT}"
+
 case ARGV[0]
-when "rm_cache" then each_node "rm -r /root/v2/worker/tmp/work_site/storage_cache"
-when "rm_log" then each_node "rm -r /root/v2/worker/log"
-when "first_run" then each_node "cd /root/v2/worker && ./first_run.sh"
-when "start" then each_node "cd /root/v2/worker && ./start.sh -d"
-when "stop" then each_node "cd /root/v2/worker && ./stop.sh"
-when "update" then each_node "cd /root/v2/worker && git pull"
+when "rm_cache" then each_node "rm -r #{NOVA_ROOT}/worker/tmp/work_site/storage_cache"
+when "rm_log" then each_node "rm -r #{NOVA_ROOT}/worker/log"
+when "first_run" then each_node "cd #{NOVA_ROOT}/worker && ./first_run.sh"
+when "start" then each_node "cd #{NOVA_ROOT}/worker && ./start.sh -d"
+when "stop" then each_node "cd #{NOVA_ROOT}/worker && ./stop.sh"
+when "update" then each_node "cd #{NOVA_ROOT}/worker && git pull"
 when "list_vm" then each_node "virsh list"
-when "list_cache" then each_node "ls -lh /root/v2/worker/tmp/work_site/storage_cache"
+when "list_cache" then each_node "ls -lh #{NOVA_ROOT}/worker/tmp/work_site/storage_cache"
 when "create_br" then
-  each_node "ruby /root/v2/scripts/create_br.rb"
+  each_node "ruby #{NOVA_ROOT}/scripts/create_br.rb"
 when "install" then
   sys_exec "cd ../installer && ./make_installer.sh && cd .."
   all_node_name do |n|
