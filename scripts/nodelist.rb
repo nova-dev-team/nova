@@ -1,11 +1,8 @@
 
 def all_node_name
   [
-    "node10",
-    "node13",
-    "node17",
-    "node18",
-    "node20"
+    "ubuntu",
+    "ubuntu1"
   ].each {|n| yield n}
 end
 
