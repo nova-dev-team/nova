@@ -42,7 +42,7 @@ echo ""
 echo "Phase 2.1: Install .deb packages..."
 echo ""
 cd $PACKAGE_ROOT/debs/archives
-dpkg -i *.deb --skip-same-version
+dpkg -i --skip-same-version *.deb
 
 if [ ! -e /usr/local/bin/ruby ]; then
   ln /usr/bin/ruby /usr/local/bin/ruby -s
