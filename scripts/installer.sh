@@ -18,10 +18,10 @@ echo "You need to manually do configuration work."
 echo ""
 
 read -p "Press any key to start installation..."
-clear
 
 # phase 1: download packages
 
+clear
 echo "Phase 1: Download .deb packages..."
 echo ""
 
@@ -35,6 +35,7 @@ all_debs=( $( cat $DEBS_LIST_FILE ) )
 
 # Phase 2: begin installing process
 
+clear
 echo "Phase 2: Install packages..."
 echo ""
 

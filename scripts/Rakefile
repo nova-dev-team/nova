@@ -53,6 +53,16 @@ end
 
 namespace :system do
 
+  desc "Configure the system"
+  task :config do
+    puts "TODO: system:configure"
+  end
+
+  desc "Installs the whole system"
+  task :install => "system:config" do
+    puts "TODO: system:install"
+  end
+
   desc "Start whole system"
   task :start do
     puts "TODO"
