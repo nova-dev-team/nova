@@ -1,0 +1,79 @@
+require File.dirname(__FILE__) + "/lib/utils.rb"
+
+desc "Show brief intro"
+task :about do
+  puts "rake about: show this message"
+  puts "rake help: show this message"
+  puts "Use 'rake -T' to get full command list"
+end
+
+namespace :check do
+
+  desc "Do health checking on current system"
+  task :health do
+    puts "TODO"
+  end
+
+  desc "Check if installed"
+  task :installed do
+    puts "TODO"
+  end
+
+  desc "Check disk usage"
+  task :du do
+    puts "TODO"
+  end
+
+end
+
+namespace :clean do
+
+  desc "Clean up log files"
+  task :logs do
+    puts "TODO"
+  end
+
+end
+
+namespace :config do
+
+  desc "Configure network bridge"
+  task "netbr" do
+    puts "TODO"
+  end
+
+  task "netforwarding" do
+    puts "TODO"
+  end
+
+end
+
+task :status do
+end
+
+namespace :system do
+
+  desc "Start whole system"
+  task :start do
+    puts "TODO"
+  end
+
+  desc "Stop whole system"
+  task :stop do
+    puts "TODO"
+  end
+
+  desc "Update whole system"
+  task :update do
+    puts "TODO"
+  end
+
+  desc "!!!RESET WHOLE SYSTEM, BE CAREFUL!!!"
+  task :reset do
+    puts "TODO"
+  end
+
+end
+
+task :default => :about
+task :help => :about
