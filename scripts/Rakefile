@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + "/lib/utils.rb"
+require File.dirname(__FILE__) + "/config/gen_node_list.rb"
 
 desc "Show brief intro"
 task :about do
@@ -42,8 +43,21 @@ namespace :config do
     puts "TODO"
   end
 
+  desc "Configure network forwarding"
   task "netforwarding" do
     puts "TODO"
+# TODO update the netforwarding procedure
+    all_nodes do |host, role|
+      i = host[4..-1].to_i
+      puts "iptables -t nat -A PREROUTING -d 166.111.131.32 -p tcp --dport #{4000 + i} -j DNAT --to-destination 10.0.5.#{i}:3000"
+      puts "iptables -t nat -A POSTROUTING -d 10.0.5.#{i} -p tcp --dport 3000 -j SNAT --to 10.0.5.254"
+    end
+
+    puts "iptables -P FORWARD ACCEPT"
+    puts "iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE"
+
+    puts "iptables-save"
+
   end
 
 end
@@ -55,7 +69,7 @@ namespace :system do
 
   desc "Configure the system"
   task :config do
-    puts "TODO: system:configure"
+    gen_node_list
   end
 
   desc "Installs the whole system"
