@@ -2,8 +2,8 @@
 
 # must run by root
 if [[ $UID -ne 0 ]]; then
-	echo "This script requires root privilege!"
-	exit 1
+  echo "This script requires root privilege!"
+  exit 1
 fi
 
 # only supports ubuntu
@@ -26,8 +26,8 @@ echo "Phase 1: Download .deb packages..."
 echo ""
 
 DEBS_LIST_FILE=$(readlink -f ./config/installer/debs.list)
-PACKAGE_ROOT=$(readlink -f data/installer)
-DEBS_PACKAGE_DIR=$PACKAGE_DIR/debs
+PACKAGE_ROOT=$(readlink -f ./data/installer)
+DEBS_PACKAGE_DIR=$PACKAGE_ROOT/debs
 
 mkdir -p $DEBS_PACKAGE_DIR/archives/partial
 all_debs=( $( cat $DEBS_LIST_FILE ) )
