@@ -64,3 +64,6 @@ echo ""
 cd $PACKAGE_ROOT/gems
 gem install --no-ri --no-rdoc -l *.gem
 
+clear
+echo "Phase 3: Configure the Nova system"
+rake system:install
