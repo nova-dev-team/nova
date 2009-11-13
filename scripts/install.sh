@@ -1,6 +1,19 @@
 #!/bin/bash
 
-# must run by root
+SINGLE_NODE=false
+
+for opt in $@; do
+  case "$opt" in
+  --single-node)
+    SINGLE_NODE=true
+  ;;
+  --help)
+    echo $opt
+  ;;
+  esac
+done
+
+# must run with root privilege
 if [[ $UID -ne 0 ]]; then
   echo "This script requires root privilege!"
   exit 1
@@ -9,19 +22,21 @@ fi
 # only supports ubuntu
 # TODO check distributation
 
-clear
-
-echo ""
-echo "This script installs the Nova platform."
-echo "However, the platform will not be fully configured by this script."
-echo "You need to manually do configuration work."
-echo ""
-
-read -p "Press any key to start installation..."
+if [[ $SINGLE_NODE == false ]]; then
+  clear
+  echo ""
+  echo "This script installs the Nova platform."
+  echo "However, the platform will not be fully configured by this script."
+  echo "You need to manually do configuration work."
+  echo ""
+  read -p "Press any key to start installation..."
+fi
 
 # phase 1: download packages
+if [[ $SINGLE_NODE == false ]]; then
+  clear
+fi
 
-clear
 echo "Phase 1: Download .deb packages..."
 echo ""
 
@@ -35,7 +50,10 @@ all_debs=( $( cat $DEBS_LIST_FILE ) )
 
 # Phase 2: begin installing process
 
-clear
+if [[ $SINGLE_NODE == false ]]; then
+  clear
+fi
+
 echo "Phase 2: Install packages..."
 echo ""
 
@@ -64,6 +82,12 @@ echo ""
 cd $PACKAGE_ROOT/gems
 gem install --no-ri --no-rdoc -l *.gem
 
-clear
-echo "Phase 3: Configure the Nova system"
-rake system:install
+if [[ $SINGLE_NODE == false ]]; then
+  clear
+  echo "Phase 3: Configure the Nova system"
+  rake system:install
+
+else
+  echo "Phase 3: Configure a single node"
+  rake config
+fi

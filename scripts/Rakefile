@@ -36,6 +36,11 @@ namespace :clean do
 
 end
 
+desc "Configure single node"
+task "config" do
+  puts "TODO: Configure single node"
+end
+
 namespace :config do
 
   desc "Configure network bridge"
@@ -44,7 +49,7 @@ namespace :config do
   end
 
   desc "Configure network forwarding"
-  task "netforwarding" do
+  task "netfw" do
     puts "TODO"
 # TODO update the netforwarding procedure
     all_nodes do |host, role|
