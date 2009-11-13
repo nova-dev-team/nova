@@ -14,9 +14,16 @@ class InstallServer
 
     loop do
       th = Thread.start(server_sock.accept) do |sock|
-	sock.each_line do |line|
+	loop do
+	  line = sock.readline
 	  puts line
-	end
+	  if line == "get_client"
+	    sock.write "no more client\n"
+	  else
+	    sock.write "ack\n" # default ack message
+	  end
+	  sock.flush
+        end
       end
       thread_list << th
 

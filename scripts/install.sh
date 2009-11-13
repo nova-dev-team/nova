@@ -113,6 +113,6 @@ if [[ $SINGLE_NODE == false ]]; then
 
 else
   echo "Phase 3: Configure a single node"
-  ruby lib/install_helper.rb $@
+  ruby lib/install_client.rb $@
 fi
 

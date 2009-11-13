@@ -80,11 +80,12 @@ namespace :system do
 
   desc "Installs the whole system"
   task :install do
-    addr = "10.0.1.214"
+    addr = this_node["intranet_ip"]
     port = 50000 + rand(10000)
+    puts "starting install server on #{addr}:#{port}"
     fork {
       sleep 1 # wait a few seconds
-      sys_exec "ruby lib/install_client.rb #{addr}:#{port}"
+      sys_exec "ruby lib/install_client.rb --install-server=#{addr}:#{port}"
     }
     InstallServer.serve addr, port
   end
