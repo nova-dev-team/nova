@@ -8,7 +8,9 @@ for opt in $@; do
     SINGLE_NODE=true
   ;;
   --help)
-    echo $opt
+    echo "install script for nova system"
+    echo "'install.sh' will install the whole system"
+    echo "'install.sh --single-node' will install this node only"
   ;;
   esac
 done
@@ -26,10 +28,18 @@ if [[ $SINGLE_NODE == false ]]; then
   clear
   echo ""
   echo "This script installs the Nova platform."
-  echo "However, the platform will not be fully configured by this script."
-  echo "You need to manually do configuration work."
+  echo ""
+  echo "The installation process:"
+  echo " 1: This node will be installed as 'master' machine."
+  echo " 2: A few questions will be asked for basic configuration. (Your instructions required)"
+  echo " 3: Other nodes will be automatically installed. (No more instructions required)"
+  echo ""
+  echo "After the installation process, most of the configuration work is done."
+  echo "You need to do a few more configuration work, though. See README for detail information."
   echo ""
   read -p "Press any key to start installation..."
+else
+  echo "Install single node only"
 fi
 
 # phase 1: download packages
