@@ -9,7 +9,6 @@ for opt in $@; do
   ;;
   --help)
     echo "This is the install script for Nova system. Currently it only supports Ubuntu distribution."
-    echo "Root privilege required."
     echo "usage:"
     echo ""
     echo "install.sh"
@@ -112,4 +111,3 @@ else
   echo "Phase 3: Configure a single node"
   rake config
 fi
-
