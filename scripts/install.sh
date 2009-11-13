@@ -8,7 +8,7 @@ for opt in $@; do
     SINGLE_NODE=true
   ;;
   --help)
-    echo "This is the install script for nova system"
+    echo "This is the install script for nova system. It requires root privilege."
     echo "usage:"
     echo ""
     echo "install.sh"
