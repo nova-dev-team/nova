@@ -56,6 +56,7 @@ fi
 echo "Phase 1: Download .deb packages..."
 echo ""
 
+SCRIPT_ROOT=$(readlink -f .)
 DEBS_LIST_FILE=$(readlink -f ./config/installer/debs.list)
 PACKAGE_ROOT=$(readlink -f ./data/installer)
 DEBS_PACKAGE_DIR=$PACKAGE_ROOT/debs
@@ -95,9 +96,11 @@ rm -r rubygems-1.3.5
 
 echo "Phase 2.3: Install .gem packages..."
 echo ""
+cd $SCRIPT_ROOT
+
 # call another script
 # the enhanced .gems installer will skip installed gems, saves install time
-ruby ./lib/install_gems.rb
+ruby lib/install_gems.rb
 
 if [[ $SINGLE_NODE == false ]]; then
   clear
@@ -110,5 +113,6 @@ if [[ $SINGLE_NODE == false ]]; then
 
 else
   echo "Phase 3: Configure a single node"
-  ruby ./lib/install_helper.rb $@
+  ruby lib/install_helper.rb $@
 fi
+

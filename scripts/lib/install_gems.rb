@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'utils.rb'
+require File.dirname(__FILE__) + '/utils.rb'
 
 GEMS_FOLDER = File.dirname(__FILE__) + '/../data/installer/gems'
 
