@@ -1,3 +1,8 @@
+require 'yaml'
+
+CONF_YAML = File.dirname(__FILE__) + '/../config/conf.yaml'
+NODE_YAML = File.dirname(__FILE__) + '/../config/node.yaml'
+
 def sys_exec cmd
   puts cmd
   IO.popen(cmd) do |f|
@@ -6,27 +11,28 @@ def sys_exec cmd
 end
 
 def all_nodes
+  y = YAML::load_file NODE_YAML
+  y["master"]["role"] = "master"
   list = []
-  File.open(File.dirname(__FILE__) + "/../config/node.list", "r") do |f|
-    list = f.readlines
+  list << y["master"]
+  y["workers"].each do |w|
+    w["role"] = "worker"
+    list << w
   end
-  list.each do |line|
-    if line.index "#"
-      line = line[0..(line.index "#") - 1] # skip comments
-    end
-    splt = line.split
-    if splt.length == 2
-      host = splt[0]
-      role = splt[1]
-      yield host, role
-    end
+  list.each do |n|
+    yield n
   end
 end
 
 def all_workers
-  all_nodes do |host, role|
-    if role == "worker"
-      yield host
+  all_nodes do |node|
+    if node["role"] == "worker"
+      yield node
     end
   end
 end
+
+def nova_conf
+  YAML::load_file CONF_YAML
+end
+

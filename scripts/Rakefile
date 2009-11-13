@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + "/lib/utils.rb"
-require File.dirname(__FILE__) + "/config/gen_node_list.rb"
+require File.dirname(__FILE__) + "/lib/gen_node_yaml.rb"
 
 desc "Show brief intro"
 task :about do
@@ -74,11 +74,11 @@ namespace :system do
 
   desc "Configure the system"
   task :config do
-    gen_node_list
+    gen_node_yaml
   end
 
   desc "Installs the whole system"
-  task :install => "system:config" do
+  task :install do
     puts "TODO: system:install"
   end
 
