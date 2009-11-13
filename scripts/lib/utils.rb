@@ -1,13 +1,15 @@
 require 'yaml'
+require 'socket'
 
+NOVA_ROOT = File.dirname(__FILE__) + "/../../"
 CONF_YAML = File.dirname(__FILE__) + '/../config/conf.yaml'
 NODE_YAML = File.dirname(__FILE__) + '/../config/node.yaml'
 
 def sys_exec cmd
   IO.popen(cmd) do |pipe|
     loop do
-      line = pipe.readline
-      puts line
+      line = pipe.readline unless pipe.eof?
+      puts line unless pipe.eof?
       break if pipe.eof?
     end
   end
@@ -33,6 +35,18 @@ def all_workers
       yield node
     end
   end
+end
+
+def this_node
+  this_node_ip = IPSocket.getaddress Socket.gethostname
+  all_nodes do |node|
+    if node["role"] == "master"
+      return node if node["intranet_ip"] == this_node_ip or node["internet_ip"] == this_node_ip
+    elsif node["role"] == "worker"
+      return node if node["intranet_ip"] == this_node_ip
+    end
+  end
+  return nil
 end
 
 def nova_conf

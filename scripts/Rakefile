@@ -1,5 +1,6 @@
 require File.dirname(__FILE__) + "/lib/utils.rb"
 require File.dirname(__FILE__) + "/lib/gen_node_yaml.rb"
+require File.dirname(__FILE__) + "/lib/install_server.rb"
 
 desc "Show brief intro"
 task :about do
@@ -79,7 +80,13 @@ namespace :system do
 
   desc "Installs the whole system"
   task :install do
-    puts "TODO: system:install"
+    addr = "10.0.1.214"
+    port = 50000 + rand(10000)
+    fork {
+      sleep 1 # wait a few seconds
+      sys_exec "ruby lib/install_client.rb #{addr}:#{port}"
+    }
+    InstallServer.serve addr, port
   end
 
   desc "Start whole system"
