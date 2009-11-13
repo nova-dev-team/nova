@@ -107,7 +107,6 @@ def gen_node_yaml
 # this file is generated according to administrator's configuration
 # comments start with '#'
 
-# hostname role
 #{yaml_str}
 NODE_YAML_HEAD
       f.write file_content
