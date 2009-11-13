@@ -96,8 +96,9 @@ rm -r rubygems-1.3.5
 
 echo "Phase 2.3: Install .gem packages..."
 echo ""
-cd $PACKAGE_ROOT/gems
-gem install --no-ri --no-rdoc -l *.gem
+# call another script
+# the enhanced .gems installer will skip installed gems, saves install time
+ruby ./lib/install_gems.rb
 
 if [[ $SINGLE_NODE == false ]]; then
   clear
@@ -110,6 +111,6 @@ if [[ $SINGLE_NODE == false ]]; then
 
 else
   echo "Phase 3: Configure a single node"
-  rake config
+  ruby ./lib/install_helper.rb $@
 fi
 
