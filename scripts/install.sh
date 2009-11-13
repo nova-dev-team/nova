@@ -8,9 +8,15 @@ for opt in $@; do
     SINGLE_NODE=true
   ;;
   --help)
-    echo "install script for nova system"
-    echo "'install.sh' will install the whole system"
-    echo "'install.sh --single-node' will install this node only"
+    echo "This is the install script for nova system"
+    echo "usage:"
+    echo ""
+    echo "install.sh"
+    echo "    -- will install the whole system"
+    echo ""
+    echo "install.sh --single-node"
+    echo "    -- will install this node only"
+    exit 0
   ;;
   esac
 done
