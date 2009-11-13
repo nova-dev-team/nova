@@ -8,7 +8,7 @@ for opt in $@; do
     SINGLE_NODE=true
   ;;
   --help)
-    echo "This is the install script for nova system"
+    echo "This is the install script for Nova system. Currently it only supports Ubuntu distribution."
     echo "usage:"
     echo ""
     echo "install.sh"
@@ -27,19 +27,19 @@ if [[ $UID -ne 0 ]]; then
   exit 1
 fi
 
-# only supports ubuntu
-# TODO check distributation
-
 if [[ $SINGLE_NODE == false ]]; then
   clear
   echo ""
-  echo "This script installs the Nova platform."
+  echo "This script installs the Nova platform. Currently it only supports Ubuntu distribution."
+  # TODO check distribution == ubuntu
   echo ""
   echo "The installation process:"
-  echo " 1: This node will be installed as 'master' machine."
-  echo " 2: A few questions will be asked for basic configuration. (Your instructions required)"
-  echo " 3: Other nodes will be automatically installed. (No more instructions required)"
+  echo " 1: Install depended software and libraries."
+  echo " 2: A few questions will be asked for basic configuration. *(Your instructions required)"
+  echo " 3: This node will be installed as 'master' machine."
+  echo " 4: Other nodes will be automatically installed."
   echo ""
+  echo "Your instructions are required in step 2 only. After that, no more instructions are required."
   echo "After the installation process, most of the configuration work is done."
   echo "You need to do a few more configuration work, though. See README for detail information."
   echo ""
@@ -101,6 +101,10 @@ gem install --no-ri --no-rdoc -l *.gem
 if [[ $SINGLE_NODE == false ]]; then
   clear
   echo "Phase 3: Configure the Nova system"
+  rake system:config
+
+  clear
+  echo "Phase 4: Install the Nova system"
   rake system:install
 
 else
