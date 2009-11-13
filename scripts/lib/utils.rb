@@ -4,9 +4,12 @@ CONF_YAML = File.dirname(__FILE__) + '/../config/conf.yaml'
 NODE_YAML = File.dirname(__FILE__) + '/../config/node.yaml'
 
 def sys_exec cmd
-  puts cmd
-  IO.popen(cmd) do |f|
-    puts f.readlines
+  IO.popen(cmd) do |pipe|
+    loop do
+      line = pipe.readline
+      puts line
+      break if pipe.eof?
+    end
   end
 end
 

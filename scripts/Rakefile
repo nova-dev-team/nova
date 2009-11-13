@@ -102,6 +102,11 @@ namespace :system do
     puts "TODO"
   end
 
+  desc "Backup the whole system"
+  task :backup do
+    puts "TODO"
+  end
+
 end
 
 task :default => :about
