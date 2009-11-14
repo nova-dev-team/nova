@@ -189,7 +189,7 @@
 	
 	<mx:HTTPService id = "imageListService" resultFormat="text" requestTimeout="5000" result="handleImageList(event)" />
 	<mx:HTTPService id="softListService" resultFormat="text" requestTimeout="5000" result="handleSoftList(event)"/>
-	<mx:HTTPService id="addVClusterService" resultFormat="text" requestTimeout="30000" method="POST" result="handleAddVCluster()">
+	<mx:HTTPService id="addVClusterService" resultFormat="text" requestTimeout="30000" result="handleAddVCluster()" method="POST">
 		<mx:request xmlns="">
 			<size>
 				{VCluster_Size.text}

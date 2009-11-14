@@ -21,9 +21,12 @@ package
 		
 		public static var mouseCursorCount:int = 0;		
 		
-		public static var URL:String = "http://166.111.131.32:3000/";
+//		public static var URL:String = "http://166.111.131.32:3000/";
 //		public static var URL:String = "http://192.168.0.125:3000/";
+		public static var URL:String = "http://192.168.0.100:3000/";
 		public static var USER_URL:String = URL + "users";
+		
+
 		
 		public static var PMACHINE:String = URL + "pmachines";
 		public static var PMACHINE_NEW:String = PMACHINE + "/new";
@@ -50,11 +53,6 @@ package
 		public static var NETWORK_ERROR:String = "Network no response, please check your network settings!";
 		
 		public static var TIME_OUT:int = 5;
-		
-		
-		
-		
-		
 		
 		
 		public static var OverallService:HTTPService = new HTTPService();
