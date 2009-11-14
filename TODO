@@ -1,4 +1,7 @@
 [TODO]
+
+[DONE]
+
 * write default configurations to conf.yaml
   NOTES: configurable items:
     - master_port: 2000
@@ -14,7 +17,6 @@
     - worker_vnc_port: 5900
     - install_folder: /usr/lib/nova
 
-[DONE]
 * rename "common_lib" to "shared_lib"
 
 * merge "install" & "scripts" folder
