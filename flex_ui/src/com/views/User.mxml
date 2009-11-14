@@ -47,4 +47,6 @@
 		]]>
 	</mx:Script>
 	<mx:HTTPService id="userService" requestTimeout="{Environment.TIME_OUT}" resultFormat="text" result="show(event)" fault="handleUserFault()"/>
+	<mx:HTTPService id="userStatusService" method="PUT"/>
+	
 </mx:Canvas>
