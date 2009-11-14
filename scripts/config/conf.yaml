@@ -1,0 +1,37 @@
+# this yaml file contains basic configuration for Nova platform
+# do not edit it unless you clearly know what you are doing
+
+# where will we install nova platform
+install_folder:                 /usr/lib/nova
+
+# which port will master node serve the web pages
+master_port:                    2000
+
+# should master node use swiftiply? it will enhance master performace
+master_use_swiftiply:           true
+
+# the first port for swiftiply, necessary if 'master_use_swiftiply' is 'true'
+master_swiftiply_port:          2100
+
+# the number of back ports for swiftiply, necessary if 'master_use_swiftiply' is 'true'
+master_swiftiply_port_count:    10
+
+# which port will worker node serve the web services
+# master port will connect to worker nodes using this port
+worker_port:                    3000
+
+# how many vnc ports could a worker serve
+# this is a limit on number of virtual machines running on a single worker node
+worker_vnc_port_count:          10
+
+# the first vnc port that will be used by virtual machines
+vm_vnc_port:                    5900
+
+# the network bridge used by virtual machines
+# it will be created on installation
+vm_network_bridge:              nova_br
+
+# the virtual machine hypervisor we use
+# currently only supports kvm
+vm_hypervisor:                  kvm
+

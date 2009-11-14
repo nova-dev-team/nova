@@ -50,7 +50,7 @@ class UsersControllerTest < ActionController::TestCase
       assert_response :success
     end
   end
-  
+
   protected
     def create_user(options = {})
       post :create, :user => { :login => 'quire', :email => 'quire@somewhere.com',

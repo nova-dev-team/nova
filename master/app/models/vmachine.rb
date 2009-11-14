@@ -2,10 +2,10 @@ class Vmachine < ActiveRecord::Base
   belongs_to :vcluster
   belongs_to :pmachine
   has_many :vmachine_infos
-  
+
 
   def master?
-		return self == self.vcluster.vmachines.first
+    return self == self.vcluster.vmachines.first
   end
 
   def get_node_list
@@ -15,14 +15,14 @@ class Vmachine < ActiveRecord::Base
     end
     return list
   end
-  
+
   def get_package_list
     vc = self.vcluster
     return vc.package_list
   end
-  
+
   def get_progress
-    
+
   end
 
   # return false if faled to allocate the vm to some pmachine
@@ -64,5 +64,5 @@ class Vmachine < ActiveRecord::Base
   def Vmachine.all_not_destroyed
     Vmachine.find_all_by_destroyed true
   end
-  
+
 end

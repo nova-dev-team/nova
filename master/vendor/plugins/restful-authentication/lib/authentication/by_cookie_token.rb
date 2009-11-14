@@ -74,7 +74,7 @@ module Authentication
     #
     module ControllerClassMethods
     end # class methods
-    
+
     module ControllerInstanceMethods
     end # instance methods
   end

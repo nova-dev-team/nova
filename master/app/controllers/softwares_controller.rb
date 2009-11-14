@@ -1,6 +1,19 @@
 class SoftwaresController < ApplicationController
   before_filter :login_required
 
+  def index
+    result = []
+    Software.all.each do |app|
+      result << {
+        :id => app.id,
+        :display_name => app.display_name,
+        :software_name => app.software_name,
+        :category_id => app.software_category.id
+      }
+    end
+    render_data result
+  end
+
   def list_category
     result = []
     SoftwareCategory.all.each do |sc|
@@ -32,15 +45,20 @@ class SoftwaresController < ApplicationController
   end
 
   def bind
-    app = Software.find_by_id param[:id]
-    sc = SoftwareCategory.find_by_id param[:cid]
+    app = Software.find_by_id params[:id]
+    sc = SoftwareCategory.find_by_id params[:cid]
     if app && sc
       app.software_category = sc
-      render_success 'Successfully changes category'
+      if app.save
+        render_success 'Successfully changes category'
+      else
+        render_failure 'DB Failed'
+      end
     else
       render_failure 'Software or Category not found!'
     end
   end
+
 
   def scan
     package_setting = Setting.find_by_key "software_package_storage"

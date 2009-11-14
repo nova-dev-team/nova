@@ -2,6 +2,11 @@ require "net/ftp"
 require "uri"
 require "utils"
 
+def local_file_copy from, to
+  FileUtils.cp from, to
+end
+
+
 module ImageResource
 
   # get a list of resource at given URI
@@ -53,9 +58,9 @@ module ImageResource
         copying_lock = File.new(copying_lockfile, "w")
         begin
           copying_lock.flock File::LOCK_EX
-    
+
           if scheme == "file"
-            FileUtils.cp path, to_file
+            local_file_copy path, to_file
           elsif scheme == "ftp"
             username, password = Util::split_userinfo userinfo
             Net::FTP.open(host, username, password) do |ftp|
@@ -81,7 +86,7 @@ module ImageResource
   # save resource from local file to given remote URI
   def ImageResource.put_resource from_file, to_uri
     scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split to_uri  # parse URI information
-  
+
     uploading_lockfile = "#{from_file}.uploading"
     uploading_lock = File.new(uploading_lockfile, "w")
 
@@ -89,7 +94,7 @@ module ImageResource
       uploading_lock.flock File::LOCK_EX
 
       if scheme == "file"
-        FileUtils.cp from_file, path
+        local_file_copy from_file, path
       elsif scheme == "ftp"
         username, password = Util::split_userinfo userinfo
         Net::FTP.open(host, username, password) do |ftp|
@@ -109,7 +114,7 @@ module ImageResource
     return to_uri
   end
 
-  # TODO prepare resource for vmachine
+  # prepare resource for vmachine
   # make sure the vmachine can access the resource
   def ImageResource.prepare_vdisk vm_name, vdisk_name, device = nil, uuid = nil
     return if vdisk_name == nil or vdisk_name == "" # skip invalid arguments
@@ -139,7 +144,7 @@ module ImageResource
 
     when "usr", "usr.cow"
       FileUtils.mv local_filename, "#{vm_dir}/#{vdisk_name}"
-      
+
       # create an upload sign, so the user's data is always uploaded
       `touch #{vm_dir}/#{vdisk_name}.upload`
     when "iso"
@@ -163,13 +168,13 @@ module ImageResource
     ImageResource.copy_pool_image "#{Setting.storage_cache}/#{vdisk_name}"
   end
 
-  
+
   # copy a pooling image, and return the pooled image name
   # if pooling_id is not given, automatically determines an id
   # if image already copied, return the existing image name
   def ImageResource.copy_pool_image local_filename, pooling_id = nil
     pooling_dir = File.dirname local_filename
-    
+
     if pooling_id == nil
       local_basename = File.basename local_filename
       pooling_list = Dir.entries(pooling_dir).select {|e| e.start_with? "#{local_basename}.pool."}
@@ -185,7 +190,7 @@ module ImageResource
     unless File.exist? pooling_name
       copying_lock_fname = "#{pooling_name}.copying"
       copying_lock_file = File.new(copying_lock_fname, "w")
-      FileUtils.cp local_filename, pooling_name 
+      local_file_copy local_filename, pooling_name 
       copying_lock_file.close
       FileUtils.rm copying_lock_fname
     end

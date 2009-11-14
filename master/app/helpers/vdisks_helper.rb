@@ -47,7 +47,7 @@ module VdisksHelper
     # a copy from worker's vmachines_helper
     def Helper.list_files dir_uri
       scheme, userinfo, host, port, registry, path, opaque, query, fragment = URI.split dir_uri  # parse URI information
-    
+
       files_list = []
       if scheme == "file"
         Dir.new(path).entries.each do |entry|

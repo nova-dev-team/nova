@@ -69,7 +69,7 @@ describe <%= controller_class_name %>Controller do
       end
     end
   end
-  
+
   describe "on failed login" do
     before do
       <%= class_name %>.should_receive(:authenticate).with(anything(), anything()).and_return(nil)
@@ -96,7 +96,7 @@ describe <%= controller_class_name %>Controller do
     it 'logs me out'                   do controller.should_receive(:logout_killing_session!); do_destroy end
     it 'redirects me to the home page' do do_destroy; response.should be_redirect     end
   end
-  
+
 end
 
 describe <%= controller_class_name %>Controller do
@@ -111,7 +111,7 @@ describe <%= controller_class_name %>Controller do
       route_for(:controller => '<%= controller_controller_name %>', :action => 'destroy').should == "/logout"
     end
   end
-  
+
   describe "route recognition" do
     it "should generate params from GET /login correctly" do
       params_from(:get, '/login').should == {:controller => '<%= controller_controller_name %>', :action => 'new'}
@@ -123,7 +123,7 @@ describe <%= controller_class_name %>Controller do
       params_from(:delete, '/logout').should == {:controller => '<%= controller_controller_name %>', :action => 'destroy'}
     end
   end
-  
+
   describe "named routing" do
     before(:each) do
       get :new
@@ -135,5 +135,5 @@ describe <%= controller_class_name %>Controller do
       new_<%= controller_routing_name %>_path().should == "/<%= controller_routing_path %>/new"
     end
   end
-  
+
 end

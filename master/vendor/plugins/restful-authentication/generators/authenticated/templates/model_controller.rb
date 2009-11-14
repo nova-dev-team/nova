@@ -11,7 +11,7 @@ class <%= model_controller_class_name %>Controller < ApplicationController
   def new
     @<%= file_name %> = <%= class_name %>.new
   end
- 
+
   def create
     logout_keeping_session!
     @<%= file_name %> = <%= class_name %>.new(params[:<%= file_name %>])
@@ -72,7 +72,7 @@ class <%= model_controller_class_name %>Controller < ApplicationController
     @<%= file_name %>.destroy
     redirect_to <%= model_controller_routing_name %>_path
   end
-  
+
   # There's no page here to update or destroy a <%= file_name %>.  If you add those, be
   # smart -- make sure you check that the visitor is authorized to do so, that they
   # supply their old password along with a new one to update it, etc.

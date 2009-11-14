@@ -1,0 +1,20 @@
+[TODO]
+* write default configurations to conf.yaml
+  NOTES: configurable items:
+    - master_port: 2000
+    - master_uses_swiftiply: true
+    - master_swiftiply_back_port: 2100
+    - master_swiftiply_back_port_count: 10
+    - worker_port: 3000
+    - vm_network_bridge: novabr
+    - vm_hypervisor: kvm
+    - master_intranet_ip: blah-blah-blah
+    - master_internet_op: blah-blah-blah
+    - worker_intranet_ip: blah-blah-blah
+    - worker_vnc_port: 5900
+    - install_folder: /usr/lib/nova
+
+[DONE]
+* rename "common_lib" to "shared_lib"
+
+* merge "install" & "scripts" folder

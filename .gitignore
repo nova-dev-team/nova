@@ -5,10 +5,10 @@
 *.swp
 log/
 doc/
-scripts/
 tmp/
 *~
 *.sqlite3
 *.sqlite3-journal
 .hg/
 .hgignore
+*.orig.*
