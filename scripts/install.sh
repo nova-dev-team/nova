@@ -63,7 +63,9 @@ DEBS_PACKAGE_DIR=$PACKAGE_ROOT/debs
 
 mkdir -p $DEBS_PACKAGE_DIR/archives/partial
 all_debs=( $( cat $DEBS_LIST_FILE ) )
-(yes | apt-get install --reinstall -d -o dir::cache=$DEBS_PACKAGE_DIR ${all_debs[@]}) || exit 1
+if [[ $SINGLE_NODE == false ]]; then
+  (yes | apt-get install --reinstall -d -o dir::cache=$DEBS_PACKAGE_DIR ${all_debs[@]}) || exit 1
+fi
 
 # Phase 2: begin installing process
 

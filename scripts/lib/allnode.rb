@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 
+=begin
 require File.join(File.dirname(__FILE__), 'nodelist')
 
 def each_node cmd
@@ -39,4 +40,14 @@ else
     each_node(ARGV.join " ")
   end
 end
+=end
 
+require 'utils.rb'
+
+def all_node_exec cmd
+  all_nodes do |node|
+    puts node["intranet_ip"]
+  end
+end
+
+all_node_exec "hi"
