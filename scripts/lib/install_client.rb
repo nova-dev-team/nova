@@ -30,6 +30,14 @@ def do_install
 
 end
 
+def install_client node_ip, install_server
+  cmd = "ssh #{node_ip} 'mkdir -p #{nova_conf["install_folder"]}'"
+  sys_exec cmd
+  cmd = "scp -r ../* #{node_ip}:/#{nova_conf["install_folder"]}"
+  sys_exec cmd
+  cmd = "ssh #{node_ip} 'bash #{nova_conf["install_folder"]}/scripts/install.sh --single-node --install-server=#{install_server}'"
+end
+
 server_ip = nil
 server_port = -1
 
@@ -48,20 +56,26 @@ end
 
 TCPSocket.open(server_ip, server_port) do |sock|
   # do installation
-  sock.write "install started\n"
+  sock.write "install_started\n"
 
   do_install
 
-  sock.write "install finished\n"
+  sock.write "install_finished\n"
 
   loop do
-    sock.write "get_client\n"
-    sock.flush
-    line = sock.readline
-    break if line == "no more client"
-# TODO configure ssh-nopass before running this script
-    # TODO scp files to another node and install it
-    sleep rand
+    begin
+      sock.write "get_client\n"
+      line = sock.readline.chomp
+      break if line.start_with? "no_more_client"
+      # TODO configure ssh-nopass before running this script
+      if line.start_with? "install"
+        splt = line.split
+        install_client splt[1], "#{server_ip}:#{server_port}"
+      end
+      sleep rand
+    rescue
+      break
+    end
   end
 end
 

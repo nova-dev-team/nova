@@ -12,24 +12,65 @@ class InstallServer
     
     thread_list = []
 
+    client_status = {}
+    node_list = []
+    all_nodes do |node|
+      client_status[node["intranet_ip"]] = "not_installed"
+    end
+
+    # terminator
+    Thread.start do
+      loop do
+	assign_ip = nil
+	client_status.each do |key, value|
+	  if value == "not_installed"
+	    assign_ip = key
+	    break
+	  end
+	end
+	if assign_ip == nil
+	  puts "Finished installing all nodes"
+	  exit! 0
+	end
+	sleep 1
+      end
+    end
+
     loop do
       th = Thread.start(server_sock.accept) do |sock|
 	loop do
-	  line = sock.readline
-	  puts line
-	  if line == "get_client"
-	    sock.write "no more client\n"
-	  else
-	    sock.write "ack\n" # default ack message
+	  begin
+	    line = sock.readline.chomp
+	    puts line
+	    if line.start_with? "get_client"
+            # TODO add mutex!
+	      assign_ip = nil
+	      client_status.each do |key, value|
+		if value == "not_installed"
+		  assign_ip = key
+		  client_status[key] = "assigned"
+		  break
+		end
+	      end
+	      puts "Found assign ip = #{assign_ip}"
+	      client_ip = assign_ip
+	      if client_ip == nil
+	        sock.write "no_more_client\n"
+	      else
+		puts "Tell client to install " + assign_ip
+	        sock.write "install #{assign_ip}\n"
+	      end
+	    else
+	      sock.write "ack\n" # default ack message
+	    end
+	  rescue
+	    # TODO client error?
+	    break
 	  end
-	  sock.flush
         end
       end
       thread_list << th
 
-      if true # TODO close server after all nodes are installed
-	break
-      end
     end
 
     thread_list.each do |th|
