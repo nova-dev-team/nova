@@ -109,9 +109,14 @@ if [[ $SINGLE_NODE == false ]]; then
   echo "Phase 3: Configure the Nova system"
   rake system:config
 
+  # config ssh nopass
+  rake config:sshnopass
+
   clear
   echo "Phase 4: Install the Nova system"
   rake system:install
+
+  # TODO add an clean up script, cleans duplicate ssh authorized keys
 
 else
   echo "Phase 3: Configure a single node"
