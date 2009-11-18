@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + "/lib/utils.rb"
 require File.dirname(__FILE__) + "/lib/gen_node_yaml.rb"
 require File.dirname(__FILE__) + "/lib/install_server.rb"
+require File.dirname(__FILE__) + "/lib/ssh_nopass.rb"
 
 desc "Show brief intro"
 task :about do
@@ -43,6 +44,11 @@ task "config" do
 end
 
 namespace :config do
+
+  desc "Configure ssh-nopass"
+  task "sshnopass" do
+    ssh_nopass
+  end
 
   desc "Configure network bridge"
   task "netbr" do

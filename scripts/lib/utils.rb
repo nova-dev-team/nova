@@ -1,9 +1,11 @@
 require 'yaml'
 require 'socket'
+require 'fileutils'
 
 NOVA_ROOT = File.dirname(__FILE__) + "/../../"
 CONF_YAML = File.dirname(__FILE__) + '/../config/conf.yaml'
 NODE_YAML = File.dirname(__FILE__) + '/../config/node.yaml'
+TEMP_DIR = File.dirname(__FILE__) + "/../tmp/"
 
 def sys_exec cmd
   IO.popen(cmd) do |pipe|
@@ -53,3 +55,6 @@ def nova_conf
   YAML::load_file CONF_YAML
 end
 
+def ensure_temp_dir_exists
+  FileUtils.mkdir_p TEMP_DIR
+end
