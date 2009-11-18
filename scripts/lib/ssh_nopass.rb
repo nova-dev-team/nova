@@ -18,6 +18,7 @@ def ssh_nopass
 	sub_process = fork {
 	    system "scp #{TEMP_DIR}/allnodes-pubkey #{node["intranet_ip"]}:/root/.ssh/"
 	    system "ssh #{node["intranet_ip"]} 'cat /root/.ssh/allnodes-pubkey >> /root/.ssh/authorized_keys'"
+	    system "ssh #{node["intranet_ip"]} 'rm /root/.ssh/allnodes-pubkey'"
 	}
 	Process.waitpid sub_process
     end
