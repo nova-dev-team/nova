@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + "/lib/utils.rb"
 require File.dirname(__FILE__) + "/lib/gen_node_yaml.rb"
 require File.dirname(__FILE__) + "/lib/install_server.rb"
 require File.dirname(__FILE__) + "/lib/ssh_nopass.rb"
+require File.dirname(__FILE__) + "/lib/clean_ssh_nopass.rb"
 
 desc "Show brief intro"
 task :about do
@@ -34,6 +35,11 @@ namespace :clean do
   desc "Clean up log files"
   task :logs do
     puts "TODO"
+  end
+
+  desc "Clean up install files"
+  task :install do
+    cleanup_ssh_nopass
   end
 
 end

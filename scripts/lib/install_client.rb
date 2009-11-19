@@ -36,6 +36,7 @@ def install_client node_ip, install_server
   cmd = "scp -r ../* #{node_ip}:/#{nova_conf["install_folder"]}"
   sys_exec cmd
   cmd = "ssh #{node_ip} 'bash #{nova_conf["install_folder"]}/scripts/install.sh --single-node --install-server=#{install_server}'"
+  sys_exec cmd
 end
 
 server_ip = nil
@@ -56,15 +57,15 @@ end
 
 TCPSocket.open(server_ip, server_port) do |sock|
   # do installation
-  sock.write "install_started\n"
+  sock.write "install_started on node #{this_node["intranet_ip"]}\n"
 
   do_install
 
-  sock.write "install_finished\n"
+  sock.write "install_finished on node #{this_node["intranet_ip"]}\n"
 
   loop do
     begin
-      sock.write "get_client\n"
+      sock.write "get_client request from node #{this_node["intranet_ip"]}\n"
       line = sock.readline.chomp
       break if line.start_with? "no_more_client"
       # TODO configure ssh-nopass before running this script

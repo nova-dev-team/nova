@@ -116,10 +116,12 @@ if [[ $SINGLE_NODE == false ]]; then
   echo "Phase 4: Install the Nova system"
   rake system:install
 
-  # TODO add an clean up script, cleans duplicate ssh authorized keys
+  rake clean:install
 
 else
   echo "Phase 3: Configure a single node"
   ruby lib/install_client.rb $@
+
+  rake clean:install
 fi
 
