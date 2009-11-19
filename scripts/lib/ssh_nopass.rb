@@ -17,8 +17,7 @@ def ssh_nopass
 	puts "sending authorized key set to ip: #{node["intranet_ip"]}"
 	sub_process = fork {
 	    system "scp #{TEMP_DIR}/allnodes-pubkey #{node["intranet_ip"]}:/root/.ssh/"
-	    system "ssh #{node["intranet_ip"]} 'cat /root/.ssh/allnodes-pubkey >> /root/.ssh/authorized_keys'"
-	    system "ssh #{node["intranet_ip"]} 'rm /root/.ssh/allnodes-pubkey'"
+	    system "ssh #{node["intranet_ip"]} 'cat /root/.ssh/allnodes-pubkey >> /root/.ssh/authorized_keys && rm /root/.ssh/allnodes-pubkey'"
 	}
 	Process.waitpid sub_process
     end

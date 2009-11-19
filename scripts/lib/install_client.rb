@@ -35,7 +35,7 @@ def install_client node_ip, install_server
   sys_exec cmd
   cmd = "scp -r ../* #{node_ip}:/#{nova_conf["install_folder"]}"
   sys_exec cmd
-  cmd = "ssh #{node_ip} 'bash #{nova_conf["install_folder"]}/scripts/install.sh --single-node --install-server=#{install_server}'"
+  cmd = "ssh #{node_ip} 'cd #{nova_conf["install_folder"]}/scripts && bash install.sh --single-node --install-server=#{install_server}'"
   sys_exec cmd
 end
 
