@@ -1,19 +1,11 @@
 CC=gcc
-CCFLAGS=-Wall
+CFLAGS=-Wall
 
+all: ndss
 
-all: ndss_ctl ndss_server
-
-
-ndss_ctl: ndss_ctl.o
-	$(CC) ndss_ctl.o -o ndss_ctl
-
-
-ndss_server: ndss_server.o
-	$(CC) ndss_server.o -o ndss_server
-
+ndss: attr.o entry.o fetch.o main.o put.o remove.o rename.o serve.o 
+	$(CC) $(CFLAGS) *.o -o $@
 
 clean:
-	rm -f *.o *~ ndss_server ndss_ctl
-
+	rm -f *.o *~ ndss
 
