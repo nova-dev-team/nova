@@ -12,6 +12,30 @@ task "checkstyle" do
   puts "TODO check coding style"
 end
 
+# a helper function, generates obj file list for make file
+def obj_targets_from folder
+  targets = []
+  Dir.entries(folder).each do |e|
+    if e =~ /\.c$/
+      fn = e[0..-3]
+      targets << "obj/#{folder}_#{fn}.obj"
+    end
+  end
+  return targets
+end
+
+def obj_targets_build_rules_from folder
+  rules = ""
+  (obj_targets_from folder).collect do |obj|
+    fn = File.basename obj
+    fn = fn[(folder.length + 1)..-5] + ".c" # removes "$(folder)_" prefix & ".obj" postfix, then add ".c" post fix
+    rules += "#{obj}: #{folder}/#{fn}\n"
+    rules += "\t$(CC) $(CFLAGS) -c #{folder}/#{fn} -o #{obj}\n\n"
+  end
+  return rules
+end
+
+
 desc "Generate Makefile & include files"
 task "gen" do
   # gen make file
@@ -23,17 +47,31 @@ task "gen" do
 # Automatically generated at #{Time.now}
 
 CC=gcc
-CFLAGS=-Wall -O2
+CFLAGS=-Wall -Ixdk -Icore
 
 all: prepare ndss
 
-prepare:
+prepare: bin obj
+
+bin:
 	mkdir -p bin
+
+obj:
 	mkdir -p obj
 
-ndss:
+xdk: obj/libxdk.a
 
-test:
+obj/libxdk.a: #{(obj_targets_from "xdk").collect {|obj| obj + " "}}
+	ar cq obj/libxdk.a $^
+	ranlib obj/libxdk.a
+
+#{obj_targets_build_rules_from "xdk"}
+
+ndss: xdk #{(obj_targets_from "core").collect {|obj| obj + " "}}
+
+#{obj_targets_build_rules_from "core"}
+
+test: prepare ndss xdk
 
 clean:
 	rm -rf bin
