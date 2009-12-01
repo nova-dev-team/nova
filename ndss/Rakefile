@@ -24,12 +24,38 @@ def obj_targets_from folder
   return targets
 end
 
+def hfile_full_path hfile
+  # find .h file in "xdk" & "core"
+  Dir.entries("xdk").each do |e|
+    return "xdk/#{hfile}" if hfile == e
+  end
+
+  Dir.entries("core").each do |e|
+    return "core/#{hfile}" if hfile == e
+  end
+end
+
+def depend_hfiles src_file
+  hfiles = []
+  File.open(src_file, "r") do |f|
+    f.each_line do |line|
+      line = line.strip
+      if line =~ /^#include \"/
+        hfile = line[10..-2]
+        puts src_file + " depends on " + (hfile_full_path hfile)
+        hfiles << (hfile_full_path hfile)
+      end
+    end
+  end
+  return hfiles
+end
+
 def obj_targets_build_rules_from folder
   rules = ""
   (obj_targets_from folder).collect do |obj|
     fn = File.basename obj
     fn = fn[(folder.length + 1)..-5] + ".c" # removes "$(folder)_" prefix & ".obj" postfix, then add ".c" post fix
-    rules += "#{obj}: #{folder}/#{fn}\n"
+    rules += "#{obj}: #{folder}/#{fn} #{(depend_hfiles "#{folder}/#{fn}").collect {|f| f + " "}}\n"
     rules += "\t$(CC) $(CFLAGS) -c #{folder}/#{fn} -o #{obj}\n\n"
   end
   return rules
@@ -67,7 +93,10 @@ obj/libxdk.a: #{(obj_targets_from "xdk").collect {|obj| obj + " "}}
 
 #{obj_targets_build_rules_from "xdk"}
 
-ndss: xdk #{(obj_targets_from "core").collect {|obj| obj + " "}}
+ndss: bin/ndss
+
+bin/ndss: xdk #{(obj_targets_from "core").collect {|obj| obj + " "}}
+	$(CC) $(CFLAGS) obj/libxdk.a #{(obj_targets_from "core").collect {|obj| obj + " "}} -o bin/ndss
 
 #{obj_targets_build_rules_from "core"}
 
@@ -140,3 +169,8 @@ INCLUDE_NDSS
 
 end
 
+
+task "default" do
+  puts "Run 'rake -T' to get list of functions"
+  puts "Run 'rake gen' to generate Makefile"
+end
