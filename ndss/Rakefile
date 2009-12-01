@@ -3,12 +3,12 @@
 
 
 desc "Report status"
-task "report" do
+task "stats" do
   puts "TODO report status"
 end
 
 desc "Check coding style"
-task "checkstyle" do
+task "check" do
   puts "TODO check coding style"
 end
 
@@ -33,6 +33,8 @@ def hfile_full_path hfile
   Dir.entries("core").each do |e|
     return "core/#{hfile}" if hfile == e
   end
+
+  raise "File '#{hfile}' not found!"
 end
 
 def depend_hfiles src_file
@@ -50,6 +52,30 @@ def depend_hfiles src_file
   return hfiles
 end
 
+def depend_obj_files src_file
+  hfiles = depend_hfiles src_file
+end
+
+def test_targets_build_rules
+  rules = ""
+  all_test_targets.collect do |target|
+    src_file = "test/" + target[4..-1] + ".c"
+    hfiles = depend_hfiles src_file
+    objfiles = hfiles.collect do |h|
+      splt = h.split '/'
+      if splt[0] == "xdk"
+        "obj/libxdk.a"
+      else
+        "obj/" + splt[0] + "_" + splt[1][0..-3] + ".obj"
+      end
+    end
+    objfiles = objfiles.uniq
+    rules += "#{target}: #{src_file} #{hfiles.collect {|h| h + " "}} #{objfiles.collect {|obj| obj + " "}}\n"
+    rules += "\t$(CC) $(CFLAGS) #{src_file} #{objfiles.collect {|obj| obj + " "}} -o #{target}\n\n"
+  end
+  return rules
+end
+
 def obj_targets_build_rules_from folder
   rules = ""
   (obj_targets_from folder).collect do |obj|
@@ -61,6 +87,15 @@ def obj_targets_build_rules_from folder
   return rules
 end
 
+def all_test_targets
+  targets = []
+  Dir.entries("test").each do |e|
+    if e =~ /^test_.*\.c/
+      targets << ("bin/" + e[0..-3])
+    end
+  end
+  return targets
+end
 
 desc "Generate Makefile & include files"
 task "gen" do
@@ -100,7 +135,9 @@ bin/ndss: obj/libxdk.a #{(obj_targets_from "core").collect {|obj| obj + " "}}
 
 #{obj_targets_build_rules_from "core"}
 
-test: prepare ndss xdk
+test: prepare ndss xdk #{all_test_targets.collect {|target| target + " "}}
+
+#{test_targets_build_rules}
 
 clean:
 	rm -rf bin
@@ -169,6 +206,34 @@ INCLUDE_NDSS
 
 end
 
+
+desc "Run all test cases"
+task "test" do
+  system "make test"
+  result = {}
+  Dir.entries("bin").each do |e|
+    if e =~ /^test_/
+      puts "== running test 'bin/#{e}' =="
+      ret = system "cd bin && ./#{e}"
+      result[e] = ret
+      if ret
+        puts "-- success --\n\n"
+      else
+        puts "-- failure --\n\n"
+      end
+    end
+  end
+
+  puts "\n\n=== final report ===\n"
+  puts "-- success:\n"
+  result.each do |k, v|
+    puts "  #{k}" if v == true
+  end
+  puts "\n-- failure:\n"
+  result.each do |k, v|
+    puts "* #{k}" if v == false
+  end
+end
 
 task "default" do
   puts "Run 'rake -T' to get list of functions"

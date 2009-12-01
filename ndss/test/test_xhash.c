@@ -1,0 +1,48 @@
+#include <stdio.h>
+
+#include "xhash.h"
+#include "xmemory.h"
+
+// hash function for int-int hash table
+int ii_hash_func(void* key) {
+  return (int) key;
+}
+
+// eql function for int-int hash table
+int ii_eql_func(void* key1, void* key2) {
+  return (int) key1 == (int) key2;
+}
+
+// free function for int-int hash table
+void ii_free_func(void* key, void* value) {
+  // do nothing
+}
+
+void test_int_int_hash() {
+  xhash xh;
+  int i;
+  xhash_init(&xh, ii_hash_func, ii_eql_func, ii_free_func);
+  for (i = 0; i < 190000; i++) {
+    xhash_put(&xh, (void *) i, (void *) i);
+  }
+  for (i = 0; i < 189900; i++) {
+    xhash_remove(&xh, (void *) i);
+  }
+  for (i = 189900; i < 190000; i++) {
+    void* ptr = xhash_get(&xh, (void *) i);
+    int val = (int) ptr;
+    printf("val=%d\n", val);
+  }
+  printf("xh->base_size=%d\n", xh.base_size);
+  printf("xh->extend_level=%d\n", xh.extend_level);
+  printf("xh->entry_count=%d\n", xh.entry_count);
+  printf("xh->extend_ptr=%d\n", xh.extend_ptr);
+  printf("xmem_usage=%d\n", xmem_use());
+  xhash_release(&xh);
+  printf("xmem_usage=%d\n", xmem_use());
+}
+
+int main() {
+  test_int_int_hash();
+  return xmem_use();
+}
