@@ -95,7 +95,7 @@ obj/libxdk.a: #{(obj_targets_from "xdk").collect {|obj| obj + " "}}
 
 ndss: bin/ndss
 
-bin/ndss: xdk #{(obj_targets_from "core").collect {|obj| obj + " "}}
+bin/ndss: obj/libxdk.a #{(obj_targets_from "core").collect {|obj| obj + " "}}
 	$(CC) $(CFLAGS) obj/libxdk.a #{(obj_targets_from "core").collect {|obj| obj + " "}} -o bin/ndss
 
 #{obj_targets_build_rules_from "core"}
@@ -128,7 +128,7 @@ INCLUDE_README
 
     Dir.entries("xdk").each do |e|
       # NOTE could blacklist unwanted .h files
-      include_list += "#include \"#{e}\"\n" if e =~ /\.h$/
+      include_list += "#include \"../xdk/#{e}\"\n" if e =~ /\.h$/
     end
 
     f.write <<INCLUDE_XDK
@@ -150,7 +150,7 @@ INCLUDE_XDK
 
     Dir.entries("core").each do |e|
       # NOTE could blacklist unwanted .h files
-      include_list += "#include \"#{e}\"\n" if e =~ /\.h$/
+      include_list += "#include \"../core/#{e}\"\n" if e =~ /\.h$/
     end
 
     f.write <<INCLUDE_NDSS
