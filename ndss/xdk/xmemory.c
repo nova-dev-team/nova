@@ -24,7 +24,7 @@ void* xrealloc(void* ptr, int new_size) {
   return realloc(ptr, new_size);
 }
 
-int xmem_use() {
+int xmem_usage() {
   return _xmalloc_counter;
 }
 
