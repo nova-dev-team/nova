@@ -20,6 +20,10 @@ void xfree(void* ptr) {
   free(ptr);
 }
 
+void* xrealloc(void* ptr, int new_size) {
+  return realloc(ptr, new_size);
+}
+
 int xmem_use() {
   return _xmalloc_counter;
 }
