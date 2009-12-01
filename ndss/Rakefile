@@ -95,7 +95,7 @@ obj/libxdk.a: #{(obj_targets_from "xdk").collect {|obj| obj + " "}}
 
 ndss: bin/ndss
 
-bin/ndss: xdk #{(obj_targets_from "core").collect {|obj| obj + " "}}
+bin/ndss: obj/libxdk.a #{(obj_targets_from "core").collect {|obj| obj + " "}}
 	$(CC) $(CFLAGS) obj/libxdk.a #{(obj_targets_from "core").collect {|obj| obj + " "}} -o bin/ndss
 
 #{obj_targets_build_rules_from "core"}
