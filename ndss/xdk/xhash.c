@@ -3,8 +3,8 @@
 #include "xhash.h"
 #include "xmemory.h"
 
-#define XHASH_INIT_SLOT_COUNT 4
-#define XHASH_THRESHOLD 5
+#define XHASH_INIT_SLOT_COUNT 16
+#define XHASH_THRESHOLD 3
 
 #define ALLOC(ty, n) ((ty *) xmalloc(sizeof(ty) * (n)))
 #define REALLOC(ty, ptr, n) (ty *) xrealloc(ptr, sizeof(ty) * (n))

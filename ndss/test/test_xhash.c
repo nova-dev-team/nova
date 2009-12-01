@@ -37,12 +37,12 @@ void test_int_int_hash() {
   printf("xh->extend_level=%d\n", xh.extend_level);
   printf("xh->entry_count=%d\n", xh.entry_count);
   printf("xh->extend_ptr=%d\n", xh.extend_ptr);
-  printf("xmem_usage=%d\n", xmem_use());
+  printf("xmem_usage=%d\n", xmem_usage());
   xhash_release(&xh);
-  printf("xmem_usage=%d\n", xmem_use());
+  printf("xmem_usage=%d\n", xmem_usage());
 }
 
 int main() {
   test_int_int_hash();
-  return xmem_use();
+  return xmem_usage();
 }

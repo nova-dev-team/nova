@@ -14,7 +14,7 @@ static void test_array_alloc() {
   for (i = 0; i < n; i++) {
     ptr[i] = (int *) xmalloc(sizeof(int) * n);
   }
-  printf("memeory_usage=%d\n", xmem_use());
+  printf("memeory_usage=%d\n", xmem_usage());
   for (i = 0; i < n; i++) {
     xfree(ptr[i]);
   }
@@ -29,5 +29,5 @@ int main() {
   test_single_alloc();
   test_array_alloc();
   test_multi_thread_alloc();
-  return xmem_use();
+  return xmem_usage();
 }
