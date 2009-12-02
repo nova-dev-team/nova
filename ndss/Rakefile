@@ -38,6 +38,10 @@ def hfile_full_path hfile
     return "include/#{hfile}" if hfile == e
   end
 
+  Dir.entries("app").each do |e|
+    return "app/#{hfile}" if hfile == e
+  end
+
   raise "File '#{hfile}' not found!"
 end
 
