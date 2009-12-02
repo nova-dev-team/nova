@@ -1,6 +1,7 @@
 #include <stdio.h>
 
-#include "xutils.h"
+#include "ndss.h"
+#include "xdk.h"
 
 int main(int argc, char *argv[]) {
   printf("NDSS - Nova Distributed Storage System\n");
