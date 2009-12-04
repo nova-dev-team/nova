@@ -1,234 +1,207 @@
 # Helper Rakefile for ndss project
 # Author: Santa Zhang
 
+require 'find'
 
-desc "Report status"
-task "stats" do
-  puts "TODO report status"
+BUILD_MODULES = ["app", "core", "test", "xdk"]
+DEFAULT_BUILD_MODULES = ["app"]
+
+$g_depend = {}
+
+def has_main_entry? file
+  File.open(file).read =~ /^int main\(/
 end
 
-desc "Check coding style"
-task "check" do
-  puts "TODO check coding style"
-end
-
-# a helper function, generates obj file list for make file
-def obj_targets_from folder
-  targets = []
-  Dir.entries(folder).each do |e|
-    if e =~ /\.c$/
-      fn = e[0..-3]
-      targets << "obj/#{folder}_#{fn}.obj"
-    end
-  end
-  return targets
-end
-
-def hfile_full_path hfile
-  # find .h file in "xdk" & "core"
-  Dir.entries("xdk").each do |e|
-    return "xdk/#{hfile}" if hfile == e
-  end
-
-  Dir.entries("core").each do |e|
-    return "core/#{hfile}" if hfile == e
-  end
-
-  Dir.entries("include").each do |e|
-    return "include/#{hfile}" if hfile == e
-  end
-
-  Dir.entries("app").each do |e|
-    return "app/#{hfile}" if hfile == e
-  end
-
-  raise "File '#{hfile}' not found!"
-end
-
-def depend_hfiles src_file
-  hfiles = []
-  File.open(src_file, "r") do |f|
-    f.each_line do |line|
+def depended_obj file
+  list = []
+  File.open(file) do |src_f|
+    src_f.each_line do |line|
       line = line.strip
-      if line =~ /^#include \"/
-        hfile = line[10..-2]
-        puts src_file + " depends on " + (hfile_full_path hfile)
-        hfiles << (hfile_full_path hfile)
+      if line =~ /#include \"/
+        header = line[10..-2]
+        all_src_files.each do |f|
+          if f.end_with? header
+            list << "obj/#{f[0..-3]}.o"
+          end
+        end
       end
     end
   end
-  return hfiles
+  return list
 end
 
-def depend_obj_files src_file
-  hfiles = depend_hfiles src_file
+def depended_header file
+  (depended_obj file).map do |obj|
+    obj[4..-3] + ".h"
+  end
 end
 
-def test_targets_build_rules
-  rules = ""
-  all_test_targets.collect do |target|
-    src_file = "test/" + target[4..-1] + ".c"
-    hfiles = depend_hfiles src_file
-    objfiles = hfiles.collect do |h|
-      splt = h.split '/'
-      if splt[0] == "xdk"
-        "obj/libxdk.a"
-      elsif splt[0] == "core"
-        "obj/libndss.a"
-      elsif splt[0] == "include"
-        "obj/lib" + splt[1][0..-3] + ".a"
+def all_targets_in_module mod
+  depend = {mod => ["bin", "obj"]}
+  action = {mod => []}
+
+  Find.find(mod) do |path|
+    next if FileTest.directory? path
+    if path =~ /\.c$/
+      obj_name = "obj/#{path[0..-3] + ".o"}"
+      if has_main_entry? path
+        bin_name = "bin/#{(File.basename path)[0..-3]}"
+        depend[mod] << bin_name
+
+        depend[bin_name] = [] if depend[bin_name] == nil
+        depend[bin_name] << obj_name
+        depend[bin_name] << (depended_obj path)
+
+        action[bin_name] = [] if action[bin_name] == nil
+        action[bin_name] << "$(CC) $(CFLAGS) #{path} #{(depended_obj path).join " "} -o #{bin_name}"
+      end
+
+      depend[mod] << obj_name
+
+      depend[obj_name] = [] if depend[obj_name] == nil
+      depend[obj_name] << path
+      depend[obj_name] << (depended_header path)
+
+      action[obj_name] = [] if action[obj_name] == nil
+      action[obj_name] << "$(CC) $(CFLAGS) -c #{path} -o #{obj_name}"
+    end
+  end
+
+  content = ""
+  depend.keys.each do |target|
+    $g_depend[target] = depend[target]
+    content += <<CONTENT
+#{target}: #{depend[target].join " "}
+#{action[target].collect {|act| "\t#{act}\n"}}
+CONTENT
+  end
+
+  return content
+end
+
+def gen_make_targets
+  content = ""
+  BUILD_MODULES.each do |mod|
+    content += all_targets_in_module mod
+    content += "\n"
+  end
+
+  content += "all: bin obj "
+  $g_depend.keys.each do |target|
+    if target =~ /\.o$/ or target =~ /^bin\//
+      content += target + " "
+    end
+  end
+  content += "\n\n"
+  return content
+end
+
+# return a list of all source files (.h, .c)
+# like find . -iname *.h && find . -iname *.c
+def all_src_files
+  list = []
+  BUILD_MODULES.each do |mod|
+    Find.find(mod) do |path|
+      if FileTest.directory? path
+        # do nothing
+      elsif path =~ /\.(c|h)$/
+        list << path
+      end
+    end
+  end
+  return list
+end
+
+# assert that there is no duplicate file name in any folder
+# note that folder1/a.c and folder2/a.c are duplicated!
+def assert_no_duplicate_fname
+  inverse_map = {}
+  all_src_files.each do |path|
+    base_name = File.basename path
+    if inverse_map.has_key? base_name
+      raise "Duplicate file name: '#{path}' & '#{inverse_map[base_name]}'"
+    end
+    inverse_map[base_name] = path
+  end
+end
+
+# ensure that every .c file either has an associated .h file, or they have main() entry
+def assert_src_header_pair
+  flist = all_src_files
+  flist.each do |path|
+    if path =~ /\.c$/
+      header_path = path[0..-3] + ".h"
+      if has_main_entry? path
+        # has main() entry, so there should not be a .h file
+        raise "'#{path}' already have main() entry, so '#{header_path}' is not needed!" if flist.include? header_path
       else
-        "obj/" + splt[0] + "_" + splt[1][0..-3] + ".obj"
+        # does not have main() entry, so it must have a .h file
+        raise "'#{path}' found, but '#{header_path}' does not exist!" unless flist.include? header_path
       end
     end
-    objfiles = objfiles.uniq
-    rules += "#{target}: #{src_file} #{hfiles.collect {|h| h + " "}} #{objfiles.collect {|obj| obj + " "}}\n"
-    rules += "\t$(CC) $(CFLAGS) #{src_file} #{objfiles.collect {|obj| obj + " "}} -o #{target}\n\n"
   end
-  return rules
 end
 
-def obj_targets_build_rules_from folder
-  rules = ""
-  (obj_targets_from folder).collect do |obj|
-    fn = File.basename obj
-    fn = fn[(folder.length + 1)..-5] + ".c" # removes "$(folder)_" prefix & ".obj" postfix, then add ".c" post fix
-    rules += "#{obj}: #{folder}/#{fn} #{(depend_hfiles "#{folder}/#{fn}").collect {|f| f + " "}}\n"
-    rules += "\t$(CC) $(CFLAGS) -c #{folder}/#{fn} -o #{obj}\n\n"
+desc "Do style checking"
+task :check do
+  puts "Checking project..."
+  puts "List of files to be checked:"
+  all_src_files.each do |f|
+    puts "  #{f}"
   end
-  return rules
-end
-
-def all_test_targets
-  targets = []
-  Dir.entries("test").each do |e|
-    if e =~ /^test_.*\.c/
-      targets << ("bin/" + e[0..-3])
-    end
-  end
-  return targets
+  puts "--"
+  assert_no_duplicate_fname
+  puts "No duplicate file name"
+  assert_src_header_pair
+  puts "All .c files either has got a .h file, or they have main() entry"
+# TODO style checking
+  puts "Finished checking"
 end
 
 desc "Generate Makefile & include files"
-task "gen" do
-  # gen make file
+task :gen => :check do
+  puts "Generating Makefile"
+  puts "==================="
   File.open("Makefile", "w") do |mf|
-    mf.write <<MF_EOF
+    
+    mf_content = <<MF_EOF
 # WARNING! This file is automatically generated by "rake gen".
 # WARNING! Any modification to it would be lost after another "rake gen" operation!
 
 # Automatically generated at #{Time.now}
 
 CC=gcc
-CFLAGS=-Wall -Ixdk -Icore -Iinclude
+CFLAGS=-Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
 
-all: prepare ndss
-
-prepare: bin obj
+default: bin obj #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
 
 bin:
 	mkdir -p bin
 
 obj:
-	mkdir -p obj
-
-xdk: obj/libxdk.a
-
-obj/libxdk.a: #{(obj_targets_from "xdk").collect {|obj| obj + " "}}
-	ar cq obj/libxdk.a $^
-	ranlib obj/libxdk.a
-
-#{obj_targets_build_rules_from "xdk"}
-
-ndss: bin/ndss
-
-obj/libndss.a: #{(obj_targets_from "core").collect {|obj| obj + " "}}
-	ar cq obj/libndss.a $^
-	ranlib obj/libndss.a
-
-bin/ndss: obj/libndss.a obj/libxdk.a #{(obj_targets_from "app").collect {|obj| obj + " "}}
-	$(CC) $(CFLAGS) obj/libndss.a obj/libxdk.a #{(obj_targets_from "app").collect {|obj| obj + " "}} -o bin/ndss
-
-#{obj_targets_build_rules_from "core"}
-
-#{obj_targets_build_rules_from "app"}
-
-test: prepare ndss xdk #{all_test_targets.collect {|target| target + " "}}
-
-#{test_targets_build_rules}
+#{BUILD_MODULES.collect {|mod| "\tmkdir -p obj/#{mod}\n"}}
 
 clean:
 	rm -rf bin
 	rm -rf obj
 
+#{gen_make_targets}
+
 MF_EOF
+    print mf_content
+    mf.write mf_content
   end
-
-  # gen include files
-  `mkdir -p include`
-  File.open("include/README", "w") do |f|
-    f.write <<INCLUDE_README
-All files in this folder is automatically generated by "rake gen". Any modification
-to these files would be lost after another "rake gen" operation!
-
-Automatically generated at #{Time.now}
-INCLUDE_README
-  end
-
-  File.open("include/xdk.h", "w") do |f|
-    include_list = ""
-
-    Dir.entries("xdk").each do |e|
-      # NOTE could blacklist unwanted .h files
-      include_list += "#include \"../xdk/#{e}\"\n" if e =~ /\.h$/
-    end
-
-    f.write <<INCLUDE_XDK
-// WARNING! This file is automatically generated by "rake gen".
-// WARNING! Any modification to it would be lost after another "rake gen" operation!
-
-// Automatically generated at #{Time.now}
-
-#ifndef XDK_H_
-#define XDK_H_
-
-#{include_list}
-#endif
-INCLUDE_XDK
-  end
-
-  File.open("include/ndss.h", "w") do |f|
-    include_list = ""
-
-    Dir.entries("core").each do |e|
-      # NOTE could blacklist unwanted .h files
-      include_list += "#include \"../core/#{e}\"\n" if e =~ /\.h$/
-    end
-
-    f.write <<INCLUDE_NDSS
-// WARNING! This file is automatically generated by "rake gen".
-// WARNING! Any modification to it would be lost after another "rake gen" operation!
-
-// Automatically generated at #{Time.now}
-
-#ifndef NDSS_H_
-#define NDSS_H_
-
-#{include_list}
-#endif
-INCLUDE_NDSS
-  end
-
 end
 
-
 desc "Run all test cases"
-task "test" do
+task :test do
   system "make test"
   result = {}
-  Dir.entries("bin").each do |e|
-    if e =~ /^test_/
-      puts "== running test 'bin/#{e}' =="
+  Find.find("test") do |f|
+    next if FileTest.directory? f
+    if f =~ /\.c$/ and has_main_entry? f
+      e = (File.basename f)[0..-3]
+      puts "== running test 'bin/#{e}'"
       ret = system "cd bin && ./#{e}"
       result[e] = ret
       if ret
@@ -250,7 +223,8 @@ task "test" do
   end
 end
 
-task "default" do
+task :default do
   puts "Run 'rake -T' to get list of functions"
   puts "Run 'rake gen' to generate Makefile"
 end
+
