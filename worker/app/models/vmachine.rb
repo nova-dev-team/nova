@@ -70,11 +70,11 @@ CDROM_DESC
 
     if params[:hda] != nil and params[:hda] != ""
       FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
-      if VdiskNaming::vdisk_type(params[:hda]).start_with? "sys"
-        real_hda_filename = "vd-notsaved-#{params[:uuid]}-hda.qcow2"
-      else
+      #if VdiskNaming::vdisk_type(params[:hda]).start_with? "sys"
+      #  real_hda_filename = "vd-notsaved-#{params[:uuid]}-hda.qcow2"
+      #else
         real_hda_filename = params[:hda]
-      end
+      #end
       hda_desc = <<HDA_DESC
     <disk type='file' device='disk'>
       <source file='#{Setting.vmachines_root}/#{params[:name]}/#{real_hda_filename}'/>

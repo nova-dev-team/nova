@@ -1,3 +1,2 @@
-*.o
-ndss_server
-ndss_ctl
+obj/
+bin/

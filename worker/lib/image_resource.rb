@@ -136,11 +136,11 @@ module ImageResource
         FileUtils.ln_s local_filename, "#{vm_dir}/#{vdisk_name}"
       end
 
-      if device != nil and VdiskNaming.system_disk? vdisk_name
-        cow_disk_name = "vd-notsaved-#{uuid}-#{device}.qcow2"
-        qcow2_cmd = "qemu-img create -b #{vm_dir}/#{vdisk_name} -f qcow2 #{vm_dir}/#{cow_disk_name}"
-        `#{qcow2_cmd}`
-      end
+      #if device != nil and VdiskNaming.system_disk? vdisk_name
+      #  cow_disk_name = "vd-notsaved-#{uuid}-#{device}.qcow2"
+      #  qcow2_cmd = "qemu-img create -b #{vm_dir}/#{vdisk_name} -f qcow2 #{vm_dir}/#{cow_disk_name}"
+      #  `#{qcow2_cmd}`
+      #end
 
     when "usr", "usr.cow"
       FileUtils.mv local_filename, "#{vm_dir}/#{vdisk_name}"
