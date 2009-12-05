@@ -53,7 +53,7 @@ def all_targets_in_module mod
         depend[bin_name] << (depended_obj path)
 
         action[bin_name] = [] if action[bin_name] == nil
-        action[bin_name] << "$(CC) $(CFLAGS) #{obj_name} #{(depended_obj path).join " "} -o #{bin_name}"
+        action[bin_name] << "$(CC) $(CFLAGS) $(LDFLAGS) #{obj_name} #{(depended_obj path).join " "} -o #{bin_name}"
       end
 
       depend[mod] << obj_name
@@ -172,6 +172,7 @@ task :gen => :check do
 
 CC=gcc
 CFLAGS=-Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
+LDFLAGS=-lpthread
 
 default: bin obj #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
 

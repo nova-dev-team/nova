@@ -3,5 +3,7 @@
 
 int ndss_ftp(int argc, char* argv[]);
 
+void ndss_ftp_help();
+
 #endif
 
