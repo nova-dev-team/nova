@@ -12,7 +12,31 @@ def has_main_entry? file
   File.open(file).read =~ /^int main\(/
 end
 
+# finds all depended obj file, including inherit dependency
 def depended_obj file
+  visited = []
+  not_visited = depended_header file
+  
+  loop do
+    break if not_visited.length == 0
+    header = not_visited[0]
+    c_src = header[0..-3] + ".c"
+    depended_header(c_src).each do |h|
+      (not_visited << h) if not (not_visited.include? h or visited.include? h)
+    end
+    not_visited.delete header
+    visited << header
+  end
+
+  obj_list = visited.map do |header|
+    "obj/#{header[0..-3]}.o"
+  end
+
+  return obj_list
+end
+
+# finds all directly depended header files, without inherit dependency
+def depended_header file
   list = []
   File.open(file) do |src_f|
     src_f.each_line do |line|
@@ -21,19 +45,13 @@ def depended_obj file
         header = line[10..-2]
         all_src_files.each do |f|
           if f.end_with? header
-            list << "obj/#{f[0..-3]}.o"
+            list << f
           end
         end
       end
     end
   end
   return list
-end
-
-def depended_header file
-  (depended_obj file).map do |obj|
-    obj[4..-3] + ".h"
-  end
 end
 
 def all_targets_in_module mod
@@ -53,7 +71,7 @@ def all_targets_in_module mod
         depend[bin_name] << (depended_obj path)
 
         action[bin_name] = [] if action[bin_name] == nil
-        action[bin_name] << "$(CC) $(CFLAGS) #{obj_name} #{(depended_obj path).join " "} -o #{bin_name}"
+        action[bin_name] << "$(CC) $(CFLAGS) $(LDFLAGS) #{obj_name} #{(depended_obj path).join " "} -o #{bin_name}"
       end
 
       depend[mod] << obj_name
@@ -172,6 +190,7 @@ task :gen => :check do
 
 CC=gcc
 CFLAGS=-Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
+LDFLAGS=-lpthread
 
 default: bin obj #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
 

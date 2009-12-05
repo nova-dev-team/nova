@@ -36,7 +36,7 @@ typedef void (*xhash_free)(void* key, void* value);
   @brief
     Hash entry type.
 */
-typedef struct hash_entry {
+typedef struct xhash_entry {
   void* key;  ///< @brief Key of the hash entry.
   void* value;  ///< @brief Value of the hash entry.
   struct xhash_entry* next; ///< @brief Link to next hash entry (linked hashtable entry).
