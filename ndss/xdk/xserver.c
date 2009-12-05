@@ -57,14 +57,14 @@ int xserver_serve(xserver* xs) {
   return 0;
 }
 
-static void* xserve_wrapper(void* arg) {
+static void* xserver_serve_wrapper(void* arg) {
   xserver_serve((xserver*) arg);
   return NULL;
 }
 
 int xserve_in_new_thread(xserver* xs) {
   pthread_t tid;
-  if (pthread_create(&tid, NULL, xserve_wrapper, (void *) xs) != 0) {
+  if (pthread_create(&tid, NULL, xserver_serve_wrapper, (void *) xs) != 0) {
     return -1;
   } else {
     return (int) tid;

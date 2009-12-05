@@ -70,7 +70,7 @@ void xserver_init(xserver* xs, int port, int backlog, xserver_acceptor acceptor)
   To prevent blocking, use xserve_in_new_thread() instead.
 
   @return
-    -1 if failed to listen
+    -1 if failed to listen.
 */
 int xserver_serve(xserver* xs);
 
