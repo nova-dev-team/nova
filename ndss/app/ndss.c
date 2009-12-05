@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "xmemory.h"
+#include "xserver.h"
 
 #include "ndss-ftp.h"
 
