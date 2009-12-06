@@ -22,8 +22,15 @@
 
   @param client_sockfd
     The file descriptor of client socket.
+  @param client_addr
+    The client's address info
+  @param sin_size
+    The memory size of client_addr
+
+  @warning
+    Do not xfree() client_addr, it will be automatically xfree()'d after execution!
 */
-typedef void (*xserver_acceptor)(int client_sockfd);
+typedef void (*xserver_acceptor)(int client_sockfd, struct sockaddr* client_addr, int sin_size);
 
 /**
   @brief

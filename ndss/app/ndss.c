@@ -4,7 +4,7 @@
 
 #include "xmemory.h"
 
-#include "ndss-ftp.h"
+#include "ndss_ftp.h"
 
 typedef int (*ndss_action)(int argc, char* argv[]);
 typedef void (*ndss_action_help)();

@@ -43,11 +43,7 @@ def depended_header file
       line = line.strip
       if line =~ /#include \"/
         header = line[10..-2]
-        all_src_files.each do |f|
-          if f.end_with? header
-            list << f
-          end
-        end
+        list.concat(all_src_files.select {|f| f.end_with? header})
       end
     end
   end
@@ -179,7 +175,6 @@ end
 desc "Generate Makefile & include files"
 task :gen => :check do
   puts "Generating Makefile"
-  puts "==================="
   File.open("Makefile", "w") do |mf|
     
     mf_content = <<MF_EOF
@@ -207,7 +202,6 @@ clean:
 #{gen_make_targets}
 
 MF_EOF
-    print mf_content
     mf.write mf_content
   end
 end
