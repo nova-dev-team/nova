@@ -28,7 +28,7 @@ static void get_client_addr_str(struct sockaddr* client_addr, char* addr_str) {
   xitoa(client_addr_in->sin_port, addr_str + pos + 1, 10);
 }
 
-static void strip_trailing_newline(char* str) {
+static void strip_trailing_crlf(char* str) {
   // abc\r\n -> abc
   int pos = strlen(str) - 1;
   while (pos >= 0 && (str[pos] == '\r' || str[pos] == '\n')) {
@@ -79,7 +79,7 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
 
     } else if (xstr_startwith(ibuf, "PASS")) {
       strcpy(password, ibuf + 5);
-      strip_trailing_newline(password);
+      strip_trailing_crlf(password);
 
       // TODO user authentication
       printf("[ftp] TODO authentication, user %s with password (quoted) '%s'\n", username, password);
