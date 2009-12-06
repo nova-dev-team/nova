@@ -175,7 +175,6 @@ end
 desc "Generate Makefile & include files"
 task :gen => :check do
   puts "Generating Makefile"
-  puts "==================="
   File.open("Makefile", "w") do |mf|
     
     mf_content = <<MF_EOF
@@ -203,7 +202,7 @@ clean:
 #{gen_make_targets}
 
 MF_EOF
-    print mf_content
+#    print mf_content
     mf.write mf_content
   end
 end

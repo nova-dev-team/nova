@@ -2,7 +2,7 @@
 
 #include "xserver.h"
 
-#include "ndss-ftp.h"
+#include "ndss_ftp.h"
 
 void ndss_ftp_help() {
   printf("usage: ndss ftp <-p port> [base_dir]\n");
