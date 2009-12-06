@@ -202,7 +202,6 @@ clean:
 #{gen_make_targets}
 
 MF_EOF
-#    print mf_content
     mf.write mf_content
   end
 end
