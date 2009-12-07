@@ -1,5 +1,7 @@
 #include <stddef.h>
 #include <string.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #include "xmemory.h"
 #include "xutils.h"
@@ -71,5 +73,40 @@ char* xstr_strip(char* str) {
   str[i] = '\0';
   
   return str;
+}
+
+int xinet_ip2str(int ip, char* str) {
+  unsigned char* p = (unsigned char *) &ip;
+  int i;
+  char seg_str[4];
+  str[0] = '\0';
+
+  // TODO big endian? small endian?
+  for (i = 3; i >= 0; i--) {
+    int seg = p[i];
+    xitoa(seg, seg_str, 10);
+    strcat(str, seg_str);
+    if (i != 0) {
+      strcat(str, ".");
+    }
+  }
+  return 0;
+}
+
+int xinet_get_sockaddr(char* host, int port, struct sockaddr_in* addr) {
+  in_addr_t a;
+  bzero(addr, sizeof(*addr));
+  addr->sin_family = AF_INET;
+  a = inet_addr(host);
+  if (a != INADDR_NONE) {
+    addr->sin_addr.s_addr = a;
+  } else {
+    struct hostent *hp = gethostbyname(host);
+    if (hp == 0 || hp->h_length != 4) {
+      return -1;
+    }
+  }
+  addr->sin_port = htons(port);
+  return 0;
 }
 

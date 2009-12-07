@@ -198,6 +198,7 @@ obj:
 clean:
 	rm -rf bin
 	rm -rf obj
+	find . -iname *~ -delete
 
 #{gen_make_targets}
 
