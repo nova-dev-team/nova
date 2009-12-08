@@ -107,6 +107,9 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
     } else if (cnt == 0) {
       printf("[ftp] client %s prematurely disconnected\n", addr_str);
       break;  // stop service
+    } else if (cnt == -1) {
+      printf("[ftp] client %s kicked because of socket error\n", addr_str);
+      break;
     }
     ibuf[cnt] = '\0';
     printf("[req %s] %s", addr_str, ibuf);
