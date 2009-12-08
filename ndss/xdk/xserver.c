@@ -21,6 +21,8 @@ static void* acceptor_wrapper(void* arg) {
   xs->acceptor(client_sockfd, client_addr, sin_size, additional_args);
   
   xfree(client_addr);
+  xfree(arg);
+
   shutdown(client_sockfd, SHUT_RDWR);
   return NULL;
 }
@@ -53,7 +55,7 @@ int xserver_serve(xserver* xs, void* additional_args) {
     pthread_t tid;
     socklen_t sin_size;
     int client_sockfd = accept(server_sockfd, (struct sockaddr *) &client_addr, &sin_size);
-    void* arg[4];
+    void** arg = xmalloc_ty(4, void *); // it will be xfree'd in acceptor wrapper
     arg[0] = xs;
     arg[1] = (void *) client_sockfd;
     arg[2] = (void *) &client_addr;
@@ -118,18 +120,22 @@ int xserve_once(xserve_once_handler handler, char* host, int port, void* args) {
 
 static void* xserve_once_wrapper(void* arg) {
   void** arg_list = (void **) arg;
+  int ret;
   
   xserve_once_handler handler = (xserve_once_handler) arg_list[0];
   char* host = (char *) arg_list[1];
   int port = (int) arg_list[2];
   void* args = (void *) arg_list[3];
 
-  return (void *) xserve_once(handler, host, port, args);
+  ret = xserve_once(handler, host, port, args);
+  xfree(arg);
+
+  return (void *) ret;
 }
 
 pthread_t xserve_once_in_new_thread(xserve_once_handler handler, char* host, int port, void* args) {
   pthread_t tid;
-  void* arg_list[6];
+  void** arg_list = xmalloc_ty(4, void *);  // it will be xfree'd in xserver_once_wrapper
   arg_list[0] = (void *) handler;
   arg_list[1] = (void *) host;
   arg_list[2] = (void *) port;
