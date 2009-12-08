@@ -59,7 +59,8 @@ package com.wizhelp.flashlight.zlib
 			uncompressedData.writeByte(0x01);
 			uncompressedData.writeUnsignedInt(0x0000FFFF);
 			
-			uncompressedData.inflate();
+			//uncompressedData.inflate();
+			uncompressedData.uncompress();
 			
 			lastDeflate = uncompressedData;
 			uncompressedData.position = dictionarySize;

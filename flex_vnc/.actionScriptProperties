@@ -11,6 +11,7 @@
 <applications>
 <application path="NovaFlexUI.mxml"/>
 <application path="FLPlayer.mxml"/>
+<application path="FLViewer.mxml"/>
 </applications>
 <modules/>
 <buildCSSFiles/>
