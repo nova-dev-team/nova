@@ -126,6 +126,19 @@ def all_src_files
   return list
 end
 
+#return a list of all directories in source folders
+def all_src_dirs
+  list = []
+  BUILD_MODULES.each do |mod|
+    Find.find(mod) do |path|
+      if FileTest.directory? path
+        list << path
+      end
+    end
+  end
+  return list
+end
+
 # assert that there is no duplicate file name in any folder
 # note that folder1/a.c and folder2/a.c are duplicated!
 def assert_no_duplicate_fname
@@ -193,7 +206,7 @@ bin:
 	mkdir -p bin
 
 obj:
-#{BUILD_MODULES.collect {|mod| "\tmkdir -p obj/#{mod}\n"}}
+#{all_src_dirs.collect {|dir| "\tmkdir -p obj/#{dir}\n"}}
 
 clean:
 	rm -rf bin
