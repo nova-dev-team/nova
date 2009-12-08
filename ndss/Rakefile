@@ -208,9 +208,13 @@ bin:
 obj:
 #{all_src_dirs.collect {|dir| "\tmkdir -p obj/#{dir}\n"}}
 
+doc: #{all_src_files.collect {|f| f + " "}}
+	doxygen
+
 clean:
 	rm -rf bin
 	rm -rf obj
+	rm -rf doc
 	find . -iname *~ -delete
 
 #{gen_make_targets}
