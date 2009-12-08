@@ -10,9 +10,9 @@ static void test_single_alloc() {
 static void test_array_alloc() {
   int n = 4;
   int i;
-  int** ptr = xmalloc2(n, int *);
+  int** ptr = xmalloc_ty(n, int *);
   for (i = 0; i < n; i++) {
-    ptr[i] = (int *) xmalloc2(n, int *);
+    ptr[i] = (int *) xmalloc_ty(n, int *);
   }
   printf("memeory_usage=%d\n", xmem_usage());
   for (i = 0; i < n; i++) {

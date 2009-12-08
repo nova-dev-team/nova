@@ -64,7 +64,7 @@ static void get_comma_separated_addr(char* ip_str, int port, char* dest) {
   strcat(dest, buf);
 }
 
-static int ftp_serve_once_ls(char* host, int port, void* args, int client_sockfd) {
+static int ftp_serve_once_ls(int client_sockfd, void* args) {
   ftp_write(client_sockfd, "TODO\n");
   printf("TODO\n");
   ftp_write(client_sockfd, (char *) args);
@@ -72,17 +72,17 @@ static int ftp_serve_once_ls(char* host, int port, void* args, int client_sockfd
   return 0;
 }
 
-static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr_in* server_addr, struct sockaddr* client_addr, int sin_size) {
+static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_addr, int sin_size, void* args) {
   int buf_size = 8192;
-  char* ibuf = xmalloc2(buf_size, char);
-  char* obuf = xmalloc2(buf_size, char);
+  char* ibuf = xmalloc_ty(buf_size, char);
+  char* obuf = xmalloc_ty(buf_size, char);
   int cnt;
   int logged_in = 0;
-  char* username = xmalloc2(80, char); // TODO better username size
-  char* password = xmalloc2(80, char); // TODO better password size
-  char* addr_str = xmalloc2(100, char);  // ip:port or ip:port(username) TODO better addr_str size
-  char* cwd = xmalloc2(10240, char); // TODO better current working directory
-  char* trans_cmd = xmalloc2(buf_size, char); // the command that starts transfer. set to "\0" if no command is in queue
+  char* username = xmalloc_ty(80, char); // TODO better username size
+  char* password = xmalloc_ty(80, char); // TODO better password size
+  char* addr_str = xmalloc_ty(100, char);  // ip:port or ip:port(username) TODO better addr_str size
+  char* cwd = xmalloc_ty(10240, char); // TODO better current working directory
+  char* trans_cmd = xmalloc_ty(buf_size, char); // the command that starts transfer. set to "\0" if no command is in queue
   char trans_type = 'A';  // transmission type, 'A' is ASCII, 'I' is image
   
   int data_port = gen_rand_port(); 
@@ -177,9 +177,7 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr_in* serv
 
     } else if (xstr_startwith(ibuf, "PASV")) {
       char tmp_buf[32];
-
-      int* data_client_sockfd = xmalloc2(1, int); // TODO this thing should be xfree'ed in handler?
-      int* health = xmalloc2(1, int); // TODO this thing should be xfree'ed in handler?
+      struct sockaddr_in* server_addr = (struct sockaddr_in*) args;
 
       get_comma_separated_addr(inet_ntoa(server_addr->sin_addr), data_port, tmp_buf);
       sprintf(obuf, "227 entering passive mode (%s)\n", tmp_buf);
@@ -191,9 +189,7 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr_in* serv
         ftp_serve_once_ls,
         inet_ntoa(server_addr->sin_addr),
         data_port,
-        "If you wanna put a string here, make sure it is an xmalloc'ed str, and xfree it in handler",
-        data_client_sockfd, // client sockfd should also be xmalloced obj
-        health
+        "If you wanna put a string here, make sure it is an xmalloc'ed str, and xfree it in handler"
       );
 
     } else if (xstr_startwith(ibuf, "QUIT")) {
@@ -224,7 +220,7 @@ static int ndss_ftp_service(char* host, int port) {
     fprintf(stderr, "in ndss_ftp_service(): failed to init xserver!\n");
     return -1;
   }
-  return xserver_serve(&xs);
+  return xserver_serve(&xs, &(xs.addr));
 }
 
 int ndss_ftp(int argc, char* argv[]) {

@@ -13,7 +13,6 @@
 */
 
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <pthread.h>
 
 /**
@@ -24,17 +23,17 @@
 
   @param client_sockfd
     The file descriptor of client socket.
-  @param server_addr
-    The server's address info.
   @param client_addr
     The client's address info.
   @param sin_size
     The memory size of client_addr.
+  @param args
+    Additional parameters.
 
   @warning
     Do not xfree() client_addr, it will be automatically xfree()'d after execution!
 */
-typedef void (*xserver_acceptor)(int client_sockfd, struct sockaddr_in* server_addr, struct sockaddr* client_addr, int sin_size);
+typedef void (*xserver_acceptor)(int client_sockfd, struct sockaddr* client_addr, int sin_size, void* args);
 
 /**
   @brief
@@ -83,16 +82,26 @@ int xserver_init(xserver* xs, char* host, int port, int backlog, xserver_accepto
   Each incoming connection is handled in a new thread.
   To prevent blocking, use xserve_in_new_thread() instead.
 
+  @param xs
+    The serving xserver.
+  @param args
+    Additional parameters for the xserver
+
   @return
     -1 if failed to listen.
 */
-int xserver_serve(xserver* xs);
+int xserver_serve(xserver* xs, void* args);
 
 /**
   @brief
     Start serving clients, in a new thread.
 
   This function runs xserve in a new thread, so there is no blocking call.
+
+  @param xs
+    The serving xserver.
+  @param args
+    Additional parameters for the xserver
 
   @return
     The id of thread in which xserve is invoked.
@@ -101,26 +110,22 @@ int xserver_serve(xserver* xs);
   @warning
     If main process exits, the service will also stop!
 */
-pthread_t xserve_in_new_thread(xserver* xs);
+pthread_t xserve_in_new_thread(xserver* xs, void* args);
 
 
 /**
   @brief
     Define a type of service handler on an port, which is served only once.
 
-  @param host
-    The host on which service is published.
-  @param port
-    The port on which service is published.
-  @param args
-    Additional parameters for the service.
   @param client_sockfd
     The socked file descriptor.
+  @param args
+    Additional parameters for the service.
 
   @return
     -1 if failure, 0 if successful. *client_sockfd will be -1 if has accept failure.
 */
-typedef int (*xserve_once_handler)(char* host, int port, void* args, int client_sockfd);
+typedef int (*xserve_once_handler)(int client_sockfd, void* args);
 
 /**
   @brief
@@ -134,13 +139,11 @@ typedef int (*xserve_once_handler)(char* host, int port, void* args, int client_
     The port on which service is published.
   @param args
     Additional parameters for the service.
-  @param client_sockfd
-    Socket file descriptor.
 
   @return
     -1 if failure, 0 if successful. *client_sockfd will be -1 if has accept failure.
 */
-int xserve_once(xserve_once_handler handler, char* host, int port, void* args, int* client_sockfd);
+int xserve_once(xserve_once_handler handler, char* host, int port, void* args);
 
 /**
   @brief
@@ -154,10 +157,6 @@ int xserve_once(xserve_once_handler handler, char* host, int port, void* args, i
     The port on which service is published.
   @param args
     Additional parameters for the service.
-  @param client_sockfd
-    Pointer to accepted client socked file descriptor.
-  @param health
-    Where the process is healthy, that is, no error occured. -1 means unhealthy, 0 means healthy.
 
   @return
     The thread id that request is being handled.
@@ -166,14 +165,7 @@ int xserve_once(xserve_once_handler handler, char* host, int port, void* args, i
   @warning
     If main process exits, the service will also stop!
 */
-pthread_t xserve_once_in_new_thread(
-  xserve_once_handler handler,
-  char* host,
-  int port,
-  void* args,
-  int* client_sockfd,
-  int* health
-);
+pthread_t xserve_once_in_new_thread(xserve_once_handler handler, char* host, int port, void* args);
 
 #endif
 
