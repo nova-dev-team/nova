@@ -12,6 +12,8 @@
 #include "xmemory.h"
 #include "xutils.h"
 
+#include "ndss_client.h"
+
 #include "ndss_ftp.h"
 
 void ndss_ftp_help() {

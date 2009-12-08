@@ -3,7 +3,7 @@
 
 require 'find'
 
-BUILD_MODULES = ["app", "core", "test", "xdk"]
+BUILD_MODULES = ["app", "core", "test", "xdk", "client"]
 DEFAULT_BUILD_MODULES = ["app"]
 
 $g_depend = {}
