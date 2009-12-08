@@ -5,15 +5,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <time.h>
 
 #include "xserver.h"
+#include "xconn.h"
 #include "xmemory.h"
 #include "xutils.h"
 
 #include "ndss_ftp.h"
 
 void ndss_ftp_help() {
-  printf("usage: ndss ftp <-p port> [base_dir]\n");
+  printf("usage: ndss ftp <-p port|--port=port> <-b bind_addr|--bind=bind_addr>\n");
 }
 
 static int ftp_write(int client_sockfd, char* cmd) {
@@ -38,70 +40,52 @@ static void strip_trailing_crlf(char* str) {
   }
 }
 
-// ip & port will be set to -1 if error occured
-static void parse_port_cmd(char* cmd, int* ip, int* port) {
-  int comma_count = 0;
-  char* ptr = cmd + strlen(cmd) - 1;
-  int v, w;
-  int ip_weight = 1;
-  int port_weight = 1;
-  *ip = 0;
-  *port = 0;
-  v = 0;
-  w = 1;
-  while (ptr >= cmd + 4) {
-    if (*ptr == '\r' || *ptr == '\n') {
-      ptr--;
-      continue;
-    }
-    if (*ptr == ',')
-      comma_count++;
-    if (comma_count > 5) {
-      *ip = -1;
-      *port = -1;
-      return;
-    }
-    if (*ptr == ',' || *ptr == ' ')  {
-      // end of a segment
-      if (comma_count > 2) {
-        *ip += v * ip_weight;
-        ip_weight *= 256;
-      } else {
-        *port += v * port_weight;
-        port_weight *= 256;
-      }
-      v = 0;
-      w = 1;
-    } else if ('0' <= *ptr && *ptr <= '9') {
-      v += w * (*ptr - '0');
-      w *= 10;
-    } else {
-      *ip = -1;
-      *port = -1;
-      return;
-    }
-    if (*ptr == '\0')
-      break;
-    ptr--;
-  }
-  if (comma_count != 5) {
-    *ip = -1;
-    *port = -1;
-  }
+// generate a random port
+static int gen_rand_port() {
+  return 20000 + (rand() % 36000);
 }
 
-static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_addr, int sin_size) {
+// for passive mode address
+static void get_comma_separated_addr(char* ip_str, int port, char* dest) {
+  char buf[8];
+  int i;
+  int h = port / 256;
+  int l = port % 256;
+  strcpy(dest, ip_str);
+  for (i = 0; dest[i] != '\0'; i++) {
+    if (dest[i] == '.')
+      dest[i] = ',';
+  }
+  strcat(dest, ",");
+  xitoa(h, buf, 10);
+  strcat(dest, buf);
+  strcat(dest, ",");
+  xitoa(l, buf, 10);
+  strcat(dest, buf);
+}
+
+static int ftp_serve_once_ls(int client_sockfd, void* args) {
+  ftp_write(client_sockfd, "TODO\n");
+  printf("TODO\n");
+  ftp_write(client_sockfd, (char *) args);
+  printf("%s\n", (char *) args);
+  return 0;
+}
+
+static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_addr, int sin_size, void* args) {
   int buf_size = 8192;
-  char* ibuf = XMALLOC(buf_size, char);
-  char* obuf = XMALLOC(buf_size, char);
+  char* ibuf = xmalloc_ty(buf_size, char);
+  char* obuf = xmalloc_ty(buf_size, char);
   int cnt;
   int logged_in = 0;
-  char* username = XMALLOC(80, char); // TODO better username size
-  char* password = XMALLOC(80, char); // TODO better password size
-  char* addr_str = XMALLOC(100, char);  // ip:port or ip:port(username) TODO better addr_str size
-  char* cwd = XMALLOC(10240, char); // TODO better current working directory
-  char* trans_cmd = XMALLOC(buf_size, char); // the command that starts transfer. set to "\0" if no command is in queue
-  char trans_type = 'A';  // transmition type, 'A' is ASCII, 'I' is image
+  char* username = xmalloc_ty(80, char); // TODO better username size
+  char* password = xmalloc_ty(80, char); // TODO better password size
+  char* addr_str = xmalloc_ty(100, char);  // ip:port or ip:port(username) TODO better addr_str size
+  char* cwd = xmalloc_ty(10240, char); // TODO better current working directory
+  char* trans_cmd = xmalloc_ty(buf_size, char); // the command that starts transfer. set to "\0" if no command is in queue
+  char trans_type = 'A';  // transmission type, 'A' is ASCII, 'I' is image
+  
+  int data_port = gen_rand_port(); 
   
   get_client_addr_str(client_addr, addr_str);
 
@@ -191,18 +175,23 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
         ftp_write(client_sockfd, obuf);
       }
 
-    } else if (xstr_startwith(ibuf, "PORT")) {
-      int clnt_ip, clnt_port;
-      parse_port_cmd(ibuf, &clnt_ip, &clnt_port);
-      if (clnt_ip < 0 || clnt_port < 0) {
-        printf("[rep %s] 501 incorrect PORT command\n", addr_str);
-        ftp_write(client_sockfd, "501 incorrect PORT command\n");
+    } else if (xstr_startwith(ibuf, "PASV")) {
+      char tmp_buf[32];
+      struct sockaddr_in* server_addr = (struct sockaddr_in*) args;
 
-      } else {
-        // TODO exec port cmd
-      }
+      get_comma_separated_addr(inet_ntoa(server_addr->sin_addr), data_port, tmp_buf);
+      sprintf(obuf, "227 entering passive mode (%s)\n", tmp_buf);
+      printf("[rep %s] %s", addr_str, obuf);  // note: no need to add '\n', already added in obuf
+      ftp_write(client_sockfd, obuf);
 
-      
+      // TODO serve in another thread
+      xserve_once_in_new_thread(
+        ftp_serve_once_ls,
+        inet_ntoa(server_addr->sin_addr),
+        data_port,
+        "If you wanna put a string here, make sure it is an xmalloc'ed str, and xfree it in handler"
+      );
+
     } else if (xstr_startwith(ibuf, "QUIT")) {
       printf("[rep %s] 221 see you\n", addr_str);
       ftp_write(client_sockfd, "211 see you\n");
@@ -225,15 +214,21 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
   xfree(obuf);
 }
 
-static int ndss_ftp_service(int port) {
+static int ndss_ftp_service(char* host, int port) {
   xserver xs;
-  xserver_init(&xs, port, 10, ndss_ftp_client_acceptor);
-  return xserver_serve(&xs);
+  if (xserver_init(&xs, host, port, 10, ndss_ftp_client_acceptor) < 0) {
+    fprintf(stderr, "in ndss_ftp_service(): failed to init xserver!\n");
+    return -1;
+  }
+  return xserver_serve(&xs, &(xs.addr));
 }
 
 int ndss_ftp(int argc, char* argv[]) {
-  int port = 10000;
+  int port = 8021;
+  char bind[16];
   int i;
+  srand(time(NULL));
+  strcpy(bind, "0.0.0.0");
 
   for (i = 2; i < argc; i++) {
     if (strcmp(argv[i], "-p") == 0) {
@@ -247,9 +242,20 @@ int ndss_ftp(int argc, char* argv[]) {
     } else if (xstr_startwith(argv[i], "--port=")) {
       // TODO check if not number
       sscanf(argv[i] + 7, "%d", &port);
+    } else if (strcmp(argv[i], "-b") == 0) {
+      if (i + 1 < argc) {
+        // TODO check ip address format
+        strcpy(bind, argv[i + 1]);
+      } else {
+        printf("error in cmdline args: '-b' must be followed by bind address!\n");
+        exit(1);
+      }
+    } else if (xstr_startwith(argv[i], "--bind=")) {
+      // TODO check ip address format
+      strcpy(bind, argv[i] + 7);
     }
   }
-  printf("[ftp] ftp server started on port %d\n", port);
-  return ndss_ftp_service(port);
+  printf("[ftp] ftp server started on %s:%d\n", bind, port);
+  return ndss_ftp_service(bind, port);
 }
 

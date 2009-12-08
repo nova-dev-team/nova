@@ -21,7 +21,7 @@
   @param ty
     Type of allocated objects.
 */
-#define XMALLOC(cnt, ty) ((ty *) xmalloc(cnt * sizeof(ty)))
+#define xmalloc_ty(cnt, ty) ((ty *) xmalloc((cnt) * sizeof(ty)))
 
 /**
   @brief

@@ -12,6 +12,7 @@
     Miscellaneous utilities.
 */
 
+#include <netinet/in.h>
 
 /**
   @brief
@@ -26,7 +27,7 @@
 
   @return
     The char* string containing text representation of the int value.
-    '\0' if error occured.
+    Return empty string if error occured.
 
   @warning
     Make sure buf have enough size!
@@ -59,6 +60,40 @@ int xstr_startwith(char* str, char* head);
     The stripped string.
 */
 char* xstr_strip(char* str);
+
+/**
+  @brief
+    Convert an IP value into string.
+
+  @param ip
+    The IP value.
+  @param str
+    The string that will contain text representation of the IP value.
+    It must have enough size (>= 16).
+  
+  @return
+    -1 if convert failure, otherwise 0.
+
+  @warning
+    str must have enough size!
+*/
+int xinet_ip2str(int ip, char* str);
+
+/**
+  @brief
+    Convert text representation of inet address into socket address.
+
+  @param host
+    Text representation of inet address.
+  @param port
+    The port of socket address.
+  @param addr
+    Socket address to be filled in.
+
+  @return
+    -1 if failure, otherwise 0.
+*/
+int xinet_get_sockaddr(char* host, int port, struct sockaddr_in* addr);
 
 #endif
 
