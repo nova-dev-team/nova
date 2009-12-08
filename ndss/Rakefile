@@ -100,7 +100,7 @@ def gen_make_targets
     content += "\n"
   end
 
-  content += "all: bin obj "
+  content += "all: bin obj doc "
   $g_depend.keys.each do |target|
     if target =~ /\.o$/ or target =~ /^bin\//
       content += target + " "
