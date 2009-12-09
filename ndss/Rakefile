@@ -3,7 +3,7 @@
 
 require 'find'
 
-BUILD_MODULES = ["app", "core", "test", "xdk", "client"]
+BUILD_MODULES = ["app", "core", "test", "xdk", "client", "3rdparty"]
 DEFAULT_BUILD_MODULES = ["app"]
 
 $g_depend = {}
@@ -100,7 +100,7 @@ def gen_make_targets
     content += "\n"
   end
 
-  content += "all: bin obj doc "
+  content += "all: bin obj "
   $g_depend.keys.each do |target|
     if target =~ /\.o$/ or target =~ /^bin\//
       content += target + " "
