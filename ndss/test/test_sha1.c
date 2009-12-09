@@ -41,18 +41,11 @@ int main()
         printf("\tA9993E36 4706816A BA3E2571 7850C26C 9CD0D89D\n");
     }
     xsha1_delete(xsh);
-//    xsh = xsha1_new();
 
-    /*
-     *  Perform test B
-     */
-/*    printf("\nTest B:\n");
-
-    SHA1Reset(&sha);
-    SHA1Input(&sha, (const unsigned char *) TESTB, strlen(TESTB));
-
-    if (!SHA1Result(&sha))
-    {
+    printf("TESTB\n");
+    xsh = xsha1_new();
+    xsha1_feed(xsh, TESTB, strlen(TESTB));
+    if (xsha1_result(xsh, message_digest) == 0) {
         fprintf(stderr, "ERROR-- could not compute message digest\n");
     }
     else
@@ -60,26 +53,19 @@ int main()
         printf("\t");
         for(i = 0; i < 5 ; i++)
         {
-            printf("%X ", sha.Message_Digest[i]);
+            printf("%X ", message_digest[i]);
         }
         printf("\n");
         printf("Should match:\n");
         printf("\t84983E44 1C3BD26E BAAE4AA1 F95129E5 E54670F1\n");
     }
-*/
-    /*
-     *  Perform test C
-     */
-    /*
-    printf("\nTest C: One million 'a' characters\n");
+    xsha1_delete(xsh);
 
-    SHA1Reset(&sha);
+    xsh = xsha1_new();
     for(i = 1; i <= 1000000; i++) {
-        SHA1Input(&sha, (const unsigned char *) TESTC, 1);
+        xsha1_feed(xsh, (const unsigned char *) TESTC, 1);
     }
-
-    if (!SHA1Result(&sha))
-    {
+    if (xsha1_result(xsh, message_digest) == 0) {
         fprintf(stderr, "ERROR-- could not compute message digest\n");
     }
     else
@@ -87,13 +73,13 @@ int main()
         printf("\t");
         for(i = 0; i < 5 ; i++)
         {
-            printf("%X ", sha.Message_Digest[i]);
+            printf("%X ", message_digest[i]);
         }
         printf("\n");
         printf("Should match:\n");
         printf("\t34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F\n");
     }
-*/
+    xsha1_delete(xsh);
     return xmem_usage();
 }
 
