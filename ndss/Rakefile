@@ -197,7 +197,7 @@ task :gen => :check do
 # Automatically generated at #{Time.now}
 
 CC=gcc
-CFLAGS=-Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
+CFLAGS=-ggdb -Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
 LDFLAGS=-lpthread
 
 default: bin obj #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}

@@ -6,12 +6,13 @@
 #include "xutils.h"
 
 void test_convert_base10() {
-  int run_times = 1000000;
+  int run_times = 100;
   int i, num, num2, num3;
   char buf[16];
   printf("Testing converting %d random numbers in base 10.\n", run_times);
   for (i = 0; i < run_times; i++) {
     num = rand();
+    printf("num=%d, %d\n", num, -num);
     num2 = -num;
     xitoa(num, buf, 10);
     sscanf(buf, "%d", &num3);
