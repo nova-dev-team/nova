@@ -32,7 +32,7 @@ xstr xstr_new();
 
 /**
   @brief
-    Destroy a xstr object.
+    Destroy an xstr object.
 
   @param xs
     The xstr to be destroyed.
@@ -79,7 +79,7 @@ int xstr_len(xstr xs);
 
 /**
   @brief
-    This is printf like function, except that it prints into a xstr. It only supports some basic formats.
+    This is printf like function, except that it prints into an xstr. It only supports some basic formats.
 
   @param xs
     The xstr that will be printed into. New data will be appended to the end of xs.

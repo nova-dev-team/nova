@@ -1,5 +1,4 @@
 #include <string.h>
-#include <stdio.h>
 #include <stdarg.h>
 
 #include "xstr.h"
@@ -128,7 +127,6 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
     case 'd':
       ival = va_arg(argp, int);
       xitoa(ival, buf, 10);
-      printf("num str=%s len=%d\n", buf, strlen(buf));
       str_len = strlen(buf);
       cnt += str_len;
       xstr_append_cstr_len_precalculated(xs, buf, str_len);
@@ -137,7 +135,6 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
     case 's':
       sval = va_arg(argp, char *);
       str_len = strlen(sval);
-      printf("str_len = %d, s=%s\n", str_len, sval);
       cnt += str_len;
       xstr_append_cstr_len_precalculated(xs, sval, str_len);
       break;
