@@ -19,7 +19,7 @@ struct xstr_impl;
   @brief
     Simple string implementation.
 */
-typedef struct xstr_impl *xstr;
+typedef struct xstr_impl* xstr;
 
 /**
   @brief
