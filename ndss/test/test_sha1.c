@@ -63,7 +63,7 @@ int main()
 
     xsh = xsha1_new();
     for(i = 1; i <= 1000000; i++) {
-        xsha1_feed(xsh, (const unsigned char *) TESTC, 1);
+        xsha1_feed(xsh, TESTC, 1);
     }
     if (xsha1_result(xsh, message_digest) == 0) {
         fprintf(stderr, "ERROR-- could not compute message digest\n");
