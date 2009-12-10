@@ -12,6 +12,8 @@
 #include "xmemory.h"
 #include "xutils.h"
 
+#include "ndss_client.h"
+
 #include "ndss_ftp.h"
 
 void ndss_ftp_help() {
@@ -65,10 +67,33 @@ static void get_comma_separated_addr(char* ip_str, int port, char* dest) {
 }
 
 static int ftp_serve_once_ls(int client_sockfd, void* args) {
-  ftp_write(client_sockfd, "TODO\n");
+  FILE* ls_pipe = popen("ls / -al", "r");
+  int buf_size = 102400;
+  char ch;
+  char* buf = xmalloc_ty(buf_size, char);
+  int i;
+
   printf("TODO\n");
-  ftp_write(client_sockfd, (char *) args);
   printf("%s\n", (char *) args);
+
+  while (!feof(ls_pipe)) {
+    i = 0;
+    while (!feof(ls_pipe) && (ch = fgetc(ls_pipe)) != '\n') {
+      buf[i] = ch;
+      i++;
+    }
+    if (feof(ls_pipe)) {
+      buf[i] = '\0';
+    } else {
+      buf[i] = '\n';
+      buf[i + 1] = '\0';
+    }
+    printf("%s", buf);
+    ftp_write(client_sockfd, buf);
+  }
+
+  pclose(ls_pipe);
+  xfree(buf);
   return 0;
 }
 
@@ -85,7 +110,8 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
   char* trans_cmd = xmalloc_ty(buf_size, char); // the command that starts transfer. set to "\0" if no command is in queue
   char trans_type = 'A';  // transmission type, 'A' is ASCII, 'I' is image
   
-  int data_port = gen_rand_port(); 
+  int data_port = -1;
+  pthread_t data_conn_tid;
   
   get_client_addr_str(client_addr, addr_str);
 
@@ -107,6 +133,9 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
     } else if (cnt == 0) {
       printf("[ftp] client %s prematurely disconnected\n", addr_str);
       break;  // stop service
+    } else if (cnt == -1) {
+      printf("[ftp] client %s kicked because of socket error\n", addr_str);
+      break;
     }
     ibuf[cnt] = '\0';
     printf("[req %s] %s", addr_str, ibuf);
@@ -179,18 +208,32 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
       char tmp_buf[32];
       struct sockaddr_in* server_addr = (struct sockaddr_in*) args;
 
+      data_port = gen_rand_port();
+
       get_comma_separated_addr(inet_ntoa(server_addr->sin_addr), data_port, tmp_buf);
       sprintf(obuf, "227 entering passive mode (%s)\n", tmp_buf);
       printf("[rep %s] %s", addr_str, obuf);  // note: no need to add '\n', already added in obuf
       ftp_write(client_sockfd, obuf);
 
-      // TODO serve in another thread
-      xserve_once_in_new_thread(
+      data_conn_tid = xserve_once_in_new_thread(
         ftp_serve_once_ls,
         inet_ntoa(server_addr->sin_addr),
         data_port,
-        "If you wanna put a string here, make sure it is an xmalloc'ed str, and xfree it in handler"
+        ibuf
       );
+
+    } else if (xstr_startwith(ibuf, "LIST")) {
+      data_port = gen_rand_port();
+      struct sockaddr_in* server_addr = (struct sockaddr_in*) args;
+      ftp_write(client_sockfd, "150 opening ASCII mode data connection for file list\n");
+      data_conn_tid = xserve_once_in_new_thread(
+        ftp_serve_once_ls,
+        inet_ntoa(server_addr->sin_addr),
+        data_port,
+        ibuf
+      );
+      pthread_join(data_conn_tid, NULL);
+      ftp_write(client_sockfd, "226 transfer complete\n");
 
     } else if (xstr_startwith(ibuf, "QUIT")) {
       printf("[rep %s] 221 see you\n", addr_str);

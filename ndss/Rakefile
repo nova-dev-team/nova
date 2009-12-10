@@ -3,7 +3,7 @@
 
 require 'find'
 
-BUILD_MODULES = ["app", "core", "test", "xdk"]
+BUILD_MODULES = ["app", "core", "test", "xdk", "client", "3rdparty"]
 DEFAULT_BUILD_MODULES = ["app"]
 
 $g_depend = {}
@@ -197,7 +197,7 @@ task :gen => :check do
 # Automatically generated at #{Time.now}
 
 CC=gcc
-CFLAGS=-Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
+CFLAGS=-ggdb -Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
 LDFLAGS=-lpthread
 
 default: bin obj #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
@@ -208,9 +208,13 @@ bin:
 obj:
 #{all_src_dirs.collect {|dir| "\tmkdir -p obj/#{dir}\n"}}
 
+api: #{all_src_files.collect {|f| f + " "}}
+	doxygen
+
 clean:
 	rm -rf bin
 	rm -rf obj
+	rm -rf api
 	find . -iname *~ -delete
 
 #{gen_make_targets}

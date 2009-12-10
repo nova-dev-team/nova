@@ -5,6 +5,7 @@
 #include "xmemory.h"
 
 #include "ftp/ndss_ftp.h"
+#include "gateway/ndss_gw.h"
 
 typedef int (*ndss_action)(int argc, char* argv[]);
 typedef void (*ndss_action_help)();
@@ -20,6 +21,8 @@ char* g_actions[] = {
   // trick: function pointers are converted to char*
 
   "ftp", "Run as an ftp server", (char *) ndss_ftp, (char *) ndss_ftp_help, 
+
+  "gw", "Serve as gateway", (char *) ndss_gw, (char *) ndss_gw_help,
 
   "help", "Display help message", (char *) print_help, (char *) help_on_help,
 
