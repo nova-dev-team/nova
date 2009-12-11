@@ -6,6 +6,9 @@ require 'find'
 BUILD_MODULES = ["app", "core", "test", "xdk", "client", "3rdparty"]
 DEFAULT_BUILD_MODULES = ["app"]
 
+# sub set of BUILD_MODULES that will be made into a lib file
+LIB_MODULES = ["client"]
+
 $g_depend = {}
 
 def has_main_entry? file
@@ -54,10 +57,13 @@ def all_targets_in_module mod
   depend = {mod => ["bin", "obj"]}
   action = {mod => []}
 
+  all_obj_list = []
+
   Find.find(mod) do |path|
     next if FileTest.directory? path
     if path =~ /\.c$/
       obj_name = "obj/#{path[0..-3] + ".o"}"
+      all_obj_list << obj_name
       if has_main_entry? path
         bin_name = "bin/#{(File.basename path)[0..-3]}"
         depend[mod] << bin_name
@@ -81,6 +87,20 @@ def all_targets_in_module mod
     end
   end
 
+  if LIB_MODULES.include? mod
+    # make .lib file
+    lib_name = "bin/lib#{mod}.lib"
+    depend[mod] << lib_name
+
+    depend[lib_name] = [] if depend[lib_name] == nil
+    depend[lib_name] << all_obj_list
+
+    action[lib_name] = [] if action[lib_name] == nil
+    action[lib_name] << "ar cq #{lib_name} $^"
+    action[lib_name] << "ranlib #{lib_name}"
+    action[lib_name] << ""
+  end
+
   content = ""
   depend.keys.each do |target|
     $g_depend[target] = depend[target]
@@ -100,7 +120,7 @@ def gen_make_targets
     content += "\n"
   end
 
-  content += "all: bin obj "
+  content += "all: bin obj #{LIB_MODULES.collect {|mod| "bin/lib#{mod}.lib "}}"
   $g_depend.keys.each do |target|
     if target =~ /\.o$/ or target =~ /^bin\//
       content += target + " "
@@ -200,7 +220,7 @@ CC=gcc
 CFLAGS=-ggdb -Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
 LDFLAGS=-lpthread
 
-default: bin obj #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
+default: bin obj libs #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
 
 bin:
 	mkdir -p bin
