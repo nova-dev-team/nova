@@ -220,7 +220,7 @@ CC=gcc
 CFLAGS=-ggdb -Wall #{BUILD_MODULES.collect {|mod| "-I#{mod} "}}
 LDFLAGS=-lpthread
 
-default: bin obj libs #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
+default: bin obj #{DEFAULT_BUILD_MODULES.collect {|mod| mod + " "}}
 
 bin:
 	mkdir -p bin
