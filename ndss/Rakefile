@@ -160,13 +160,14 @@ def mk_obj_dirs_list
   end
   list = list.sort
   min_list = []
-  (0..(list.size - 2)).each do |idx|
+  (0..(list.length - 2)).each do |idx|
     a = list[idx]
     b = list[idx + 1]
-    if idx == list.size - 2
-      min_list << b
-    elsif (b.start_with? a) == false
+    if (b.start_with? a) == false
       min_list << a
+    end
+    if idx == list.length - 2
+      min_list << b
     end
   end
   return min_list
