@@ -3,19 +3,23 @@
 #include "xvec.h"
 #include "xmemory.h"
 
+/**
+  @brief
+    The implementation of xvec.
+*/
 struct xvec_impl {
-  xvec_free xvfree;
-  int size;
-  int mem_size;
-  void** data;
+  xvec_free xvfree; ///< @brief Function to release element memory.
+  int size; ///< @brief Number of elements in the xvec.
+  int max_size; ///< @brief Maximum number of elements in the xvec.
+  void** data;  ///< @brief Vector of void* pointers to data array.
 };
 
 xvec xvec_new(xvec_free xvfree) {
   xvec xv = xmalloc_ty(1, struct xvec_impl);
   xv->xvfree = xvfree;
   xv->size = 0;
-  xv->mem_size = 16;
-  xv->data = xmalloc_ty(xv->mem_size, void *);
+  xv->max_size = 16;
+  xv->data = xmalloc_ty(xv->max_size, void *);
   return xv;
 }
 
@@ -39,10 +43,10 @@ void* xvec_get(xvec xv, int index) {
   return xv->data[index];
 }
 
-static void ensure_mem_size(xvec xv, int mem_size) {
-  if (xv->mem_size < mem_size) {
-    xv->mem_size = mem_size * 2;
-    xv->data = xrealloc(xv->data, xv->mem_size * sizeof(void *));
+static void ensure_max_size(xvec xv, int max_size) {
+  if (xv->max_size < max_size) {
+    xv->max_size = max_size * 2;
+    xv->data = xrealloc(xv->data, xv->max_size * sizeof(void *));
   }
 }
 
@@ -50,7 +54,7 @@ int xvec_put(xvec xv, int index, void* data) {
   if (index < 0 || index > xv->size)
     return -1;
   
-  ensure_mem_size(xv, index + 1);
+  ensure_max_size(xv, index + 1);
   if (index == xv->size) {
     xv->size++; // append new data
   }
@@ -62,7 +66,7 @@ int xvec_insert(xvec xv, int index, void* data) {
   if (index < 0 || index > xv->size)
     return -1;
 
-  ensure_mem_size(xv, xv->size + 1);
+  ensure_max_size(xv, xv->size + 1);
   xv->size++;
   if (index == xv->size) {
     // append to end
