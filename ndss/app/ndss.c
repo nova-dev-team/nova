@@ -1,3 +1,15 @@
+/**
+  @mainpage
+
+  @section Introduction
+
+  TODO
+
+  @section Features
+  
+  TODO
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>

@@ -132,31 +132,35 @@ end
 
 # return a list of all source files (.h, .c)
 # like find . -iname *.h && find . -iname *.c
+$g_all_src_files = nil
 def all_src_files
-  list = []
+  return $g_all_src_files if $g_all_src_files != nil
+  $g_all_src_files = []
   BUILD_MODULES.each do |mod|
     Find.find(mod) do |path|
       if FileTest.directory? path
         # do nothing
       elsif path =~ /\.(c|h)$/
-        list << path
+        $g_all_src_files << path
       end
     end
   end
-  return list
+  return $g_all_src_files
 end
 
 #return a list of all directories in source folders
+$g_all_src_dirs = nil
 def all_src_dirs
-  list = []
+  return $g_all_src_dirs if $g_all_src_dirs != nil
+  $g_all_src_dirs = []
   BUILD_MODULES.each do |mod|
     Find.find(mod) do |path|
       if FileTest.directory? path
-        list << path
+        $g_all_src_dirs << path
       end
     end
   end
-  return list
+  return $g_all_src_dirs
 end
 
 # assert that there is no duplicate file name in any folder
