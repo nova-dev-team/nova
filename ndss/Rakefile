@@ -149,18 +149,27 @@ def all_src_files
 end
 
 #return a list of all directories in source folders
-$g_all_src_dirs = nil
-def all_src_dirs
-  return $g_all_src_dirs if $g_all_src_dirs != nil
-  $g_all_src_dirs = []
+def mk_obj_dirs_list
+  list = []
   BUILD_MODULES.each do |mod|
     Find.find(mod) do |path|
       if FileTest.directory? path
-        $g_all_src_dirs << path
+        list << path
       end
     end
   end
-  return $g_all_src_dirs
+  list = list.sort
+  min_list = []
+  (0..(list.size - 2)).each do |idx|
+    a = list[idx]
+    b = list[idx + 1]
+    if idx == list.size - 2
+      min_list << b
+    elsif (b.start_with? a) == false
+      min_list << a
+    end
+  end
+  return min_list
 end
 
 # assert that there is no duplicate file name in any folder
@@ -230,7 +239,7 @@ bin:
 	mkdir -p bin
 
 obj:
-#{all_src_dirs.collect {|dir| "\tmkdir -p obj/#{dir}\n"}}
+#{mk_obj_dirs_list.collect {|dir| "\tmkdir -p obj/#{dir}\n"}}
 
 api: #{all_src_files.collect {|f| f + " "}}
 	doxygen
