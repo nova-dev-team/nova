@@ -3,11 +3,11 @@
 
 require 'find'
 
-BUILD_MODULES = ["app", "core", "test", "xdk", "client", "3rdparty"]
+BUILD_MODULES = ["app", "core", "test", "xdk", "ndssclient", "3rdparty"]
 DEFAULT_BUILD_MODULES = ["app"]
 
 # sub set of BUILD_MODULES that will be made into a lib file
-LIB_MODULES = ["client"]
+LIB_MODULES = ["ndssclient"]
 
 $g_depend = {}
 
@@ -88,8 +88,8 @@ def all_targets_in_module mod
   end
 
   if LIB_MODULES.include? mod
-    # make .lib file
-    lib_name = "bin/lib#{mod}.lib"
+    # make .a file
+    lib_name = "bin/lib#{mod}.a"
     depend[mod] << lib_name
 
     depend[lib_name] = [] if depend[lib_name] == nil
@@ -120,7 +120,7 @@ def gen_make_targets
     content += "\n"
   end
 
-  content += "all: bin obj #{LIB_MODULES.collect {|mod| "bin/lib#{mod}.lib "}}"
+  content += "all: bin obj #{LIB_MODULES.collect {|mod| "bin/lib#{mod}.a "}}"
   $g_depend.keys.each do |target|
     if target =~ /\.o$/ or target =~ /^bin\//
       content += target + " "
