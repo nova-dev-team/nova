@@ -6,8 +6,11 @@ require 'find'
 BUILD_MODULES = ["app", "core", "test", "xdk", "ndssclient", "3rdparty"]
 DEFAULT_BUILD_MODULES = ["app"]
 
-# sub set of BUILD_MODULES that will be made into a lib file
+# subset of BUILD_MODULES that will be made into a lib file
 LIB_MODULES = ["ndssclient"]
+
+# subset of BUILD_MODULES, as test cases
+TEST_MODULES = ["test"]
 
 $g_depend = {}
 
@@ -262,17 +265,19 @@ desc "Run all test cases"
 task :test do
   system "make test"
   result = {}
-  Find.find("test") do |f|
-    next if FileTest.directory? f
-    if f =~ /\.c$/ and has_main_entry? f
-      e = (File.basename f)[0..-3]
-      puts "== running test 'bin/#{e}'"
-      ret = system "cd bin && ./#{e}"
-      result[e] = ret
-      if ret
-        puts "-- success --\n\n"
-      else
-        puts "-- failure --\n\n"
+  TEST_MODULES.each do |mod|
+    Find.find(mod) do |f|
+      next if FileTest.directory? f
+      if f =~ /\.c$/ and has_main_entry? f
+        e = (File.basename f)[0..-3]
+        puts "== running test 'bin/#{e}'"
+        ret = system "cd bin && ./#{e}"
+        result[e] = ret
+        if ret
+          puts "-- success --\n\n"
+        else
+          puts "-- failure --\n\n"
+        end
       end
     end
   end
