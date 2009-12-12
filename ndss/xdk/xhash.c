@@ -83,7 +83,6 @@ void xhash_delete(xhash xh) {
       p = q;
     }
   }
-
   xfree(xh->slot);
   xfree(xh);
 }
