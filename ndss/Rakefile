@@ -3,8 +3,14 @@
 
 require 'find'
 
-BUILD_MODULES = ["app", "core", "test", "xdk", "client", "3rdparty"]
+BUILD_MODULES = ["app", "core", "test", "xdk", "ndssclient", "3rdparty"]
 DEFAULT_BUILD_MODULES = ["app"]
+
+# subset of BUILD_MODULES that will be made into a lib file
+LIB_MODULES = ["ndssclient"]
+
+# subset of BUILD_MODULES, as test cases
+TEST_MODULES = ["test"]
 
 $g_depend = {}
 
@@ -54,10 +60,13 @@ def all_targets_in_module mod
   depend = {mod => ["bin", "obj"]}
   action = {mod => []}
 
+  all_obj_list = []
+
   Find.find(mod) do |path|
     next if FileTest.directory? path
     if path =~ /\.c$/
       obj_name = "obj/#{path[0..-3] + ".o"}"
+      all_obj_list << obj_name
       if has_main_entry? path
         bin_name = "bin/#{(File.basename path)[0..-3]}"
         depend[mod] << bin_name
@@ -81,6 +90,20 @@ def all_targets_in_module mod
     end
   end
 
+  if LIB_MODULES.include? mod
+    # make .a file
+    lib_name = "bin/lib#{mod}.a"
+    depend[mod] << lib_name
+
+    depend[lib_name] = [] if depend[lib_name] == nil
+    depend[lib_name] << all_obj_list
+
+    action[lib_name] = [] if action[lib_name] == nil
+    action[lib_name] << "ar cq #{lib_name} $^"
+    action[lib_name] << "ranlib #{lib_name}"
+    action[lib_name] << ""
+  end
+
   content = ""
   depend.keys.each do |target|
     $g_depend[target] = depend[target]
@@ -100,7 +123,7 @@ def gen_make_targets
     content += "\n"
   end
 
-  content += "all: bin obj "
+  content += "all: bin obj #{LIB_MODULES.collect {|mod| "bin/lib#{mod}.a "}}"
   $g_depend.keys.each do |target|
     if target =~ /\.o$/ or target =~ /^bin\//
       content += target + " "
@@ -112,22 +135,24 @@ end
 
 # return a list of all source files (.h, .c)
 # like find . -iname *.h && find . -iname *.c
+$g_all_src_files = nil
 def all_src_files
-  list = []
+  return $g_all_src_files if $g_all_src_files != nil
+  $g_all_src_files = []
   BUILD_MODULES.each do |mod|
     Find.find(mod) do |path|
       if FileTest.directory? path
         # do nothing
       elsif path =~ /\.(c|h)$/
-        list << path
+        $g_all_src_files << path
       end
     end
   end
-  return list
+  return $g_all_src_files
 end
 
 #return a list of all directories in source folders
-def all_src_dirs
+def mk_obj_dirs_list
   list = []
   BUILD_MODULES.each do |mod|
     Find.find(mod) do |path|
@@ -136,7 +161,19 @@ def all_src_dirs
       end
     end
   end
-  return list
+  list = list.sort
+  min_list = []
+  (0..(list.length - 2)).each do |idx|
+    a = list[idx]
+    b = list[idx + 1]
+    if (b.start_with? a) == false
+      min_list << a
+    end
+    if idx == list.length - 2
+      min_list << b
+    end
+  end
+  return min_list
 end
 
 # assert that there is no duplicate file name in any folder
@@ -206,7 +243,7 @@ bin:
 	mkdir -p bin
 
 obj:
-#{all_src_dirs.collect {|dir| "\tmkdir -p obj/#{dir}\n"}}
+#{mk_obj_dirs_list.collect {|dir| "\tmkdir -p obj/#{dir}\n"}}
 
 api: #{all_src_files.collect {|f| f + " "}}
 	doxygen
@@ -228,17 +265,19 @@ desc "Run all test cases"
 task :test do
   system "make test"
   result = {}
-  Find.find("test") do |f|
-    next if FileTest.directory? f
-    if f =~ /\.c$/ and has_main_entry? f
-      e = (File.basename f)[0..-3]
-      puts "== running test 'bin/#{e}'"
-      ret = system "cd bin && ./#{e}"
-      result[e] = ret
-      if ret
-        puts "-- success --\n\n"
-      else
-        puts "-- failure --\n\n"
+  TEST_MODULES.each do |mod|
+    Find.find(mod) do |f|
+      next if FileTest.directory? f
+      if f =~ /\.c$/ and has_main_entry? f
+        e = (File.basename f)[0..-3]
+        puts "== running test 'bin/#{e}'"
+        ret = system "cd bin && ./#{e}"
+        result[e] = ret
+        if ret
+          puts "-- success --\n\n"
+        else
+          puts "-- failure --\n\n"
+        end
       end
     end
   end

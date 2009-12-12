@@ -1,3 +1,15 @@
+/**
+  @mainpage
+
+  @section Introduction
+
+  TODO
+
+  @section Features
+  
+  TODO
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -6,6 +18,7 @@
 
 #include "ftp/ndss_ftp.h"
 #include "gateway/ndss_gw.h"
+#include "serv/ndss_serv.h"
 
 typedef int (*ndss_action)(int argc, char* argv[]);
 typedef void (*ndss_action_help)();
@@ -25,6 +38,8 @@ char* g_actions[] = {
   "gw", "Serve as gateway", (char *) ndss_gw, (char *) ndss_gw_help,
 
   "help", "Display help message", (char *) print_help, (char *) help_on_help,
+
+  "serv", "Serve as storage node", (char *) ndss_serv, (char *) ndss_serv_help,
 
   // terminated by NULL
   NULL

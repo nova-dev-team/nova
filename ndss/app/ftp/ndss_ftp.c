@@ -12,9 +12,9 @@
 #include "xmemory.h"
 #include "xutils.h"
 
-#include "ndss_client.h"
-
 #include "ndss_ftp.h"
+#include "ftp_session.h"
+#include "ftp_fs.h"
 
 void ndss_ftp_help() {
   printf("usage: ndss ftp <-p port|--port=port> <-b bind_addr|--bind=bind_addr>\n");
