@@ -6,11 +6,49 @@
 #define XHASH_INIT_SLOT_COUNT 16
 #define XHASH_THRESHOLD 3
 
+/**
+  @brief
+    Hash entry type.
+*/
+typedef struct xhash_entry {
+  void* key;  ///< @brief Key of the hash entry.
+  void* value;  ///< @brief Value of the hash entry.
+  struct xhash_entry* next; ///< @brief Link to next hash entry (linked hashtable entry).
+} xhash_entry;
+
+/**
+  @brief
+    Linear hash table type.
+
+  TODO add detailed info about the linear hash table
+*/
+struct xhash_impl {
+  xhash_entry** slot; ///< @brief Slots used to store hash entry (as link list).
+
+  int entry_count; ///< @brief For calculating load average.
+  int extend_ptr;  ///< @brief Index of next element to be expanded.
+  int extend_level; ///< @brief How many times the table get expanded.
+
+  /**
+    @brief
+      The size of the hash table in the begining.
+
+    Current hash table's "appearing" size is base_size * 2 ^ level.
+    Actuall size could be calculated by: extend_ptr + base_size * 2 ^ level.
+  */
+  int base_size;
+
+  xhash_hash hash_func; ///< @brief Hashcode calculator.
+  xhash_eql eql_func; ///< @brief Hash entry equality checker.
+  xhash_free free_func; ///< @brief Hash entry destructor.
+};
+
 #define ALLOC(ty, n) ((ty *) xmalloc(sizeof(ty) * (n)))
 #define REALLOC(ty, ptr, n) (ty *) xrealloc(ptr, sizeof(ty) * (n))
 
-void xhash_init(xhash* xh, xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free) {
+xhash xhash_new(xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free) {
   int i;
+  xhash xh = xmalloc_ty(1, struct xhash_impl);
 
   xh->extend_ptr = 0;
   xh->extend_level = 0;
@@ -27,9 +65,10 @@ void xhash_init(xhash* xh, xhash_hash arg_hash, xhash_eql arg_eql, xhash_free ar
     xh->slot[i] = NULL;
   }
 
+  return xh;
 }
 
-void xhash_release(xhash* xh) {
+void xhash_delete(xhash xh) {
   size_t i;
   size_t actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
   xhash_entry* p;
@@ -46,11 +85,11 @@ void xhash_release(xhash* xh) {
   }
 
   xfree(xh->slot);
-
+  xfree(xh);
 }
 
 // calculates the actuall slot id of a key
-static int _xhash_slot_id(xhash* xh, void* key) {
+static int _xhash_slot_id(xhash xh, void* key) {
   size_t hcode = xh->hash_func(key);
   if (hcode % (xh->base_size << xh->extend_level) < xh->extend_ptr) {
     // already extended part
@@ -63,7 +102,7 @@ static int _xhash_slot_id(xhash* xh, void* key) {
 
 
 // extend the hash table if necessary
-static void _xhash_try_extend(xhash *xh) {
+static void _xhash_try_extend(xhash xh) {
   if (xh->entry_count > XHASH_THRESHOLD * (xh->base_size << xh->extend_level)) {
     xhash_entry* p;
     xhash_entry* q;
@@ -92,7 +131,7 @@ static void _xhash_try_extend(xhash *xh) {
 
 }
 
-void xhash_put(xhash* xh, void* key, void* value) {
+void xhash_put(xhash xh, void* key, void* value) {
   size_t slot_id;
   xhash_entry *entry = ALLOC(xhash_entry, 1);
 
@@ -109,7 +148,7 @@ void xhash_put(xhash* xh, void* key, void* value) {
   xh->entry_count++;
 }
 
-void *xhash_get(xhash* xh, void* key) {
+void *xhash_get(xhash xh, void* key) {
   size_t slot_id = _xhash_slot_id(xh, key);
 
   xhash_entry* p;
@@ -127,7 +166,7 @@ void *xhash_get(xhash* xh, void* key) {
 
 // shrink the hash table if necessary
 // table size is shrinked to 1/2
-static void _xhash_try_shrink(xhash *xh) {
+static void _xhash_try_shrink(xhash xh) {
   if (xh->extend_level == 0)
     return;
 
@@ -156,7 +195,7 @@ static void _xhash_try_shrink(xhash *xh) {
   }
 }
 
-int xhash_remove(xhash* xh, void* key) {
+int xhash_remove(xhash xh, void* key) {
   int slot_id;
   xhash_entry* p;
   xhash_entry* q;
@@ -195,5 +234,9 @@ int xhash_remove(xhash* xh, void* key) {
     }
   }
   return -1;
+}
+
+int xhash_size(xhash xh) {
+  return xh->entry_count;
 }
 

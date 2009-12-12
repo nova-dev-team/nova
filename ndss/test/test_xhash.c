@@ -21,24 +21,25 @@ void ii_free_func(void* key, void* value) {
 void test_int_int_hash() {
   xhash xh;
   int i;
-  xhash_init(&xh, ii_hash_func, ii_eql_func, ii_free_func);
+  xh = xhash_new(ii_hash_func, ii_eql_func, ii_free_func);
   for (i = 0; i < 190000; i++) {
-    xhash_put(&xh, (void *) i, (void *) i);
+    xhash_put(xh, (void *) i, (void *) i);
+    if (i % 5000 == 0) {
+      printf("size(xh)=%d\n", xhash_size(xh));
+      printf("xmem_usage=%d\n", xmem_usage());
+    }
   }
   for (i = 0; i < 189900; i++) {
-    xhash_remove(&xh, (void *) i);
+    xhash_remove(xh, (void *) i);
   }
   for (i = 189900; i < 190000; i++) {
-    void* ptr = xhash_get(&xh, (void *) i);
+    void* ptr = xhash_get(xh, (void *) i);
     int val = (int) ptr;
     printf("val=%d\n", val);
   }
-  printf("xh->base_size=%d\n", xh.base_size);
-  printf("xh->extend_level=%d\n", xh.extend_level);
-  printf("xh->entry_count=%d\n", xh.entry_count);
-  printf("xh->extend_ptr=%d\n", xh.extend_ptr);
+  printf("size(xh)=%d\n", xhash_size(xh));
   printf("xmem_usage=%d\n", xmem_usage());
-  xhash_release(&xh);
+  xhash_delete(xh);
   printf("xmem_usage=%d\n", xmem_usage());
 }
 
@@ -46,3 +47,4 @@ int main() {
   test_int_int_hash();
   return xmem_usage();
 }
+

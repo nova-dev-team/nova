@@ -17,87 +17,69 @@
 /**
   @brief
     Function type for hashcode calculator.
+
+  @param key
+    The key whose hash value should be calculated.
+
+  @return
+    The hash value of key.
 */
 typedef int (*xhash_hash)(void* key);
 
 /**
   @brief
     Function type for hash entry equality checking.
+
+  @param key1
+    The key to be compared.
+  @param key2
+    The key to be compared.
+
+  @return
+    1 if the keys are equal, otherwise 0.
 */
 typedef int (*xhash_eql)(void* key1, void* key2);
 
 /**
   @brief
     Function type for hash entry destructor.
+
+  @param key
+    Pointer to the key.
+  @param value
+    Pointer to the value.
 */
 typedef void (*xhash_free)(void* key, void* value);
 
 /**
   @brief
-    Hash entry type.
+    Interface of xhash which is exposed to users.
 */
-typedef struct xhash_entry {
-  void* key;  ///< @brief Key of the hash entry.
-  void* value;  ///< @brief Value of the hash entry.
-  struct xhash_entry* next; ///< @brief Link to next hash entry (linked hashtable entry).
-} xhash_entry;
-
-/**
-  @brief
-    Linear hash table type.
-
-  TODO add detailed info about the linear hash table
-*/
-typedef struct xhash {
-  xhash_entry** slot; ///< @brief Slots used to store hash entry (as link list).
-
-  int entry_count; ///< @brief For calculating load average.
-  int extend_ptr;  ///< @brief Index of next element to be expanded.
-  int extend_level; ///< @brief How many times the table get expanded.
-
-  /**
-    @brief
-      The size of the hash table in the begining.
-
-    Current hash table's "appearing" size is base_size * 2 ^ level.
-    Actuall size could be calculated by: extend_ptr + base_size * 2 ^ level.
-  */
-  int base_size;
-
-  xhash_hash hash_func; ///< @brief Hashcode calculator.
-  xhash_eql eql_func; ///< @brief Hash entry equality checker.
-  xhash_free free_func; ///< @brief Hash entry destructor.
-} xhash;
+typedef struct xhash_impl* xhash; 
 
 /**
   @brief
     Initialize hash table.
 
-  @param xh
-    The hash table to be initialized.
   @param arg_hash
     The hashcode calculator function.
   @param arg_eql
     The hash entry equality checker.
   @param arg_free
     The hash entry destructor.
-
-  @warning
-    Do not initialize a hash table more than once!
 */
-void xhash_init(xhash* xh, xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free);
+xhash xhash_new(xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free);
 
 /**
   @brief
     Destruct a hash table.
 
-  The hash table itself will be destructed by calling xfree().
-  free_func() will be invoked on each entry.
+  The hash table itself will be destructed by calling xfree(). free_func() will be invoked on each entry.
 
   @param xh
     The hash table to be destructed.
 */
-void xhash_release(xhash* xh);
+void xhash_delete(xhash xh);
 
 /**
   @brief
@@ -110,7 +92,7 @@ void xhash_release(xhash* xh);
   @param value
     Pointer to the value element.
 */
-void xhash_put(xhash* xh, void* key, void* value);
+void xhash_put(xhash xh, void* key, void* value);
 
 /**
   @brief
@@ -124,7 +106,7 @@ void xhash_put(xhash* xh, void* key, void* value);
   @return
     NULL if not found, otherwise corresponding *value will be returned.
 */
-void* xhash_get(xhash* xh, void* key);
+void* xhash_get(xhash xh, void* key);
 
 /**
   @brief
@@ -138,7 +120,19 @@ void* xhash_get(xhash* xh, void* key);
   @return
     0 if successful, -1 if failed.
 */
-int xhash_remove(xhash* xh, void* key);
+int xhash_remove(xhash xh, void* key);
+
+/**
+  @brief
+    Get the number of elements in a xhash table.
+
+  @param xh
+    The xhash table object.
+
+  @return
+    Number of elements inside the xhash table.
+*/
+int xhash_size(xhash xh);
 
 #endif
 
