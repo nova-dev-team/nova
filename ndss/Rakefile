@@ -44,7 +44,7 @@ end
 # finds all directly depended header files, without inherit dependency
 def depended_header file
   list = []
-  File.open(file) do |src_f|
+  File.open(file[0..-3] + ".c") do |src_f|
     src_f.each_line do |line|
       line = line.strip
       if line =~ /#include \"/
@@ -53,6 +53,18 @@ def depended_header file
       end
     end
   end
+  if File.exist? file[0..-3] + ".h"
+    File.open(file[0..-3] + ".h") do |src_f|
+      src_f.each_line do |line|
+        line = line.strip
+        if line =~ /#include \"/
+          header = line[10..-2]
+          list.concat(all_src_files.select {|f| f.end_with? header})
+        end
+      end
+    end
+  end
+  list = list.uniq
   return list
 end
 
