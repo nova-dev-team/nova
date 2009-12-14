@@ -153,3 +153,12 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
   return cnt;
 }
 
+xbool xstr_startwith_cstr(xstr xs, char* head) {
+  int i;
+  for (i = 0; xs->str[i] != '\0' && head[i] != '\0'; i++) {
+    if (xs->str[i] != head[i])
+      return XFALSE;
+  }
+  return head[i] == '\0';
+}
+

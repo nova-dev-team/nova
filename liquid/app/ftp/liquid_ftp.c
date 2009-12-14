@@ -12,12 +12,12 @@
 #include "xmemory.h"
 #include "xutils.h"
 
-#include "ndss_ftp.h"
+#include "liquid_ftp.h"
 #include "ftp_session.h"
 #include "ftp_fs.h"
 
-void ndss_ftp_help() {
-  printf("usage: ndss ftp <-p port|--port=port> <-b bind_addr|--bind=bind_addr>\n");
+void liquid_ftp_help() {
+  printf("usage: liquid ftp <-p port|--port=port> <-b bind_addr|--bind=bind_addr>\n");
 }
 
 static int ftp_write(int client_sockfd, char* cmd) {
@@ -97,7 +97,7 @@ static int ftp_serve_once_ls(int client_sockfd, void* args) {
   return 0;
 }
 
-static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_addr, int sin_size, void* args) {
+static void liquid_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_addr, int sin_size, void* args) {
   int buf_size = 8192;
   char* ibuf = xmalloc_ty(buf_size, char);
   char* obuf = xmalloc_ty(buf_size, char);
@@ -118,7 +118,7 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
   printf("[ftp] got new client connection from %s\n", addr_str);
 
   // show welcome message
-  ftp_write(client_sockfd, "220 ndss ftp\n");
+  ftp_write(client_sockfd, "220 liquid ftp\n");
 
   // start with root at '/'
   strcpy(cwd, "/");
@@ -257,16 +257,16 @@ static void ndss_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_
   xfree(obuf);
 }
 
-static int ndss_ftp_service(char* host, int port) {
+static int liquid_ftp_service(char* host, int port) {
   xserver xs;
-  if (xserver_init(&xs, host, port, 10, ndss_ftp_client_acceptor) < 0) {
-    fprintf(stderr, "in ndss_ftp_service(): failed to init xserver!\n");
+  if (xserver_init(&xs, host, port, 10, liquid_ftp_client_acceptor) < 0) {
+    fprintf(stderr, "in liquid_ftp_service(): failed to init xserver!\n");
     return -1;
   }
   return xserver_serve(&xs, &(xs.addr));
 }
 
-int ndss_ftp(int argc, char* argv[]) {
+int liquid_ftp(int argc, char* argv[]) {
   int port = 8021;
   char bind[16];
   int i;
@@ -299,6 +299,6 @@ int ndss_ftp(int argc, char* argv[]) {
     }
   }
   printf("[ftp] ftp server started on %s:%d\n", bind, port);
-  return ndss_ftp_service(bind, port);
+  return liquid_ftp_service(bind, port);
 }
 

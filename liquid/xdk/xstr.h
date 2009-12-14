@@ -1,6 +1,8 @@
 #ifndef XSTR_H_
 #define XSTR_H_
 
+#include "xdef.h"
+
 /**
   @author
     Santa Zhang
@@ -113,6 +115,20 @@ void xstr_append_char(xstr xs, char ch);
     The c-string to be appended.
 */
 void xstr_append_cstr(xstr xs, char* cs);
+
+/**
+  @brief
+    Test if an xstr starts with a c-string.
+
+  @param xs
+    The xstring to be tested.
+  @param head
+    The cstring which might be the head.
+
+  @return
+    XTRUE or XFALSE.
+*/
+xbool xstr_startwith_cstr(xstr xs, char* head);
 
 #endif
 

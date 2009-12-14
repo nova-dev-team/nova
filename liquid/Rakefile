@@ -1,13 +1,13 @@
-# Helper Rakefile for ndss project
+# Helper Rakefile for liquid project
 # Author: Santa Zhang
 
 require 'find'
 
-BUILD_MODULES = ["app", "core", "test", "xdk", "ndssclient", "3rdparty"]
+BUILD_MODULES = ["app", "core", "test", "xdk", "liquidclient", "3rdparty"]
 DEFAULT_BUILD_MODULES = ["app"]
 
 # subset of BUILD_MODULES that will be made into a lib file
-LIB_MODULES = ["ndssclient"]
+LIB_MODULES = ["liquidclient"]
 
 # subset of BUILD_MODULES, as test cases
 TEST_MODULES = ["test"]

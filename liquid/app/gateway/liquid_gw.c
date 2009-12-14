@@ -1,12 +1,12 @@
 #include <stdio.h>
 
-#include "ndss_gw.h"
+#include "liquid_gw.h"
 
-void ndss_gw_help() {
+void liquid_gw_help() {
   printf("TODO add gateway help info here\n");
 }
 
-int ndss_gw(int argc, char* argv[]) {
+int liquid_gw(int argc, char* argv[]) {
   printf("TODO serve as gateway\n");
   return 0;
 }
