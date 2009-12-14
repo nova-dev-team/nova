@@ -130,5 +130,7 @@ void xstr_append_cstr(xstr xs, char* cs);
 */
 xbool xstr_startwith_cstr(xstr xs, char* head);
 
+xstr xstr_copy(xstr orig);
+
 #endif
 

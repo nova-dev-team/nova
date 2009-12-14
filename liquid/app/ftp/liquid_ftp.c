@@ -11,41 +11,10 @@
 
 #include "ftp_session.h"
 
-/*
-
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-#include "xserver.h"
-#include "xconn.h"
-#include "xmemory.h"
-#include "xutils.h"
-
-#include "liquid_ftp.h"
-#include "ftp_session.h"
-#include "ftp_fs.h"
-*/
-
 void liquid_ftp_help() {
   printf("usage: liquid ftp <-p port|--port=port> <-b bind_addr|--bind=bind_addr>\n");
 }
 
-/*
-static int ftp_write(int client_sockfd, char* cmd) {
-  return write(client_sockfd, cmd, strlen(cmd));
-}
-
-static void get_client_addr_str(struct sockaddr* client_addr, char* addr_str) {
-  struct sockaddr_in* client_addr_in = (struct sockaddr_in *) client_addr;
-  int pos;
-  strcpy(addr_str, inet_ntoa(client_addr_in->sin_addr));
-  pos = strlen(addr_str);
-  addr_str[pos] = ':';
-  xitoa(client_addr_in->sin_port, addr_str + pos + 1, 10);
-}
-*/
 static void strip_trailing_crlf(char* str) {
   // abc\r\n -> abc
   int pos = strlen(str) - 1;
@@ -54,222 +23,24 @@ static void strip_trailing_crlf(char* str) {
     pos--;
   }
 }
-/*
-// generate a random port
-static int gen_rand_port() {
-  return 20000 + (rand() % 36000);
-}
 
-// for passive mode address
-static void get_comma_separated_addr(char* ip_str, int port, char* dest) {
-  char buf[8];
+static void add_comma_separated_data_server_addr(xstr rep, ftp_session session) {
+  int data_server_port = ftp_session_get_data_server_port(session);
+  char* data_server_ip = xmalloc_ty(16, char);
   int i;
-  int h = port / 256;
-  int l = port % 256;
-  strcpy(dest, ip_str);
-  for (i = 0; dest[i] != '\0'; i++) {
-    if (dest[i] == '.')
-      dest[i] = ',';
-  }
-  strcat(dest, ",");
-  xitoa(h, buf, 10);
-  strcat(dest, buf);
-  strcat(dest, ",");
-  xitoa(l, buf, 10);
-  strcat(dest, buf);
-}
+  strcpy(data_server_ip, ftp_session_get_host_ip_cstr(session));
 
-static int ftp_serve_once_ls(int client_sockfd, void* args) {
-  FILE* ls_pipe = popen("ls / -al", "r");
-  int buf_size = 102400;
-  char ch;
-  char* buf = xmalloc_ty(buf_size, char);
-  int i;
-
-  printf("TODO\n");
-  printf("%s\n", (char *) args);
-
-  while (!feof(ls_pipe)) {
-    i = 0;
-    while (!feof(ls_pipe) && (ch = fgetc(ls_pipe)) != '\n') {
-      buf[i] = ch;
-      i++;
-    }
-    if (feof(ls_pipe)) {
-      buf[i] = '\0';
-    } else {
-      buf[i] = '\n';
-      buf[i + 1] = '\0';
-    }
-    printf("%s", buf);
-    ftp_write(client_sockfd, buf);
+  xstr_printf(rep, "(");
+  for (i = 0; data_server_ip[i] != '\0'; i++) {
+    char ch = data_server_ip[i];
+    if (ch == '.')
+      xstr_append_char(rep, ',');
+    else
+      xstr_append_char(rep, ch);
   }
 
-  pclose(ls_pipe);
-  xfree(buf);
-  return 0;
+  xstr_printf(rep, ",%d,%d)\n", data_server_port / 256, data_server_port % 256);
 }
-
-static void liquid_ftp_client_acceptor(int client_sockfd, struct sockaddr* client_addr, int sin_size, void* args) {
-  int buf_size = 8192;
-  char* ibuf = xmalloc_ty(buf_size, char);
-  char* obuf = xmalloc_ty(buf_size, char);
-  int cnt;
-  int logged_in = 0;
-  char* username = xmalloc_ty(80, char); // TODO better username size
-  char* password = xmalloc_ty(80, char); // TODO better password size
-  char* addr_str = xmalloc_ty(100, char);  // ip:port or ip:port(username) TODO better addr_str size
-  char* cwd = xmalloc_ty(10240, char); // TODO better current working directory
-  char* trans_cmd = xmalloc_ty(buf_size, char); // the command that starts transfer. set to "\0" if no command is in queue
-  char trans_type = 'A';  // transmission type, 'A' is ASCII, 'I' is image
-  
-  int data_port = -1;
-  pthread_t data_conn_tid;
-  
-  get_client_addr_str(client_addr, addr_str);
-
-  printf("[ftp] got new client connection from %s\n", addr_str);
-
-  // show welcome message
-  ftp_write(client_sockfd, "220 liquid ftp\n");
-
-  // start with root at '/'
-  strcpy(cwd, "/");
-
-  for (;;) {
-    cnt = read(client_sockfd, ibuf, buf_size);
-    if (cnt == buf_size) {
-      printf("[rep %s] 501 too long request\n", addr_str);
-      ftp_write(client_sockfd, "501 too long request\n");
-      printf("[ftp] client %s kicked because of too long request\n", addr_str);
-      break;  // stop service
-    } else if (cnt == 0) {
-      printf("[ftp] client %s prematurely disconnected\n", addr_str);
-      break;  // stop service
-    } else if (cnt == -1) {
-      printf("[ftp] client %s kicked because of socket error\n", addr_str);
-      break;
-    }
-    ibuf[cnt] = '\0';
-    printf("[req %s] %s", addr_str, ibuf);
-
-    if (xstr_startwith(ibuf, "USER")) {
-      // check if command is correct
-      if (strlen(ibuf) < 6) {
-        printf("[rep %s] 501 please provode username\n", addr_str);
-        ftp_write(client_sockfd, "501 please provide username\n");
-      } else {
-        strcpy(username, ibuf + 5);
-        xstr_strip(username);
-        strcat(addr_str, "(");
-        strcat(addr_str, username);
-        strcat(addr_str, ")");
-        printf("[rep %s] 331 password required\n", addr_str);
-        ftp_write(client_sockfd, "331 password required\n");
-      }
-
-    } else if (xstr_startwith(ibuf, "PASS")) {
-      // check if command is correct
-      if (strlen(ibuf) < 6) {
-        printf("[rep %s] 501 please provide password\n", addr_str);
-        ftp_write(client_sockfd, "501 please provide password\n");
-      } else {
-        strcpy(password, ibuf + 5);
-        strip_trailing_crlf(password);
-
-        // TODO user authentication
-        printf("[ftp] TODO authentication, user %s with password (quoted) '%s'\n", username, password);
-
-        logged_in = 1;
-        printf("[rep %s] 230 user logged in\n", addr_str);
-        ftp_write(client_sockfd, "230 user logged in\n");
-      }
-
-    } else if (xstr_startwith(ibuf, "SYST")) {
-      printf("[rep %s] 215 UNIX Type: L8\n", addr_str);
-      ftp_write(client_sockfd, "215 UNIX Type: L8\n");
-
-    } else if (xstr_startwith(ibuf, "FEAT")) {
-      printf("[rep %s] 211-Features:\n", addr_str);
-      printf("[rep %s]  MDTM\n", addr_str);
-      printf("[rep %s]  REST STREAM\n", addr_str);
-      printf("[rep %s]  SIZE\n", addr_str);
-      printf("[rep %s] 211 End\n", addr_str);
-      ftp_write(client_sockfd, "211-Features:\n MDTM\n REST STREAM\n SIZE\n211 End\n");
-
-    } else if (xstr_startwith(ibuf, "PWD")) {
-      printf("[rep %s] 257 \"%s\" is current directory\n", addr_str, cwd);
-      sprintf(obuf, "257 \"%s\" is current directory\n", cwd);
-      ftp_write(client_sockfd, obuf);
-      strcpy(trans_cmd, ibuf);
-
-    } else if (xstr_startwith(ibuf, "TYPE")) {
-      if (strlen(ibuf) < 6) {
-        printf("[rep %s] 501 incorrect TYPE command\n", addr_str);
-        ftp_write(client_sockfd, "501 incorrect TYPE command\n");
-      } else if (ibuf[5] != 'A' && ibuf[5] != 'I') {
-        printf("[rep %s] 501 incorrect TYPE option\n", addr_str);
-        ftp_write(client_sockfd, "501 incorrect TYPE option\n");
-      } else {
-        trans_type = ibuf[5];
-        printf("[rep %s] 200 Type set to %c\n", addr_str, trans_type);
-        sprintf(obuf, "200 Type set to %c\n", trans_type);
-        ftp_write(client_sockfd, obuf);
-      }
-
-    } else if (xstr_startwith(ibuf, "PASV")) {
-      char tmp_buf[32];
-      struct sockaddr_in* server_addr = (struct sockaddr_in*) args;
-
-      data_port = gen_rand_port();
-
-      get_comma_separated_addr(inet_ntoa(server_addr->sin_addr), data_port, tmp_buf);
-      sprintf(obuf, "227 entering passive mode (%s)\n", tmp_buf);
-      printf("[rep %s] %s", addr_str, obuf);  // note: no need to add '\n', already added in obuf
-      ftp_write(client_sockfd, obuf);
-
-      data_conn_tid = xserve_once_in_new_thread(
-        ftp_serve_once_ls,
-        inet_ntoa(server_addr->sin_addr),
-        data_port,
-        ibuf
-      );
-
-    } else if (xstr_startwith(ibuf, "LIST")) {
-      data_port = gen_rand_port();
-      struct sockaddr_in* server_addr = (struct sockaddr_in*) args;
-      ftp_write(client_sockfd, "150 opening ASCII mode data connection for file list\n");
-      data_conn_tid = xserve_once_in_new_thread(
-        ftp_serve_once_ls,
-        inet_ntoa(server_addr->sin_addr),
-        data_port,
-        ibuf
-      );
-      pthread_join(data_conn_tid, NULL);
-      ftp_write(client_sockfd, "226 transfer complete\n");
-
-    } else if (xstr_startwith(ibuf, "QUIT")) {
-      printf("[rep %s] 221 see you\n", addr_str);
-      ftp_write(client_sockfd, "211 see you\n");
-      printf("[ftp] client %s quitted\n", addr_str);
-      break;
-
-    } else {
-      printf("[rep %s] 500 unknown command\n", addr_str);
-      ftp_write(client_sockfd, "500 unknown command\n");
-    }
-  }
-  
-  printf("[ftp] releasing resource for client %s\n", addr_str);
-  xfree(username);
-  xfree(password);
-  xfree(cwd);
-  xfree(trans_cmd);
-  xfree(addr_str);
-  xfree(ibuf);
-  xfree(obuf);
-}
-*/
 
 static void reply(ftp_session session, const char* text) {
   printf("[rep %s] %s", ftp_session_get_user_identifier_cstr(session), text);
@@ -295,14 +66,39 @@ static xsuccess get_request(ftp_session session, char* inbuf, int buf_size) {
   return XSUCCESS;
 }
 
+static void data_acceptor(xsocket data_xsock, void* args) {
+  ftp_session session = (ftp_session) args;
+  const char* data_cmd = ftp_session_get_data_cmd_cstr(session);
+
+  if (xcstr_startwith_cstr(data_cmd, "LIST")) {
+    xstr ls_data = xstr_new();
+    FILE* ls_pipe = popen("ls -al /", "r");
+    char* buf = xmalloc_ty(8192, char);
+    int cnt;
+
+    while (!feof(ls_pipe)) {
+      cnt = fread(buf, 1, 8192, ls_pipe);
+      printf("read count = %d\n", cnt);
+      printf("xsock_write ret = %d\n", xsocket_write(data_xsock, (void *) buf, cnt));
+    }
+
+    pclose(ls_pipe);
+    xfree(buf);
+
+    reply(session, "226 transfer complete\n");
+    xstr_delete(ls_data);
+  }
+}
+
 static void cmd_acceptor(xsocket client_xs, void* args) {
   int buf_size = 8192;
+  xstr host_addr = (xstr) args;
   char* inbuf = xmalloc_ty(buf_size, char);
   char* outbuf = xmalloc_ty(buf_size, char);
   xbool stop_service = XFALSE;
 
   // client_xs will NOT be deleted by ftp_session, but will be deleted by xserver
-  ftp_session session = ftp_session_new(client_xs);
+  ftp_session session = ftp_session_new(client_xs, host_addr);
   reply(session, "220 liquid ftp\n");
 
   // pre-login
@@ -338,7 +134,10 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       stop_service = XTRUE;
 
     } else {
-      reply(session, "500 unknown command\n");
+      xstr rep = xstr_new();
+      xstr_printf(rep, "500 unknown command '%s'\n", inbuf);
+      reply(session, xstr_get_cstr(rep));
+      xstr_delete(rep);
     }
   }
 
@@ -367,8 +166,39 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       xstr_printf(rep, "257 \"%s\" is current directory\n", ftp_session_get_cwd_cstr(session));
       reply(session, xstr_get_cstr(rep));
       xstr_delete(rep);
-    } else {
-      reply(session, "500 unknown command\n");
+    } else if (xcstr_startwith_cstr(inbuf, "TYPE")) {
+      if (strlen(inbuf) < 6) {
+        reply(session, "501 please provide type\n");
+      } else {
+        char type = inbuf[5];
+        if (type == 'a' || type == 'A') {
+          ftp_session_set_trans_type(session, 'A');
+          reply(session, "200 type set to A\n");
+        } else if (type == 'i' || type == 'I') {
+          ftp_session_set_trans_type(session, 'I');
+          reply(session, "200 type set to I\n");
+        } else {
+          reply(session, "500 invalid TYPE command\n");
+        }
+      }
+
+    } else if (xcstr_startwith_cstr(inbuf, "PASV")) {
+      xstr rep = xstr_new();
+      xstr_set_cstr(rep, "227 entering passive mode ");
+      ftp_session_prepare_data_service(session, data_acceptor);
+      add_comma_separated_data_server_addr(rep, session);
+      reply(session, xstr_get_cstr(rep));
+      xstr_delete(rep);
+    } else if (xcstr_startwith_cstr(inbuf, "LIST")) {
+      reply(session, "150 here comes the listing\n");
+      ftp_session_set_data_cmd_cstr(session, inbuf);
+      ftp_session_trigger_data_service(session);
+
+   } else {
+      xstr rep = xstr_new();
+      xstr_printf(rep, "500 unknown command '%s'\n", inbuf);
+      reply(session, xstr_get_cstr(rep));
+      xstr_delete(rep);
     }
   }
 
@@ -379,16 +209,15 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
 
 
 static xsuccess liquid_ftp_service(xstr host, int port) {
-  int ret;
   int backlog = 10;
-  xserver xs = xserver_new(host, port, backlog, cmd_acceptor, 4, XTRUE, NULL); /// XXX debug, only serve 4 times
+  void* args = (void *) host;
+  xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, XTRUE, args);
   if (xs == NULL) {
     fprintf(stderr, "in liquid_ftp_service(): failed to init xserver!\n");
     return XFAILURE;
   }
-  ret = xserver_serve(xs);
-  xserver_delete(xs);
-  return ret;
+  printf("[ftp] ftp server started on %s:%d\n", xstr_get_cstr(host), port);
+  return xserver_serve(xs);  // xserver is self destrying, after service, it will destroy it self
 }
 
 xsuccess liquid_ftp(int argc, char* argv[]) {
@@ -423,7 +252,6 @@ xsuccess liquid_ftp(int argc, char* argv[]) {
       xstr_set_cstr(bind_addr, argv[i + 1]);
     }
   }
-  printf("[ftp] ftp server started on %s:%d\n", xstr_get_cstr(bind_addr), port);
   return liquid_ftp_service(bind_addr, port);
 }
 

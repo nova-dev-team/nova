@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 
 #include "xmemory.h"
 #include "xstr.h"
@@ -7,6 +8,7 @@
 #include "ftp_session.h"
 
 struct ftp_session_impl {
+  xstr host_addr;
   xsocket cmd_sock;
   xbool logged_in;
   xbool username_given;
@@ -15,6 +17,10 @@ struct ftp_session_impl {
   xstr cwd;
   xstr user_identifier;
   xbool user_aborted; ///< @brief Records whether user issued ABOR for data transmission.
+  char trans_type;  // A:ASCII, I:BINARY
+  char trans_mode;  // P:passive (only support this)
+
+  xserver data_server;
   
   /*
     TODO:
@@ -30,8 +36,9 @@ struct ftp_session_impl {
   */
 };
 
-ftp_session ftp_session_new(xsocket cmd_sock) {
+ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr) {
   ftp_session session = xmalloc_ty(1, struct ftp_session_impl);
+  session->host_addr = host_addr;
   session->cmd_sock = cmd_sock;
   session->logged_in = XFALSE;
   session->username_given = XFALSE;
@@ -42,6 +49,8 @@ ftp_session ftp_session_new(xsocket cmd_sock) {
   session->user_identifier = xstr_new();
   xstr_printf(session->user_identifier, "%s:%d", xsocket_get_host_cstr(session->cmd_sock), xsocket_get_port(session->cmd_sock));
   session->user_aborted = XFALSE;
+  session->trans_type = 'A';
+  session->trans_mode = 'P';
   return session;
 }
 
@@ -52,6 +61,7 @@ void ftp_session_delete(ftp_session session) {
   xstr_delete(session->data_cmd);
   xstr_delete(session->cwd);
   xstr_delete(session->user_identifier);
+  xstr_delete(session->host_addr);
 
   xfree(session);
 }
@@ -100,6 +110,52 @@ xbool ftp_session_auth_cstr(ftp_session session, char* password) {
 
 const char* ftp_session_get_cwd_cstr(ftp_session session) {
   return xstr_get_cstr(session->cwd);
+}
+
+char ftp_session_get_trans_mode(ftp_session session) {
+  return session->trans_mode;
+}
+
+char ftp_session_get_trans_type(ftp_session session) {
+  return session->trans_type;
+}
+
+void ftp_session_set_trans_type(ftp_session session, char type) {
+  session->trans_type = type;
+}
+
+void ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data_acceptor) {
+  int data_port = 20000 + rand() % 36000;
+  int backlog = 1;
+  int serv_count = 1;
+  xbool new_thread = XTRUE;
+  xstr host = xstr_copy(session->host_addr);
+  session->data_server = xserver_new(host, data_port, backlog, data_acceptor, serv_count, new_thread, (void *) session);
+}
+
+void ftp_session_trigger_data_service(ftp_session session) {
+  xserver_serve(session->data_server);
+}
+
+xstr ftp_session_get_host_addr(ftp_session session) {
+  return session->host_addr;
+}
+
+char* ftp_session_get_host_ip_cstr(ftp_session session) {
+  return xserver_get_ip_cstr(session->data_server);
+}
+
+
+int ftp_session_get_data_server_port(ftp_session session) {
+  return xserver_get_port(session->data_server);
+}
+
+const char* ftp_session_get_data_cmd_cstr(ftp_session session) {
+  return xstr_get_cstr(session->data_cmd);
+}
+
+void ftp_session_set_data_cmd_cstr(ftp_session session, char* data_cmd) {
+  xstr_set_cstr(session->data_cmd, data_cmd);
 }
 
 

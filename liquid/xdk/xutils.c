@@ -39,7 +39,7 @@ char* xitoa(int value, char* buf, int base) {
 }
 
 
-xbool xcstr_startwith_cstr(char* str, char* head) {
+xbool xcstr_startwith_cstr(const char* str, const char* head) {
   int i;
   for (i = 0; str[i] != '\0' && head[i] != '\0'; i++) {
     if (str[i] != head[i])

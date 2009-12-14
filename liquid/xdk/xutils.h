@@ -49,7 +49,7 @@ char* xitoa(int value, char* buf, int base);
   @return
     1 if true, 0 if false.
 */
-xbool xcstr_startwith_cstr(char* str, char* head);
+xbool xcstr_startwith_cstr(const char* str, const char* head);
 
 /**
   @brief

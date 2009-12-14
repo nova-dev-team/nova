@@ -45,7 +45,7 @@ int xsocket_get_port(xsocket xs) {
   return ntohs(xs->port);
 }
 
-int xsocket_write(xsocket xs, void* data, int len) {
+int xsocket_write(xsocket xs, const void* data, int len) {
   return write(xs->sockfd, data, len);
 }
 
@@ -59,6 +59,11 @@ void xsocket_delete(xsocket xs) {
   xfree(xs);
 }
 
+static void xserver_delete(xserver xs) {
+  xsocket_delete(xs->sock);
+  xfree(xs);
+}
+
 xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor, int serv_count, xbool new_thread, void* args) {
   xserver xs = xmalloc_ty(1, struct xserver_impl);
   xs->sock = xsocket_new(host, port);
@@ -67,6 +72,16 @@ xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor,
   xs->serv_count = serv_count;
   xs->new_thread = new_thread;
   xs->args = args;
+  if (bind(xs->sock->sockfd, (struct sockaddr *) &(xs->sock->addr), sizeof(struct sockaddr)) < 0) {
+    perror("error in bind()");
+    xserver_delete(xs);
+    return NULL;
+  }
+  if (listen(xs->sock->sockfd, xs->backlog) < 0) {
+    perror("error in listen()");
+    xserver_delete(xs);
+    return NULL;
+  }
   return xs;
 }
 
@@ -83,16 +98,9 @@ static void* acceptor_wrapper(void* pthread_arg) {
   return NULL;
 }
 
+
 xsuccess xserver_serve(xserver xs) {
   int serv_count = 0;
-  if (bind(xs->sock->sockfd, (struct sockaddr *) &(xs->sock->addr), sizeof(struct sockaddr)) < 0) {
-    perror("error in bind()");
-    return XFAILURE;
-  }
-  if (listen(xs->sock->sockfd, xs->backlog) < 0) {
-    perror("error in listen()");
-    return XFAILURE;
-  }
   while (xs->serv_count == XUNLIMITED || serv_count < xs->serv_count) {
     struct sockaddr_in client_addr;
     socklen_t sin_size;
@@ -123,11 +131,16 @@ xsuccess xserver_serve(xserver xs) {
       xsocket_delete(client_xs);
     }
   }
+  xserver_delete(xs); // self destroy
   return XSUCCESS;
 }
 
-void xserver_delete(xserver xs) {
-  xsocket_delete(xs->sock);
-  xfree(xs);
+int xserver_get_port(xserver xs) {
+  return xs->sock->port;
+}
+
+
+char* xserver_get_ip_cstr(xserver xs) {
+  return inet_ntoa(xs->sock->addr.sin_addr);
 }
 

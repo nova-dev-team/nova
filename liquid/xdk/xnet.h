@@ -14,7 +14,7 @@ const char* xsocket_get_host_cstr(xsocket xs);
 
 int xsocket_get_port(xsocket xs);
 
-int xsocket_write(xsocket xs, void* data, int len);
+int xsocket_write(xsocket xs, const void* data, int len);
 
 int xsocket_read(xsocket xs, void* buf, int max_len);
 
@@ -30,7 +30,9 @@ xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor,
 
 xsuccess xserver_serve(xserver xs);
 
-void xserver_delete(xserver xs);
+int xserver_get_port(xserver xs);
+
+char* xserver_get_ip_cstr(xserver xs);
 
 #endif
 

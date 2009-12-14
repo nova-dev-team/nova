@@ -162,3 +162,9 @@ xbool xstr_startwith_cstr(xstr xs, char* head) {
   return head[i] == '\0';
 }
 
+xstr xstr_copy(xstr orig) {
+  xstr new_str = xstr_new();
+  xstr_set_cstr(new_str, xstr_get_cstr(orig));
+  return new_str;
+}
+

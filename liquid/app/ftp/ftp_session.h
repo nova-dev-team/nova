@@ -9,7 +9,7 @@ struct ftp_session_impl;
 
 typedef struct ftp_session_impl* ftp_session;
 
-ftp_session ftp_session_new(xsocket cmd_sock);
+ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr);
 
 void ftp_session_delete(ftp_session session);
 
@@ -32,6 +32,28 @@ xbool ftp_session_auth_cstr(ftp_session, char* password);
 const char* ftp_session_get_cwd_cstr(ftp_session session);
 
 int ftp_session_is_user_aborted();
+
+char ftp_session_get_trans_mode(ftp_session session);
+
+char ftp_session_get_trans_type(ftp_session session);
+
+void ftp_session_set_trans_type(ftp_session session, char type);
+
+void ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data_acceptor);
+
+void ftp_session_wait_data_service();
+
+void ftp_session_trigger_data_service();
+
+xstr ftp_session_get_host_addr(ftp_session session);
+
+char* ftp_session_get_host_ip_cstr(ftp_session session);
+
+int ftp_session_get_data_server_port(ftp_session session);
+
+const char* ftp_session_get_data_cmd_cstr(ftp_session session);
+
+void ftp_session_set_data_cmd_cstr(ftp_session session, char* data_cmd);
 
 #endif
 
