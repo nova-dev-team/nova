@@ -15,16 +15,17 @@
 #include <assert.h>
 
 #include "xmemory.h"
+#include "xdef.h"
 
 #include "ftp/liquid_ftp.h"
 #include "gateway/liquid_gw.h"
 #include "serv/liquid_serv.h"
 
-typedef int (*liquid_action)(int argc, char* argv[]);
+typedef xsuccess (*liquid_action)(int argc, char* argv[]);
 typedef void (*liquid_action_help)();
 
 // forward declaration
-static int print_help(int argc, char* argv[]);
+static xsuccess print_help(int argc, char* argv[]);
 static void help_on_help();
 
 
@@ -49,7 +50,7 @@ static void help_on_help() {
   printf("TODO HELP ON HELP\n");
 }
 
-static int print_help(int argc, char* argv[]) {
+static xsuccess print_help(int argc, char* argv[]) {
   int i, j;
   int max_action_name_length = 0; // for pretty printing
   for (i = 0; g_actions[i] != NULL; i += 4) {
@@ -71,7 +72,7 @@ static int print_help(int argc, char* argv[]) {
       printf("%s\n", g_actions[i + 1]);
     }
     printf("\nSee 'liquid help COMMAND' for more information on a specific command.\n");
-    return 0;
+    return XSUCCESS;
   } else {
     // liquid help 'action'
     printf("[TODO] print help information on a specific command\n");
@@ -79,16 +80,16 @@ static int print_help(int argc, char* argv[]) {
     for (i = 0; g_actions[i] != NULL; i += 4) {
       if (strcmp(g_actions[i], argv[2]) == 0) {
         ((liquid_action_help) g_actions[i + 3])();
-        return 0;
+        return XSUCCESS;
       }
     }
     
     printf("liquid: '%s' is not a valid help topic. See 'liquid help'.\n", argv[2]);
-    return 1;
+    return XFAILURE;
   }
 }
 
-static int find_and_exec_action(int argc, char* argv[]) {
+static xsuccess find_and_exec_action(int argc, char* argv[]) {
   int i;
 
   // TODO suggest best match when action not found
@@ -99,7 +100,7 @@ static int find_and_exec_action(int argc, char* argv[]) {
   }
 
   printf("liquid: '%s' is not a valid command. See 'liquid help'.\n", argv[1]);
-  return 1;
+  return XFAILURE;
 }
 
 int main(int argc, char* argv[]) {
@@ -109,6 +110,7 @@ int main(int argc, char* argv[]) {
   } else {
     ret = find_and_exec_action(argc, argv);
   }
+  printf("xmem_usage = %d\n", xmem_usage());
   assert(xmem_usage() == 0);
   return ret;
 }

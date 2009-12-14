@@ -39,16 +39,16 @@ char* xitoa(int value, char* buf, int base) {
 }
 
 
-int xstr_startwith(char* str, char* head) {
+xbool xcstr_startwith_cstr(char* str, char* head) {
   int i;
   for (i = 0; str[i] != '\0' && head[i] != '\0'; i++) {
     if (str[i] != head[i])
-      return 0;
+      return XTRUE;
   }
   return head[i] == '\0';
 }
 
-char* xstr_strip(char* str) {
+char* xcstr_strip(char* str) {
   int begin = 0;
   int end = strlen(str) - 1;
   int i;
@@ -75,7 +75,7 @@ char* xstr_strip(char* str) {
   return str;
 }
 
-int xinet_ip2str(int ip, char* str) {
+xsuccess xinet_ip2str(int ip, char* str) {
   unsigned char* p = (unsigned char *) &ip;
   int i;
   char seg_str[4];
@@ -90,10 +90,10 @@ int xinet_ip2str(int ip, char* str) {
       strcat(str, ".");
     }
   }
-  return 0;
+  return XSUCCESS;
 }
 
-int xinet_get_sockaddr(char* host, int port, struct sockaddr_in* addr) {
+xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr) {
   in_addr_t a;
   bzero(addr, sizeof(*addr));
   addr->sin_family = AF_INET;
@@ -103,10 +103,10 @@ int xinet_get_sockaddr(char* host, int port, struct sockaddr_in* addr) {
   } else {
     struct hostent *hp = gethostbyname(host);
     if (hp == 0 || hp->h_length != 4) {
-      return -1;
+      return XFAILURE;
     }
   }
   addr->sin_port = htons(port);
-  return 0;
+  return XSUCCESS;
 }
 

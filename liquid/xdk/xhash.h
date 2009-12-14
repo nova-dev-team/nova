@@ -1,6 +1,8 @@
 #ifndef XHASH_H_
 #define XHASH_H_
 
+#include "xdef.h"
+
 /**
   @author
     Santa Zhang
@@ -38,7 +40,7 @@ typedef int (*xhash_hash)(void* key);
   @return
     1 if the keys are equal, otherwise 0.
 */
-typedef int (*xhash_eql)(void* key1, void* key2);
+typedef xbool (*xhash_eql)(void* key1, void* key2);
 
 /**
   @brief
@@ -120,7 +122,7 @@ void* xhash_get(xhash xh, void* key);
   @return
     0 if successful, -1 if failed.
 */
-int xhash_remove(xhash xh, void* key);
+xsuccess xhash_remove(xhash xh, void* key);
 
 /**
   @brief

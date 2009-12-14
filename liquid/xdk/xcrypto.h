@@ -1,6 +1,8 @@
 #ifndef XCRYPTO_H_
 #define XCRYPTO_H_
 
+#include "xdef.h"
+
 /**
   @author
     Santa Zhang
@@ -115,12 +117,12 @@ void xsha1_feed(xsha1 xsh, void* data, int size);
     Pointer to output array. It is an unsigned int array with 5 elements.
 
   @return
-    1 if calculation was succesfull. 0 if failed to calculate SHA1 value (possible data corruption).
+    XSUCCESS if calculation was succesfull. XFAILURE if failed to calculate SHA1 value (possible data corruption).
 
   @warning
     Make sure result has got enough memory size!
 */
-int xsha1_result(xsha1 xsh, unsigned int* result);
+xsuccess xsha1_result(xsha1 xsh, unsigned int* result);
 
 /**
   @brief

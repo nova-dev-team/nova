@@ -3,7 +3,7 @@
 #include "xutils.h"
 
 void t(char* str, char* head, int v) {
-  if (v != xstr_startwith(str, head)) {
+  if (v != xcstr_startwith_cstr(str, head)) {
     if (v == 0) {
       printf("'%s' is not started with '%s'!\n", str, head);
     } else {
@@ -12,7 +12,7 @@ void t(char* str, char* head, int v) {
   }
 }
 
-void test_xstr_startwith() {
+void test_xcstr_startwith_cstr() {
   t("", "", 1);
   t("a", "", 1);
   t("a", "a", 1);
@@ -24,6 +24,6 @@ void test_xstr_startwith() {
 }
 
 int main() {
-  test_xstr_startwith();
+  test_xcstr_startwith_cstr();
   return 0;
 }

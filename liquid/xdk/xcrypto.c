@@ -56,13 +56,16 @@ void xsha1_feed(xsha1 xsh, void* data, int size) {
   SHA1Input((SHA1Context *) xsh, data, size);
 }
 
-int xsha1_result(xsha1 xsh, unsigned int* result) {
-  int ret = SHA1Result((SHA1Context *) xsh);
-  int i;
-  for (i = 0; i < 5; i++) {
-    result[i] = xsh->message_digest[i];
+xsuccess xsha1_result(xsha1 xsh, unsigned int* result) {
+  if (SHA1Result((SHA1Context *) xsh)) {
+    int i;
+    for (i = 0; i < 5; i++) {
+      result[i] = xsh->message_digest[i];
+    }
+    return XSUCCESS;
+  } else {
+    return XFAILURE;
   }
-  return ret;
 }
 
 void xsha1_delete(xsha1 xsh) {

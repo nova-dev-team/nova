@@ -1,10 +1,36 @@
 #ifndef XDK_H_
 #define XDK_H_
 
-#define XTRUE 1
-#define XFALSE 0
-#define XFAILURE -1
+/**
+  @author
+    Santa Zhang
 
-typedef int xbool;
+  @file
+    xdef.h
+
+  @brief
+    Defines types used in xdk.
+*/
+
+/**
+  @brief
+    Enumeration of bool type.
+*/
+typedef enum xbool {
+  XTRUE = 1,
+  XFALSE = 0
+} xbool;
+
+
+/**
+  @brief
+    Enumeration of success/failure flag.
+*/
+typedef enum xsuccess {
+  XSUCCESS = 0,
+  XFAILURE = -1
+} xsuccess;
+
+#define XUNLIMITED -1
 
 #endif

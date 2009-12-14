@@ -26,7 +26,7 @@ int main()
     printf("\nTest A: 'abc'\n");
 
     xsha1_feed(xsh, TESTA, strlen(TESTA));
-    if (xsha1_result(xsh, message_digest) == 0) {
+    if (xsha1_result(xsh, message_digest) != XSUCCESS) {
         fprintf(stderr, "ERROR-- could not compute message digest\n");
     }
     else
@@ -45,7 +45,7 @@ int main()
     printf("TESTB\n");
     xsh = xsha1_new();
     xsha1_feed(xsh, TESTB, strlen(TESTB));
-    if (xsha1_result(xsh, message_digest) == 0) {
+    if (xsha1_result(xsh, message_digest) != XSUCCESS ) {
         fprintf(stderr, "ERROR-- could not compute message digest\n");
     }
     else
@@ -65,7 +65,7 @@ int main()
     for(i = 1; i <= 1000000; i++) {
         xsha1_feed(xsh, TESTC, 1);
     }
-    if (xsha1_result(xsh, message_digest) == 0) {
+    if (xsha1_result(xsh, message_digest) != XSUCCESS) {
         fprintf(stderr, "ERROR-- could not compute message digest\n");
     }
     else

@@ -6,8 +6,8 @@ void liquid_gw_help() {
   printf("TODO add gateway help info here\n");
 }
 
-int liquid_gw(int argc, char* argv[]) {
+xsuccess liquid_gw(int argc, char* argv[]) {
   printf("TODO serve as gateway\n");
-  return 0;
+  return XSUCCESS;
 }
 

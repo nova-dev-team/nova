@@ -204,14 +204,14 @@ int xhash_remove(xhash xh, void* key) {
   p = xh->slot[slot_id];
   if (p == NULL) {
     // head is null, so no element found
-    return -1;
+    return XFAILURE;
   } else if (xh->eql_func(key, p->key)) {
     // head is target
     xh->slot[slot_id] = xh->slot[slot_id]->next;
     xh->free_func(p->key, p->value);
     xfree(p);
     xh->entry_count--;
-    return 0;
+    return XSUCCESS;
   } else {
     // head is not target
     q = p->next;
@@ -219,7 +219,7 @@ int xhash_remove(xhash xh, void* key) {
       // q is the item to be checked
       q = p->next;
       if (q == NULL)
-        return -1;
+        return XFAILURE;
       
       if (xh->eql_func(key, q->key)) {
         // q is target
@@ -227,12 +227,12 @@ int xhash_remove(xhash xh, void* key) {
         xh->free_func(q->key, q->value);
         xfree(q);
         xh->entry_count--;
-        return 0;
+        return XSUCCESS;
       }
       p = q;
     }
   }
-  return -1;
+  return XFAILURE;
 }
 
 int xhash_size(xhash xh) {

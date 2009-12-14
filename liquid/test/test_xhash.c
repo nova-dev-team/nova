@@ -9,8 +9,11 @@ int ii_hash_func(void* key) {
 }
 
 // eql function for int-int hash table
-int ii_eql_func(void* key1, void* key2) {
-  return (*(int *) key1) == (*(int *) key2);
+xbool ii_eql_func(void* key1, void* key2) {
+  if ((*(int *) key1) == (*(int *) key2))
+    return XTRUE;
+  else
+    return XFALSE;
 }
 
 // free function for int-int hash table

@@ -14,6 +14,8 @@
 
 #include <netinet/in.h>
 
+#include "xdef.h"
+
 /**
   @brief
     Convert int value into a char* string.
@@ -47,7 +49,7 @@ char* xitoa(int value, char* buf, int base);
   @return
     1 if true, 0 if false.
 */
-int xstr_startwith(char* str, char* head);
+xbool xcstr_startwith_cstr(char* str, char* head);
 
 /**
   @brief
@@ -59,7 +61,7 @@ int xstr_startwith(char* str, char* head);
   @return
     The stripped string.
 */
-char* xstr_strip(char* str);
+char* xcstr_strip(char* str);
 
 /**
   @brief
@@ -77,7 +79,7 @@ char* xstr_strip(char* str);
   @warning
     str must have enough size!
 */
-int xinet_ip2str(int ip, char* str);
+xsuccess xinet_ip2str(int ip, char* str);
 
 /**
   @brief
@@ -93,7 +95,7 @@ int xinet_ip2str(int ip, char* str);
   @return
     -1 if failure, otherwise 0.
 */
-int xinet_get_sockaddr(char* host, int port, struct sockaddr_in* addr);
+xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr);
 
 #endif
 

@@ -1,11 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
+#include "xdef.h"
+#include "xnet.h"
+#include "xstr.h"
+#include "xutils.h"
+
+/*
+
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <time.h>
 
 #include "xserver.h"
 #include "xconn.h"
@@ -15,11 +23,13 @@
 #include "liquid_ftp.h"
 #include "ftp_session.h"
 #include "ftp_fs.h"
+*/
 
 void liquid_ftp_help() {
   printf("usage: liquid ftp <-p port|--port=port> <-b bind_addr|--bind=bind_addr>\n");
 }
 
+/*
 static int ftp_write(int client_sockfd, char* cmd) {
   return write(client_sockfd, cmd, strlen(cmd));
 }
@@ -256,22 +266,36 @@ static void liquid_ftp_client_acceptor(int client_sockfd, struct sockaddr* clien
   xfree(ibuf);
   xfree(obuf);
 }
+*/
 
-static int liquid_ftp_service(char* host, int port) {
-  xserver xs;
-  if (xserver_init(&xs, host, port, 10, liquid_ftp_client_acceptor) < 0) {
-    fprintf(stderr, "in liquid_ftp_service(): failed to init xserver!\n");
-    return -1;
-  }
-  return xserver_serve(&xs, &(xs.addr));
+static void reply(xsocket client_xs, char* text) {
+  xsocket_write(client_xs, text, strlen(text));
 }
 
-int liquid_ftp(int argc, char* argv[]) {
+static void client_acceptor(xsocket client_xs, void* args) {
+  reply(client_xs, "220 liquid ftp\n");
+}
+
+
+static xsuccess liquid_ftp_service(xstr host, int port) {
+  int ret;
+  int backlog = 10;
+  xserver xs = xserver_new(host, port, backlog, client_acceptor, 4, XTRUE, NULL); /// XXX debug, only serve 4 times
+  if (xs == NULL) {
+    fprintf(stderr, "in liquid_ftp_service(): failed to init xserver!\n");
+    return XFAILURE;
+  }
+  ret = xserver_serve(xs);
+  xserver_delete(xs);
+  return ret;
+}
+
+xsuccess liquid_ftp(int argc, char* argv[]) {
   int port = 8021;
-  char bind[16];
+  xstr bind_addr = xstr_new();  // will be sent into liquid_ftp_service(), and work as a component of xserver. will be destroyed when xserver is deleted
   int i;
   srand(time(NULL));
-  strcpy(bind, "0.0.0.0");
+  xstr_set_cstr(bind_addr, "0.0.0.0");
 
   for (i = 2; i < argc; i++) {
     if (strcmp(argv[i], "-p") == 0) {
@@ -282,23 +306,23 @@ int liquid_ftp(int argc, char* argv[]) {
         printf("error in cmdline args: '-p' must be followed by port number!\n");
         exit(1);
       }
-    } else if (xstr_startwith(argv[i], "--port=")) {
+    } else if (xcstr_startwith_cstr(argv[i], "--port=")) {
       // TODO check if not number
       sscanf(argv[i] + 7, "%d", &port);
     } else if (strcmp(argv[i], "-b") == 0) {
       if (i + 1 < argc) {
         // TODO check ip address format
-        strcpy(bind, argv[i + 1]);
+        xstr_set_cstr(bind_addr, argv[i + 1]);
       } else {
         printf("error in cmdline args: '-b' must be followed by bind address!\n");
         exit(1);
       }
-    } else if (xstr_startwith(argv[i], "--bind=")) {
+    } else if (xcstr_startwith_cstr(argv[i], "--bind=")) {
       // TODO check ip address format
-      strcpy(bind, argv[i] + 7);
+      xstr_set_cstr(bind_addr, argv[i + 1]);
     }
   }
-  printf("[ftp] ftp server started on %s:%d\n", bind, port);
-  return liquid_ftp_service(bind, port);
+  printf("[ftp] ftp server started on %s:%d\n", xstr_get_cstr(bind_addr), port);
+  return liquid_ftp_service(bind_addr, port);
 }
 
