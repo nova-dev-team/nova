@@ -45,7 +45,7 @@ static void get_client_addr_str(struct sockaddr* client_addr, char* addr_str) {
   addr_str[pos] = ':';
   xitoa(client_addr_in->sin_port, addr_str + pos + 1, 10);
 }
-
+*/
 static void strip_trailing_crlf(char* str) {
   // abc\r\n -> abc
   int pos = strlen(str) - 1;
@@ -54,7 +54,7 @@ static void strip_trailing_crlf(char* str) {
     pos--;
   }
 }
-
+/*
 // generate a random port
 static int gen_rand_port() {
   return 20000 + (rand() % 36000);
@@ -271,13 +271,31 @@ static void liquid_ftp_client_acceptor(int client_sockfd, struct sockaddr* clien
 }
 */
 
-static void reply(ftp_session session, char* text) {
-  printf("[rep %s] %s", "TODO-client-addr", text);
-  ftp_session_cmd_write(session, text, strlen(text));
+static void reply(ftp_session session, const char* text) {
+  printf("[rep %s] %s", ftp_session_get_user_identifier_cstr(session), text);
+  ftp_session_cmd_write(session, (void *) text, strlen(text));
+}
+
+static xsuccess get_request(ftp_session session, char* inbuf, int buf_size) {
+  int cnt = ftp_session_cmd_read(session, inbuf, buf_size);
+  if (cnt == buf_size) {
+    reply(session, "501 too long request\n");
+    printf("[ftp] client %s kicked because of too long request\n", ftp_session_get_user_identifier_cstr(session));
+    return XFAILURE;
+  } else if (cnt == 0) {
+    printf("[ftp] client %s prematurely disconnected\n", ftp_session_get_user_identifier_cstr(session));
+    return XFAILURE;
+  } else if (cnt == -1) {
+    printf("[ftp] client %s kicked because of socket error\n", ftp_session_get_user_identifier_cstr(session));
+    return XFAILURE;
+  }
+  inbuf[cnt] = '\0';
+  strip_trailing_crlf(inbuf);
+  printf("[req %s] %s\n", ftp_session_get_user_identifier_cstr(session), inbuf);
+  return XSUCCESS;
 }
 
 static void cmd_acceptor(xsocket client_xs, void* args) {
-  int cnt;
   int buf_size = 8192;
   char* inbuf = xmalloc_ty(buf_size, char);
   char* outbuf = xmalloc_ty(buf_size, char);
@@ -289,28 +307,69 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
 
   // pre-login
   while (stop_service == XFALSE && ftp_session_is_logged_in(session) == XFALSE) {
-    cnt = ftp_session_cmd_read(session, inbuf, buf_size);
-    if (cnt == buf_size) {
-      reply(session, "501 too long request\n");
-      printf("[ftp] client %s kicked because of too long request\n", "TODO-client-addr");
-      stop_service = XTRUE;
-      break;  // stop service
-    } else if (cnt == 0) {
-      printf("[ftp] client %s prematurely disconnected\n", "TODO-client-addr");
-      stop_service = XTRUE;
-      break;  // stop service
-    } else if (cnt == -1) {
-      printf("[ftp] client %s kicked because of socket error\n", "TODO-client-addr");
+    if (get_request(session, inbuf, buf_size) != XSUCCESS) {
       stop_service = XTRUE;
       break;
     }
-    inbuf[cnt] = '\0';
-    printf("[req %s] %s", "TODO-client-addr", inbuf);
+
+    if (xcstr_startwith_cstr(inbuf, "USER")) {
+      // check if command is correct
+      if (strlen(inbuf) < 6) {
+        reply(session, "501 please provide username\n");
+      } else {
+        ftp_session_set_username_cstr(session, inbuf + 5);
+        reply(session, "331 password required\n");
+      }
+
+    } else if (xcstr_startwith_cstr(inbuf, "PASS")) {
+      // check if command is correct
+      if (strlen(inbuf) < 6) {
+        reply(session, "501 please provide password\n");
+      } else {
+        if (ftp_session_auth_cstr(session, inbuf + 5)) {
+          reply(session, "230 user logged in\n");
+        } else {
+          reply(session, "530 login incorrect\n");
+        }
+      }
+
+    } else if (xcstr_startwith_cstr(inbuf, "QUIT")) {
+      reply(session, "211 see you\n");
+      stop_service = XTRUE;
+
+    } else {
+      reply(session, "500 unknown command\n");
+    }
   }
 
   // post-login
   while (stop_service == XFALSE) {
+    if (get_request(session, inbuf, buf_size) != XSUCCESS) {
       stop_service = XTRUE;
+      break;
+    }
+
+    if (xcstr_startwith_cstr(inbuf, "USER")) {
+      reply(session, "500 cannot change username\n");
+    } else if (xcstr_startwith_cstr(inbuf, "QUIT")) {
+      reply(session, "211 see you\n");
+      stop_service = XTRUE;
+    } else if (xcstr_startwith_cstr(inbuf, "SYST")) {
+      reply(session, "215 UNIX Type: L8\n");
+    } else if (xcstr_startwith_cstr(inbuf, "FEAT")) {
+      reply(session, "211-Features:\n");
+      reply(session, " MDTM\n");
+      reply(session, " REST STREAM\n");
+      reply(session, " SIZE\n");
+      reply(session, "211 End\n");
+    } else if (xcstr_startwith_cstr(inbuf, "PWD")) {
+      xstr rep = xstr_new();
+      xstr_printf(rep, "257 \"%s\" is current directory\n", ftp_session_get_cwd_cstr(session));
+      reply(session, xstr_get_cstr(rep));
+      xstr_delete(rep);
+    } else {
+      reply(session, "500 unknown command\n");
+    }
   }
 
   ftp_session_delete(session);

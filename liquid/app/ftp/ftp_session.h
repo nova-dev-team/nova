@@ -19,9 +19,17 @@ int ftp_session_cmd_read(ftp_session session, void* buf, int max_len);
 
 xbool ftp_session_is_logged_in(ftp_session session);
 
-void ftp_session_set_username(xstr username);
+xbool ftp_session_is_username_given(ftp_session session);
 
-void ftp_session_auth(xstr password);
+void ftp_session_set_username_cstr(ftp_session session, char* cstr_username);
+
+const char* ftp_session_get_username_cstr(ftp_session session);
+
+const char* ftp_session_get_user_identifier_cstr(ftp_session session);
+
+xbool ftp_session_auth_cstr(ftp_session, char* password);
+
+const char* ftp_session_get_cwd_cstr(ftp_session session);
 
 int ftp_session_is_user_aborted();
 

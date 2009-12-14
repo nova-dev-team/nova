@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -34,6 +35,14 @@ xsocket xsocket_new(xstr host, int port) {
     xsock->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     return xsock;
   }
+}
+
+const char* xsocket_get_host_cstr(xsocket xs) {
+  return xstr_get_cstr(xs->host);
+}
+
+int xsocket_get_port(xsocket xs) {
+  return ntohs(xs->port);
 }
 
 int xsocket_write(xsocket xs, void* data, int len) {

@@ -10,6 +10,10 @@ typedef struct xsocket_impl* xsocket;
 
 xsocket xsocket_new(xstr host, int port);
 
+const char* xsocket_get_host_cstr(xsocket xs);
+
+int xsocket_get_port(xsocket xs);
+
 int xsocket_write(xsocket xs, void* data, int len);
 
 int xsocket_read(xsocket xs, void* buf, int max_len);

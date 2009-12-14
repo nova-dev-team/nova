@@ -43,7 +43,7 @@ xbool xcstr_startwith_cstr(char* str, char* head) {
   int i;
   for (i = 0; str[i] != '\0' && head[i] != '\0'; i++) {
     if (str[i] != head[i])
-      return XTRUE;
+      return XFALSE;
   }
   return head[i] == '\0';
 }
