@@ -98,6 +98,7 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
   xbool stop_service = XFALSE;
 
   // client_xs will NOT be deleted by ftp_session, but will be deleted by xserver
+  // host_addr will NOT be deleted by ftp_session, but will be deleted by ftp entry
   ftp_session session = ftp_session_new(client_xs, host_addr);
   reply(session, "220 liquid ftp\n");
 
@@ -209,6 +210,7 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
 
 
 static xsuccess liquid_ftp_service(xstr host, int port) {
+  int ret;
   int backlog = 10;
   void* args = (void *) host;
   xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, XTRUE, args);
@@ -217,7 +219,9 @@ static xsuccess liquid_ftp_service(xstr host, int port) {
     return XFAILURE;
   }
   printf("[ftp] ftp server started on %s:%d\n", xstr_get_cstr(host), port);
-  return xserver_serve(xs);  // xserver is self destrying, after service, it will destroy it self
+  ret = xserver_serve(xs);  // xserver is self destrying, after service, it will destroy it self
+  xstr_delete(host);
+  return ret;
 }
 
 xsuccess liquid_ftp(int argc, char* argv[]) {

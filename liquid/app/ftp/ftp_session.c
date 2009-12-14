@@ -19,21 +19,7 @@ struct ftp_session_impl {
   xbool user_aborted; ///< @brief Records whether user issued ABOR for data transmission.
   char trans_type;  // A:ASCII, I:BINARY
   char trans_mode;  // P:passive (only support this)
-
   xserver data_server;
-  
-  /*
-    TODO:
-
-    pthread signal for data cmd
-      when user send PASV cmd, an xserver (serve 1 time, no new thread) is created.
-      the data_sock acceptor function should wait on data_cmd signal.
-      when user data cmd is recv'ed, the signal will be called.
-
-    data xserver
-
-    client sock
-  */
 };
 
 ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr) {
@@ -61,7 +47,6 @@ void ftp_session_delete(ftp_session session) {
   xstr_delete(session->data_cmd);
   xstr_delete(session->cwd);
   xstr_delete(session->user_identifier);
-  xstr_delete(session->host_addr);
 
   xfree(session);
 }
