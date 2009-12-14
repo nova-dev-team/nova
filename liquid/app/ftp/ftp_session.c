@@ -1,13 +1,18 @@
+#include "xmemory.h"
+#include "xstr.h"
+#include "xnet.h"
+
 #include "ftp_session.h"
 
-#include "xstr.h"
-
 struct ftp_session_impl {
-  int logged_in;
+  xbool logged_in;
   int username_given;
   xstr username;
   xstr data_cmd;
   int user_aborted; ///< @brief Records whether user issued ABOR for data transmission.
+
+
+  xsocket cmd_sock;
   
   /*
     TODO:
@@ -23,4 +28,27 @@ struct ftp_session_impl {
   */
 };
 
+ftp_session ftp_session_new(xsocket cmd_sock) {
+  ftp_session session = xmalloc_ty(1, struct ftp_session_impl);
+  session->cmd_sock = cmd_sock;
+  return session;
+}
+
+void ftp_session_delete(ftp_session session) {
+  //*** DO NOT DELETE cmd_sock! it will be automatically deleted by xserver!
+  xfree(session);
+}
+
+int ftp_session_cmd_write(ftp_session session, void* data, int len) {
+  return xsocket_write(session->cmd_sock, data, len);
+}
+
+int ftp_session_cmd_read(ftp_session session, void* buf,  int max_len) {
+  return xsocket_read(session->cmd_sock, buf, max_len);
+}
+
+
+xbool ftp_session_is_logged_in(ftp_session session) {
+  return session->logged_in;
+}
 

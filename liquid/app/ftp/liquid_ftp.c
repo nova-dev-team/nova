@@ -5,8 +5,11 @@
 
 #include "xdef.h"
 #include "xnet.h"
+#include "xmemory.h"
 #include "xstr.h"
 #include "xutils.h"
+
+#include "ftp_session.h"
 
 /*
 
@@ -268,19 +271,58 @@ static void liquid_ftp_client_acceptor(int client_sockfd, struct sockaddr* clien
 }
 */
 
-static void reply(xsocket client_xs, char* text) {
-  xsocket_write(client_xs, text, strlen(text));
+static void reply(ftp_session session, char* text) {
+  printf("[rep %s] %s", "TODO-client-addr", text);
+  ftp_session_cmd_write(session, text, strlen(text));
 }
 
-static void client_acceptor(xsocket client_xs, void* args) {
-  reply(client_xs, "220 liquid ftp\n");
+static void cmd_acceptor(xsocket client_xs, void* args) {
+  int cnt;
+  int buf_size = 8192;
+  char* inbuf = xmalloc_ty(buf_size, char);
+  char* outbuf = xmalloc_ty(buf_size, char);
+  xbool stop_service = XFALSE;
+
+  // client_xs will NOT be deleted by ftp_session, but will be deleted by xserver
+  ftp_session session = ftp_session_new(client_xs);
+  reply(session, "220 liquid ftp\n");
+
+  // pre-login
+  while (stop_service == XFALSE && ftp_session_is_logged_in(session) == XFALSE) {
+    cnt = ftp_session_cmd_read(session, inbuf, buf_size);
+    if (cnt == buf_size) {
+      reply(session, "501 too long request\n");
+      printf("[ftp] client %s kicked because of too long request\n", "TODO-client-addr");
+      stop_service = XTRUE;
+      break;  // stop service
+    } else if (cnt == 0) {
+      printf("[ftp] client %s prematurely disconnected\n", "TODO-client-addr");
+      stop_service = XTRUE;
+      break;  // stop service
+    } else if (cnt == -1) {
+      printf("[ftp] client %s kicked because of socket error\n", "TODO-client-addr");
+      stop_service = XTRUE;
+      break;
+    }
+    inbuf[cnt] = '\0';
+    printf("[req %s] %s", "TODO-client-addr", inbuf);
+  }
+
+  // post-login
+  while (stop_service == XFALSE) {
+      stop_service = XTRUE;
+  }
+
+  ftp_session_delete(session);
+  xfree(inbuf);
+  xfree(outbuf);
 }
 
 
 static xsuccess liquid_ftp_service(xstr host, int port) {
   int ret;
   int backlog = 10;
-  xserver xs = xserver_new(host, port, backlog, client_acceptor, 4, XTRUE, NULL); /// XXX debug, only serve 4 times
+  xserver xs = xserver_new(host, port, backlog, cmd_acceptor, 4, XTRUE, NULL); /// XXX debug, only serve 4 times
   if (xs == NULL) {
     fprintf(stderr, "in liquid_ftp_service(): failed to init xserver!\n");
     return XFAILURE;

@@ -40,6 +40,10 @@ int xsocket_write(xsocket xs, void* data, int len) {
   return write(xs->sockfd, data, len);
 }
 
+int xsocket_read(xsocket xs, void* buf, int max_len) {
+  return read(xs->sockfd, buf, max_len);
+}
+
 void xsocket_delete(xsocket xs) {
   shutdown(xs->sockfd, SHUT_RDWR);
   xstr_delete(xs->host);

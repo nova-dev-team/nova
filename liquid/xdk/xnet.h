@@ -12,6 +12,8 @@ xsocket xsocket_new(xstr host, int port);
 
 int xsocket_write(xsocket xs, void* data, int len);
 
+int xsocket_read(xsocket xs, void* buf, int max_len);
+
 void xsocket_delete(xsocket xs);
 
 struct xserver_impl;
