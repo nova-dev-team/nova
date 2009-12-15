@@ -48,7 +48,7 @@ struct xhash_impl {
 
 xhash xhash_new(xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free) {
   int i;
-  xhash xh = xmalloc_ty(1, struct xhash_impl);
+  xhash xh = (struct xhash_impl *) xmalloc(sizeof(struct xhash_impl));
 
   xh->extend_ptr = 0;
   xh->extend_level = 0;
@@ -237,5 +237,20 @@ int xhash_remove(xhash xh, void* key) {
 
 int xhash_size(xhash xh) {
   return xh->entry_count;
+}
+
+void xhash_visit(xhash xh, xhash_visitor visitor) {
+  size_t i;
+  size_t actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
+  xbool should_continue = XTRUE;
+  xhash_entry* p;
+  
+  for (i = 0; i < actual_size && should_continue == XTRUE; i++) {
+    p = xh->slot[i];
+    while (p != NULL && should_continue == XTRUE) {
+      should_continue = visitor(p->key, p->value);
+      p = p->next;
+    }
+  }
 }
 

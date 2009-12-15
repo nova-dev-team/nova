@@ -53,6 +53,8 @@ typedef xbool (*xhash_eql)(void* key1, void* key2);
 */
 typedef void (*xhash_free)(void* key, void* value);
 
+typedef xbool (*xhash_visitor)(void* key, void* value);
+
 /**
   @brief
     Interface of xhash which is exposed to users.
@@ -123,6 +125,8 @@ void* xhash_get(xhash xh, void* key);
     0 if successful, -1 if failed.
 */
 xsuccess xhash_remove(xhash xh, void* key);
+
+void xhash_visit(xhash xh, xhash_visitor visitor);
 
 /**
   @brief

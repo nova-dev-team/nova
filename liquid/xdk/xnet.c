@@ -26,6 +26,7 @@ struct xserver_impl {
   void* args;
 };
 
+// host will be deleted when deleting xsocked
 xsocket xsocket_new(xstr host, int port) {
   xsocket xsock = xmalloc_ty(1, struct xsocket_impl);
   xsock->host = host;
@@ -143,7 +144,16 @@ xsuccess xserver_serve(xserver xs) {
       } else if (pid == 0) {
         // child process
 
+        // begin monitoring mem usage in service process
+        xmem_reset_counter();
         xs->acceptor(client_xs, xs->args);
+        
+        if (xmem_usage() != 0) {
+          printf("[xdk] mem leak: xmem_usage() = %d for xserver's service process\n", xmem_usage());
+#ifdef XMEM_DEBUG
+          xmem_print_usage();
+#endif
+        }
         xsocket_delete(client_xs);
         // exit child process
         exit(0);

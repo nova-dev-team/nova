@@ -26,7 +26,7 @@ static void strip_trailing_crlf(char* str) {
 
 static void add_comma_separated_data_server_addr(xstr rep, ftp_session session) {
   int data_server_port = ftp_session_get_data_server_port(session);
-  char* data_server_ip = xmalloc_ty(16, char);
+  char data_server_ip[16];
   int i;
   strcpy(data_server_ip, ftp_session_get_host_ip_cstr(session));
 

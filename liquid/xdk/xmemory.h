@@ -21,7 +21,15 @@
   @param ty
     Type of allocated objects.
 */
+
+
+//#define XMEM_DEBUG
+
+#ifdef XMEM_DEBUG
+#define xmalloc_ty(cnt, ty) ((ty *) xmalloc_debug((cnt) * sizeof(ty), __FILE__, __LINE__))
+#else
 #define xmalloc_ty(cnt, ty) ((ty *) xmalloc((cnt) * sizeof(ty)))
+#endif
 
 /**
   @brief
@@ -39,7 +47,10 @@
   @warning
     xmalloc'ed memory chunk must be freed by xfree().
 */
+
 void* xmalloc(int size);
+
+void* xmalloc_debug(int size, const char* file, int line);
 
 /**
   @brief
@@ -84,6 +95,10 @@ void* xrealloc(void* ptr, int new_size);
     Number of allocated memory chunks.
 */
 int xmem_usage();
+
+void xmem_print_usage();
+
+void xmem_reset_counter();
 
 #endif
 
