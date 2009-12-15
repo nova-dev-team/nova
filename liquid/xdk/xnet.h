@@ -26,7 +26,7 @@ typedef struct xserver_impl* xserver;
 
 typedef void (*xserver_acceptor)(xsocket client_xs, void* args);
 
-xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor, int serv_count, xbool new_thread, void* args);
+xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor, int serv_count, char serv_mode, void* args);
 
 xsuccess xserver_serve(xserver xs);
 

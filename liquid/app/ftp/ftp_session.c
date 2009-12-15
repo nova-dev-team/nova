@@ -113,9 +113,9 @@ void ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data
   int data_port = 20000 + rand() % 36000;
   int backlog = 1;
   int serv_count = 1;
-  xbool new_thread = XTRUE;
+  char serv_mode = 't';
   xstr host = xstr_copy(session->host_addr);
-  session->data_server = xserver_new(host, data_port, backlog, data_acceptor, serv_count, new_thread, (void *) session);
+  session->data_server = xserver_new(host, data_port, backlog, data_acceptor, serv_count, serv_mode, (void *) session);
 }
 
 void ftp_session_trigger_data_service(ftp_session session) {

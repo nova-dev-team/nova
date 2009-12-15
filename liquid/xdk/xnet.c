@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <netinet/in.h>
@@ -20,7 +21,7 @@ struct xserver_impl {
   int backlog;
   xserver_acceptor acceptor;
   int serv_count;
-  int new_thread;
+  char serv_mode; // 'b' blocking, 'p' new process, 't' new thread
   void* args;
 };
 
@@ -64,13 +65,13 @@ static void xserver_delete(xserver xs) {
   xfree(xs);
 }
 
-xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor, int serv_count, xbool new_thread, void* args) {
+xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor, int serv_count, char serv_mode, void* args) {
   xserver xs = xmalloc_ty(1, struct xserver_impl);
   xs->sock = xsocket_new(host, port);
   xs->backlog = backlog;
   xs->acceptor = acceptor;
   xs->serv_count = serv_count;
-  xs->new_thread = new_thread;
+  xs->serv_mode = serv_mode;
   xs->args = args;
   if (bind(xs->sock->sockfd, (struct sockaddr *) &(xs->sock->addr), sizeof(struct sockaddr)) < 0) {
     perror("error in bind()");
@@ -115,7 +116,8 @@ xsuccess xserver_serve(xserver xs) {
 
     serv_count++;
 
-    if (xs->new_thread == XTRUE) {
+    if (xs->serv_mode == 't' || xs->serv_mode == 'T') {
+      // serve in new thread
       pthread_t tid;
       void** arglist = xmalloc_ty(3, void *);  // will be xfree'd in acceptor wrapper
       arglist[0] = xs;
@@ -126,7 +128,24 @@ xsuccess xserver_serve(xserver xs) {
         // TODO handle error creating new thread
         return XFAILURE;
       }
+    } else if (xs->serv_mode == 'p' || xs->serv_mode == 'P') {
+      pid_t pid = fork();
+      if (pid < 0) {
+        perror("error in forking new process");
+        return XFAILURE;
+      } else if (pid == 0) {
+        // child process
+        xs->acceptor(client_xs, xs->args);
+        xsocket_delete(client_xs);
+        // exit child process
+        exit(0);
+
+      } else {
+        // parent process
+        // do nothing
+      }
     } else {
+      // blocking
       xs->acceptor(client_xs, xs->args);
       xsocket_delete(client_xs);
     }

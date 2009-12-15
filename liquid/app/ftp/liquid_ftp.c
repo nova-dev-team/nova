@@ -213,7 +213,8 @@ static xsuccess liquid_ftp_service(xstr host, int port) {
   int ret;
   int backlog = 10;
   void* args = (void *) host;
-  xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, XTRUE, args);
+  char serv_mode = 'p'; // serv in new process
+  xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, serv_mode, args);
   if (xs == NULL) {
     fprintf(stderr, "in liquid_ftp_service(): failed to init xserver!\n");
     return XFAILURE;
