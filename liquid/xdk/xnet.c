@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 #include <pthread.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -102,6 +103,12 @@ static void* acceptor_wrapper(void* pthread_arg) {
 
 xsuccess xserver_serve(xserver xs) {
   int serv_count = 0;
+
+  // prevent zombie processes
+  if (xs->serv_mode == 'p' || xs->serv_mode == 'P') {
+    signal(SIGCHLD, SIG_IGN);
+  }
+
   while (xs->serv_count == XUNLIMITED || serv_count < xs->serv_count) {
     struct sockaddr_in client_addr;
     socklen_t sin_size;
@@ -135,6 +142,7 @@ xsuccess xserver_serve(xserver xs) {
         return XFAILURE;
       } else if (pid == 0) {
         // child process
+
         xs->acceptor(client_xs, xs->args);
         xsocket_delete(client_xs);
         // exit child process
@@ -142,7 +150,9 @@ xsuccess xserver_serve(xserver xs) {
 
       } else {
         // parent process
-        // do nothing
+        
+        // tricky here, reset rand seed, prevent sub process from rand value collisions
+        srand(pid);
       }
     } else {
       // blocking
