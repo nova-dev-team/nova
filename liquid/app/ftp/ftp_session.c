@@ -48,6 +48,8 @@ void ftp_session_delete(ftp_session session) {
   xstr_delete(session->cwd);
   xstr_delete(session->user_identifier);
 
+  // TODO kill data server
+
   xfree(session);
 }
 

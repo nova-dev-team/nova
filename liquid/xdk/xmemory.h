@@ -23,7 +23,7 @@
 */
 
 
-//#define XMEM_DEBUG
+#define XMEM_DEBUG
 
 #ifdef XMEM_DEBUG
 #define xmalloc_ty(cnt, ty) ((ty *) xmalloc_debug((cnt) * sizeof(ty), __FILE__, __LINE__))

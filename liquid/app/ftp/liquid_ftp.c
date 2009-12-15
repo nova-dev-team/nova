@@ -72,19 +72,9 @@ static void data_acceptor(xsocket data_xsock, void* args) {
 
   if (xcstr_startwith_cstr(data_cmd, "LIST")) {
     xstr ls_data = xstr_new();
-    FILE* ls_pipe = popen("ls -al /", "r");
-    char* buf = xmalloc_ty(8192, char);
-    int cnt;
-
-    while (!feof(ls_pipe)) {
-      cnt = fread(buf, 1, 8192, ls_pipe);
-      printf("read count = %d\n", cnt);
-      printf("xsock_write ret = %d\n", xsocket_write(data_xsock, (void *) buf, cnt));
-    }
-
-    pclose(ls_pipe);
-    xfree(buf);
-
+    xstr_set_cstr(ls_data, "drwxr-xr-x 2 user group 4096 Dec 07 07:09 vdisks_upload\r\n");
+    xstr_append_cstr(ls_data, "drwxr-xr-x 2 user group 4096 Apr 02 07:09 vdisks_upload2\r\n");
+    xsocket_write(data_xsock, (const void *) xstr_get_cstr(ls_data), xstr_len(ls_data));
     reply(session, "226 transfer complete\n");
     xstr_delete(ls_data);
   }
