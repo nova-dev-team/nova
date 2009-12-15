@@ -145,4 +145,12 @@ void ftp_session_set_data_cmd_cstr(ftp_session session, char* data_cmd) {
   xstr_set_cstr(session->data_cmd, data_cmd);
 }
 
+xstr ftp_session_get_cwd(ftp_session session) {
+  return session->cwd;
+}
+
+xsuccess ftp_session_try_cwd_cstr(ftp_session session, char* new_path, xstr error_msg) {
+  xstr_set_cstr(session->cwd, new_path);
+  return XSUCCESS;
+}
 
