@@ -4,8 +4,10 @@
 #include "xmemory.h"
 #include "xstr.h"
 #include "xnet.h"
+#include "xutils.h"
 
 #include "ftp_session.h"
+#include "ftp_fs.h"
 
 struct ftp_session_impl {
   xstr host_addr;
@@ -42,14 +44,10 @@ ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr) {
 
 void ftp_session_delete(ftp_session session) {
   //*** DO NOT DELETE cmd_sock! it will be automatically deleted by xserver!
-
   xstr_delete(session->username);
   xstr_delete(session->data_cmd);
   xstr_delete(session->cwd);
   xstr_delete(session->user_identifier);
-
-  // TODO kill data server
-
   xfree(session);
 }
 
@@ -150,7 +148,19 @@ xstr ftp_session_get_cwd(ftp_session session) {
 }
 
 xsuccess ftp_session_try_cwd_cstr(ftp_session session, char* new_path, xstr error_msg) {
-  xstr_set_cstr(session->cwd, new_path);
-  return XSUCCESS;
+  xsuccess ret = ftp_fs_try_cwd_cstr(xstr_get_cstr(session->cwd), new_path, error_msg);
+  if (ret == XSUCCESS) {
+    if (xcstr_startwith_cstr(new_path, "/")) {
+      xstr_set_cstr(session->cwd, new_path);
+    } else {
+      const char* cstr = xstr_get_cstr(session->cwd);
+      int cstr_len = xstr_len(session->cwd);
+      if (cstr[cstr_len - 1] != '/') {
+        xstr_append_char(session->cwd, '/');
+      }
+      xstr_append_cstr(session->cwd, new_path);
+    }
+  }
+  return ret;
 }
 

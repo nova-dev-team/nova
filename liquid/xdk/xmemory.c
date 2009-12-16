@@ -83,7 +83,7 @@ void xmem_log_table_delete(xmem_log_table* xl) {
 
 // calculates the actuall slot id of a key
 static int xmem_log_table_slot_id(xmem_log_table* xl, void* key) {
-  size_t hcode = (int) key;
+  long hcode = (long) key;
   if (hcode % (xl->base_size << xl->extend_level) < xl->extend_ptr) {
     // already extended part
     return hcode % (xl->base_size << (1 + xl->extend_level));
@@ -107,8 +107,8 @@ static void xmem_log_table_try_extend(xmem_log_table* xl) {
     xl->slot[xl->extend_ptr] = NULL;
     xl->slot[actual_size] = NULL;
     while (p != NULL) {
-      size_t hcode = (int) p->ptr;
-      size_t slot_id = hcode % (xl->base_size << (1 + xl->extend_level));
+      long hcode = (long) p->ptr;
+      long slot_id = hcode % (xl->base_size << (1 + xl->extend_level));
       q = p->next;
       p->next = xl->slot[slot_id];
       xl->slot[slot_id] = p;

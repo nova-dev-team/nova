@@ -82,6 +82,15 @@ static void data_acceptor(xsocket data_xsock, void* args) {
     }
     xstr_delete(error_msg);
     xstr_delete(ls_data);
+
+  } else if (xcstr_startwith_cstr(data_cmd, "RETR")) {
+    xstr error_msg = xstr_new();
+    if (ftp_fs_retr_file(data_xsock, ftp_session_get_cwd(session), data_cmd + 5, error_msg) == XSUCCESS) {
+      reply(session, "226 transfer complete\n");
+    } else {
+      reply(session, xstr_get_cstr(error_msg));
+    }
+    xstr_delete(error_msg);
   }
 }
 
@@ -189,6 +198,15 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       reply(session, "150 here comes the listing\n");
       ftp_session_set_data_cmd_cstr(session, inbuf);
       ftp_session_trigger_data_service(session);
+
+    } else if (xcstr_startwith_cstr(inbuf, "RETR")) {
+      if (strlen(inbuf) < 6) {
+        reply(session, "501 please provide filename\n");
+      } else {
+        reply(session, "150 sending file\n");
+        ftp_session_set_data_cmd_cstr(session, inbuf);
+        ftp_session_trigger_data_service(session);
+      }
 
     } else if (xcstr_startwith_cstr(inbuf, "CWD")) {
       if (strlen(inbuf) < 4) {
