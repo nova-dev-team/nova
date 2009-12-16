@@ -101,6 +101,8 @@ static void* acceptor_wrapper(void* pthread_arg) {
 
   xfree(pthread_arg);
   xsocket_delete(client_xs);
+
+  xmem_usage(stdout);
   return NULL;
 }
 

@@ -163,6 +163,7 @@ xsuccess ftp_fs_retr_file(xsocket xsock, xstr current_dir, const char* filename,
       }
       xsocket_write(xsock, buf, cnt);
     }
+    fclose(fp);
     xfree(buf);
     xstr_delete(fullpath);
     return XSUCCESS;
