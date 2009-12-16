@@ -44,16 +44,11 @@ struct xhash_impl {
 };
 
 #define ALLOC(ty, n) ((ty *) xmalloc(sizeof(ty) * (n)))
-
-#ifdef XMEM_DEBUG
-#define REALLOC(ty, ptr, n) (ty *) realloc(ptr, sizeof(ty) * (n))
-#else
 #define REALLOC(ty, ptr, n) (ty *) xrealloc(ptr, sizeof(ty) * (n))
-#endif
 
 xhash xhash_new(xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free) {
   int i;
-  xhash xh = (struct xhash_impl *) xmalloc(sizeof(struct xhash_impl));
+  xhash xh = xmalloc_ty(1, struct xhash_impl);
 
   xh->extend_ptr = 0;
   xh->extend_level = 0;
@@ -93,7 +88,7 @@ void xhash_delete(xhash xh) {
 }
 
 // calculates the actuall slot id of a key
-static int _xhash_slot_id(xhash xh, void* key) {
+static int xhash_slot_id(xhash xh, void* key) {
   size_t hcode = xh->hash_func(key);
   if (hcode % (xh->base_size << xh->extend_level) < xh->extend_ptr) {
     // already extended part
@@ -106,7 +101,7 @@ static int _xhash_slot_id(xhash xh, void* key) {
 
 
 // extend the hash table if necessary
-static void _xhash_try_extend(xhash xh) {
+static void xhash_try_extend(xhash xh) {
   if (xh->entry_count > XHASH_THRESHOLD * (xh->base_size << xh->extend_level)) {
     xhash_entry* p;
     xhash_entry* q;
@@ -137,12 +132,12 @@ static void _xhash_try_extend(xhash xh) {
 
 void xhash_put(xhash xh, void* key, void* value) {
   size_t slot_id;
-  xhash_entry *entry = ALLOC(xhash_entry, 1);
+  xhash_entry* entry = ALLOC(xhash_entry, 1);
 
   // first of all, test if need to expand
-  _xhash_try_extend(xh);
+  xhash_try_extend(xh);
 
-  slot_id = _xhash_slot_id(xh, key);
+  slot_id = xhash_slot_id(xh, key);
 
   entry->next = xh->slot[slot_id];
   entry->key = key;
@@ -152,8 +147,8 @@ void xhash_put(xhash xh, void* key, void* value) {
   xh->entry_count++;
 }
 
-void *xhash_get(xhash xh, void* key) {
-  size_t slot_id = _xhash_slot_id(xh, key);
+void* xhash_get(xhash xh, void* key) {
+  size_t slot_id = xhash_slot_id(xh, key);
 
   xhash_entry* p;
   xhash_entry* q;
@@ -170,7 +165,7 @@ void *xhash_get(xhash xh, void* key) {
 
 // shrink the hash table if necessary
 // table size is shrinked to 1/2
-static void _xhash_try_shrink(xhash xh) {
+static void xhash_try_shrink(xhash xh) {
   if (xh->extend_level == 0)
     return;
 
@@ -185,7 +180,7 @@ static void _xhash_try_shrink(xhash xh) {
       if (xh->slot[slot_id] == NULL) {
         xh->slot[slot_id] = xh->slot[i];
       } else {
-        xhash_entry *p = xh->slot[slot_id];
+        xhash_entry* p = xh->slot[slot_id];
         while (p->next != NULL)
           p = p->next;
         p->next = xh->slot[i];
@@ -204,8 +199,8 @@ int xhash_remove(xhash xh, void* key) {
   xhash_entry* p;
   xhash_entry* q;
 
-  _xhash_try_shrink(xh);
-  slot_id = _xhash_slot_id(xh, key);
+  xhash_try_shrink(xh);
+  slot_id = xhash_slot_id(xh, key);
   p = xh->slot[slot_id];
   if (p == NULL) {
     // head is null, so no element found
@@ -244,7 +239,7 @@ int xhash_size(xhash xh) {
   return xh->entry_count;
 }
 
-void xhash_visit(xhash xh, xhash_visitor visitor) {
+void xhash_visit(xhash xh, xhash_visitor visitor, void* args) {
   size_t i;
   size_t actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
   xbool should_continue = XTRUE;
@@ -253,7 +248,7 @@ void xhash_visit(xhash xh, xhash_visitor visitor) {
   for (i = 0; i < actual_size && should_continue == XTRUE; i++) {
     p = xh->slot[i];
     while (p != NULL && should_continue == XTRUE) {
-      should_continue = visitor(p->key, p->value);
+      should_continue = visitor(p->key, p->value, args);
       p = p->next;
     }
   }

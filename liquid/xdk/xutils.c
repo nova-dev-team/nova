@@ -101,7 +101,7 @@ xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr
   if (a != INADDR_NONE) {
     addr->sin_addr.s_addr = a;
   } else {
-    struct hostent *hp = gethostbyname(host);
+    struct hostent* hp = gethostbyname(host);
     if (hp == 0 || hp->h_length != 4) {
       return XFAILURE;
     }

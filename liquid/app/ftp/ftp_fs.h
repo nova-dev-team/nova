@@ -6,5 +6,5 @@
 
 xsuccess ftp_fs_list_into_xstr(xstr path, xstr holder, xstr error_msg);
 
-#endif
+#endif  // LIQUID_FTP_FS_H_
 

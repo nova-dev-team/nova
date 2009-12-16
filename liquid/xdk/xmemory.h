@@ -1,6 +1,8 @@
 #ifndef XDK_XMEMORY_H_
 #define XDK_XMEMORY_H_
 
+#include <stdio.h>
+
 /**
   @author
     Santa Zhang
@@ -21,15 +23,7 @@
   @param ty
     Type of allocated objects.
 */
-
-
-//#define XMEM_DEBUG
-
-#ifdef XMEM_DEBUG
-#define xmalloc_ty(cnt, ty) ((ty *) xmalloc_debug((cnt) * sizeof(ty), __FILE__, __LINE__))
-#else
-#define xmalloc_ty(cnt, ty) ((ty *) xmalloc((cnt) * sizeof(ty)))
-#endif
+#define xmalloc_ty(cnt, ty) ((ty *) xmalloc((cnt) * sizeof(ty), __FILE__, __LINE__))
 
 /**
   @brief
@@ -48,9 +42,7 @@
     xmalloc'ed memory chunk must be freed by xfree().
 */
 
-void* xmalloc(int size);
-
-void* xmalloc_debug(int size, const char* file, int line);
+void* xmalloc(int size, ...);
 
 /**
   @brief
@@ -91,14 +83,16 @@ void* xrealloc(void* ptr, int new_size);
   At the end of execution, this function should return 0, indicating that
   all xmalloc'ed memory are released. This means there is no memory leak.
 
+  @param fp
+    File pointer to which the output message will be printed.
+    stderr is advocated. If NULL is given, nothing will be printed.
+
   @return
     Number of allocated memory chunks.
 */
-int xmem_usage();
-
-void xmem_print_usage();
+int xmem_usage(FILE* fp);
 
 void xmem_reset_counter();
 
-#endif
+#endif  // XDK_XMEMORY_H_
 

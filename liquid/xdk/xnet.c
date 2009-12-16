@@ -57,7 +57,10 @@ int xsocket_read(xsocket xs, void* buf, int max_len) {
 }
 
 void xsocket_delete(xsocket xs) {
-  shutdown(xs->sockfd, SHUT_RDWR);
+  // do not use shutdown here
+  // otherwise deleting xsocket in main process will also
+  // close it in child process (when serving in multi-process)
+  close(xs->sockfd);
   xstr_delete(xs->host);
   xfree(xs);
 }
@@ -148,11 +151,8 @@ xsuccess xserver_serve(xserver xs) {
         xmem_reset_counter();
         xs->acceptor(client_xs, xs->args);
         
-        if (xmem_usage() != 0) {
-          printf("[xdk] mem leak: xmem_usage() = %d for xserver's service process\n", xmem_usage());
-#ifdef XMEM_DEBUG
-          xmem_print_usage();
-#endif
+        if (xmem_usage(stdout) != 0) {
+          printf("*** [xdk] possible memory leak in xserver's service process!\n");
         }
         xsocket_delete(client_xs);
         // exit child process
@@ -163,6 +163,10 @@ xsuccess xserver_serve(xserver xs) {
         
         // tricky here, reset rand seed, prevent sub process from rand value collisions
         srand(pid);
+
+        // release client handle in this process
+        // also release allocated memory resource, make xmem monitor happy
+        xsocket_delete(client_xs);
       }
     } else {
       // blocking

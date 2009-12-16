@@ -59,5 +59,5 @@ const char* ftp_session_get_data_cmd_cstr(ftp_session session);
 
 void ftp_session_set_data_cmd_cstr(ftp_session session, char* data_cmd);
 
-#endif
+#endif  // LIQUID_FTP_SESSION_H_
 

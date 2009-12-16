@@ -53,7 +53,7 @@ typedef xbool (*xhash_eql)(void* key1, void* key2);
 */
 typedef void (*xhash_free)(void* key, void* value);
 
-typedef xbool (*xhash_visitor)(void* key, void* value);
+typedef xbool (*xhash_visitor)(void* key, void* value, void* args);
 
 /**
   @brief
@@ -126,7 +126,7 @@ void* xhash_get(xhash xh, void* key);
 */
 xsuccess xhash_remove(xhash xh, void* key);
 
-void xhash_visit(xhash xh, xhash_visitor visitor);
+void xhash_visit(xhash xh, xhash_visitor visitor, void* args);
 
 /**
   @brief
@@ -140,5 +140,5 @@ void xhash_visit(xhash xh, xhash_visitor visitor);
 */
 int xhash_size(xhash xh);
 
-#endif
+#endif  // XHASH_H_
 

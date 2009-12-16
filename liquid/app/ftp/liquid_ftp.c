@@ -228,7 +228,6 @@ static xsuccess liquid_ftp_service(xstr host, int port) {
   }
   printf("[ftp] ftp server started on %s:%d\n", xstr_get_cstr(host), port);
   ret = xserver_serve(xs);  // xserver is self destrying, after service, it will destroy it self
-  xstr_delete(host);
   return ret;
 }
 

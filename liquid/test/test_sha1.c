@@ -80,6 +80,6 @@ int main()
         printf("\t34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F\n");
     }
     xsha1_delete(xsh);
-    return xmem_usage();
+    return xmem_usage(NULL);
 }
 

@@ -7,5 +7,5 @@ xsuccess liquid_serv(int argc, char* argv[]);
 
 void liquid_serv_help();
 
-#endif
+#endif  // LIQUID_SERV_H_
 

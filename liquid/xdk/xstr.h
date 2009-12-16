@@ -132,5 +132,4 @@ xbool xstr_startwith_cstr(xstr xs, char* head);
 
 xstr xstr_copy(xstr orig);
 
-#endif
-
+#endif  // XSTR_H_

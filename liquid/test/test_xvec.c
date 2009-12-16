@@ -10,7 +10,7 @@ void int_xv_free(void* ptr) {
 int main() {
   xvec xv = xvec_new(int_xv_free);
   int i;
-  int *q;
+  int* q;
   for (i = 0; i < 10; i++) {
     int* p = xmalloc_ty(1, int);
     *p = i;
@@ -38,6 +38,5 @@ int main() {
     printf("%d: %d\n", i, *p);
   }
   xvec_delete(xv);
-  printf("mem use=%d\n", xmem_usage());
-  return xmem_usage();
+  return xmem_usage(stdout);
 }
