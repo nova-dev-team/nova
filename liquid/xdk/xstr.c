@@ -77,9 +77,11 @@ void xstr_append_char(xstr xs, char ch) {
 
 // for the case where cs_len is pre-calculated
 // prevent calling strlen(cs) more than once
-static void xstr_append_cstr_len_precalculated(xstr xs, char* cs, int cs_len) {
+static void xstr_append_cstr_len_precalculated(xstr xs, const char* cs, int cs_len) {
   if (cs_len > 0) {
-    ensure_mem_size(xs, xs->len + cs_len + 1);
+
+    // *** do not modify "+16"! make sure there is *enough* memory
+    ensure_mem_size(xs, xs->len + cs_len + 16);
 
     // Note: we did not use strcat(xs->str, ...), but used strcpy(xs->str + xs->len),
     // because we know exactly where new string should be appended, rather than scanning xs->str
@@ -89,7 +91,7 @@ static void xstr_append_cstr_len_precalculated(xstr xs, char* cs, int cs_len) {
   }
 }
 
-void xstr_append_cstr(xstr xs, char* cs) {
+void xstr_append_cstr(xstr xs, const char* cs) {
   int cs_len = strlen(cs);
   xstr_append_cstr_len_precalculated(xs, cs, cs_len);
 }

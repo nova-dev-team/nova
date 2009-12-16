@@ -114,7 +114,7 @@ void xstr_append_char(xstr xs, char ch);
   @param cs
     The c-string to be appended.
 */
-void xstr_append_cstr(xstr xs, char* cs);
+void xstr_append_cstr(xstr xs, const char* cs);
 
 /**
   @brief

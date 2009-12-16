@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
@@ -139,4 +140,33 @@ xsuccess ftp_fs_try_cwd_cstr(const char* current_dir, const char* new_path, xstr
   }
   return XSUCCESS;
 }
+
+xsuccess ftp_fs_retr_file(xsocket xsock, xstr current_dir, const char* filename, xstr error_msg) {
+  FILE* fp;
+  xstr fullpath = xstr_copy(current_dir);
+  xstr_append_char(fullpath, '/');
+  xstr_append_cstr(fullpath, filename);
+  
+  fp = fopen(xstr_get_cstr(fullpath), "r");
+  if (fp == NULL) {
+    xstr_delete(fullpath);
+    xstr_set_cstr(error_msg, "500 failed to open file\n");
+    return XFAILURE;
+  } else {
+    int buf_size = 8192;
+    int cnt;
+    void* buf = xmalloc_ty(buf_size, char);
+    while (!feof(fp)) {
+      cnt = fread(buf, 1, buf_size, fp);
+      if (cnt <= 0) {
+        break;
+      }
+      xsocket_write(xsock, buf, cnt);
+    }
+    xfree(buf);
+    xstr_delete(fullpath);
+    return XSUCCESS;
+  }
+}
+
 
