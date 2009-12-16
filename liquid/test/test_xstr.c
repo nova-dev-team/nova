@@ -12,7 +12,7 @@ int main() {
   printf("good!\n%s\n", cs);
   xstr_set_cstr(xs, cs2);
   printf("result: %s\nxstr_len : %d\n", xstr_get_cstr(xs), xstr_len(xs));
-  printf("len by strlen:%d %d\n", strlen(cs2), strlen(xstr_get_cstr(xs)));
+  printf("len by strlen:%d %d\n", (int) strlen(cs2), (int) strlen(xstr_get_cstr(xs)));
   xstr_set_cstr(xs, "");
  // printf("xstr_printf returnd %d\n", xstr_printf(xs, "sdfsdf%^sdfsdf"));
   printf("xstr_printf returnd %d\n", xstr_printf(xs, "%d", 1));
