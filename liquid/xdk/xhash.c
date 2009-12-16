@@ -44,7 +44,12 @@ struct xhash_impl {
 };
 
 #define ALLOC(ty, n) ((ty *) xmalloc(sizeof(ty) * (n)))
+
+#ifdef XMEM_DEBUG
+#define REALLOC(ty, ptr, n) (ty *) realloc(ptr, sizeof(ty) * (n))
+#else
 #define REALLOC(ty, ptr, n) (ty *) xrealloc(ptr, sizeof(ty) * (n))
+#endif
 
 xhash xhash_new(xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free) {
   int i;

@@ -1,4 +1,5 @@
 #include <malloc.h>
+#include <string.h>
 
 #include "xhash.h"
 
@@ -55,7 +56,9 @@ void xfree(void* ptr) {
 // TODO pthread lock 'counter--' operation
 
 #ifdef XMEM_DEBUG
-  xhash_remove(_xmalloc_registry, ptr);
+  if (_xmalloc_registry != NULL) {
+    xhash_remove(_xmalloc_registry, ptr);
+  }
 #endif
 
   _xmalloc_counter--;
@@ -85,6 +88,9 @@ int xmem_usage() {
 static xbool xmem_reg_print_visitor(void* key, void* value) {
   loc_info* loc = (loc_info *) value;
   printf("mem_usage: %s\t %d\n", loc->file, loc->line);
+  if (strcmp(loc->file, "xdk/xstr.c") == 0 && loc->line == 21) {
+    printf("  content: %s\n", (char *) key);
+  }
   return XTRUE;
 }
 
