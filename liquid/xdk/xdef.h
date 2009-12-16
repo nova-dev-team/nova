@@ -1,5 +1,5 @@
-#ifndef XDK_H_
-#define XDK_H_
+#ifndef XDK_XDEF_H_
+#define XDK_XDEF_H_
 
 /**
   @author
@@ -33,4 +33,4 @@ typedef enum xsuccess {
 
 #define XUNLIMITED -1
 
-#endif
+#endif  // XDK_XDEF_H_

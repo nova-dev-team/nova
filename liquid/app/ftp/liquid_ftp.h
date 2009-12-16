@@ -7,5 +7,5 @@ xsuccess liquid_ftp(int argc, char* argv[]);
 
 void liquid_ftp_help();
 
-#endif
+#endif  // LIQUID_FTP_H_
 

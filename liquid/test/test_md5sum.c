@@ -30,6 +30,6 @@ int main() {
     }
     xmd5_delete(xm);
   }
-  return xmem_usage();
+  return xmem_usage(NULL);
 }
 

@@ -7,4 +7,5 @@ xsuccess liquid_gw(int argc, char* argv[]);
 
 void liquid_gw_help();
 
-#endif
+#endif  // LIQUID_GW_H_
+

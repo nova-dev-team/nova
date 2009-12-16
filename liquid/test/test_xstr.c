@@ -36,5 +36,5 @@ int main() {
   printf("OK Finally :\n%s", xstr_get_cstr(xs));
   printf("suck");
   xstr_delete(xs);
-  return xmem_usage();
+  return xmem_usage(NULL);
 }

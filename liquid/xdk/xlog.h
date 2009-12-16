@@ -3,5 +3,5 @@
 
 #define xflogf(logger, fmt, ...) fprintf(logger, fmt, __VA_ARGS__)
 
-#endif
+#endif  // XLOG_H_
 

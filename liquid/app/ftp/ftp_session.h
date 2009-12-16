@@ -29,7 +29,11 @@ const char* ftp_session_get_user_identifier_cstr(ftp_session session);
 
 xbool ftp_session_auth_cstr(ftp_session, char* password);
 
+xsuccess ftp_session_try_cwd_cstr(ftp_session session, char* new_path, xstr error_msg);
+
 const char* ftp_session_get_cwd_cstr(ftp_session session);
+
+xstr ftp_session_get_cwd(ftp_session session);
 
 int ftp_session_is_user_aborted();
 
@@ -55,5 +59,5 @@ const char* ftp_session_get_data_cmd_cstr(ftp_session session);
 
 void ftp_session_set_data_cmd_cstr(ftp_session session, char* data_cmd);
 
-#endif
+#endif  // LIQUID_FTP_SESSION_H_
 

@@ -34,5 +34,5 @@ int xserver_get_port(xserver xs);
 
 char* xserver_get_ip_cstr(xserver xs);
 
-#endif
+#endif  // XNET_H_
 

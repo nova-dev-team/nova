@@ -35,7 +35,7 @@ void test_int_int_hash() {
     xhash_put(xh, key, value);
     if (i % 5000 == 0) {
       printf("size(xh)=%d\n", xhash_size(xh));
-      printf("xmem_usage=%d\n", xmem_usage());
+      printf("xmem_usage=%d\n", xmem_usage(NULL));
     }
   }
   for (i = 0; i < 189900; i++) {
@@ -49,14 +49,14 @@ void test_int_int_hash() {
     printf("val=%d\n", val);
   }
   printf("size(xh)=%d\n", xhash_size(xh));
-  printf("xmem_usage=%d\n", xmem_usage());
+  printf("xmem_usage=%d\n", xmem_usage(NULL));
   xhash_delete(xh);
   xfree(helper_key);
-  printf("xmem_usage=%d\n", xmem_usage());
+  printf("xmem_usage=%d\n", xmem_usage(NULL));
 }
 
 int main() {
   test_int_int_hash();
-  return xmem_usage();
+  return xmem_usage(NULL);
 }
 

@@ -159,5 +159,5 @@ int xvec_push_back(xvec xv, void* data);
 */
 int xvec_size(xvec xv);
 
-#endif
+#endif  // XVEC_H_
 

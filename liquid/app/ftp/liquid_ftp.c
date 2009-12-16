@@ -10,6 +10,7 @@
 #include "xutils.h"
 
 #include "ftp_session.h"
+#include "ftp_fs.h"
 
 void liquid_ftp_help() {
   printf("usage: liquid ftp <-p port|--port=port> <-b bind_addr|--bind=bind_addr>\n");
@@ -72,20 +73,14 @@ static void data_acceptor(xsocket data_xsock, void* args) {
 
   if (xcstr_startwith_cstr(data_cmd, "LIST")) {
     xstr ls_data = xstr_new();
-    FILE* ls_pipe = popen("ls -al /", "r");
-    char* buf = xmalloc_ty(8192, char);
-    int cnt;
-
-    while (!feof(ls_pipe)) {
-      cnt = fread(buf, 1, 8192, ls_pipe);
-      printf("read count = %d\n", cnt);
-      printf("xsock_write ret = %d\n", xsocket_write(data_xsock, (void *) buf, cnt));
+    xstr error_msg = xstr_new();
+    if (ftp_fs_list_into_xstr(ftp_session_get_cwd(session), ls_data, error_msg) == XSUCCESS) {
+      xsocket_write(data_xsock, (const void *) xstr_get_cstr(ls_data), xstr_len(ls_data));
+      reply(session, "226 transfer complete\n");
+    } else {
+      reply(session, xstr_get_cstr(error_msg));
     }
-
-    pclose(ls_pipe);
-    xfree(buf);
-
-    reply(session, "226 transfer complete\n");
+    xstr_delete(error_msg);
     xstr_delete(ls_data);
   }
 }
@@ -195,7 +190,19 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       ftp_session_set_data_cmd_cstr(session, inbuf);
       ftp_session_trigger_data_service(session);
 
-   } else {
+    } else if (xcstr_startwith_cstr(inbuf, "CWD")) {
+      if (strlen(inbuf) < 4) {
+        reply(session, "501 invalid CWD command\n");
+      } else {
+        xstr error_msg = xstr_new();
+        if (ftp_session_try_cwd_cstr(session, inbuf + 4, error_msg) == XSUCCESS) {
+          reply(session, "250 CWD command successful\n");
+        } else {
+          reply(session, xstr_get_cstr(error_msg));
+        }
+        xstr_delete(error_msg);
+      }
+    } else {
       xstr rep = xstr_new();
       xstr_printf(rep, "500 unknown command '%s'\n", inbuf);
       reply(session, xstr_get_cstr(rep));
@@ -221,7 +228,6 @@ static xsuccess liquid_ftp_service(xstr host, int port) {
   }
   printf("[ftp] ftp server started on %s:%d\n", xstr_get_cstr(host), port);
   ret = xserver_serve(xs);  // xserver is self destrying, after service, it will destroy it self
-  xstr_delete(host);
   return ret;
 }
 

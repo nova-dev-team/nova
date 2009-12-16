@@ -97,5 +97,5 @@ xsuccess xinet_ip2str(int ip, char* str);
 */
 xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr);
 
-#endif
+#endif  // XUTILS_H_
 

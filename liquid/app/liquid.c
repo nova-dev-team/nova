@@ -110,8 +110,7 @@ int main(int argc, char* argv[]) {
   } else {
     ret = find_and_exec_action(argc, argv);
   }
-  printf("xmem_usage = %d\n", xmem_usage());
-  assert(xmem_usage() == 0);
+  assert(xmem_usage(stdout) == 0);
   return ret;
 }
 
