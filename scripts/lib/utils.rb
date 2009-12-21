@@ -81,7 +81,7 @@ def git_update_this_node
 	sys_exec "git checkout master"
     end
 
-    sys_exec "git pull #{repo} master"
+    sys_exec "git pull #{repo} +master:master"
 
     if working_branch != "master"
 	sys_exec "git checkout #{working_branch}"
