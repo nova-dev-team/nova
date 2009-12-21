@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + "/lib/gen_node_yaml.rb"
 require File.dirname(__FILE__) + "/lib/install_server.rb"
 require File.dirname(__FILE__) + "/lib/ssh_nopass.rb"
 require File.dirname(__FILE__) + "/lib/clean_ssh_nopass.rb"
+require File.dirname(__FILE__) + "/lib/create_br.rb"
 
 desc "Show brief intro"
 task :about do
@@ -58,7 +59,11 @@ namespace :config do
 
   desc "Configure network bridge"
   task "netbr" do
-    puts "TODO"
+    ifname = nova_conf["vm_network_interface"]
+    brname = nova_conf["vm_network_bridge"]
+    puts "Creating bridge '#{brname}' on interface '#{ifname}'..."
+    create_bridge ifname, brname
+    puts "Done"
   end
 
   desc "Configure network forwarding"
