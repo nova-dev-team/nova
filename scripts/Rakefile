@@ -119,7 +119,16 @@ namespace :system do
 
   desc "Update whole system"
   task :update do
-    puts "TODO"
+      puts "Warning! If you have modified code, make sure the modification are already committed"
+      puts "The update process will discard everything that is not committed!"
+      puts "Please input: 'Yes I know what I am doing' to continue (' is not part of the input)"
+      input = STDIN.gets.chomp
+      if input != "Yes I know what I am doing"
+	    puts "Update process is cancelled"
+      else
+	    # TODO update every node
+	    git_update_this_node
+      end
   end
 
   desc "!!!RESET WHOLE SYSTEM, BE CAREFUL!!!"
