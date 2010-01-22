@@ -128,7 +128,7 @@ void xstr_append_cstr(xstr xs, const char* cs);
   @return
     XTRUE or XFALSE.
 */
-xbool xstr_startwith_cstr(xstr xs, char* head);
+xbool xstr_startwith_cstr(xstr xs, const char* head);
 
 /**
   @brief

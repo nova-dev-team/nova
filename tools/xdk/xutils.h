@@ -143,6 +143,18 @@ void xsleep_msec(int msec);
 
 /**
   @brief
+    Check if filesystem entry exists.
+
+  @param path
+    Path to the filesystem entry.
+
+  @return
+    Whether the filesystem entry exists.
+*/
+xbool xfilesystem_exists(const char* path);
+
+/**
+  @brief
     Remove files, (possibily) recursive, like "rm -rf".
 
   @param path
