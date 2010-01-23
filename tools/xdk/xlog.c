@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <time.h>
 
 #include "xlog.h"
 #include "xoption.h"
@@ -128,7 +129,8 @@ static void prepare_fp() {
       log_fp = NULL;
       prepare_fp(); // retry, again
     }
-  } else {
+  } else if (log_name != NULL) {
+    // only prepare fp if log_name is given, that means the logging system is initialized
     xstr log_fn = xstr_new();
     xjoin_path_cstr(log_fn, log_dir, log_name);
     xstr_append_cstr(log_fn, ".log");

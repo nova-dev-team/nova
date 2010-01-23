@@ -392,3 +392,41 @@ int xhash_hash_cstr(void* key) {
   return hv;
 }
 
+int xhash_hash_xstr(void* key) {
+  xstr xs = (xstr) key;
+  return xhash_hash_cstr((void *) xstr_get_cstr(xs));
+}
+
+xbool xhash_eql_xstr(void* key1, void* key2) {
+  return xstr_eql((xstr) key1, (xstr) key2);
+}
+
+xsuccess xgetline_fp(FILE* fp, xstr line) {
+  xsuccess ret = XSUCCESS;
+  xstr_set_cstr(line, "");
+  if (feof(fp)) {
+    ret = XFAILURE;
+  } else {
+    int code;
+    int counter = 0;
+    for (;;) {
+      counter++;
+      code = fgetc(fp);
+      if (code == '\r') {
+        continue;
+      } else if (code == '\n') {
+        break;
+      } else if (feof(fp)) {
+        if (counter == 1) {
+          ret = XFAILURE;
+        }
+        break;
+      } else {
+        char ch = (char) code;
+        xstr_append_char(line, ch);
+      }
+    }
+  }
+  return ret;
+}
+

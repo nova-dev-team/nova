@@ -154,4 +154,29 @@ xstr xstr_copy(xstr orig);
 */
 char xstr_last_char(xstr xs);
 
+/**
+  @brief
+    Test if 2 xstr is equal.
+
+  @param xstr1
+    The xstr to be tested.
+  @param xstr2
+    The xstr to be tested.
+
+  @return
+    Whether the 2 xstr is equal.
+*/
+xbool xstr_eql(xstr xstr1, xstr xstr2);
+
+/**
+  @brief
+    Strip an xstr.
+  
+  @param xs
+    The xstr object to be stripped.
+  @param strip_set
+    A c-string containing all the chars to be stripped.
+*/
+void xstr_strip(xstr xs, char* strip_set);
+
 #endif  // XSTR_H_
