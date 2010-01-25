@@ -29,10 +29,11 @@ static xsuccess start_port_mapper_server(xstr bind_addr, int port) {
   xserver xs = xserver_new(bind_addr, port, backlog, port_mapper_acceptor, XUNLIMITED, 'p', NULL);
   if (xs == NULL) {
     fprintf(stderr, "in start_port_mapper_server(): failed to init xserver!\n");
-    return XFAILURE;
+    ret = XFAILURE;
+  } else {
+    printf("[info] port mapper running on %s:%d, dest is %s:%d\n", xstr_get_cstr(bind_addr), port, xstr_get_cstr(forward_to_host), forward_to_port);
+    ret = xserver_serve(xs);
   }
-  printf("[info] port mapper running on %s:%d, dest is %s:%d\n", xstr_get_cstr(bind_addr), port, xstr_get_cstr(forward_to_host), forward_to_port);
-  ret = xserver_serve(xs);
   xstr_delete(bind_addr);
   return ret;
 }
