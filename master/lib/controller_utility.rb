@@ -1,1 +1,1 @@
-require "#{RAILS_ROOT}/../shared_lib/controller_utility.rb"
+require "#{RAILS_ROOT}/../common/lib/controller_utility.rb"

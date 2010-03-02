@@ -31,11 +31,11 @@ def do_install
 end
 
 def install_client node_ip, install_server
-  cmd = "ssh #{node_ip} 'mkdir -p #{nova_conf["install_folder"]}'"
+  cmd = "ssh -o stricthostkeychecking=no #{node_ip} 'mkdir -p #{nova_conf["install_folder"]}'"
   sys_exec cmd
-  cmd = "scp -r ../* #{node_ip}:/#{nova_conf["install_folder"]}"
+  cmd = "scp -o stricthostkeychecking=no -r ../* #{node_ip}:/#{nova_conf["install_folder"]}"
   sys_exec cmd
-  cmd = "ssh #{node_ip} 'cd #{nova_conf["install_folder"]}/scripts && bash install.sh --single-node --install-server=#{install_server}'"
+  cmd = "ssh -o stricthostkeychecking=no #{node_ip} 'cd #{nova_conf["install_folder"]}/scripts && bash install.sh --single-node --install-server=#{install_server}'"
   sys_exec cmd
 end
 

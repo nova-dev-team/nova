@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + "/lib/gen_node_yaml.rb"
 require File.dirname(__FILE__) + "/lib/install_server.rb"
 require File.dirname(__FILE__) + "/lib/ssh_nopass.rb"
 require File.dirname(__FILE__) + "/lib/clean_ssh_nopass.rb"
+require File.dirname(__FILE__) + "/lib/create_br.rb"
 
 desc "Show brief intro"
 task :about do
@@ -58,7 +59,11 @@ namespace :config do
 
   desc "Configure network bridge"
   task "netbr" do
-    puts "TODO"
+    ifname = nova_conf["vm_network_interface"]
+    brname = nova_conf["vm_network_bridge"]
+    puts "Creating bridge '#{brname}' on interface '#{ifname}'..."
+    create_bridge ifname, brname
+    puts "Done"
   end
 
   desc "Configure network forwarding"
@@ -114,7 +119,16 @@ namespace :system do
 
   desc "Update whole system"
   task :update do
-    puts "TODO"
+      puts "Warning! If you have modified code, make sure the modification are already committed"
+      puts "The update process will discard everything that is not committed!"
+      puts "Please input: 'Yes I know what I am doing' to continue (' is not part of the input)"
+      input = STDIN.gets.chomp
+      if input != "Yes I know what I am doing"
+	    puts "Update process is cancelled"
+      else
+	    # TODO update every node
+	    git_update_this_node
+      end
   end
 
   desc "!!!RESET WHOLE SYSTEM, BE CAREFUL!!!"

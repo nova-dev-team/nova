@@ -3,8 +3,8 @@ require 'socket'
 require 'fileutils'
 
 NOVA_ROOT = File.dirname(__FILE__) + "/../../"
-CONF_YAML = File.dirname(__FILE__) + '/../config/conf.yaml'
-NODE_YAML = File.dirname(__FILE__) + '/../config/node.yaml'
+CONF_YAML = "#{NOVA_ROOT}/common/config/conf.yaml"
+NODE_YAML = "#{NOVA_ROOT}/common/config/node.yaml"
 TEMP_DIR = File.dirname(__FILE__) + "/../tmp/"
 
 def sys_exec cmd
@@ -58,3 +58,33 @@ end
 def ensure_temp_dir_exists
   FileUtils.mkdir_p TEMP_DIR
 end
+
+def current_git_branch
+    IO.popen("git branch") do |f|
+	f.each_line do |line|
+	    if line.start_with? "*"
+		splt = line.split
+		return splt[1]
+	    end
+	end
+    end
+end
+
+def is_git_master_branch?
+    return current_git_branch == "master"
+end
+
+def git_update_this_node
+    repo = "http://166.111.131.32/nova-update.git"
+    working_branch = current_git_branch
+    if working_branch != "master"
+	sys_exec "git checkout master"
+    end
+
+    sys_exec "git pull #{repo} +master:master"
+
+    if working_branch != "master"
+	sys_exec "git checkout #{working_branch}"
+    end
+end
+
