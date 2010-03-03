@@ -1,20 +1,17 @@
 <html>
 <head>
-
-<title>Nova platform: Welcome!</title>
+<title>Nova platform</title>
 
 <link href="/stylesheets/prototype_window/default.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/prototype_window/mac_os_x.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/custom_buttons/custom_buttons.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/iphone_checkbox/style.css" rel="stylesheet" type="text/css" />
 
-
 <script type="text/javascript" src="/javascripts/prototype.js"> </script>
 <script type="text/javascript" src="/javascripts/effects.js"> </script>
 <script type="text/javascript" src="/javascripts/iphone_checkbox/iphone_checkbox.js"> </script>
 <script type="text/javascript" src="/javascripts/prototype_window/window.js"> </script>
 <script type="text/javascript" src="/javascripts/prototype_window/window_effects.js"> </script>
-
 
 <%= growl4rails_includes %>
 
@@ -32,13 +29,13 @@ body {
 }
 
 input, select, textarea {
-	margin: 5px 0;
-	padding: 5px;
-	color: #6A6969;
-	border-width: 1px;
-	border-style: solid;
+  margin: 5px 0;
+  padding: 5px;
+  color: #6A6969;
+  border-width: 1px;
+  border-style: solid;
   border-color: #D4D4D4 #EBEBEB #EBEBEB #D4D4D4; 	
-	font: 11px 'Lucida Grande', Verdana, Helvetica, sans-serif;
+  font: 11px 'Lucida Grande', Verdana, Helvetica, sans-serif;
   height: 18pt;
 }
 
@@ -47,13 +44,7 @@ input {
 }
 
 #login_panel_text {
-	font: 14px 'Lucida Grande', Verdana, Helvetica, sans-serif;
-}
-
-
-h1 {
-  font-size: 28px;
-  color: #000;
+  font: 14px 'Lucida Grande', Verdana, Helvetica, sans-serif;
 }
 
 a {
@@ -62,19 +53,6 @@ a {
 
 a:hover {
   background-color: #6688bb;
-}
-
-.ie_warning_style {
-  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
-  font-size: 13px;
-}
-
-.ie_warning_style_ahref {
-  color: #667788
-}
-
-.ie_warning_style_ahref:hover {
-  color: white
 }
 
 /* NOTE IE has problems rendering the border, since its width is included in the div's width */
@@ -246,17 +224,17 @@ html>body #page {
       </td>\
     </tr>\
   </table>\
-  </p>\
-  <p align='center'>\
+</p>\
+<p align='center'>\
   <button id='btn_send_signup' type='button' class='btn' onclick='send_signup()'><span><span>Sign up!</span></span></button>\
-  </p>\
+</p>\
       ");
       
-    new iPhoneStyle('input[type=checkbox]', {
-      rightside: 46, // display bug fix
-      checkedLabel: "YES",  // default is "ON"
-      uncheckedLabel: "NO"  // default is "OFF"
-    });
+      new iPhoneStyle('input[type=checkbox]', {
+        rightside: 46, // display bug fix
+        checkedLabel: "YES",  // default is "ON"
+        uncheckedLabel: "NO"  // default is "OFF"
+      });
       win.show();
     }
     
@@ -571,7 +549,6 @@ html>body #page {
     
     window.onresize = do_layout;
     do_layout();
-
     
     $("page").show(); // prevents blinking
     $("logo_holder").show();
@@ -582,16 +559,6 @@ html>body #page {
       do_layout();
     }
 
-/*    if (Prototype.Browser.IE) {
-      // warning for ie
-      Dialog._openDialog($("ie_warning").innerHTML, {
-        width: 400,
-        id: "ie_warning_win",
-        className: "mac_os_x",
-        blurClassName: "blur_os_x"
-      });
-    }
-*/
     decorate_field($('login'), "User ID", "wait_for_input");
     
     if (Prototype.Browser.IE == false && Prototype.Browser.Opera == false) {
@@ -643,7 +610,8 @@ html>body #page {
 </script>
 </head>
 <body scroll="no">
-<!-- div# page set to display:none, and will be shown by javascript. this is intended to reduce flickering -->
+
+<!-- div #page set to "display:none". It will be shown by javascript. This is intended to reduce flickering. -->
 <div id="page" style="display: none;">
   
   <div id="login_panel" align='right'>
@@ -657,49 +625,24 @@ html>body #page {
   </td>
   <td>
     <div id="login_panel_text">
-<%
-# <p><%= label_tag 'remember_me', 'Remember me' % >
-# <%= check_box_tag 'remember_me', '1', @remember_me % >
-%>
     &nbsp;&nbsp;
     <a href='#' onclick="do_login(); return false">Login</a>
+    &nbsp;
     <a href="#" onclick="do_signup(); return false">Sign Up</a>
     </div>
   </td>
   </tr>
   </table>
   </div>
-
-<%
-#  <%= link_to_prototype_dialog("show a confirm win", "say hi", 'alert', {:title => "Demo win", :className => "mac_os_x", :width => 340, :height => 300}) % >
-%>
 </div>
 
 <div id="logo_holder" style="display: none;">
   <img src="/images/logo-medium.png" />
 </div>
 
-<div id="bottom_line" style="display: none;">
-<div style="position: absolute">&copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a></div>
-<div align="right" >
-<!--
-  <a href="/docs/index.html" onclick="alert('TODO')">Documentation</a> &nbsp;
--->
-</div>
+<div id="bottom_line" style="display: none;position: absolute">
+  &copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>
 </div>
 
-<div id="ie_warning" style="display: none;">
-<p align="center" class="ie_warning_style">
-Warning: IE browser is not fully supported!<br />
-We suggest the following browsers:<br />
-  <a class="ie_warning_style_ahref" href="http://firefox.com">Firefox</a>,
-  <a class="ie_warning_style_ahref" href="http://google.com/chrome">Google Chrome</a>,
-  <a class="ie_warning_style_ahref" href="http://apple.com/safari">Safari</a>,
-  and <a class="ie_warning_style_ahref" href="http://opera.com">Opera</a>.
-<br />
-<button type="button" class="btn" onclick="Dialog.okCallback(); return false"><span><span>Close warning</span></span></button>
-</p>
-</div>
-
-
-</body></html>
+</body>
+</html>
