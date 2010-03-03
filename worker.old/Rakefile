@@ -1,0 +1,133 @@
+# Add your own tasks in files placed in lib/tasks ending in .rake,
+# for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
+
+require(File.join(File.dirname(__FILE__), 'config', 'boot'))
+
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
+
+require 'tasks/rails'
+
+namespace :nova do
+  namespace :worker do
+
+=begin Original first_run.sh
+#!/bin/sh
+
+rake backgroundrb:setup
+
+rake db:migrate RAILS_ENV=production
+rake db:migrate RAILS_ENV=development
+
+rake db:migrate:reset RAILS_ENV=production
+rake db:migrate:reset RAILS_ENV=development
+
+rake db:fixtures:load RAILS_ENV=production
+rake db:fixtures:load RAILS_ENV=development
+=end
+
+    def do_init
+      `rake backgroundrb:setup`
+      `rake db:migrate RAILS_ENV=production`
+      `rake db:migrate RAILS_ENV=development`
+      `rake db:migrate:reset RAILS_ENV=production`
+      `rake db:migrate:reset RAILS_ENV=development`
+      `rake db:fixtures:load RAILS_ENV=production`
+      `rake db:fixtures:load RAILS_ENV=development`
+    end
+
+    desc "Initialize system"
+    task :init do
+      do_init
+    end
+
+=begin Original start script
+#!/bin/sh
+
+echo Backgroundrb is set to 'development' environment
+echo To change it, edit 'start.sh'
+echo Or you can run it by command:
+echo "  script/backgroundrb start -e development"
+echo
+echo "*** NOTICE: Please make sure you have run 'first_run.sh' once"
+echo
+
+script/backgroundrb start -e development
+script/server $@ -d
+
+=end
+
+    desc "Start Nova worker (Development mode)"
+    task :devstart do
+      puts "Starting Nova worker in *Development* mode..."
+      `script/server -d`
+    end
+
+    def do_start
+      puts "TODO"
+    end
+
+    desc "Start Nova worker (Release mode)"
+    task :start do
+      puts "Starting Nova worker in *Release* mode..."
+      do_start
+    end
+
+=begin original stop.sh
+#!/bin/sh
+
+script/backgroundrb stop
+
+if [ -e "tmp/pids/server.pid" ]
+then
+  read hg< "tmp/pids/server.pid"
+  kill ${hg}
+fi
+
+=end
+
+    desc "Stop Nova worker"
+    task :stop do
+      `script/backgroundrb stop`
+
+      if File.exists? "tmp/pids/server.pid"
+        puts "Found tmp/pids/server.pid file"
+        puts "Nova master server pid = #{File.read 'tmp/pids/server.pid'}"
+        puts "Terminating..."
+        `kill #{File.read "tmp/pids/server.pid"}`
+      end
+    end
+
+    desc "Reset system, remove all Vmachines, cleanup all resource"
+    task :reset do
+      require 'rubygems'
+      require 'libvirt'
+      
+      `Rake nova:worker:stop`
+
+      virt_conn = Libvirt::open("qemu:///system")
+      virt_conn.list_defined_domains.each do |domain_name|
+        puts "Destroying domain '#{domain_name}'"
+        begin
+          dom = virt_conn.lookup_domain_by_name domain_name
+          puts "UUID=#{dom.uuid}"
+          begin
+            dom.destroy
+          rescue
+            # do nothing here
+          end
+          dom.undefine
+        rescue
+          next
+        end
+      end
+
+      `rm tmp/work_site -rf`
+      do_init
+      do_start
+
+    end
+  end
+end
+
