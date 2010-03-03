@@ -37,8 +37,17 @@ input, select, textarea {
 	color: #6A6969;
 	border-width: 1px;
 	border-style: solid;
-  	border-color: #D4D4D4 #EBEBEB #EBEBEB #D4D4D4; 	
+  border-color: #D4D4D4 #EBEBEB #EBEBEB #D4D4D4; 	
 	font: 11px 'Lucida Grande', Verdana, Helvetica, sans-serif;
+  height: 18pt;
+}
+
+input {
+  width: 100pt;
+}
+
+#login_panel_text {
+	font: 14px 'Lucida Grande', Verdana, Helvetica, sans-serif;
 }
 
 
@@ -178,13 +187,19 @@ html>body #page {
         title: "Sign up form",
         width: 440,
         height: 350,
-        top: parseInt(logo.getStyle("top")) + 30,
+        top: parseInt(logo.getStyle("top")) + 40,
         left: parseInt(logo.getStyle("left")) + 220,
         minimizable: false,
         maximizable: false,
         resizable: false,
         destroyOnClose: true
       });
+
+      /* IE layout bug fix */
+      if (Prototype.Browser.IE) {
+        win.top += 15;
+      }
+
       win.getContent().update("\
 <p align='center'>\
   <table>\
@@ -632,14 +647,27 @@ html>body #page {
 <div id="page" style="display: none;">
   
   <div id="login_panel" align='right'>
-  <%= text_field_tag 'login', @login %>
-  <%= password_field_tag 'password', nil %>
+  <table>
+  <tr>
+  <td>
+    <div>
+    <%= text_field_tag 'login', @login %>
+    <%= password_field_tag 'password', nil %>
+    </div>
+  </td>
+  <td>
+    <div id="login_panel_text">
 <%
 # <p><%= label_tag 'remember_me', 'Remember me' % >
 # <%= check_box_tag 'remember_me', '1', @remember_me % >
 %>
-  <a href='#' onclick="do_login(); return false">Login</a>
-  <a href="#" onclick="do_signup(); return false">Sign Up</a>
+    &nbsp;&nbsp;
+    <a href='#' onclick="do_login(); return false">Login</a>
+    <a href="#" onclick="do_signup(); return false">Sign Up</a>
+    </div>
+  </td>
+  </tr>
+  </table>
   </div>
 
 <%
@@ -652,9 +680,11 @@ html>body #page {
 </div>
 
 <div id="bottom_line" style="display: none;">
-<div style="position: absolute">&copy;2009 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a></div>
+<div style="position: absolute">&copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a></div>
 <div align="right" >
+<!--
   <a href="/docs/index.html" onclick="alert('TODO')">Documentation</a> &nbsp;
+-->
 </div>
 </div>
 

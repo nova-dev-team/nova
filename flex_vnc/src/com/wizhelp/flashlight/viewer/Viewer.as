@@ -187,7 +187,7 @@ package com.wizhelp.flashlight.viewer
 			
 			super.handleServerVersion(version);
 			
-			socket.writeUTFBytes("RFB 003.003\n");
+			socket.writeUTFBytes("RFB 003.008\n");
 			socket.flush();
 			
 			logger.debug("<< handleServerVersion()");
