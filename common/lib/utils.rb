@@ -105,6 +105,3 @@ module VdiskNaming
 
 end
 
-def sys_exec
-
-end

@@ -93,7 +93,7 @@ fi
 
       if File.exists? "tmp/pids/server.pid"
         puts "Found tmp/pids/server.pid file"
-        puts "Nova master server pid = #{File.read 'tmp/pids/server.pid'}"
+        puts "Nova worker server pid = #{File.read 'tmp/pids/server.pid'}"
         puts "Terminating..."
         `kill #{File.read "tmp/pids/server.pid"}`
       end
