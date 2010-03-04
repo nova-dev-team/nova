@@ -1,7 +1,7 @@
 <%
 require 'fileutils'
 require 'pp'
-require 'libvirt'
+#require 'libvirt'
 require 'cgi'
 require 'xmlsimple'
 %>
@@ -162,7 +162,8 @@ function change_system_setting(key) {
 <%=
 info_of_vmachines = ""
 
-all_domains = Vmachine.all_domains
+#all_domains = Vmachine.all_domains
+all_domains = []
 
 counter = 0
 
@@ -376,7 +377,7 @@ pipe.close
 <hr>
 
 This is the "worker" module of the nova system. <b>Intended for administrators only</b>.<p>
-&copy;2009 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
+&copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
 
 <% end -%>
 

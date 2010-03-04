@@ -1,0 +1,1 @@
+This is an wrapper around KVM. We had used libvirt for this purpose, but it is prone to error.
