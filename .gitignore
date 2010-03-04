@@ -3,6 +3,7 @@
 *.o
 *.log
 *.swp
+*.swo
 log/
 doc/
 tmp/
