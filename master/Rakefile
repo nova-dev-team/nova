@@ -12,23 +12,6 @@ require 'tasks/rails'
 namespace :nova do
   namespace :master do
 
-=begin The original start.sh
-#!/bin/sh
-
-echo Backgroundrb is set to 'development' environment
-echo To change it, edit 'start.sh'
-echo Or you can run it by command:
-echo "  script/backgroundrb start -e development"
-echo
-echo "*** NOTICE: Please make sure you have run 'first_run.sh' once"
-echo
-
-script/backgroundrb start -e development
-swiftiply -c config/swiftiply.conf
-swiftiply_mongrel_rails -n 10 -p 3100 -d
-#script/server $@
-=end
-
     desc "Start Nova master (Development mode)"
     task :devstart do
       puts "Starting Nova master in *Development* mode..."
@@ -41,65 +24,26 @@ swiftiply_mongrel_rails -n 10 -p 3100 -d
       puts "TODO"
     end
 
-=begin The original stop script
-#!/bin/sh
+    desc "Stop Nova server"
+    task :stop do
+      
+      if File.exists? "tmp/pids/server.pid"
+        puts "Found tmp/pids/server.pid file"
+        puts "Nova master server pid = #{File.read 'tmp/pids/server.pid'}"
+        puts "Terminating..."
+        `kill #{File.read "tmp/pids/server.pid"}`
+      end
+      
+      `killall mongrel`
+      `killall swiftiply`
+      `killall swiftiply_mongrel_rails`
+      `killall mongrel_reals`
+      `rm -rf log/*.pid`
 
-script/backgroundrb stop
-
-if [ -e "tmp/pids/server.pid" ]
-then
-  read hg< "tmp/pids/server.pid"
-  kill ${hg}
-fi
-
-killall mongrel
-killall swiftiply
-killall swiftiply_mongrel_rails
-killall mongrel_rails
-rm -rf log/*.pid
-=end
-
-  desc "Stop Nova server"
-  task :stop do
-    
-    if File.exists? "tmp/pids/server.pid"
-      puts "Found tmp/pids/server.pid file"
-      puts "Nova master server pid = #{File.read 'tmp/pids/server.pid'}"
-      puts "Terminating..."
-      `kill #{File.read "tmp/pids/server.pid"}`
     end
-    
-    `killall mongrel`
-    `killall swiftiply`
-    `killall swiftiply_mongrel_rails`
-    `killall mongrel_reals`
-    `rm -rf log/*.pid`
-
-  end
-
-=begin The original first_run.sh
-#!/bin/sh
-
-# triggers 'first_run.sh' script for Ceil component
-#cd lib/ceil/server
-#./first_run.sh
-#cd ../../..
-
-rake backgroundrb:setup
-
-rake db:migrate RAILS_ENV=production
-rake db:migrate RAILS_ENV=development
-
-rake db:migrate:reset RAILS_ENV=production
-rake db:migrate:reset RAILS_ENV=development
-
-rake db:fixtures:load RAILS_ENV=production
-rake db:fixtures:load RAILS_ENV=development
-=end
 
     desc "Initialize system"
     task :init do
-      `rake backgroundrb:setup`
       `rake db:migrate RAILS_ENV=production`
       `rake db:migrate RAILS_ENV=development`
       `rake db:migrate:reset RAILS_ENV=production`
