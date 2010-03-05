@@ -105,3 +105,43 @@ module VdiskNaming
 
 end
 
+
+# Execute a shell command, prints the command it self, and the output message.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
+def my_exec cmd
+  puts "[cmd] #{cmd}"
+  system cmd
+end
+
+
+# Check if running with root privilege, exit 1 if not.
+# This function is intended to be used in Rakefile.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
+def require_root_privilege
+  if ENV['USER'] != "root"
+    puts "This script requires root privilege!"
+    exit 1
+  end
+end
+
+
+# Kill a process by pid file.
+# This function is intended to be used in Rakefile.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
+def kill_by_pid_file file_path
+  if File.exists? file_path
+    puts "Found pid file: #{file_path}"
+    pid = File.read file_path
+    puts "Process pid: #{pid}"
+    puts "Terminating..."
+    my_exec "kill -9 #{pid}"
+    File.delete file_path
+  end
+end
+

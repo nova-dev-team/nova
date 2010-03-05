@@ -9,18 +9,22 @@ require 'rake/rdoctask'
 
 require 'tasks/rails'
 
+require "#{File.dirname __FILE__}/../common/lib/utils.rb"
 require 'fileutils'
 
 namespace :nova do
   namespace :worker do
 
     def do_init
-      `rake db:migrate RAILS_ENV=production`
-      `rake db:migrate RAILS_ENV=development`
-      `rake db:migrate:reset RAILS_ENV=production`
-      `rake db:migrate:reset RAILS_ENV=development`
-      `rake db:fixtures:load RAILS_ENV=production`
-      `rake db:fixtures:load RAILS_ENV=development`
+      require_root_privilege
+      puts "Migrating database..."
+      my_exec "rake db:migrate RAILS_ENV=production"
+      my_exec "rake db:migrate RAILS_ENV=development"
+      my_exec "rake db:migrate:reset RAILS_ENV=production"
+      my_exec "rake db:migrate:reset RAILS_ENV=development"
+      puts "Loading data..."
+      my_exec "rake db:fixtures:load RAILS_ENV=production"
+      my_exec "rake db:fixtures:load RAILS_ENV=development"
     end
 
     desc "Initialize system"
@@ -28,31 +32,31 @@ namespace :nova do
       do_init
     end
 
-    desc "Start Nova worker (Development mode)"
-    task :devstart do
-      puts "Starting Nova worker in *Development* mode..."
-      `script/server -d`
-      FileUtils.mkdir_p "#{RAILS_ROOT}/tmp"
-      `hostname > #{RAILS_ROOT}/tmp/hostname`
-    end
-
     def do_start
-      puts "TODO"
+      require_root_privilege  # we must run worker as "root", since we will connect to "qemu:///system", which is privileged action
+      service_port = 4000 # TODO move service_port to common/config
+      puts "Writing hostname into tmp/hostname..."
+      FileUtils.mkdir_p "#{RAILS_ROOT}/tmp"
+      my_exec "hostname > #{RAILS_ROOT}/tmp/hostname"
+      puts "Starting Nova worker on port #{service_port}..."
+      my_exec "script/server -d -p #{service_port}"
     end
 
-    desc "Start Nova worker (Release mode)"
+    desc "Start Nova worker"
     task :start do
-      puts "Starting Nova worker in *Release* mode..."
       do_start
     end
 
     desc "Stop Nova worker"
     task :stop do
-      if File.exists? "tmp/pids/server.pid"
-        puts "Found tmp/pids/server.pid file"
-        puts "Nova worker server pid = #{File.read 'tmp/pids/server.pid'}"
+      require_root_privilege  # worker is started using root privilege, so we have to kill it using root privilege
+      server_pid_file = "tmp/pids/server.pid"
+      if File.exists? server_pid_file
+        puts "Found #{server_pid_file}"
+        server_pid = File.read server_pid_file
+        puts "Nova worker server pid = #{server_pid}"
         puts "Terminating..."
-        `kill #{File.read "tmp/pids/server.pid"}`
+        my_exec "kill -9 #{server_pid}"
       end
     end
 
@@ -61,7 +65,7 @@ namespace :nova do
       require 'rubygems'
       require 'libvirt'
       
-      `Rake nova:worker:stop`
+      my_exec "Rake nova:worker:stop"
 
       virt_conn = Libvirt::open("qemu:///system")
       virt_conn.list_defined_domains.each do |domain_name|
@@ -80,10 +84,9 @@ namespace :nova do
         end
       end
 
-      `rm tmp/work_site -rf`
+      my_exec "rm tmp/work_site -rf"
       do_init
       do_start
-
     end
   end
 end

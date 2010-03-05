@@ -9,47 +9,45 @@ require 'rake/rdoctask'
 
 require 'tasks/rails'
 
+require "#{File.dirname __FILE__}/../common/lib/utils.rb"
+
 namespace :nova do
   namespace :master do
 
-    desc "Start Nova master (Development mode)"
-    task :devstart do
-      puts "Starting Nova master in *Development* mode..."
-      `script/server -d`
-    end
-
-    desc "Start Nova master (Release mode)"
+    desc "Start Nova master"
     task :start do
-      puts "Starting Nova master in *Release* mode..."
-      puts "TODO"
+      service_port = 3000 # TODO move service_port into common/config
+      puts "Starting Nova master on port #{service_port}..."
+      my_exec "script/server -d -p #{service_port}"
     end
 
     desc "Stop Nova server"
     task :stop do
+      kill_by_pid_file "#{File.dirname __FILE__}/tmp/pids/server.pid"
       
-      if File.exists? "tmp/pids/server.pid"
-        puts "Found tmp/pids/server.pid file"
-        puts "Nova master server pid = #{File.read 'tmp/pids/server.pid'}"
-        puts "Terminating..."
-        `kill #{File.read "tmp/pids/server.pid"}`
+      my_exec "killall mongrel"
+      my_exec "killall swiftiply"
+      my_exec "killall swiftiply_mongrel_rails"
+      my_exec "killall mongrel_reals"
+
+      Dir.foreach("#{File.dirname __FILE__}/log") do |entry|
+        if entry.end_with? ".pid"
+          kill_by_pid_file entry
+        end
       end
-      
-      `killall mongrel`
-      `killall swiftiply`
-      `killall swiftiply_mongrel_rails`
-      `killall mongrel_reals`
-      `rm -rf log/*.pid`
 
     end
 
     desc "Initialize system"
     task :init do
-      `rake db:migrate RAILS_ENV=production`
-      `rake db:migrate RAILS_ENV=development`
-      `rake db:migrate:reset RAILS_ENV=production`
-      `rake db:migrate:reset RAILS_ENV=development`
-      `rake db:fixtures:load RAILS_ENV=production`
-      `rake db:fixtures:load RAILS_ENV=development`
+      puts "Migrating database..."
+      my_exec "rake db:migrate RAILS_ENV=production"
+      my_exec "rake db:migrate RAILS_ENV=development"
+      my_exec "rake db:migrate:reset RAILS_ENV=production"
+      my_exec "rake db:migrate:reset RAILS_ENV=development"
+      puts "Loading data..."
+      my_exec "rake db:fixtures:load RAILS_ENV=production"
+      my_exec "rake db:fixtures:load RAILS_ENV=development"
     end
 
   end
