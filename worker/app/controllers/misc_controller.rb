@@ -4,6 +4,10 @@ class MiscController < ApplicationController
     render_success "Hi"
   end
 
+  def role
+    render_success "worker"
+  end
+
   def whoami
     render_success "Worker"
   end
