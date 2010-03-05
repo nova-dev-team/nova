@@ -1,14 +1,66 @@
 <%
 require 'fileutils'
 require 'pp'
-#require 'libvirt'
+require 'libvirt'
 require 'cgi'
 require 'xmlsimple'
 %>
 
-<%
-content_for :header_scripts do
-%>
+<html>
+<head>
+<title>Nova worker</title>
+
+
+<link type="text/css" rel="stylesheet" href="/stylesheets/SyntaxHighlighter.css"></link>
+<script language="javascript" src="/javascripts/shCore.js"></script>
+<script language="javascript" src="/javascripts/shBrushXml.js"></script>
+<script type="text/javascript" src="/javascripts/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
+
+<style type="text/css" media="screen">
+
+body {
+  /*margin: 0;*/
+  margin-bottom: 25px;
+  padding: 0;
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 13px;
+  color: #333;
+}
+
+a {
+  color: #7541dc
+}
+
+input, select, textarea {
+	margin: 5px 0;
+	padding: 5px;
+	color: #6A6969;
+	border-width: 1px;
+	border-style: solid;
+  border-color: #D4D4D4 #EBEBEB #EBEBEB #D4D4D4;
+	font: 11px 'Lucida Grande', Verdana, Helvetica, sans-serif;
+}
+
+table {
+  border-spacing: 0px;
+}
+
+.code {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.row_type_1 {
+
+}
+
+.row_type_0 {
+  background: #d9ddff;
+}
+
+</style>
+
+<script type="text/javascript">
 
 $(document).ready(function () {
   dp.SyntaxHighlighter.HighlightAll('xml_code');
@@ -131,20 +183,19 @@ function change_system_setting(key) {
     });
   }
 }
+</script>
+</head>
 
-<% end -%>
-
-
-
-
-
-
-
-
-
-<% content_for :main_content do %>
+<body>
 
 <h1>Nova worker</h1>
+<%=
+  node_hostname = ""
+  if File.exists? "#{RAILS_ROOT}/tmp/hostname"
+    node_hostname = "hostname: " + (File.read "#{RAILS_ROOT}/tmp/hostname")
+  end
+  node_hostname
+%>
 <hr>
 
 
@@ -162,8 +213,7 @@ function change_system_setting(key) {
 <%=
 info_of_vmachines = ""
 
-#all_domains = Vmachine.all_domains
-all_domains = []
+all_domains = Vmachine.all_domains
 
 counter = 0
 
@@ -379,5 +429,6 @@ pipe.close
 This is the "worker" module of the nova system. <b>Intended for administrators only</b>.<p>
 &copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
 
-<% end -%>
+</body>
+</html>
 

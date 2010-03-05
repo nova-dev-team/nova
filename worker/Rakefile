@@ -9,6 +9,8 @@ require 'rake/rdoctask'
 
 require 'tasks/rails'
 
+require 'fileutils'
+
 namespace :nova do
   namespace :worker do
 
@@ -30,6 +32,8 @@ namespace :nova do
     task :devstart do
       puts "Starting Nova worker in *Development* mode..."
       `script/server -d`
+      FileUtils.mkdir_p "#{RAILS_ROOT}/tmp"
+      `hostname > #{RAILS_ROOT}/tmp/hostname`
     end
 
     def do_start
