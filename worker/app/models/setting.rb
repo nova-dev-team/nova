@@ -1,5 +1,11 @@
 class Setting < ActiveRecord::Base
 
+  @@RUN_ROOT = nil  # cached for readonly value
+  def Setting.run_root
+    return @@RUN_ROOT if @@RUN_ROOT
+    @@RUN_ROOT = (Setting.find_by_key "run_root").value
+  end
+
   # where all the image files are located
   def Setting.storage_server_vdisks
     (Setting.find_by_key "storage_server").value + "/vdisks"

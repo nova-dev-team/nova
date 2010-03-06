@@ -310,10 +310,8 @@ html
 </select><%= spacing %>
 Memory size: <input type="text" size="4" id="new_vm_mem_size" value="512"/> MB<%= spacing %>
 <br>
-Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
-Save to: <input type="text" id="new_vm_hda_save"/><br>
-Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
-Save to: <input type="text" id="new_vm_hdb_save"/><br>
+Hard Disk: <input type="text" id="new_vm_hda"/><br>
+IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255.255.255.0"/><%= spacing %>Gateway: <input type="text"><br>
 <button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
 
 <hr>
@@ -321,29 +319,25 @@ Save to: <input type="text" id="new_vm_hdb_save"/><br>
 
 <h2>Storage server</h2>
 <%=
-  list = []
-  begin
-    File.open(Setting.resource_list_cache, "r") do |file|
-      list = file.readlines
-    end
-  rescue
-    # do nothing
-  end
+  html_str = ""
+  if File.exists? "#{Setting.run_root}/server_files_list"
+    list_data = File.read "#{Setting.run_root}/server_files_list"
+    if list_data =~ /Fatal error: max-retries exceeded/
+      html_str = "<font color='red'>The storage server is probably down.</font>"
+    else
+      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/server_files_list"}</b>\n"
+      html_str += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td>"
+      html_str += "<pre>\n"
 
-  if list.length != 0
-    list_html = "Refreshed on #{list[0]}"
-  else
-    list_html = "The file list will be updated in a while."
-  end
-  list_html += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>"
-  if list.size != 0
-    list[1..-1].each do |entry|
-      list_html += entry
+      # TODO pretty print the list_data
+      html_str += list_data
+      html_str += "</pre></td></tr></table>\n"
     end
+  else
+    html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
   end
-  list_html.chomp
+  html_str
 %>
-</pre></td></tr></table>
 <hr>
 
 <h2>Local resource</h2>
