@@ -10,7 +10,6 @@ require 'xmlsimple'
 <head>
 <title>Nova worker</title>
 
-
 <link type="text/css" rel="stylesheet" href="/stylesheets/SyntaxHighlighter.css"></link>
 <script language="javascript" src="/javascripts/shCore.js"></script>
 <script language="javascript" src="/javascripts/shBrushXml.js"></script>
@@ -20,9 +19,6 @@ require 'xmlsimple'
 <style type="text/css" media="screen">
 
 body {
-  /*margin: 0;*/
-  margin-bottom: 25px;
-  padding: 0;
   font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
   font-size: 13px;
   color: #333;
@@ -192,9 +188,16 @@ function change_system_setting(key) {
 <%=
   node_hostname = ""
   if File.exists? "#{RAILS_ROOT}/tmp/hostname"
-    node_hostname = "hostname: " + (File.read "#{RAILS_ROOT}/tmp/hostname")
+    node_hostname = "hostname: " + (File.read "#{RAILS_ROOT}/tmp/hostname") + "<br>"
   end
   node_hostname
+%>
+<%=
+  version_name = ""
+  if File.exists? "#{RAILS_ROOT}/../VERSION"
+    version_name = "version: " + (File.read "#{RAILS_ROOT}/../VERSION") + "<br>"
+  end
+  version_name
 %>
 <hr>
 
@@ -426,7 +429,7 @@ pipe.close
 %>
 <hr>
 
-This is the "worker" module of the nova system. <b>Intended for administrators only</b>.<p>
+This is the "worker" module of the Nova system. <b>Intended for developers only</b>.<p>
 &copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
 
 </body>

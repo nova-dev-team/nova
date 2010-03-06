@@ -15,8 +15,10 @@ GET&POST /vmachines/start
 async call, immediately return. it should be called by master_helper in a background queue. and when worker received the call, it calls worker_helper, who forks a new process, and gets the job done.
 params:
   name=name of the vm
+  hypervisor=which hypervisor do we use? "kvm", "xen", "vbox"
   cpu_count=number of CPUs
   mem_size=memory size in MB
+  sys_arch=system architecture, "x86_64", "i386"
   hda_image=URI of hda image
   hda_save_to=where will the hda image be saved, when vm halts (optional) (not including "destroy")
   hdb_image=URI of hdb image (optional)

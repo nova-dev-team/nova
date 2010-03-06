@@ -50,13 +50,10 @@ namespace :nova do
     desc "Stop Nova worker"
     task :stop do
       require_root_privilege  # worker is started using root privilege, so we have to kill it using root privilege
-      server_pid_file = "tmp/pids/server.pid"
-      if File.exists? server_pid_file
-        puts "Found #{server_pid_file}"
-        server_pid = File.read server_pid_file
-        puts "Nova worker server pid = #{server_pid}"
-        puts "Terminating..."
-        my_exec "kill -9 #{server_pid}"
+      kill_by_pid_file "tmp/pids/server.pid"
+
+      if File.exists? "#{RAILS_ROOT}/tmp/hostname"
+        FileUtils.rm "#{RAILS_ROOT}/tmp/hostname"
       end
     end
 

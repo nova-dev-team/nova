@@ -1,3 +1,9 @@
+# This file contains general utilities for the Nova system.
+# It is shared among "master" & "worker" modules, and the helper scripts.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+
+
 class String
   def is_uuid?
     return false unless self.length == 36
@@ -108,7 +114,6 @@ end
 
 # Execute a shell command, prints the command it self, and the output message.
 #
-# Author::    Santa Zhang (mailto:santa1987@gmail.com)
 # Since::     0.3
 def my_exec cmd
   puts "[cmd] #{cmd}"
@@ -119,7 +124,6 @@ end
 # Check if running with root privilege, exit 1 if not.
 # This function is intended to be used in Rakefile.
 #
-# Author::    Santa Zhang (mailto:santa1987@gmail.com)
 # Since::     0.3
 def require_root_privilege
   if ENV['USER'] != "root"
@@ -132,7 +136,6 @@ end
 # Kill a process by pid file.
 # This function is intended to be used in Rakefile.
 #
-# Author::    Santa Zhang (mailto:santa1987@gmail.com)
 # Since::     0.3
 def kill_by_pid_file file_path
   if File.exists? file_path

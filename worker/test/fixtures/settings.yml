@@ -1,13 +1,46 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+#
+# Author::  Santa Zhang (mailto:santa1987@gmail.com)
 
-# We use the crappy name "no_edit", bacause 'readonly' was already used by ActiveRecord
+# TODO read values from common/config
 
-# where is the disk images, cdrom iso files stored
-# Could be changed in web ui
+# Where is the Nova code stored.
+#
+# Since::   0.3
+nova_root:
+  key: nova_root
+  value: /nova/system
+  editable: false
+
+# Where is the vm running.
+#
+# Since::   0.3
+run_root:
+  key: run_root
+  value: /nova/run
+  editable: false
+
+# Where is the storage server running.
+#
+# Since::   0.3
 storage_server:
   key: storage_server
   value: ftp://user:passwd@somewhere.com/
   editable: true
+
+# Number of disk image copies to be maintained in the background.
+#
+# Since::   0.3
+image_pool_size:
+  key: image_pool_size
+  value: 5
+  editable: true
+
+
+# TODO deprecate the following settings.
+
+# where is the disk images, cdrom iso files stored
+# Could be changed in web ui
 
 # where is the local cache directory
 # for God's sake don't change it

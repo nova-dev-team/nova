@@ -1,49 +1,75 @@
-require "utils.rb"
+require "#{File.dirname __FILE__}/utils.rb"
 require 'cgi'
 
-# a helper module for both master & worker module
+# Helper module for both "master" and "worker" component.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
 module ControllerUtility
 
 private
 
-  # report request result, either successful or failure
-  def render_result success, message, option = {}
-    if (option.keys.include? :success) or (option.keys.include? :message)
+  # Reply to a request.
+  #
+  # * success: boolean true or false
+  # * message: text info about the result of the request
+  # * addition_info: additional reply data, a hash table
+  # bold: additional_info cannot contain key "success" or "message"
+  #
+  # example reply data in JSON:
+  # {
+  #   "success":true,
+  #   "message":"your request is successful",
+  #   "result":"blah"
+  # }
+  #
+  # Since::     0.3
+  def reply_result success, message, additional_info = {}
+    if (additional_info.keys.include? :success) or (additional_info.keys.include? :message)
       raise "DO NOT use ':success' or ':message', they are preserved keys!"
     end
-    result = {:success => success, :message => message}.merge(option)
+    result = {:success => success, :message => message}.merge(additional_info)
     respond_to do |accept|
       accept.json {render :json => result}
-      accept.html {render :text => CGI.escapeHTML(result.to_json)}
+      accept.html do
+        # TODO better json result rendering
+        render :text => <<HTML
+<html>
+<head>
+<title>request result</title>
+</head>
+<body>
+<div id="json_src">
+#{CGI.escapeHTML(result.to_json)}
+</div>
+</body>
+</html>
+HTML
+      end
     end
   end
 
-  # report failure
-  def render_failure message, option = {}
-    render_result false, message, option
+  # Reply a failed request.
+  #
+  # Since::     0.3
+  def reply_failure message, additional_info = {}
+    reply_result false, message, additional_info
   end
 
-  # report success
-  def render_success message, option = {}
-    render_result true, message, option
+  # Reply a successful request.
+  #
+  # Since::     0.3
+  def reply_success message, additional_info = {}
+    reply_result true, message, additional_info
   end
 
-  # report for a successful query
-  def render_data data
-    render_result true, "Query successful.", :data => data
-  end
-
-  # report for a successful query, the data set is from a whole model
+  # Render a all data of a given model. It is like running "select * from model".
   #
-  # option:
+  # * you can select a given set of columns, by setting option[:items].
+  #   example: option[:items] = [:id, :created_at, :updated_at]
   #
-  #  * option[:items] is a list of items to be rendered. eg:
-  #
-  #      option[:items] = [:id, :created_at, :updated_at]
-  #
-  #    if option[:items] is not given, by default, all items will be rendered
-  #
-  def render_model model, option = {}
+  # Since::     0.3
+  def reply_model model, option = {}
     all_columns = model.columns.collect {|column| column.name}
     if option[:items] == nil
       option[:items] = all_columns
@@ -56,9 +82,12 @@ private
       option[:items].each {|item| row_data[item] = row[item]}
       row_data
     end
-    render_data data
+    reply_success "query successful!", :data => data
   end
 
+  # Check if parameter is valid (non-empty).
+  #
+  # Since::     0.3
   def valid_param? param
     param != nil and param != ""
   end
