@@ -46,7 +46,6 @@ table {
 }
 
 .row_type_1 {
-
 }
 
 .row_type_0 {
@@ -310,7 +309,7 @@ html
 </select><%= spacing %>
 Memory size: <input type="text" size="4" id="new_vm_mem_size" value="512"/> MB<%= spacing %>
 <br>
-Hard Disk: <input type="text" id="new_vm_hda"/><br>
+Hard Disk: <input type="text" id="new_vm_hda" size=60/><br>
 IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255.255.255.0"/><%= spacing %>Gateway: <input type="text"><br>
 <button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
 
@@ -325,8 +324,11 @@ IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255
     if list_data =~ /Fatal error: max-retries exceeded/
       html_str = "<font color='red'>The storage server is probably down.</font>"
     else
-      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}</b>\n"
-      html_str += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td>"
+      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
+      if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
+        html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead.</font>"
+      end
+      html_str += "<br>\n<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td>"
       html_str += "<pre>\n"
 
       # TODO pretty print the list_data
@@ -420,7 +422,6 @@ pipe.close
 <h2>System settings</h2>
 <%=
   system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
-  
   counter = 0
   (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
     system_settings_html += "<tr class='row_type_#{counter % 2}'><td>"
