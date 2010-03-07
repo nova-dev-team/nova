@@ -9,44 +9,77 @@ require "uuidtools"
 # Since::     0.3
 class Vmachine < ActiveRecord::Base
 
+  # libvirt VM status
+  LIBVIRT_RUNNING = 1
+  LIBVIRT_SUSPENDED = 3
+  LIBVIRT_NOT_RUNNING = 5
+
+  # Connection to libvirt.
+  #
+  # Since::   0.3
   @@virt_conn = Libvirt::open("qemu:///system")
 
+  # Get the connection to libvirt.
+  #
+  # Since::   0.3
   def Vmachine.virt_conn
     @@virt_conn
   end
 
+  # List all vmachines by their name.
+  #
+  # Since::   0.3
   def Vmachine.all_names
     all_domains.collect {|dom| dom.name}
   end
 
+  # List all vmachine domains.
+  #
+  # Since::   0.3
   def Vmachine.all_domains
     virt_conn = Vmachine.virt_conn
-
     all_domains = []
     Vmachine.all.each do |vm_model|
       begin
         all_domains << virt_conn.lookup_domain_by_uuid(vm_model.uuid)
       rescue
+        # vmachine not found by libvirt, delete it!
+        Vmachine.delete vm_model
         next
       end
     end
-
     return all_domains
   end
 
+  # Find a vm domain by uuid
+  #
+  # Since::   0.3
   def Vmachine.find_domain_by_uuid uuid
     Vmachine.virt_conn.lookup_domain_by_uuid uuid
   end
 
+  # Find a vm domain by name
+  #
+  # Since::   0.3
   def Vmachine.find_domain_by_name name
     Vmachine.virt_conn.lookup_domain_by_name name
   end
 
-  # Check if params are correct, when creating new vm.
+  # Check if params are correct, before creating new vm.
+  #
+  # * Required params:
+  #   cpu_count:  number of CPUs
+  #   mem_size:   memory size
+  #   name:       name of the VM
+  #   hypervisor: which hypervisor do we use?
+  #   arch:       hardware architecture
+  #   hda_image:  uri of hard disk 1 (hda) image
+  #   run_agent:  which agent do we need to run
+  #   uuid:       uuid of the VM
   #
   # Since::     0.3
   def Vmachine.validate_params params
-    ["cpu_count", "mem_size", "name", "hypervisor", "sys_arch", "hda_image", "run_agent", "uuid"].each do |item|
+    ["cpu_count", "mem_size", "name", "hypervisor", "arch", "hda_image", "run_agent", "uuid"].each do |item|
       if params[item] == nil or params[item] == ""
         raise "please provide \"#{item}\"!"
       end
@@ -135,6 +168,7 @@ XML_DESC
     Vmachine.validate_params params
     xml_desc = Vmachine.emit_domain_xml params
     dom = Vmachine.virt_conn.define_domain_xml xml_desc
+    # TODO write config files in VM working dir
   end
 
   # write logs into vmachine folder
@@ -201,7 +235,7 @@ XML_DESC
 
   # non-blocking, most work is delegated to stop_vmachine_worker
   def Vmachine.stop uuid
-    # TODO stop a domain, and inform the update_vmachine_worker to upload it, if necessary
+    # TODO deprecate this function. when vm stopped, background worker will detect it, and start uploading disk images
     vm_model = Vmachine.find_by_uuid uuid
     Vmachine.delete vm_model if vm_model != nil
     Vmachine.libvirt_action "stop", uuid
@@ -235,7 +269,7 @@ XML_DESC
 
 private
 
-  def Vmachine.libvirt_action action_name, uuid
+  def Vmachine.libvirt_call action_name, uuid
     begin
       dom = Vmachine.find_domain_by_uuid uuid
     rescue

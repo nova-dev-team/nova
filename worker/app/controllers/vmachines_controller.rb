@@ -10,83 +10,72 @@ class VmachinesController < ApplicationController
 
 public
 
-  # libvirt states
-  STATE_RUNNING = 1
-  STATE_SUSPENDED = 3
-  STATE_NOT_RUNNING = 5
-
+  # Show a listing of all VM
+  #
+  # Since::     0.3
   def index
-    list
-  end
-
-  # list all vmachines, and show their status
-  # TODO deprecate this function
-  def list
-    params[:show_active] ||= "true"
-    params[:show_inactive] ||= "false"
-    doms_info = []
-    Vmachine.all_domains.each do |dom|
+    doms_list = []
+    Vmachine.all_domains.each do |dom| 
       dom_info = {}
 
-      ["name", "uuid", "info"].each do |property|
+      # extract info by using "send"
+      ["name", "uuid"].each do |property|
         dom_info[property] = dom.send property
       end
 
-      # vnc port
-      if state_has_vnc? dom.info.state
+      # get the vnc port
+      if dom.info.state == Vmachine::LIBVIRT_RUNNING or dom.info.state == Vmachine::LIBVIRT_SUSPENDED
+        # only these 2 state has vnc port
         xml_desc = XmlSimple.xml_in dom.xml_desc
-        dom_info["vnc_port"] = xml_desc['devices'][0]['graphics'][0]['port']
+        dom_info["vnc_port"] = xml_desc["device"][0]["graphics"][0]["port"]
       end
 
-      doms_info << dom_info 
+      doms_list << dom_info
     end
 
-    respond_to do |accept|
-      accept.json {render :json => doms_info}
-      accept.html {render :text => doms_info.to_json}
-    end
+    reply_success "query successful!", :data => doms_list
   end
 
-  # For debug purpose, create a domain, but do not start it.
+  # Create and then start a domain.
   #
   # Since::     0.3
-  def create
-    # TODO disable this function in production code.
-    begin
-      Vmachine.define params
-      reply_success "success!"
-    rescue => e
-      reply_failure e.to_s
-    end
-  end
-
-  # create & start an domain
   def start
-    Vmachine.default_params.each do |key, value|
-      params[key] = value unless valid_param? params[key]
-    end
-
     action_request "start", params
   end
 
-  # stop and destroy an domain
+  # Destroy a domain.
+  #
+  # Since::     0.3
   def destroy
-    action_request "destroy", params[:uuid]
+    action_request "destroy", params
   end
 
+  # Suspend a domain.
+  #
+  # Since::     0.3
   def suspend
-    action_request "suspend", params[:uuid]
+    action_request "suspend", params
   end
 
+  # Resume a domain.
+  #
+  # Since::     0.3
   def resume
-    action_request "resume", params[:uuid]
+    action_request "resume", params
   end
 
 private
 
+  # This is a helper, it triggers Vmachine's action, and replies result to user.
+  #
+  # Since::     0.3
   def action_request action_name, args
-    result = Vmachine.send action_name, args
-    render_result result[:success], result[:message]
+    begin
+      result = Vmachine.send action_name, args
+      reply_success result[:message]
+    rescue => e
+      reply_failure e.to_s
+    end
   end
 
 end
