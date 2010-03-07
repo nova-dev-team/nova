@@ -1,10 +1,4 @@
-require 'rubygems'
-require 'json'
-require 'libvirt'
-require 'pp'
 require 'xmlsimple'
-require 'uuidtools'
-require 'fileutils'
 
 class VmachinesController < ApplicationController
 
@@ -72,7 +66,13 @@ private
   def action_request action_name, args
     begin
       result = Vmachine.send action_name, args
-      reply_success result[:message]
+      if result == nil
+        reply_failure "call to Vmachine.#{action_name} failed"
+      elsif result[:success]
+        reply_success result[:message]
+      else
+        reply_failure result[:message]
+      end
     rescue => e
       reply_failure e.to_s
     end
