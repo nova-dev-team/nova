@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
       // The listing is first written to a "list~" file, and after all listing has been fetched, it is renamed to "list".
       // This prevents worker from reading incomplete file listing
       system("lftp -f ftp_server_files_list_updater_lftp_script 2>&1 | tee \"ftp_server_files_list~\" > /dev/null");
-      printf("renaming tmp list file, ret=%d\n", rename("ftp_server_files_list~", "ftp_server_files_list"));
+      rename("ftp_server_files_list~", "ftp_server_files_list");
       sleep(120); // sleep for 2 minutes
     }
   } else {

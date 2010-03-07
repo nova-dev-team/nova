@@ -343,39 +343,52 @@ IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255
 <h2>Local resource</h2>
 
 Vmachines directory structure:<br>
-<b>du -ah <%=h Setting.vmachines_root %></b>
+<b>du -ah <%=h "TODO"
+#Setting.vmachines_root
+%></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
+=begin
 FileUtils.mkdir_p Setting.vmachines_root  # assure existance of vmachines directory
 dir_listing = ""
 pipe = IO.popen("cd #{Setting.vmachines_root} && du -ah")
 dir_listing = pipe.readlines.join.chomp
 pipe.close
+=end
 %>
 <pre>
-<%=h dir_listing %>
+<%=h "TODO"
+#dir_listing
+%>
 </pre>
 </td></tr></table>
 <p>
 
 Cache directory structure:<br>
-<b>du -ah <%=h Setting.storage_cache %></b>
+<b>du -ah <%=h "TODO"
+#Setting.storage_cache
+%></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
+=begin
 FileUtils.mkdir_p Setting.storage_cache  # assure existance of vmachines directory
 dir_listing = ""
 pipe = IO.popen("cd #{Setting.storage_cache} && du -ah")
 dir_listing = pipe.readlines.join.chomp
 pipe.close
+=end
 %>
 <pre>
-<%=h dir_listing %>
+<%=h "TODO"
+#dir_listing
+%>
 </pre>
 </td></tr></table>
 <hr>
 
 <h2>Vmachines log</h2>
-<%=
+<%= "TODO"
+=begin
   vmachines_log_html = "<table width='100%'><tr><td>Vmachine</td><td>Log</td></tr>"
   counter = 0
   # read vmachines logs
@@ -400,6 +413,7 @@ pipe.close
 
   vmachines_log_html += "</table>"
   vmachines_log_html
+=end
 %>
 <hr>
 
@@ -408,7 +422,7 @@ pipe.close
   system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
   
   counter = 0
-  Setting.all.each do |setting|
+  (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
     system_settings_html += "<tr class='row_type_#{counter % 2}'><td>"
     system_settings_html += setting.key
     system_settings_html += "</td><td>"
