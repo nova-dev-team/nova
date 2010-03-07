@@ -320,12 +320,12 @@ IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255
 <h2>Storage server</h2>
 <%=
   html_str = ""
-  if File.exists? "#{Setting.run_root}/server_files_list"
-    list_data = File.read "#{Setting.run_root}/server_files_list"
+  if File.exists? "#{Setting.run_root}/ftp_server_files_list"
+    list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
     if list_data =~ /Fatal error: max-retries exceeded/
       html_str = "<font color='red'>The storage server is probably down.</font>"
     else
-      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/server_files_list"}</b>\n"
+      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}</b>\n"
       html_str += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td>"
       html_str += "<pre>\n"
 

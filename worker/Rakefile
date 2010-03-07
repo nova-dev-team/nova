@@ -18,6 +18,8 @@ namespace :nova do
 
     def do_init
       require_root_privilege
+      puts "Building helper tools.."
+      my_exec "cd #{RAILS_ROOT}/lib && make"
       puts "Migrating database..."
       my_exec "rake db:migrate RAILS_ENV=production"
       my_exec "rake db:migrate RAILS_ENV=development"
@@ -41,12 +43,11 @@ namespace :nova do
       my_exec "hostname > #{RAILS_ROOT}/tmp/hostname"
       puts "Starting Nova worker on port #{service_port}..."
       
-
       conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yaml"
 
-      # TODO write lftp_script
+      # TODO when writing lftp_script, read configs from common/config
       FileUtils.mkdir_p conf["run_root"]
-      File.open("#{conf["run_root"]}/lftp_script", "w") do |f|
+      File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
         f.write <<LFTP_SCRIPT
 set net:max-retries 2
 set net:reconnect-interval-base 1
@@ -57,7 +58,7 @@ ls
 LFTP_SCRIPT
       end
 
-      my_exec "#{RAILS_ROOT}/lib/server_files_list_updater.rb #{conf["run_root"]}"
+      my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
       my_exec "#{RAILS_ROOT}/script/server -d -p #{service_port}"
     end
 
