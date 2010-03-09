@@ -1,4 +1,6 @@
 require File.dirname(__FILE__) + '/../common/nfs'
+require File.dirname(__FILE__) + '/../common/iso'
+
 require 'net/http'
 require 'rubygems'
 require 'json'
@@ -34,6 +36,40 @@ class ClusterConfiguration
       file.puts(@node_list)
     end
   end
+
+	def fetch_by_iso
+		iso_root = File.dirname(__FILE__) + '/../..'
+		path_config = iso_root + CEIL_ISO_CONFIG_PATH
+		filename_servers_config = path_config + '/' + CEIL_ISO_FILENAME_SERVERS
+		filename_cluster_config = path_config + '/' + CEIL_ISO_FILENAME_CLUSTER
+		filename_soft_list = path_config + '/' + CEIL_ISO_FILENAME_SOFTLIST
+		filename_node_list = path_config + '/' + CEIL_ISO_FILENAME_NODELIST
+
+		begin
+
+			File.open(filename_node_list) do |file|
+				@node_list = file.readlines
+			end	
+			File.open(filename_soft_list) do |file|
+				@inst_list = file.readlines
+			end
+			File.open(filename_servers_config) do |file|
+				@package_server = file.readline
+				@package_server_type = file.readline
+				@key_server = file.readline
+				@key_server_type = file.readline
+			end
+			File.open(filename_cluster_config) do |file|
+				@host_name = file.readline
+				@cluster_name = file.readline
+			end
+
+		rescue => e
+			puts "Error during fetch configuration from cdrom, #{e.to_s}"
+			return nil
+		end
+	end
+
 
   def fetch_by_nfs(server_addr)
     map_source = "/config"
@@ -96,8 +132,10 @@ class ClusterConfiguration
   end
 end
 
-#cc = ClusterConfiguration.new "192.168.0.110"
-#cc.fetch_by_nfs "127.0.0.1"
-#puts cc.instlist
-#puts cc.nodelist
+=begin
+cc = ClusterConfiguration.new "10.0.1.211"
+cc.fetch_by_iso
+puts cc.inst_list
+puts cc.node_list
+=end
 
