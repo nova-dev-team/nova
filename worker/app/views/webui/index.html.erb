@@ -1,9 +1,9 @@
 <%
 require 'fileutils'
-require 'pp'
 require 'libvirt'
 require 'cgi'
 require 'xmlsimple'
+require 'uuidtools'
 %>
 
 <html>
@@ -29,13 +29,13 @@ a {
 }
 
 input, select, textarea {
-	margin: 5px 0;
-	padding: 5px;
-	color: #6A6969;
-	border-width: 1px;
-	border-style: solid;
+  margin: 5px 0;
+  padding: 5px;
+  color: #6A6969;
+  border-width: 1px;
+  border-style: solid;
   border-color: #D4D4D4 #EBEBEB #EBEBEB #D4D4D4;
-	font: 11px 'Lucida Grande', Verdana, Helvetica, sans-serif;
+  font: 11px 'Lucida Grande', Verdana, Helvetica, sans-serif;
 }
 
 table {
@@ -47,13 +47,11 @@ table {
 }
 
 .row_type_1 {
-
 }
 
 .row_type_0 {
   background: #d9ddff;
 }
-
 </style>
 
 <script type="text/javascript">
@@ -288,10 +286,17 @@ info_of_vmachines
 
 <h2>Add new vmachine</h2>
 <%
-spacing = ""
-4.times {spacing += "&nbsp;"}
+spacing = "&nbsp;" * 4
 %>
-Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name" value="dummy_vm"/><%= spacing %>
+Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name" size=30 value="vm_<%=
+  time_now = Time.now
+  "%04d%02d%02d%02d%02d%02d" % [time_now.year, time_now.month, time_now.day, time_now.hour, time_now.min, time_now.sec]
+%>"/><%= spacing %>
+UUID: <input type="text" id="new_vm_uuid" size=48 value="<%= UUIDTools::UUID.random_create.to_s %>"/>
+<br>
+Hypervisor: <select id="new_vm_hypervisor">
+<option value='kvm'>KVM</option>
+</select><%= spacing %>
 Architecture: <select id="new_vm_arch">
 <option value='i686'>i686</option>
 <option value='x86_64'>x86_64</option>
@@ -303,83 +308,90 @@ html = ""
 html
 %>
 </select><%= spacing %>
-Memory size: <input type="text" size="4" id="new_vm_mem_size" value="128"/> MB<%= spacing %>
-Boot Device: <select id="new_vm_boot_dev">
-<option value='hd'>Hard Disk (hda)</option>
-<option value='cdrom'>CDROM (hdc)</option>
-</select><br>
-Hard Disk 1 (hda): <input type="text" id="new_vm_hda"/><%= spacing %>
-Hard Disk 2 (hdb, optional): <input type="text" id="new_vm_hdb"/> <%= spacing %>
-CDROM (hdc, optional): <input type="text" id="new_vm_cdrom"/><br>
-Extra Dependency(separate with space, optional): <input type="text" id="extra_depend" size=80><br>
+Memory size: <input type="text" size="4" id="new_vm_mem_size" value="512"/> MB<%= spacing %>
+<br>
+Hard Disk: <input type="text" id="new_vm_hda" size=60/><br>
+IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255.255.255.0"/><%= spacing %>Gateway: <input type="text"><br>
 <button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
 
+<hr>
+
+
+<h2>Storage server</h2>
+<%=
+  html_str = ""
+  if File.exists? "#{Setting.run_root}/ftp_server_files_list"
+    list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
+    if list_data =~ /Fatal error: max-retries exceeded/
+      html_str = "<font color='red'>The storage server is probably down.</font>"
+    else
+      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
+      if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
+        html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead.</font>"
+      end
+      html_str += "<br>\n<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td>"
+      html_str += "<pre>\n"
+
+      # TODO pretty print the list_data
+      html_str += list_data
+      html_str += "</pre></td></tr></table>\n"
+    end
+  else
+    html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
+  end
+  html_str
+%>
 <hr>
 
 <h2>Local resource</h2>
 
 Vmachines directory structure:<br>
-<b>du -ah <%=h Setting.vmachines_root %></b>
+<b>du -ah <%=h "TODO"
+#Setting.vmachines_root
+%></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
+=begin
 FileUtils.mkdir_p Setting.vmachines_root  # assure existance of vmachines directory
 dir_listing = ""
 pipe = IO.popen("cd #{Setting.vmachines_root} && du -ah")
 dir_listing = pipe.readlines.join.chomp
 pipe.close
+=end
 %>
 <pre>
-<%=h dir_listing %>
+<%=h "TODO"
+#dir_listing
+%>
 </pre>
 </td></tr></table>
 <p>
 
 Cache directory structure:<br>
-<b>du -ah <%=h Setting.storage_cache %></b>
+<b>du -ah <%=h "TODO"
+#Setting.storage_cache
+%></b>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
+=begin
 FileUtils.mkdir_p Setting.storage_cache  # assure existance of vmachines directory
 dir_listing = ""
 pipe = IO.popen("cd #{Setting.storage_cache} && du -ah")
 dir_listing = pipe.readlines.join.chomp
 pipe.close
+=end
 %>
 <pre>
-<%=h dir_listing %>
+<%=h "TODO"
+#dir_listing
+%>
 </pre>
 </td></tr></table>
 <hr>
 
-<h2>Vdisks on storage server</h2>
-<%=
-  list = []
-  begin
-    File.open(Setting.resource_list_cache, "r") do |file|
-      list = file.readlines
-    end
-  rescue
-    # do nothing
-  end
-
-  if list.length != 0
-    list_html = "Refreshed on #{list[0]}"
-  else
-    list_html = "The file list will be updated in a while."
-  end
-  list_html += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>"
-  if list.size != 0
-    list[1..-1].each do |entry|
-      list_html += entry
-    end
-  end
-  list_html.chomp
-%>
-</pre></td></tr></table>
-<hr>
-
-
 <h2>Vmachines log</h2>
-<%=
+<%= "TODO"
+=begin
   vmachines_log_html = "<table width='100%'><tr><td>Vmachine</td><td>Log</td></tr>"
   counter = 0
   # read vmachines logs
@@ -404,23 +416,23 @@ pipe.close
 
   vmachines_log_html += "</table>"
   vmachines_log_html
+=end
 %>
 <hr>
 
 <h2>System settings</h2>
 <%=
-  system_settings_html = "<table width='100%'><tr><td>Key</td><td>Value</td><td>Action</td></tr>"
-  
+  system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
   counter = 0
-  Setting.all.each do |setting|
+  (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
     system_settings_html += "<tr class='row_type_#{counter % 2}'><td>"
     system_settings_html += setting.key
     system_settings_html += "</td><td>"
     system_settings_html += setting.value
     if setting.editable
-      system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>"
+      system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>\n"
     else
-      system_settings_html += "</td><td>READ ONLY</td></tr>"
+      system_settings_html += "</td><td>READ ONLY</td></tr>\n"
     end
     counter += 1
   end
