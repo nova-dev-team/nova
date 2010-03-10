@@ -3,23 +3,23 @@
 # iso content = 
 #    ceil_base_path/* + node.list + soft.list + network.conf + server.conf
 require 'fileutils'
+require File.dirname(__FILE__) + '/../common/dir'
+require File.dirname(__FILE__) + '/../common/iso'
+
 #require 'dir'
 	
 PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -l -o '
 PATH_GENISO = '/usr/bin/genisoimage'
 
-FILENAME_SERVERS = 'servers.conf'
-FILENAME_NETWORK = 'network.conf'
-FILENAME_NODELIST = 'node.list'
-FILENAME_SOFTLIST = 'soft.list'
+CONFIG_PATH = CEIL_ISO_CONFIG_PATH
+
+FILENAME_SERVERS = CEIL_ISO_FILENAME_SERVERS
+FILENAME_NETWORK = CEIL_ISO_FILENAME_NETWORK
+FILENAME_CLUSTER = CEIL_ISO_FILENAME_CLUSTER
+FILENAME_NODELIST = CEIL_ISO_FILENAME_NODELIST
+FILENAME_SOFTLIST = CEIL_ISO_FILENAME_SOFTLIST
 
 class CeilIsoGenerator
-	def temp_dir(suffix)
-		note = `date "+%Y%m%d%H%M"`.chomp
-		suff = rand(1000)
-		return "/tmp/#{note}_#{suff}_#{suffix}"
-	end
-
 	def initialize
 		@net_ipaddr = nil
 		@net_netmask = nil
@@ -38,6 +38,9 @@ class CeilIsoGenerator
 		#nodelist string
 
 		@softlist = nil
+		@hostname = 'nova'
+		@clustername = 'nova-cluster'
+
 		#softlist string: appnames seperated by space
 		#example
 		# softlist = "hg hj hx hz"
@@ -69,6 +72,11 @@ class CeilIsoGenerator
 		@softlist = softlist
 	end
 
+	def config_cluster(hostname, clustername)
+		@hostname = hostname
+		@clustername = clustername
+	end
+
 	def generate(iso_path)
 
 		# 1.mk tmp dir /tmp/geniso
@@ -78,7 +86,7 @@ class CeilIsoGenerator
 		try_count = 0
 
 		begin
-			tmpdir = temp_dir("iso#{try_count}")
+			tmpdir = DirTool.temp_dir("iso#{try_count}")
 			try_count = try_count + 1
 			#puts try_count
 			result = 0
@@ -96,27 +104,30 @@ class CeilIsoGenerator
 
 		# copy files
 		FileUtils.cp_r(@base_path, tmpdir)
+
 		# create config files
-		filename_servers = tmpdir + '/' + FILENAME_SERVERS
-		filename_network = tmpdir + '/' + FILENAME_NETWORK
-		filename_nodelist = tmpdir + '/' + FILENAME_NODELIST
-		filename_softlist = tmpdir + '/' + FILENAME_SOFTLIST
+		DirTool.mkdir(tmpdir + CONFIG_PATH)
+		filename_servers = tmpdir + CONFIG_PATH + '/' + FILENAME_SERVERS
+		filename_network = tmpdir + CONFIG_PATH + '/' + FILENAME_NETWORK
+		filename_nodelist = tmpdir + CONFIG_PATH + '/' + FILENAME_NODELIST
+		filename_softlist = tmpdir + CONFIG_PATH + '/' + FILENAME_SOFTLIST
+		filename_cluster = tmpdir + CONFIG_PATH + '/' + FILENAME_CLUSTER
 
 		File.open(filename_servers, 'w') do |file|
 			content = ""
-			content << @server_package << '\n'
-			content << @server_type_package << '\n'
-			content << @server_key << '\n'
-			content << @server_type_key << '\n'
+			content << @server_package << "\n"
+			content << @server_type_package << "\n"
+			content << @server_key << "\n"
+			content << @server_type_key << "\n"
 			file.puts content
 		end
 
 		File.open(filename_network, 'w') do |file|
 			content = ""
-			content << @net_ipaddr << '\n'
-			content << @net_netmask << '\n'
-			content << @net_gateway << '\n'
-			content << @net_dns << '\n'
+			content << @net_ipaddr << "\n"
+			content << @net_netmask << "\n"
+			content << @net_gateway << "\n"
+			content << @net_dns << "\n"
 			file.puts content
 		end
 
@@ -127,9 +138,14 @@ class CeilIsoGenerator
 		File.open(filename_softlist, 'w') do |file|
 			file.puts @softlist
 		end
+		
+		File.open(filename_cluster, 'w') do |file|
+			file.puts @hostname
+			file.puts @clustername
+		end
 
 		#3.pack tmpdir
-		cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir;
+		cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
 		result = system cmdline
 		if result 
 			return iso_path
@@ -141,15 +157,13 @@ class CeilIsoGenerator
 end
 
 =begin
-example:
-
 igen = CeilIsoGenerator.new
 igen.config_essential('/home/rei/nova/tools')
 igen.config_network('10.0.1.210', '255.255.255.0', '10.0.1.254', '166.111.8.28')
-igen.config_servers('10.0.1.215', 'FTP', '10.0.1.215', 'NFS')
-igen.config_nodelist('10.0.1.210 node1\n10.0.1.211 node2')
-igen.config_softlist('common ssh-nopass hadoop')
+igen.config_cluster("nova-0-1", "nova-cluster-name")
+igen.config_servers('10.0.1.215', 'FTP', '10.0.1.215', 'FTP')
+igen.config_nodelist("10.0.1.210 node1\n10.0.1.211 node2")
+igen.config_softlist("common ssh-nopass hadoop")
 igen.generate('/home/rei/test.iso')
 =end
-
 
