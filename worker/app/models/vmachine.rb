@@ -3,30 +3,16 @@ require "libvirt"
 require "fileutils"
 require "uuidtools"
 
+# This is the model for virtual machines. We use this class to controll virtual machines.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
 class Vmachine < ActiveRecord::Base
 
   @@virt_conn = Libvirt::open("qemu:///system")
 
   def Vmachine.virt_conn
     @@virt_conn
-  end
-
-  def Vmachine.default_params
-    {
-      :arch => "i686",
-      :emulator => "kvm", # ENHANCE currently we only support KVM
-      :name => "dummy_vm",
-      :vcpu => 1,
-      :mem_size => 128,
-      :uuid => UUIDTools::UUID.random_create.to_s,
-      :hda => "",
-      :hdb => "", # this is optional, could be "" (means no such a device)
-      :cdrom => "", # this is optional, could be "" (means no such a device)
-      :depend => "", # additional dependency on COW disks, separate with space
-      :boot_dev => "hd", # hd, cdrom
-      :vnc_port => -1,   # setting vnc_port to -1 means libvirt will automatically set the port
-      :mac => ""  # mac is required, such as "11:22:33:44:55:66"
-    }
   end
 
   def Vmachine.all_names
@@ -56,19 +42,25 @@ class Vmachine < ActiveRecord::Base
     Vmachine.virt_conn.lookup_domain_by_name name
   end
 
-  def Vmachine.emit_domain_xml params
-    if params[:cdrom] != nil and params[:cdrom] != ""
-      FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
-      cdrom_desc = <<CDROM_DESC
-    <disk type='file' device='cdrom'>
-      <source file='#{Setting.vmachines_root}/#{params[:name]}/#{params[:cdrom]}'/>
-      <target dev='hdc'/>
-      <readonly/>
-    </disk>
-CDROM_DESC
+  # Check if params are correct, when creating new vm.
+  #
+  # Since::     0.3
+  def Vmachine.validate_params params
+    ["cpu_count", "mem_size", "name", "hypervisor", "sys_arch", "hda_image", "run_agent", "uuid"].each do |item|
+      if params[item] == nil or params[item] == ""
+        raise "please provide \"#{item}\"!"
+      end
     end
 
-    if params[:hda] != nil and params[:hda] != ""
+    ["cpu_count", "mem_size"].each do |num_item|
+      if params[num_item].to_i.to_s != params[num_item]
+        raise "incorrect \"#{cpu_count}\" value!"
+      end
+    end
+  end
+
+  def Vmachine.emit_domain_xml params
+    if params[:hda_image] != nil and params[:hda_image] != ""
       FileUtils.mkdir_p "#{Setting.vmachines_root}/#{params[:name]}" # assure path exists
       #if VdiskNaming::vdisk_type(params[:hda]).start_with? "sys"
       #  real_hda_filename = "vd-notsaved-#{params[:uuid]}-hda.qcow2"
@@ -135,14 +127,14 @@ MAC_DESC
 XML_DESC
   end
 
-  def Vmachine.define_domain_xml xml_desc
-    Vmachine.virt_conn.define_domain_xml xml_desc
-  end
-
+  # Define a new vm domain.
+  # Called in vmachines_controller.rb
+  #
+  # Since::     0.3
   def Vmachine.define params
+    Vmachine.validate_params params
     xml_desc = Vmachine.emit_domain_xml params
-    puts xml_desc
-    dom = Vmachine.define_domain_xml xml_desc
+    dom = Vmachine.virt_conn.define_domain_xml xml_desc
   end
 
   # write logs into vmachine folder

@@ -47,6 +47,19 @@ public
     end
   end
 
+  # For debug purpose, create a domain, but do not start it.
+  #
+  # Since::     0.3
+  def create
+    # TODO disable this function in production code.
+    begin
+      Vmachine.define params
+      reply_success "success!"
+    rescue => e
+      reply_failure e.to_s
+    end
+  end
+
   # create & start an domain
   def start
     Vmachine.default_params.each do |key, value|

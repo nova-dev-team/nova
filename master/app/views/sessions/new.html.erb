@@ -640,8 +640,13 @@ html>body #page {
   <img src="/images/logo-medium.png" />
 </div>
 
-<div id="bottom_line" style="display: none;position: absolute">
-  &copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>
+<div id="bottom_line" style="display: none">
+  <div style="position:absolute">
+    &copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>
+  </div>
+  <div align="right" style="font-size:9px; vertical-align:center;">
+    <%= File.read "#{RAILS_ROOT}/../VERSION" %> &nbsp;&nbsp;
+  </div>
 </div>
 
 </body>
