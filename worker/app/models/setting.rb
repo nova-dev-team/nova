@@ -14,13 +14,13 @@ class Setting < ActiveRecord::Base
     @@RUN_ROOT = (Setting.find_by_key "run_root").value
   end
 
-  @@NOVA_ROOT = nil # cached for readonly value
+  @@SYSTEM_ROOT = nil # cached for readonly value
   # Return the source code directory.
   #
   # Since::   0.3
-  def Setting.nova_root
-    return @@NOVA_ROOT if @@NOVA_ROOT
-    @@NOVA_ROOT = (Setting.find_by_key "nova_root").value
+  def Setting.system_root
+    return @@SYSTEM_ROOT if @@SYSTEM_ROOT
+    @@SYSTEM_ROOT = (Setting.find_by_key "system_root").value
   end
 
   # Return the size of image pool.
@@ -31,7 +31,7 @@ class Setting < ActiveRecord::Base
   end
 
   # Return the storage server's address. For version 0.3, it is an FTP site.
-  # The URI should look like: ftp://user:password@somewhere, there is no '/' at the end.
+  # The URI should look like: ftp://user:password@somewhere/, the trailing '/' is optional.
   #
   # Since::   0.3
   def Setting.storage_server

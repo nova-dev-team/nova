@@ -1,3 +1,8 @@
+# Controller for virtual machines model.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
+
 require 'xmlsimple'
 
 class VmachinesController < ApplicationController

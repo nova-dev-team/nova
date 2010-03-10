@@ -7,8 +7,8 @@
 # Where is the Nova code stored.
 #
 # Since::   0.3
-nova_root:
-  key: nova_root
+system_root:
+  key: system_root
   value: /nova/system
   editable: false
 

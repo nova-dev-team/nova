@@ -139,6 +139,10 @@ params[:hda_image]
 }'/>
       <target dev='hda'/>
     </disk>
+    <disk type='file' device='cdrom'>
+      <source file='agent-cd.iso'/>
+      <target dev='cdrom'/>
+    </disk>
     <interface type='bridge'>
       <source bridge='#{
 # TODO nova br, read from common/config
@@ -169,6 +173,9 @@ XML_DESC
     # TODO
     dom = Vmachine.virt_conn.define_domain_xml xml_desc
     # TODO write config files in VM working dir
+    Vmachine.open_file params[:name], "xml_desc.xml" do |f|
+      f.write xml_desc
+    end
   end
 
   # write logs into vmachine folder
@@ -306,6 +313,18 @@ private
       return {:success => true, :message => "action '#{action_name}' on vm with name '#{name}' is done."}
     rescue
       raise "action '#{action_name}' on vm with name '#{name}' has failed!"
+    end
+  end
+
+  # A helper function that opens a file (typically config/log file) for a vm.
+  # The vm's working directory will be created if not exist.
+  #
+  # Since::   0.3
+  def Vmachine.open_file vm_name, file_name, open_mode = "w"
+    vm_dir = File.join Setting.run_root, vm_name
+    FileUtils.mkdir_p vm_dir unless File.exists? vm_dir
+    File.open(File.join vm_dir, file_name, open_mode) do |f|
+      yield f
     end
   end
 

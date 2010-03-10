@@ -12,16 +12,16 @@
 ActiveRecord::Schema.define(:version => 20091006045143) do
 
   create_table "settings", :force => true do |t|
-    t.string   "key",        :limit => 40
-    t.string   "value"
-    t.boolean  "editable",                 :default => true
+    t.string   "key",        :limit => 40,                   :null => false
+    t.string   "value",                                      :null => false
+    t.boolean  "editable",                 :default => true, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "vmachines", :force => true do |t|
-    t.string   "name"
-    t.string   "uuid"
+    t.string   "name",       :null => false
+    t.string   "uuid",       :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
