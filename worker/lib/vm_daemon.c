@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     fprintf(fp, "%d", pid);
     fclose(fp);
 
-    // TODO
+    // TODO forever loop, read current vm status, determine what to do next
 
     sprintf(cmd, "./vm_daemon_helper.rb %s", vm_dir);
     printf("[cmd] %s\n", cmd);

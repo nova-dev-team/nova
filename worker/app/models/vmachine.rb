@@ -339,11 +339,11 @@ private
       f.write "preparing"
     end
 
-    Vmachine.log params[:name], "preparing resources for vmachine '#{params[:name]}'"
+    Vmachine.log params[:name], "changed vmachine status to 'preparing'"
 
     # start the vm_daemon for the virtual machine
     pid = fork do
-      chdir "#{RAILS_ROOT}/lib"
+      Dir.chdir "#{RAILS_ROOT}/lib"
       exec "./vm_daemon #{File.join Setting.vm_root, params[:name]}"
     end
     Process.detach pid  # prevent zombie process
