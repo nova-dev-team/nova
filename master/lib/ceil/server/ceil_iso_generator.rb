@@ -157,13 +157,13 @@ class CeilIsoGenerator
 end
 
 =begin
-
 igen = CeilIsoGenerator.new
 igen.config_essential('/home/rei/nova/tools')
 igen.config_network('10.0.1.210', '255.255.255.0', '10.0.1.254', '166.111.8.28')
 igen.config_cluster("nova-0-1", "nova-cluster-name")
-igen.config_servers('10.0.1.215', 'FTP', '10.0.1.215', 'NFS')
+igen.config_servers('10.0.1.215', 'FTP', '10.0.1.215', 'FTP')
 igen.config_nodelist("10.0.1.210 node1\n10.0.1.211 node2")
 igen.config_softlist("common ssh-nopass hadoop")
 igen.generate('/home/rei/test.iso')
 =end
+
