@@ -170,24 +170,17 @@ XML_DESC
     Vmachine.validate_params params
     xml_desc = Vmachine.emit_domain_xml params
 
+    # define the domain!
     dom = Vmachine.virt_conn.define_domain_xml xml_desc
-    # TODO write config files in VM working dir
-    Vmachine.open_file params[:name], "xml_desc.xml" do |f|
-      puts "writing to file"
+
+    # write config files in VM working dir
+    Vmachine.open_vm_file(params[:name], "xml_desc.xml") do |f|
       f.write xml_desc
     end
-  end
-
-  # write logs into vmachine folder
-  def Vmachine.log vm_name, message
-    vm_dir = File.join Setting.vmachines_root, vm_name
-    FileUtils.mkdir_p vm_dir
-
-    logfilename = File.join vm_dir, "log"
-    logfile = File.open(logfilename, "a")
-    logfile.flock(File::LOCK_EX) # lock the file, prevent possible race condition
-    logfile.write("#{Time.now}: #{message}\n")
-    logfile.close
+    Vmachine.open_vm_file(params[:name], "status") do |f|
+      f.write "defined"
+    end
+    Vmachine.log params[:name], "virtual machine defined"
   end
 
   # Create a new domain, and start it.
@@ -199,7 +192,9 @@ XML_DESC
   def Vmachine.start params
     begin
       dom = Vmachine.define params
-      # TODO trigger background helper
+
+      # start background helper
+      Vmachine.start_vm_daemon params
       return {:success => true, :message => "vm named '#{params[:name]}' defined, it will be started soon."}
     rescue => e
       # check if domain name already used
@@ -241,7 +236,6 @@ XML_DESC
   end
 
   # blocking method
-
   # Destroy a VM domain, either by name or by uuid. Its hda image will not be saved.
   # The clean up work is left for background workers.
   #
@@ -320,11 +314,55 @@ private
   # The vm's working directory will be created if not exist.
   #
   # Since::   0.3
-  def Vmachine.open_file vm_name, file_name, open_mode = "w"
+  def Vmachine.open_vm_file vm_name, file_name, open_mode = "w"
     vm_dir = File.join Setting.vm_root, vm_name
     FileUtils.mkdir_p vm_dir unless File.exists? vm_dir
     File.open((File.join vm_dir, file_name), open_mode) do |f|
       yield f
+    end
+  end
+
+  # Start the background helper daemon, which prepares resource, and starts the vm.
+  #
+  # Since::   0.3
+  def Vmachine.start_vm_daemon params
+    # TODO write lftp scripts for downloading resource
+    Vmachine.open_vm_file(params[:name], "lftp.retr.script") do |f|
+    end
+    
+    # TODO write lftp scripts for uploading resource
+    Vmachine.open_vm_file(params[:name], "lftp.stor.script") do |f|
+    end
+
+    # change status to preparing
+    Vmachine.open_vm_file(params[:name], "status") do |f|
+      f.write "preparing"
+    end
+
+    Vmachine.log params[:name], "preparing resources for vmachine '#{params[:name]}'"
+
+    # start the vm_daemon for the virtual machine
+    pid = fork do
+      chdir "#{RAILS_ROOT}/lib"
+      exec "./vm_daemon #{File.join Setting.vm_root, params[:name]}"
+    end
+    Process.detach pid  # prevent zombie process
+
+    Vmachine.log params[:name], "vm_daemon started for '#{params[:name]}'"
+  end
+
+  # Write logs for the virtual machine.
+  #
+  # Since::     0.3
+  def Vmachine.log vm_name, message
+    Vmachine.open_vm_file(vm_name, "log", "a") do |f|
+      message.each_line do |line|
+        if line.end_with? "\n"
+          f.write "[#{Time.now}] #{line}"
+        else
+          f.write "[#{Time.now}] #{line}\n"
+        end
+      end
     end
   end
 
