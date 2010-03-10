@@ -170,10 +170,10 @@ XML_DESC
     Vmachine.validate_params params
     xml_desc = Vmachine.emit_domain_xml params
 
-    # TODO
     dom = Vmachine.virt_conn.define_domain_xml xml_desc
     # TODO write config files in VM working dir
     Vmachine.open_file params[:name], "xml_desc.xml" do |f|
+      puts "writing to file"
       f.write xml_desc
     end
   end
@@ -280,7 +280,7 @@ XML_DESC
 
 private
 
-  # Make a call to libvirt, with given action name, and vm uuid
+  # Make a call to libvirt, with given action name, and vm uuid.
   #
   # Since::     0.3
   def Vmachine.libvirt_call_by_uuid action_name, uuid
@@ -298,7 +298,7 @@ private
     end
   end
 
-  # Make a call to libvirt, with given action name, and vm name
+  # Make a call to libvirt, with given action name, and vm name.
   #
   # Since::     0.3
   def Vmachine.libvirt_call_by_name action_name, name
@@ -321,9 +321,9 @@ private
   #
   # Since::   0.3
   def Vmachine.open_file vm_name, file_name, open_mode = "w"
-    vm_dir = File.join Setting.run_root, vm_name
+    vm_dir = File.join Setting.vm_root, vm_name
     FileUtils.mkdir_p vm_dir unless File.exists? vm_dir
-    File.open(File.join vm_dir, file_name, open_mode) do |f|
+    File.open((File.join vm_dir, file_name), open_mode) do |f|
       yield f
     end
   end

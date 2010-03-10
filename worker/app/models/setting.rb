@@ -14,6 +14,20 @@ class Setting < ActiveRecord::Base
     @@RUN_ROOT = (Setting.find_by_key "run_root").value
   end
 
+  # Return the running directory for virtual machines.
+  #
+  # Since::     0.3
+  def Setting.vm_root
+    return File.join Setting.run_root, "vm"
+  end
+
+  # Return the image pool root directory.
+  #
+  # Since::     0.3
+  def Setting.image_pool_root
+    return File.join Setting.run_root, "image_pool"
+  end
+
   @@SYSTEM_ROOT = nil # cached for readonly value
   # Return the source code directory.
   #
