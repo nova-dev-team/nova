@@ -241,19 +241,39 @@ int main(int argc, char* argv[]) {
   } else {
     char* pid_fn = argv[1];
     char* image_pool_dir = argv[2];
-    if (chdir(image_pool_dir) != 0) {
-      printf("error: cannot chdir to '%s'\n", image_pool_dir);
-      exit(1);
-    }
-    for (;;) {
-      // reloads config data
-      refresh_config();
+    int pid = fork();
+    if (pid == 0) {
+      // child process, do work
+      if (chdir(image_pool_dir) != 0) {
+        printf("error: cannot chdir to '%s'\n", image_pool_dir);
+        exit(1);
+      }
 
-      // make sure there's enough images in the pool
-      maintain_pool_size();
+      // wait for 1 second, check if parent process could write pid file
+      sleep(1);
 
-      // sleep, wait for next round
-      sleep(g_interval);
+      for (;;) {
+        // reloads config data
+        refresh_config();
+
+        // make sure there's enough images in the pool
+        maintain_pool_size();
+
+        // sleep, wait for next round
+        sleep(g_interval);
+      }
+    } else {
+      // parent process, write pid file, and exits
+      FILE* fp = fopen(pid_fn, "w");
+      if (fp != NULL) {
+        fprintf(fp, "%d", pid);
+        fclose(fp);
+      } else {
+        // failed to open pid file, kill child process
+        printf("error: cannot write pid file!\n");
+        kill(pid, 9);
+        exit(1);
+      }
     }
     return 0;
   }
