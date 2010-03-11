@@ -7,8 +7,8 @@
 # Where is the Nova code stored.
 #
 # Since::   0.3
-nova_root:
-  key: nova_root
+system_root:
+  key: system_root
   value: /nova/system
   editable: false
 
@@ -33,45 +33,6 @@ storage_server:
 # Since::   0.3
 image_pool_size:
   key: image_pool_size
-  value: 5
-  editable: true
-
-
-# TODO deprecate the following settings.
-
-# where is the disk images, cdrom iso files stored
-# Could be changed in web ui
-
-# where is the local cache directory
-# for God's sake don't change it
-storage_cache:
-  key: storage_cache
-  value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/storage_cache/
-  editable: false
-
-# where is the vmachines' running environment
-# again, for God's sake, don't change this crappy thing
-vmachines_root:
-  key: vmachines_root
-  value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/vmachines/
-  editable: false
-
-
-# the filename for cached resource listing
-resource_list_cache:
-  key: resource_list_cache
-  value: <%= "#{RAILS_ROOT}" %>/tmp/work_site/resource_list_cache
-  editable: false
-
-# stupid work around for qcow2 format images
-image_pooling:
-  key: image_pooling
-  value: "true"
-  editable: true
-
-# stupid work around for qcow2 format images
-image_pooling_count:
-  key: image_pooling_count
   value: 5
   editable: true
 

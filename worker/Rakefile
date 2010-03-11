@@ -11,12 +11,15 @@ require 'tasks/rails'
 
 require "#{File.dirname __FILE__}/../common/lib/utils.rb"
 require 'fileutils'
+require 'yaml'
 
 namespace :nova do
   namespace :worker do
 
     def do_init
       require_root_privilege
+      puts "Building helper tools.."
+      my_exec "cd #{RAILS_ROOT}/lib && make"
       puts "Migrating database..."
       my_exec "rake db:migrate RAILS_ENV=production"
       my_exec "rake db:migrate RAILS_ENV=development"
@@ -39,7 +42,24 @@ namespace :nova do
       FileUtils.mkdir_p "#{RAILS_ROOT}/tmp"
       my_exec "hostname > #{RAILS_ROOT}/tmp/hostname"
       puts "Starting Nova worker on port #{service_port}..."
-      my_exec "script/server -d -p #{service_port}"
+      
+      conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yaml"
+
+      # TODO when writing lftp_script, read configs from common/config
+      FileUtils.mkdir_p conf["run_root"]
+      File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
+        f.write <<LFTP_SCRIPT
+set net:max-retries 2
+set net:reconnect-interval-base 1
+open 166.111.131.34:8021
+user santa santa
+pwd
+ls
+LFTP_SCRIPT
+      end
+
+      my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
+      my_exec "#{RAILS_ROOT}/script/server -d -p #{service_port}"
     end
 
     desc "Start Nova worker"
@@ -50,7 +70,11 @@ namespace :nova do
     desc "Stop Nova worker"
     task :stop do
       require_root_privilege  # worker is started using root privilege, so we have to kill it using root privilege
-      kill_by_pid_file "tmp/pids/server.pid"
+
+      Dir.foreach("#{RAILS_ROOT}/tmp/pids") do |entry|
+        next if (entry.end_with? ".pid") == false
+        kill_by_pid_file "#{RAILS_ROOT}/tmp/pids/#{entry}"
+      end
 
       if File.exists? "#{RAILS_ROOT}/tmp/hostname"
         FileUtils.rm "#{RAILS_ROOT}/tmp/hostname"
