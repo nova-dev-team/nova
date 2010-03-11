@@ -59,6 +59,7 @@ LFTP_SCRIPT
       end
 
       my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
+      my_exec "#{RAILS_ROOT}/lib/image_pool_maintainer #{RAILS_ROOT}/tmp/pids/image_pool_maintainer.pid #{conf["run_root"]}/image_pool"
       my_exec "#{RAILS_ROOT}/script/server -d -p #{service_port}"
     end
 
