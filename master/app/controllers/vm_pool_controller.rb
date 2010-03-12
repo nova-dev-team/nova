@@ -1,0 +1,2 @@
+class VmPoolController < ApplicationController
+end
