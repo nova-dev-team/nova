@@ -121,8 +121,10 @@ LFTP_SCRIPT
         end
       end
 
-      my_exec "rm tmp/work_site -rf"
+      # TODO cleanup resource
+
       do_init
+      do_stop
       do_start
     end
   end

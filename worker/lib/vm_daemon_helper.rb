@@ -80,20 +80,37 @@ when "poll"
 when "cleanup"
   puts "doing cleanup"
 
-  # move logs into archive folder, rename it as #{uuid}.#{vm_name}.log
   if File.exists? "xml_desc.xml"
-    FileUtils.mkdir_p "../archive"
+
+    # remove big image files
+    if File.exists? "required_images"
+      File.open "required_images" do |f|
+        f.each_line do |line|
+          img = line.strip
+          if File.exists? img
+            FileUtils.rm_f img
+          end
+        end
+      end
+    end
+
+    # save info files into archive
     xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
     uuid = xml_desc["uuid"]
     name = xml_desc["name"]
-    FileUtils.mv "log", "../archive/#{uuid}.#{name}.log"
+    FileUtils.mkdir_p "../archive"
+
+    parent_dir = File.join vm_dir, ".."
+    Dir.chdir parent_dir
+    FileUtils.mv vm_dir, "archive/#{name}.#{uuid}"
+  else
+    # delete everything
+    parent_dir = File.join vm_dir, ".."
+    Dir.chdir parent_dir
+    puts "removing vm folder #{vm_dir}"
+    FileUtils.rm_rf vm_dir
   end
 
-  parent_dir = (File.split vm_dir)[0]
-  Dir.chdir parent_dir
-  
-  puts "removing vm folder #{vm_dir}"
-  FileUtils.rm_rf vm_dir
 else
   puts "error: action '#{action}' not understood!"
 end

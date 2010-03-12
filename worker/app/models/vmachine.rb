@@ -115,7 +115,14 @@ class Vmachine < ActiveRecord::Base
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
     <type arch='#{params[:arch]}' machine='pc'>hvm</type>
-    <boot dev='hd'/>
+    <boot dev='#{
+# if used user's custom cd image, we boot from cdrom
+if params[:cd_image] != nil and params[:cd_image] != ""
+  "cdrom"
+else
+  "hd"
+end
+}'/>
   </os>
   <features>
     <pae/>
@@ -132,17 +139,25 @@ else
 end
 }</emulator>
     <disk type='file' device='disk'>
-      <source file='#{
-# TODO make agent cd
-"hda-#{params[:hda_image]}"
-}'/>
+      <source file='#{params[:hda_image]}'/>
       <target dev='hda'/>
     </disk>
-    <disk type='file' device='cdrom'>
+#{
+# determine cdrom
+if params[:run_agent].to_s == "true"
+"    <disk type='file' device='cdrom'>
       <source file='agent-cd.iso'/>
       <target dev='cdrom'/>
     </disk>
-    <interface type='bridge'>
+"
+elsif params[:cd_image] != nil and params[:cd_image] != ""
+"    <disk type='file' device='cdrom'>
+      <source file='#{params[:cd_image]}'/>
+      <target dev='cdrom'/>
+    </disk>
+"
+end
+}    <interface type='bridge'>
       <source bridge='#{
 # TODO nova br, read from common/config
 "br0"
@@ -192,9 +207,6 @@ XML_DESC
     begin
       dom = Vmachine.define params
 
-      # start background helper
-      Vmachine.start_vm_daemon params
-      return {:success => true, :message => "vm named '#{params[:name]}' defined, it will be started soon."}
     rescue => e
       # check if domain name already used
       begin
@@ -214,6 +226,15 @@ XML_DESC
 
       return {:success => false, :message => e.to_s}
     end
+
+    begin
+      # start background helpe
+      Vmachine.start_vm_daemon params
+    rescue => e
+      return {:success => false, :message => e.to_s}
+    end
+
+    return {:success => true, :message => "vm named '#{params[:name]}' defined, it will be started soon."}
   end
 
   # non-blocking, most work is delegated to stop_vmachine_worker
@@ -325,27 +346,39 @@ private
   #
   # Since::   0.3
   def Vmachine.start_vm_daemon params
-    # TODO write lftp scripts for downloading resource
-    Vmachine.open_vm_file(params[:name], "lftp.retr.script") do |f|
-      f.write <<RETR_SCRIPT
-set net:max-retries 2
-set net:reconnect-interval-base 1
-open #{File.read "#{RAILS_ROOT}/config/storage_server.conf"}
-cd vdisks
-get -c #{params[:hda_image]} hda-#{params[:hda_image]}
-RETR_SCRIPT
+
+    # the 'required_images' file contains all the required vdisk/iso image for the vm to boot
+    Vmachine.open_vm_file(params[:name], "required_images") do |f|
+      f.write "#{params[:hda_image]}\n"
+      if params[:cd_image] != nil and params[:cd_image] != ""
+        f.write "#{params[:cd_image]}\n"
+      end
+    end
+
+    # the 'agent_packages' file contains all the required packages for agent cd image
+    if params[:run_agent].to_s == "true" and params[:agent_hint] != nil and params[:agent_hint] != ""
+      Vmachine.open_vm_file(params[:name], "agent_packages") do |f|
+        params[:agent_hint].each_line do |line|
+          if line.start_with? "agent_packages="
+            pkgs = (line[15..-1].split /,| |\n/).select {|item| item.length > 0}
+            pkgs.each do |pkg|
+              f.write "#{pkg}\n"
+            end
+          end
+        end
+      end
+    end
+
+    if params[:agent_hint] != nil and params[:agent_hint] != ""
+      Vmachine.open_vm_file(params[:name], "agent_hint") do |f|
+        f.write params[:agent_hint]
+      end
     end
     
-    # TODO write lftp scripts for uploading resource
-    Vmachine.open_vm_file(params[:name], "lftp.stor.script") do |f|
-      if params[:hda_save_to] != nil and params[:hda_save_to] != ""
-        f.write <<STOR_SCRIPT
-set net:max-retries 2
-set net:reconnect-interval-base 1
-open #{File.read "#{RAILS_ROOT}/config/storage_server.conf"}
-cd vdisks
-put -c hda-#{params[:hda_image]} #{params[:hda_save_to]}
-STOR_SCRIPT
+    # write the 'hda_save_to' file, which indicates the hda image will be saved
+    if params[:hda_save_to] != nil and params[:hda_save_to] != ""
+      Vmachine.open_vm_file(params[:name], "hda_save_to") do |f|
+        f.write params[:hda_save_to]
       end
     end
 
