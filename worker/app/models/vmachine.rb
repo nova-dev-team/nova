@@ -133,9 +133,8 @@ end
 }</emulator>
     <disk type='file' device='disk'>
       <source file='#{
-# TODO determine hda image name
 # TODO make agent cd
-params[:hda_image]
+"hda-#{params[:hda_image]}"
 }'/>
       <target dev='hda'/>
     </disk>
