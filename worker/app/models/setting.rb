@@ -3,13 +3,29 @@
 # Author::    Santa Zhang (mailto:santa1987@gmail.com)
 # Since::     0.3
 
-require 'utils.rb'
+require 'fileutils'
 
 class Setting < ActiveRecord::Base
 
   def save
     if self.key == "storage_server"
-      write_storage_server_to_config self.value # update also write to config/storage_server.conf
+      # update also write to config/storage_server.conf
+      File.open("#{RAILS_ROOT}/config/storage_server.conf", "w") do |f|
+        f.write self.value
+      end
+
+      # update also write to run_root
+      FileUtils.mkdir_p Setting.run_root
+      File.open("#{Setting.run_root}/ftp_server_files_list_updater_lftp_script", "w") do |f|
+        f.write <<LFTP_SCRIPT
+set net:max-retries 2
+set net:reconnect-interval-base 1
+open #{self.value}
+pwd
+ls
+LFTP_SCRIPT
+      end
+
       puts "Update to storage_server also forwarded to config/storage_server.conf!"
     end
     super

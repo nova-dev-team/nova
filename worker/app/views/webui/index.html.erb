@@ -11,172 +11,32 @@ require 'uuidtools'
 <title>Nova worker</title>
 
 <link type="text/css" rel="stylesheet" href="/stylesheets/SyntaxHighlighter.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/custom_buttons.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
+
 <script language="javascript" src="/javascripts/shCore.js"></script>
 <script language="javascript" src="/javascripts/shBrushXml.js"></script>
 <script type="text/javascript" src="/javascripts/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
-
-<style type="text/css" media="screen">
-
-body {
-  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
-  font-size: 13px;
-  color: #333;
-}
-
-a {
-  color: #7541dc
-}
-
-input, select, textarea {
-  margin: 5px 0;
-  padding: 5px;
-  color: #6A6969;
-  border-width: 1px;
-  border-style: solid;
-  border-color: #D4D4D4 #EBEBEB #EBEBEB #D4D4D4;
-  font: 11px 'Lucida Grande', Verdana, Helvetica, sans-serif;
-}
-
-table {
-  border-spacing: 0px;
-}
-
-.code {
-  font-family: "Courier New", Courier, monospace;
-}
-
-.row_type_1 {
-}
-
-.row_type_0 {
-  background: #d9ddff;
-}
-</style>
+<script type="text/javascript" src="/javascripts/vmachine_logic.js?<%= rand.to_s[2..-1] %>"></script>
 
 <script type="text/javascript">
 
 $(document).ready(function () {
   dp.SyntaxHighlighter.HighlightAll('xml_code');
+
+  // these codes are necessary!
+  $("input[name=chk_mount_iso]").attr("checked", false);
+  $("input[name=chk_agent_cd]").attr("checked", false);
+
+  disable("new_vm_iso_cdrom");
+  disable("new_vm_ip_addr");
+  disable("new_vm_subnet_mask");
+  disable("new_vm_gateway");
+  disable("new_vm_dns");
+  disable("new_vm_agent_packages");
 });
 
-function add_vmachine() {
-  var arch = $("#new_vm_arch").val();
-  var name = $("#new_vm_name").val();
-  var mem_size = $("#new_vm_mem_size").val();
-  var cpu_count = $("#new_vm_cpu_count").val();
-  var hda = $("#new_vm_hda").val();
-  var hdb = $("#new_vm_hdb").val();
-  var cdrom = $("#new_vm_cdrom").val();
-  var extra_depend = $("#extra_depend").val();
-  var boot_dev = $("#new_vm_boot_dev").val();
-  
-  // check args
-  if (hda == null || hda == "") {
-    alert("You must pick an hda device!");
-    return;
-  }
-  
-  if (mem_size == null || mem_size == "") {
-    alert("You must provide memory size!");
-    return;
-  }
-  
-  vmachine_name_regex = /^([a-z])+([a-z0-9_\.])*$/;
-  if (name == null || name == "" || name.length > 20 || vmachine_name_regex.test(name) == false) {
-    alert("Invalid vmachine name!");
-    return;
-  }
-
-  if (boot_dev == "cdrom" && (cdrom == null || cdrom == "")) {
-    alert("You must provide a cdrom image, if you wanna boot from it!");
-    return;
-  }
-  
-  $.ajax({
-    url: "/vmachines/start",
-    type: "POST",
-    dataType: "json",
-    data: {
-      arch: arch,
-      name: name,
-      vcpu: cpu_count,
-      mem_size: mem_size,
-      hda: hda,
-      hdb: hdb,
-      cdrom: cdrom,
-      depend: extra_depend,
-      boot_dev: boot_dev
-    },
-    success: function(result) {
-      if (result.success) {
-        window.location.reload();
-      } else {
-        alert("Error message:" + result.message);
-      }
-    },
-    error: function() {
-      alert("Request failed!");
-    }
-  });
-  
-}
-
-function vm_ajax(url, uuid) {
-  $.ajax({
-    url: url,
-    type: "POST",
-    dataType: "json",
-    data: {
-      uuid: uuid
-    },
-    success: function(result) {
-      if (result.success) {
-        window.location.reload();
-      } else {
-        alert("Error message:" + result.message);
-      }
-    },
-    error: function() {
-      alert("Request failed!");
-    }
-  });
-}
-
-function destroy_vmachine(name, uuid) {
-  if (confirm("Are you really going to destroy vmachine named '" + name + "', with UUID=" + uuid + "?")) {
-    vm_ajax("/vmachines/destroy.json", uuid);
-  }
-}
-
-function resume_vmachine(uuid) {
-  vm_ajax("/vmachines/resume.json", uuid);
-}
-
-function suspend_vmachine(uuid) {
-  vm_ajax("/vmachines/suspend.json", uuid);
-}
-
-function change_system_setting(key) {
-  new_value = prompt("Input the new value for key '" + key + "'.");
-  if (new_value && new_value != "") {
-    $.ajax({
-      url: "/settings/edit",
-      type: "POST",
-      dataType: "json",
-      data: {
-        key: key,
-        value: new_value
-      },
-      success: function() {
-        window.location.reload();
-      },
-      error: function() {
-        alert("Request failed!");
-      }
-    });
-  }
-}
 </script>
 </head>
 
@@ -198,7 +58,6 @@ function change_system_setting(key) {
   version_name
 %>
 <hr>
-
 
 
 <h2>List of all vmachines</h2>
@@ -265,7 +124,7 @@ CONTROLLS_HTML
 <tr><td colspan=5>
 <table width='100%' id='vnc-view-#{dom.uuid}' style='display:none;'>
 <tr><td>
-<applet CODE=VncViewer.class ARCHIVE=vncviewer.jar WIDTH=800 HEIGHT=600>
+<applet CODE=VncViewer.class ARCHIVE=vncviewer.jar WIDTH=1024 HEIGHT=768>
   <param name=PORT value=#{vnc_port}>
   <param name=PASSWORD value="All your base are belong to us">
 </applet>
@@ -277,43 +136,61 @@ VNC_HTML
   counter += 1
 end
 
-
 info_of_vmachines
 %>
 </table>
-
 <hr>
 
 <h2>Add new vmachine</h2>
 <%
-spacing = "&nbsp;" * 4
+def spacing count = 8
+  "&nbsp;" * count
+end
 %>
-Name (a-z, 0-9, '_', '.'): <input type="text" id="new_vm_name" size=30 value="vm_<%=
+Name (a-z, 0-9, '_', '-', '.'): <input type="text" id="new_vm_name" size=28 value="vm_<%=
   time_now = Time.now
   "%04d%02d%02d%02d%02d%02d" % [time_now.year, time_now.month, time_now.day, time_now.hour, time_now.min, time_now.sec]
-%>"/><%= spacing %>
-UUID: <input type="text" id="new_vm_uuid" size=48 value="<%= UUIDTools::UUID.random_create.to_s %>"/>
-<br>
+%>"/><%= spacing 16 %>
+
+UUID: <input type="text" id="new_vm_uuid" size=47 value="<%= UUIDTools::UUID.random_create.to_s %>"/><br>
+
 Hypervisor: <select id="new_vm_hypervisor">
 <option value='kvm'>KVM</option>
-</select><%= spacing %>
+</select><%= spacing 12 %>
+
 Architecture: <select id="new_vm_arch">
 <option value='i686'>i686</option>
 <option value='x86_64'>x86_64</option>
-</select><%= spacing %>
-CPU Count: <select id="new_vm_cpu_count">
+</select><%= spacing 9 %>
+
+CPU count: <select id="new_vm_cpu_count">
 <%=
 html = ""
 (1..4).each {|v| html += "<option>#{v}</option>"}
 html
 %>
-</select><%= spacing %>
-Memory size: <input type="text" size="4" id="new_vm_mem_size" value="512"/> MB<%= spacing %>
-<br>
-Hard Disk: <input type="text" id="new_vm_hda" size=60/><br>
-IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255.255.255.0"/><%= spacing %>Gateway: <input type="text"><br>
-<button onclick="add_vmachine()">Add</button> Current page will be reloaded when clicked.
+</select><%= spacing 10 %>
 
+Memory size (in MB): <input type="text" size="6" id="new_vm_mem_size" value="512" /><br>
+
+Hard disk image: <input type="text" id="new_vm_hda_image" size=40 /><%= spacing 6%>
+
+Save to (optional): <input type="text" id="new_vm_hda_save_to" size=40 /><br>
+
+<input type="checkbox" name="chk_mount_iso" onclick="toggle_mount_iso()" /> Mount .iso CD image?<br>
+
+.iso CD image: <input type="text" id="new_vm_cd_image" size=42 disabled class='disabled_input' /><br>
+
+<input type="checkbox" name="chk_agent_cd" onclick="toggle_agent_cd()" /> Use agent CD?<br>
+
+IP: <input id="new_vm_ip_addr" type="text" size=15 disabled class='disabled_input' /><%= spacing 2 %>
+Subnet mask: <input id="new_vm_subnet_mask" type="text" size=15 value="255.255.255.0" disabled class='disabled_input' /><%= spacing 2 %>
+Gateway: <input id="new_vm_gateway" type="text" size=15 disabled class='disabled_input' /><%= spacing 2%>
+DNS (optional): <input id="new_vm_dns" type="text" size=15 disabled class='disabled_input' /><br>
+
+Packages to be installed (separate with comma or space): <input type="text" id="new_vm_agent_packages" size=69 disabled class='disabled_input' /><br>
+
+<button type="button" class="btn" onclick="add_vmachine()"><span><span>Add new vmachine</span></span></button> <%= spacing 2 %> Current page will be reloaded when clicked.
 <hr>
 
 
@@ -329,6 +206,7 @@ IP: <input type="text"/><%= spacing %>Subnet mask: <input type="text" value="255
       if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
         html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead.</font>"
       end
+      html_str += "</b>"
       html_str += "<br>\n<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td>"
       html_str += "<pre>\n"
 
@@ -420,17 +298,18 @@ pipe.close
 %>
 <hr>
 
+
 <h2>System settings</h2>
 <%=
   system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
   counter = 0
   (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
-    system_settings_html += "<tr class='row_type_#{counter % 2}'><td>"
+    system_settings_html += "<tr class='row_type_#{counter % 2}' height=30><td>"
     system_settings_html += setting.key
-    system_settings_html += "</td><td>"
+    system_settings_html += "</td><td id='sys_setting_holder_#{setting.key}'>"
     system_settings_html += setting.value
     if setting.editable
-      system_settings_html += "</td><td><button onclick='change_system_setting(\"#{setting.key}\")'>Change</button></td></tr>\n"
+      system_settings_html += "</td><td><button type='button' class='btn' onclick='change_system_setting(\"#{setting.key}\")'><span><span>Change</span></span></button></td></tr>\n"
     else
       system_settings_html += "</td><td>READ ONLY</td></tr>\n"
     end
@@ -441,8 +320,8 @@ pipe.close
 %>
 <hr>
 
-This is the "worker" module of the Nova system. <b>Intended for developers only</b>.<p>
-&copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
+This is the "worker" module of the Nova system. <b>Intended for developers only!</b><p>
+&copy;2009-2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
 
 </body>
 </html>
