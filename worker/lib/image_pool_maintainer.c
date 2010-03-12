@@ -219,7 +219,6 @@ void maintain_pool_size() {
 
         // check if original image has .copying lock
         sprintf(buf, "%s.copying", p_dirent->d_name);
-        printf("test %s\n", buf);
         if (lstat(buf, &st) == 0) {
           printf("file %s has .copying lock, skip copying!\n", p_dirent->d_name);
         } else {

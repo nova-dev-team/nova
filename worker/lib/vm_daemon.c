@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
     char* vm_dir = argv[1];
 
     // there's no need to free those malloc'd pointers
-    char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
+    char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) * 2 + 200));
     char* pid_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_info = (char *) malloc(sizeof(char) * 100);
@@ -53,14 +53,14 @@ int main(int argc, char* argv[]) {
     // 4 destroyed: vm destroyed, remove all resources
     // 5 failed: failed to start for some reason, should be moved to 'broken' directory?
 
-    sprintf(cmd, "./vm_daemon_helper.rb %s prepare", vm_dir);
+    sprintf(cmd, "./vm_daemon_helper.rb %s prepare 2>&1 >> %s/raw_exec_output.log", vm_dir, vm_dir);
     printf("[cmd] %s\n", cmd);
     system(cmd);
 
     sprintf(status_fn, "%s/status", vm_dir);
     for (;;) {
       FILE* status_fp = NULL;
-      sprintf(cmd, "./vm_daemon_helper.rb %s poll", vm_dir);
+      sprintf(cmd, "./vm_daemon_helper.rb %s poll 2>&1 >> %s/raw_exec_output.log", vm_dir, vm_dir);
       printf("[cmd] %s\n", cmd);
       system(cmd);
 
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
     }
 
     // clean up resource
-    sprintf(cmd, "./vm_daemon_helper.rb %s cleanup", vm_dir);
+    sprintf(cmd, "./vm_daemon_helper.rb %s cleanup 2>&1 >> %s/raw_exec_output.log", vm_dir, vm_dir);
     printf("[cmd] %s\n", cmd);
     system(cmd);
 
