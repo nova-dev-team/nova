@@ -16,9 +16,12 @@ int main(int argc, char* argv[]) {
     printf("depends on ruby, and must run with 'vm_deamon_helper.rb' in same dir!\n");
     return 1;
   } else {
-    char* cmd = (char *) malloc(sizeof(char) * (strlen(argv[0]) + 100));
-    char* pid_fn = (char *) malloc(sizeof(char) * (strlen(argv[0]) + 100));
     char* vm_dir = argv[1];
+
+    // there's no need to free those malloc'd pointers
+    char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
+    char* pid_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
+    char* status_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
 
     int pid = getpid();
     FILE* fp = NULL;
@@ -35,11 +38,28 @@ int main(int argc, char* argv[]) {
     fprintf(fp, "%d", pid);
     fclose(fp);
 
-    // TODO forever loop, read current vm status, determine what to do next
+    // forever loop, read current vm status, determine what to do next
 
-    sprintf(cmd, "./vm_daemon_helper.rb %s", vm_dir);
+    // vm statuses:
+    // 1 preparing: downloading vdisks
+    // 2 using: running/suspended
+    // 3 saving: uploading changed resource
+    // 4 destroyed: vm destroyed, remove all resources
+    // 5 failed: failed to start for some reason, should be moved to 'broken' directory?
+
+    sprintf(cmd, "./vm_daemon_helper.rb %s prepare", vm_dir);
     printf("[cmd] %s\n", cmd);
     system(cmd);
+
+    for (;;) {
+      sprintf(cmd, "./vm_daemon_helper.rb %s poll", vm_dir);
+      printf("[cmd] %s\n", cmd);
+      system(cmd);
+
+      // TODO check if to be destroyed
+
+      sleep(1); // sleep 1 sec between each polling round
+    }
 
     return 0;
   }

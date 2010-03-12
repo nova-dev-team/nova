@@ -235,8 +235,8 @@ void maintain_pool_size() {
 
 int main(int argc, char* argv[]) {
   printf("This is image_pool_maintainer!\n");
-  if (argc < 3) {
-    printf("usage: image_pool_maintainer <pid_file> <image_pool_dir>\n");
+  if (argc < 4) {
+    printf("usage: image_pool_maintainer <pid_file> <conf_file_path> <image_pool_dir>\n");
     return 1;
   } else {
     char* pid_fn = argv[1];

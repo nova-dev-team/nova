@@ -1,7 +1,7 @@
 # This is config file for image_pool_maintainer.
 # Every config is written like "item=value".
 # White space is not allowed!
-# Place this file inside image_pool_dir, name it as "image_pool_maintainer.conf".
+# Enable this config file by renaming it to "image_pool_maintainer.conf".
 
 # sleep time during each polling round (in seconds)
 sleep_interval=10
