@@ -83,7 +83,7 @@ when "cleanup"
   # move logs into archive folder, rename it as #{uuid}.#{vm_name}.log
   if File.exists? "xml_desc.xml"
     FileUtils.mkdir_p "../archive"
-    xml_desc XmlSimple.xml_in(File.read "xml_desc.xml")
+    xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
     uuid = xml_desc["uuid"]
     name = xml_desc["name"]
     FileUtils.mv "log", "../archive/#{uuid}.#{name}.log"
