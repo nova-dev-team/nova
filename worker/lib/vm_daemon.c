@@ -22,12 +22,14 @@ int main(int argc, char* argv[]) {
     char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* pid_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
+    char* status_info = (char *) malloc(sizeof(char) * 100);
 
     int pid = getpid();
     FILE* fp = NULL;
 
     cmd[0] = '\0';
     pid_fn[0] = '\0';
+    status_fn[0] = '\0';
 
     printf("This is vm_daemon!\n");
     printf("Running with pid = %d\n", pid);
@@ -35,6 +37,10 @@ int main(int argc, char* argv[]) {
     sprintf(pid_fn, "%s/vm_daemon.pid", vm_dir);
 
     fp = fopen(pid_fn, "w");
+    if (fp == NULL) {
+      printf("error: cannot open pid file %s!\n", pid_fn);
+      exit(1);
+    }
     fprintf(fp, "%d", pid);
     fclose(fp);
 
@@ -51,15 +57,35 @@ int main(int argc, char* argv[]) {
     printf("[cmd] %s\n", cmd);
     system(cmd);
 
+    sprintf(status_fn, "%s/status", vm_dir);
     for (;;) {
+      FILE* status_fp = NULL;
       sprintf(cmd, "./vm_daemon_helper.rb %s poll", vm_dir);
       printf("[cmd] %s\n", cmd);
       system(cmd);
 
-      // TODO check if to be destroyed
+      // check if to be destroyed (read 'status' file)
+      status_fp = fopen(status_fn, "r");
+      if (status_fp != NULL) {
+        fscanf(status_fp, "%s", status_info);
+        if (strcmp(status_info, "destroyed") == 0) {
+          printf("vm destroyed detected!\n");
+          break;
+        }
+        fclose(status_fp);
+      } else {
+        // cannot read file, print warning, remove the vm
+        printf("warning: cannot read 'status' file, consider vm as destroyed!\n");
+        break;
+      }
 
       sleep(1); // sleep 1 sec between each polling round
     }
+
+    // clean up resource
+    sprintf(cmd, "./vm_daemon_helper.rb %s cleanup", vm_dir);
+    printf("[cmd] %s\n", cmd);
+    system(cmd);
 
     return 0;
   }
