@@ -327,10 +327,26 @@ private
   def Vmachine.start_vm_daemon params
     # TODO write lftp scripts for downloading resource
     Vmachine.open_vm_file(params[:name], "lftp.retr.script") do |f|
+      f.write <<RETR_SCRIPT
+set net:max-retries 2
+set net:reconnect-interval-base 1
+open #{File.read "#{RAILS_ROOT}/config/storage_server.conf"}
+cd vdisks
+get -c #{params[:hda_image]} hda-#{params[:hda_image]}
+RETR_SCRIPT
     end
     
     # TODO write lftp scripts for uploading resource
     Vmachine.open_vm_file(params[:name], "lftp.stor.script") do |f|
+      if params[:hda_save_to] != nil and params[:hda_save_to] != ""
+        f.write <<STOR_SCRIPT
+set net:max-retries 2
+set net:reconnect-interval-base 1
+open #{File.read "#{RAILS_ROOT}/config/storage_server.conf"}
+cd vdisks
+put -c hda-#{params[:hda_image]} #{params[:hda_save_to]}
+STOR_SCRIPT
+      end
     end
 
     # change status to preparing

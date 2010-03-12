@@ -1,0 +1,38 @@
+body, td {
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 13px;
+  color: #333;
+}
+
+a {
+  color: #7541dc
+}
+
+input, select, textarea {
+  margin: 5px 0;
+  padding: 5px;
+  color: #6A6969;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #D4D4D4 #EBEBEB #EBEBEB #D4D4D4;
+  font: 13px 'Lucida Grande', Verdana, Helvetica, sans-serif;
+}
+
+.disabled_input {
+  background: #EBEBEB;
+}
+
+table {
+  border-spacing: 0px;
+}
+
+pre, .code {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.row_type_1 {
+}
+
+.row_type_0 {
+  background: #d9ddff;
+}
