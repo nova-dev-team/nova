@@ -3,8 +3,8 @@ require 'socket'
 require 'fileutils'
 
 NOVA_ROOT = File.dirname(__FILE__) + "/../../"
-CONF_YAML = "#{NOVA_ROOT}/common/config/conf.yaml"
-NODE_YAML = "#{NOVA_ROOT}/common/config/node.yaml"
+CONF_YAML = "#{NOVA_ROOT}/common/config/conf.yml"
+NODE_YAML = "#{NOVA_ROOT}/common/config/node.yml"
 TEMP_DIR = File.dirname(__FILE__) + "/../tmp/"
 
 def sys_exec cmd

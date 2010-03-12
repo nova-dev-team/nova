@@ -142,8 +142,8 @@ int text_ends_with(char* text, char* tail) {
 }
 
 // reloads config file from disk
-void refresh_config() {
-  FILE* fp = fopen("image_pool_maintainer.conf", "r");
+void refresh_config(char* conf_path) {
+  FILE* fp = fopen(conf_path, "r");
   if (fp != NULL) {
     int buf_size = 256;
     char* buf = (char *) malloc(sizeof(char) * buf_size);
@@ -240,7 +240,8 @@ int main(int argc, char* argv[]) {
     return 1;
   } else {
     char* pid_fn = argv[1];
-    char* image_pool_dir = argv[2];
+    char* image_pool_conf = argv[2];
+    char* image_pool_dir = argv[3];
     int pid = fork();
     if (pid == 0) {
       // child process, do work
@@ -254,7 +255,7 @@ int main(int argc, char* argv[]) {
 
       for (;;) {
         // reloads config data
-        refresh_config();
+        refresh_config(image_pool_conf);
 
         // make sure there's enough images in the pool
         maintain_pool_size();

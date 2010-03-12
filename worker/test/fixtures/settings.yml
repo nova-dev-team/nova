@@ -25,7 +25,15 @@ run_root:
 # Since::   0.3
 storage_server:
   key: storage_server
-  value: ftp://user:passwd@somewhere.com/
+<%
+require 'utils.rb'
+
+storage_server_value = "ftp://user:passwd@somewhere.com/"
+# Writes the storage_server settings to config/storage_server.yml
+write_storage_server_to_config storage_server_value
+
+%>
+  value: <%= storage_server_value %>
   editable: true
 
 # Number of disk image copies to be maintained in the background.

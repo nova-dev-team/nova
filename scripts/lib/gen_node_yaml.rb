@@ -8,14 +8,14 @@ def gen_node_yaml
   should_gen = false # should we really generate the node_list
   
   if File.exist? NODE_YAML
-    puts "Existing 'node.yaml' detected"
+    puts "Existing 'node.yml' detected"
     all_nodes do |node|
       master = node if node["role"] == "master"
       workers << node if node["role"] == "worker"
     end
   end
 
-  puts "Configuring 'node.yaml' file"
+  puts "Configuring 'node.yml' file"
 
   if master != nil:
     puts "Existing master node info:"
@@ -112,10 +112,10 @@ NODE_YAML_HEAD
       f.write file_content
       puts "YAML data:"
       puts yaml_str
-      puts "Updated 'node.yaml' file"
+      puts "Updated 'node.yml' file"
     end
   else
-    puts "'node.yaml' not modified"
+    puts "'node.yml' not modified"
   end
   
 end

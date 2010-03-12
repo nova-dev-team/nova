@@ -3,7 +3,17 @@
 # Author::    Santa Zhang (mailto:santa1987@gmail.com)
 # Since::     0.3
 
+require 'utils.rb'
+
 class Setting < ActiveRecord::Base
+
+  def save
+    if self.key == "storage_server"
+      write_storage_server_to_config self.value # update also write to config/storage_server.conf
+      puts "Update to storage_server also forwarded to config/storage_server.conf!"
+    end
+    super
+  end
 
   @@RUN_ROOT = nil  # cached for readonly value
   # Return the working directory for worker module.
