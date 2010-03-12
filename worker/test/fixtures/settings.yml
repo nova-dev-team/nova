@@ -28,7 +28,7 @@ storage_server:
 <%
 storage_server_value = "ftp://user:passwd@somewhere.com/"
 # Writes the storage_server settings to config/storage_server.conf
-File.open("#{RAIS_ROOT}/config/storage_server.conf", "w") do |f|
+File.open("#{RAILS_ROOT}/config/storage_server.conf", "w") do |f|
   f.write storage_server_value
 end
 

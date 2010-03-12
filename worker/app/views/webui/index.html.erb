@@ -18,7 +18,7 @@ require 'uuidtools'
 <script language="javascript" src="/javascripts/shBrushXml.js"></script>
 <script type="text/javascript" src="/javascripts/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
-<script type="text/javascript" src="/javascripts/vmachine_logic.js?<%= rand.to_s[2..-1] %>"></script>
+<script type="text/javascript" src="/javascripts/vmachine_logic.js"></script>
 
 <script type="text/javascript">
 
@@ -200,7 +200,7 @@ Packages to be installed (separate with comma or space): <input type="text" id="
   if File.exists? "#{Setting.run_root}/ftp_server_files_list"
     list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
     if list_data =~ /Fatal error: max-retries exceeded/
-      html_str = "<font color='red'>The storage server is probably down.</font>"
+      html_str = "<b><font color='red'>The storage server is probably down.</font></b>"
     else
       html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
       if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
