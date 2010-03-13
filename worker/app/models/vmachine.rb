@@ -141,20 +141,20 @@ else
 end
 }</emulator>
     <disk type='file' device='disk'>
-      <source file='#{params[:hda_image]}'/>
+      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
       <target dev='hda'/>
     </disk>
 #{
 # determine cdrom
 if params[:run_agent].to_s == "true"
 "    <disk type='file' device='cdrom'>
-      <source file='agent-cd.iso'/>
+      <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
       <target dev='cdrom'/>
     </disk>
 "
 elsif params[:cd_image] != nil and params[:cd_image] != ""
 "    <disk type='file' device='cdrom'>
-      <source file='#{params[:cd_image]}'/>
+      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
       <target dev='cdrom'/>
     </disk>
 "
