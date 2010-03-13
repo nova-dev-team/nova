@@ -199,6 +199,47 @@ Packages to be installed (separate with comma or space): <input type="text" id="
 
 
 <h2>Storage server</h2>
+<%
+def pretty_server_file_list text
+  ret = ""
+
+  item_counter = 0
+  group_counter = 0
+
+  text.each_line do |line|
+    if line.start_with? "ftp://"
+      if group_counter > 0
+        if item_counter == 0
+          ret += "(nothing)"
+        end
+        ret += "</pre></td></tr></table><br>\n"
+      end
+
+      idx = line.index "/", 6
+      folder = line[idx..-1].strip
+      ret += "Resource in folder: <b>" + folder + "</b><br>\n"
+      item_counter = 0
+      ret += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>\n"
+      group_counter += 1
+    else
+      splt = line.split
+      fn = splt[8]
+      size = splt[4].to_i
+      next if fn.start_with? "."
+      ret += "%-10s%s\n" % [size.to_pretty_file_size, fn]
+      item_counter += 1
+    end
+  end
+
+  if item_counter == 0
+    ret += "(nothing)"
+  end
+  ret += "</pre></td></tr></table>\n"
+
+  return ret
+end
+%>
+
 <%=
   html_str = ""
   if File.exists? "#{Setting.run_root}/ftp_server_files_list"
@@ -211,12 +252,9 @@ Packages to be installed (separate with comma or space): <input type="text" id="
         html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead.</font>"
       end
       html_str += "</b>"
-      html_str += "<br>\n<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td>"
-      html_str += "<pre>\n"
+      html_str += "<br>\n"
 
-      # TODO pretty print the list_data
-      html_str += list_data
-      html_str += "</pre></td></tr></table>\n"
+      html_str += pretty_server_file_list list_data
     end
   else
     html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
@@ -227,47 +265,44 @@ Packages to be installed (separate with comma or space): <input type="text" id="
 
 <h2>Local resource</h2>
 
-Vmachines directory structure:<br>
-<b>du -ah <%=h "TODO"
-#Setting.vmachines_root
-%></b>
-<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%
-=begin
-FileUtils.mkdir_p Setting.vmachines_root  # assure existance of vmachines directory
-dir_listing = ""
-pipe = IO.popen("cd #{Setting.vmachines_root} && du -ah")
-dir_listing = pipe.readlines.join.chomp
-pipe.close
-=end
+def pretty_du dir
+  # TODO make the output prettier
+  FileUtils.mkdir_p dir # assure existance of dir
+  html = "<pre>"
+  pipe = IO.popen "cd #{dir} && du -ah"
+  du_output = pipe.readlines.join.chomp
+  pipe.close
+
+  size_info = {}
+  du_output.each_line do |line|
+    splt = line.split
+    size_info[splt[1]] = splt[0]
+  end
+
+  du_data = du_output.collect {|line| line.split[1]}
+  du_sorted = du_data.sort
+
+  du_sorted.each do |item|
+    html += "%-10s%s\n" % [size_info[item], item]
+  end
+
+  html += "</pre>"
+  return html
+end
 %>
-<pre>
-<%=h "TODO"
-#dir_listing
-%>
-</pre>
+
+<b>Vmachines working directory:</b><br>
+du -ah <%=h Setting.vm_root %>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<%= pretty_du Setting.vm_root %>
 </td></tr></table>
 <p>
 
-Cache directory structure:<br>
-<b>du -ah <%=h "TODO"
-#Setting.storage_cache
-%></b>
+<b>Image pool directory:</b><br>
+du -ah <%=h Setting.image_pool_root %>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
-<%
-=begin
-FileUtils.mkdir_p Setting.storage_cache  # assure existance of vmachines directory
-dir_listing = ""
-pipe = IO.popen("cd #{Setting.storage_cache} && du -ah")
-dir_listing = pipe.readlines.join.chomp
-pipe.close
-=end
-%>
-<pre>
-<%=h "TODO"
-#dir_listing
-%>
-</pre>
+<%= pretty_du Setting.image_pool_root %>
 </td></tr></table>
 <hr>
 

@@ -155,7 +155,8 @@ if params[:run_agent].to_s == "true"
 elsif params[:cd_image] != nil and params[:cd_image] != ""
 "    <disk type='file' device='cdrom'>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
-      <target dev='cdrom'/>
+      <target dev='hdc'/>
+      <readonly/>
     </disk>
 "
 end

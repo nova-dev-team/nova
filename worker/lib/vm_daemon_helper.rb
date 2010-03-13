@@ -224,6 +224,7 @@ when "prepare"
 
   # TODO boot vm, handle failure if necessary
 
+  write_log "starting vmachine"
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
   virt_conn = Libvirt::open("qemu:///system")
@@ -235,8 +236,13 @@ when "prepare"
       f.write "using"
     end
     write_log "changed vmachine status to 'using'"
+
+    File.open("xml_desc.real.xml", "w") do |f|
+      f.write dom.xml_desc
+    end
+    write_log "dumped real xml description to 'xml_desc.real.xml'"
   rescue
-    write_log "vmachine domain with UUID=#{uuid} not found, consider it to be destroyed!"
+    write_log "failed to boot vmachine, check the error logs!"
     File.open("status", "w") do |f|
       f.write "destroyed"
     end

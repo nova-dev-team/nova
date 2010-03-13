@@ -67,6 +67,10 @@ namespace :nova do
 set net:max-retries 2
 set net:reconnect-interval-base 1
 open #{File.read "#{RAILS_ROOT}/config/storage_server.conf"}
+cd /vdisks
+pwd
+ls
+cd /agent_packages
 pwd
 ls
 LFTP_SCRIPT
@@ -85,6 +89,12 @@ LFTP_SCRIPT
 
     def do_stop
       require_root_privilege  # worker is started using root privilege, so we have to kill it using root privilege
+
+      conf = read_config
+      # remove temp helper files
+      FileUtils.rm_f "#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script"
+      FileUtils.rm_f "#{conf["run_root"]}/ftp_server_files_list~"
+      FileUtils.rm_f "#{conf["run_root"]}/ftp_server_files_list"
 
       Dir.foreach("#{RAILS_ROOT}/tmp/pids") do |entry|
         next if (entry.end_with? ".pid") == false
@@ -131,7 +141,6 @@ LFTP_SCRIPT
 
       do_init
       do_stop
-      do_start
     end
   end
 end
