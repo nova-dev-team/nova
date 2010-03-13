@@ -149,7 +149,7 @@ end
 if params[:run_agent].to_s == "true"
 "    <disk type='file' device='cdrom'>
       <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
-      <target dev='cdrom'/>
+      <target dev='hdc'/>
     </disk>
 "
 elsif params[:cd_image] != nil and params[:cd_image] != ""
@@ -194,6 +194,15 @@ XML_DESC
     Vmachine.open_vm_file(params[:name], "status") do |f|
       f.write "defined"
     end
+    Vmachine.open_vm_file(params[:name], "params") do |f|
+      params.each do |key, value|
+        f.write "#{key}=#{value}\n"
+      end
+    end
+    vm = Vmachine.new
+    vm.name = params[:name]
+    vm.uuid = params[:uuid]
+    vm.save
     Vmachine.log params[:name], "virtual machine defined"
   end
 
@@ -237,27 +246,38 @@ XML_DESC
     return {:success => true, :message => "vm named '#{params[:name]}' defined, it will be started soon."}
   end
 
-  # non-blocking, most work is delegated to stop_vmachine_worker
-  # TODO make it like a "power-off", hda-image will be saved
-  def Vmachine.stop uuid
-    vm_model = Vmachine.find_by_uuid uuid
-    Vmachine.delete vm_model if vm_model != nil
-    Vmachine.libvirt_action "stop", uuid
+  # Suspend a vmachine. This is a blocking call, but won't take a long time.
+  # You must provide either uuid or name of the VM.
+  #
+  # Since::     0.3
+  def Vmachine.suspend params
+    if params[:uuid] != nil and params[:uuid] != ""
+      Vmachine.libvirt_call_by_uuid "suspend", params[:uuid]
+    elsif params[:name] != nil and params[:name] != ""
+      Vmachine.libvirt_call_by_name "suspend", params[:name]
+    else
+      raise "Please provide either uuid or name!"
+    end
   end
 
-  # blocking method, will not take long time
-  def Vmachine.suspend uuid
-    Vmachine.libvirt_action "suspend", uuid
+  # Resume a vmachine. This is a blocking call, but won't take a long time.
+  # You must provide either uuid or name of the VM.
+  #
+  # Since::     0.3
+  def Vmachine.resume params
+    if params[:uuid] != nil and params[:uuid] != ""
+      Vmachine.libvirt_call_by_uuid "resume", params[:uuid]
+    elsif params[:name] != nil and params[:name] != ""
+      Vmachine.libvirt_call_by_name "resume", params[:name]
+    else
+      raise "Please provide either uuid or name!"
+    end
   end
 
-  # blocking method
-  def Vmachine.resume uuid
-    Vmachine.libvirt_action "resume", uuid
-  end
-
-  # blocking method
   # Destroy a VM domain, either by name or by uuid. Its hda image will not be saved.
   # The clean up work is left for background workers.
+  #
+  # * This is a blocking method!
   #
   # * When both name & uuid is given, we work according to "uuid" value.
   #

@@ -54,6 +54,8 @@ namespace :nova do
     def do_start
       require_root_privilege  # we must run worker as "root", since we will connect to "qemu:///system", which is privileged action
 
+      # TODO check if has network bridge
+
       conf = read_config
       service_port = conf["worker_port"]
       puts "Writing hostname into tmp/hostname..."

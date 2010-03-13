@@ -250,8 +250,6 @@ when "prepare"
   end
 
 when "poll"
-  puts "polling"
-
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
 
@@ -281,24 +279,31 @@ when "poll"
     end
 
     hda_image = ""
+    File.open("params") do |f|
+      f.each_line do |line|
+        line = line.strip
+        if line.start_with? "hda_image="
+          hda_image = line[10..-1]
+        end
+      end
+    end
     # save image file
     File.open("uploading_lock", "w") do |f|
       f.write Time.now
     end
     puts "uploading_lock created"
-    File.open("hda_save_to.lftp") do |f|
+    File.open("hda_save_to.lftp", "w") do |f|
       f.write <<HDA_SAVE_TO_LFTP
 set net:max-retries 2
 set net:reconnect-interval-base 1
-open #{File.read "#{File.dirname __FILE__}/../config/storage_server.conf"}
-put -c  #{hda_image} #{File.read "hda_save_to"}
+open #{storage_server}
+put #{hda_image} -o #{File.read "hda_save_to"}
 HDA_SAVE_TO_LFTP
     end
     my_exec "lftp -f hda_save_to.lftp 2>&1 >> hda_save_to.log"
     FileUtils.rm "uploading_lock"
     puts "uploading_lock removed"
-    # TODO handle upload error if necessary
-
+    
   else
     # hda_save_to not found, no need to save, do nothing
     write_log "detected vmachine stopped, saving not required"
@@ -313,10 +318,6 @@ HDA_SAVE_TO_LFTP
 
 when "cleanup"
   puts "doing cleanup"
-
-  puts "disabled for debugging purpose"
-  exit
-
   write_log "detected vmachine destroyed"
 
   if File.exists? "xml_desc.xml"
@@ -338,11 +339,11 @@ when "cleanup"
     xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
     uuid = xml_desc["uuid"][0]
     name = xml_desc["name"][0]
-    FileUtils.mkdir_p "../archive"
+    FileUtils.mkdir_p "../../vm_archive"
 
     parent_dir = File.join vm_dir, ".."
     Dir.chdir parent_dir
-    FileUtils.mv vm_dir, "archive/#{name}.#{uuid}"
+    FileUtils.mv vm_dir, "../vm_archive/#{name}.#{uuid}"
   else
     # delete everything
     parent_dir = File.join vm_dir, ".."

@@ -63,6 +63,7 @@ $(document).ready(function () {
 
 <h2>List of all vmachines</h2>
 
+
 <table width="100%">
 <tr>
 <td>Name</td>
@@ -72,72 +73,72 @@ $(document).ready(function () {
 <td>Actions</td>
 </tr>
 <%=
-info_of_vmachines = ""
+html = ""
 
-all_domains = Vmachine.all_domains
-
-counter = 0
-
-all_domains.each do |dom|
-  info_of_vmachines += "<tr class='row_type_#{counter % 2}'><td>#{dom.name}</td>"
-  info_of_vmachines += "<td>#{dom.uuid}</td>"
-  
-  state_text = case dom.info.state
-  when VmachinesController::STATE_RUNNING
-    "Running"
-  when VmachinesController::STATE_SUSPENDED
-    "Suspended"
-  when VmachinesController::STATE_NOT_RUNNING
-    "Not running"
-  else
-    dom.info.state.to_s
-  end
-  
-  info_of_vmachines += "<td>#{state_text}</td>"
-  
+row_counter = 0
+Vmachine.all_domains.each do |dom|
   xml_desc = XmlSimple.xml_in dom.xml_desc
-  vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
-  if vnc_port == "-1"
-    vnc_port = "Not allocated"
-  end
-  info_of_vmachines += "<td>#{vnc_port}</td><td>"
-  
-  if dom.info.state == VmachinesController::STATE_RUNNING
-    info_of_vmachines += "<button onclick='suspend_vmachine(\"#{dom.uuid}\")'>Suspend</button>\n"
-  elsif dom.info.state == VmachinesController::STATE_SUSPENDED
-    info_of_vmachines += "<button onclick='resume_vmachine(\"#{dom.uuid}\")'>Resume</button>\n"
-  end
 
-  vnc_html = "<button onclick=\"$('#vnc-view-#{dom.uuid}').toggle('fast')\">VNC</button>" if dom.info.state != VmachinesController::STATE_NOT_RUNNING
-
-  info_of_vmachines += <<CONTROLLS_HTML
-<button onclick="destroy_vmachine('#{dom.name}', '#{dom.uuid}')">Destroy !!!</button>
-<button onclick="$('#xml-def-#{dom.uuid}').toggle('fast')">XML</button>
-#{vnc_html || ""}
-</td></tr>
-CONTROLLS_HTML
-
-  info_of_vmachines += "<tr><td colspan=5><table width='100%' class='code' id='xml-def-#{dom.uuid}' style='display:none;'><tr><td><pre class='xml' name='xml_code' cols='160'>"
-  info_of_vmachines += CGI.escapeHTML dom.xml_desc
-  info_of_vmachines += "</pre></td></tr></table></td></tr>"
-
-  info_of_vmachines += <<VNC_HTML
-<tr><td colspan=5>
-<table width='100%' id='vnc-view-#{dom.uuid}' style='display:none;'>
-<tr><td>
-<applet CODE=VncViewer.class ARCHIVE=vncviewer.jar WIDTH=1024 HEIGHT=768>
-  <param name=PORT value=#{vnc_port}>
-  <param name=PASSWORD value="All your base are belong to us">
-</applet>
-</td></tr>
-</table>
+  html += <<VM_HTML
+<tr class='row_type_#{row_counter % 2}' height=30>
+<td>#{dom.name}</td>
+<td>#{dom.uuid}</td>
+<td>
+#{
+case dom.info.state
+when Vmachine::LIBVIRT_RUNNING
+  "Running"
+when Vmachine::LIBVIRT_SUSPENDED
+  "<b>Suspended</b>"
+when Vmachine::LIBVIRT_NOT_RUNNING
+  "<font color='red'><b>Not running</b></font>"
+else
+  dom.info.state.to_s
+end
+}
+</td>
+<td>
+#{
+vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
+if vnc_port == "-1"
+  vnc_port = "Not allocated"
+end
+vnc_port
+}
+</td>
+<td>
+#{
+if dom.info.state != Vmachine::LIBVIRT_NOT_RUNNING
+  "<button type='button' class='btn' onclick=\"window.open('/vmachines/observe/#{dom.name}');return false;\"><span><span>Observe</span></span></button>\n"
+end
+}
+<button type='button' class='btn' onclick="$('#xml-def-#{dom.uuid}').toggle('fast')"><span><span>Toggle XML</span></span></button>
+#{
+if dom.info.state == Vmachine::LIBVIRT_RUNNING
+  "<button type='button' class='btn' onclick=\"suspend_vmachine('#{dom.uuid}')\"><span><span>Suspend</span></span></button>\n"
+elsif dom.info.state == Vmachine::LIBVIRT_SUSPENDED
+  "<button type='button' class='btn' onclick=\"resume_vmachine('#{dom.uuid}')\"><span><span>Resume</span></span></button>\n"
+end
+}
+#{
+if dom.info.state != Vmachine::LIBVIRT_NOT_RUNNING
+"<button type='button' class='btn' onclick=\"destroy_vmachine('#{dom.name}', '#{dom.uuid}')\"><span><span><font color='red'><b>Destroy !!!</b></font></span></span></button>"
+end
+}
+</td>
 </tr>
-VNC_HTML
-  
-  counter += 1
+<tr><td colspan=5>
+<div style="display:none;" id='xml-def-#{dom.uuid}'>
+<pre class='xml' name='xml_code' cols='160'>
+#{CGI.escapeHTML dom.xml_desc}
+</pre>
+</div>
+</td></tr>
+VM_HTML
+  row_counter += 1
 end
 
-info_of_vmachines
+html
 %>
 </table>
 <hr>
@@ -267,7 +268,6 @@ end
 
 <%
 def pretty_du dir
-  # TODO make the output prettier
   FileUtils.mkdir_p dir # assure existance of dir
   html = "<pre>"
   pipe = IO.popen "cd #{dir} && du -ah"
@@ -315,37 +315,31 @@ du -ah <%=h Setting.image_pool_root %>
 
 <h2>Vmachines log</h2>
 <%= "TODO"
-=begin
   vmachines_log_html = "<table width='100%'><tr><td>Vmachine</td><td>Log</td></tr>"
   counter = 0
   # read vmachines logs
-  
-  vmachines_root = Setting.vmachines_root
-  Dir.entries(vmachines_root).each do |entry|
+  vm_root = Setting.vm_root
+  Dir.entries(vm_root).each do |entry|
     next if entry.start_with? "."
-    begin
-      vm_logfile = File.open("#{vmachines_root}/#{entry}/log", "r")
-    rescue
-      next
+    log_path = File.join vm_root, entry, "log"
+    if File.exists? log_path
+      vmachines_log_html += "\n<tr class='row_type_#{counter % 2}'><td>"
+      vmachines_log_html += entry
+      vmachines_log_html += "</td><td><pre>"
+      vmachines_log_html += (File.read log_path).chomp
+      vmachines_log_html += "</pre></td></tr>"
     end
-    vmachines_log_html += "<tr class='row_type_#{counter % 2}'><td>"
-    vmachines_log_html += entry
-    vmachines_log_html += "</td><td><pre>"
-    vmachines_log_html += vm_logfile.readlines.join.chomp
-    vmachines_log_html += "</pre></td></tr>"
-
-    vm_logfile.close
     counter += 1
   end
 
   vmachines_log_html += "</table>"
   vmachines_log_html
-=end
 %>
 <hr>
 
 
 <h2>System settings</h2>
+<div id="sys_settings_panel">
 <%=
   system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
   counter = 0
@@ -364,6 +358,7 @@ du -ah <%=h Setting.image_pool_root %>
   system_settings_html += "</table>"
   system_settings_html
 %>
+</div>
 <hr>
 
 This is the "worker" module of the Nova system. <b>Intended for developers only!</b><p>

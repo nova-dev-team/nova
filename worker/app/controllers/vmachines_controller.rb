@@ -35,6 +35,12 @@ public
     reply_success "query successful!", :data => doms_list
   end
 
+  # Render a observing page, uses VNC.
+  #
+  # Since::     0.3
+  def observe
+  end
+
   # Create and then start a domain.
   #
   # Since::     0.3

@@ -180,12 +180,12 @@ function add_vmachine() {
       cd_image: cd_image
     },
     success: function(result) {
+      $("#add_new_vmachine_div").unblock();
       if (result.success) {
         window.location.reload();
       } else {
-        alert("Error message:" + result.message);
+        alert("Error message: " + result.message);
       }
-      $("#add_new_vmachine_div").unblock();
     },
     error: function() {
       alert("Request failed!");
@@ -207,7 +207,7 @@ function vm_ajax(url, uuid) {
       if (result.success) {
         window.location.reload();
       } else {
-        alert("Error message:" + result.message);
+        alert("Error message: " + result.message);
       }
     },
     error: function() {
@@ -217,7 +217,7 @@ function vm_ajax(url, uuid) {
 }
 
 function destroy_vmachine(name, uuid) {
-  if (confirm("Are you really going to destroy vmachine named '" + name + "', with UUID=" + uuid + "?")) {
+  if (confirm("Are you sure to destroy vmachine named '" + name + "'")) {
     vm_ajax("/vmachines/destroy.json", uuid);
   }
 }
@@ -233,6 +233,7 @@ function suspend_vmachine(uuid) {
 function change_system_setting(key) {
   old_value = $("#sys_setting_holder_" + key).html();
   new_value = prompt("Input the new value for key '" + key + "'.", old_value);
+  $("#sys_settings_panel").block();
   if (new_value && new_value != "") {
     $.ajax({
       url: "/settings/edit.json",
@@ -242,10 +243,16 @@ function change_system_setting(key) {
         key: key,
         value: new_value
       },
-      success: function() {
-        $("#sys_setting_holder_" + key).html(new_value);
+      success: function(result) {
+        $("#sys_settings_panel").unblock();
+        if (result.success) {
+          $("#sys_setting_holder_" + key).html(new_value);
+        } else {
+          alert("Error message: " + result.message);
+        }
       },
       error: function() {
+        $("#sys_settings_panel").unblock();
         alert("Request failed!");
       }
     });
