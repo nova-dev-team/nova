@@ -21,6 +21,10 @@ class Setting < ActiveRecord::Base
 set net:max-retries 2
 set net:reconnect-interval-base 1
 open #{self.value}
+cd /vdisks
+pwd
+ls
+cd /agent_packages
 pwd
 ls
 LFTP_SCRIPT
