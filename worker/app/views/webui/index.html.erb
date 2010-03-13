@@ -283,8 +283,15 @@ def pretty_du dir
   du_data = du_output.collect {|line| line.split[1]}
   du_sorted = du_data.sort
 
+  item_counter = 0
   du_sorted.each do |item|
+    next if item == "."
     html += "%-10s%s\n" % [size_info[item], item]
+    item_counter += 1
+  end
+
+  if item_counter == 0
+    html += "(nothing)"
   end
 
   html += "</pre>"

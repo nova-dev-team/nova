@@ -7,9 +7,15 @@
 # Where is the Nova code stored.
 #
 # Since::   0.3
+
+<%
+require 'yaml'
+conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+%>
+
 system_root:
   key: system_root
-  value: /nova/system
+  value: <%= conf["system_root"] %>
   editable: false
 
 # Where is the vm running.
@@ -17,7 +23,7 @@ system_root:
 # Since::   0.3
 run_root:
   key: run_root
-  value: /nova/run
+  value: <%= conf["run_root"] %>
   editable: false
 
 # Where is the storage server running.

@@ -61,7 +61,9 @@ namespace :nova do
       my_exec "hostname > #{RAILS_ROOT}/tmp/hostname"
       puts "Starting Nova worker on port #{service_port}..."
 
-      FileUtils.mkdir_p conf["run_root"]
+      FileUtils.mkdir_p "#{conf["run_root"]}/vm"
+      FileUtils.mkdir_p "#{conf["run_root"]}/image_pool"
+
       File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
         f.write <<LFTP_SCRIPT
 set net:max-retries 2

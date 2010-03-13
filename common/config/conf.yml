@@ -21,10 +21,10 @@ worker_port:                    4000
 vm_vnc_port:                    5900
 
 # where is the working dir
-run_root:                       /nova/run
+run_root:                       /nova/run1
 
 # where is the system installed
-system_root:                    /nova/system
+system_root:                    /nova/system2
 
 # the network interface that will be utilized by virtual machines
 vm_network_interface:           eth0
