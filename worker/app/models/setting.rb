@@ -27,6 +27,18 @@ LFTP_SCRIPT
       end
 
       puts "Update to storage_server also forwarded to config/storage_server.conf!"
+    elsif self.key == "image_pool_size"
+      image_pool_maintainer_conf = File.read "#{RAILS_ROOT}/lib/image_pool_maintainer.conf"
+      File.open("#{RAILS_ROOT}/lib/image_pool_maintainer.conf", "w") do |f|
+        image_pool_maintainer_conf.each_line do |line|
+          line = line.strip
+          if line.start_with? "pool_size="
+            f.write "pool_size=#{self.value}\n"
+          else
+            f.write "#{line}\n"
+          end
+        end
+      end
     end
     super
   end

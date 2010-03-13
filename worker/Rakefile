@@ -83,8 +83,7 @@ LFTP_SCRIPT
       do_start
     end
 
-    desc "Stop Nova worker"
-    task :stop do
+    def do_stop
       require_root_privilege  # worker is started using root privilege, so we have to kill it using root privilege
 
       Dir.foreach("#{RAILS_ROOT}/tmp/pids") do |entry|
@@ -97,8 +96,15 @@ LFTP_SCRIPT
       end
     end
 
+    desc "Stop Nova worker"
+    task :stop do
+      do_stop
+    end
+
     desc "Reset system, remove all Vmachines, cleanup all resource"
     task :reset do
+      require_root_privilege
+
       require 'rubygems'
       require 'libvirt'
       

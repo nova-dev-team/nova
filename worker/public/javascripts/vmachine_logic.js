@@ -159,6 +159,7 @@ function add_vmachine() {
       agent_hint += "agent_packages=" + agent_packages;
     }
   }
+  $("#add_new_vmachine_div").block();
 
   $.ajax({
     url: "/vmachines/start.json",
@@ -184,9 +185,11 @@ function add_vmachine() {
       } else {
         alert("Error message:" + result.message);
       }
+      $("#add_new_vmachine_div").unblock();
     },
     error: function() {
       alert("Request failed!");
+      $("#add_new_vmachine_div").unblock();
     }
   });
   

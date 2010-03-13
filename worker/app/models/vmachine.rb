@@ -1,6 +1,7 @@
 require "utils"
 require "libvirt"
 require "fileutils"
+require "yaml"
 
 # This is the model for virtual machines. We use this class to controll virtual machines.
 #
@@ -107,6 +108,7 @@ class Vmachine < ActiveRecord::Base
   #
   # Since::     0.3
   def Vmachine.emit_domain_xml params
+    nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
     xml_desc = <<XML_DESC
 <domain type='qemu'>
   <name>#{params[:name]}</name>
@@ -158,13 +160,10 @@ elsif params[:cd_image] != nil and params[:cd_image] != ""
 "
 end
 }    <interface type='bridge'>
-      <source bridge='#{
-# TODO nova br, read from common/config
-"br0"
-}'/>
+      <source bridge='#{nova_conf["vm_network_bridge"]}'/>
       <mac address='#{
-# TODO generate mac addr  
-"TODO"
+# generate random mac addreaa
+((1..6).collect {|n| "%02x" % (256 * rand)}).join ":"
 }'/>
     </interface>
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>
@@ -392,7 +391,7 @@ private
     # start the vm_daemon for the virtual machine
     pid = fork do
       Dir.chdir "#{RAILS_ROOT}/lib"
-      exec "./vm_daemon #{File.join Setting.vm_root, params[:name]}"
+      exec "./vm_daemon #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, params[:name]}"
     end
     Process.detach pid  # prevent zombie process
 
