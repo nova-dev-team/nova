@@ -120,11 +120,7 @@ elsif dom.info.state == Vmachine::LIBVIRT_SUSPENDED
   "<button type='button' class='btn' onclick=\"resume_vmachine('#{dom.uuid}')\"><span><span>Resume</span></span></button>\n"
 end
 }
-#{
-if dom.info.state != Vmachine::LIBVIRT_NOT_RUNNING
-"<button type='button' class='btn' onclick=\"destroy_vmachine('#{dom.name}', '#{dom.uuid}')\"><span><span><font color='red'><b>Destroy !!!</b></font></span></span></button>"
-end
-}
+<button type='button' class='btn' onclick=\"destroy_vmachine('#{dom.name}', '#{dom.uuid}')\"><span><span><font color='red'><b>Destroy !!!</b></font></span></span></button>
 </td>
 </tr>
 <tr><td colspan=5>
