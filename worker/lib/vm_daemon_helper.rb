@@ -267,6 +267,15 @@ when "poll"
 
   if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
     exit  # the vm is still running, skip the following actions
+  else
+    begin
+      dom.destroy
+    ensure
+      begin
+        dom.undefine
+      rescue
+      end
+    end
   end
 
   if File.exists? "hda_save_to"
