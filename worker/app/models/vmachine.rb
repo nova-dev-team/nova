@@ -110,7 +110,7 @@ class Vmachine < ActiveRecord::Base
   def Vmachine.emit_domain_xml params
     nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
     xml_desc = <<XML_DESC
-<domain type='qemu'>
+<domain type='kvm'>
   <name>#{params[:name]}</name>
   <uuid>#{params[:uuid]}</uuid>
   <memory>#{params[:mem_size].to_i * 1024}</memory>
