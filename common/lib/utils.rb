@@ -2,67 +2,74 @@
 # It is shared among "master" & "worker" modules, and the helper scripts.
 #
 # Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
 
 
+# Reopens string class, and added some helper functions.
+#
+# Since::     0.3
 class String
+
+  # Check if the string itself looks like an uuid.
+  #
+  # Since::   0.3
   def is_uuid?
     return false unless self.length == 36
     self.downcase.each_char {|ch| return false unless (ch == '-' or ('0' <= ch and ch <= '9') or ('a' <= ch and ch <= 'f'))}
     return false unless ((self.split '-').map {|segment| segment.length}) == [8, 4, 4, 4, 12]
     true
   end
+
 end
 
+# Define a module which could be displayed as file size.
+#
+# Since::     0.3
+module CouldDisplayAsFileSize
+
+  # Convert current value to file size. Largest unit is TB. Returned value is a String.
+  #
+  # Since::       0.3
+  def to_pretty_file_size
+
+    def pretty_val val
+      if val > 10
+        val.round
+      else
+        (val * 10.0).round / 10.0
+      end
+    end
+
+    if self < 1000
+      return self.to_s
+    elsif self < 1000 * 1000
+      val = pretty_val(self / 1024.0)
+      return val.to_s + "K"
+    elsif self < 1000 * 1000 * 1000
+      val = pretty_val(self / 1024.0 / 1024.0)
+      return val.to_s + "M"
+    elsif self < 1000 * 1000 * 1000 * 1000
+      val = pretty_val(self / 1024.0 / 1024.0 / 1024.0)
+      return val.to_s + "G"
+    else # largest unit is TB
+      val = pretty_val(self / 1024.0 / 1024.0 / 1024.0 / 1024.0)
+      return val.to_s + "T"
+    end
+  end
+end
+
+# Reopens the Fixnum class, and add some helper function to it.
+#
+# Since::     0.3
 class Fixnum
-
-  def to_pretty_file_size
-    def pretty_val val
-      if val > 10
-        val.round
-      else
-        (val * 10.0).round / 10.0
-      end
-    end
-
-    if self < 1000
-      return self.to_s
-    elsif self < 1000 * 1000
-      val = pretty_val(self / 1024.0)
-      return val.to_s + "K"
-    elsif self < 1000 * 1000 * 1000
-      val = pretty_val(self / 1024.0 / 1024.0)
-      return val.to_s + "M"
-    elsif self < 1000 * 1000 * 1000 * 1000
-      val = pretty_val(self / 1024.0 / 1024.0 / 1024.0)
-      return val.to_s + "G"
-    end
-  end
-
+  include CouldDisplayAsFileSize
 end
 
+# Reopens the Bignum class, and add some helper function to it.
+#
+# Since::     0.3
 class Bignum
-  def to_pretty_file_size
-    def pretty_val val
-      if val > 10
-        val.round
-      else
-        (val * 10.0).round / 10.0
-      end
-    end
-
-    if self < 1000
-      return self.to_s
-    elsif self < 1000 * 1000
-      val = pretty_val(self / 1024.0)
-      return val.to_s + "K"
-    elsif self < 1000 * 1000 * 1000
-      val = pretty_val(self / 1024.0 / 1024.0)
-      return val.to_s + "M"
-    elsif self < 1000 * 1000 * 1000 * 1000
-      val = pretty_val(self / 1024.0 / 1024.0 / 1024.0)
-      return val.to_s + "G"
-    end
-  end
+  include CouldDisplayAsFileSize
 end
 
 
