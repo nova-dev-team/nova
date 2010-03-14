@@ -10,7 +10,7 @@ class MiscController < ApplicationController
   #
   # Since::     0.3
   def role
-    render_success "worker"
+    reply_success "worker"
   end
 
 end
