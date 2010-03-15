@@ -242,11 +242,13 @@ end
   if File.exists? "#{Setting.run_root}/ftp_server_files_list"
     list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
     if list_data =~ /Fatal error: max-retries exceeded/
-      html_str = "<b><font color='red'>The storage server is probably down.</font></b>"
+      html_str = "<b><font color='red'>The storage server is probably down!</font></b>"
+    elsif list_data =~ /Not connected/ or list_data =~ /Name or service not known/
+      html_str = "<b><font color='red'>Failed to connect to storage server!</font></b>"
     else
       html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
       if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
-        html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead.</font>"
+        html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead!</font>"
       end
       html_str += "</b>"
       html_str += "<br>\n"

@@ -14,6 +14,8 @@
 
 #include <unistd.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 void print_help() {
   printf("This is ftp_server_files_list_updater.\n");
@@ -31,6 +33,7 @@ int main(int argc, char* argv[]) {
   char* list_fn = NULL; // will be malloc'ed later. don't use array, prevent buffer overflow
   char* run_root;
   char* pid_file;
+
   if (argc < 3) {
     print_help();
     return 1;
@@ -57,11 +60,25 @@ int main(int argc, char* argv[]) {
     // child process, persistantly polling ftp server for files list
     chdir(run_root);
     for (;;) {
+      int i;
+      int config_mtime = -1;
+      struct stat st;
+
+      lstat("ftp_server_files_list_updater_lftp_script", &st);
+      config_mtime = st.st_mtime;
       // The listing is first written to a "list~" file, and after all listing has been fetched, it is renamed to "list".
       // This prevents worker from reading incomplete file listing
       system("lftp -f ftp_server_files_list_updater_lftp_script 2>&1 | tee \"ftp_server_files_list~\" > /dev/null");
       rename("ftp_server_files_list~", "ftp_server_files_list");
-      sleep(120); // sleep for 2 minutes
+
+      // sleep for at most 2 minutes, in the meanwhile, check for config file modification every 1 second
+      for (i = 0; i < 120; i++) {
+        lstat("ftp_server_files_list_updater_lftp_script", &st);
+        if (st.st_mtime != config_mtime) {
+          break;
+        }
+        sleep(1);
+      }
     }
   } else {
     // parent process, write pid, and exits
