@@ -264,7 +264,10 @@ when "poll"
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
   rescue
-    # domain not found, exit
+    # domain not found, write "destroyed" to status file
+    File.open("status", "w") do |f|
+      f.write "destroyed"
+    end
     exit
   end
 

@@ -94,7 +94,7 @@ when Vmachine::LIBVIRT_NOT_RUNNING
   vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
   if vm_daemon_status == "preparing"
     "Preparing"
-  elsif vm_daemon_status = "saving"
+  elsif vm_daemon_status == "saving"
     "Saving"
   else
     "<font color='red'><b>Not running</b></font>"
