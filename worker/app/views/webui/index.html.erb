@@ -91,7 +91,14 @@ when Vmachine::LIBVIRT_RUNNING
 when Vmachine::LIBVIRT_SUSPENDED
   "<b>Suspended</b>"
 when Vmachine::LIBVIRT_NOT_RUNNING
-  "<font color='red'><b>Not running</b></font>"
+  vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+  if vm_daemon_status == "preparing"
+    "Preparing"
+  elsif vm_daemon_status = "saving"
+    "Saving"
+  else
+    "<font color='red'><b>Not running</b></font>"
+  end
 else
   dom.info.state.to_s
 end
@@ -113,6 +120,7 @@ if dom.info.state != Vmachine::LIBVIRT_NOT_RUNNING
 end
 }
 <button type='button' class='btn' onclick="$('#xml-def-#{dom.uuid}').toggle('fast')"><span><span>Toggle XML</span></span></button>
+<button type='button' class='btn' onclick="$('#vm-log-#{dom.uuid}').toggle('fast')"><span><span>Toggle Log</span></span></button>
 #{
 if dom.info.state == Vmachine::LIBVIRT_RUNNING
   "<button type='button' class='btn' onclick=\"suspend_vmachine('#{dom.uuid}')\"><span><span>Suspend</span></span></button>\n"
@@ -128,6 +136,21 @@ end
 <pre class='xml' name='xml_code' cols='160'>
 #{CGI.escapeHTML dom.xml_desc}
 </pre>
+</div>
+</td></tr>
+<tr><td colspan=5>
+<div style="display:none;" id='vm-log-#{dom.uuid}'>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<pre class='code'>
+#{
+begin
+  CGI.escapeHTML (File.read "#{Setting.vm_root}/#{dom.name}/log").strip
+rescue
+  "(failed to read logs)"
+end
+}
+</pre>
+</td></tr></table>
 </div>
 </td></tr>
 VM_HTML
@@ -309,30 +332,6 @@ du -ah <%=h Setting.image_pool_root %>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%= pretty_du Setting.image_pool_root %>
 </td></tr></table>
-<hr>
-
-<h2>Vmachines log</h2>
-<%= "TODO"
-  vmachines_log_html = "<table width='100%'><tr><td>Vmachine</td><td>Log</td></tr>"
-  counter = 0
-  # read vmachines logs
-  vm_root = Setting.vm_root
-  Dir.entries(vm_root).each do |entry|
-    next if entry.start_with? "."
-    log_path = File.join vm_root, entry, "log"
-    if File.exists? log_path
-      vmachines_log_html += "\n<tr class='row_type_#{counter % 2}'><td>"
-      vmachines_log_html += entry
-      vmachines_log_html += "</td><td><pre>"
-      vmachines_log_html += (File.read log_path).chomp
-      vmachines_log_html += "</pre></td></tr>"
-    end
-    counter += 1
-  end
-
-  vmachines_log_html += "</table>"
-  vmachines_log_html
-%>
 <hr>
 
 

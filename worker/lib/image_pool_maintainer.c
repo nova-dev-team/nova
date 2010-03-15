@@ -91,6 +91,9 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
     printf("error: cannot copy file!\n");
     return 1;
   }
+
+  gettimeofday(&begin_time, NULL);
+
   for (;;) {
     int cnt = fread(buf, sizeof(char), buf_size, src);
     if (cnt <= 0) {

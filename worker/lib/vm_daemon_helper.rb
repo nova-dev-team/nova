@@ -264,12 +264,8 @@ when "poll"
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
   rescue
-    # domain not found, could be destroyed
-    write_log "vmachine domain with UUID=#{uuid} not found, consider it to be destroyed!"
-    File.open("status", "w") do |f|
-      f.write "destroyed"
-    end
-    exit  # exit this polling round, no need to do saving. on next calling round, "cleanup" actions will be performed
+    # domain not found, exit
+    exit
   end
 
   if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED

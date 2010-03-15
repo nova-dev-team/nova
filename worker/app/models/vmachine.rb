@@ -39,15 +39,20 @@ class Vmachine < ActiveRecord::Base
   def Vmachine.all_domains
     virt_conn = Vmachine.virt_conn
     all_domains = []
-    Vmachine.all.each do |vm_model|
+    
+    Dir.foreach(Setting.vm_root) do |vm_entry|
+      vm_dir_path = File.join Setting.vm_root, vm_entry
+      next if vm_entry.start_with? "."
+      next unless File.directory? vm_dir_path
+
       begin
-        all_domains << virt_conn.lookup_domain_by_uuid(vm_model.uuid)
+        all_domains << virt_conn.lookup_domain_by_name(vm_entry)
       rescue
-        # vmachine not found by libvirt, delete it!
-        Vmachine.delete vm_model
-        next
+        # failed to find the vm, mark it as "destroyed"
+        Vmachine.log vm_entry, "Failed to lookup VM domain with name='#{vm_entry}'"
       end
     end
+
     return all_domains
   end
 
@@ -199,10 +204,6 @@ XML_DESC
         f.write "#{key}=#{value}\n"
       end
     end
-    vm = Vmachine.new
-    vm.name = params[:name]
-    vm.uuid = params[:uuid]
-    vm.save
     Vmachine.log params[:name], "virtual machine defined"
   end
 
@@ -291,8 +292,6 @@ XML_DESC
       rescue
       end
       Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
-      vm_model = Vmachine.find_by_uuid params[:uuid]
-      Vmachine.delete vm_model if vm_model != nil
       return {:success => true, :message => "destroyed vm with uuid #{params[:uuid]}."}
 
     elsif params[:name] != nil and params[:name] != ""
@@ -303,8 +302,6 @@ XML_DESC
       rescue
       end
       Vmachine.libvirt_call_by_name "undefine", params[:name]
-      vm_model = Vmachine.find_by_name params[:name]
-      Vmachine.delete vm_model if vm_model != nil
       return {:success => true, :message => "destroyed vm named '#{params[:name]}'."}
 
     else

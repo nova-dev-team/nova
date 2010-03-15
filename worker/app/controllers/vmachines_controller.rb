@@ -34,8 +34,17 @@ public
         dom_info["status"] = "Running"
       when Vmachine::LIBVIRT_SUSPENDED
         dom_info["status"] = "Suspended"
-      when
-        dom_info["status"] = "Not running"
+      when Vmachine::LIBVIRT_NOT_RUNNING
+        vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+        if vm_daemon_status == "preparing"
+          dom_info["status"] = "Preparing"
+        elsif vm_daemon_status == "saving"
+          dom_info["status"] = "Saving"
+        else
+          dom_info["status"] = "Not running"
+        end
+      else
+        dom_info["status"] = dom.info.state.to_s
       end
       doms_list << dom_info
     end

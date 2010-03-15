@@ -23,7 +23,7 @@ void print_help() {
   printf("\n");
   printf("Usage:\n");
   printf("    ftp_server_files_list_updater <pid_file> <run_root>\n");
-  printf("    <pid_file> is the file which will contain the pid of this running deamon.\n");
+  printf("    <pid_file> is the file which will contain the pid of this running daemon.\n");
   printf("    <run_root> is the working dir of Nova worker.\n");
 }
 
