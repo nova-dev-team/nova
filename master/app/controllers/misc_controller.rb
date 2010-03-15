@@ -1,6 +1,8 @@
-require 'pp'
+# A helper controller that provides lots of utilities.
+#
+# Author::      Santa Zhang (mailto:santa1987@gmail.com)
+# Since::       0.3
 
-## class that handles miscellaneous actions
 class MiscController < ApplicationController
 
   # TODO create a verification image, NOTE that opera's caching causes problems
@@ -8,19 +10,11 @@ class MiscController < ApplicationController
     send_file RAILS_ROOT + "/tmp/v.jpg", :type => "image/jpeg", :filename => "v.jpg", :disposition => 'inline'
   end
 
-  def hi
-    render :text => "HI"
-  end
-
-  def whoami
-    render :text => "Master"
-  end
-
-  #
+  # Reply the role of this node.
   #
   # Since:: 0.3
   def role
-    render :text => "role"
+    reply_success "master"
   end
 
   def browser_detect

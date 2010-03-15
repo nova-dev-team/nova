@@ -12,6 +12,8 @@ class ApplicationController < ActionController::Base
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
 
+  include ControllerUtility
+
   def version
     render_data :success => true, :message => "Version: 1.0"
   end

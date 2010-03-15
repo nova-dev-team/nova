@@ -3,6 +3,8 @@ class SessionsController < ApplicationController
   # Be sure to include AuthenticationSystem in Application Controller instead
   include AuthenticatedSystem
 
+  before_filter :check_if_installed?
+
   # render new.rhtml
   def new
     if logged_in?
