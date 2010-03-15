@@ -27,7 +27,7 @@ def write_log message
 end
 
 def find_available_copy image_pool_dir, hda_name
-  copy = nil
+  copy_list = []
   Dir.foreach(image_pool_dir) do |entry|
     entry_path = File.join image_pool_dir, entry
     if (entry.start_with? hda_name) == false or entry !~ /\.pool\.[0-9]+$/
@@ -37,10 +37,17 @@ def find_available_copy image_pool_dir, hda_name
     if File.exists? entry_copying_lock
       next # skip if entry is being copied
     end
-    copy = entry_path
-    break
+    copy_list << entry_path
   end
-  return copy
+  # choose a copy with largest copy number
+  copy_list.sort! do |a, b|
+    idx = (a.rindex ".") + 1
+    va = a[idx..-1].to_i
+    idx = (b.rindex ".") + 1
+    vb = b[idx..-1].to_i
+    vb <=> va
+  end
+  return copy_list[0]
 end
 
 def prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
