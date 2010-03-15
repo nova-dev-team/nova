@@ -22,7 +22,31 @@ int g_interval = 1;
 // global image pool size
 int g_pool_size = 5;
 
+// return 1 if there is vm running.
+int has_vm_running() {
+  DIR* p_dir;
+  struct stat st;
+  int ret = 0;
+  p_dir = opendir("../vm");
+  if (p_dir != NULL) {
+    struct dirent* p_dirent;
+    while ((p_dirent = readdir(p_dir)) != NULL) {
+      if (p_dirent->d_name[0] == '.') {
+        continue;
+      }
+      lstat(p_dirent->d_name, &st);
+      if (S_ISDIR(st.st_mode)) {
+        ret = 1;
+        break;
+      }
+    }
+    closedir(p_dir);
+  }
+  return ret;
+}
+
 // copy with speed limit.
+// it will check the "run/vm" dir, only limits the speed when there is vm running.
 // params: old_fn = old file name
 //         new_fn = new file name
 //         mbps = speed limit (MB/s)
@@ -35,9 +59,12 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
   int buf_size = 1024 * 16;
   char* buf = (char *) malloc(buf_size);
   double sleep_usec = 1;
+  int should_limit_speed = 0;
+
+  int loop_round = 0;
 
   struct timeval begin_time;
-  gettimeofday(&begin_time, NULL);
+  struct timeval end_time;
 
   src = fopen(old_fn, "rb");
   dst = fopen(new_fn, "wb");
@@ -50,25 +77,43 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
     if (cnt <= 0) {
       break;
     }
-    bytes_copied += cnt;
-    if (bytes_copied > mbps * 1024 * 1024) {
-      // sleep only when copied enough data
 
-      struct timeval end_time;
-      long long usec;
-      gettimeofday(&end_time, NULL);
-      usec = (end_time.tv_sec - begin_time.tv_sec) * 1000 * 1000 + (end_time.tv_usec - begin_time.tv_usec);
-      
-      if (bytes_copied < 1.024 * 1.024 * mbps * usec) {
-        // copying too slow
-        sleep_usec /= 1.1;
-      } else {
-        // copying too fast
-        sleep_usec *= 1.1;
+    if (should_limit_speed) {
+      bytes_copied += cnt;
+      if (bytes_copied > mbps * 1024 * 1024) {
+        // sleep only when copied enough data
+
+        long long usec;
+        gettimeofday(&end_time, NULL);
+        usec = (end_time.tv_sec - begin_time.tv_sec) * 1000 * 1000 + (end_time.tv_usec - begin_time.tv_usec);
+        
+        if (bytes_copied < 1.024 * 1.024 * mbps * usec) {
+          // copying too slow
+          sleep_usec /= 1.1;
+        } else {
+          // copying too fast
+          sleep_usec *= 1.1;
+        }
+        usleep((int) sleep_usec);
       }
-      usleep((int) sleep_usec);
+
+      if (loop_round % 100 == 0 && !has_vm_running()) {
+        should_limit_speed = 0;
+        printf("*** no running VM found, speed boost!\n");
+      }
+    } else {
+      // no speed limit
+      // check if need to limit speed, if so, change "should_limit_speed" to 1, and sets the begin_time
+      
+      if (loop_round % 100 == 0 && has_vm_running()) {
+        gettimeofday(&begin_time, NULL);
+        sleep_usec = 1;
+        should_limit_speed = 1;
+        printf("*** running VM found, speed limited!\n");
+      }
     }
     fwrite(buf, sizeof(char), cnt, dst);
+    loop_round++;
   }
   fclose(src);
   fclose(dst);
@@ -185,7 +230,7 @@ void maintain_image_count(char* image_fn) {
       printf("created lock file %s\n", test_fn);
       
       sprintf(test_fn, "%s.pool.%d", image_fn, copy_id);
-      printf("copying %s --> %s with speed limit %d MB/s\n", image_fn, test_fn, g_mbps);
+      printf("copying %s --> %s with speed limit %d MB/s (speed will boost if no VM is running)\n", image_fn, test_fn, g_mbps);
       copy_with_speed_limit(image_fn, test_fn, g_mbps);
 
       // remove lock file
