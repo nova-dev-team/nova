@@ -24,24 +24,46 @@ int g_pool_size = 5;
 
 // return 1 if there is vm running.
 int has_vm_running() {
+  static int last_ret = -1;
+  static struct timeval last_call_time;
+  struct timeval time_now;
+
   DIR* p_dir;
   struct stat st;
   int ret = 0;
+
+  // do real checking at least 2 sec apart
+  if (last_ret != -1) {
+    gettimeofday(&time_now, NULL);
+    if (time_now.tv_sec < last_call_time.tv_sec + 2) {
+      return last_ret;
+    }
+  }
+
+  gettimeofday(&last_call_time, NULL);
+
   p_dir = opendir("../vm");
   if (p_dir != NULL) {
     struct dirent* p_dirent;
     while ((p_dirent = readdir(p_dir)) != NULL) {
-      if (p_dirent->d_name[0] == '.') {
-        continue;
+      char* buffer = (char *) malloc(strlen(p_dirent->d_name) + 20);
+      int should_break = 0;
+      if (p_dirent->d_name[0] != '.') {
+        sprintf(buffer, "../vm/%s", p_dirent->d_name);
+        lstat(buffer, &st);
+        if (S_ISDIR(st.st_mode)) {
+          ret = 1;
+          should_break = 1;
+        }
       }
-      lstat(p_dirent->d_name, &st);
-      if (S_ISDIR(st.st_mode)) {
-        ret = 1;
+      free(buffer);
+      if (should_break) {
         break;
       }
     }
     closedir(p_dir);
   }
+  last_ret = ret;
   return ret;
 }
 
@@ -59,10 +81,7 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
   int buf_size = 1024 * 16;
   char* buf = (char *) malloc(buf_size);
   double sleep_usec = 1;
-  int should_limit_speed = 0;
-
-  int loop_round = 0;
-
+  int should_limit_speed = 1;
   struct timeval begin_time;
   struct timeval end_time;
 
@@ -94,10 +113,14 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
           // copying too fast
           sleep_usec *= 1.1;
         }
+        // limit sleep time to 20ms
+        if (sleep_usec > 1000 * 20) {
+          sleep_usec = 1000 * 20;
+        }
         usleep((int) sleep_usec);
       }
 
-      if (loop_round % 100 == 0 && !has_vm_running()) {
+      if (!has_vm_running()) {
         should_limit_speed = 0;
         printf("*** no running VM found, speed boost!\n");
       }
@@ -105,15 +128,15 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
       // no speed limit
       // check if need to limit speed, if so, change "should_limit_speed" to 1, and sets the begin_time
       
-      if (loop_round % 100 == 0 && has_vm_running()) {
+      if (has_vm_running()) {
         gettimeofday(&begin_time, NULL);
         sleep_usec = 1;
         should_limit_speed = 1;
+        bytes_copied = 0;
         printf("*** running VM found, speed limited!\n");
       }
     }
     fwrite(buf, sizeof(char), cnt, dst);
-    loop_round++;
   }
   fclose(src);
   fclose(dst);

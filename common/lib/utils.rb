@@ -20,6 +20,20 @@ class String
     true
   end
 
+  # Check if the string looks like ip address.
+  #
+  # Since::   0.3
+  def is_ip_addr?
+    return false if (self.count ".") != 3
+    splt = self.split "."
+    return false if splt.length != 4
+    splt.each do |seg|
+      return false if seg == ""
+      return false if seg.to_i.to_s != seg
+    end
+    true
+  end
+
 end
 
 # Define a module which could be displayed as file size.
