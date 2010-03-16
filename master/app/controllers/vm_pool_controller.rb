@@ -6,19 +6,33 @@
 # Since::     0.3
 
 class VmPoolController < ApplicationController
-  
-  before_filter :check_if_enabled
 
   def index
     reply_success "TODO"
   end
 
-private
+  def create
+    reply_success "TODO"
+  end
 
-  def check_if_enabled
-    unless component_enabled? "vm_pool"
-      reply_failure "Sorry, the 'vm_pool' component is not enabled!"
-    end
+  def destroy
+    reply_success "TODO"
+  end
+
+  def edit
+    reply_success "TODO"
+  end
+
+  def request
+    reply_success "TODO"
+  end
+
+  def release
+    reply_success "TODO"
+  end
+
+  def observe
+    reply_success "TODO"
   end
 
 end
