@@ -39,15 +39,20 @@ class Vmachine < ActiveRecord::Base
   def Vmachine.all_domains
     virt_conn = Vmachine.virt_conn
     all_domains = []
-    Vmachine.all.each do |vm_model|
+    
+    Dir.foreach(Setting.vm_root) do |vm_entry|
+      vm_dir_path = File.join Setting.vm_root, vm_entry
+      next if vm_entry.start_with? "."
+      next unless File.directory? vm_dir_path
+
       begin
-        all_domains << virt_conn.lookup_domain_by_uuid(vm_model.uuid)
+        all_domains << virt_conn.lookup_domain_by_name(vm_entry)
       rescue
-        # vmachine not found by libvirt, delete it!
-        Vmachine.delete vm_model
-        next
+        # failed to find the vm, mark it as "destroyed"
+        Vmachine.log vm_entry, "Failed to lookup VM domain with name='#{vm_entry}'"
       end
     end
+
     return all_domains
   end
 
@@ -110,7 +115,7 @@ class Vmachine < ActiveRecord::Base
   def Vmachine.emit_domain_xml params
     nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
     xml_desc = <<XML_DESC
-<domain type='qemu'>
+<domain type='kvm'>
   <name>#{params[:name]}</name>
   <uuid>#{params[:uuid]}</uuid>
   <memory>#{params[:mem_size].to_i * 1024}</memory>
@@ -149,7 +154,7 @@ end
 if params[:run_agent].to_s == "true"
 "    <disk type='file' device='cdrom'>
       <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
-      <target dev='cdrom'/>
+      <target dev='hdc'/>
     </disk>
 "
 elsif params[:cd_image] != nil and params[:cd_image] != ""
@@ -194,6 +199,11 @@ XML_DESC
     Vmachine.open_vm_file(params[:name], "status") do |f|
       f.write "defined"
     end
+    Vmachine.open_vm_file(params[:name], "params") do |f|
+      params.each do |key, value|
+        f.write "#{key}=#{value}\n"
+      end
+    end
     Vmachine.log params[:name], "virtual machine defined"
   end
 
@@ -237,27 +247,38 @@ XML_DESC
     return {:success => true, :message => "vm named '#{params[:name]}' defined, it will be started soon."}
   end
 
-  # non-blocking, most work is delegated to stop_vmachine_worker
-  # TODO make it like a "power-off", hda-image will be saved
-  def Vmachine.stop uuid
-    vm_model = Vmachine.find_by_uuid uuid
-    Vmachine.delete vm_model if vm_model != nil
-    Vmachine.libvirt_action "stop", uuid
+  # Suspend a vmachine. This is a blocking call, but won't take a long time.
+  # You must provide either uuid or name of the VM.
+  #
+  # Since::     0.3
+  def Vmachine.suspend params
+    if params[:uuid] != nil and params[:uuid] != ""
+      Vmachine.libvirt_call_by_uuid "suspend", params[:uuid]
+    elsif params[:name] != nil and params[:name] != ""
+      Vmachine.libvirt_call_by_name "suspend", params[:name]
+    else
+      raise "Please provide either uuid or name!"
+    end
   end
 
-  # blocking method, will not take long time
-  def Vmachine.suspend uuid
-    Vmachine.libvirt_action "suspend", uuid
+  # Resume a vmachine. This is a blocking call, but won't take a long time.
+  # You must provide either uuid or name of the VM.
+  #
+  # Since::     0.3
+  def Vmachine.resume params
+    if params[:uuid] != nil and params[:uuid] != ""
+      Vmachine.libvirt_call_by_uuid "resume", params[:uuid]
+    elsif params[:name] != nil and params[:name] != ""
+      Vmachine.libvirt_call_by_name "resume", params[:name]
+    else
+      raise "Please provide either uuid or name!"
+    end
   end
 
-  # blocking method
-  def Vmachine.resume uuid
-    Vmachine.libvirt_action "resume", uuid
-  end
-
-  # blocking method
   # Destroy a VM domain, either by name or by uuid. Its hda image will not be saved.
   # The clean up work is left for background workers.
+  #
+  # * This is a blocking method!
   #
   # * When both name & uuid is given, we work according to "uuid" value.
   #
@@ -271,8 +292,6 @@ XML_DESC
       rescue
       end
       Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
-      vm_model = Vmachine.find_by_uuid params[:uuid]
-      Vmachine.delete vm_model if vm_model != nil
       return {:success => true, :message => "destroyed vm with uuid #{params[:uuid]}."}
 
     elsif params[:name] != nil and params[:name] != ""
@@ -283,8 +302,6 @@ XML_DESC
       rescue
       end
       Vmachine.libvirt_call_by_name "undefine", params[:name]
-      vm_model = Vmachine.find_by_name params[:name]
-      Vmachine.delete vm_model if vm_model != nil
       return {:success => true, :message => "destroyed vm named '#{params[:name]}'."}
 
     else

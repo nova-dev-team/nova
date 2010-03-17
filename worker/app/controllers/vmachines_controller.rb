@@ -26,13 +26,36 @@ public
       if dom.info.state == Vmachine::LIBVIRT_RUNNING or dom.info.state == Vmachine::LIBVIRT_SUSPENDED
         # only these 2 state has vnc port
         xml_desc = XmlSimple.xml_in dom.xml_desc
-        dom_info["vnc_port"] = xml_desc["device"][0]["graphics"][0]["port"]
+        dom_info["vnc_port"] = xml_desc["devices"][0]["graphics"][0]["port"]
       end
 
+      case dom.info.state
+      when Vmachine::LIBVIRT_RUNNING
+        dom_info["status"] = "Running"
+      when Vmachine::LIBVIRT_SUSPENDED
+        dom_info["status"] = "Suspended"
+      when Vmachine::LIBVIRT_NOT_RUNNING
+        vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+        if vm_daemon_status == "preparing"
+          dom_info["status"] = "Preparing"
+        elsif vm_daemon_status == "saving"
+          dom_info["status"] = "Saving"
+        else
+          dom_info["status"] = "Not running"
+        end
+      else
+        dom_info["status"] = dom.info.state.to_s
+      end
       doms_list << dom_info
     end
 
     reply_success "query successful!", :data => doms_list
+  end
+
+  # Render a observing page, uses VNC.
+  #
+  # Since::     0.3
+  def observe
   end
 
   # Create and then start a domain.

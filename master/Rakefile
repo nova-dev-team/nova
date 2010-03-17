@@ -14,6 +14,8 @@ require "#{File.dirname __FILE__}/../common/lib/utils.rb"
 namespace :nova do
   namespace :master do
 
+    # TODO add storage server controller, or merge it into "master"?
+
     desc "Start Nova master"
     task :start do
       service_port = 3000 # TODO move service_port into common/config

@@ -1,0 +1,31 @@
+<%
+require 'xmlsimple'
+vm_name = params[:uuid]
+%>
+<html>
+<head>
+<title>VNC on <%= vm_name %></title>
+<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
+</head>
+<body>
+<%=
+begin
+  dom = Vmachine.find_domain_by_name vm_name
+  xml_desc = XmlSimple.xml_in dom.xml_desc
+  vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
+  if vnc_port != "-1"
+"
+<applet CODE=VncViewer.class ARCHIVE='/vncviewer.jar' WIDTH=1024 HEIGHT=768>
+  <param name=PORT value=#{vnc_port}>
+  <param name=PASSWORD value='ALL YOUR BASE'>
+</applet>
+"
+  else
+"<font color='red'>Vmachine with name '#{vm_name}' is not ready!</font>"
+  end
+rescue
+"<font color='red'>Vmachine with name '#{vm_name}' not found!</font>"
+end
+%>
+</body>
+</html>

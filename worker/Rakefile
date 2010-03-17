@@ -53,6 +53,10 @@ namespace :nova do
 
     def do_start
       require_root_privilege  # we must run worker as "root", since we will connect to "qemu:///system", which is privileged action
+      my_exec "modprobe kvm_intel"
+
+      # make sure there is network bridge
+      my_exec "./lib/create_br.rb"
 
       conf = read_config
       service_port = conf["worker_port"]

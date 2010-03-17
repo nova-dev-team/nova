@@ -1,1 +1,1 @@
-require "#{RAILS_ROOT}/../common/lib/utils.rb"
+require "#{File.dirname __FILE__}/../../common/lib/utils.rb"

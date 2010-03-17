@@ -32,7 +32,15 @@ LFTP_SCRIPT
 
       puts "Update to storage_server also forwarded to config/storage_server.conf!"
     elsif self.key == "image_pool_size"
-      image_pool_maintainer_conf = File.read "#{RAILS_ROOT}/lib/image_pool_maintainer.conf"
+      begin
+        image_pool_maintainer_conf = File.read "#{RAILS_ROOT}/lib/image_pool_maintainer.conf"
+      rescue
+        # when config file is not ready, just create a new file for it
+        File.open("#{RAILS_ROOT}/lib/image_pool_maintainer.conf", "w") do |f|
+          f.write "pool_size=#{self.value}\n"
+        end
+        retry
+      end
       File.open("#{RAILS_ROOT}/lib/image_pool_maintainer.conf", "w") do |f|
         image_pool_maintainer_conf.each_line do |line|
           line = line.strip

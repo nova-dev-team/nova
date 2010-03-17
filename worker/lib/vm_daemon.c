@@ -13,7 +13,7 @@
 int main(int argc, char* argv[]) {
   if (argc < 3) {
     printf("usage: vm_daemon <storage_server> <vm_dir>\n");
-    printf("depends on ruby, and must run with 'vm_deamon_helper.rb' in same dir!\n");
+    printf("depends on ruby, and must run with 'vm_daemon_helper.rb' in same dir!\n");
     return 1;
   } else {
     char* storage_server = argv[1];
@@ -57,6 +57,10 @@ int main(int argc, char* argv[]) {
     sprintf(cmd, "./vm_daemon_helper.rb %s %s prepare 2>&1 >> %s/raw_exec_output.log", storage_server, vm_dir, vm_dir);
     printf("[cmd] %s\n", cmd);
     system(cmd);
+
+    // after vm booted, we don't do anything for 30 seconds
+    // this is necessary, because libvirt takes some time do boot the vm
+    sleep(30);
 
     sprintf(status_fn, "%s/status", vm_dir);
     for (;;) {

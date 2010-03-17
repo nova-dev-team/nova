@@ -27,7 +27,7 @@ run_root:                       /nova/run
 system_root:                    /nova/system
 
 # the network interface that will be utilized by virtual machines
-vm_network_interface:           eth0
+vm_network_interface:           eth1
 
 # the network bridge used by virtual machines
 # it will be created on installation

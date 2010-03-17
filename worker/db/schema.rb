@@ -20,10 +20,6 @@ ActiveRecord::Schema.define(:version => 20091006045143) do
   end
 
   create_table "vmachines", :force => true do |t|
-    t.string   "name",       :null => false
-    t.string   "uuid",       :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
 end
