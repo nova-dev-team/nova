@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 
-# You might want to change this
+# Run the daemons like this:
+#
+#   RAILS_ENV=production ./script/daemons start
+
 ENV["RAILS_ENV"] ||= "production"
 
 require File.dirname(__FILE__) + "/../../config/environment"
@@ -11,9 +14,6 @@ Signal.trap("TERM") do
 end
 
 while($running) do
-  
-  # Replace this with your code
-  ActiveRecord::Base.logger.info "This daemon is still running at #{Time.now}.\n"
   
   sleep 10
 end

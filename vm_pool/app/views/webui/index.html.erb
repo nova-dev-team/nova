@@ -87,7 +87,7 @@
       html += "<button type='button' class='btn' onclick=''><span><span>Reuse</span></span></button> "
       html += "<button type='button' class='btn' onclick=''><span><span>Delete</span></span></button> "
     when "failure"
-      html += "<button type='button' class='btn' onclick=''><span><span>Reconnect</span></span></button> "
+      html += "<button type='button' class='btn' onclick='reconnect_pmachine(\"#{pm.ip}\")'><span><span>Reconnect</span></span></button> "
     end
 
     html += "</td></tr>\n"

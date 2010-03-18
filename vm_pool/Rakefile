@@ -17,9 +17,9 @@ namespace :nova do
 
     # TODO add storage server controller, or merge it into "master"?
 
-    desc "Start Nova master"
+    desc "Start Nova vm_pool"
     task :start do
-      puts "Starting Nova master..."
+      puts "Starting Nova vm_pool..."
       conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
 
       if conf["master_use_swiftiply"]

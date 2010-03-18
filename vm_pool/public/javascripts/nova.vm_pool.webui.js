@@ -74,7 +74,7 @@ function pm_ajax(url, uuid) {
     type: "POST",
     dataType: "json",
     data: {
-      uuid: uuid
+      ip: uuid
     },
     success: function(result) {
       if (result.success) {
@@ -91,16 +91,20 @@ function pm_ajax(url, uuid) {
 
 function delete_pmachine(ip_addr, uuid) {
   if (confirm("Are you sure to delete pmachine with IP=" + ip_addr + "?")) {
-    vm_ajax("/pmachines/delete.json", ip_addr);
+    pm_ajax("/pmachines/delete.json", ip_addr);
   }
 }
 
 function reuse_pmachine(ip_addr) {
-  vm_ajax("/pmachines/reuse.json", ip_addr);
+  pm_ajax("/pmachines/reuse.json", ip_addr);
 }
 
 function retire_pmachine(ip_addr) {
-  vm_ajax("/pmachines/retire.json", ip_addr);
+  pm_ajax("/pmachines/retire.json", ip_addr);
+}
+
+function reconnect_pmachine(ip_addr) {
+  pm_ajax("/pmachines/reconnect.json", ip_addr);
 }
 
 function change_system_setting(key) {
