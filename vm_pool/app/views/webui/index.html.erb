@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>Nova vm_pool</title>
+
+<link type="text/css" rel="stylesheet" href="/stylesheets/custom_buttons.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
+
+<script type="text/javascript" src="/javascripts/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
+
+</head>
+
+<body>
+
+<h1>Nova vm_pool</h1>
+<%=
+  version_name = ""
+  if File.exists? "#{RAILS_ROOT}/../VERSION"
+    version_name = "version: " + (File.read "#{RAILS_ROOT}/../VERSION") + "<br>"
+  end
+  version_name
+%>
+<hr>
+
+<h2>System settings</h2>
+<div id="sys_settings_panel">
+<%=
+  system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
+  counter = 0
+  (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
+    system_settings_html += "<tr class='row_type_#{counter % 2}' height=30><td>"
+    system_settings_html += setting.key
+    system_settings_html += "</td><td id='sys_setting_holder_#{setting.key}'>"
+    system_settings_html += setting.value
+    if setting.editable
+      system_settings_html += "</td><td><button type='button' class='btn' onclick='change_system_setting(\"#{setting.key}\")'><span><span>Change</span></span></button></td></tr>\n"
+    else
+      system_settings_html += "</td><td>READ ONLY</td></tr>\n"
+    end
+    counter += 1
+  end
+  system_settings_html += "</table>"
+  system_settings_html
+%>
+</div>
+<hr>
+
+This is the "vm_pool" module of the Nova system. <b>Intended for developers only!</b><p>
+&copy;2009-2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
+
+</body>
+</html>
+
