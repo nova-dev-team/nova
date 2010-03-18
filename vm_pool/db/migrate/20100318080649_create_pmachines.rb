@@ -10,6 +10,10 @@ class CreatePmachines < ActiveRecord::Migration
       # the number of VMs constantly running on the pmachine
       t.column :vm_pool_size,   :integer, :default => 4
 
+      # the status of the physical machine.
+      # could be "pending" (connecting), "working", "failure", "retired"
+      t.column :status,         :string, :null => false
+
       t.timestamps
     end
   end

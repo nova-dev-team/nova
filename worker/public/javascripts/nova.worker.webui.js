@@ -217,7 +217,7 @@ function vm_ajax(url, uuid) {
 }
 
 function destroy_vmachine(name, uuid) {
-  if (confirm("Are you sure to destroy vmachine named '" + name + "'")) {
+  if (confirm("Are you sure to destroy vmachine named '" + name + "'?")) {
     vm_ajax("/vmachines/destroy.json", uuid);
   }
 }
@@ -233,8 +233,8 @@ function suspend_vmachine(uuid) {
 function change_system_setting(key) {
   old_value = $("#sys_setting_holder_" + key).html();
   new_value = prompt("Input the new value for key '" + key + "'.", old_value);
-  $("#sys_settings_panel").block();
-  if (new_value && new_value != "") {
+  if (new_value && new_value != "" && new_value != old_value) {
+    $("#sys_settings_panel").block();
     $.ajax({
       url: "/settings/edit.json",
       type: "POST",

@@ -8,6 +8,7 @@
 <script type="text/javascript" src="/javascripts/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
+<script type="text/javascript" src="/javascripts/nova.vm_pool.webui.js"></script>
 
 </head>
 
@@ -23,10 +24,100 @@
 %>
 <hr>
 
+<h2>Pool Overview</h2>
+<li>To start using the system, you have to set the correct "storage_server" value in "System settings" section.</li>
+<li>To delete a pmachine, retire it and wait until no VM hosted on it is being used.</li>
+<br>
+
+<table width="100%">
+<tr>
+<td>Pmachine IP</td><td>Hostname</td><td>Status</td><td>Pool size</td><td>Preparing</td><td>Running</td><td>Using</td><td>Failure</td><td>Actions</td>
+</tr>
+<%=
+  html = ""
+  counter = 0
+  Pmachine.all.each do |pm|
+    html += "<tr class='row_type_#{counter % 2}' height=30>\n"
+    html += "<td>#{pm.ip}</td>"
+    if pm.hostname != nil
+      html += "<td>#{pm.hostname}</td>"
+    else
+      html += "<td><i>(unknown)</i></td>"
+    end
+    if pm.status != "failure"
+      html += "<td>#{pm.status.capitalize}</td>"
+    else
+      html += "<td><font color='red'><b>Failure</b></font></td>"
+    end
+    html += "<td>#{pm.vm_pool_size}</td>"
+    preparing = 0
+    running = 0
+    using = 0
+    failure = 0
+    pm.vmachines.each do |vm|
+      using += 1 if vm.using
+      case vm.status
+      when "preparing"
+        preparing += 1
+      when "running"
+        running += 1
+      when "suspended"  # even if VM suspended, we consider it "capable" of "running"
+        running += 1
+      when "not running"
+        failure += 1
+      else
+        # "unknown", do nothing
+      end
+    end
+    html += "<td>#{preparing}</td><td>#{running}</td><td>#{using}</td>"
+    if failure == 0
+      html += "<td>#{failure}</td>"
+    else
+      html += "<td><font color='red'><b>#{failure}</b></font></td>"
+    end
+
+    # action buttons
+    html += "<td>"
+    html += "<button type='button' class='btn' onclick=''><span><span>Edit pool size</span></span></button> "
+    case pm.status
+    when "working"
+      html += "<button type='button' class='btn' onclick=''><span><span>Toggle detail</span></span></button> "
+      html += "<button type='button' class='btn' onclick=''><span><span>Retire</span></span></button> "
+    when "retired"
+      html += "<button type='button' class='btn' onclick=''><span><span>Reuse</span></span></button> "
+      html += "<button type='button' class='btn' onclick=''><span><span>Delete</span></span></button> "
+    when "failure"
+      html += "<button type='button' class='btn' onclick=''><span><span>Reconnect</span></span></button> "
+    end
+
+    html += "</td></tr>\n"
+    counter += 1
+  end
+  html
+%>
+</table>
+
+<hr>
+
+<div id="add_new_pmachine_div">
+<h2>Add new pmachine</h2>
+<%
+def spacing n = 4
+  "&nbsp;" * n
+end
+%>
+Pmachine IP: <input type='text' size=20 id="new_pm_ip"/><%= spacing 8 %>
+Pool size: <input type="text" size=3 value="<%= Setting.vm_pool_size %>" id="new_pm_pool_size"/> <%= spacing 8 %>
+<button type='button' class='btn' onclick="add_pmachine()"><span><span>Add new pmachine</span></span></button><%= spacing 2 %>Current page will be reloaded when clicked.
+</div>
+<hr>
+
 <h2>System settings</h2>
+<li>Modification on most settings only takes effect on newly booted vmachines.</li>
+<br>
 <div id="sys_settings_panel">
 <%=
-  system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
+  system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Actions</td></tr>\n"
   counter = 0
   (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
     system_settings_html += "<tr class='row_type_#{counter % 2}' height=30><td>"
@@ -46,8 +137,8 @@
 </div>
 <hr>
 
-This is the "vm_pool" module of the Nova system. <b>Intended for developers only!</b><p>
-&copy;2009-2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
+This is the "vm_pool" module of the Nova system. <b>Intended for administrators only!</b><p>
+&copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
 
 </body>
 </html>

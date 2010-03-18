@@ -39,7 +39,8 @@ namespace :nova do
             end
           end
         end
-
+        
+        my_exec "#{File.dirname __FILE__}/scripts/daemon start"
         my_exec "swiftiply_mongrel_rails -n #{conf["master_swiftiply_cluster_size"]} -p #{conf["master_swiftiply_first_port"]} -d"
 
       else

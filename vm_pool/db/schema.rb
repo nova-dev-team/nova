@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(:version => 20100318080649) do
     t.string   "ip",           :limit => 20,                :null => false
     t.string   "hostname",     :limit => 40
     t.integer  "vm_pool_size",               :default => 4
+    t.string   "status",                                    :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -32,6 +33,7 @@ ActiveRecord::Schema.define(:version => 20100318080649) do
     t.integer  "use_count",                 :default => 0,     :null => false
     t.boolean  "using",                     :default => false, :null => false
     t.integer  "pmachine_id"
+    t.string   "status",      :limit => 40
     t.datetime "created_at"
     t.datetime "updated_at"
   end

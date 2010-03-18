@@ -12,7 +12,7 @@ require 'uuidtools'
 
 <link type="text/css" rel="stylesheet" href="/stylesheets/SyntaxHighlighter.css"></link>
 <link type="text/css" rel="stylesheet" href="/stylesheets/custom_buttons.css"></link>
-<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/nova.worker.webui.css"></link>
 
 <script language="javascript" src="/javascripts/shCore.js"></script>
 <script language="javascript" src="/javascripts/shBrushXml.js"></script>
@@ -338,7 +338,7 @@ du -ah <%=h Setting.image_pool_root %>
 <h2>System settings</h2>
 <div id="sys_settings_panel">
 <%=
-  system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Action</td></tr>\n"
+  system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Actions</td></tr>\n"
   counter = 0
   (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
     system_settings_html += "<tr class='row_type_#{counter % 2}' height=30><td>"
