@@ -8,3 +8,78 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 require 'tasks/rails'
+
+require "#{File.dirname __FILE__}/../common/lib/utils.rb"
+require "yaml"
+
+namespace :nova do
+  namespace :vm_pool do
+
+    # TODO add storage server controller, or merge it into "master"?
+
+    desc "Start Nova master"
+    task :start do
+      puts "Starting Nova master..."
+      conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
+
+      if conf["master_use_swiftiply"]
+        # use swiftiply
+
+        # regenerate swiftiply.conf
+        swift = File.read "#{File.dirname __FILE__}/config/swiftiply.conf"
+        my_exec "swiftiply -c config/swiftiply.conf"
+        File.open("#{File.dirname __FILE__}/config/swiftiply.conf", "w") do |f|
+          swift.each_line do |line|
+            if line.start_with? "cluster_port"
+              f.write "cluster_port: #{conf["master_port"]}\n"
+            elsif line.strip.start_with? "outgoing:"
+              f.write "    outgoing: 127.0.0.1:#{conf["master_swiftiply_first_port"]}\n"
+            else
+              f.write line
+            end
+          end
+        end
+
+        my_exec "swiftiply_mongrel_rails -n #{conf["master_swiftiply_cluster_size"]} -p #{conf["master_swiftiply_first_port"]} -d"
+
+      else
+        # don't use swiftiply
+        my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["master_port"]}"
+      end
+    end
+
+    desc "Stop Nova server"
+    task :stop do
+      kill_by_pid_file "#{File.dirname __FILE__}/tmp/pids/server.pid"
+      
+      my_exec "killall swiftiply"
+      my_exec "killall mongrel_rails"
+
+      Dir.foreach("#{File.dirname __FILE__}/log") do |entry|
+        if entry.end_with? ".pid"
+          kill_by_pid_file entry
+        end
+      end
+
+      Dir.foreach("#{File.dirname __FILE__}/tmp/pids") do |entry|
+        if entry.end_with? ".pid"
+          kill_by_pid_file entry
+        end
+      end
+    end
+
+    desc "Initialize system"
+    task :init do
+      puts "Migrating database..."
+      my_exec "rake db:migrate RAILS_ENV=production"
+      my_exec "rake db:migrate RAILS_ENV=development"
+      my_exec "rake db:migrate:reset RAILS_ENV=production"
+      my_exec "rake db:migrate:reset RAILS_ENV=development"
+      puts "Loading data..."
+      my_exec "rake db:fixtures:load RAILS_ENV=production"
+      my_exec "rake db:fixtures:load RAILS_ENV=development"
+    end
+
+  end
+end
+
