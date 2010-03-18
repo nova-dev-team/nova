@@ -32,7 +32,7 @@ while($running) do
             ActiveRecord::Base.logger.info "#{Time.now}: Trying to connect pmachine #{pm.ip}:#{conf["worker_port"]}\n"
             raw_reply = RestClient.get "http://#{pm.ip}:#{conf["worker_port"]}/misc/role.json"
             reply = JSON.parse raw_reply
-            if reply[:success] != true or reply[:message] != "worker"
+            if reply["success"] != true or reply["message"] != "worker"
               pm.status = "failure"
               pm.save
               ActiveRecord::Base.logger.error "#{Time.now}: failure! raw_reply is #{raw_reply}\n"

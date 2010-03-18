@@ -82,9 +82,11 @@
     case pm.status
     when "working"
       html += "<button type='button' class='btn' onclick=''><span><span>Toggle detail</span></span></button> "
-      html += "<button type='button' class='btn' onclick=''><span><span>Retire</span></span></button> "
+      html += "<button type='button' class='btn' onclick='retire_pmachine(\"#{pm.ip}\")'><span><span>Retire</span></span></button> "
     when "retired"
-      html += "<button type='button' class='btn' onclick=''><span><span>Reuse</span></span></button> "
+      html += "<button type='button' class='btn' onclick='reuse_pmachine(\"#{pm.ip}\")'><span><span>Reuse</span></span></button> "
+
+      # TODO delete only when there is no vm being used
       html += "<button type='button' class='btn' onclick=''><span><span>Delete</span></span></button> "
     when "failure"
       html += "<button type='button' class='btn' onclick='reconnect_pmachine(\"#{pm.ip}\")'><span><span>Reconnect</span></span></button> "

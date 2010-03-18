@@ -42,6 +42,18 @@ class PmachinesController < ApplicationController
     reconnect # reuse is basically "reconnect"
   end
 
+  def retire
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm == nil
+      reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    else
+      pm.status = "retired"
+      pm.save
+      reply_success "Pmachine with IP=#{params[:ip]} changed to 'retired' statuus."
+    end
+  end
+
 private
 
   # Check if provided valid ip address.
