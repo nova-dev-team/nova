@@ -21,6 +21,22 @@ class SettingsController < ApplicationController
     reply_model Setting, :items => params[:items]
   end
 
+  # Show the value for a single item.
+  #
+  # Since::     0.3
+  def show
+    if valid_param? params[:key]
+      s = Setting.find_by_key params[:key]
+      if s == nil
+        reply_failure "failed to find setting with name '#{params[:key]}'"
+      else
+        reply_success "query successful!", :value => s.value
+      end
+    else
+      reply_failure "please provide the 'key'!"
+    end
+  end
+
   # Edit a setting value.
   #
   # * params[:key]: key for the item to be edited
