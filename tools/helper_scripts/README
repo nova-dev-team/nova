@@ -1,0 +1,4 @@
+List of helper scripts:
+
+cleanup_ssh_nopass.rb
+  Delete duplicate entries in "authorized_keys" file. It will backup the original file to "authorized_keys~".

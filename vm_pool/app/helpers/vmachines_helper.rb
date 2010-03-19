@@ -1,0 +1,2 @@
+module VmachinesHelper
+end

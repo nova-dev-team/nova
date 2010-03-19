@@ -8,6 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <errno.h>
 
 #include "xmemory.h"
 #include "xutils.h"
@@ -16,10 +17,14 @@
 #include "ftp_fs.h"
 
 // if this is set to 1, then every filesystem operation will be profiled
+#ifndef PROFILE_FTP_FS
 #define PROFILE_FTP_FS 1
+#endif  // PROFILE_FTP_FS
 
 // if this is set to 1, then sendfile() of Linux will be used
+#ifndef USE_LINUX_SENDFILE
 #define USE_LINUX_SENDFILE 1
+#endif  // USE_LINUX_SENDFILE
 
 #if USE_LINUX_SENDFILE == 1
 #include <sys/sendfile.h>
@@ -229,12 +234,34 @@ xsuccess ftp_fs_retr_file(xsocket xsock, const xstr root_jail, const xstr curren
       int out_fd = xsocket_get_socket_fd(xsock);
       off_t off_value = start_pos;
       struct stat st;
-      stat(xstr_get_cstr(jailed_fullpath), &st);
       off_t send_count = st.st_size - off_value;
-      if (send_count < 0) {
-        send_count = 0;
+
+      // note that sendfile() has a limit of 2GB, so if the file is larger than 1G (a smaller value than 2G, just to avoid margin values), we send 1G at a time
+      const int send_limit = 1 * 1024 * 1024 * 1024;  // 1 GB
+      int limited_send_count;
+
+      stat(xstr_get_cstr(jailed_fullpath), &st);
+      while (send_count > 0) {
+        int cnt;
+
+        // limit send count to 1G
+        if (send_count > send_limit) {
+          limited_send_count = send_limit;
+        } else {
+          limited_send_count = send_count;
+        }
+        if ((cnt = sendfile(out_fd, in_fd, &off_value, limited_send_count)) < 0) {
+          int err = errno;
+          xlog_error("sendfile failure, error code %d, reason '%s'. parameters: out_fd=%d, in_fd=%d, off_value=%lld, send_count=%lld", err, strerror(err), out_fd, in_fd, off_value, send_count);
+          xstr_set_cstr(error_msg, "500 server side error\r\n");
+          ret = XFAILURE;
+          break;
+        }
+        if (cnt == 0) {
+          break;
+        }
+        send_count -= cnt;
       }
-      sendfile(out_fd, in_fd, &off_value, send_count);
       close(in_fd);
     }
 #else

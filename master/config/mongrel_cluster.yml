@@ -1,6 +1,0 @@
---- 
-log_file: log/mongrel.log
-port: "3000"
-environment: development
-pid_file: tmp/pids/mongrel.pid
-servers: 10

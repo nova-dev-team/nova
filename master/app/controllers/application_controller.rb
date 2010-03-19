@@ -14,10 +14,6 @@ class ApplicationController < ActionController::Base
 
   include ControllerUtility
 
-  def version
-    render_data :success => true, :message => "Version: 1.0"
-  end
-
 protected
 
 

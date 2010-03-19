@@ -95,7 +95,7 @@ LFTP_SCRIPT
   end
 
   # Return the storage server's address. For version 0.3, it is an FTP site.
-  # The URI should look like: ftp://user:password@somewhere/, the trailing '/' is optional.
+  # The URI should look like: ftp://user:passwd@somewhere.com/, the trailing '/' is optional.
   #
   # Since::   0.3
   def Setting.storage_server

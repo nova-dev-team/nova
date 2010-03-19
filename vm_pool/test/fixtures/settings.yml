@@ -1,0 +1,43 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+#
+# Author::  Santa Zhang (mailto:santa1987@gmail.com)
+# Since::   0.3
+
+# Number of running VMs on each pmachine.
+#
+# Since::   0.3
+vm_pool_size:
+  key:  vm_pool_size
+  value:  4
+
+# After a VM is used for "vm_max_use_count" times, it will be destroyed, and a new, clean VM will be booted.
+#
+# Since::   0.3
+vm_max_use_count:
+  key: vm_max_use_count
+  value:  3
+
+vm_cpu_count:
+  key:  vm_cpu_count
+  value:  1
+
+vm_mem_size:
+  key:  vm_mem_size
+  value:  512
+
+vm_hypervisor:
+  key:  vm_hypervisor
+  value:  kvm
+
+vm_arch:
+  key:  vm_arch
+  value:  i686
+
+vm_hda_image:
+  key:  vm_hda_image
+  value:  vm_pool.qcow2
+
+storage_server:
+  key:  storage_server
+  value:  ftp://user:passwd@somewhere.com/
+

@@ -1,31 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
-#  map.resources :vmachine_infos
-
-#  map.resources :vdisks
-
-#  map.resources :vclusters
-
-  # this is a stupid hack, to make "settings/edit" work good
-#  map.connect 'settings/edit', :controller => 'settings', :action => 'edit'
-#  map.resources :settings
-
-#  map.resources :groups
-
-#  map.resources :vmachines
-
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'
   map.login '/login', :controller => 'sessions', :action => 'new'
-  #map.register '/register', :controller => 'users', :action => 'create'
-  #map.signup '/signup', :controller => 'users', :action => 'new'
-#  map.resources :users
-
-#  map.resource :session
-
   map.home '', :controller => 'app', :action => 'home'
 
-  map.connect 'flexui', :controller => 'app', :action => 'flexui'
-
-  # map.connect 'misc/verification_image.:format', :controller => 'misc', :action => 'verification_image'
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
@@ -67,31 +44,8 @@ ActionController::Routing::Routes.draw do |map|
   # consider removing the them or commenting them out if you're using named routes and resources.
 
   # default routing, also includes the first version of nova api
-  # we have to use :path_prefix, so that the old api does not overshadow newer version api
-  map.connect ':controller/:action/:id', :path_prefix => '/'
-  map.connect ':controller/:action.:format', :path_prefix => '/'
-  map.connect ':controller/:action/:id.:format', :path_prefix => '/'
-
-  # alias for old version api, call them "v1" branch
-#  map.connect ':controller/:action/:id', :path_prefix => '/api/v1'
-#  map.connect ':controller/:action.:format', :path_prefix => '/api/v1'
-#  map.connect ':controller/:action/:id.:format', :path_prefix => '/api/v1'
-
-  # versioned api
-  map.namespace :api do |api|
-
-    api.namespace :v2 do |v2|
-      v2.connect ':controller/:action/:id'
-      v2.connect ':controller/:action.:format'
-      v2.connect ':controller/:action/:id.:format'
-    end
-
-#    api.namespace :v3 do |v3|
-#      v3.connect ':controller/:action/:id'
-#      v3.connect ':controller/:action.:format'
-#      v3.connect ':controller/:action/:id.:format'
-#    end
-  end
-
+  map.connect ':controller/:action/:id'
+  map.connect ':controller/:action.:format'
+  map.connect ':controller/:action/:id.:format'
 
 end

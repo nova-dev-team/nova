@@ -267,7 +267,7 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
         ftp_session_set_data_cmd_cstr(session, inbuf);
         ftp_session_trigger_data_service(session);
       } else {
-        reply(session, "425 use PASV first\r\b");
+        reply(session, "425 use PASV first\r\n");
       }
 
     } else if (xcstr_startwith_cstr(inbuf, "RETR")) {

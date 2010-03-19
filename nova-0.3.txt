@@ -113,3 +113,28 @@ show html page of worker interface
 #
 ##############################################################
 
+master has 2 daemons, called "status_pusher" & "status_poller". When vm are created,
+the settings will be saved into master's DB, and then "pusher" is triggerred.
+The pusher will check master DB, and tries to push vm status to workers. If master DB
+says a vm should be up and running, while they are actually not running, it is pusher's
+job to start the vm, make the "real" status of the vm to be equal to master's "assumed"
+status of the vm.
+
+Poller, on the other hand, is not triggerred frequently. It is automatically called
+every a few minutes, checks workers for their status. It is designed for fault-detecting.
+
+
+vm status
+=========
+The VMs has those statuses:
+
+* pending: the "start" action is in queue, to be carried out by "pusher" (assumed: "starting", real: nil)
+* preparing: the "start" action is carried out by pusher, worker is preparing for it (assumed: "preparing", real: "preparing")
+* installing: the agent is installing the VM (assumed: "installing", real: "running")
+* running: the agent has finished installing the VM
+* paused: the VM is paused
+* destroying:
+
+"pause" & "destroy" action will be carried out immediately. They are blocking call.
+
+

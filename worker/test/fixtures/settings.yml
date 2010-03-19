@@ -1,11 +1,6 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 #
 # Author::  Santa Zhang (mailto:santa1987@gmail.com)
-
-# TODO read values from common/config
-
-# Where is the Nova code stored.
-#
 # Since::   0.3
 
 <%
@@ -13,6 +8,9 @@ require 'yaml'
 conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
 %>
 
+# Where is the Nova code stored.
+#
+# Since::   0.3
 system_root:
   key: system_root
   value: <%= conf["system_root"] %>
