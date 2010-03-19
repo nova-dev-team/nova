@@ -9,6 +9,7 @@ require 'rest_client'
 require 'timeout'
 require 'json'
 require 'uuidtools'
+require 'fileutils'
 
 ENV["RAILS_ENV"] ||= "production"
 
@@ -19,6 +20,21 @@ Signal.trap("TERM") do
   $running = false
 end
 
+def write_log message
+  unless File.exists? "#{RAILS_ROOT}/log"
+    FileUtils.mkdir_p "#{RAILS_ROOT}/log"
+  end
+  File.open("#{RAILS_ROOT}/log/my_log", "a") do |f|
+    message.each_line do |line|
+      if line.end_with? "\n"
+        f.write "#{Time.now}: #{line}"
+      else
+        f.write "#{Time.now}: #{line}\n"
+      end
+    end
+  end
+end
+
 while($running) do
   # connect pending pmachines  
   Pmachine.all.each do |pm|
@@ -26,13 +42,13 @@ while($running) do
       begin
         timeout 5 do
           begin
-            ActiveRecord::Base.logger.info "#{Time.now}: Trying to connect pmachine #{pm.ip}\n"
+            write_log "Trying to connect pmachine #{pm.ip}"
             raw_reply = RestClient.get "#{pm.root_url}/misc/role.json"
             reply = JSON.parse raw_reply
             if reply["success"] != true or reply["message"] != "worker"
               pm.status = "failure"
               pm.save
-              ActiveRecord::Base.logger.error "#{Time.now}: failure! raw_reply is #{raw_reply}\n"
+              write_log "Failed to connect #{pm.ip}, raw reply is '#{raw_reply}'"
             else
               pm.status = "working"
               pm.save
@@ -40,13 +56,13 @@ while($running) do
           rescue
             pm.status = "failure"
             pm.save
-            ActiveRecord::Base.logger.error "#{Time.now}: failure! time out!\n"
+            write_log "Time out connecting #{pm.ip}, raw reply is '#{raw_reply}'"
           end
         end
       rescue => e
         pm.status = "failure"
         pm.save
-        ActiveRecord::Base.logger.error "#{Time.now}: exception #{e.to_s}!\n"
+        write_log "Exception: '#{e.to_s}'"
       end
     end
   end
@@ -65,18 +81,36 @@ while($running) do
 
     # sync info on vm
     begin
-      reply = JSON.parse RestClient.get "#{pm.root_url}/vmachines.json"
-      reply.data do |real_vm|
-        if pm.vmachines.fine_by_uuid real_vm.uuid != nil
+      write_log "Sync VM statuses from #{pm.root_url}/vmachines/index.json"
+      raw_reply = RestClient.get "#{pm.root_url}/vmachines/index.json"
+      reply = JSON.parse raw_reply
+      write_log "Raw reply is: #{raw_reply}"
+      reply["data"].each do |real_vm|
+        write_log "Working on VM with name='#{real_vm["name"]}', uuid=#{real_vm["uuid"]}"
+
+        vm_already_in_db = false
+        vm = nil
+        pm.vmachines.each do |vm_in_db|
+          if vm_in_db.uuid == real_vm["uuid"]
+            vm_already_in_db = true
+            vm = vm_in_db
+            break
+          end
+        end
+
+        if vm_already_in_db
+          write_log "VM '#{real_vm["name"]}' already in DB"
           vm.status = real_vm["status"]
           if real_vm["vnc_port"] != nil
             vm.vnc_port = real_vm["vnc_port"].to_i
           end
+          vm.save
         else
+          write_log "VM '#{real_vm["name"]}' not in DB"
           vm = Vmachine.new
           vm.name = real_vm["name"]
           vm.uuid = real_vm["uuid"]
-          vm.status = real_vm["status"].downcase
+          vm.status = real_vm["status"]
           if real_vm["vnc_port"] != nil
             vm.vnc_port = real_vm["vnc_port"].to_i
           end
@@ -87,32 +121,36 @@ while($running) do
     rescue
     end
 
-    if pm.vmachines.size < pm.pool_size
+    if pm.vmachines.size < pm.vm_pool_size
+      write_log "Increase VM pool size on Pmachine #{pm.ip}"
       # create new vm
       vm = Vmachine.new
+      vm.name = "vmp-#{pm.id}-new"
+      vm.uuid = UUIDTools::UUID.random_create.to_s
       vm.save # for vm.id
       vm.name = "vmp-#{pm.id}-#{vm.id}"
-      vm.uuid = UUIDTools::UUID.random_create.to_s
       vm.status = "preparing"
       pm.vmachines << vm
       vm.save
 
-      reply = JSON.parse RestClient.post "#{pm.root_url}/vmachines/start.json",
-        :arch => Setting.find_by_key("vm_arch").to_i,
-        :cpu_count => Setting.find_by_key("vm_cpu_count").to_i,
-        :hda_image => Setting.find_by_key("vm_hda_image"),
-        :hypervisor => Setting.find_by_key("vm_hypervisor"),
-        :mem_size => Setting.find_by_key("vm_mem_size").to_i,
+      raw_reply = RestClient.post "#{pm.root_url}/vmachines/start.json",
+        :arch => Setting.find_by_key("vm_arch").value,
+        :cpu_count => Setting.find_by_key("vm_cpu_count").value.to_i,
+        :hda_image => Setting.find_by_key("vm_hda_image").value,
+        :hypervisor => Setting.find_by_key("vm_hypervisor").value,
+        :mem_size => Setting.find_by_key("vm_mem_size").value.to_i,
         :run_agent => false,
         :uuid => vm.uuid,
         :name => vm.name
 
-      unless replay["success"]
+      reply = JSON.parse raw_reply
+      write_log "Reply from worker: #{reply}"
+      unless reply["success"]
         vm.status = "failure"
         vm.save
       end
 
-    elsif pm.vmachines.size > pm.pool_size
+    elsif pm.vmachines.size > pm.vm_pool_size
       # stop unused vm
     end
   end

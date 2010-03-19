@@ -56,7 +56,7 @@
     failure = 0
     pm.vmachines.each do |vm|
       using += 1 if vm.using
-      case vm.status
+      case vm.status.downcase
       when "preparing"
         preparing += 1
       when "running"

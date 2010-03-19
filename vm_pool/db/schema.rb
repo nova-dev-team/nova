@@ -29,7 +29,9 @@ ActiveRecord::Schema.define(:version => 20100318080649) do
   end
 
   create_table "vmachines", :force => true do |t|
+    t.string   "name"
     t.string   "uuid",        :limit => 40,                    :null => false
+    t.integer  "vnc_port"
     t.integer  "use_count",                 :default => 0,     :null => false
     t.boolean  "using",                     :default => false, :null => false
     t.integer  "pmachine_id"
