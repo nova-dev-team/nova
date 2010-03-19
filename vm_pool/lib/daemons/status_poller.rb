@@ -85,6 +85,23 @@ while($running) do
       raw_reply = RestClient.get "#{pm.root_url}/vmachines/index.json"
       reply = JSON.parse raw_reply
       write_log "Raw reply is: #{raw_reply}"
+
+      # remove VMs that are not runing any more
+      pm.vmachines.each do |vm|
+        vm_found = false
+        reply["data"].each do |real_vm|
+          if real_vm["uuid"] == vm.uuid
+            vm_found = true
+            break
+          end
+        end
+        unless vm_found
+          write_log "VM '#{vm.name}' is not running any more!"
+          Vmachine.delete vm
+        end
+      end
+
+      # get status of actuall running VMs
       reply["data"].each do |real_vm|
         write_log "Working on VM with name='#{real_vm["name"]}', uuid=#{real_vm["uuid"]}"
 
