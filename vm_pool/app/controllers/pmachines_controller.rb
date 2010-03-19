@@ -54,6 +54,17 @@ class PmachinesController < ApplicationController
     end
   end
 
+  def delete
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm == nil
+      reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    else
+      Pmachine.delete pm
+      reply_success "Pmachine with IP=#{params[:ip]} deleted."
+    end
+  end
+
 private
 
   # Check if provided valid ip address.

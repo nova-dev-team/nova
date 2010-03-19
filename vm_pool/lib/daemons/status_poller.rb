@@ -8,7 +8,6 @@ require 'rubygems'
 require 'rest_client'
 require 'timeout'
 require 'json'
-require 'yaml'
 
 ENV["RAILS_ENV"] ||= "production"
 
@@ -20,17 +19,14 @@ Signal.trap("TERM") do
 end
 
 while($running) do
-
-  conf = YAML::load File.read "#{File.dirname __FILE__}/../../../common/config/conf.yml"
-
   # connect pending pmachines  
   Pmachine.all.each do |pm|
     if pm.status == "pending"
       begin
         timeout 5 do
           begin
-            ActiveRecord::Base.logger.info "#{Time.now}: Trying to connect pmachine #{pm.ip}:#{conf["worker_port"]}\n"
-            raw_reply = RestClient.get "http://#{pm.ip}:#{conf["worker_port"]}/misc/role.json"
+            ActiveRecord::Base.logger.info "#{Time.now}: Trying to connect pmachine #{pm.ip}\n"
+            raw_reply = RestClient.get "#{pm.root_url}/misc/role.json"
             reply = JSON.parse raw_reply
             if reply["success"] != true or reply["message"] != "worker"
               pm.status = "failure"
@@ -53,6 +49,28 @@ while($running) do
       end
     end
   end
+
+  # connect all working vmachines
+  Pmachine.find(:all, :conditions =>'status = "working"').each do |pm|
+    begin
+      # sync the settings for "storage_server"
+      reply = JSON.parse RestClient.get "#{pm.root_url}/settings/show.json?key=storage_server"
+      if reply["value"] != Setting.storage_server
+        RestClient.post "#{pm.root_url}/settings/edit", :key => "storage_server", :value => Setting.storage_server
+      end
+    rescue
+    end
+
+    if pm.vmachines.size < pm.pool_size
+      # create new vm
+    elsif pm.vmachines.size > pm.pool_size
+      # stop unused vm
+    end
+
+    # TODO poll vmachine status
+
+  end
   
   sleep 10
 end
+

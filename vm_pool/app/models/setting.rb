@@ -14,7 +14,7 @@ class Setting < ActiveRecord::Base
   @@STORAGE_SERVER = nil
   def Setting.storage_server
     return @@STORAGE_SERVER if @@STORAGE_SERVER
-    @@STORAGE_SERVER = (Setting.find_by_key "storage_server").value.to_i
+    @@STORAGE_SERVER = (Setting.find_by_key "storage_server").value
   end
 
 end

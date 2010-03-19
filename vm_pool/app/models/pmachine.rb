@@ -3,6 +3,8 @@
 # Author::  Santa Zhang (mailto:santa1987@gmail.com)
 # Sinc::    0.3
 
+require 'yaml'
+
 class Pmachine < ActiveRecord::Base
 
   has_many :vmachines
@@ -26,6 +28,12 @@ class Pmachine < ActiveRecord::Base
 
   # Unmark a pmachine from "retired" status, change it to "pending" status
   def reuse
+  end
+
+
+  def root_url
+    conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+    return "http://#{self.ip}:#{conf["worker_port"]}"
   end
 
 end
