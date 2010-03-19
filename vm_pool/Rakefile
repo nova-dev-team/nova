@@ -17,14 +17,21 @@ namespace :nova do
 
     # TODO add storage server controller, or merge it into "master"?
 
+    def all_daemons action
+      Dir["#{File.dirname __FILE__}/lib/daemons/*_ctl"].each do |f|
+        my_exec "#{f} #{action}"
+      end
+    end
+
     desc "Start Nova vm_pool"
     task :start do
       puts "Starting Nova vm_pool..."
-      conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
+      # boot the daemons
+      all_daemons "start"
 
+      conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
       if conf["master_use_swiftiply"]
         # use swiftiply
-
         # regenerate swiftiply.conf
         swift = File.read "#{File.dirname __FILE__}/config/swiftiply.conf"
         my_exec "swiftiply -c config/swiftiply.conf"
@@ -39,10 +46,7 @@ namespace :nova do
             end
           end
         end
-        
-        my_exec "#{File.dirname __FILE__}/scripts/daemon start"
         my_exec "swiftiply_mongrel_rails -n #{conf["master_swiftiply_cluster_size"]} -p #{conf["master_swiftiply_first_port"]} -d"
-
       else
         # don't use swiftiply
         my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["master_port"]}"
@@ -51,6 +55,8 @@ namespace :nova do
 
     desc "Stop Nova server"
     task :stop do
+      all_daemons "stop"
+      
       kill_by_pid_file "#{File.dirname __FILE__}/tmp/pids/server.pid"
       
       my_exec "killall swiftiply"

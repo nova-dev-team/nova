@@ -27,7 +27,7 @@ while($running) do
   Pmachine.all.each do |pm|
     if pm.status == "pending"
       begin
-        timeout 30 do
+        timeout 5 do
           begin
             ActiveRecord::Base.logger.info "#{Time.now}: Trying to connect pmachine #{pm.ip}:#{conf["worker_port"]}\n"
             raw_reply = RestClient.get "http://#{pm.ip}:#{conf["worker_port"]}/misc/role.json"
