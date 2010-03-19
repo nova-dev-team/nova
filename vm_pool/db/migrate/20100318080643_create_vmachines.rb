@@ -1,7 +1,9 @@
 class CreateVmachines < ActiveRecord::Migration
   def self.up
     create_table :vmachines do |t|
+      t.column :name,           :string
       t.column :uuid,           :string, :limit => 40, :null => false
+      t.column :vnc_port,       :integer
       
       # How many times has the VM been used?
       t.column :use_count,      :integer, :default => 0, :null => false
