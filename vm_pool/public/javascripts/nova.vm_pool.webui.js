@@ -136,3 +136,85 @@ function change_system_setting(key) {
   }
 }
 
+function port_mapping_del(ip, port) {
+  $("#port_mapping_div").block();
+  $.ajax({
+    url: "/misc/del_port_mapping.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: ip,
+      port: port,
+    },
+    success: function(result) {
+      $("#port_mapping_div").unblock();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      $("#port_mapping_div").unblock();
+      alert("Request failed!");
+    }
+  });
+}
+
+function port_mapping_add() {
+  var local_port = $("#port_mapping_local_port").val();
+  var dest_port = $("#port_mapping_dest_port").val();
+  var dest_ip = $("#port_mapping_dest_ip").val();
+  var mapping_timeout = $("#port_mapping_timeout").val();
+
+  if (mapping_timeout == null || mapping_timeout == "") {
+    mapping_timeout = "0";
+  }
+
+  // check if params are valid
+  num_regex = /^[0-9]+$/;
+  if (num_regex.test(local_port) == false) {
+    alert("Invalid proxy port!");
+    return;
+  }
+  if (num_regex.test(dest_port) == false) {
+    alert("Invalid destination port!");
+    return;
+  }
+  if (num_regex.test(mapping_timeout) == false) {
+    alert("Invalid timeout!");
+    return;
+  }
+  if (is_valid_ip(dest_ip) == false) {
+    alert("Invalid destination IP!");
+    return;
+  }
+
+
+  $("#port_mapping_div").block();
+  $.ajax({
+    url: "/misc/add_port_mapping.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      local_port: local_port,
+      ip: dest_ip,
+      port: dest_port,
+      timeout: mapping_timeout
+    },
+    success: function(result) {
+      $("#port_mapping_div").unblock();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      $("#port_mapping_div").unblock();
+      alert("Request failed!");
+    }
+  });
+
+}
+

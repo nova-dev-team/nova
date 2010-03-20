@@ -126,6 +126,44 @@ Pool size: <input type="text" size=3 value="<%= Setting.vm_pool_size %>" id="new
 </div>
 <hr>
 
+<h2>Port mappings</h2>
+<div id="port_mapping_div">
+Proxy port: <input type="text" size=5 id="port_mapping_local_port"/><%= spacing 4 %>Destination IP: <input type="text" size=20 id="port_mapping_dest_ip"/><%= spacing 4 %>
+Destination port: <input type="text" size=5 id="port_mapping_dest_port"/><%= spacing 4 %>Timeout (optional): <input type="text" size=4 id="port_mapping_timeout"> minutes<%= spacing 4 %>
+<button type="button" class='btn' onclick="port_mapping_add()"><span><span>Add new mapping</span></span></button>
+<p>
+<table width="100%">
+<tr><td>Proxy port</td><td>Destination IP</td><td>Destination port</td><td>Action</td></tr>
+<%=
+  html = ""
+  counter = 0
+  Dir.foreach("#{RAILS_ROOT}/log") do |entry|
+    next unless entry =~ /\.pid$/
+    pid = File.read("#{RAILS_ROOT}/log/#{entry}").to_i
+    begin
+      Process.kill 0, pid
+    rescue
+      next
+    end
+    main_fn = entry[0..-5]
+    next unless main_fn =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+_[0-9]+$/
+    port_fn = File.join "#{RAILS_ROOT}/log/#{main_fn}.local_port"
+    if File.exists? port_fn
+      html += "<tr height=30 class='row_type_#{counter % 2}'><td>#{File.read(port_fn)}</td><td>#{main_fn.split("_")[0]}</td><td>#{main_fn.split("_")[1]}</td><td>"
+      html += "<button type='button' class='btn' onclick=\"port_mapping_del('#{main_fn.split("_")[0]}', '#{main_fn.split("_")[1]}')\"><span><span>Delete</span></span></button>"
+      html += "</td></tr>"
+    else
+      # kill broken mappings
+      kill_by_pid_file "#{RAILS_ROOT}/log/#{entry}"
+    end
+    counter += 1
+  end
+  html
+%>
+</table>
+</div>
+<hr>
+
 <h2>System settings</h2>
 <li>Modification on most settings only takes effect on newly booted vmachines.</li>
 <br>

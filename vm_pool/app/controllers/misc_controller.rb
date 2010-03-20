@@ -21,6 +21,25 @@ class MiscController < ApplicationController
   # Since::     0.3
   def add_port_mapping
     return unless valid_ip_and_port_param?
+
+    timeout = nil
+    if valid_param? params[:timeout]
+      if params[:timeout].to_i.to_s != params[:timeout]
+        reply_failure "Please provide a valid 'timeout'!"
+        return
+      end
+      timeout = params[:timeout]
+    end
+
+    local_port = nil
+    if valid_param? params[:local_port]
+      if params[:local_port].to_i.to_s != params[:local_port]
+        reply_failure "Please provide a valid 'local_port'!"
+        return
+      end
+      local_port = params[:local_port].to_i
+    end
+
     fwd_addr = "#{params[:ip]}:#{params["port"]}"
     # check if already has got a port forwarding
     port_file = "#{RAILS_ROOT}/log/#{fwd_addr.gsub ":", "_"}.local_port"
@@ -28,11 +47,15 @@ class MiscController < ApplicationController
       local_port = File.read(port_file).to_i
       FileUtils.touch port_file  # mark the file new, so that the daemon will not time out
     else
-      local_port = 12000 + rand(36000)  # random port
-      if valid_param? params[:timeout] and params[:timeout].to_i.to_s == params[:timeout]
-        timeout = params[:timeout].to_i
-      else
-        timeout = 0 # forever working
+      if local_port == nil
+        local_port = 12000 + rand(36000)  # random port
+      end
+      if timeout == nil
+        if valid_param? params[:timeout] and params[:timeout].to_i.to_s == params[:timeout]
+          timeout = params[:timeout].to_i
+        else
+          timeout = 0 # forever working
+        end
       end
       my_exec "#{RAILS_ROOT}/lib/port_fwd_daemon #{timeout} #{local_port} #{fwd_addr} #{RAILS_ROOT}/log #{RAILS_ROOT}/../tools/server_side/bin/port_mapper"
     end
