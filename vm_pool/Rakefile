@@ -85,6 +85,7 @@ namespace :nova do
       puts "Loading data..."
       my_exec "rake db:fixtures:load RAILS_ENV=production"
       my_exec "rake db:fixtures:load RAILS_ENV=development"
+      my_exec "cd lib && make"
     end
 
   end
