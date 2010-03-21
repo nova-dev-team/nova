@@ -8,6 +8,7 @@
 #include <sys/un.h>
 #include <pthread.h>
 #include <errno.h>
+#include <signal.h>
 
 #include "xstr.h"
 #include "xnet.h"
@@ -537,6 +538,7 @@ int main(int argc, char* argv[]) {
   int i;
   char* sock_fn = NULL;  // optional socket file name, if it is set to NULL, the socket filename will be automatically determined
   xbool ask_for_help = XFALSE;
+  char* pid_fn = NULL;
 
   for (i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
@@ -545,10 +547,11 @@ int main(int argc, char* argv[]) {
   }
 
   if (ask_for_help) {
-    printf("usage: vnc_proxy [-b bind_addr] [-p bind_port] [-s socket_file]\n");
+    printf("usage: vnc_proxy [-b bind_addr] [-p bind_port] [-s socket_file] [-pf pid_file]\n");
     printf("       bind_addr is default to 0.0.0.0\n");
     printf("       bind_port is default to 5900\n");
     printf("       socket_file is optional\n");
+    printf("       if '-p' given, the process will work as a daemon.\n");
     printf("\n");
     printf("You need to use vnc_proxy_ctl to change proxy settings\n");
     exit(0);
@@ -587,17 +590,55 @@ int main(int argc, char* argv[]) {
         printf("error in cmdline args: '-s' must be followed by socket file name!\n");
         exit(1);
       }
+    } else if (strcmp(argv[i], "-pf") == 0) {
+      if (i + 1 < argc) {
+        pid_fn = argv[i + 1];
+      } else {
+        printf("error in cmdline args: '-pf' must be followed by pid file path!\n");
+        exit(1);
+      }
     }
   }
 
   printf("If you need help, use: 'vnc_proxy -h' or 'vnc_proxy --help'\n");
 
-  // TODO prepare the vnc mapping hash table
-  vnc_mapping = xvec_new(vnc_mapping_free);
+  if (pid_fn == NULL) {
+    // prepare the vnc mapping hash table
+    vnc_mapping = xvec_new(vnc_mapping_free);
 
-  // ipc server is started in a new thread
-  start_ipc_server(port, sock_fn);
+    // ipc server is started in a new thread
+    start_ipc_server(port, sock_fn);
 
-  return start_vnc_proxy_server(bind_addr, port);
+    return start_vnc_proxy_server(bind_addr, port);
+  } else {
+    int pid;
+    // prevent zombies
+    signal(SIGCHLD, SIG_IGN);
+
+    pid = fork();
+    if (pid == 0) {
+      // child process, do work
+
+      // write pid file
+      FILE *fp = fopen(pid_fn, "w");
+      if (fp == NULL) {
+        printf("error: failed to open pid file '%s'!\n", pid_fn);
+        exit(1);
+      }
+      fprintf(fp, "%d", getpid());
+      fclose(fp);
+
+      // prepare the vnc mapping hash table
+      vnc_mapping = xvec_new(vnc_mapping_free);
+
+      // ipc server is started in a new thread
+      start_ipc_server(port, sock_fn);
+
+      return start_vnc_proxy_server(bind_addr, port);
+    } else {
+      // parent process, end here
+      return 0;
+    }
+  }
 }
 

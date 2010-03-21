@@ -14,6 +14,6 @@ Signal.trap("TERM") do
 end
 
 while($running) do
-  
+  # pusher does nothing, hiahiahia~  
   sleep 10
 end
