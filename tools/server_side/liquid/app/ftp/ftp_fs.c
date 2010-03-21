@@ -251,8 +251,6 @@ xsuccess ftp_fs_retr_file(xsocket xsock, const xstr root_jail, const xstr curren
           limited_send_count = send_count;
         }
         if ((cnt = sendfile(out_fd, in_fd, &off_value, limited_send_count)) < 0) {
-          int err = errno;
-          xlog_error("sendfile failure, error code %d, reason '%s'. parameters: out_fd=%d, in_fd=%d, off_value=%lld, send_count=%lld", err, strerror(err), out_fd, in_fd, off_value, send_count);
           xstr_set_cstr(error_msg, "500 server side error\r\n");
           ret = XFAILURE;
           break;
