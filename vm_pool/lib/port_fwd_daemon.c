@@ -71,47 +71,46 @@ int main(int argc, char* argv[]) {
     // parent process, exit now
     exit(0);
   } else {
+    pid = fork();
+    if (pid == 0) {
+      // child, run port forewarder
+      execl(path_to_port_mapper, path_to_port_mapper, "-p", local_port, "-d", fwd_addr, (char *) NULL);
+    } else {
+      // parent, monitors the running status of child process
 
-  pid = fork();
-  if (pid == 0) {
-    // child, run port forewarder
-    execl(path_to_port_mapper, path_to_port_mapper, "-p", local_port, "-d", fwd_addr, (char *) NULL);
-  } else {
-    // parent, monitors the running status of child process
+      FILE *fp;
+      // write pid file & port file
+      to_fn(fwd_addr);
+      sprintf(fpath, "%s/%s.pid", log_folder, fwd_addr);
+      fp = fopen(fpath, "w");
+      fprintf(fp, "%d", pid);
+      fclose(fp);
+      sprintf(fpath, "%s/%s.local_port", log_folder, fwd_addr);
+      fp = fopen(fpath, "w");
+      fprintf(fp, "%s", local_port);
+      fclose(fp);
 
-    FILE *fp;
-    // write pid file & port file
-    to_fn(fwd_addr);
-    sprintf(fpath, "%s/%s.pid", log_folder, fwd_addr);
-    fp = fopen(fpath, "w");
-    fprintf(fp, "%d", pid);
-    fclose(fp);
-    sprintf(fpath, "%s/%s.local_port", log_folder, fwd_addr);
-    fp = fopen(fpath, "w");
-    fprintf(fp, "%s", local_port);
-    fclose(fp);
-
-    // polling the port file
-    for(;;) {
-      struct stat st;
-      int now = time(NULL);
-      if (lstat(fpath, &st) != 0 || kill(pid, 0) != 0) {
-        break;
+      // polling the port file
+      for(;;) {
+        struct stat st;
+        int now = time(NULL);
+        if (lstat(fpath, &st) != 0 || kill(pid, 0) != 0) {
+          break;
+        }
+        if (timeout_minutes != 0 && now - st.st_mtime > 60 * timeout_minutes) {
+          break;
+        }
+        sleep(10);
       }
-      if (timeout_minutes != 0 && now - st.st_mtime > 60 * timeout_minutes) {
-        break;
-      }
+
+      // clean up the log files
+      sprintf(fpath, "%s/%s.pid", log_folder, fwd_addr);
+      remove(fpath);
+      sprintf(fpath, "%s/%s.local_port", log_folder, fwd_addr);
+      remove(fpath);
       sleep(10);
+      kill(pid, 9);
     }
-
-    // clean up the log files
-    sprintf(fpath, "%s/%s.pid", log_folder, fwd_addr);
-    remove(fpath);
-    sprintf(fpath, "%s/%s.local_port", log_folder, fwd_addr);
-    remove(fpath);
-    sleep(10);
-    kill(pid, 9);
-  }
   }
   return 0;
 }
