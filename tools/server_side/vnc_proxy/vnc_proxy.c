@@ -424,12 +424,15 @@ static void* ipc_server(void* arg) {
       pthread_mutex_lock(&vnc_mapping_mutex);
 
       if (xcstr_startwith_cstr(buf, "add") == XTRUE) {
+        xsuccess success = XSUCCESS;
         xstr reply_msg = xstr_new();
         xstr_set_cstr(reply_msg, "success\r\n");
 
         if (xstr_len(new_mapping->new_passwd) == 0) {
           xstr_set_cstr(reply_msg, "new password not given, this proxy mapping will be ignored!\r\n");
-          xlog_warning("%s", xstr_get_cstr(reply_msg));
+          xlog_error("%s", xstr_get_cstr(reply_msg));
+          xstr_set_cstr(reply_msg, "failure\r\n");
+          success = XFAILURE;
         } else {
           // warn if there is alread a mapping with same new passwd (first 8 bytes)
           for (i = 0; i < xvec_size(vnc_mapping); i++) {
@@ -443,12 +446,17 @@ static void* ipc_server(void* arg) {
               }
             }
             if (new_pwd[j] == existing_pwd[j] && new_pwd[j] == '\0') {
-              xstr_set_cstr(reply_msg, "same passwd (first 8 bytes) already exists!\r\n");
-              xlog_warning("%s", xstr_get_cstr(reply_msg));
+              xstr_set_cstr(reply_msg, "same passwd (first 8 bytes) already exists! just ignore!\r\n");
+              xlog_error("%s", xstr_get_cstr(reply_msg));
+              xstr_set_cstr(reply_msg, "failure\r\n");
+              success = XFAILURE;
+              break;
             }
           }
         }
-        xvec_push_back(vnc_mapping, new_mapping);
+        if (success == XSUCCESS) {
+          xvec_push_back(vnc_mapping, new_mapping);
+        }
         send(client_sockfd, xstr_get_cstr(reply_msg), xstr_len(reply_msg) + 1, 0);
         xstr_delete(reply_msg);
       } else if (xcstr_startwith_cstr(buf, "del.dest") == XTRUE) {
