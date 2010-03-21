@@ -51,6 +51,9 @@ namespace :nova do
         # don't use swiftiply
         my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["master_port"]}"
       end
+
+      # start vnc_proxy
+      my_exec "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy -p #{conf["vm_vnc_port"]} -s #{RAILS_ROOT}/log/vnc_proxy.sock -pf #{RAILS_ROOT}/log/vnc_proxy.pid"
     end
 
     desc "Stop Nova server"
@@ -61,6 +64,7 @@ namespace :nova do
       
       my_exec "killall swiftiply"
       my_exec "killall mongrel_rails"
+      my_exec "killall vnc_proxy"
 
       Dir.foreach("#{File.dirname __FILE__}/log") do |entry|
         if entry.end_with? ".pid"

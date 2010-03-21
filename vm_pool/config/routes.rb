@@ -41,6 +41,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.home '', :controller => "webui", :action => "index"
 
+  map.connect 'observe/:id', :controller => "vmachines", :action => "observe"
+
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action.:format'
   map.connect ':controller/:action/:id.:format'
