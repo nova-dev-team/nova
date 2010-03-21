@@ -118,14 +118,38 @@ class MiscController < ApplicationController
   #
   # Since::     0.3
   def acquire
-    reply_failure "TODO"
+    Vmachine.all.each do |vm|
+      if vm.using == false
+        vm.using = true
+        vm.save
+        reply_success "successfully acquired VM", :name => vm.name
+        return
+      end
+    end
+    reply_failure "failed to acquire new VM"
   end
 
   # Release an acquired VM back into the pool.
   #
   # Since::     0.3
   def release
-    reply_failure "TODO"
+    unless valid_param? params[:name]
+      reply_failure "Please provide the 'name' parameter!"
+      return
+    end
+    vm = Vmachine.find_by_name params[:name]
+    if vm == nil
+      reply_failure "VM with name '#{vm.name}' not found!"
+      return
+    end
+    if vm.using == false
+      reply_failure "VM '#{vm.name}' is not being used!"
+      return
+    end
+    vm.using = false
+    vm.use_count += 1
+    vm.save
+    reply_success "VM '#{vm.name}' released, current use_count = #{vm.use_count}"
   end
 
 private
