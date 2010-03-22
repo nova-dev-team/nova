@@ -11,6 +11,7 @@ require 'tasks/rails'
 
 require "#{File.dirname __FILE__}/../common/lib/utils.rb"
 require "yaml"
+require "fileutils"
 
 namespace :nova do
   namespace :vm_pool do
@@ -26,6 +27,9 @@ namespace :nova do
     desc "Start Nova vm_pool"
     task :start do
       puts "Starting Nova vm_pool..."
+      unless File.exists? "#{File.dirname __FILE__}/log"
+        FileUtils.mkdir_p "#{File.dirname __FILE__}/log"
+      end
       # boot the daemons
       all_daemons "start"
 

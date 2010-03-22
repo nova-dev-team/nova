@@ -1,4 +1,10 @@
+build-essential
 irb
+libvirt0
+libvirt-bin
+libvirt-dev
+libvirt-ruby
+mongrel
 rails
 ruby
 ruby-dev
