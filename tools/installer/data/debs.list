@@ -1,5 +1,6 @@
 build-essential
 irb
+lftp
 libvirt0
 libvirt-bin
 libvirt-dev
