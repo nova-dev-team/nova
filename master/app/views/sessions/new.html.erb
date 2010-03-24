@@ -7,14 +7,13 @@
 <link href="/stylesheets/jquery.notice.css" rel="stylesheet" type="text/css" />
 <link href="/stylesheets/thickbox.css" rel="stylesheet" type="text/css" />
 
-<script type="text/javascript" src="/javascripts/jquery-1.3.2.js"> </script>
+<script type="text/javascript" src="/javascripts/jquery-1.4.2.min.js"> </script>
 <script type="text/javascript" src="/javascripts/jquery.blockUI.js"> </script>
 <script type="text/javascript" src="/javascripts/jquery.notice.js"> </script>
 <script type="text/javascript" src="/javascripts/thickbox-compressed.js"> </script>
 <script type="text/javascript" src="/javascripts/iphone_checkbox.jquery.js"> </script>
 
 <style type="text/css" media="screen">
-
 /*
   IE png fix
 */
@@ -101,13 +100,25 @@ html>body #page {
   background-color: #ff4444;
 }
 
+.message_title {
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
+}
+
+.message_body {
+  font-family: "Lucida Grande", "Bitstream Vera Sans", "Verdana";
+  font-size: 11px;
+  color: white;
+}
+
 </style>
 <script type="text/javascript">
 
 function do_message(type, title, msg) {
-  // TODO different color on different msg type
   jQuery.noticeAdd({
-    text: "<b>" + title + "</b><br>" + msg
+    text: "<table><tr><td rowspan='2' valign='top'><img src='/images/" + type + ".png'></td><td class='message_title'>" + title + "</td></tr><tr><td class='message_body'>" + msg + "</td></tr></table>"
   });
 }
 
@@ -117,13 +128,12 @@ function do_login() {
   
   if (login_field.hasClass("wait_for_input")) {
     login_field.addClass("wrong_input");
-    do_message("error", "Not enough information", "Please provide your user ID!");
+    do_message("failure", "Not enough information", "Please provide your user ID!");
     return;
   }
-  
   if (password_field.hasClass("wait_for_input")) {
     password_field.addClass("wrong_input");
-    do_message("error", "Not enough information", "Please provide your password!");
+    do_message("failure", "Not enough information", "Please provide your password!");
     return;
   }
 
@@ -139,11 +149,11 @@ function do_login() {
       if (result.success) {
         window.location = '/';
       } else {
-        do_message("error", "Login failed", result.message);
+        do_message("failure", "Login failed", result.message);
       }
     },
     failure: function() {
-      do_message("error", "Connection failed", "Please check your network connection!");
+      do_message("failure", "Connection failed", "Please check your network connection!");
     }
   });
 }
@@ -185,7 +195,6 @@ function do_layout() {
   if (left_origin < 0 || top_origin < 0) {
     left_origin = Math.max(0, left_origin);
     top_origin = Math.max(0, top_origin);
-    // TODO show scrollbars
   }
   
   if (_resizing_fix_090630) {
@@ -213,31 +222,34 @@ function do_layout() {
   }
 }
 
-function decorate_field(field, default_text, default_class) {
-  field.val(default_text);
-  field.addClass(default_class);
-  
-  field.focus(function() {
-    if (field.hasClass(default_class)) {
-      field.val(""); // clear default data, wait for user's input
-    }
-  });
+function decorate_fields(fields, default_text, default_class) {
+  $.each(fields, function(idx, field) {
+    field.val(default_text);
+    field.addClass(default_class);
 
-  field.keypress(function(e) {
-    if (field.val() != "" || e.charCode != 0) {
-      field.removeClass(default_class);
-      field.removeClass("wrong_input");
-    }
-  });
+    field.focus(function() {
+      if (field.hasClass(default_class)) {
+        field.val(""); // clear default data, wait for user's input
+      }
+    });
 
-  // on lost focus, check if has user input
-  field.blur(function() {
-    if (field.val() == "") {
-      field.val(default_text);
-      field.addClass(default_class);
-    }
-  });
+    field.keypress(function(e) {
+      if (field.val() != "" || e.charCode != 0) {
+        $.each(fields, function(idx2, field2) {
+          field2.removeClass(default_class);
+          field2.removeClass("wrong_input");
+        });
+      }
+    });
 
+    // on lost focus, check if has user input
+    field.blur(function() {
+      if (field.val() == "") {
+        field.val(default_text);
+        field.addClass(default_class);
+      }
+    });
+  });
 }
 
 function validate_signup() {
@@ -249,7 +261,7 @@ function validate_signup() {
   var signup_fullname = $("#signup_fullname");
   
   function signup_error(msg) {
-    do_message("error", "Incorrect signup information", msg);
+    do_message("failure", "Incorrect signup information", msg);
   }
   
   if (signup_user_id.hasClass("wait_for_input")) {
@@ -319,49 +331,52 @@ function validate_signup() {
 
 function send_signup() {
   if (validate_signup() == false)
-    return;
+    return false;
   
   // prevent sending twice when user double-click "sign up" button
-  $("btn_send_signup").onclick = function() {};
+  $("#btn_send_signup").onclick = function() {};
 
-  // TODO close the ThickBox
+  var signup_user_id = $("#signup_user_id");
+  var signup_password = $("#signup_password");
+  var signup_password_confirm = $("#signup_password_confirm");
+  var signup_email = $("#signup_email");
+  var signup_verification = $("#signup_verification");
+  var signup_admin = $("#signup_admin");
 
-  var signup_user_id = $("signup_user_id");
-  var signup_password = $("signup_password");
-  var signup_password_confirm = $("signup_password_confirm");
-  var signup_email = $("signup_email");
-  var signup_verification = $("signup_verification");
-  var signup_fullname = $("signup_fullname");
-  
-  var signup_admin = $("signup_admin");
-
-  var user_group = "user";
-  if (signup_admin.checked) {
-    user_group = "admin";
+  var signup_fullname = "";
+  if ($("#signup_fullname").hasClass("wait_for_input") == false) {
+    signup_fullname = $("#signup_fullname").val();
   }
-  
-  new Ajax.Request('/users/create', {
-    method: 'post',
-    parameters: {
-      'login': signup_user_id.value,
-      'password': signup_password.value,
-      'password_confirmation': signup_password_confirm.value,
-      'email': signup_email.value,
-      'name': signup_fullname.value,
-      'group': user_group
+
+  var privilege = "normal";
+  if (signup_admin.checked) {
+    privilege = "admin";
+  }
+
+  $.ajax({
+    url: '/users/create.json',
+    type: 'POST',
+    data: {
+      login: signup_user_id.val(),
+      password: signup_password.val(),
+      password_confirmation: signup_password_confirm.val(),
+      email: signup_email.val(),
+      name: signup_fullname,
+      privilege: privilege
     },
-    onSuccess: function(transport){
-      var json = transport.responseText.evalJSON(true);
-      if (json.success) {
-        do_message("ok", "Sign up successful", json.message);
+    dataType: 'json',
+    success: function(result) {
+      if (result.success) {
+        do_message("success", "Sign up success", result.message);
       } else {
-        do_message("error", "Sign up failed", json.message);
+        do_message("failure", "Sign up failed", result.message);
       }
     },
-    onFailure: function() {
-      do_message("error", "Connection failed", "Please check your network connection!");
+    failure: function() {
+      do_message("failure", "Connection failed", "Please check your network connection!");
     }
   });
+  return true;
 }
 
 window.onload = function() {
@@ -378,32 +393,16 @@ window.onload = function() {
   }
 
   // login & password
-  decorate_field($('#login'), "User ID", "wait_for_input");
-  decorate_field($('#password'), "password", "wait_for_input");
+  decorate_fields([$('#login')], "User ID", "wait_for_input");
+  decorate_fields([$('#password')], "password", "wait_for_input");
 
   // signup panel
-  decorate_field($("#signup_user_id"), "3~20 characters", "wait_for_input");
-  decorate_field($("#signup_password"), "", "wait_for_input");
-  decorate_field($("#signup_password_confirm"), "", "wait_for_input");
-  decorate_field($("#signup_email"), "6~40 characters", "wait_for_input");
-  decorate_field($("#signup_fullname"), "<= 40 characters", "wait_for_input");
+  decorate_fields([$("#signup_user_id")], "3~20 characters", "wait_for_input");
+  decorate_fields([$("#signup_password"), $("#signup_password_confirm")], "", "wait_for_input");
+  decorate_fields([$("#signup_email")], "6~40 characters", "wait_for_input");
+  decorate_fields([$("#signup_fullname")], "<= 40 characters", "wait_for_input");
 
-  $('#login').keypress(function(e) {
-    if (e.keyCode == Event.KEY_RETURN) {
-      do_login();
-    }
-  });
-  $('password').keypress(function(e) {
-    if (e.keyCode == Event.KEY_RETURN) {
-      do_login();
-    }
-  });
-  
-  var dom_win_height = 370;
-  if ($.browser.msie) {
-    dom_win_height = 390;
-  }
-
+  // apply iphone style each time, so that the iphone checkbox has correct geometry
   $("#signup_window_link").click(function(){
     $("#signup_admin").iphoneStyle({
       checkedLabel: "YES",
@@ -417,7 +416,6 @@ window.onload = function() {
 
 <!-- div #page set to "display:none". It will be shown by javascript. This is intended to reduce flickering. -->
 <div id="page" style="display: none;">
-  
   <div id="login_panel" align='right'>
   <table>
   <tr>
@@ -498,7 +496,7 @@ window.onload = function() {
     </table>
   </p>
   <p align='center'>
-    <button id='btn_send_signup' type='button' class='btn' onclick='send_signup()'><span><span>Sign up!</span></span></button>
+    <button id='btn_send_signup' type='button' class='btn' onclick='send_signup() && tb_remove()'><span><span>Sign up!</span></span></button>
   </p>
 </div>
 
