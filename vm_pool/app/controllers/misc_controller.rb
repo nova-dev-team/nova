@@ -152,6 +152,13 @@ class MiscController < ApplicationController
     reply_success "VM '#{vm.name}' released, current use_count = #{vm.use_count}"
   end
 
+  # List info of all the vmachines.
+  #
+  # Since::     0.3
+  def list_vm
+    reply_model Vmachine, :items => ["id", "name", "use_count", "uuid", "using", "pmachine_id", "status"]
+  end
+
 private
 
   def valid_ip_and_port_param?
