@@ -352,6 +352,33 @@ when "cleanup"
       end
     end
 
+    # make sure the vm domain is destroyed
+    virt_conn = Libvirt::open("qemu:///system")
+    begin
+      dom = virt_conn.lookup_domain_by_uuid(uuid)
+
+      if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
+        exit  # the vm is still running, skip the following actions
+      else
+        begin
+          dom.destroy
+        ensure
+          begin
+            dom.undefine
+          rescue
+          end
+        end
+      end
+
+    rescue
+      # domain not found, write "saving" to status file
+      File.open("status", "w") do |f|
+        f.write "saving"
+      end
+
+      # XXX don't exit here. need to save image int the following code
+    end
+
     # save info files into archive
     xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
     uuid = xml_desc["uuid"][0]
