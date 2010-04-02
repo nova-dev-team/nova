@@ -263,25 +263,27 @@ when "poll"
   virt_conn = Libvirt::open("qemu:///system")
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
-  rescue
-    # domain not found, write "destroyed" to status file
-    File.open("status", "w") do |f|
-      f.write "destroyed"
-    end
-    exit
-  end
 
-  if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
-    exit  # the vm is still running, skip the following actions
-  else
-    begin
-      dom.destroy
-    ensure
+    if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
+      exit  # the vm is still running, skip the following actions
+    else
       begin
-        dom.undefine
-      rescue
+        dom.destroy
+      ensure
+        begin
+          dom.undefine
+        rescue
+        end
       end
     end
+
+  rescue
+    # domain not found, write "saving" to status file
+    File.open("status", "w") do |f|
+      f.write "saving"
+    end
+
+    # XXX don't exit here. need to save image int the following code
   end
 
   if File.exists? "hda_save_to"
