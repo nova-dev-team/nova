@@ -42,8 +42,9 @@ ActionController::Routing::Routes.draw do |map|
   map.home '', :controller => "webui", :action => "index"
 
   map.connect 'observe/:id', :controller => "vmachines", :action => "observe"
-  map.connect 'acquire', :controller => "misc", :action => "acquire"
-  map.connect 'release/:name', :controller => "misc", :action => "release"
+  map.connect 'acquire.:format', :controller => "misc", :action => "acquire"
+  map.connect 'release/:name.:format', :controller => "misc", :action => "release"
+  map.connect 'list_vm.:format', :controller => "misc", :action => "list_vm"
 
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action.:format'
