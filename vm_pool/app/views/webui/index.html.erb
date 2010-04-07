@@ -24,7 +24,7 @@
 %>
 <hr>
 
-<h2>Pool Overview</h2>
+<h2>Pool overview</h2>
 <li>To start using the system, you have to set the correct "storage_server" &amp; "vm_hda_image" value in "System settings" section.</li>
 <li>To delete a pmachine, retire it and wait until no VM hosted on it is being used.</li>
 <br>
@@ -123,6 +123,48 @@ end
 Pmachine IP: <input type='text' size=20 id="new_pm_ip"/><%= spacing 8 %>
 Pool size: <input type="text" size=3 value="<%= Setting.vm_pool_size %>" id="new_pm_pool_size"/> <%= spacing 8 %>
 <button type='button' class='btn' onclick="add_pmachine()"><span><span>Add new pmachine</span></span></button><%= spacing 2 %>Current page will be reloaded when clicked.
+</div>
+<hr>
+
+<h2>Vmachines overview</h2>
+<div id="vm-overview">
+<li>Directly changing vmachine status is <b>STRONGLY NOT RECOMMENDED!</b></li>
+<p>
+<table width="100%">
+<tr><td>Vmachine name</td><td>Pmachine IP</td><td>Status</td><td>Using?</td><td>Actions</td></tr>
+<%=
+  html = ""
+  counter = 0
+  Vmachine.all.each do |vm|
+    html += "<tr class='row_type_#{counter % 2}' height=30>"
+    html += "<td>#{vm.name}</td><td>#{vm.pmachine.ip}</td>"
+    html += "<td>"
+    if vm.status == "Running"
+      html += vm.status
+    elsif vm.status == "Preparing"
+      html += "<b>" + vm.status + "</b>"
+    else
+      html += "<font color='red'>" + vm.status + "</font>"
+    end
+    html += "</td><td><div id='vm-overview-is-using-#{vm.name}'>"
+    if vm.using
+      html += "<b>Yes</b>"
+    else
+      html += "<font color='gray'>No</font>"
+    end
+    html += "</div><td><div id='vm-overview-action-1-#{vm.name}' style='display:inline;'>"
+    if vm.using
+      html += "<button type='button' class='btn' onclick='force_release_vm(\"#{vm.name}\")'><span><span><font color='red'>Force release</font></span></span></button>"
+    else
+      html += "<button type='button' class='btn' onclick='force_acquire_vm(\"#{vm.name}\")'><span><span><font color='red'>Force acquire</font></span></span></button>"
+    end
+    html += "</div>&nbsp;<button type='button' class='btn' onclick='force_destroy_vm(\"#{vm.name}\")'><span><span><font color='red'>Force destroy</font></span></span></button>"
+    html += "</td></tr>"
+    counter += 1
+  end
+  html
+%>
+</table>
 </div>
 <hr>
 

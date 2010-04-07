@@ -247,3 +247,73 @@ function change_pool_size(ip_addr) {
   });
 }
 
+function force_release_vm(vm_name) {
+  $.ajax({
+    url: "/misc/release.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: vm_name
+    },
+    success: function(result) {
+      if (result.success) {
+        $("#vm-overview-is-using-" + vm_name).html("<font color='gray'>No</font>");
+        $("#vm-overview-action-1-" + vm_name).html("<button type='button' class='btn' onclick='force_acquire_vm(\"" + vm_name + "\")'><span><span><font color='red'>Force acquire</font></span></span></button>");
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+}
+
+function force_acquire_vm(vm_name) {
+  $.ajax({
+    url: "/misc/acquire.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: vm_name
+    },
+    success: function(result) {
+      if (result.success) {
+        $("#vm-overview-is-using-" + vm_name).html("<b>Yes</b>");
+        $("#vm-overview-action-1-" + vm_name).html("<button type='button' class='btn' onclick='force_release_vm(\"" + vm_name + "\")'><span><span><font color='red'>Force release</font></span></span></button>");
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+}
+
+function force_destroy_vm(vm_name) {
+  if(confirm("Are you sure to destroy vm with name='" + vm_name + "'?")) {
+    $("#vm-overview").block();
+    $.ajax({
+      url: "/misc/destroy_vm.json",
+      type: "POST",
+      dataType: "json",
+      data: {
+        name: vm_name
+      },
+      success: function(result) {
+        if (result.success) {
+          window.location.reload();
+        } else {
+          $("#vm-overview").unblock();
+          alert("Error message: " + result.message);
+        }
+      },
+      error: function() {
+        $("#vm-overview").unblock();
+        alert("Request failed!");
+      }
+    });
+  }
+}
+
