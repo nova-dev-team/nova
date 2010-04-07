@@ -78,7 +78,7 @@
 
     # action buttons
     html += "<td>"
-    html += "<button type='button' class='btn' onclick=''><span><span>Edit pool size</span></span></button> "
+    html += "<button type='button' class='btn' onclick='change_pool_size(\"#{pm.ip}\")'><span><span>Edit pool size</span></span></button> "
     case pm.status
     when "pending"
 
