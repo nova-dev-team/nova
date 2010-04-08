@@ -379,6 +379,8 @@ function send_signup() {
   return true;
 }
 
+var iphone_style_for_admin_chkbox = false;
+
 window.onload = function() {
   window.onresize = do_layout;
 
@@ -404,10 +406,13 @@ window.onload = function() {
 
   // apply iphone style each time, so that the iphone checkbox has correct geometry
   $("#signup_window_link").click(function(){
-    $("#signup_admin").iphoneStyle({
-      checkedLabel: "YES",
-      uncheckedLabel: "NO"
-    });
+    if (iphone_style_for_admin_chkbox == false) {
+      $("#signup_admin").iphoneStyle({
+        checkedLabel: "YES",
+        uncheckedLabel: "NO"
+      });
+      iphone_style_for_admin_chkbox = true;
+    }
   });
 }
 </script>
