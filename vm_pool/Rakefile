@@ -16,7 +16,13 @@ require "fileutils"
 namespace :nova do
   namespace :vm_pool do
 
-    # TODO add storage server controller, or merge it into "master"?
+    # Make sure all folders are ready.
+    #
+    # Since::     0.3
+    def prepare_folders
+      FileUtils.mkdir_p "#{RAILS_ROOT}/log"
+      FileUtils.mkdir_p "#{RAILS_ROOT}/tmp/pids"
+    end
 
     def all_daemons action
       Dir["#{File.dirname __FILE__}/lib/daemons/*_ctl"].each do |f|
@@ -26,6 +32,7 @@ namespace :nova do
 
     desc "Start Nova vm_pool"
     task :start do
+      prepare_folders
       puts "Starting Nova vm_pool..."
       unless File.exists? "#{File.dirname __FILE__}/log"
         FileUtils.mkdir_p "#{File.dirname __FILE__}/log"
@@ -85,6 +92,7 @@ namespace :nova do
 
     desc "Initialize system"
     task :init do
+      prepare_folders
       puts "Migrating database..."
       my_exec "rake db:migrate RAILS_ENV=production"
       my_exec "rake db:migrate RAILS_ENV=development"
