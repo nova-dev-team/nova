@@ -139,12 +139,13 @@ Pool size: <input type="text" size=3 value="<%= Setting.vm_pool_size %>" id="new
     html += "<tr class='row_type_#{counter % 2}' height=30>"
     html += "<td>#{vm.name}</td><td>#{vm.pmachine.ip}</td>"
     html += "<td>"
-    if vm.status == "Running"
-      html += vm.status
-    elsif vm.status == "Preparing"
-      html += "<b>" + vm.status + "</b>"
+    vm_status = vm.status.capitalize # just make it handy
+    if vm_status == "Running"
+      html += vm_status
+    elsif vm_status == "Preparing"
+      html += "<b>" + vm_status + "</b>"
     else
-      html += "<font color='red'>" + vm.status + "</font>"
+      html += "<font color='red'>" + vm_status + "</font>"
     end
     html += "</td><td><div id='vm-overview-is-using-#{vm.name}'>"
     if vm.using
