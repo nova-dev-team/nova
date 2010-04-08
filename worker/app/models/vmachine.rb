@@ -167,9 +167,10 @@ elsif params[:cd_image] != nil and params[:cd_image] != ""
 end
 }    <interface type='bridge'>
       <source bridge='#{nova_conf["vm_network_bridge"]}'/>
-      <mac address='#{
-# generate random mac addreaa
-((1..6).collect {|n| "%02x" % (256 * rand)}).join ":"
+      <mac address='54:7E:#{
+# generate random mac address
+# note that mac address has some format requirements
+((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
 }'/>
     </interface>
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>

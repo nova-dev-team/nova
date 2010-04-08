@@ -68,13 +68,13 @@ function add_pmachine() {
   
 }
 
-function pm_ajax(url, uuid) {
+function pm_ajax(url, ip_addr) {
   $.ajax({
     url: url,
     type: "POST",
     dataType: "json",
     data: {
-      ip: uuid
+      ip: ip_addr
     },
     success: function(result) {
       if (result.success) {
@@ -89,7 +89,7 @@ function pm_ajax(url, uuid) {
   });
 }
 
-function delete_pmachine(ip_addr, uuid) {
+function delete_pmachine(ip_addr) {
   if (confirm("Are you sure to delete pmachine with IP=" + ip_addr + "?")) {
     pm_ajax("/pmachines/delete.json", ip_addr);
   }
@@ -216,5 +216,104 @@ function port_mapping_add() {
     }
   });
 
+}
+
+function change_pool_size(ip_addr) {
+  new_value = prompt("Please input the new pool size");
+  num_regex = /^[0-9]+$/;
+  if (num_regex.test(new_value) == false) {
+    alert("Invalid pool size value!");
+    return;
+  }
+
+  $.ajax({
+    url: "/pmachines/edit_pool_size.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: ip_addr,
+      pool_size: new_value
+    },
+    success: function(result) {
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+}
+
+function force_release_vm(vm_name) {
+  $.ajax({
+    url: "/misc/release.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: vm_name
+    },
+    success: function(result) {
+      if (result.success) {
+        $("#vm-overview-is-using-" + vm_name).html("<font color='gray'>No</font>");
+        $("#vm-overview-action-1-" + vm_name).html("<button type='button' class='btn' onclick='force_acquire_vm(\"" + vm_name + "\")'><span><span><font color='red'>Force acquire</font></span></span></button>");
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+}
+
+function force_acquire_vm(vm_name) {
+  $.ajax({
+    url: "/misc/acquire.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: vm_name
+    },
+    success: function(result) {
+      if (result.success) {
+        $("#vm-overview-is-using-" + vm_name).html("<b>Yes</b>");
+        $("#vm-overview-action-1-" + vm_name).html("<button type='button' class='btn' onclick='force_release_vm(\"" + vm_name + "\")'><span><span><font color='red'>Force release</font></span></span></button>");
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+}
+
+function force_destroy_vm(vm_name) {
+  if(confirm("Are you sure to destroy vm with name='" + vm_name + "'?")) {
+    $("#vm-overview").block();
+    $.ajax({
+      url: "/misc/destroy_vm.json",
+      type: "POST",
+      dataType: "json",
+      data: {
+        name: vm_name
+      },
+      success: function(result) {
+        if (result.success) {
+          window.location.reload();
+        } else {
+          $("#vm-overview").unblock();
+          alert("Error message: " + result.message);
+        }
+      },
+      error: function() {
+        $("#vm-overview").unblock();
+        alert("Request failed!");
+      }
+    });
+  }
 }
 

@@ -6,6 +6,7 @@
 require 'utils'
 require 'yaml'
 require 'fileutils'
+require 'rest_client'
 
 class MiscController < ApplicationController
 
@@ -114,19 +115,34 @@ class MiscController < ApplicationController
     end
   end
 
-  # Acquire a VM from the pool.
+  # Acquire a VM from the pool. If name is given, it tries to acquire that vm. If name not given, it selects a vm from the pool.
   #
   # Since::     0.3
   def acquire
-    Vmachine.all.each do |vm|
-      if vm.using == false
+    if valid_param? params[:name]
+      # name given, try to get the vm from pool
+      vm = Vmachine.find_by_name params[:name]
+      if vm == nil
+        reply_failure "VM with name='#{params[:name]}' not found!"
+      elsif vm.using
+        reply_failure "VM with name='#{params[:name]}' is already used!"
+      else
         vm.using = true
         vm.save
         reply_success "successfully acquired VM", :name => vm.name
-        return
       end
+    else
+      # name not given, select a vm from pool
+      Vmachine.all.each do |vm|
+        if vm.using == false
+          vm.using = true
+          vm.save
+          reply_success "successfully acquired VM", :name => vm.name
+          return
+        end
+      end
+      reply_failure "failed to acquire new VM"
     end
-    reply_failure "failed to acquire new VM"
   end
 
   # Release an acquired VM back into the pool.
@@ -150,6 +166,33 @@ class MiscController < ApplicationController
     vm.use_count += 1
     vm.save
     reply_success "VM '#{vm.name}' released, current use_count = #{vm.use_count}"
+  end
+
+  # Destroy vmachine.
+  #
+  # Since::     0.3
+  def destroy_vm
+    unless valid_param? params[:name]
+      reply_failure "Please provide the 'name' parameter!"
+      return
+    end
+    vm = Vmachine.find_by_name params[:name]
+    if vm == nil
+      reply_failure "VM with name '#{vm.name}' not found!"
+      return
+    end
+    Vmachine.delete vm
+    conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+    pm_addr = "http://#{vm.pmachine.ip}:#{conf["worker_port"]}"
+    RestClient.post "#{pm_addr}/vmachines/destroy.json", :name => params[:name]
+    reply_success "VM with name='#{params[:name]}' destoryed"
+  end
+
+  # List info of all the vmachines.
+  #
+  # Since::     0.3
+  def list_vm
+    reply_model Vmachine, :items => ["id", "name", "use_count", "uuid", "using", "pmachine_id", "status"]
   end
 
 private

@@ -26,6 +26,9 @@ class PmachinesController < ApplicationController
     end
   end
 
+  # Mark the pmachine as "to be reconnected". The connection job is left for background processes.
+  #
+  # Since::     0.3
   def reconnect
     return unless valid_ip?
     pm = Pmachine.find_by_ip params[:ip]
@@ -38,6 +41,9 @@ class PmachinesController < ApplicationController
     end
   end
 
+  # Mark pmachines with "retired" tag as "to be reconnected".
+  #
+  # Since::     0.3
   def reuse
     reconnect # reuse is basically "reconnect"
   end
@@ -54,6 +60,24 @@ class PmachinesController < ApplicationController
     end
   end
 
+  # Change the pool size of this pmachine.
+  #
+  # Since::     0.3
+  def edit_pool_size
+    return unless valid_pool_size? and valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm == nil
+      reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    else
+      pm.vm_pool_size = params[:pool_size].to_i
+      pm.save
+      reply_success "Pmachine with IP=#{params[:ip]} has changed pool size to #{pm.vm_pool_size}."
+    end
+  end
+
+  # Delete the pmachine, use with care!
+  #
+  # Since::     0.3
   def delete
     return unless valid_ip?
     pm = Pmachine.find_by_ip params[:ip]

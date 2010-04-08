@@ -22,6 +22,14 @@ require 'yaml'
 namespace :nova do
   namespace :worker do
 
+    # Make sure all folders are ready.
+    #
+    # Since::     0.3
+    def prepare_folders
+      FileUtils.mkdir_p "#{RAILS_ROOT}/log"
+      FileUtils.mkdir_p "#{RAILS_ROOT}/tmp/pids"
+    end
+
     # Read common YAML config.
     #
     # Since::     0.3
@@ -33,6 +41,7 @@ namespace :nova do
     #
     # Since::     0.3
     def do_init
+      prepare_folders
       require_root_privilege
       puts "Building helper tools.."
       my_exec "cd #{RAILS_ROOT}/lib && make"
@@ -52,6 +61,7 @@ namespace :nova do
     end
 
     def do_start
+      prepare_folders
       require_root_privilege  # we must run worker as "root", since we will connect to "qemu:///system", which is privileged action
       my_exec "modprobe kvm_intel"
 

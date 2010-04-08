@@ -15,10 +15,19 @@ require "yaml"
 namespace :nova do
   namespace :master do
 
+    # Make sure all folders are ready.
+    #
+    # Since::     0.3
+    def prepare_folders
+      FileUtils.mkdir_p "#{RAILS_ROOT}/log"
+      FileUtils.mkdir_p "#{RAILS_ROOT}/tmp/pids"
+    end
+
     # TODO add storage server controller, or merge it into "master"?
 
     desc "Start Nova master"
     task :start do
+      prepare_folders
       puts "Starting Nova master..."
       conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
 
@@ -70,6 +79,7 @@ namespace :nova do
 
     desc "Initialize system"
     task :init do
+      prepare_folders
       puts "Migrating database..."
       my_exec "rake db:migrate RAILS_ENV=production"
       my_exec "rake db:migrate RAILS_ENV=development"
