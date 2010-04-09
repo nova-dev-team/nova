@@ -155,6 +155,18 @@ void cleanup_image_pool_dir() {
               strcat(fpath, ".copying");
               remove(fpath);
               delete fpath;
+            } else if (item_info.has_copying_lock == false && st.st_size == 0) {
+              // delete images with 0 size
+              char* fpath = new char[strlen(image_pool_path) + strlen(p_dirent->d_name) + 40];
+              strcpy(fpath, image_pool_path);
+              strcat(fpath, "/");
+              strcat(fpath, p_dirent->d_name);
+              remove(fpath);
+              if (item_info.has_logfile) {
+                strcat(fpath, ".log");
+                remove(fpath);
+              }
+              delete fpath;
             } else {
               item_info.last_mtime = st.st_mtime;
               item_info.last_filesize = st.st_size;
