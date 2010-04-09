@@ -146,7 +146,7 @@ void cleanup_image_pool_dir() {
             // so delete the file, and also delete the .copying lock file
             ImagePoolItemInfo last_info = g_image_pool_dir.find(p_dirent->d_name)->second;
             if ((st.st_mtime == last_info.last_mtime || st.st_size == last_info.last_filesize) && item_info.has_copying_lock) {
-              printf("removing '%s' since it is trash\n", p_dirent->d_name);
+              printf("removing '%s' since it is trash (copying failed)\n", p_dirent->d_name);
               char* fpath = new char[strlen(image_pool_path) + strlen(p_dirent->d_name) + 40];
               strcpy(fpath, image_pool_path);
               strcat(fpath, "/");
@@ -157,6 +157,7 @@ void cleanup_image_pool_dir() {
               delete fpath;
             } else if (item_info.has_copying_lock == false && st.st_size == 0) {
               // delete images with 0 size
+              printf("removing '%s' since it is trash (zero file size)\n", p_dirent->d_name);
               char* fpath = new char[strlen(image_pool_path) + strlen(p_dirent->d_name) + 40];
               strcpy(fpath, image_pool_path);
               strcat(fpath, "/");
