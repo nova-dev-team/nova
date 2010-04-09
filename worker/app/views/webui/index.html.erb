@@ -332,6 +332,12 @@ du -ah <%=h Setting.image_pool_root %>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <%= pretty_du Setting.image_pool_root %>
 </td></tr></table>
+<p>
+
+<b>Revoke image:</b><br>
+This utility is used to delete deprecated VM images. Note that if the image is being downloaded from storage server, the revoke request will be ignored.<br>
+Image name: <input type="text" id='revoke_vm_image_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_image()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
+Current page will be reloaded when clicked.
 <hr>
 
 

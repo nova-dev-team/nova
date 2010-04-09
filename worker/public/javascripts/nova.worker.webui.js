@@ -259,3 +259,27 @@ function change_system_setting(key) {
   }
 }
 
+function revoke_vm_image() {
+  img_name = $("#revoke_vm_image_name").val();
+  $.ajax({
+    url: "/misc/revoke_vm_image.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      image_name: img_name
+    },
+    success: function(result) {
+      $("#sys_settings_panel").unblock();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      $("#sys_settings_panel").unblock();
+      alert("Request failed!");
+    }
+  });
+}
+
