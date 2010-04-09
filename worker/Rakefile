@@ -63,12 +63,26 @@ namespace :nova do
     def do_start
       prepare_folders
       require_root_privilege  # we must run worker as "root", since we will connect to "qemu:///system", which is privileged action
+      conf = read_config
+
+      # check if the port is being used by others
+      p = IO.popen "lsof -i tcp:#{conf["worker_port"]}"
+      lsof_out = p.readlines
+      if lsof_out.length > 1
+        puts "!!! The port #{conf["worker_port"]} is occupied by the folloing processes:"
+        print lsof_out
+        puts "!!! Please kill those processes before continue!\n"
+        exit
+      end
+      p.close
+
+
+      # TODO check if is really intel arch
       my_exec "modprobe kvm_intel"
 
       # make sure there is network bridge
       my_exec "./lib/create_br.rb"
 
-      conf = read_config
       service_port = conf["worker_port"]
       puts "Writing hostname into tmp/hostname..."
       FileUtils.mkdir_p "#{RAILS_ROOT}/tmp"
@@ -80,6 +94,7 @@ namespace :nova do
 
       File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
         f.write <<LFTP_SCRIPT
+set net:timeout 10
 set net:max-retries 2
 set net:reconnect-interval-base 1
 open #{File.read "#{RAILS_ROOT}/config/storage_server.conf"}

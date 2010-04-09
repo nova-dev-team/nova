@@ -18,6 +18,7 @@ class Setting < ActiveRecord::Base
       FileUtils.mkdir_p Setting.run_root
       File.open("#{Setting.run_root}/ftp_server_files_list_updater_lftp_script", "w") do |f|
         f.write <<LFTP_SCRIPT
+set net:timeout 10
 set net:max-retries 2
 set net:reconnect-interval-base 1
 open #{self.value}

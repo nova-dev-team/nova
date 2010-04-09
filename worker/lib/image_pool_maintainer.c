@@ -69,6 +69,7 @@ int has_vm_running() {
 
 // copy with speed limit.
 // it will check the "run/vm" dir, only limits the speed when there is vm running.
+// and it will check if a ".revoke" file exists, if so, the copying process is cancelled immediately.
 // params: old_fn = old file name
 //         new_fn = new file name
 //         mbps = speed limit (MB/s)
@@ -80,24 +81,48 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
   FILE* dst;
   int buf_size = 1024 * 16;
   char* buf = (char *) malloc(buf_size);
+  char* revoke_fn = (char *) malloc(sizeof(char) * (strlen(new_fn) + 10));
   double sleep_usec = 1;
   int should_limit_speed = 1;
   struct timeval begin_time;
   struct timeval end_time;
+  struct stat st1, st2;
+  int loop_counter = 0;
 
   src = fopen(old_fn, "rb");
+  if (src == NULL) {
+    // will go to here if src & dest files are deleted (eg. by revoking images)
+    printf("error: cannot open '%s' for reading\n", old_fn);
+    free(buf);
+    free(revoke_fn);
+    return 1;
+  }
   dst = fopen(new_fn, "wb");
-  if (src == NULL || dst == NULL) {
+  if (dst == NULL) {
+    // will go to here if src & dest files are deleted (eg. by revoking images)
     printf("error: cannot copy file!\n");
+    free(buf);
+    free(revoke_fn);
     return 1;
   }
 
   gettimeofday(&begin_time, NULL);
 
+  strcpy(revoke_fn, new_fn);
+  strcat(revoke_fn, ".revoke");
+
   for (;;) {
+    loop_counter += 1;
     int cnt = fread(buf, sizeof(char), buf_size, src);
     if (cnt <= 0) {
       break;
+    }
+    fwrite(buf, sizeof(char), cnt, dst);
+    if (loop_counter % 1024 == 0) {
+      // check if need to revoke the image
+      if (lstat(revoke_fn, &st1) == 0) {
+        break;
+      }
     }
 
     if (should_limit_speed) {
@@ -139,12 +164,30 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
         printf("*** running VM found, speed limited!\n");
       }
     }
-    fwrite(buf, sizeof(char), cnt, dst);
   }
   fclose(src);
   fclose(dst);
 
+  // check if src and dst has same file size, if not, delete the copied dst file
+  if (lstat(old_fn, &st1) != 0 || lstat(new_fn, &st2) != 0) {
+    printf("Error: failed to call lstat on image files!\n");
+    printf("Delete '%s' because of failure\n", new_fn);
+    remove(new_fn);
+  } else if (st1.st_size != st2.st_size) {
+    printf("Error: the copied image file does not have same size as original image file!\n");
+    printf("Delete '%s' because of failure\n", new_fn);
+    remove(new_fn);
+  }
+
+  // check if the image is revoked
+  if (lstat(revoke_fn, &st1) == 0) {
+    printf("Image '%s' is revoked!\n", new_fn);
+    remove(revoke_fn);
+    remove(new_fn);
+  }
+
   free(buf);
+  free(revoke_fn);
   return 0;
 }
 

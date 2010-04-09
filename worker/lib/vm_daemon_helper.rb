@@ -95,6 +95,7 @@ def prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
       lftp_script_file = File.join image_pool_dir, "#{hda_name}.lftp"
       File.open(lftp_script_file, "w") do |f|
         f.write <<LFTP_SCRIPT_FILE
+set net:timeout 10
 set net:max-retries 2
 set net:reconnect-interval-base 1
 open #{storage_server}
@@ -166,6 +167,7 @@ def prepare_iso_image storage_server, image_pool_dir, vm_dir, iso_name
       lftp_script_file = File.join image_pool_dir, "#{iso_name}.lftp"
       File.open(lftp_script_file, "w") do |f|
         f.write <<LFTP_SCRIPT_FILE
+set net:timeout 10
 set net:max-retries 2
 set net:reconnect-interval-base 1
 open #{storage_server}
@@ -311,6 +313,7 @@ when "poll"
     puts "uploading_lock created"
     File.open("hda_save_to.lftp", "w") do |f|
       f.write <<HDA_SAVE_TO_LFTP
+set net:timeout 10
 set net:max-retries 2
 set net:reconnect-interval-base 1
 open #{storage_server}

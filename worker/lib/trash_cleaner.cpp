@@ -104,6 +104,17 @@ int my_stat(const char* dir, const char* base_fname, const char* ext_fname, stru
   return ret;
 }
 
+int my_remove(const char* dir, const char* base_fname, const char* ext_fname) {
+  char* fpath = new char[strlen(dir) + strlen(base_fname) + strlen(ext_fname) + 10];
+  strcpy(fpath, dir);
+  strcat(fpath, "/");
+  strcat(fpath, base_fname);
+  strcat(fpath, ext_fname);
+  int ret = remove(fpath);
+  delete fpath;
+  return ret;
+}
+
 void cleanup_image_pool_dir() {
   printf("Working in image pool...\n");
   char* image_pool_path = new char[strlen(g_run_root) + 20];
@@ -116,14 +127,27 @@ void cleanup_image_pool_dir() {
   } else {
     struct dirent* p_dirent;
     while ((p_dirent = readdir(p_dir)) != NULL) {
+      struct stat st;
       if (text_starts_with(p_dirent->d_name, (char *) ".")) {
         // skip files starting with "."
         continue;
       }
+      if (text_ends_with(p_dirent->d_name, ".revoke")) {
+        // check if the image to be revoked really exists
+        char* revoked_image_fn = new char[strlen(image_pool_path) + strlen(p_dirent->d_name) + 10];
+        strcpy(revoked_image_fn, image_pool_path);
+        strcat(revoked_image_fn, "/");
+        strcat(revoked_image_fn, p_dirent->d_name);
+        revoked_image_fn[strlen(revoked_image_fn) - 7] = '\0'; // get the image to be revoked
+        if (lstat(revoked_image_fn, &st) != 0) {
+          // the image to be revoked does not exist, delete the trashed .revoke file
+          my_remove(image_pool_path, p_dirent->d_name, "");
+        }
+        delete revoked_image_fn;
+      }
       if (is_vm_disk_image(p_dirent->d_name)) {
         printf("found VM image: '%s'\n", p_dirent->d_name);
         ImagePoolItemInfo item_info;
-        struct stat st;
         if (my_stat(image_pool_path, p_dirent->d_name, ".copying", &st) == 0) {
           item_info.has_copying_lock = true;
           printf(".copying lock found for '%s'\n", p_dirent->d_name);
@@ -198,25 +222,27 @@ int main(int argc, char* argv[]) {
     printf("Usage: trash_cleaner <pid_file> <run_root>\n");
     exit(0);
   }
-  char* pid_fn = argv[1];
-  FILE* p_pidf = fopen(pid_fn, "w");
-  if (p_pidf == NULL) {
-    printf("Failed to create pid file '%s'!\n", pid_fn);
-    exit(1);
-  }
-  fprintf(p_pidf, "%d", getpid());
-  fclose(p_pidf);
-  g_run_root = argv[2];
+  if (fork() == 0) {
+    char* pid_fn = argv[1];
+    FILE* p_pidf = fopen(pid_fn, "w");
+    if (p_pidf == NULL) {
+      printf("Failed to create pid file '%s'!\n", pid_fn);
+      exit(1);
+    }
+    fprintf(p_pidf, "%d", getpid());
+    fclose(p_pidf);
+    g_run_root = argv[2];
 
-  // ok, start to do cleanup work
-  for (;;) {
-    printf("Doing cleanup work...\n");
+    // ok, start to do cleanup work
+    for (;;) {
+      printf("Doing cleanup work...\n");
 
-    // first of all, cleanup image pool directory
-    cleanup_image_pool_dir();
+      // first of all, cleanup image pool directory
+      cleanup_image_pool_dir();
 
-    // do cleanup every 3 minutes
-    sleep(3 * 60);
+      // do cleanup every 3 minutes
+      sleep(3 * 60);
+    }
   }
   return 0;
 }
