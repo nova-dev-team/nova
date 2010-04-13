@@ -1,12 +1,26 @@
 require File.dirname(__FILE__) + '/../common/nfs'
 require File.dirname(__FILE__) + '/../common/ftp'
 require File.dirname(__FILE__) + '/../common/dir'
+require 'ftools'
+require 'fileutils'
 
 class PackageDownloader
 	def initialize(server_addr)
 		@server_addr = server_addr
 		@nfs = NFSTransfer.new(server_addr)
 		@ftp = FTPTransfer.new(server_addr)
+	end
+
+	def local_exists(app_name)
+		#cdrom:/packages/app_name
+		#cdrom:/ceil/launcher/package_downloader.rb
+
+		local_path = File.dirname(__FILE__) + "/../../packages/#{app_name}"
+		if File.exists?(local_path)
+			return local_path
+		else
+			return nil
+		end
 	end
 
 	def download_nfs(source, dest)
@@ -39,7 +53,12 @@ class PackageDownloader
 		system "mkdir C:\\Temp"
 		system "mkdir C:\\Temp\\#{app_name}"
 		
-		@ftp.download_dir(package_source, dest, "\\")
+		local_path = local_exists(app_name)
+		if local_path
+			FileUtils.cp_r(local_path, dest)
+		else
+			@ftp.download_dir(package_source, dest, "\\")
+		end
 		return dest
 	end
 
@@ -71,6 +90,8 @@ class PackageDownloader
 end
 
 #pd = PackageDownloader.new "166.111.131.32"
+#puts pd.local_exists("gundam")
+
 #gun = pd.win_shortcut_by_ftp("win_office");
 
 #puts gun
