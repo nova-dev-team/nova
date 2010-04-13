@@ -60,7 +60,7 @@ class Ceil
 			begin
 				puts "Processing #{app_name}"
 				
-				system "d:\\bscript\\#{app_name}.bat"
+				#system "d:\\bscript\\#{app_name}.bat"
 				
 				temp_path = nil
   	    @log.send("10", "#{app_name}", "server using #{@cc.package_server_type}")
@@ -70,7 +70,7 @@ class Ceil
           #when "nfs"
             #temp_path = @package_downloader.package_by_nfs(app_name, role)
           when "ftp"
-            temp_path = @package_downloader.win_shortcut_by_ftp(app_name)
+            temp_path = @package_downloader.win_package_by_ftp(app_name)
           else 
             @log.send("-10", "#{app_name}", "package server type #{@cc.package_server_type} not supported.")
             puts "package server type #{@cc.package_server_type} not supported."
@@ -80,8 +80,10 @@ class Ceil
         @log.send("35", "#{app_name}")
 				
   			@log.send("55", "#{app_name}")
-				
+				entry_file = temp_path + "\\entry.bat"
 				@log.send("70", "#{app_name}")
+				
+				system "cd \"#{temp_path}\" && #{entry_file}"
 				#use system instead puts..
 				@log.send("80", "#{app_name}")
 			rescue => e

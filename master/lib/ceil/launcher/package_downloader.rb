@@ -13,6 +13,7 @@ class PackageDownloader
 		DirTool.make_clean_dir(dest)
 		@nfs.download_dir(source, dest);
 	end
+
 	def download_ftp(source, dest)
 		DirTool.make_clean_dir(dest)
 		@ftp.download_dir(source, dest);
@@ -31,7 +32,17 @@ class PackageDownloader
 		download_nfs(key_source, dest)
 		return dest
 	end
-  
+
+  def win_package_by_ftp(app_name)
+		package_source = "/packages/#{app_name}"
+		dest = "C:\\Temp\\#{app_name}"
+		system "mkdir C:\\Temp"
+		system "mkdir C:\\Temp\\#{app_name}"
+		
+		@ftp.download_dir(package_source, dest, "\\")
+		return dest
+	end
+
   def win_shortcut_by_ftp(link_name, linkpath = 'D:\\GO\\Start\\All Programs')
     package_source = "/packages/#{link_name}"
     @ftp.download_dir(package_source, linkpath)

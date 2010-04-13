@@ -1,5 +1,7 @@
 require 'net/ftp'
 require File.dirname(__FILE__) + '/../common/rescue'
+require File.dirname(__FILE__) + '/../common/dir'
+
 class String
   def dir?
     return (self[-1] == 47)  #string ends with "/" is a dir
@@ -40,7 +42,7 @@ class FTPTransfer
     }
   end
 
-  def download_recursive(remote_path, local_path)
+  def download_recursive(remote_path, local_path, sp = "/")
     #puts "DIR #{remote_path}"
     DirTool.mkdir(local_path)
     Rescue.ignore {
@@ -50,15 +52,19 @@ class FTPTransfer
         puts "	FILE: #{file}"
         if @conn.cd(remote_path + "/" + file)
           puts "[#{file}] is a dir, now dip into it"
-          download_recursive(remote_path + "/" + file, local_path + "/" + file)
+					Rescue.ignore {
+            download_recursive(remote_path + "/" + file, local_path + sp + file)
+					}
         else
           puts "[#{file}] is a file, now download #{remote_path}/#{file} to #{local_path}"
-          download_file(remote_path, file, local_path)
+					Rescue.ignore {
+            download_file(remote_path, file, local_path)
+					}
         end
       end
     }
   end
-  def download_dir(remote_path, local_path)
+  def download_dir(remote_path, local_path, sp = "/")
     puts "DOWN DIR #{remote_path}"
     @conn = Net::FTP.new(@server_addr)
 
@@ -75,5 +81,7 @@ class FTPTransfer
   end
 end
 
-
+ftp = FTPTransfer.new("localhost")
+system 'mkdir /tmp/hgg'
+ftp.download_dir("/packages/common", "/tmp/hgg")
 

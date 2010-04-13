@@ -12,7 +12,7 @@ module DirTool
   end
 
   def DirTool.mkdir(local_path)
-    system "mkdir \"#{local_path}\" 2> /dev/null"	
+    system "mkdir \"#{local_path}\""	
   end
 
 	def DirTool.backup(file_path)
