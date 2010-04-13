@@ -13,3 +13,4 @@ tmp/
 .hg/
 .hgignore
 *.orig.*
+lazy.sh

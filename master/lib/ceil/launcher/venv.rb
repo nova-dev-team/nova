@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../common/dir'
 require File.dirname(__FILE__) + '/../common/iso'
 
 class Environment
-  attr_reader :local_addr, :local_mask, :server_addr, :default_gateway, :nameserver;
+  attr_reader :local_addr, :local_mask, :server_addr, :default_gateway, :name_server;
 
    def initialize
     @local_addr = nil
@@ -23,24 +23,32 @@ class Environment
 		puts filename_network_config
 		begin
 			File.open(filename_network_config, 'r') do |file|
-				@local_addr = file.readline
-				@local_mask = file.readline
-				@default_gateway = file.readline
-				@name_server = file.readline
+				@local_addr = file.readline.chomp
+				@local_mask = file.readline.chomp
+				@default_gateway = file.readline.chomp
+				@name_server = file.readline.chomp
 			end
 			
 			puts @local_addr
 			puts @local_mask
 			puts @default_gateway
 			puts @name_server
-
+			puts "FIN"
+			return @local_addr
+			
 		rescue
 			puts "Cannot find #{CEIL_ISO_CONFIG_PATH}/#{CEIL_ISO_FILENAME_NETWORK} in cdrom!"
 			return nil
 		end
-
 	end
-
+	
+	def reconfig_network_win32
+		filename_ipchanger = File.dirname(__FILE__) + '/ipchanger.exe'
+		cmd = "#{filename_ipchanger} #{@local_addr} #{@local_mask} #{@default_gateway} #{@name_server}"
+		#puts cmd
+		system cmd
+	end
+	
 	def reconfig_network(if_name)
 		ubuntu_network_interface = '/etc/network/interfaces'
 		ubuntu_network_nameserver = '/etc/resolv.conf'
@@ -56,7 +64,6 @@ class Environment
 		content << "\n"
 		content << "# #{`date`}\n"
 
-		
 		DirTool.backup(ubuntu_network_interface)
 		File.open(ubuntu_network_interface, 'wb') do |file|
 			file.puts(content)
@@ -88,12 +95,19 @@ class Environment
       return nil
     end
   end
+  
+  
+  def check_win
+    require 'socket'
+    @local_addr = IPSocket.getaddress(Socket.gethostname)
+    @server_addr = IpV4Address::calc_prev(@local_addr)
+  end
 end
 
 =begin
 env = Environment.new
 env.check_iso
-env.reconfig_network("eth0")
+puts env.local_addr
 =end
 
 #env = Environment.new;

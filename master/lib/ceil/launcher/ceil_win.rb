@@ -14,30 +14,34 @@ class Ceil
 	end
 	
 	def check_win
+	
 		@env = Environment.new
-    while ! @env.check_win
-      puts "Waiting for unconfigured networking... 10sec"
-      sleep 10
-    end
-
+		
+		if ! @env.check_iso
+			puts "Cannot fetch config files in cdrom! [step1]"
+			return nil
+		end
+		
+		puts "reconfig"
+   	@env.reconfig_network_win32
+  	puts "finished"
+  	
+		puts @env.local_addr
+		
 		begin
-      #@env.local_addr = "10.0.40.18"
-      #@env.server_addr = "166.111.131.32"
-      
+			
 		  @cc = ClusterConfiguration.new(@env.local_addr)
-      #@cc = ClusterConfiguration.new("10.0.40.18")
-
-      server_addr = @env.server_addr
+			if !@cc.fetch_by_iso
+				puts "Cannot fetch config files in cdrom! [step2]"
+				return nil		
+			end
+			
+      server_addr = @env.default_gateway
       
 			#server_addr = "166.111.131.32"
       
       puts "Server Address should be #{server_addr}"
-			
-			while !@cc.fetch_by_http(server_addr)
-        puts "Waiting for server response... 10sec"
-        sleep 10
-  		end
-			
+
       @log = LogReporter.new(server_addr, @env.local_addr)
 			@log.send("0", "ceil", "configuration fetched")
 			  

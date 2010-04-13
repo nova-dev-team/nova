@@ -13,30 +13,33 @@ class Ceil
     @key_downlaoder = nil
   end
 
-	def check_iso
-
-		@env = Environment.new
+  def check_iso
+    @env = Environment.new
     return nil if ! @env.check_iso
+
 
     begin
       @cc = ClusterConfiguration.new(@env.local_addr)
-      server_addr = @env.server_addr
+      server_addr = @env.default_gateway
+      local_addr = @env.local_addr
+      
       #server_addr = "192.168.0.110"
 			
-			if ! @cc.fetch_by_iso
+      if ! @cc.fetch_by_iso
         puts "Cannot find config files in cdrom"
         return nil
-			end
+      end
 
-			ubuntu_filename_hostname = '/etc/hostname'
-			begin
-				File.open(ubuntu_filename_hostname, 'wb') do |file|
-					file.puts @cc.host_name
-				end
-			rescue
-			end
+      ubuntu_filename_hostname = '/etc/hostname'
+      begin
+        File.open(ubuntu_filename_hostname, 'wb') do |file|
+          file.puts @cc.host_name
+        end
+				@env.reconfig_network('eth0')
+      rescue
+      end
 
-      @log = LogReporter.new(server_addr)
+      @log = LogReporter.new(server_addr, local_addr)
       if !@log.send("0", "ceil", "configuration fetched")
         return nil
       end
@@ -49,7 +52,7 @@ class Ceil
       return nil
     end
 
-	end
+    end
 
   def check
     @env = Environment.new

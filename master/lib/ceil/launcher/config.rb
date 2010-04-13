@@ -50,9 +50,12 @@ class ClusterConfiguration
 			File.open(filename_node_list) do |file|
 				@node_list = file.readlines
 			end	
+			@node_list = @node_list.join.chomp
 			File.open(filename_soft_list) do |file|
 				@inst_list = file.readlines
 			end
+			@inst_list = @inst_list.join.chomp
+
 			File.open(filename_servers_config) do |file|
 				@package_server = file.readline
 				@package_server_type = file.readline
