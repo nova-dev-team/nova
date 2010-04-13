@@ -57,14 +57,14 @@ class ClusterConfiguration
 			@inst_list = @inst_list.join.chomp
 
 			File.open(filename_servers_config) do |file|
-				@package_server = file.readline
-				@package_server_type = file.readline
-				@key_server = file.readline
-				@key_server_type = file.readline
+				@package_server = file.readline.chomp
+				@package_server_type = file.readline.chomp
+				@key_server = file.readline.chomp
+				@key_server_type = file.readline.chomp
 			end
 			File.open(filename_cluster_config) do |file|
-				@host_name = file.readline
-				@cluster_name = file.readline
+				@host_name = file.readline.chomp
+				@cluster_name = file.readline.chomp
 			end
 
 		rescue => e
