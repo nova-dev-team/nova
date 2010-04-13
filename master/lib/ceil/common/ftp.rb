@@ -80,8 +80,9 @@ class FTPTransfer
     @conn.close
   end
 end
-
+=begin
 ftp = FTPTransfer.new("localhost")
 system 'mkdir /tmp/hgg'
 ftp.download_dir("/packages/common", "/tmp/hgg")
+=end
 
