@@ -432,5 +432,24 @@ private
     end
   end
 
+  # Change the hda_save_to value.
+  # * If 'hda_save_to' is empty "", the hda_save_to file will be removed.
+  #
+  # Since::     0.3
+  def Vmachine.change_hda_save_to vm_name, hda_save_to
+    hda_save_to_fn = File.join Setting.vm_root, vm_name, "hda_save_to"
+    if hda_save_to == ""
+      if File.exists? hda_save_to_fn
+        FileUtils.rm_f hda_save_to_fn
+      end
+      return {:success => true, :message => "Disabled saving for '#{vm_name}'"}
+    else
+      File.open(hda_save_to_fn, "w") do |f|
+        f.write hda_save_to
+      end
+      return {:success => true, :message => "Enabled saving for '#{vm_name}', target address is '#{hda_save_to}'"}
+    end
+  end
+
 end
 

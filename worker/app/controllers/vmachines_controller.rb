@@ -86,6 +86,24 @@ public
     action_request "resume", params
   end
 
+  # Modify the hda save to address.
+  #
+  # Since::     0.3
+  def change_hda_save_to
+    if valid_param? params[:name] and valid_param? params[:hda_save_to]
+      result = Vmachine.change_hda_save_to params[:name], params[:hda_save_to]
+      if result == nil
+        reply_failure "call to Vmachine.change_hda_save_to failed"
+      elsif result[:success]
+        reply_success result[:message]
+      else
+        reply_failure result[:message]
+      end
+    else
+      reply_failure "Please provide 'name' and 'hda_save_to' params!"
+    end
+  end
+
 private
 
   # This is a helper, it triggers Vmachine's action, and replies result to user.

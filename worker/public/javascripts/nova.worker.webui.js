@@ -283,3 +283,31 @@ function revoke_vm_image() {
   });
 }
 
+function change_hda_save_to(vm_name, old_value) {
+  new_value = prompt("Input the new hda_save_to value (input nothing to disable saving)", old_value);
+  if (new_value == null || new_value == old_value) {
+    return;
+  }
+  $.ajax({
+    url: "/vmachines/change_hda_save_to.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: vm_name,
+      hda_save_to: new_value
+    },
+    success: function(result) {
+      $("#sys_settings_panel").unblock();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      $("#sys_settings_panel").unblock();
+      alert("Request failed!");
+    }
+  });
+}
+

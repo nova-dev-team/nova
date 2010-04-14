@@ -68,6 +68,7 @@ $(document).ready(function () {
 <tr>
 <td>Name</td>
 <td>UUID</td>
+<td>HDA save to (click to edit)</td>
 <td>Status</td>
 <td>VNC port</td>
 <td>Actions</td>
@@ -79,10 +80,26 @@ row_counter = 0
 Vmachine.all_domains.each do |dom|
   xml_desc = XmlSimple.xml_in dom.xml_desc
 
+  hda_save_to_fn = File.join Setting.vm_root, dom.name, "hda_save_to"
+  if File.exists? hda_save_to_fn
+    hda_save_to = File.read hda_save_to_fn
+  else
+    hda_save_to = ""
+  end
+
   html += <<VM_HTML
 <tr class='row_type_#{row_counter % 2}' height=30>
 <td>#{dom.name}</td>
 <td>#{dom.uuid}</td>
+<td><a href='#' onclick="change_hda_save_to('#{dom.name}', '#{hda_save_to}')">
+#{
+if hda_save_to == ""
+  "<font color='gray'><i>(none)</i></font>"
+else
+  hda_save_to
+end
+}
+</a></td>
 <td>
 #{
 case dom.info.state
