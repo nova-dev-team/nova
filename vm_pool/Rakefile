@@ -57,10 +57,10 @@ namespace :nova do
             end
           end
         end
-        my_exec "swiftiply_mongrel_rails -n #{conf["master_swiftiply_cluster_size"]} -p #{conf["master_swiftiply_first_port"]} -d"
+        my_exec "swiftiply_mongrel_rails -n #{conf["master_swiftiply_cluster_size"]} -p #{conf["master_swiftiply_first_port"]} -d &"
       else
         # don't use swiftiply
-        my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["master_port"]}"
+        my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["master_port"]} &"
       end
 
       # start vnc_proxy
