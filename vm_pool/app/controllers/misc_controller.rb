@@ -124,7 +124,7 @@ class MiscController < ApplicationController
       vm = Vmachine.find_by_name params[:name]
       if vm == nil
         reply_failure "VM with name='#{params[:name]}' not found!"
-      elsif vm.using
+      elsif vm.using or vm.status.downcase != "running"
         reply_failure "VM with name='#{params[:name]}' is already used!"
       else
         vm.using = true
@@ -134,7 +134,7 @@ class MiscController < ApplicationController
     else
       # name not given, select a vm from pool
       Vmachine.all.each do |vm|
-        if vm.using == false
+        if vm.using == false and vm.status.downcase == "running"
           vm.using = true
           vm.save
           reply_success "successfully acquired VM", :name => vm.name
