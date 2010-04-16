@@ -13,7 +13,7 @@ vnc_port = conf["vm_vnc_port"]
 <%=
 begin
 <<VNC
-<applet code="VncViewer.class" archive="/vncviewer.jar" width="1024" height="768">
+<applet code="VncViewer.class" archive="/vncviewer.jar" width="1280" height="800">
   <param name="port" value="#{vnc_port}">
   <param name="password" value="#{vm_name[4..-1]}">
 </applet>
