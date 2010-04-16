@@ -15,7 +15,7 @@ begin
   vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
   if vnc_port != "-1"
 "
-<applet CODE=VncViewer.class ARCHIVE='/vncviewer.jar' WIDTH=1024 HEIGHT=768>
+<applet CODE=VncViewer.class ARCHIVE='/vncviewer.jar' WIDTH=1280 HEIGHT=800>
   <param name=PORT value=#{vnc_port}>
   <param name=PASSWORD value='ALL YOUR BASE'>
 </applet>
