@@ -124,7 +124,9 @@ class MiscController < ApplicationController
       vm = Vmachine.find_by_name params[:name]
       if vm == nil
         reply_failure "VM with name='#{params[:name]}' not found!"
-      elsif vm.using or vm.status.downcase != "running"
+      elsif vm.status.downcase != "running"
+        reply_failure "VM with name='#{params[:name]}' is not ready to be used!"
+      elsif vm.using
         reply_failure "VM with name='#{params[:name]}' is already used!"
       else
         vm.using = true
