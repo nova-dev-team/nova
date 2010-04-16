@@ -131,7 +131,7 @@ Pool size: <input type="text" size=3 value="<%= Setting.vm_pool_size %>" id="new
 <li>Directly changing vmachine status is <b>STRONGLY NOT RECOMMENDED!</b></li>
 <p>
 <table width="100%">
-<tr><td>Vmachine name</td><td>Pmachine IP</td><td>Status</td><td>Using?</td><td>Actions</td></tr>
+<tr><td>Vmachine name</td><td>Pmachine IP</td><td>Status</td><td>Using?</td><td>Use count</td><td>Actions</td></tr>
 <%=
   html = ""
   counter = 0
@@ -153,6 +153,7 @@ Pool size: <input type="text" size=3 value="<%= Setting.vm_pool_size %>" id="new
     else
       html += "<font color='gray'>No</font>"
     end
+    html += "<td>#{vm.use_count}</td>"
     html += "</div><td><div id='vm-overview-action-1-#{vm.name}' style='display:inline;'>"
     if vm.using
       html += "<button type='button' class='btn' onclick='force_release_vm(\"#{vm.name}\")'><span><span><font color='red'>Force release</font></span></span></button>"
