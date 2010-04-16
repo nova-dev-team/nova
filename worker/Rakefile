@@ -63,6 +63,7 @@ namespace :nova do
     def do_start
       prepare_folders
       require_root_privilege  # we must run worker as "root", since we will connect to "qemu:///system", which is privileged action
+      my_exec "cd #{RAILS_ROOT}/lib && make" # make sure newest binary are used
       conf = read_config
 
       # check if the port is being used by others
