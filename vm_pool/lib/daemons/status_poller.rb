@@ -117,11 +117,17 @@ while($running) do
 
         if vm_already_in_db
           write_log "VM '#{real_vm["name"]}' already in DB"
-          vm.status = real_vm["status"]
-          if real_vm["vnc_port"] != nil
-            vm.vnc_port = real_vm["vnc_port"].to_i
+          if vm.status == "garbaged"
+            # destroy VM if it is used too many times
+            write_log "VM '#{real_vm["name"]}' is used too many times, garbage collecting..."
+            RestClient.post "#{pm.root_url}/vmachines/destroy.json", :uuid => vm.uuid
+          else
+            vm.status = real_vm["status"]
+            if real_vm["vnc_port"] != nil
+              vm.vnc_port = real_vm["vnc_port"].to_i
+            end
+            vm.save
           end
-          vm.save
         else
           write_log "VM '#{real_vm["name"]}' not in DB"
           vm = Vmachine.new

@@ -155,7 +155,7 @@ class MiscController < ApplicationController
     end
     vm = Vmachine.find_by_name params[:name]
     if vm == nil
-      reply_failure "VM with name '#{vm.name}' not found!"
+      reply_failure "VM with name '#{params[:name]}' not found!"
       return
     end
     if vm.using == false
@@ -164,6 +164,9 @@ class MiscController < ApplicationController
     end
     vm.using = false
     vm.use_count += 1
+    if vm.use_count >= Setting.vm_max_use_count.to_i
+      vm.status = "garbaged"
+    end
     vm.save
     reply_success "VM '#{vm.name}' released, current use_count = #{vm.use_count}"
   end
@@ -178,7 +181,7 @@ class MiscController < ApplicationController
     end
     vm = Vmachine.find_by_name params[:name]
     if vm == nil
-      reply_failure "VM with name '#{vm.name}' not found!"
+      reply_failure "VM with name '#{params[:name]}' not found!"
       return
     end
     Vmachine.delete vm
