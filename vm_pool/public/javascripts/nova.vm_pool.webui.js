@@ -220,6 +220,9 @@ function port_mapping_add() {
 
 function change_pool_size(ip_addr) {
   new_value = prompt("Please input the new pool size");
+  if (new_value == null) {
+    return;
+  }
   num_regex = /^[0-9]+$/;
   if (num_regex.test(new_value) == false) {
     alert("Invalid pool size value!");
