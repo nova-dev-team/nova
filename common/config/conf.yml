@@ -11,7 +11,7 @@ master_use_swiftiply:           true
 master_swiftiply_first_port:    10000
 
 # the number of back ports for swiftiply, necessary if 'master_use_swiftiply' is 'true'
-master_swiftiply_cluster_size:    5
+master_swiftiply_cluster_size:  5
 
 # which port will worker node serve the web services
 # master port will connect to worker nodes using this port

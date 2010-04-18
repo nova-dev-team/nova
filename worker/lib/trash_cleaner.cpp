@@ -3,11 +3,15 @@
 #include <map>
 #include <string>
 #include <cstring>
+#include <cstdarg>
 
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <libvirt/libvirt.h>
+#include <libvirt/virterror.h>
 
 using namespace std;
 
@@ -32,6 +36,25 @@ char* g_run_root;
 // listing of the image pool dir. filename -> item info
 // only VM disk image files are included in the list
 map<string, ImagePoolItemInfo> g_image_pool_dir;
+
+// Map which stores VM's last ack time.
+// If we lose contact to a VM for a long time, remove its resource.
+map<string, int> g_vm_alive_time;
+
+// connection to libvirt
+virConnectPtr g_virt_conn = NULL;
+
+FILE* g_log_fp = NULL;
+
+#define do_log(fmt, ...) {\
+  do_log_start(); \
+  printf(fmt, ## __VA_ARGS__);  \
+  if (g_log_fp != NULL || 1) { \
+    fprintf(g_log_fp, fmt, ## __VA_ARGS__); \
+    fflush(g_log_fp); \
+  } \
+  do_log_end(fmt);  \
+}
 
 int text_starts_with(const char* text, const char* head) {
   int i;
@@ -63,6 +86,27 @@ int text_ends_with(const char* text, const char* tail) {
   }
 
   return 1;
+}
+
+void do_log_start() {
+  char timestr_buf[32];
+  struct tm* tm_struct;
+  time_t tm_val = time(NULL);
+  tm_struct = localtime(&tm_val);
+  strftime(timestr_buf, sizeof(timestr_buf), "[%Y.%m.%d %H:%M:%S] ", tm_struct);
+  printf("%s", timestr_buf);
+  if (g_log_fp != NULL) {
+    fprintf(g_log_fp, "%s", timestr_buf);
+  }
+}
+
+void do_log_end(const char* fmt) {
+  if (!text_ends_with(fmt, "\n")) {
+    printf("\n");
+    if (g_log_fp != NULL) {
+      fprintf(g_log_fp, "\n");
+    }
+  }
 }
 
 bool is_vm_disk_image(const char* filename) {
@@ -116,14 +160,14 @@ int my_remove(const char* dir, const char* base_fname, const char* ext_fname) {
 }
 
 void cleanup_image_pool_dir() {
-  printf("Working in image pool...\n");
+  do_log("Working in image pool...\n");
   char* image_pool_path = new char[strlen(g_run_root) + 20];
   strcpy(image_pool_path, g_run_root);
   strcat(image_pool_path, "/image_pool");
-  printf("Image pool: %s\n", image_pool_path);
+  do_log("Image pool: %s\n", image_pool_path);
   DIR* p_dir = opendir(image_pool_path);
   if (p_dir == NULL) {
-    printf("Error: cannot open directory '%s'!\n", image_pool_path);
+    do_log("Error: cannot open directory '%s'!\n", image_pool_path);
   } else {
     struct dirent* p_dirent;
     while ((p_dirent = readdir(p_dir)) != NULL) {
@@ -146,18 +190,18 @@ void cleanup_image_pool_dir() {
         delete revoked_image_fn;
       }
       if (is_vm_disk_image(p_dirent->d_name)) {
-        printf("found VM image: '%s'\n", p_dirent->d_name);
+        do_log("found VM image: '%s'\n", p_dirent->d_name);
         ImagePoolItemInfo item_info;
         if (my_stat(image_pool_path, p_dirent->d_name, ".copying", &st) == 0) {
           item_info.has_copying_lock = true;
-          printf(".copying lock found for '%s'\n", p_dirent->d_name);
+          do_log(".copying lock found for '%s'\n", p_dirent->d_name);
         } else {
           item_info.has_copying_lock = false;
         }
         
         if (my_stat(image_pool_path, p_dirent->d_name, ".log", &st) == 0) {
           item_info.has_logfile = true;
-          printf("log file found for '%s'\n", p_dirent->d_name);
+          do_log("log file found for '%s'\n", p_dirent->d_name);
         } else {
           item_info.has_logfile = false;
         }
@@ -170,7 +214,7 @@ void cleanup_image_pool_dir() {
             // so delete the file, and also delete the .copying lock file
             ImagePoolItemInfo last_info = g_image_pool_dir.find(p_dirent->d_name)->second;
             if ((st.st_mtime == last_info.last_mtime || st.st_size == last_info.last_filesize) && item_info.has_copying_lock) {
-              printf("removing '%s' since it is trash (copying failed)\n", p_dirent->d_name);
+              do_log("removing '%s' since it is trash (copying failed)\n", p_dirent->d_name);
               char* fpath = new char[strlen(image_pool_path) + strlen(p_dirent->d_name) + 40];
               strcpy(fpath, image_pool_path);
               strcat(fpath, "/");
@@ -181,7 +225,7 @@ void cleanup_image_pool_dir() {
               delete fpath;
             } else if (item_info.has_copying_lock == false && st.st_size == 0) {
               // delete images with 0 size
-              printf("removing '%s' since it is trash (zero file size)\n", p_dirent->d_name);
+              do_log("removing '%s' since it is trash (zero file size)\n", p_dirent->d_name);
               char* fpath = new char[strlen(image_pool_path) + strlen(p_dirent->d_name) + 40];
               strcpy(fpath, image_pool_path);
               strcat(fpath, "/");
@@ -205,7 +249,7 @@ void cleanup_image_pool_dir() {
           
         } else {
           // well, I think this is not going to happen...
-          printf("Error: '%s' found but cannot stat it!\n", p_dirent->d_name);
+          do_log("Error: '%s' found but cannot stat it!\n", p_dirent->d_name);
         }
 
       }
@@ -216,14 +260,92 @@ void cleanup_image_pool_dir() {
   return;
 }
 
+void cleanup_vm_dir() {
+  const char* conn = "qemu:///system";
+  if (g_virt_conn == NULL) {
+    g_virt_conn = virConnectOpen(conn);
+    if (g_virt_conn == NULL) {
+      do_log("error: cannot open connection to '%s'", conn);
+      return;
+    }
+  }
+  time_t now = time(NULL);
+  char* vm_dir = new char[strlen(g_run_root) + 10];
+  strcpy(vm_dir, g_run_root);
+  strcat(vm_dir, "/");
+  strcat(vm_dir, "vm");
+
+  DIR* p_dir = opendir(vm_dir);
+  if (p_dir != NULL) {
+    struct dirent* p_dirent;
+    while ((p_dirent = readdir(p_dir)) != NULL) {
+      if (text_starts_with(p_dirent->d_name, ".")) {
+        continue; // skip .* files
+      }
+      char* fpath = new char[(strlen(vm_dir) + strlen(p_dirent->d_name)) * 2 + 10];
+      strcpy(fpath, vm_dir);
+      strcat(fpath, "/");
+      strcat(fpath, p_dirent->d_name);
+      struct stat st;
+      if (lstat(fpath, &st) != 0) {
+        do_log("failed to stat on '%s'", fpath);
+      }
+      if (S_ISDIR(st.st_mode)) {
+        do_log("Checking if VM '%s' exists", p_dirent->d_name);
+        if (virDomainLookupByName(g_virt_conn, p_dirent->d_name) != NULL) {
+          do_log("Domain '%s' is running", p_dirent->d_name);
+          g_vm_alive_time[p_dirent->d_name] = now;
+        } else {
+          do_log("Domain '%s' is NOT running", p_dirent->d_name);
+          if (g_vm_alive_time.find(p_dirent->d_name) == g_vm_alive_time.end()) {
+            g_vm_alive_time[p_dirent->d_name] = now;
+          }
+          if (now - g_vm_alive_time[p_dirent->d_name] > 60 * 60) {
+            // remove the vm if it is not detected for 1 hour
+            do_log("Consider VM '%s' trashed since it is not detected for a long time", p_dirent->d_name);
+            do_log("Remove all data of '%s' since it is trashed", p_dirent->d_name);
+            char* rm_cmd = new char[strlen(fpath) + 40];
+            sprintf(rm_cmd, "rm %s -rf", fpath);
+            do_log("[cmd] %s", rm_cmd);
+            system(rm_cmd);
+            delete [] rm_cmd;
+          }
+        }
+      }
+      delete [] fpath;
+    }
+    closedir(p_dir);
+  } else {
+    do_log("failed to open dir '%s'\n", vm_dir);
+  }
+
+  delete [] vm_dir;
+}
+
 int main(int argc, char* argv[]) {
   printf("This is trash_cleaner!\n");
   if (argc < 3) {
-    printf("Usage: trash_cleaner <pid_file> <run_root>\n");
+    printf("Usage: trash_cleaner <log_folder> <run_root>\n");
     exit(0);
   }
+
   if (fork() == 0) {
-    char* pid_fn = argv[1];
+    char* pid_fn = new char[strlen(argv[1]) + 40];
+    strcpy(pid_fn, argv[1]);
+    strcat(pid_fn, "/");
+    strcat(pid_fn, "trash_cleaner.pid");
+
+    char* log_fn = new char[strlen(argv[1]) + 40];
+    strcpy(log_fn, argv[1]);
+    strcat(log_fn, "/");
+    strcat(log_fn, "trash_cleaner.log");
+    g_log_fp = fopen(log_fn, "a");
+    if (g_log_fp == NULL) {
+      printf("*** error: failed to open log file '%s'!\n", log_fn);
+      exit(1);
+    }
+    delete [] log_fn;
+
     FILE* p_pidf = fopen(pid_fn, "w");
     if (p_pidf == NULL) {
       printf("Failed to create pid file '%s'!\n", pid_fn);
@@ -235,10 +357,13 @@ int main(int argc, char* argv[]) {
 
     // ok, start to do cleanup work
     for (;;) {
-      printf("Doing cleanup work...\n");
+      do_log("Doing cleanup work...\n");
 
       // first of all, cleanup image pool directory
       cleanup_image_pool_dir();
+
+      // cleanup the running VMs
+      cleanup_vm_dir();
 
       // do cleanup every 3 minutes
       sleep(3 * 60);

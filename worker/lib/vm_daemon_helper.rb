@@ -3,6 +3,7 @@
 require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
+#require 'ceil_iso_generator'
 
 # libvirt status constants
 LIBVIRT_RUNNING = 1
@@ -229,7 +230,19 @@ when "prepare"
 
   # TODO check if download success
 
+  # TODO download packages
+
   # TODO make agent iso images
+=begin
+  iso_gen = CeilIsoGenerator.new
+  iso_gen.config_essential(File.join Setting.system_root, "master/lib/ceil")
+  iso_gen.config_network("10.0.4.100", "255.255.255.0", "10.0.4.1", "166.111.8.28")
+  iso_gen.config_cluster("nova-0-1", "nova-cluster-name")
+  iso_gen.config_servers("10.0.4.1", "FTP", "10.0.1.211", "FTP")
+  iso_gen.config_nodelist("10.0.4.100 node1")
+  iso_gen.config_softlist("common ssh-nopass")
+  iso_gen.generate(File.join vm_dir, "agent_cd.iso")
+=end
 
   # TODO boot vm, handle failure if necessary
 
