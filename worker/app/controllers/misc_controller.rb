@@ -14,6 +14,9 @@ class MiscController < ApplicationController
     reply_success "worker"
   end
 
+  # Removes deprecated VM image.
+  #
+  # Since::     0.3
   def revoke_vm_image
     unless valid_param? params[:image_name]
       reply_failure "Please provide 'image_name'!"
@@ -41,6 +44,37 @@ class MiscController < ApplicationController
         reply_success "Image with name='#{params[:image_name]}' is revoked!"
       else
         reply_success "Image with name='#{params[:image_name]}' not found, nothing revoked!"
+      end
+    end
+  end
+  
+  # Removes deprecated VM packages.
+  #
+  # Since::     0.3
+  def revoke_package
+    unless valid_param? params[:package_name]
+      reply_failure "Please provide 'package_name'!"
+    else
+      pkg_dir = File.join Setting.package_pool_root, params[:package_name]
+      pkg_copying_lock = "#{pkg_dir}.copying"
+      pkg_lftp_log = "#{pkg_dir}.lftp.log"
+      if File.exists? pkg_copying_lock
+        reply_failure "Cannot revoke package '#{params[:package_name]}', it is being used now."
+      else
+        has_revoked_some_files = false
+        if File.exists? pkg_lftp_log
+          FileUtils.rm_rf pkg_lftp_log
+          has_revoked_some_files = true
+        end
+        if File.exists? pkg_dir
+          FileUtils.rm_rf pkg_dir
+          has_revoked_some_files = true
+        end
+        if has_revoked_some_files
+          reply_success "Package with name='#{params[:image_name]}' is revoked!"
+        else
+          reply_success "Package with name='#{params[:image_name]}' not found, nothing revoked!"
+        end
       end
     end
   end

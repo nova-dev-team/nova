@@ -79,6 +79,13 @@ LFTP_SCRIPT
     return File.join Setting.run_root, "image_pool"
   end
 
+  # Return the package pool root directory.
+  #
+  # Since::     0.3
+  def Setting.package_pool_root
+    return File.join Setting.run_root, "package_pool"
+  end
+
   @@SYSTEM_ROOT = nil # cached for readonly value
   # Return the source code directory.
   #

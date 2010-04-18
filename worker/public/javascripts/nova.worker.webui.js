@@ -283,6 +283,31 @@ function revoke_vm_image() {
   });
 }
 
+function revoke_vm_package() {
+  pkg_name = $("#revoke_package_name").val();
+  $.ajax({
+    url: "/misc/revoke_package.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      package_name: pkg_name
+    },
+    success: function(result) {
+      $("#sys_settings_panel").unblock();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      $("#sys_settings_panel").unblock();
+      alert("Request failed!");
+    }
+  });
+}
+
+
 function change_hda_save_to(vm_name, old_value) {
   new_value = prompt("Input the new hda_save_to value (input nothing to disable saving)", old_value);
   if (new_value == null || new_value == old_value) {

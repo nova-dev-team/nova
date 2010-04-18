@@ -305,10 +305,10 @@ end
 <h2>Local resource</h2>
 
 <%
-def pretty_du dir
+def pretty_du dir, max_depth
   FileUtils.mkdir_p dir # assure existance of dir
   html = "<pre>"
-  pipe = IO.popen "cd #{dir} && du -ah"
+  pipe = IO.popen "cd #{dir} && du -ah --max-depth=#{max_depth}"
   du_output = pipe.readlines.join.chomp
   pipe.close
 
@@ -335,25 +335,38 @@ def pretty_du dir
   html += "</pre>"
   return html
 end
+
+
 %>
 
 <b>Vmachines working directory:</b><br>
 du -ah <%=h Setting.vm_root %>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
-<%= pretty_du Setting.vm_root %>
+<%= pretty_du Setting.vm_root, 2 %>
 </td></tr></table>
 <p>
 
 <b>Image pool directory:</b><br>
 du -ah <%=h Setting.image_pool_root %>
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
-<%= pretty_du Setting.image_pool_root %>
+<%= pretty_du Setting.image_pool_root, 2 %>
 </td></tr></table>
 <p>
 
-<b>Revoke image:</b><br>
-This utility is used to delete deprecated VM images. Note that if the image is being downloaded from storage server, the revoke request will be ignored.<br>
+<b>Package pool directory:</b><br>
+du -ah <%= Setting.package_pool_root %>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<%= pretty_du Setting.package_pool_root, 1 %>
+</td></tr></table>
+<p>
+
+<b>Revoke image or package:</b><br>
+This utility is used to delete deprecated VM images or packages.<br>
+Note that if the image is being downloaded from storage server, the revoke request will be ignored.<br>
+And if revoke happends when some VM is creating its agent cd, the generated agent cd will be broken.<br>
 Image name: <input type="text" id='revoke_vm_image_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_image()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
+Current page will be reloaded when clicked.<br>
+Package name: <input type="text" id='revoke_package_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_package()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
 Current page will be reloaded when clicked.
 <hr>
 
