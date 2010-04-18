@@ -308,7 +308,7 @@ end
 def pretty_du dir, max_depth
   FileUtils.mkdir_p dir # assure existance of dir
   html = "<pre>"
-  pipe = IO.popen "cd #{dir} && du -ah --max-depth=#{max_depth}"
+  pipe = IO.popen "cd #{dir} && du -ah --max-depth=#{max_depth} | grep -v \"\.log$\""
   du_output = pipe.readlines.join.chomp
   pipe.close
 
