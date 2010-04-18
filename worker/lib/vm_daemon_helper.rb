@@ -197,8 +197,88 @@ LFTP_SCRIPT_FILE
   end
 end
 
+
+# Prepare agent packages. Download packages into package_pool, and soft link them into VM's running dir, so that
+# they could be directly used to create iso images.
+#
+# Authro::    Santa Zhang (santa1987@gmail.com)
+# Since::     0.3
+def prepare_agent_package storage_server, package_pool, vm_dir, package_name
+  # make sure the package pool exists
+  FileUtils.mkdir_p package_pool unless File.exists? package_pool
+
+  package_dir = File.join package_pool, package_name
+  copying_lock = package_dir + ".copying"
+  dest_dir = File.join vm_dir, "packages", package_name
+
+  unless File.exists? "#{vm_dir}/packages"
+    FileUtils.mkdir_p "#{vm_dir}/packages"
+  end
+
+  if File.exists? package_dir and (File.exists? copying_lock) == false
+    # package already available
+    write_log "package '#{package_name}' already available, making soft link"
+    unless File.exists? dest_dir
+      FileUtils.ln_s package_dir, dest_dir
+    end
+  else
+    write_log "package '#{package_name}' not available, need to be downloaded"
+
+    if File.exists? package_dir and File.exists? copying_lock
+      # already started downloading by another process, wait for it
+      write_log "download already started by another process, waiting for it"
+      while File.exists? copying_lock
+        sleep 1
+      end
+      write_log "detected download finished, restart preparing procedure"
+      prepare_agent_package storage_server, package_pool, vm_dir, package_name
+    else
+      # package not downloaded, create downloading lock, and download it
+      write_log "start downloading '#{package_name}'"
+
+      # create downloading lock
+      File.open(copying_lock, "w") {|f|}
+      write_log "created downloading lock"
+
+      # use lftp to download packages
+      lftp_script_file = File.join package_pool, "#{package_name}.lftp"
+      File.open(lftp_script_file, "w") do |f|
+        f.write <<LFTP_SCRIPT_FILE
+set net:timeout 10
+set net:max-retries 2
+set net:reconnect-interval-base 1
+open #{storage_server}
+cd agent_packages
+mirror #{package_name} #{package_name}
+LFTP_SCRIPT_FILE
+      end
+      write_log "generated lftp download script"
+      write_log "calling lftp to do download work"
+      my_exec "cd #{package_pool} && lftp -f #{package_name}.lftp 2>&1 >> #{package_name}.lftp.log"
+      write_log "lftp process finished"
+
+      FileUtils.rm_f lftp_script_file
+      write_log "removed generated lftp download script"
+
+      FileUtils.rm_f copying_lock
+      write_log "removed copying lock file"
+      write_log "finished downloading package '#{package_name}'"
+    end
+    write_log "retry preparing precess"
+    prepare_agent_package storage_server, package_pool, vm_dir, package_name
+  end
+end 
+
+
+###############################################################################################
+#                                                                                             #
+#                                        MAIN SECTION                                         #
+#                                                                                             #
+###############################################################################################
+
+
 if ARGV.length < 3
-  puts "usage: vm_daemon <storage_server> <vm_dir> <action>"
+  puts "usage: vm_daemon_helper.rb <storage_server> <vm_dir> <action>"
   exit 1
 end
 
@@ -212,6 +292,7 @@ case action
 when "prepare"
   puts "preparing"
   image_pool_dir = File.join vm_dir, "../../image_pool"
+  package_pool_dir = File.join vm_dir, "../../package_pool"
 
   File.open "required_images" do |f|
     f.each_line do |line|
@@ -228,11 +309,22 @@ when "prepare"
     end
   end
 
+
   # TODO check if download success
 
   # TODO download packages
+  if File.exists? "agent_packages"
+    write_log "preparing required packages"
+    File.read("agent_packages").each_line do |line|
+      pkg = line.strip
+      prepare_agent_package storage_server, package_pool_dir, vm_dir, pkg
+    end
 
-  # TODO make agent iso images
+    # TODO make agent iso images
+    # place holder code, since Huang Gang's ceil is not working now
+    `genisoimage -L -D -l -f -o agent-cd.iso packages/`
+  end
+
 =begin
   iso_gen = CeilIsoGenerator.new
   iso_gen.config_essential(File.join Setting.system_root, "master/lib/ceil")

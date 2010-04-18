@@ -51,9 +51,9 @@ FILE* g_log_fp = NULL;
   printf(fmt, ## __VA_ARGS__);  \
   if (g_log_fp != NULL || 1) { \
     fprintf(g_log_fp, fmt, ## __VA_ARGS__); \
-    fflush(g_log_fp); \
   } \
   do_log_end(fmt);  \
+  fflush(g_log_fp); \
 }
 
 int text_starts_with(const char* text, const char* head) {
