@@ -362,8 +362,9 @@ du -ah <%= Setting.package_pool_root %>
 
 <b>Revoke image or package:</b><br>
 This utility is used to delete deprecated VM images or packages.<br>
-Note that if the image is being downloaded from storage server, the revoke request will be ignored.<br>
-And if revoke happends when some VM is creating its agent cd, the generated agent cd will be broken.<br>
+<li>If the image is being downloaded from storage server, the revoke request will be ignored.</li>
+<li>If some VM creates its agent cd with some package which is being revoked, the generated agent cd will be broken.</li>
+<br>
 Image name: <input type="text" id='revoke_vm_image_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_image()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
 Current page will be reloaded when clicked.<br>
 Package name: <input type="text" id='revoke_package_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_package()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
