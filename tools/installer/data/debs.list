@@ -1,4 +1,5 @@
 build-essential
+genisoimage
 irb
 lftp
 libvirt0

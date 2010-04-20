@@ -410,6 +410,17 @@ private
     # start the vm_daemon for the virtual machine
     pid = fork do
       Dir.chdir "#{RAILS_ROOT}/lib"
+      # close all opened df: this prevents occupying server socket
+      Dir.foreach("/proc/#{Process.pid}/fd") do |entry|
+        next if entry.start_with? "."
+        fd = entry.to_i
+        if fd > 2
+          begin
+            IO::new(fd).close
+          rescue
+          end
+        end
+      end
       exec "./vm_daemon #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, params[:name]}"
     end
     Process.detach pid  # prevent zombie process

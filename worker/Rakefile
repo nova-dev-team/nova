@@ -110,7 +110,7 @@ LFTP_SCRIPT
 
       my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
       my_exec "#{RAILS_ROOT}/lib/image_pool_maintainer #{RAILS_ROOT}/tmp/pids/image_pool_maintainer.pid #{RAILS_ROOT}/lib/image_pool_maintainer.conf #{conf["run_root"]}/image_pool"
-      my_exec "#{RAILS_ROOT}/lib/trash_cleaner #{RAILS_ROOT}/tmp/pids/trash_cleaner.pid #{conf["run_root"]}"
+      my_exec "#{RAILS_ROOT}/lib/trash_cleaner #{RAILS_ROOT}/log #{conf["run_root"]}"
       my_exec "#{RAILS_ROOT}/script/server -d -p #{service_port} &"
     end
 
@@ -131,6 +131,11 @@ LFTP_SCRIPT
       Dir.foreach("#{RAILS_ROOT}/tmp/pids") do |entry|
         next if (entry.end_with? ".pid") == false
         kill_by_pid_file "#{RAILS_ROOT}/tmp/pids/#{entry}"
+      end
+
+      Dir.foreach("#{RAILS_ROOT}/log") do |entry|
+        next if (entry.end_with? ".pid") == false
+        kill_by_pid_file "#{RAILS_ROOT}/log/#{entry}"
       end
 
       if File.exists? "#{RAILS_ROOT}/tmp/hostname"
