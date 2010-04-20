@@ -77,9 +77,8 @@ namespace :nova do
       end
       p.close
 
-
-      # TODO check if is really intel arch
       my_exec "modprobe kvm_intel"
+      my_exec "modprobe kvm_amd"
 
       # make sure there is network bridge
       my_exec "./lib/create_br.rb"

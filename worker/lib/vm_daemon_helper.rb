@@ -384,8 +384,11 @@ when "poll"
       end
     end
 
-  rescue
+  rescue Exception => e
     # domain not found, write "saving" to status file
+    File.open("log", "a") do |f|
+      f.write "#{Time.now}: Exception in ruby: #{e.to_s}\n"
+    end
     File.open("status", "w") do |f|
       f.write "saving"
     end

@@ -63,18 +63,19 @@ def create_bridge ifname, brname
   end
 end
 
-# Automatically create network bridge
-pipe = IO.popen "ifconfig | grep ^eth"
-pipe_out = pipe.readlines
-pipe.close
+if $0 == __FILE__
+  # Automatically create network bridge
+  pipe = IO.popen "ifconfig | grep ^eth"
+  pipe_out = pipe.readlines
+  pipe.close
 
-ifname = pipe_out[0].split[0]
-puts "Automatically chosen #{ifname} as bridged interface"
+  ifname = pipe_out[0].split[0]
+  puts "Automatically chosen #{ifname} as bridged interface"
 
-conf = YAML::load File.read "#{File.dirname __FILE__}/../../common/config/conf.yml"
-brname = conf["vm_network_bridge"]
+  conf = YAML::load File.read "#{File.dirname __FILE__}/../../common/config/conf.yml"
+  brname = conf["vm_network_bridge"]
 
-puts "Creating bridge '#{brname}' on interface '#{ifname}'"
+  puts "Creating bridge '#{brname}' on interface '#{ifname}'"
 
-create_bridge ifname, brname
-
+  create_bridge ifname, brname
+end
