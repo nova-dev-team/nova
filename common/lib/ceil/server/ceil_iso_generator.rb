@@ -3,12 +3,21 @@
 # iso content = 
 #    ceil_base_path/* + node.list + soft.list + network.conf + server.conf
 require 'fileutils'
-require File.dirname(__FILE__) + '/../common/dir'
-require File.dirname(__FILE__) + '/../common/iso'
+
+#require File.dirname(__FILE__) + '/../common/dir'
+
+#require File.dirname(__FILE__) + '/../common/iso'
+CEIL_ISO_FILENAME_SERVERS = 'servers.conf'
+CEIL_ISO_FILENAME_NETWORK = 'network.conf'
+CEIL_ISO_FILENAME_CLUSTER = 'cluster.conf'
+CEIL_ISO_FILENAME_NODELIST = 'node.list'
+CEIL_ISO_FILENAME_SOFTLIST = 'soft.list'
+
+CEIL_ISO_CONFIG_PATH = '/config'
 
 #require 'dir'
 	
-PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -l -o '
+PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -f -l -o '
 PATH_GENISO = '/usr/bin/genisoimage'
 
 CONFIG_PATH = CEIL_ISO_CONFIG_PATH
@@ -30,6 +39,9 @@ class CeilIsoGenerator
 
 		@server_package = nil
 		@server_key = nil #ipaddr of package/key server
+
+		@port_package = nil
+		@port_key = nil
 
 		@server_type_key = nil
 		@server_type_package = nil #server type, ie. FTP, NFS, BLAH..
@@ -57,10 +69,15 @@ class CeilIsoGenerator
 		@net_dns = nameserver
 	end
 
-	def config_servers(server_package, server_type_package, server_key, server_type_key)
+	def config_package_server(server_package, port_package, server_type_package)
 		@server_package = server_package
+		@port_package = port_package
 		@server_type_package = server_type_package
+	end
+
+	def config_key_server(server_key, port_key, server_type_key)
 		@server_key = server_key
+		@port_key = port_key
 		@server_type_key = server_type_key
 	end
 
@@ -77,16 +94,17 @@ class CeilIsoGenerator
 		@clustername = clustername
 	end
 
-	def generate(iso_path)
+	def generate(tmp_path, iso_path)
 
-		# 1.mk tmp dir /tmp/geniso
+		#	1.get tmp_path
 		# 2.cp files to tmp dir
 		# 3.geniso
-    tmpdir = nil
+    tmpdir = tmp_path
 		try_count = 0
 
+=begin
 		begin
-			tmpdir = DirTool.temp_dir("iso#{try_count}")
+			#tmpdir = DirTool.temp_dir("iso#{try_count}")
 			try_count = try_count + 1
 			#puts try_count
 			result = 0
@@ -101,12 +119,17 @@ class CeilIsoGenerator
 			puts "Cannot create tempdir"
 			return nil
 		end
+=end
 
-		# copy files
-		FileUtils.cp_r(@base_path, tmpdir)
+		# link base_path to tmpdir/
+		#FileUtils.cp_r(@base_path, tmpdir)
+
+		FileUtils.ln_s(@base_path, tmpdir)
 
 		# create config files
-		DirTool.mkdir(tmpdir + CONFIG_PATH)
+		FileUtils.mkdir(tmpdir + CONFIG_PATH)
+		#DirTool.mkdir()
+
 		filename_servers = tmpdir + CONFIG_PATH + '/' + FILENAME_SERVERS
 		filename_network = tmpdir + CONFIG_PATH + '/' + FILENAME_NETWORK
 		filename_nodelist = tmpdir + CONFIG_PATH + '/' + FILENAME_NODELIST
@@ -116,8 +139,10 @@ class CeilIsoGenerator
 		File.open(filename_servers, 'w') do |file|
 			content = ""
 			content << @server_package << "\n"
+			content << @port_package << "\n"
 			content << @server_type_package << "\n"
 			content << @server_key << "\n"
+			content << @port_key << "\n"
 			content << @server_type_key << "\n"
 			file.puts content
 		end
@@ -155,14 +180,16 @@ class CeilIsoGenerator
 	end
 
 end
+
 =begin
 igen = CeilIsoGenerator.new
-igen.config_essential('/home/rei/nova/master/lib/ceil')
+igen.config_essential('/home/rei/nova/common/lib/ceil')
 igen.config_network('10.0.1.200', '255.255.255.0', '10.0.1.254', '166.111.8.28')
 igen.config_cluster("nova-0-1", "nova-cluster-name")
-igen.config_servers('10.0.1.211', 'FTP', '10.0.1.211', 'FTP')
+igen.config_package_server('10.0.1.211', '21', 'ftp')
+igen.config_key_server('10.0.1.211', '21', 'ftp')
 igen.config_nodelist("10.0.1.200 node1\n10.0.1.211 node2")
 igen.config_softlist("common ssh-nopass hadoop")
-igen.generate('/home/rei/test.iso')
+igen.generate('/var/vm1', '/home/rei/test.iso')
 =end
 
