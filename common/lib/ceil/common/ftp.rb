@@ -30,9 +30,10 @@ class Net::FTP
 end
 
 class FTPTransfer
-  def initialize(server_addr)
+  def initialize(server_addr, port = '21')
     BasicSocket.do_not_reverse_lookup = true
     @server_addr = server_addr
+		@server_port = port
   end
 
   def download_file(remote_path, file_name, local_path)
@@ -66,7 +67,8 @@ class FTPTransfer
   end
   def download_dir(remote_path, local_path, sp = "/")
     puts "DOWN DIR #{remote_path}"
-    @conn = Net::FTP.new(@server_addr)
+    @conn = Net::FTP.new #(@server_addr)
+		@conn.connect(@server_addr, @server_port)
 
     Rescue.ignore {
       @conn.login("anonymous", "ceil_client")
@@ -80,6 +82,7 @@ class FTPTransfer
     @conn.close
   end
 end
+
 =begin
 ftp = FTPTransfer.new("localhost")
 system 'mkdir /tmp/hgg'

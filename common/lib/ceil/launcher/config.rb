@@ -8,8 +8,8 @@ require 'json'
 class ClusterConfiguration
   attr_reader :node_list, :inst_list, 
               :host_name, :cluster_name, 
-              :package_server, :package_server_type,
-              :key_server, :key_server_type
+              :package_server, :package_server_type, :package_server_port,
+              :key_server, :key_server_type, :key_server_port
 
   def initialize(local_addr)
     @node_list = nil
@@ -18,12 +18,15 @@ class ClusterConfiguration
     @cluster_name = nil
     @local_addr = local_addr
 
-    #default server..
+    #default params
     @package_server = "localhost"
     @key_server = "localhost"
-    #default server type = nfs
-    @package_server_type = "nfs"
-    @key_server_type = "nfs"
+
+    @package_server_type = "ftp"
+		@package_server_port = '21'
+
+    @key_server_type = "ftp"
+		@key_server_port = '21'
   end
 
   def generate_config_file(local_path)
@@ -58,8 +61,10 @@ class ClusterConfiguration
 
 			File.open(filename_servers_config) do |file|
 				@package_server = file.readline.chomp
+				@package_server_port = file.readline.chomp
 				@package_server_type = file.readline.chomp
 				@key_server = file.readline.chomp
+				@key_server_port = file.readline.chomp
 				@key_server_type = file.readline.chomp
 			end
 			File.open(filename_cluster_config) do |file|

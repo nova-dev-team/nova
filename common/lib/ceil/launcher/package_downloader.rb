@@ -5,10 +5,10 @@ require 'ftools'
 require 'fileutils'
 
 class PackageDownloader
-	def initialize(server_addr)
+	def initialize(server_addr, port = '21')
 		@server_addr = server_addr
 		@nfs = NFSTransfer.new(server_addr)
-		@ftp = FTPTransfer.new(server_addr)
+		@ftp = FTPTransfer.new(server_addr, port)
 	end
 
 	def local_exists(app_name)
