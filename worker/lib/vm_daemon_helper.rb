@@ -392,6 +392,11 @@ HDA_SAVE_TO_LFTP
     # hda_save_to not found, no need to save, do nothing
     write_log "'hda_save_to' not found, saving skipped"
   end
+
+  write_log "changed VM status to 'destroyed'"
+  File.open("status", "w") do |f|
+    f.write "destroyed"
+  end
 end
 
 
@@ -424,7 +429,7 @@ end
 
 
 
-def do_cleanup starge_server, vm_dir
+def do_cleanup storage_server, vm_dir
   write_log "doing cleanup work"
 
   if File.exists? "xml_desc.xml"
