@@ -49,14 +49,16 @@ class PackageDownloader
 
   def win_package_by_ftp(app_name)
 		package_source = "/packages/#{app_name}"
+		temp = "C:\\Temp"
 		dest = "C:\\Temp\\#{app_name}"
+
 		system "mkdir C:\\Temp"
-		system "mkdir C:\\Temp\\#{app_name}"
-		
+
 		local_path = local_exists(app_name)
 		if local_path
-			FileUtils.cp_r(local_path, dest)
+			FileUtils.cp_r(local_path, temp)
 		else
+			system "mkdir C:\\Temp\\#{app_name}"
 			@ftp.download_dir(package_source, dest, "\\")
 		end
 		return dest
