@@ -48,10 +48,8 @@ class Vmachine < ActiveRecord::Base
       begin
         all_domains << virt_conn.lookup_domain_by_name(vm_entry)
       rescue
-        # failed to find the vm
-        # this could happen if we are listing the VM too frequently.
-        # and could happen if creating agent-cd takes too long.
-        Vmachine.log vm_entry, "Failed to lookup VM domain with name='#{vm_entry}'"
+        # when the VM is being prepared, or being saved, it will not be found by lookup_domain_by_name
+        # in this case, we just ignore it
       end
     end
 

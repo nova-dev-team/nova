@@ -455,11 +455,9 @@ def do_cleanup storage_server, vm_dir
 
     # make sure the vm domain is destroyed
     virt_conn = Libvirt::open("qemu:///system")
-    begin
-      dom = virt_conn.lookup_domain_by_uuid(uuid)
-      dom.destroy rescue nil
-      dom.undefine rescue nil
-    end
+    dom = virt_conn.lookup_domain_by_uuid(uuid) rescue nil
+    dom.destroy rescue nil
+    dom.undefine rescue nil
 
     # make sure archive folder exists
     FileUtils.mkdir_p "../../vm_archive"
