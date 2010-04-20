@@ -48,7 +48,9 @@ class Vmachine < ActiveRecord::Base
       begin
         all_domains << virt_conn.lookup_domain_by_name(vm_entry)
       rescue
-        # failed to find the vm, mark it as "destroyed"
+        # failed to find the vm
+        # this could happen if we are listing the VM too frequently.
+        # and could happen if creating agent-cd takes too long.
         Vmachine.log vm_entry, "Failed to lookup VM domain with name='#{vm_entry}'"
       end
     end
@@ -390,6 +392,7 @@ private
     if params[:agent_hint] != nil and params[:agent_hint] != ""
       Vmachine.open_vm_file(params[:name], "agent_hint") do |f|
         f.write params[:agent_hint]
+        f.write "\n"
       end
     end
     

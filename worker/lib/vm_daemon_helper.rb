@@ -209,10 +209,10 @@ def prepare_agent_package storage_server, package_pool, vm_dir, package_name
 
   package_dir = File.join package_pool, package_name
   copying_lock = package_dir + ".copying"
-  dest_dir = File.join vm_dir, "packages", package_name
+  dest_dir = File.join vm_dir, "agent-cd/packages", package_name
 
-  unless File.exists? "#{vm_dir}/packages"
-    FileUtils.mkdir_p "#{vm_dir}/packages"
+  unless File.exists? "#{vm_dir}/agent-cd/packages"
+    FileUtils.mkdir_p "#{vm_dir}/agent-cd/packages"
   end
 
   if File.exists? package_dir and (File.exists? copying_lock) == false
@@ -322,7 +322,7 @@ when "prepare"
 
     # TODO make agent iso images
     # place holder code, since Huang Gang's ceil is not working now
-    `genisoimage -L -D -l -f -o agent-cd.iso packages/`
+    `genisoimage -L -D -l -f -o agent-cd.iso agent-cd/`
   end
 
 =begin
@@ -457,6 +457,9 @@ when "cleanup"
             FileUtils.rm_f img
           end
         end
+      end
+      if File.exists? "agent-cd.iso"
+        FileUtils.rm_f "agent-cd.iso"
       end
     end
 
