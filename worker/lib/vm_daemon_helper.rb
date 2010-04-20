@@ -128,11 +128,11 @@ end
 def prepare_iso_image storage_server, image_pool_dir, vm_dir, iso_name
   # be care of the .copying lock!
   #
-  # if iso exists in the image_pool
-  #   make hard link, directly use it
-  # else there it is not in image_pool
-  #   if the base image is being copied, wait until it is ready, and make hard link
-  #   else the base image is not copied, download it directly, and make hard link
+  # if package exists in the package_pool
+  #   make soft link, directly use it
+  # else it is not in package_pool
+  #   if the package is being copied, wait until it is ready, and make soft link (by calling the function again)
+  #   else the package is not copied, download it directly, and make soft link (by calling the function again)
 
   base_image_path = File.join image_pool_dir, iso_name
   base_image_copying_lock = File.join image_pool_dir, "#{iso_name}.copying"
@@ -277,19 +277,7 @@ end
 ###############################################################################################
 
 
-if ARGV.length < 3
-  puts "usage: vm_daemon_helper.rb <storage_server> <vm_dir> <action>"
-  exit 1
-end
-
-storage_server = ARGV[0]
-vm_dir = ARGV[1]
-action = ARGV[2]
-
-Dir.chdir vm_dir
-
-case action
-when "prepare"
+def do_prepare storage_server, vm_dir
   puts "preparing"
   image_pool_dir = File.join vm_dir, "../../image_pool"
   package_pool_dir = File.join vm_dir, "../../package_pool"
@@ -362,45 +350,12 @@ when "prepare"
     end
     exit  # exit this polling round, no need to do saving. on next calling round, "cleanup" actions will be performed
   end
+end
 
-when "poll"
-  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
-  uuid = xml_desc["uuid"][0]
 
-  virt_conn = Libvirt::open("qemu:///system")
-  begin
-    dom = virt_conn.lookup_domain_by_uuid(uuid)
-
-    if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
-      exit  # the vm is still running, skip the following actions
-    else
-      begin
-        dom.destroy
-      ensure
-        begin
-          dom.undefine
-        rescue
-        end
-      end
-    end
-
-  rescue Exception => e
-    # domain not found, write "saving" to status file
-    File.open("log", "a") do |f|
-      f.write "#{Time.now}: Exception in ruby: #{e.to_s}\n"
-    end
-    File.open("status", "w") do |f|
-      f.write "saving"
-    end
-
-    # XXX don't exit here. need to save image int the following code
-  end
-
+def do_save storage_server, vm_dir
   if File.exists? "hda_save_to"
-
-    write_log "detected vmachine stopped, changed status to 'saving'"
-
-    # vm stopped, start saving job
+    write_log "changed VM status to 'saving'"
     File.open("status", "w") do |f|
       f.write "saving"
     end
@@ -418,7 +373,7 @@ when "poll"
     File.open("uploading_lock", "w") do |f|
       f.write Time.now
     end
-    puts "uploading_lock created"
+    write_log "uploading_lock created"
     File.open("hda_save_to.lftp", "w") do |f|
       f.write <<HDA_SAVE_TO_LFTP
 set net:timeout 10
@@ -429,27 +384,54 @@ put #{hda_image} -o #{File.read "hda_save_to"}
 HDA_SAVE_TO_LFTP
     end
     my_exec "lftp -f hda_save_to.lftp 2>&1 >> hda_save_to.log"
-    FileUtils.rm "uploading_lock"
-    puts "uploading_lock removed"
-    
+    FileUtils.rm_f "uploading_lock"
+    FileUtils.rm_f "hda_save_to.lftp"
+    write_log "uploading_lock removed"
+    write_log "saving done"
   else
     # hda_save_to not found, no need to save, do nothing
-    write_log "detected vmachine stopped, saving not required"
+    write_log "'hda_save_to' not found, saving skipped"
   end
+end
 
-  # when saving finished, make the vm as 'destroyed'
-  File.open("status", "w") do |f|
-    f.write "destroyed"
+
+
+def do_poll storage_server, vm_dir
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  uuid = xml_desc["uuid"][0]
+
+  virt_conn = Libvirt::open("qemu:///system")
+  begin
+    dom = virt_conn.lookup_domain_by_uuid(uuid)
+
+    if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
+      return  # the vm is still running, skip the following actions
+    else
+      write_log "detected VM shutdown, saving it"
+      begin
+        dom.destroy
+      ensure
+        dom.undefine rescue nil
+      end
+      do_save storage_server, vm_dir
+    end
+
+  rescue
+    write_log "failed to find domain while polling, saving the VM before destoying it"
+    do_save storage_server, vm_dir
   end
+end
 
-  write_log "changed vmachine status to 'destroyed'"
 
-when "cleanup"
-  puts "doing cleanup"
-  write_log "detected vmachine destroyed"
+
+def do_cleanup starge_server, vm_dir
+  write_log "doing cleanup work"
 
   if File.exists? "xml_desc.xml"
     # if the vm has xml_desc.xml, we could retrieve the uuid & name, and could archive the running info
+    xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+    uuid = xml_desc["uuid"][0]
+    name = xml_desc["name"][0]
 
     # remove big image files
     if File.exists? "required_images"
@@ -470,46 +452,54 @@ when "cleanup"
     virt_conn = Libvirt::open("qemu:///system")
     begin
       dom = virt_conn.lookup_domain_by_uuid(uuid)
-
-      if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
-        exit  # the vm is still running, skip the following actions
-      else
-        begin
-          dom.destroy
-        ensure
-          begin
-            dom.undefine
-          rescue
-          end
-        end
-      end
-
-    rescue
-      # domain not found, write "saving" to status file
-      File.open("status", "w") do |f|
-        f.write "saving"
-      end
-
-      # XXX don't exit here. need to save image int the following code
+      dom.destroy rescue nil
+      dom.undefine rescue nil
     end
 
-    # save info files into archive
-    xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
-    uuid = xml_desc["uuid"][0]
-    name = xml_desc["name"][0]
+    # make sure archive folder exists
     FileUtils.mkdir_p "../../vm_archive"
 
     parent_dir = File.join vm_dir, ".."
     Dir.chdir parent_dir
     FileUtils.mv vm_dir, "../vm_archive/#{name}.#{uuid}"
   else
-    # delete everything
+    # delete everything, since we don't have any info to archive the VM
     parent_dir = File.join vm_dir, ".."
     Dir.chdir parent_dir
     puts "removing vm folder #{vm_dir}"
     FileUtils.rm_rf vm_dir
   end
 
+end
+
+
+###############################################################################################
+#                                                                                             #
+#                                        SCRIPT ENTRY                                         #
+#                                                                                             #
+###############################################################################################
+
+
+if ARGV.length < 3
+  puts "usage: vm_daemon_helper.rb <storage_server> <vm_dir> <action>"
+  exit 1
+end
+
+storage_server = ARGV[0]
+vm_dir = ARGV[1]
+action = ARGV[2]
+
+Dir.chdir vm_dir
+
+case action
+when "prepare"
+  do_prepare storage_server, vm_dir
+when "poll"
+  do_poll storage_server, vm_dir
+when "save"
+  do_save storage_server, vm_dir
+when "cleanup"
+  do_cleanup storage_server, vm_dir
 else
   puts "error: action '#{action}' not understood!"
 end
