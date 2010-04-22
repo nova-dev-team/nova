@@ -4,6 +4,7 @@ require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
 require 'ceil_iso_generator'
+require 'uri'
 
 # libvirt status constants
 LIBVIRT_RUNNING = 1
@@ -312,7 +313,7 @@ def do_prepare rails_root, storage_server, vm_dir
     # place holder code, since Huang Gang's ceil is not working now
 #    `genisoimage -L -D -l -f -o agent-cd.iso agent-cd/`
     begin
-      write_log "loading iso generator lib"
+      write_log "creating agent cd using iso generator"
 
       igen = CeilIsoGenerator.new
       write_log "config_essential: #{rails_root}/../common/lib/ceil"
@@ -322,6 +323,7 @@ def do_prepare rails_root, storage_server, vm_dir
       agent_submask = ""
       agent_gateway = ""
       agent_dns = ""
+      cluster_name = ""
       File.read("agent_hint").each_line do |line|
         line = line.strip
         if line.start_with? "ip="
@@ -329,22 +331,27 @@ def do_prepare rails_root, storage_server, vm_dir
         elsif line.start_with? "subnet_mask="
           agent_submask = line[12..-1]
         elsif line.start_with? "gateway="
-          agent_gatwway = line[8..-1]
-        elseif line.start_with? "dns="
+          agent_gateway = line[8..-1]
+        elsif line.start_with? "dns="
           agent_dns = line[4..-1]
+        elsif line.start_with? "cluster_name="
+          cluster_name = line[13..-1]
         end
       end
 
-      write_log "config_network: ip=#{agent_ip}, submask=#{agent_submask}, gateway=#{agent_gateway}, dns=#{agent_dns}"
+      write_log "config_network: ip=#{agent_ip}, submask=#{agent_submask}, gateway=#{agent_gateway}, dns=#{agent_dns}, cluster_name=#{cluster_name}"
       igen.config_network(agent_ip, agent_submask, agent_gateway, agent_dns)
 
       # TODO setup cluster name, so the agent could retrieve keys
-      igen.config_cluster("nova-0-1", "nova-cluster-name")
+      vm_name = File.basename vm_dir
+      igen.config_cluster(vm_name, cluster_name)
 
-      # TODO set user name, password, etc. and read server info from "storage_server" variable
-      igen.config_package_server('santa:santa@10.0.1.223', '8021', 'ftp')
-      # TODO set key server
-      igen.config_key_server('santa:santa@10.0.1.223', '8021', 'ftp')
+      # set user name, password, etc. and read server info from "storage_server" variable
+      server_uri = URI::parse storage_server
+      server_user_pwd_host = "#{server_uri.user}:#{server_uri.password}@#{server_uri.host}"
+      igen.config_package_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
+      # set key server
+      igen.config_key_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
 
       igen.config_nodelist(File.read "nodelist")
 

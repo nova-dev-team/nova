@@ -20,6 +20,7 @@ function toggle_mount_iso() {
     disable("new_vm_dns");
     disable("new_vm_agent_packages");
     disable("new_vm_nodelist");
+    disable("new_vm_cluster_name");
   } else {
     disable("new_vm_cd_image");
   }
@@ -36,6 +37,7 @@ function toggle_agent_cd() {
     enable("new_vm_dns");
     enable("new_vm_agent_packages");
     enable("new_vm_nodelist");
+    enable("new_vm_cluster_name");
     disable("new_vm_cd_image");
   } else {
     disable("new_vm_ip_addr");
@@ -44,6 +46,7 @@ function toggle_agent_cd() {
     disable("new_vm_dns");
     disable("new_vm_agent_packages");
     disable("new_vm_nodelist");
+    disable("new_vm_cluster_name");
   }
 }
 
@@ -133,6 +136,7 @@ function add_vmachine() {
     var dns = $("#new_vm_dns").val();
     var agent_packages = $("#new_vm_agent_packages").val();
     var nodelist = $("#new_vm_nodelist").val();
+    var cluster_name = $("#new_vm_cluster_name").val();
     if (is_valid_ip(ip_addr) == false) {
       alert("Invalid IP address!");
       return;
@@ -165,6 +169,10 @@ function add_vmachine() {
 
     if (nodelist != null && nodelist != "") {
       agent_hint += "nodelist=" + nodelist + "\n";
+    }
+
+    if (cluster_name != null && cluster_name != "") {
+      agent_hint += "cluster_name=" + cluster_name + "\n";
     }
   }
   $("#add_new_vmachine_div").block();

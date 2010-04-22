@@ -226,10 +226,13 @@ Save to (optional): <input type="text" id="new_vm_hda_save_to" size=40 /><br>
 IP: <input id="new_vm_ip_addr" type="text" size=15 disabled class='disabled_input' /><%= spacing 2 %>
 Subnet mask: <input id="new_vm_subnet_mask" type="text" size=15 value="255.255.255.0" disabled class='disabled_input' /><%= spacing 2 %>
 Gateway: <input id="new_vm_gateway" type="text" size=15 disabled class='disabled_input' /><%= spacing 2%>
-DNS (optional): <input id="new_vm_dns" type="text" size=15 disabled class='disabled_input' /><br>
+DNS (optional): <input id="new_vm_dns" type="text" size=15 disabled class='disabled_input' /><%= spacing 2%>
+Cluster name (optional): <input id="new_vm_cluster_name" type="text" size=15 disabled class='disabled_input' />
+<br>
 
-Packages to be installed (separate with comma or space): <input type="text" id="new_vm_agent_packages" size=69 disabled class='disabled_input' /><br>
-Node list (&quot;ip hostname&quot;, separate with comma): <input type="text" id="new_vm_nodelist" size=80 disabled class='disabled_input' /><br>
+
+Packages to be installed (separate with comma or space): <input type="text" id="new_vm_agent_packages" size=119 disabled class='disabled_input' /><br>
+Node list (&quot;ip hostname&quot;, separate with comma): <input type="text" id="new_vm_nodelist" size=130 disabled class='disabled_input' /><br>
 
 <button type="button" class="btn" onclick="add_vmachine()"><span><span>Add new vmachine</span></span></button> <%= spacing 2 %> Current page will be reloaded when clicked.
 </div>
