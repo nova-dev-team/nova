@@ -2,6 +2,7 @@ require "utils"
 require "libvirt"
 require "fileutils"
 require "yaml"
+require "pathname"
 
 # This is the model for virtual machines. We use this class to controll virtual machines.
 #
@@ -374,6 +375,7 @@ private
     end
 
     # the 'agent_packages' file contains all the required packages for agent cd image
+    # also, writes the 'nodelist' file
     if params[:run_agent].to_s == "true" and params[:agent_hint] != nil and params[:agent_hint] != ""
       Vmachine.open_vm_file(params[:name], "agent_packages") do |f|
         params[:agent_hint].each_line do |line|
@@ -381,6 +383,17 @@ private
             pkgs = (line[15..-1].split /,| |\n/).select {|item| item.length > 0}
             pkgs.each do |pkg|
               f.write "#{pkg}\n"
+            end
+          end
+        end
+      end
+      Vmachine.open_vm_file(params[:name], "nodelist") do |f|
+        params[:agent_hint].each_line do |line|
+          if line.start_with? "nodelist="
+            nodelist = ((line[9..-1]).split ',').select {|item| item.length > 0}
+            nodelist.each do |node|
+              node = node.strip
+              f.write "#{node}\n"
             end
           end
         end
@@ -422,7 +435,7 @@ private
           end
         end
       end
-      exec "./vm_daemon #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, params[:name]}"
+      exec "./vm_daemon #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, params[:name]}"
     end
     Process.detach pid  # prevent zombie process
 

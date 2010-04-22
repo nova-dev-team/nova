@@ -19,6 +19,7 @@ function toggle_mount_iso() {
     disable("new_vm_gateway");
     disable("new_vm_dns");
     disable("new_vm_agent_packages");
+    disable("new_vm_nodelist");
   } else {
     disable("new_vm_cd_image");
   }
@@ -34,6 +35,7 @@ function toggle_agent_cd() {
     enable("new_vm_gateway");
     enable("new_vm_dns");
     enable("new_vm_agent_packages");
+    enable("new_vm_nodelist");
     disable("new_vm_cd_image");
   } else {
     disable("new_vm_ip_addr");
@@ -41,6 +43,7 @@ function toggle_agent_cd() {
     disable("new_vm_gateway");
     disable("new_vm_dns");
     disable("new_vm_agent_packages");
+    disable("new_vm_nodelist");
   }
 }
 
@@ -84,7 +87,7 @@ function add_vmachine() {
   var hda_save_to = $("#new_vm_hda_save_to").val();
   var run_agent = $("input[name=chk_agent_cd]").is(":checked");
   var mount_iso = $("input[name=chk_mount_iso]").is(":checked");
-  var agent_hint = "";    // ip, subnet mask, gateway, dns, packages, etc...
+  var agent_hint = "";    // ip, subnet mask, gateway, dns, packages, nodelist, etc...
   var uuid = $("#new_vm_uuid").val();
   var cd_image = $("#new_vm_cd_image").val();
 
@@ -129,6 +132,7 @@ function add_vmachine() {
     var gateway = $("#new_vm_gateway").val();
     var dns = $("#new_vm_dns").val();
     var agent_packages = $("#new_vm_agent_packages").val();
+    var nodelist = $("#new_vm_nodelist").val();
     if (is_valid_ip(ip_addr) == false) {
       alert("Invalid IP address!");
       return;
@@ -156,7 +160,11 @@ function add_vmachine() {
     }
 
     if (agent_packages != null) {
-      agent_hint += "agent_packages=" + agent_packages;
+      agent_hint += "agent_packages=" + agent_packages + "\n";
+    }
+
+    if (nodelist != null && nodelist != "") {
+      agent_hint += "nodelist=" + nodelist + "\n";
     }
   }
   $("#add_new_vmachine_div").block();

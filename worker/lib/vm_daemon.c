@@ -11,13 +11,14 @@
 #include <unistd.h>
 
 int main(int argc, char* argv[]) {
-  if (argc < 3) {
-    printf("usage: vm_daemon <storage_server> <vm_dir>\n");
+  if (argc < 4) {
+    printf("usage: vm_daemon <rails_root> <storage_server> <vm_dir>\n");
     printf("depends on ruby, and must run with 'vm_daemon_helper.rb' in same dir!\n");
     return 1;
   } else {
-    char* storage_server = argv[1];
-    char* vm_dir = argv[2];
+    char* rails_root = argv[1];
+    char* storage_server = argv[2];
+    char* vm_dir = argv[3];
 
     // there's no need to free those malloc'd pointers
     char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) * 2 + strlen(storage_server) * 2 + 200));
@@ -54,7 +55,7 @@ int main(int argc, char* argv[]) {
     // 4 destroyed: vm destroyed, remove all resources
     // 5 failed: failed to start for some reason, should be moved to 'broken' directory?
 
-    sprintf(cmd, "./vm_daemon_helper.rb %s %s prepare 2>&1 >> %s/raw_exec_output.log", storage_server, vm_dir, vm_dir);
+    sprintf(cmd, "./vm_daemon_helper.rb %s %s %s prepare 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
     printf("[cmd] %s\n", cmd);
     system(cmd);
 
@@ -65,7 +66,7 @@ int main(int argc, char* argv[]) {
     sprintf(status_fn, "%s/status", vm_dir);
     for (;;) {
       FILE* status_fp = NULL;
-      sprintf(cmd, "./vm_daemon_helper.rb %s %s poll 2>&1 >> %s/raw_exec_output.log", storage_server, vm_dir, vm_dir);
+      sprintf(cmd, "./vm_daemon_helper.rb %s %s %s poll 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
       printf("[cmd] %s\n", cmd);
       system(cmd);
 
@@ -88,7 +89,7 @@ int main(int argc, char* argv[]) {
     }
 
     // clean up resource
-    sprintf(cmd, "./vm_daemon_helper.rb %s %s cleanup 2>&1 >> %s/raw_exec_output.log", storage_server, vm_dir, vm_dir);
+    sprintf(cmd, "./vm_daemon_helper.rb %s %s %s cleanup 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
     printf("[cmd] %s\n", cmd);
     system(cmd);
 

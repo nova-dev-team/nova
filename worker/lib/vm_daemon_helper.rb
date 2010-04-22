@@ -3,7 +3,7 @@
 require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
-#require 'ceil_iso_generator'
+require 'ceil_iso_generator'
 
 # libvirt status constants
 LIBVIRT_RUNNING = 1
@@ -277,7 +277,7 @@ end
 ###############################################################################################
 
 
-def do_prepare storage_server, vm_dir
+def do_prepare rails_root, storage_server, vm_dir
   puts "preparing"
   image_pool_dir = File.join vm_dir, "../../image_pool"
   package_pool_dir = File.join vm_dir, "../../package_pool"
@@ -301,7 +301,7 @@ def do_prepare storage_server, vm_dir
   # TODO check if download success
 
   # TODO download packages
-  if File.exists? "agent_packages"
+  if File.exists? "agent_packages" or File.exists? "nodelist"
     write_log "preparing required packages"
     File.read("agent_packages").each_line do |line|
       pkg = line.strip
@@ -310,19 +310,60 @@ def do_prepare storage_server, vm_dir
 
     # TODO make agent iso images
     # place holder code, since Huang Gang's ceil is not working now
-    `genisoimage -L -D -l -f -o agent-cd.iso agent-cd/`
-  end
+#    `genisoimage -L -D -l -f -o agent-cd.iso agent-cd/`
+    begin
+      write_log "loading iso generator lib"
 
-=begin
-  iso_gen = CeilIsoGenerator.new
-  iso_gen.config_essential(File.join Setting.system_root, "master/lib/ceil")
-  iso_gen.config_network("10.0.4.100", "255.255.255.0", "10.0.4.1", "166.111.8.28")
-  iso_gen.config_cluster("nova-0-1", "nova-cluster-name")
-  iso_gen.config_servers("10.0.4.1", "FTP", "10.0.1.211", "FTP")
-  iso_gen.config_nodelist("10.0.4.100 node1")
-  iso_gen.config_softlist("common ssh-nopass")
-  iso_gen.generate(File.join vm_dir, "agent_cd.iso")
-=end
+      igen = CeilIsoGenerator.new
+      write_log "config_essential: #{rails_root}/../common/lib/ceil"
+      igen.config_essential("#{rails_root}/../common/lib/ceil")
+
+      agent_ip = ""
+      agent_submask = ""
+      agent_gateway = ""
+      agent_dns = ""
+      File.read("agent_hint").each_line do |line|
+        line = line.strip
+        if line.start_with? "ip="
+          agent_ip = line[3..-1]
+        elsif line.start_with? "subnet_mask="
+          agent_submask = line[12..-1]
+        elsif line.start_with? "gateway="
+          agent_gatwway = line[8..-1]
+        elseif line.start_with? "dns="
+          agent_dns = line[4..-1]
+        end
+      end
+
+      write_log "config_network: ip=#{agent_ip}, submask=#{agent_submask}, gateway=#{agent_gateway}, dns=#{agent_dns}"
+      igen.config_network(agent_ip, agent_submask, agent_gateway, agent_dns)
+
+      # TODO setup cluster name, so the agent could retrieve keys
+      igen.config_cluster("nova-0-1", "nova-cluster-name")
+
+      # TODO set user name, password, etc. and read server info from "storage_server" variable
+      igen.config_package_server('santa:santa@10.0.1.223', '8021', 'ftp')
+      # TODO set key server
+      igen.config_key_server('santa:santa@10.0.1.223', '8021', 'ftp')
+
+      igen.config_nodelist(File.read "nodelist")
+
+      # set the software packages
+      software_packages = ["common", "ssh-nopass"] # by default, install those 2 packages
+      File.read("agent_packages").each_line do |pkg|
+        pkg = pkg.strip
+        unless software_packages.include? pkg
+          software_packages << pkg
+        end
+      end
+      write_log "config_softlist: #{software_packages.join " "}"
+      igen.config_softlist(software_packages.join " ")
+
+      igen.generate("#{vm_dir}/agent-cd", "#{vm_dir}/agent-cd.iso")
+    rescue Exception => e
+      write_log "Exception: #{e.to_s}"
+    end
+  end
 
   # TODO boot vm, handle failure if necessary
 
@@ -484,19 +525,20 @@ end
 
 
 if ARGV.length < 3
-  puts "usage: vm_daemon_helper.rb <storage_server> <vm_dir> <action>"
+  puts "usage: vm_daemon_helper.rb <rails_root> <storage_server> <vm_dir> <action>"
   exit 1
 end
 
-storage_server = ARGV[0]
-vm_dir = ARGV[1]
-action = ARGV[2]
+rails_root = ARGV[0]
+storage_server = ARGV[1]
+vm_dir = ARGV[2]
+action = ARGV[3]
 
 Dir.chdir vm_dir
 
 case action
 when "prepare"
-  do_prepare storage_server, vm_dir
+  do_prepare rails_root, storage_server, vm_dir
 when "poll"
   do_poll storage_server, vm_dir
 when "save"
