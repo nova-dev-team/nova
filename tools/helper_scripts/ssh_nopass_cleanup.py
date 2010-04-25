@@ -35,6 +35,7 @@ def ssh_nopass_cleanup(home_folder):
         for line in other_lines:
           f.write(line)
       print "Re-written '%s'." % auth_key_file
+    print "Done!"
   else: # "authorized_keys" file not found
     print "File not found: %s" % auth_key_file
 
@@ -43,5 +44,4 @@ if __name__ == "__main__":
   home_dir = os.environ["HOME"]
   print "This script removes duplicated entries in '%s/.ssh/authorized_keys'." % home_dir
   ssh_nopass_cleanup(home_dir)
-  print "Done!"
 
