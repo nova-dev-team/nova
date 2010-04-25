@@ -92,7 +92,7 @@ namespace :nova do
       FileUtils.mkdir_p "#{conf["run_root"]}/vm"
       FileUtils.mkdir_p "#{conf["run_root"]}/image_pool"
 
-      unless File.exists? "#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script"
+      unless File.exists? "#{RAILS_ROOT}/config/storage_server.conf"
         puts "!!!"
         puts "!!! You haven't initialized the worker module!"
         puts "!!! run 'rake nova:worker:init' first!"
@@ -122,7 +122,7 @@ LFTP_SCRIPT
     end
 
     desc "Start Nova worker"
-    task :start do
+    task :start => :stop do
       do_start
     end
 
