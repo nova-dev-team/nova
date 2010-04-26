@@ -2,16 +2,16 @@ About the installer
 ===================
 
 Installing Nova is a complex process. First, you need to install the master server by running "install.sh", which
-downloads required .deb packages by apt-get, installs ruby .gem packages, and compiles utility tools. Then, you
-will have to start an FTP (actually, the "storage server" of Nova platform). The next step is to create an installer
-package by running "make_allinone_installer.rb" script, which creates an self-contained installer packages for
-worker module installation. When all those are done, you can simple install a new worker machine by running
-"install_worker.rb", or by master module web interface.
+downloads required .deb packages by apt-get, installs ruby .gem packages, and compiles utility tools. Then, you will
+have to start an FTP (actually, the "storage server" of Nova platform). The next step is to create an installer
+package by running "make_allinone_installer.rb" script, which creates an self-contained installer packages for worker
+module installation, and pushes it into the FTP storage server. When all those are done, you can simply install a new
+worker machine by running "install_worker.rb", or by master module's web interface.
 
 Well, in conclusion, you have to do those:
 
   1:  ./install.sh
   2:  start an FTP server
   3:  ./make_allinone_installer.rb (you will be asked to provide the FTP server started in step 2)
-  4:  install new worker machine by running "./install_worker.rb", or by master module web interface
+  4:  install new worker machine by running "./install_worker.rb", or by master module's web interface
 

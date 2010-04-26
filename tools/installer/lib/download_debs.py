@@ -40,24 +40,9 @@ def apt_depends(deb_list):
         open_list.append(depend_pkg)
   return closed_list
 
-"""
-with open(os.path.dirname(__file__) + "") as f:
-
-pkgs_input = raw_input("input packages in a line, separate with space:\n")
-pkgs = pkgs_input.split()
-pkgs_depend = apt_depends(pkgs)
-pkgs_depend.sort()
-print pkgs_depend
-down_dir = raw_input("Download folder: ")
-partial_folder = down_dir + os.path.sep + "partial"
-if not os.path.exists(partial_folder):
-  os.makedirs(partial_folder)
-for pkg in pkgs_depend:
-  cmd = "sudo apt-get install --reinstall -d -y -o Dir::Cache::Archives=%s %s" % (down_dir, pkg)
-  print cmd
-  os.system(cmd)
-"""
-
+#
+# MAIN FUNCTION SECTION
+#
 
 required_debs_list_fn = os.path.dirname(__file__) + os.path.sep + "../data/debs.list"
 pkgs = []

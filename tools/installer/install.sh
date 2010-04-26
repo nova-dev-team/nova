@@ -5,10 +5,10 @@ echo
 echo "This script installs the Nova platform. Currently it only supports Ubuntu distribution."
 echo "You may want to modify '../../common/config/conf.yml' according to your needs."
 echo
-echo "The installation process::"
+echo "The installation process:"
 echo "1: Install depended .deb packages"
 echo "2: Install depended .gem packages"
-echo "3: Compiling utility tools"
+echo "3: Compile utility tools"
 echo "4: Install Nova master module"
 echo "5: Create worker node installer"
 echo "6: Configure the Nova system"
