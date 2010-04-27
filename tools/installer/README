@@ -15,3 +15,5 @@ Well, in conclusion, you have to do those:
   3:  ./make_allinone_installer.rb (you will be asked to provide the FTP server started in step 2)
   4:  install new worker machine by running "./install_worker.rb", or by master module's web interface
 
+NOTE: Make sure the machine on which you are makeing the all-in-one installer has same architecture with the target
+      machines! All-in-one installer made on amd64 machines could only be used on amd64 machines!

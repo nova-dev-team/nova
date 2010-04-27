@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# check root privilege
+if [[ $UID -ne 0 ]]; then
+  echo "This script requires root privilege!"
+  exit 1
+fi
+
 clear
 echo
 echo "This script installs the Nova platform. Currently it only supports Ubuntu distribution."
@@ -27,11 +33,11 @@ SCRIPT_ROOT=$(dirname $0)
 DEBS_LIST=$SCRIPT_ROOT/data/debs.list
 DEBS_DIR=$SCRIPT_ROOT/data/debs
 
-sudo apt-get update
+apt-get update
 all_debs=( $( cat $DEBS_LIST ) )
-sudo apt-get install -y ${all_debs[@]} || exit 1
+apt-get install -y ${all_debs[@]} || exit 1
 
 # switch to ruby script
 echo
-ruby $SCRIPT_ROOT/install_stage2.rb
+ruby $SCRIPT_ROOT/lib/install_stage2.rb
 
