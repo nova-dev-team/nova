@@ -18,7 +18,7 @@ if File.exists? "#{File.dirname __FILE__}/data/debs"
   unless empty_deb_folder
     puts "!!!"
     puts "!!! We found some .deb packages already downloaded in data/debs dir."
-    puts "!!! They might be stale, we suggest you press Ctrl-C to stop the script now, and remove data/debs dir."
+    puts "!!! They might be stale, we suggest you press Ctrl-C to stop the script now, and remove data/debs dir manually first."
     puts "!!! Or you can press ENTER and continue the script."
     puts "!!!"
     gets # pause
@@ -32,7 +32,7 @@ tmp_dir = "/tmp/nova-all-in-one-installer.#{token}"
 my_exec "mkdir -p #{tmp_dir}"
 
 cruft_list = []
-File.read("#{File.dirname __FILE__}/lib/installer_cruft_list").each_line do |line|
+File.read("#{File.dirname __FILE__}/data/installer_cruft_list").each_line do |line|
   line = line.strip
   next if line.start_with? "#" or line == ""
   cruft_list << line

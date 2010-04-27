@@ -44,6 +44,15 @@ def apt_depends(deb_list):
 # MAIN FUNCTION SECTION
 #
 
+blacklisted_debs_list_fn = os.path.dirname(__file__) + os.path.sep + "../data/debs.list.blacklist"
+pkgs_blacklist = []
+with open(blacklisted_debs_list_fn, "r") as f:
+  for line in f.readlines():
+    pkg_name = line.strip()
+    if pkg_name == "":
+      continue
+    pkgs_blacklist += pkg_name,
+
 required_debs_list_fn = os.path.dirname(__file__) + os.path.sep + "../data/debs.list"
 pkgs = []
 with open(required_debs_list_fn, "r") as f:
@@ -53,7 +62,11 @@ with open(required_debs_list_fn, "r") as f:
       continue
     pkgs += pkg_name,
 print pkgs
-pkgs_depend = apt_depends(pkgs)
+pkgs_depend_all = apt_depends(pkgs)
+pkgs_depend = []
+for pkg in pkgs_depend_all:
+  if pkg not in pkgs_blacklist:
+    pkgs_depend += pkg,
 pkgs_depend.sort()
 print pkgs_depend
 

@@ -1,0 +1,8 @@
+citadel-common
+citadel-mta
+citadel-server
+courier-authlib
+courier-authdaemon
+dpkg
+dpkg-dev
+adduser
