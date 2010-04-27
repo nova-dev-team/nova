@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Installs the Nova platform (master module).
+#
+# Author::    Santa Zhang (santa1987@gmail.com)
+# Since::     0.3
+
 # check root privilege
 if [[ $UID -ne 0 ]]; then
   echo "This script requires root privilege!"

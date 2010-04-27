@@ -25,6 +25,8 @@ end
 worker_host = ARGV[0]
 token = random_token
 
+# copy the installer package to remote server, and triggers the install.sh
+# note that we use 'stricthostkeychecking=no' to prevent the prompt of ssh
 my_exec <<CMD
   scp -o stricthostkeychecking=no -r #{File.dirname __FILE__}/data/all-in-one #{worker_host}:/tmp/install-nova.#{token}
   ssh -o stricthostkeychecking=no #{worker_host} "cd /tmp/install-nova.#{token} && ./install.sh && rm -rf /tmp/install-nova.#{token}"
