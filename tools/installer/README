@@ -6,14 +6,32 @@ downloads required .deb packages by apt-get, installs ruby .gem packages, and co
 have to start an FTP (actually, the "storage server" of Nova platform). The next step is to create an installer
 package by running "make_allinone_installer.rb" script, which creates an self-contained installer packages for worker
 module installation, and pushes it into the FTP storage server. When all those are done, you can simply install a new
-worker machine by running "install_worker.rb", or by master module's web interface.
+worker machine by running "install_worker_by_package.rb", or by master module's web interface.
 
 Well, in conclusion, you have to do those:
 
   1:  ./install.sh
   2:  start an FTP server
   3:  ./make_allinone_installer.rb (you will be asked to provide the FTP server started in step 2)
-  4:  install new worker machine by running "./install_worker.rb", or by master module's web interface
+  4:  install new worker machine by running "./install_worker_by_package.rb", or by master module's web interface
 
 NOTE: Make sure the machine on which you are makeing the all-in-one installer has same architecture with the target
-      machines! All-in-one installer made on amd64 machines could only be used on amd64 machines!
+      machines! For example, all-in-one installer made on amd64 machines could only be used on amd64 machines!
+
+
+About worker installer scripts
+==============================
+
+There are 2 worker installer scripts, "install_worker_by_package.rb" and "install_worker_by_scp.rb", which should be
+used under different occasions.
+
+install_worker_by_package.rb:
+  We suggest that you use this script for worker machine installation. A very small bootstrap script will be pushed to
+  worker machine, and will be triggered on remote worker machine. The script will download the installer from storage
+  FTP server, and gets the installation process done.
+
+install_worker_by_scp.rb:
+  This script copies all the files to remote worker machine, and runs the 'install.sh'. It does not need the running
+  FTP storage server, but requires that every worker machine has Internet connection (for apt-get downloading packages).
+  To use this script, you may want to endable forwarding on frontend server.
+

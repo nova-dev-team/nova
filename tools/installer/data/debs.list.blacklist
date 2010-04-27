@@ -6,3 +6,5 @@ courier-authdaemon
 dpkg
 dpkg-dev
 adduser
+msmtp-mta
+lsb-invalid-mta

@@ -7,6 +7,8 @@
 
 require "#{File.dirname __FILE__}/../../common/lib/utils.rb"
 
+require_root_privilege
+
 if File.exists? "#{File.dirname __FILE__}/data/debs"
   empty_deb_folder = true
   Dir.foreach("#{File.dirname __FILE__}/data/debs") do |entry|
@@ -25,8 +27,15 @@ if File.exists? "#{File.dirname __FILE__}/data/debs"
   end
 end
 
-require_root_privilege
-my_exec "#{File.dirname __FILE__}/lib/download_debs.py"
+if File.exists? "#{File.dirname __FILE__}/data/all-in-one/install.sh" or File.exists? "#{File.dirname __FILE__}/data/all-in-one/nova-all-in-one-installer.tar.gz"
+  puts "!!!"
+  puts "!!! We found that an all-in-one installer already exists under 'data/all-in-one'!"
+  puts "!!! It will be overwritten by newly created installer package."
+  puts "!!! You can press Ctrl-C to stop the script now, or press ENTER to continue."
+  puts "!!!"
+end
+
+#my_exec "#{File.dirname __FILE__}/lib/download_debs.py"
 token = random_token
 tmp_dir = "/tmp/nova-all-in-one-installer.#{token}"
 my_exec "mkdir -p #{tmp_dir}"
@@ -43,26 +52,28 @@ my_exec "
   cp -r -v * #{tmp_dir}
   cd #{tmp_dir}
   #{(cruft_list.collect {|item| "rm -rf #{item}"}).join "\n"}
-  tar cvzf ../nova-all-in-one-installer.#{token}.tar.gz *
+  tar cvzf /tmp/nova-all-in-one-installer.#{token}.tar.gz *
 "
 
-puts
-puts "########################  INSTALLER CREATED  #######################"
-puts
-puts "Now please provide the FTP addresss. Include the username, password and port info in URL, like 'ftp://santa:santa@localhost:8021/'"
-ftp_url = gets.chomp
+my_exec "
+  mkdir -p #{File.dirname __FILE__}/data/all-in-one
+  mv /tmp/nova-all-in-one-installer.#{token}.tar.gz #{File.dirname __FILE__}/data/all-in-one/nova-all-in-one-installer.tar.gz
+  rm -rf /tmp/nova-all-in-one-installer.#{token}*
+"
 
-File.open("/tmp/nova-all-in-one-installer.#{token}.lftp", "w") do |f|
-  f.write <<LFTP
-open #{ftp_url}
-put nova-all-in-one-installer.#{token}.tar.gz -o nova-all-in-one-installer.tar.gz
-LFTP
+File.open("#{File.dirname __FILE__}/data/all-in-one/install.sh", "w") do |f|
+  f.write <<INSTALL_SH
+#!/bin/bash
+tar zxf nova-all-in-one-installer.tar.gz
+cd tools/installer/data/debs
+dpkg -i *.deb
+cd ../../lib
+ruby install_stage2.rb
+INSTALL_SH
 end
 
 my_exec "
-  cd /tmp
-  lftp -f nova-all-in-one-installer.#{token}.lftp
-  rm -rf nova-all-in-one-installer.#{token}*
+  chmod a+x #{File.dirname __FILE__}/data/all-in-one/install.sh
 "
 
 puts "Everything done!"

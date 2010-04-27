@@ -17,7 +17,7 @@ print
 print "================================================"
 print
 lst.sort()
-save_fn = raw_input("Save to file: ")
+save_fn = raw_input("Save to file (input nothing to skip): ")
 if save_fn != "":
   with open(save_fn, "w") as f:
     for item in lst:
