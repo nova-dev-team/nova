@@ -16,9 +16,9 @@ puts "Usage: install_worker.rb <worker_host>"
 exit if ARGV.length == 0
 
 unless File.exists? "#{File.dirname __FILE__}/data/all-in-one/install.sh" and File.exists? "#{File.dirname __FILE__}/data/all-in-one/nova-all-in-one-installer.tar.gz"
-  print "!!!"
-  print "!!! All-in-one installer package not found! Make sure you have ran './make_allinone_installer.rb' first!"
-  print "!!!"
+  puts "!!!"
+  puts "!!! All-in-one installer package not found! Make sure you have ran './make_allinone_installer.rb' first!"
+  puts "!!!"
   exit
 end
 
