@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:Accordion x="0" y="0" width="100%" height="100%">
+		<mx:Canvas label="My Account 1" width="100%" height="100%">
+		</mx:Canvas>
+		<mx:Canvas label="My Account 2" width="100%" height="100%">
+		</mx:Canvas>
+		<mx:Canvas label="My Account 3" width="100%" height="100%">
+		</mx:Canvas>
+		<mx:Canvas label="My Account 4" width="100%" height="100%">
+		</mx:Canvas>
+	</mx:Accordion>
+</mx:Canvas>
