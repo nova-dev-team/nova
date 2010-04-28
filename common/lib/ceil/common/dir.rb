@@ -6,6 +6,12 @@ module DirTool
 		return "/tmp/#{note}_#{suff}_#{suffix}"
 	end
 
+	def DirTool.temp_generate(suffix)
+		local = temp_dir(suffix)
+		system "mkdir -p #{local}"
+		return local
+	end
+
   def DirTool.make_clean_dir(local_path)
     system "rm -rf #{local_path} 2> /dev/null"
     system "mkdir #{local_path}"

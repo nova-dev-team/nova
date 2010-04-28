@@ -11,11 +11,22 @@ class PackageDownloader
 		@ftp = FTPTransfer.new(server_addr, port, usr, pwd)
 	end
 
-	def local_exists(app_name)
+	def local_exists_key(app_name)
+		local_path = File.dirname(__FILE__) + "/../../keys/#{app_name}"
+		if File.exists?(local_path)
+			return local_path
+		else
+			return nil
+		end
+	end
+
+	def local_exists(app_name, role = "")
 		#cdrom:/packages/app_name
 		#cdrom:/ceil/launcher/package_downloader.rb
+		suffix = ""
+		suffix = "/#{role}" if role.length > 0
 
-		local_path = File.dirname(__FILE__) + "/../../packages/#{app_name}"
+		local_path = File.dirname(__FILE__) + "/../../packages/#{app_name}" + suffix
 		if File.exists?(local_path)
 			return local_path
 		else
@@ -74,16 +85,29 @@ class PackageDownloader
 		suffix = "/#{char}" if char.length > 0
 		dest = DirTool.temp_generate("install_#{app_name}_#{char}")
 		
-		package_source = "/packages/#{app_name}#{suffix}"
-		download_ftp(package_source, dest)
-		return dest
+		local_path = local_exists(app_name, char)
+		if local_path
+			FileUtils.cp_r(local_path + '/.', dest)
+			return dest
+		else
+			package_source = "/packages/#{app_name}#{suffix}"
+			download_ftp(package_source, dest)
+			return dest
+		end
 	end
 
 	def key_by_ftp(cluster_name, app_name)
 		dest = DirTool.temp_generate("key_#{app_name}")
-		key_source = "/keys/#{cluster_name}/#{app_name}"
-		download_ftp(key_source, dest)
-		return dest
+
+		local_path = local_exists_key(app_name)
+		if local_path
+			FileUtils.cp_r(local_path + '/.', dest)
+			return dest
+		else
+			key_source = "/keys/#{cluster_name}/#{app_name}"
+			download_ftp(key_source, dest)
+			return dest
+		end
 	end
 
 	def download_by_carrier()
@@ -91,9 +115,18 @@ class PackageDownloader
 	end
 end
 
-#pd = PackageDownloader.new "166.111.131.32"
-#puts pd.local_exists("gundam")
 
+=begin
+pd = PackageDownloader.new "166.111.131.32"
+puts pd.local_exists("gundam")
+puts pd.local_exists("gundam", "master")
+puts pd.local_exists("gundam", "worker")
+puts pd.local_exists_key("gundam")
+puts pd.package_by_ftp("gundam", "master")
+puts pd.package_by_ftp("gundam", "worker")
+puts pd.key_by_ftp("test", "gundam")
+
+=end
 #gun = pd.win_shortcut_by_ftp("win_office");
 
 #puts gun
