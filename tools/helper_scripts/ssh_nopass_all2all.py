@@ -214,6 +214,8 @@ def config_ssh_nopass(nodelist):
       my_exec("scp -r -o stricthostkeychecking=no %s %s@%s:/tmp/nova-ssh-all2all-remote.%s" % (tmp_dir, user, ip, token))
       my_exec('ssh -o stricthostkeychecking=no %s@%s "cd /tmp/nova-ssh-all2all-remote.%s && python ./ssh_nopass_all2all.py && rm -rf /tmp/nova-ssh-all2all-remote.%s"' % (user, ip, token, token))
 
+  my_exec("rm -rf %s" % tmp_dir)
+
 
 def run_remote_mode():
   print "Running in remote mode"
