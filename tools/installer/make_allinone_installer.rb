@@ -79,7 +79,7 @@ File.open("#{File.dirname __FILE__}/data/all-in-one/install.sh", "w") do |f|
 
 tar zxf nova-all-in-one-installer.tar.gz
 cd tools/installer/data/debs
-dpkg -i *.deb
+dpkg -i --skip-same-version *.deb
 cd ../../lib
 ruby install_stage2.rb
 INSTALL_SH
