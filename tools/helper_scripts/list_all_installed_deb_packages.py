@@ -20,6 +20,6 @@ lst.sort()
 save_fn = raw_input("Save to file (input nothing to skip): ")
 if save_fn != "":
   with open(save_fn, "w") as f:
-    for item in lst:
-      f.write(item + "\n")
+    for i in range(2, len(lst)):
+      f.write(lst[i] + "\n")
 
