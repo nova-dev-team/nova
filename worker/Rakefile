@@ -127,6 +127,7 @@ LFTP_SCRIPT
     end
 
     def do_stop
+      prepare_folders
       require_root_privilege  # worker is started using root privilege, so we have to kill it using root privilege
 
       conf = read_config
