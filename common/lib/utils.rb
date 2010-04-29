@@ -162,7 +162,11 @@ end
 #
 # Since::     0.3
 def my_exec cmd
-  puts "[cmd] #{cmd}"
+  cmd.each_line do |cmd_line|
+    cmd_line = cmd_line.strip
+    next if cmd_line == ""
+    puts "[cmd] #{cmd_line}"
+  end
   system cmd
 end
 
@@ -192,5 +196,18 @@ def kill_by_pid_file file_path
     my_exec "kill -9 #{pid}"
     File.delete file_path
   end
+end
+
+# Randomly generate a token with alphabets, like "acd", 'zfc', etc.
+#
+# Since::     0.3
+def random_token length = 5
+  token = ""
+  alphabets = "abcdefghijklmnopqrstuvwxyz"
+  1.upto(length) do |i|
+    idx = rand(alphabets.length)
+    token += alphabets[idx..idx]
+  end
+  return token
 end
 

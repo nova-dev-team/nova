@@ -30,10 +30,12 @@ class Net::FTP
 end
 
 class FTPTransfer
-  def initialize(server_addr, port = '21')
+  def initialize(server_addr, port = '21', usr = 'anonymous', passwd = 'CeilClient')
     BasicSocket.do_not_reverse_lookup = true
     @server_addr = server_addr
 		@server_port = port
+		@usr = usr
+		@passwd = passwd
   end
 
   def download_file(remote_path, file_name, local_path)
@@ -71,7 +73,7 @@ class FTPTransfer
 		@conn.connect(@server_addr, @server_port)
 
     Rescue.ignore {
-      @conn.login("anonymous", "ceil_client")
+      @conn.login(@usr, @passwd)
     }
 
     @conn.passive = true

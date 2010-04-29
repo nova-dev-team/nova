@@ -1,4 +1,13 @@
 List of helper scripts:
 
-cleanup_ssh_nopass.rb
+add_frontend_port_forwarding.py
+  Enable ip forwarding on frontend server, so that backend servers could visit the Internet.
+
+list_all_installed_deb_packages.py
+  List all the installed .deb packages in a system.
+
+ssh_nopass_cleanup.rb
   Delete duplicate entries in "authorized_keys" file. It will backup the original file to "authorized_keys~".
+
+ssh_nopass_all2all.rb
+  Configure ssh nopass visiting in a cluster.

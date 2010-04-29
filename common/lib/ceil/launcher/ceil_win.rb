@@ -45,9 +45,9 @@ class Ceil
       @log = LogReporter.new(server_addr, @env.local_addr)
 			@log.send("0", "ceil", "configuration fetched")
 			  
-			@package_downloader = PackageDownloader.new(@cc.package_server, @cc.package_server_port)
+			@package_downloader = PackageDownloader.new(@cc.package_server, @cc.package_server_port, @cc.package_server_username, @cc.package_server_password)
 			#@package_downloader = PackageDownloader.new(server_addr)
-			@key_downloader = PackageDownloader.new(@cc.key_server, @cc.key_server_port)
+			@key_downloader = PackageDownloader.new(@cc.key_server, @cc.key_server_port, @cc.key_server_username, @cc.key_server_password)
 			@install_list = @cc.inst_list.split
 		rescue => e
 			puts "Cannot fetch configuration info from server #{@env.server_addr}, #{e.to_s}"

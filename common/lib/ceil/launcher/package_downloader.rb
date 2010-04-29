@@ -5,10 +5,10 @@ require 'ftools'
 require 'fileutils'
 
 class PackageDownloader
-	def initialize(server_addr, port = '21')
+	def initialize(server_addr, port = '21', usr = 'anonymous', pwd = 'CeilClient')
 		@server_addr = server_addr
 		@nfs = NFSTransfer.new(server_addr)
-		@ftp = FTPTransfer.new(server_addr, port)
+		@ftp = FTPTransfer.new(server_addr, port, usr, pwd)
 	end
 
 	def local_exists(app_name)

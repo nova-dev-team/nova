@@ -1,0 +1,18 @@
+About the installer
+===================
+
+Installing Nova is a complex process. First, you need to install the master server by running "install.sh", which
+downloads required .deb packages by apt-get, installs ruby .gem packages, and compiles utility tools. The next step
+is to create an installer package by running "make_allinone_installer.rb" script, which creates an self-contained
+installer packages for worker module installation. When all those are done, you can simply install a new worker
+machine by running "install_worker.rb", or by master module's web interface.
+
+Well, in conclusion, you have to do those:
+
+  1:  ./install.sh
+  2:  ./make_allinone_installer.rb
+  3:  install new worker machine by running "./install_worker.rb", or by master module's web interface
+
+NOTE: Make sure the machine on which you are makeing the all-in-one installer has same architecture with the target
+      machines! For example, all-in-one installer made on amd64 machines could only be used on amd64 machines!
+

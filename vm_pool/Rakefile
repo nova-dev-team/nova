@@ -33,6 +33,13 @@ namespace :nova do
     desc "Start Nova vm_pool"
     task :start => :stop do
       prepare_folders
+      unless File.exists? "#{RAILS_ROOT}/config/INIT_DONE"
+        puts "!!!"
+        puts "!!! You have'nt initialized vm_pool module!"
+        puts "!!! Run 'rake nova:vm_pool:init' first!"
+        puts "!!!"
+        exit
+      end
       puts "Starting Nova vm_pool..."
       unless File.exists? "#{RAILS_ROOT}/log"
         FileUtils.mkdir_p "#{RAILS_ROOT}/log"
@@ -69,6 +76,7 @@ namespace :nova do
 
     desc "Stop Nova server"
     task :stop do
+      prepare_folders
       all_daemons "stop"
       
       kill_by_pid_file "#{RAILS_ROOT}/tmp/pids/server.pid"
@@ -104,6 +112,7 @@ namespace :nova do
       my_exec "rake db:fixtures:load RAILS_ENV=production"
       my_exec "rake db:fixtures:load RAILS_ENV=development"
       my_exec "cd lib && make"
+      File.open("#{RAILS_ROOT}/config/INIT_DONE", "w").write ""
     end
 
   end

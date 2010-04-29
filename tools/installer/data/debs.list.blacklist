@@ -1,0 +1,13 @@
+citadel-common
+citadel-mta
+citadel-server
+libcitadel2
+courier-base
+courier-mta
+courier-authlib
+courier-authdaemon
+dpkg
+dpkg-dev
+adduser
+msmtp-mta
+lsb-invalid-mta

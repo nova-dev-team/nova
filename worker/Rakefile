@@ -92,6 +92,14 @@ namespace :nova do
       FileUtils.mkdir_p "#{conf["run_root"]}/vm"
       FileUtils.mkdir_p "#{conf["run_root"]}/image_pool"
 
+      unless File.exists? "#{RAILS_ROOT}/config/storage_server.conf"
+        puts "!!!"
+        puts "!!! You haven't initialized the worker module!"
+        puts "!!! run 'rake nova:worker:init' first!"
+        puts "!!!"
+        exit
+      end
+
       File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
         f.write <<LFTP_SCRIPT
 set net:timeout 10
@@ -114,11 +122,12 @@ LFTP_SCRIPT
     end
 
     desc "Start Nova worker"
-    task :start do
+    task :start => :stop do
       do_start
     end
 
     def do_stop
+      prepare_folders
       require_root_privilege  # worker is started using root privilege, so we have to kill it using root privilege
 
       conf = read_config

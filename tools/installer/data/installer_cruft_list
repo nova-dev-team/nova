@@ -1,0 +1,19 @@
+# This file contains all the unnecessary files for the all-in-one installer.
+# All the relative path are against project root (actually, ../../..).
+# It is suggested that sub folders ends with '/'.
+# Comments starts with '#'.
+#
+# Author::    Santa Zhang (santa1987@gmail.com)
+# Since::     0.3
+
+deprecated/
+flex_ui/
+flex_vnc/
+master/db/*.sqlite3
+master/log/
+master/tmp/
+vm_pool/
+worker/db/*.sqlite3
+worker/log/
+worker/tmp/
+tools/installer/data/all-in-one/

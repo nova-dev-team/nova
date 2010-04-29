@@ -9,7 +9,10 @@ class ClusterConfiguration
   attr_reader :node_list, :inst_list, 
               :host_name, :cluster_name, 
               :package_server, :package_server_type, :package_server_port,
+							:package_server_username, :package_server_password,
+							:key_server_username, :key_server_password,
               :key_server, :key_server_type, :key_server_port
+							
 
   def initialize(local_addr)
     @node_list = nil
@@ -27,6 +30,10 @@ class ClusterConfiguration
 
     @key_server_type = "ftp"
 		@key_server_port = '21'
+		@package_server_username = 'anonymous'
+		@package_server_password = 'CeilClient'
+		@key_server_username = 'anonymous'
+		@key_server_password = 'CeilClient'
   end
 
   def generate_config_file(local_path)
@@ -59,14 +66,30 @@ class ClusterConfiguration
 			end
 			@inst_list = @inst_list.join.chomp
 
+
+
 			File.open(filename_servers_config) do |file|
-				@package_server = file.readline.chomp
+				package_server = file.readline.chomp.split '@'
+				@package_server = package_server[-1]
+				package_server_login = package_server[0].split ':'
+
+				@package_server_username = package_server_login[0]
+				@package_server_password = package_server_login[-1]
+
 				@package_server_port = file.readline.chomp
 				@package_server_type = file.readline.chomp
-				@key_server = file.readline.chomp
+
+				key_server = file.readline.chomp.split '@'
+				@key_server = key_server[-1]
+				key_server_login = key_server[0].split ':'
+				@key_server_username = key_server_login[0]
+				@key_server_password = key_server_login[-1]
+
 				@key_server_port = file.readline.chomp
 				@key_server_type = file.readline.chomp
 			end
+		
+
 			File.open(filename_cluster_config) do |file|
 				@host_name = file.readline.chomp
 				@cluster_name = file.readline.chomp
