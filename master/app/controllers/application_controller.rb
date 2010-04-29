@@ -16,7 +16,22 @@ class ApplicationController < ActionController::Base
 
 protected
 
+  # before_filter for privileged pages.
+  # If user is visiting with browser, an redirect will be issued.
+  # If the request is in JSON, error will be replied.
+  #
+  # Author::  Santa Zhang (santa1987@gmail.com)
+  # Since::   0.3
+  def login_required
+    respond_to do |accept|
+      accept.html { redirect_to login_url unless logged_in? }
+      accept.json { reply_failure "Login required!" unless logged_in? }
+    end
+  end
+  
 
+# TODO deprecate those code
+=begin
   def redirect_unless_logged_in
     redirect_to login_url unless logged_in?
   end
@@ -71,5 +86,5 @@ protected
   def render_error error_msg
     render :text => error_msg
   end
-
+=end
 end
