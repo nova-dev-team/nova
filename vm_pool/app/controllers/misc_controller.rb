@@ -17,6 +17,18 @@ class MiscController < ApplicationController
     reply_success "vm_pool"
   end
 
+  # Reply the current version of Nova platform.
+  #
+  # Since::   0.3
+  def version
+    if File.exists? "#{RAILS_ROOT}/../VERSION"
+      ver = File.read("#{RAILS_ROOT}/../VERSION").strip
+      reply_success "Version is '#{ver}'", :version => ver
+    else
+      reply_failure "Version unknown!"
+    end
+  end
+
   # Use the 'port_mapper' tool to add a port forwarding.
   #
   # Since::     0.3

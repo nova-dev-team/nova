@@ -12,6 +12,18 @@ class MiscController < ApplicationController
     reply_success "master"
   end
 
+  # Reply the current version of Nova platform.
+  #
+  # Since::   0.3
+  def version
+    if File.exists? "#{RAILS_ROOT}/../VERSION"
+      ver = File.read("#{RAILS_ROOT}/../VERSION").strip
+      reply_success "Version is '#{ver}'", :version => ver
+    else
+      reply_failure "Version unknown!"
+    end
+  end
+
   # Reply the role of current user.
   # Possible return values: "root", "admin", "normal user". If user not logged in, an failure will be returned.
   #
