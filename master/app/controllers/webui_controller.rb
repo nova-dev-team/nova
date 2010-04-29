@@ -12,7 +12,11 @@ class WebuiController < ApplicationController
   #
   # Since::   0.3
   def index
-    redirect_to :controller => :webui, :action => :workspace
+    if @current_user.privilege == "normal user"
+      redirect_to :controller => :webui, :action => :workspace
+    else
+      redirect_to :controller => :webui, :action => :overview
+    end
   end
 
 end

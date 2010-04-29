@@ -33,15 +33,17 @@ User privilege: <%= current_user.privilege %><br>
 <table><tr>
 <%=
 html = ""
+
 [
   # privilege,      link,           title
-  ["normal user",   "workspace",    "Workspace"],
-  ["normal user",   "wizard",       "Wizard"],
+  ["admin",         "overview",     "Overview"],
   ["admin",         "user",         "Users"],
   ["root",          "worker",       "Workers"],
   ["root",          "resource",     "Resource"],
   ["root",          "setting",      "Settings"],
   ["admin",         "monitor",      "Monitor"],
+  ["normal user",   "workspace",    "Workspace"],
+  ["normal user",   "wizard",       "Wizard"],
   ["normal user",   "account",      "Account info"],
 ].each do |item|
   priv, link, title = item
@@ -54,6 +56,7 @@ html = ""
   header_link_class += "_active" if link == params[:action]
   html += "<td class='#{header_link_class}' onclick='window.location=\"#{link}\"'><a class='#{header_link_class}' href='#{link}'>#{spacing(4) + title + spacing(4)}</a></td>"
 end
+
 html
 %>
 </tr></table>
