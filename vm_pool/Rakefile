@@ -64,7 +64,7 @@ namespace :nova do
       end
 
       # start vnc_proxy
-      my_exec "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy -p #{conf["vm_vnc_port"]} -s #{RAILS_ROOT}/log/vnc_proxy.sock -pf #{RAILS_ROOT}/log/vnc_proxy.pid"
+      my_exec "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy -p #{conf["vm_vnc_port"]} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock -pf #{RAILS_ROOT}/log/vnc_proxy.pid"
     end
 
     desc "Stop Nova server"
@@ -77,6 +77,7 @@ namespace :nova do
       my_exec "killall mongrel_rails"
       my_exec "killall vnc_proxy"
       my_exec "rm -rf #{RAILS_ROOT}/log/*.local_port"
+      my_exec "rm -f #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
 
       Dir.foreach("#{RAILS_ROOT}/log") do |entry|
         if entry.end_with? ".pid"

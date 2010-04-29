@@ -19,7 +19,7 @@ int forward_to_port;
 static void port_mapper_acceptor(xsocket client_xs, void* args) {
   xsocket dest_xs = xsocket_new(xstr_copy(forward_to_host), forward_to_port);
   xsocket_connect(dest_xs);
-  xsocket_shortcut(dest_xs, client_xs);
+  xsocket_shortcut(dest_xs, client_xs, 100);
   xsocket_delete(dest_xs);
 }
 

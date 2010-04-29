@@ -184,7 +184,7 @@ while($running) do
     ip = vm.pmachine.ip
     port = vm.vnc_port
     next if port == nil
-    system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl add -p #{pwd} -d #{ip}:#{port} -s #{RAILS_ROOT}/log/vnc_proxy.sock"
+    system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl add -p #{pwd} -d #{ip}:#{port} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
   end
   
   sleep 10
