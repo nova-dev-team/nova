@@ -9,26 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090929110217) do
-
-  create_table "groups", :force => true do |t|
-    t.string   "name",       :limit => 40
-    t.boolean  "special",                  :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "net_segments", :force => true do |t|
-    t.string   "name",         :limit => 20
-    t.string   "head_ip",      :limit => 20
-    t.integer  "size"
-    t.string   "mask",         :limit => 20
-    t.integer  "vcluster_id"
-    t.boolean  "used",                       :default => false
-    t.integer  "lock_version",               :default => 0
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+ActiveRecord::Schema.define(:version => 20090812091810) do
 
   create_table "pmachines", :force => true do |t|
     t.string   "addr"
@@ -44,31 +25,8 @@ ActiveRecord::Schema.define(:version => 20090929110217) do
   create_table "settings", :force => true do |t|
     t.string   "key",        :limit => 40
     t.string   "value"
-    t.boolean  "no_edit",                  :default => false
+    t.boolean  "editable",                 :default => true,  :null => false
     t.boolean  "for_worker",               :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "software_categories", :force => true do |t|
-    t.string   "software_category_name", :limit => 40
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "softwares", :force => true do |t|
-    t.string   "software_name",        :limit => 40
-    t.string   "display_name",         :limit => 40
-    t.text     "description"
-    t.boolean  "available"
-    t.integer  "software_category_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "ugrelationships", :force => true do |t|
-    t.integer  "user_id"
-    t.integer  "group_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -84,6 +42,7 @@ ActiveRecord::Schema.define(:version => 20090929110217) do
     t.string   "remember_token",            :limit => 40
     t.datetime "remember_token_expires_at"
     t.boolean  "activated",                               :default => false
+    t.string   "privilege",                 :limit => 20,                    :null => false
   end
 
   add_index "users", ["login"], :name => "index_users_on_login", :unique => true
@@ -106,12 +65,12 @@ ActiveRecord::Schema.define(:version => 20090929110217) do
   end
 
   create_table "vdisks", :force => true do |t|
-    t.string   "raw_name",             :limit => 100
+    t.string   "file_name",    :limit => 100
     t.string   "display_name"
     t.string   "description"
     t.string   "type"
-    t.integer  "base_upon"
-    t.integer  "software_category_id"
+    t.string   "os_family"
+    t.string   "os_name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -147,13 +106,6 @@ ActiveRecord::Schema.define(:version => 20090929110217) do
     t.boolean  "destroyed",                       :default => false
     t.string   "status",                          :default => "not running"
     t.integer  "vnc_port"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "vsrelationships", :force => true do |t|
-    t.integer  "software_category_id"
-    t.integer  "vdisk_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

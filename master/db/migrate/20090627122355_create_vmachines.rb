@@ -1,14 +1,29 @@
 class CreateVmachines < ActiveRecord::Migration
   def self.up
     create_table :vmachines do |t|
+
+      # Author::    Santa Zhang
+      # Since::     0.3
+
       t.column :uuid,              :string, :limit => 40, :null => false
       t.column :cpu_count,         :integer, :default => 1
-      t.column :memory_size,       :integer, :default => 256 # memory size in MB
+
+      # Unit of memory size is MB
+      t.column :memory_size,       :integer, :default => 256
       t.column :hda,               :string, :limit => 40
+
+      # TODO support secondary disk
       t.column :hdb,               :string, :limit => 40
+
       t.column :cdrom,             :string, :limit => 40
-      t.column :boot_device,       :string, :limit => 10, :default => "hd" # hd, cdrom
-      t.column :arch,              :string, :limit => 10, :default => "i686" # x86_64, i686...
+
+      # Which device will the machine be booted.
+      # It could be "hd", or "cdrom"
+      t.column :boot_device,       :string, :limit => 10, :default => "hd"
+
+      # The architecture of the VM.
+      # Could be "i686" or "x86_64", etc.
+      t.column :arch,              :string, :limit => 10, :default => "i686"
       t.column :ip,                :string, :limit => 20, :unique => true
       t.column :mac,               :string, :limit => 24
       t.column :hostname,          :string, :limit => 40

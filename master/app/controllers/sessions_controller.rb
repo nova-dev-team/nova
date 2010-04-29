@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
   # render new.rhtml
   def new
     if logged_in?
-      redirect_to :controller => :app, :action => :home
+      redirect_to home_url
     end
   end
 

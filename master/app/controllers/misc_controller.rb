@@ -18,7 +18,7 @@ class MiscController < ApplicationController
   # Since::   0.3
   def my_privilege
     if logged_in?
-      priv = "root"
+      priv = current_user.privilege
       reply_success "Your privilege is '#{priv}'", :privilege => priv
     else
       reply_failure "You are not logged in!"
