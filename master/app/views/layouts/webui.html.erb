@@ -1,0 +1,70 @@
+<%
+
+def spacing size = 8
+  "&nbsp;" * size
+end
+
+%>
+<html>
+<head>
+<title>Nova master</title>
+<link type="text/css" rel="stylesheet" href="/stylesheets/custom_buttons.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.master.css"></link>
+<script type="text/javascript" src="/javascripts/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
+</head>
+<body>
+<table width="100%"><tr><td>
+<h1>Nova master</h1></td><td align='right' valign="top">
+User privilege: <%= @current_user.privilege %><br>
+<a href="/logout">Logout</a>
+</td></tr></table>
+<table width="100%"><tr><td>
+<%=
+  version_name = ""
+  if File.exists? "#{RAILS_ROOT}/../VERSION"
+    version_name = "version: " + (File.read "#{RAILS_ROOT}/../VERSION") + "<br>"
+  end
+  version_name
+%>
+</td><td align="right">
+<table><tr>
+<%=
+html = ""
+[
+  # privilege,      link,           title
+  ["normal user",   "workspace",    "Workspace"],
+  ["normal user",   "wizard",       "Wizard"],
+  ["admin",         "user",         "Users"],
+  ["root",          "worker",       "Workers"],
+  ["root",          "resource",     "Resource"],
+  ["root",          "setting",      "Settings"],
+  ["admin",         "monitor",      "Monitor"],
+  ["normal user",   "account",      "Account info"],
+].each do |item|
+  priv, link, title = item
+  if @current_user.privilege == "admin"
+    next if priv == "root"
+  elsif @current_user.privilege == "normal user"
+    next if priv == "root" or priv == "admin"
+  end
+  header_link_class = "header_link"
+  header_link_class += "_active" if link == params[:action]
+  html += "<td class='#{header_link_class}' onclick='window.location=\"#{link}\"'><a class='#{header_link_class}' href='#{link}'>#{spacing(4) + title + spacing(4)}</a></td>"
+end
+html
+%>
+</tr></table>
+</td></tr></table>
+<hr class="current_page_header_hr"/>
+
+<%= yield :page %>
+
+<hr/>
+This is the "master" module of the Nova system, in plain UI mode. <b>We highly suggest that you use the <a href='/flexui/index.html'>Flex UI</a> for better experience.</b><p>
+&copy;2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
+</body>
+</html>
+

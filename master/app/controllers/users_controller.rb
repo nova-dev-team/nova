@@ -10,10 +10,10 @@ class UsersController < ApplicationController
   def create
     logout_keeping_session!
     @user = User.new(params)
-    if params[:group] != "admin"
-      @user.groups << (Group.find_by_name 'user') ## default user group
+    if params[:privilege] != "admin"
+      @user.privilege = "normal user"
     else
-      @user.groups << (Group.find_by_name 'admin')
+      @user.privilege = "admin"
     end
     success = @user && @user.save
     if success && @user.errors.empty?
@@ -22,7 +22,9 @@ class UsersController < ApplicationController
       # button. Uncomment if you understand the tradeoffs.
       # reset session
 
-      ## don't sign in the user immediately, since we need to activate it by admin
+      # Santa Zhang:
+      #
+      # don't sign in the user immediately, since we need to activate it by admin
       # self.current_user = @user # !! now logged in
 
 

@@ -1,4 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
+  map.new_session '/login', :controller => 'sessions', :action => 'new'
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'
   map.login '/login', :controller => 'sessions', :action => 'new'
   map.home '', :controller => 'webui'
