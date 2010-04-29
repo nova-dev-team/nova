@@ -29,8 +29,6 @@ class User < ActiveRecord::Base
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :name, :password, :password_confirmation
 
-  has_many :ugrelationships
-  has_many :groups, :through => :ugrelationships
   has_many :vclusters
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
@@ -52,21 +50,5 @@ class User < ActiveRecord::Base
   def email=(value)
     write_attribute :email, (value ? value.downcase : nil)
   end
-
-  def in_group? group_name
-    groups.include?(Group.find_by_name group_name)
-  end
-
-  def is_root?
-    in_group? "root"
-  end
-
-  def is_admin?
-    in_group? "admin"
-  end
-
-  protected
-
-
 
 end
