@@ -18,7 +18,7 @@ end
 <body>
 <table width="100%"><tr><td>
 <h1>Nova master</h1></td><td align='right' valign="top">
-User privilege: <%= @current_user.privilege %><br>
+User privilege: <%= current_user.privilege %><br>
 <a href="/logout">Logout</a>
 </td></tr></table>
 <table width="100%"><tr><td>
@@ -45,9 +45,9 @@ html = ""
   ["normal user",   "account",      "Account info"],
 ].each do |item|
   priv, link, title = item
-  if @current_user.privilege == "admin"
+  if current_user.privilege == "admin"
     next if priv == "root"
-  elsif @current_user.privilege == "normal user"
+  elsif current_user.privilege == "normal user"
     next if priv == "root" or priv == "admin"
   end
   header_link_class = "header_link"
