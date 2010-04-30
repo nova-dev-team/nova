@@ -15,7 +15,7 @@ function do_message(type, title, msg) {
 //
 
 function load_user_list(page, page_size) {
-  if ($("#user_table_container").html().trim() == "") {
+  if ($("#user_table_container").html() == "") {
     html = "<table id='user_table' width='100%'>"
     html += "<tr class='row_type_0'><td><b>#</b></td><td><b>Login</b></td><td><b>Privilege</b></td><td><b>Activated</b></td><td><b>Name</b></td><td><b>Email</b></td></tr>"
     for (i = 0; i < page_size; i++) {
@@ -65,9 +65,9 @@ function load_user_list(page, page_size) {
           $("#user_table-r" + i + "-privilege").html(u.privilege);
 
           if (u.activated) {
-            html = "<input name='user_table-" + u.login + "-activated' " + (u.login == g_current_user ? "disabled" : "") + " type='checkbox' checked onclick='user_set_activated(\"" + u.login + "\")'/>";
+            html = "<input name='user_table-user-" + u.login + "-activated' " + (u.login == g_current_user ? "disabled" : "") + " type='checkbox' checked onclick='user_set_activated(\"" + u.login + "\")'/>";
           } else {
-            html = "<input name='user_table-" + u.login + "-activated' " + (u.login == g_current_user ? "disabled" : "") + " type='checkbox' unchecked onclick='user_set_activated(\"" + u.login + "\")'/>";
+            html = "<input name='user_table-user-" + u.login + "-activated' " + (u.login == g_current_user ? "disabled" : "") + " type='checkbox' unchecked onclick='user_set_activated(\"" + u.login + "\")'/>";
           }
           $("#user_table-r" + i + "-activated").html(html);
         }
@@ -89,7 +89,7 @@ function load_user_list(page, page_size) {
 
 
 function user_set_activated(user_login) {
-  activated = $("input[name='user_table-" + user_login + "-activated']").attr("checked");
+  activated = $("input[name='user_table-user-" + user_login + "-activated']").attr("checked");
   $.ajax({
     url: "/users/edit",
     type: "POST",
@@ -103,12 +103,12 @@ function user_set_activated(user_login) {
         do_message("success", activated ? "User activated" : "User deactivated", result.message);
       } else {
         do_message("failure", "Activate failed", result.message);
-        $("input[name='user_table-" + user_login + "-activated']").attr("checked", !activated);
+        $("input[name='user_table-user-" + user_login + "-activated']").attr("checked", !activated);
       }
     },
     error: function(result) {
       do_message("failure", "Request failed", "Please check your network connection!");
-      $("input[name='user_table-" + user_login + "-activated']").attr("checked", !activated);
+      $("input[name='user_table-user-" + user_login + "-activated']").attr("checked", !activated);
     }
   });
 }
