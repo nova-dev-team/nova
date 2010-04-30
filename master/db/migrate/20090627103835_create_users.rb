@@ -12,6 +12,14 @@ class CreateUsers < ActiveRecord::Migration
       t.column :remember_token_expires_at, :datetime
       t.column :activated,                 :boolean, :default => false
 
+
+
+      # Author::    Santa Zhang (santa1987@gmail.com)
+      # Since::     0.3
+      #
+      # The user's privilege. Could be "root", "admin" or "normal user".
+      t.column :privilege,                  :string, :limit => 20, :null => false
+
     end
     add_index :users, :login, :unique => true
   end

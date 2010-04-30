@@ -1,0 +1,41 @@
+<% content_for :page do %>
+
+<p/>
+
+<table align="center"><tr><td>
+
+This is your account info:<p/>
+
+<hr>
+
+<table><tr><td>
+Login:</td><td><img src="/images/spacer.gif" width=40 height=40 /></td><td><b><%= @current_user.login %></b></td>
+</tr></tr><td>
+Privilege:</td><td><img src="/images/spacer.gif" width=40 height=40 /></td><td><b><%= @current_user.privilege %></b></td>
+</tr></tr><td>
+Fullname:</td><td><img src="/images/spacer.gif" width=40 height=40 /></td><td><input id="user_fullname" type="text" value="<%= @current_user.name %>" size=35 /></td>
+</tr><tr><td>
+Email:</td><td><img src="/images/spacer.gif" width=40 height=40 /></td><td><input id="user_email" type="text" value="<%= @current_user.email %>" size=35 /></td>
+</tr></table>
+
+<p/>
+
+<center><button type="button" class="btn" onclick="user_update_info()"><span><span>Update info</span></span></button></center>
+<br/>
+<hr>
+
+<b>Reset password:</b><p/>
+<table><tr><td>
+Current password:</td><td><img src="/images/spacer.gif" width=40 height=40 /></td><td><input id="user_old_password" type="password"/></td>
+</tr><tr><td>
+New password:</td><td><img src="/images/spacer.gif" width=40 height=40 /></td><td><input id="user_new_password" type="password"/></td>
+</tr><tr><td>
+Confirm new passoword:</td><td><img src="/images/spacer.gif" width=40 height=40 /></td><td><input id="user_new_password_confirm" type="password"/></td>
+</tr></table>
+
+<p/>
+
+<center><button type="button" class="btn" onclick="user_reset_password()"><span><span>Reset password</span></span></button></center>
+<br/>
+</td></tr></table>
+<% end %>

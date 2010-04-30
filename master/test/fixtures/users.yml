@@ -6,6 +6,7 @@ root:
   crypted_password:           3b952fa1f20fe8d476a136b8f80ae5c551ae4d94 # 'monkey'
   created_at:                 <%= 1.days.ago.to_s :db  %>
   activated:                  true
+  privilege:                  root
 
 admin:
   id:                         2
@@ -15,23 +16,17 @@ admin:
   crypted_password:           3096bce0027d0ec9026ba948c32ae388e619168f # 'monkey'
   created_at:                 <%= 1.days.ago.to_s :db %>
   activated:                  true
+  privilege:                  admin
 
 # for debugging
 santa:
   id:                         3
   login:                      santa
   email:                      santa1987@gmail.com
+  name:                       "Santa Zhang"
   salt:                       da4b9237bacccdf19c0760cab7aec4a8359010b0 # SHA1('1')
   crypted_password:           3096bce0027d0ec9026ba948c32ae388e619168f # 'monkey'
   created_at:                 <%= 1.days.ago.to_s :db %>
   activated:                  true
-
-hxm:
-  id:                         4
-  login:                      hxm
-  email:                      huangxiaomeng@gmail.com
-  salt:                       da4b9237bacccdf19c0760cab7aec4a8359010b0 # SHA1('1')
-  crypted_password:           3096bce0027d0ec9026ba948c32ae388e619168f # 'monkey'
-  created_at:                 <%= 1.days.ago.to_s :db %>
-  activated:                  true
+  privilege:                  "normal user"
 

@@ -1,12 +1,9 @@
 ## This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
-  # Be sure to include AuthenticationSystem in Application Controller instead
-  include AuthenticatedSystem
 
-  # render new.rhtml
   def new
     if logged_in?
-      redirect_to :controller => :app, :action => :home
+      redirect_to home_url
     end
   end
 

@@ -1,0 +1,17 @@
+.current_page_header_hr {
+  border: 0;
+  height: 1px;
+  color: blue;
+  background-color: blue;
+}
+
+.header_link {
+  text-decoration: none;
+  background: #EDF7FF;
+}
+
+.header_link_active {
+  text-decoration: none;
+  font-weight: bold;
+  background: #D2E4FC;
+}

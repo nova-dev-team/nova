@@ -14,6 +14,19 @@ class MiscController < ApplicationController
     reply_success "worker"
   end
 
+  # Reply the current version of Nova platform.
+  #
+  # Since::   0.3
+  def version
+    if File.exists? "#{RAILS_ROOT}/../VERSION"
+      ver = File.read("#{RAILS_ROOT}/../VERSION").strip
+      reply_success "Version is '#{ver}'", :version => ver
+    else
+      reply_failure "Version unknown!"
+    end
+  end
+
+
   # Removes deprecated VM image.
   #
   # Since::     0.3
