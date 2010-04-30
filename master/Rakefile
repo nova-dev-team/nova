@@ -59,6 +59,7 @@ namespace :nova do
 
     desc "Stop Nova server"
     task :stop do
+      prepare_folders
       kill_by_pid_file "#{File.dirname __FILE__}/tmp/pids/server.pid"
       
       my_exec "killall swiftiply"

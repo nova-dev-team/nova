@@ -11,14 +11,23 @@ end
 <link type="text/css" rel="stylesheet" href="/stylesheets/custom_buttons.css"></link>
 <link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
 <link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.master.css"></link>
-<script type="text/javascript" src="/javascripts/jquery-1.4.2.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/stylesheets/jquery.notice.css"></link>
+
+<script type="text/javascript">
+// Global information
+var g_current_user = "<%= @current_user.login %>";
+</script>
+
+<script type="text/javascript" src="/javascripts/jquery-1.3.2.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.notice.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
+<script type="text/javascript" src="/javascripts/nova.master.webui.js"></script>
 </head>
 <body>
 <table width="100%"><tr><td>
 <h1>Nova master</h1></td><td align='right' valign="top">
-User privilege: <%= current_user.privilege %><br>
+<%= "user: <b>#{@current_user.login}</b>, privilege: <b>#{@current_user.privilege}</b>" %><br/>
 <a href="/logout">Logout</a>
 </td></tr></table>
 <table width="100%"><tr><td>
@@ -38,18 +47,16 @@ html = ""
   # privilege,      link,           title
   ["admin",         "overview",     "Overview"],
   ["admin",         "user",         "Users"],
-  ["root",          "worker",       "Workers"],
-  ["root",          "resource",     "Resource"],
-  ["root",          "setting",      "Settings"],
+  ["root",          "system",       "System"],
   ["admin",         "monitor",      "Monitor"],
   ["normal user",   "workspace",    "Workspace"],
   ["normal user",   "wizard",       "Wizard"],
   ["normal user",   "account",      "Account info"],
 ].each do |item|
   priv, link, title = item
-  if current_user.privilege == "admin"
+  if @current_user.privilege == "admin"
     next if priv == "root"
-  elsif current_user.privilege == "normal user"
+  elsif @current_user.privilege == "normal user"
     next if priv == "root" or priv == "admin"
   end
   header_link_class = "header_link"

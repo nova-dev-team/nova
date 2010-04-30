@@ -1,23 +1,27 @@
-require 'pp'
+# Controller for the user accounts.
+#
+# Author::    Santa Zhang (santa1987@gmail.com)
+# Since::     0.3
 
 class UsersController < ApplicationController
 
-  # render new.rhtml
-  def new
-    @user = User.new
-  end
-
+  # Create new user account. This is just an API, with no HTML web pages.
+  #
+  # Author::    Santa Zhang
+  # Since::     0.3
   def create
     logout_keeping_session!
     @user = User.new(params)
-    if params[:privilege] != "admin"
-      @user.privilege = "normal user"
-    else
-      @user.privilege = "admin"
+    if @user
+      if params[:privilege] != "admin"
+        @user.privilege = "normal user"
+      else
+        @user.privilege = "admin"
+      end
     end
     success = @user && @user.save
     if success && @user.errors.empty?
-            # Protects against session fixation attacks, causes request forgery
+      # Protects against session fixation attacks, causes request forgery
       # protection if visitor resubmits an earlier form using back
       # button. Uncomment if you understand the tradeoffs.
       # reset session
@@ -26,165 +30,198 @@ class UsersController < ApplicationController
       #
       # don't sign in the user immediately, since we need to activate it by admin
       # self.current_user = @user # !! now logged in
-
-
-      render_success "Your account has been registered. Please wait for administrator's approval."
-
-      ## redirect_back_or_default('/')
-      ## flash[:notice] = "Thanks for signing up!  We're sending you an email with your activation code."
+      reply_success "Your account has been registered. Please wait for administrator's approval."
     else
-      ## flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
-      ## render :action => 'new'
-
       error_text = @user.errors.collect {|item, reason| "#{item}: #{reason}\n"}
-      render_failure "Your account could not be created. Server error:\n#{error_text}"
-
+      reply_failure "Your account could not be created. Server error:\n#{error_text}"
     end
   end
 
 
-## Show (partial) list of users
-## For normal user, only him/herself was shown
-## For root user, all users are shown, including "root"
-## For admin user, all normal users and him/herself was shown
-## TODO
-  def index
+  # Show a list of users. Login required.
+  # Only the user himself and users with lower privilege will be listed.
+  # Paging is supported. You can use 'page' to denote the page id (starts from 1), and 'page_size' to denote number of elements on one page.
+  #
+  # Since::     0.3
+  def list
 
-    if not logged_in_and_activated?
-      render_failure "You must be logged in to carry out this action"
+    # login required
+    unless logged_in?
+      reply_failure "You are not logged in!"
       return
     end
 
-    # helper funciton to select fields to respond
-    def user_data_in_hash u
-      {:id => u.id, :login => u.login, :fullname => u.name, :email => u.email, :groups => u.groups.collect {|g| g.name}, :activated => u.activated}
+    if params[:page]
+      unless params[:page_size]
+        reply_failure "If you want to enabled paging, add the 'page_size' parameter which indicates number of users to be shown in one page!"
+        return
+      end
+      unless params[:page].to_s == params[:page].to_i.to_s and params[:page_size].to_s == params[:page_size].to_i.to_s and params[:page].to_i > 0 and params[:page_size].to_i > 0
+        reply_failure "Please provide valid 'page' and 'page_size' parameter!"
+        return
+      end
     end
 
-    if current_user.in_group? "root"
-      users_list = User.all.collect {|u| user_data_in_hash u}
-    elsif current_user.in_group? "admin"
-      users_list = (User.all.select {|u| u.in_group? "user"}).collect {|u| user_data_in_hash u}
-      users_list << (user_data_in_hash current_user)
+    if @current_user.privilege == "root"
+      users_list = User.all
+    elsif @current_user.privilege == "admin"
+      users_list = User.find(:all, :conditions => ["privilege = 'normal user' or login = ?", @current_user.login])
     else
-      users_list = [user_data_in_hash current_user]
+      users_list = [@current_user]
     end
 
-    render_success "Successfully retrieved list of users", {:users => users_list}
+    if params[:page]
+      page_size = params[:page_size].to_i
+      page_begin = (params[:page].to_i - 1) * page_size
+      page_end = page_begin + page_size
+      if page_begin >= users_list.size
+        reply_failure "Page number is too big!"
+        return
+      end
+      if page_end >= users_list.size
+        page_end = users_list.size
+      end
+      pages_total = (users_list.size + page_size - 1) / page_size
+
+      # note that we used "..." here, last item (page_end) is not included
+      users_list = users_list[page_begin...page_end]
+    end
+
+    info_list = users_list.collect do |user|
+      { :id => user.id, :login => user.login, :name => user.name, :email => user.email, :privilege => user.privilege, :activated => user.activated }
+    end
+
+    if defined? pages_total
+      reply_success "Successfully retrieved list of users", :users => info_list, :pages_total => pages_total
+    else
+      reply_success "Successfully retrieved list of users", :users => info_list
+    end
 
   end
 
-  def whoami
-    if not logged_in_and_activated?
-      render_failure "You must be logged in to carry out this action"
-      return
-    end
 
-    render_success "Successfully retrieved your information", {
-      :name => current_user.name,
-      :email => current_user.email,
-      :login_id => current_user.login,
-      :groups => current_user.groups.collect {|g| g.name}
-    }
-  end
-
-## Update a user's settings, such as fullname, password, email address.
-## Also used to change activation and groups, which requires privileged user.
-## A user cannot change his/her own activation flag and groups
-## When changing password, old password is also required, along with a password confirmation.
-## When changing full username and email address, they must be well formatted as required by "User" model.
+  # Update a user's information, such as full name, email address, and password. Login required.
+  # It is also used to activate/deactivate users.
+  # Note that user's full name and email address should be well formatted, since they will be checked when saving new infomation.
+  #
+  # For "normal user", nothing except his own information could be retireved/changed.
+  # Root & admin could activate/deactivate users with lower privilege.
+  #
+  # When changing password, old password and new password confirmation is also required.
+  #
+  # Since::     0.3
   def edit
-
-    # require logged in
-    if not logged_in_and_activated?
-      render_failure "You are not logged in"
+    # login required
+    unless logged_in?
+      reply_failure "You are not logged in!"
       return
     end
 
-    information_updated = false # flag to denote a change in user's profile
+    if params[:login] == nil or params[:login] == ""
+      reply_failure "You must provide the user's login name!"
+      return
+    end
 
-    user = User.find_by_id params[:id]
+    # prevent normal user from retrieving any information except his own
+    if @current_user.privilege != "root" and @current_user.privilege != "admin"
+      if @current_user.login != params[:login]
+        reply_failure "You are not allowed to change anything except your own information!"
+        return
+      end
+    end
+
+    # This is a flag to indicate whether the user's profile is actually changed.
+    information_updated = false
+
+    user = User.find_by_login params[:login]
     if user == nil
-      render_failure "User not found"
+      reply_failure "User with login='#{params[:login]}' not found!"
       return
     end
 
-    if params[:fullname]
-      # only user him/herself could change these properties
-      if logged_in_and_activated? and current_user.id == user.id
-        information_updated = true
-        user.name = params[:fullname]
-        # length test is take when saving to database
+    if params[:name]
+      # only the user him/herself could change these properties
+      if @current_user.id == user.id
+        if user.name != params[:name]
+          information_updated = true
+          user.name = params[:name]
+        end
       else
-        render_failure "You are not allowd to do this"
+        reply_failure "You cannot change other user's private information!"
         return
       end
     end
 
     if params[:email]
-      if logged_in_and_activated? and current_user.id == user.id
-        information_updated = true
-        user.email = params[:email]
+      if @current_user.id == user.id
+        # only the user him/herself could change these properties
+        if user.email != params[:email]
+          information_updated = true
+          user.email = params[:email]
+        end
       else
-        render_failure "You are not allowd to do this"
+        reply_failure "You cannot change other user's private information!"
         return
       end
     end
 
     if params[:new_password] || params[:new_password_confirm] || params[:old_password]
-      if !logged_in_and_activated? or current_user.id != user.id
-        render_failure "You are not allowd to do this"
+      if @current_user.id != user.id
+        reply_failure "You cannot change other user's password!"
         return
       end
 
       if !(params[:new_password] and params[:new_password_confirm] and params[:old_password])
-        render_failure "Please provide old password, new password and new password confirmation"
+        reply_failure "Please provide old password, new password and new password confirmation!"
         return
       end
 
-      if User.authenticate current_user.login, params[:old_password]
+      if User.authenticate @current_user.login, params[:old_password]
         user.password = params[:new_password]
         user.password_confirmation = params[:new_password_confirm]
         information_updated = true
       else
-        render_failure "Wrong old password"
+        reply_failure "Wrong old password!"
         return
       end
     end
 
-    if params[:activated] # root or admin required
-      if current_user.is_root? # root could active anyone except itself
-
-        if user.is_root? # trying to change settings of root itself, disallowed
-          render_failure "Root user cannot be deactivated!"
+    # Activate users. Only root and admin could do this!
+    if params[:activated]
+      if @current_user.privilege == "root"
+        # root could activate/deactivate anyone except itself
+        if user.login == @current_user.login
+          reply_failure "You cannot deactivate yourself!"
           return
         end
-
-      elsif current_user.is_admin?
-
-        if user.is_admin? # trying to change settings of admins, disallowed
-          render_failure "Administrators cannot be deactivated!"
+      elsif @current_user.privilege == "admin"
+        if user.login == @current_user.login
+          reply_failure "You cannot deactivate yourself!"
           return
-        elsif user.is_root? # cannot deactivate root
-          render_failure "You are not allowed to do this!"
+        elsif user.privilege == "root"
+          reply_failure "You cannot deactivate root user!"
+          return
+        elsif user.privilege == "admin"
+          reply_failure "You cannot deactivate admin users!"
           return
         end
-
-      else # normal user cannot do this
-        render_failure "You do not have enough priviledge for this action!"
+      else
+        # normal users, disallow
+        reply_failure "You are not allowed to do this!"
         return
       end
 
-      user.activated = (params[:activated] == 'true')
-      information_updated = true
+      if user.activated.to_s != params[:activated].to_s
+        user.activated = (params[:activated] == 'true')
+        information_updated = true
+      end
     end
 
     if information_updated and user.save
-      render_success "Successfully changed settings of '#{user.login}'"
+      reply_success "Successfully changed properties of '#{user.login}'"
     else
-      render_failure "Nothing updated for '#{user.login}'"
+      reply_success "Nothing updated for '#{user.login}'"
     end
-#  rescue
- #   render_failure "Exception occured on server"
   end
 
 end

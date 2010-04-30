@@ -1,3 +1,15 @@
 <% content_for :page do %>
-TODO: content for user
+<script type="text/javascript">
+$(document).ready(function() {
+  load_user_list(1, 20);
+});
+</script>
+
+<center>
+<b>User listing</b><p>
+
+<div id="user_table_container"></div>
+</center>
+
 <% end %>
+

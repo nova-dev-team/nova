@@ -12,7 +12,7 @@ class FlexuiController < ApplicationController
   #
   # Since::   0.3
   def index
-    redirect_to "/flexui/ui"
+    redirect_to :controller => :flexui, :action => :ui
   end
 
   # The handler which renders the Flex container.

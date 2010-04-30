@@ -9,9 +9,11 @@ class User < ActiveRecord::Base
   validates_length_of       :login,    :within => 3..20
   validates_uniqueness_of   :login
 
-  ## NOTE original :with => Authentication.login_regex was modified.
-  ## NOTE Users SHOULD not register with names starting with '.' or '_', which is reserved by system
-  ## NOTE also, UPPERCASE is not allowed for normal users
+  # Santa Zhang:
+  #
+  # original :with => Authentication.login_regex was modified.
+  # Users SHOULD not register with names starting with '.' or '_', which is reserved by system
+  # also, UPPERCASE is not allowed for normal users
   validates_format_of       :login,    :with => /\A[a-zA-Z_\.]+[a-zA-Z0-9_\.]*\z/, :message => Authentication.bad_login_message
 
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
@@ -21,7 +23,6 @@ class User < ActiveRecord::Base
   validates_length_of       :email,    :within => 6..40 #r@a.wk
   validates_uniqueness_of   :email
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
-
 
 
   # HACK HACK HACK -- how to do attr_accessible from here?
