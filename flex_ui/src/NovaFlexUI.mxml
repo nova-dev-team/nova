@@ -1,34 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*">
-	<mx:TabNavigator x="0" y="0" width="100%" height="100%" minHeight="480" minWidth="640" horizontalAlign="right">
-		<mx:Canvas label="Workspace" width="100%" height="100%">
-			<pages:Workspace x="0" y="0">
-			</pages:Workspace>
+	<mx:Script source="NovaFlexUI.as" />	
+	<mx:VBox x="0" y="0" width="100%" height="100%" minHeight="480" minWidth="640">
+		<mx:Canvas width="100%" height="30">
+			<mx:HBox right="0" top="0">
+				<mx:Label text="user: root, privilege: root" />
+				<mx:LinkButton label="Logout" id="logout_btn" click="logout()" />
+			</mx:HBox>
 		</mx:Canvas>
-		<mx:Canvas label="Wizard" width="100%" height="100%">
-			<pages:Wizard x="0" y="0">
-			</pages:Wizard>
-		</mx:Canvas>
-		<mx:Canvas label="User Management" width="100%" height="100%">
-			<pages:UserManagement x="0" y="0">
-			</pages:UserManagement>
-		</mx:Canvas>
-		<mx:Canvas label="Resource Management" width="100%" height="100%">
-			<pages:ResourceManagement x="0" y="0">				
-			</pages:ResourceManagement>
-		</mx:Canvas>
-		<mx:Canvas label="System Monitor" width="100%" height="100%">
-			<pages:SystemMonitor x="0" y="0">
-			</pages:SystemMonitor>
-		</mx:Canvas>
-		<mx:Canvas label="My Account" width="100%" height="100%">
-			<pages:MyAccount x="0" y="0">
-			</pages:MyAccount>
-		</mx:Canvas>
-		<mx:Canvas label="Logout" width="100%" height="100%">
-			<pages:Logout x="0" y="0">
-			</pages:Logout>
-		</mx:Canvas>
-	</mx:TabNavigator>
-	<mx:Label x="0" y="0" text="Nova" fontSize="16" color="#000000"/>
+		<mx:TabNavigator horizontalAlign="right" x="0" y="0" width="100%" height="100%">
+			<mx:Canvas label="Overview" width="100%" height="100%">
+				<pages:Overview x="0" y="0" />
+			</mx:Canvas>
+			<mx:Canvas label="Users" width="100%" height="100%">
+				<pages:Users x="0" y="0" />
+			</mx:Canvas>
+			<mx:Canvas label="System" width="100%" height="100%">
+				<pages:System x="0" y="0" />
+			</mx:Canvas>
+			<mx:Canvas label="Monitor" width="100%" height="100%">
+				<pages:Monitor x="0" y="0" />
+			</mx:Canvas>
+			<mx:Canvas label="Workspace" width="100%" height="100%">
+				<pages:Workspace x="0" y="0" />
+			</mx:Canvas>
+			<mx:Canvas label="Wizard" width="100%" height="100%">
+				<pages:Wizard x="0" y="0" />
+			</mx:Canvas>
+			<mx:Canvas label="My Account" width="100%" height="100%">
+				<pages:MyAccount x="0" y="0" />
+			</mx:Canvas>
+		</mx:TabNavigator>
+	</mx:VBox>
+	<mx:Canvas x="0" y="0">
+		<mx:VBox>
+			<mx:Label text="Nova" fontSize="16" color="#000000" />
+			<mx:Label text="version: 0.3-nightly" color="#000000" />
+		</mx:VBox>	
+	</mx:Canvas>
 </mx:Application>
