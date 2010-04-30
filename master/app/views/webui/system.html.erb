@@ -1,3 +1,21 @@
 <% content_for :page do %>
-TODO: content for system
+
+<script type="text/javascript">
+$(document).ready(function() {
+  system_load_settings(<%= Setting.count %>);
+});
+</script>
+
+<center>
+
+<b>System settings</b> <a href='#' onclick="system_load_settings(<%= Setting.count %>);">(refresh)</a><p/>
+
+<%
+# don't add any thing inside the <div></div>
+%>
+<div id="system_settings_container"></div>
+
+</center>
+
+
 <% end %>

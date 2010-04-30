@@ -113,6 +113,98 @@ function user_set_activated(user_login) {
   });
 }
 
+
+//
+// "System" page
+//
+
+function system_load_settings(setting_count) {
+  if ($("#system_settings_container").html() == "") {
+    html = "<table id='system_settings' width='100%'>"
+    html += "<tr class='row_type_0'><td><b>Key</b></td><td><b>Value</b> (click to edit)</td><td><b>For worker?</b></td></tr>"
+    for (i = 0; i < setting_count; i++) {
+      html += "<tr id='system_settings-r" + i + "' class='row_type_" + ((i + 1) % 2) + "'>"
+      html += "<td id='system_settings-r" + i + "-key'>&nbsp;</td>"
+      html += "<td id='system_settings-r" + i + "-value'>&nbsp;</td>"
+      html += "<td id='system_settings-r" + i + "-for_worker'>&nbsp;</td>"
+      html += "</tr>"
+    }
+    html += "</table>"
+    $("#system_settings_container").html(html);
+  }
+  $("#system_settings_container").block();
+  $.ajax({
+    url: "/settings/index",
+    type: "POST",
+    dataType: "json",
+    data: {
+      items: "key,value,editable,for_worker"
+    },
+    success: function(result) {
+      $("#system_settings_container").unblock();
+      if (result.success) {
+        for (i = 0; i < result.data.length; i++) {
+          s = result.data[i];
+          $("#system_settings-r" + i + "-key").html(s.key);
+
+          if (s.editable) {
+            html = "<a href='#' onclick='system_setting_edit(\"" + s.key + "\")'><div id='system_settings-key-" + s.key + "'>" + s.value + "</div></a>"
+            $("#system_settings-r" + i + "-value").html(html);
+          } else {
+            $("#system_settings-r" + i + "-value").html(s.value);
+          }
+
+          if (s.for_worker) {
+            $("#system_settings-r" + i + "-for_worker").html("<input type='checkbox' disabled checked>");
+          } else {
+            $("#system_settings-r" + i + "-for_worker").html("<input type='checkbox' disabled unchecked>");
+          }
+        }
+      } else {
+        $("#system_settings_container").unblock();
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function(result) {
+      $("#system_settings_container").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+
+function system_setting_edit(key) {
+  old_value = $("#system_settings-key-" + key).html();
+  new_value = prompt("Please provide new value for '" + key + "'", old_value);
+  if (new_value == null) {
+    return;
+  }
+  $("#system_settings_container").block();
+  $.ajax({
+    url: "/settings/edit",
+    type: "POST",
+    dataType: "json",
+    data: {
+      key: key,
+      value: new_value
+    },
+    success: function(result) {
+      $("#system_settings_container").unblock();
+      if (result.success) {
+        $("#system_settings_container").unblock();
+        $("#system_settings-key-" + key).html(new_value);
+      } else {
+        $("#system_settings_container").unblock();
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function(result) {
+      $("#system_settings_container").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
 //
 // "Account info" page
 //
