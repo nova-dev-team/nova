@@ -30,8 +30,24 @@ class MiscController < ApplicationController
   # Since::   0.3
   def my_privilege
     if logged_in?
-      priv = current_user.privilege
+      priv = @current_user.privilege
       reply_success "Your privilege is '#{priv}'", :privilege => priv
+    else
+      reply_failure "You are not logged in!"
+    end
+  end
+
+  # Reply detailed information of current user.
+  # If user not logged in, an failure will be replied.
+  #
+  # Since::   0.3
+  def who_am_i
+    if logged_in?
+      reply_success "Your info is successfully retireved.",
+        :privilege => @current_user.privilege,
+        :login => @current_user.login,
+        :name => @current_user.name,
+        :email => @current_user.email
     else
       reply_failure "You are not logged in!"
     end

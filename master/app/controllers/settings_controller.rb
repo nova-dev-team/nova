@@ -1,9 +1,11 @@
-# system settings, determines system behavior
+# This is the controller for system settings.
+#
+# Author::    Santa Zhang (santa1987@gmail.com)
+# Since::     0.3
 
 require 'rubygems'
 require 'rest_client'
 require 'json'
-require 'pp'
 
 class SettingsController < ApplicationController
 
@@ -25,6 +27,10 @@ class SettingsController < ApplicationController
     reply_model Setting, :items => params[:items]
   end
 
+  # Change system setting.
+  # If the setting is also for worker machines, they will be updated, too.
+  #
+  # Since::   0.3
   def edit
     if params[:key] and params[:value]
       setting = Setting.find_by_key params[:key]
@@ -56,6 +62,10 @@ class SettingsController < ApplicationController
 
 private
 
+  # Filter to check if user logged in, and if current user is "root".
+  # Only root could view/change system settings.
+  #
+  # Since::   0.3
   def root_required
     unless logged_in? and @current_user.privilege == "root"
       reply_failure "You do not have enough privilege for this action!"
