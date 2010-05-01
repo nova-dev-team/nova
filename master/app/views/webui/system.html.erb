@@ -15,6 +15,35 @@ $(document).ready(function() {
 %>
 <div id="system_settings_container"></div>
 
+<p/>
+<hr>
+<p/>
+
+<b>Worker machines</b> <a href='#' onclick="alert('TODO')">(refresh)</a><p/>
+
+<%
+# don't add any thing inside the <div></div>
+%>
+<div id="worker_machines_container"></div>
+
+Worker IP: <input type="text" id="new_worker_machine_ip" /> <%= spacing 2 %> <button type="button" class='btn'><span><span>Add new worker</span></span></button>
+
+<p/>
+<hr>
+<p/>
+
+<b>Port mappings</b> <a href='#' onclick="alert('TODO')">(refresh)</a><p/>
+
+<%
+# don't add any thing inside the <div></div>
+%>
+<div id="port_mappings_container"></div>
+
+Proxy port: <input type="text" id="port_mapping_proxy_port"/> <%= spacing 2 %>
+Destination IP: <input type="text" id="port_mapping_ip" /> <%= spacing 2 %>
+Destination Port: <input type="text" id="port_mapping_dest_port"/> <%= spacing 2 %>
+<button type="button" class='btn'><span><span>Add new mapping</span></span></button>
+
 </center>
 
 
