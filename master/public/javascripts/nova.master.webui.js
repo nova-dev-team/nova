@@ -76,11 +76,10 @@ function load_user_list(page, page_size) {
           i++;
         }
       } else {
-        $("#user_table_container").unblock();
         do_message("failure", "Error occurred", result.message);
       }
     },
-    error: function(result) {
+    error: function() {
       $("#user_table_container").unblock();
       do_message("failure", "Request failed", "Please check your network connection!");
     }
@@ -106,7 +105,7 @@ function user_set_activated(user_login) {
         $("input[name='user_table-user-" + user_login + "-activated']").attr("checked", !activated);
       }
     },
-    error: function(result) {
+    error: function() {
       do_message("failure", "Request failed", "Please check your network connection!");
       $("input[name='user_table-user-" + user_login + "-activated']").attr("checked", !activated);
     }
@@ -161,11 +160,10 @@ function system_load_settings(setting_count) {
           }
         }
       } else {
-        $("#system_settings_container").unblock();
         do_message("failure", "Error occurred", result.message);
       }
     },
-    error: function(result) {
+    error: function() {
       $("#system_settings_container").unblock();
       do_message("failure", "Request failed", "Please check your network connection!");
     }
@@ -191,15 +189,102 @@ function system_setting_edit(key) {
     success: function(result) {
       $("#system_settings_container").unblock();
       if (result.success) {
-        $("#system_settings_container").unblock();
         $("#system_settings-key-" + key).html(new_value);
       } else {
-        $("#system_settings_container").unblock();
         do_message("failure", "Error occurred", result.message);
       }
     },
-    error: function(result) {
+    error: function() {
       $("#system_settings_container").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+
+function port_mapping_load() {
+  if ($("#port_mappings_container").html() == "") {
+    html = "<table id='port_mappings' width='100%'>"
+    html += "<tr class='row_type_0'><td><b>Proxy port</b> (click to delete)</td><td><b>Destination IP</b></td><td><b>Destination port</b></td></tr>"
+    html += "</table>"
+    $("#port_mappings_container").html(html);
+  }
+  $("#port_mappings_container").block();
+  $.ajax({
+    url: "/misc/list_port_mapping",
+    type: "POST",
+    dataType: "json",
+    success: function(result) {
+      $("#port_mappings_container").unblock();
+      if (result.success) {
+        for (i = 0; i < result.data.length; i++) {
+          ip = result.data[i].ip;
+          dest_port = result.data[i].port;
+          proxy_port = result.data[i].local_port;
+          row_id = "port_mapping_rid_" + i;
+          html = "<tr class='row_type_" + ((i + 1) % 2) + "' id='" + row_id + "'>";
+          html += "<td><a href='#' onclick='del_port_mapping(\"" + ip + "\", \"" + dest_port + "\", \"" + row_id + "\")'>" + proxy_port + "</a></td>";
+          html += "<td>" + ip + "</td>";
+          html += "<td>" + dest_port + "</td>";
+          html += "</tr>";
+          $("#port_mappings > tbody:last").append(html);
+        }
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#port_mappings_container").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function del_port_mapping(dest_ip, dest_port, row_id) {
+  $("#" + row_id).hide();
+  $.ajax({
+    url: "/misc/del_port_mapping",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: dest_ip,
+      port: dest_port
+    },
+    success: function(result) {
+      if (result.success) {
+        // do nothing
+      } else {
+        $("#" + row_id).show();
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function add_port_mapping() {
+  var proxy_port = $("#port_mapping_proxy_port").val();
+  var dest_port = $("#port_mapping_dest_port").val();
+  var dest_ip = $("#port_mapping_ip").val();
+  $.ajax({
+    url: "/misc/add_port_mapping",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: dest_ip,
+      port: dest_port,
+      local_port: proxy_port
+    },
+    success: function(result) {
+      if (result.success) {
+        port_mapping_load();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
@@ -236,7 +321,7 @@ function user_update_info() {
         do_message("failure", "Update failed", result.message);
       }
     },
-    error: function(result) {
+    error: function() {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
@@ -263,7 +348,7 @@ function user_reset_password() {
         do_message("failure", "Reset failed", result.message);
       }
     },
-    error: function(result) {
+    error: function() {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });

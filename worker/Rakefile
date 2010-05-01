@@ -44,7 +44,6 @@ namespace :nova do
       prepare_folders
       require_root_privilege
       puts "Building helper tools.."
-      my_exec "cd #{RAILS_ROOT}/lib && make"
       puts "Migrating database..."
       my_exec "rake db:migrate RAILS_ENV=production"
       my_exec "rake db:migrate RAILS_ENV=development"

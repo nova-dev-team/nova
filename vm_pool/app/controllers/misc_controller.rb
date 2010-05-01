@@ -90,7 +90,7 @@ class MiscController < ApplicationController
       end
       main_fn = entry[0..-5]
       next unless main_fn =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+_[0-9]+$/
-      port_fn = File.join "#{RAILS_ROOT}/log/#{main_fn}.local_port"
+      port_fn = "#{RAILS_ROOT}/log/#{main_fn}.local_port"
       if File.exists? port_fn
         mappings << {
           :local_port => File.read(port_fn).to_i,
@@ -214,6 +214,9 @@ class MiscController < ApplicationController
 
 private
 
+  # Check if the parameters for port mapper is correct.
+  #
+  # Since::   0.3
   def valid_ip_and_port_param?
     unless valid_param? params[:ip] and params[:ip].is_ip_addr?
       reply_failure "Please provide a valid 'ip'."

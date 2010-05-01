@@ -14,4 +14,20 @@ class ApplicationController < ActionController::Base
 
   include ControllerUtility
 
+protected
+
+  # Filter to check if user logged in, and if current user is "root".
+  # Only root could view/change system settings.
+  # If the user is root, returns true. Other wise false is returned.
+  #
+  # Since::   0.3
+  def root_required
+    unless logged_in? and @current_user.privilege == "root"
+      reply_failure "You do not have enough privilege for this action!"
+      return false
+    else
+      return true
+    end
+  end
+
 end

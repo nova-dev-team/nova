@@ -41,6 +41,7 @@ namespace :nova do
         exit
       end
       puts "Starting Nova vm_pool..."
+      my_exec "cd #{RAILS_ROOT}/lib && make"
       unless File.exists? "#{RAILS_ROOT}/log"
         FileUtils.mkdir_p "#{RAILS_ROOT}/log"
       end
@@ -111,7 +112,7 @@ namespace :nova do
       puts "Loading data..."
       my_exec "rake db:fixtures:load RAILS_ENV=production"
       my_exec "rake db:fixtures:load RAILS_ENV=development"
-      my_exec "cd lib && make"
+      my_exec "cd #{RAILS_ROOT}/lib && make"
       File.open("#{RAILS_ROOT}/config/INIT_DONE", "w").write ""
     end
 

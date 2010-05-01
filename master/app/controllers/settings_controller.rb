@@ -60,16 +60,4 @@ class SettingsController < ApplicationController
     end
   end
 
-private
-
-  # Filter to check if user logged in, and if current user is "root".
-  # Only root could view/change system settings.
-  #
-  # Since::   0.3
-  def root_required
-    unless logged_in? and @current_user.privilege == "root"
-      reply_failure "You do not have enough privilege for this action!"
-    end
-  end
-
 end

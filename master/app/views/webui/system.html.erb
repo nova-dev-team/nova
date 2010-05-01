@@ -3,6 +3,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
   system_load_settings(<%= Setting.count %>);
+  port_mapping_load();
 });
 </script>
 
@@ -38,11 +39,12 @@ Worker IP: <input type="text" id="new_worker_machine_ip" /> <%= spacing 2 %> <bu
 # don't add any thing inside the <div></div>
 %>
 <div id="port_mappings_container"></div>
+<p/>
 
 Proxy port: <input type="text" id="port_mapping_proxy_port"/> <%= spacing 2 %>
 Destination IP: <input type="text" id="port_mapping_ip" /> <%= spacing 2 %>
 Destination Port: <input type="text" id="port_mapping_dest_port"/> <%= spacing 2 %>
-<button type="button" class='btn'><span><span>Add new mapping</span></span></button>
+<button type="button" class='btn' onclick="add_port_mapping()"><span><span>Add new mapping</span></span></button>
 
 </center>
 
