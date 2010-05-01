@@ -301,7 +301,6 @@ def do_prepare rails_root, storage_server, vm_dir
 
   # TODO check if download success
 
-  # TODO download packages
   if File.exists? "agent_packages" or File.exists? "nodelist"
     write_log "preparing required packages"
     File.read("agent_packages").each_line do |line|
@@ -309,9 +308,6 @@ def do_prepare rails_root, storage_server, vm_dir
       prepare_agent_package storage_server, package_pool_dir, vm_dir, pkg
     end
 
-    # TODO make agent iso images
-    # place holder code, since Huang Gang's ceil is not working now
-#    `genisoimage -L -D -l -f -o agent-cd.iso agent-cd/`
     begin
       write_log "creating agent cd using iso generator"
 
@@ -342,7 +338,7 @@ def do_prepare rails_root, storage_server, vm_dir
       write_log "config_network: ip=#{agent_ip}, submask=#{agent_submask}, gateway=#{agent_gateway}, dns=#{agent_dns}, cluster_name=#{cluster_name}"
       igen.config_network(agent_ip, agent_submask, agent_gateway, agent_dns)
 
-      # TODO setup cluster name, so the agent could retrieve keys
+      # setup cluster name, so the agent could retrieve keys
       vm_name = File.basename vm_dir
       igen.config_cluster(vm_name, cluster_name)
 
