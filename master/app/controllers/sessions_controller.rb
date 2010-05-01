@@ -1,58 +1,62 @@
-## This controller handles the login/logout function of the site.  
+# This controller handles the login/logout action.
+#
+# Author::    Santa Zhang (santa1987@gmail.com)
+# Since::     0.3
+
 class SessionsController < ApplicationController
 
+  # If user logged in, redirects to home. Other wise render the login page.
+  #
+  # Since::   0.3
   def new
     if logged_in?
       redirect_to home_url
     end
   end
 
+  # Handles login request.
+  #
+  # Since::   0.3
   def create
     logout_keeping_session!
     user = User.authenticate(params[:login], params[:password])
     if user
-      if user.activated ## check if the user is activated
+      # Check if user is activated
+      if user.activated
         # Protects against session fixation attacks, causes request forgery
         # protection if user resubmits an earlier form using back
         # button. Uncomment if you understand the tradeoffs.
         # reset_session
         self.current_user = user
-        new_cookie_flag = (params[:remember_me] == "1")
-        handle_remember_cookie! new_cookie_flag
+        #new_cookie_flag = (params[:remember_me] == "1")
+        #handle_remember_cookie! new_cookie_flag
 
-        ## TODO clear this routine, only json notation required
-        if request.request_method == :get ## for browsers
-          redirect_back_or_default('/')
-          flash[:notice] = "Logged in successfully"
-        else
-          respond_to do |accept|
-            accept.json {
-              render :json => {:success => true, :message => "You are logged in"}
-            }
-          end
-        end
-      else ## the user is not activated
-        note_failed_signin
-        @login       = params[:login]
-        @remember_me = params[:remember_me]
         respond_to do |accept|
-          accept.json {
-            render :json => {:success => false, :message => "'#{params[:login]}' is not activated"}
-          }
+          accept.html { redirect_back_or_default("/") }
+          accept.json { reply_success "You are now logged in." }
+        end
+      else
+        # User not activated
+        note_failed_signin
+        #@login       = params[:login]
+        #@remember_me = params[:remember_me]
+        respond_to do |accept|
+          accept.json { reply_failure "'#{params[:login]}' is not activated yet!" }
         end
       end
     else
       note_failed_signin
-      @login       = params[:login]
-      @remember_me = params[:remember_me]
+      #@login       = params[:login]
+      #@remember_me = params[:remember_me]
       respond_to do |accept|
-        accept.json {
-          render :json => {:success => false, :message => "incorrect login for '#{params[:login]}', check your username and password"}
-        }
+        accept.json { reply_failure "Incorrect login info for '#{params[:login]}', check your user id and password!" }
       end
     end
   end
 
+  # Logout current user.
+  #
+  # Since::   0.3
   def destroy
     logout_killing_session!
     flash[:notice] = "You have been logged out."
