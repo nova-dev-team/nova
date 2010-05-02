@@ -75,6 +75,7 @@ class Environment
 		end
 
 		system "ifdown #{if_name}"
+		sleep 5
 		system "ifup #{if_name}"
 		sleep 10
 	end

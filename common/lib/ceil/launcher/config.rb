@@ -11,16 +11,21 @@ class ClusterConfiguration
               :package_server, :package_server_type, :package_server_port,
 							:package_server_username, :package_server_password,
 							:key_server_username, :key_server_password,
-              :key_server, :key_server_type, :key_server_port
-							
+              :key_server, :key_server_type, :key_server_port, 
+							:character, :local_addr, :local_mask, :default_gateway, :name_server
 
   def initialize(local_addr)
+  	@local_addr = nil
+		@local_mask = nil
+		@default_gateway = nil
+		@name_server = nil
+
     @node_list = nil
     @inst_list = nil
     @host_name = nil
     @cluster_name = nil
     @local_addr = local_addr
-
+	
     #default params
     @package_server = "localhost"
     @key_server = "localhost"
@@ -34,6 +39,8 @@ class ClusterConfiguration
 		@package_server_password = 'CeilClient'
 		@key_server_username = 'anonymous'
 		@key_server_password = 'CeilClient'
+
+		@character = ["worker"]
   end
 
   def generate_config_file(local_path)
@@ -54,13 +61,25 @@ class ClusterConfiguration
 		filename_cluster_config = path_config + '/' + CEIL_ISO_FILENAME_CLUSTER
 		filename_soft_list = path_config + '/' + CEIL_ISO_FILENAME_SOFTLIST
 		filename_node_list = path_config + '/' + CEIL_ISO_FILENAME_NODELIST
-
+		filename_network_config = path_config + '/' + CEIL_ISO_FILENAME_NETWORK
 		begin
+			File.open(filename_network_config, 'r') do |file|
+				@local_addr = file.readline.chomp
+				@local_mask = file.readline.chomp
+				@default_gateway = file.readline.chomp
+				@name_server = file.readline.chomp
+			end
 
 			File.open(filename_node_list) do |file|
 				@node_list = file.readlines
 			end	
 			@node_list = @node_list.join.chomp
+			master = @node_list.split[0]
+		
+			if master == @local_addr
+				@character << "master"
+			end
+
 			File.open(filename_soft_list) do |file|
 				@inst_list = file.readlines
 			end

@@ -124,7 +124,7 @@ class Ceil
 				@log.send("30", "#{app_name}")
 				paths.each do |temp_path|
 					if File.exists?(temp_path + "/entry.sh")
-						system "#{File.dirname(__FILE__)}/exec.sh #{temp_path} entry.sh #{@cc.host_name} #{@cc.cluster_name}"
+						system "/bin/sh #{File.dirname(__FILE__)}/exec.sh #{temp_path} entry.sh #{@cc.host_name} #{@cc.cluster_name}"
 					  @log.send("35", "#{app_name}")
 					else
 					  @log.send("-30", "#{app_name}", "entry of package #{app_name} not found, maybe #{@cc.package_server_type} downloading failed, or the package is broken")
@@ -152,7 +152,7 @@ class Ceil
 				@log.send("70", "#{app_name}")
 				
 				if File.exists?(temp_path + "/attach.sh")
-  				system "#{File.dirname(__FILE__)}/exec.sh #{temp_path} attach.sh #{@cc.host_name} #{@cc.cluster_name}"
+  				system "/bin/sh #{File.dirname(__FILE__)}/exec.sh #{temp_path} attach.sh #{@cc.host_name} #{@cc.cluster_name}"
   				
   				@log.send("75", "#{app_name}")
   			else
@@ -174,5 +174,7 @@ class Ceil
 end
 
 ceil = Ceil.new
-ceil.start if ceil.check
+ceil.start if ceil.check_iso
+puts "ceil finished"
+
 
