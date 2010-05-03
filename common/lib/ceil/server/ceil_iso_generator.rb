@@ -122,8 +122,11 @@ class CeilIsoGenerator
 
 		# link base_path to tmpdir/
 		#FileUtils.cp_r(@base_path, tmpdir)
+		begin	
+			FileUtils.ln_s(@base_path, tmpdir)
+		rescue
+		end
 
-		FileUtils.ln_s(@base_path, tmpdir)
 		# create config files
 		FileUtils.mkdir(tmpdir + CONFIG_PATH)
 		#DirTool.mkdir()
@@ -182,11 +185,11 @@ end
 =begin
 igen = CeilIsoGenerator.new
 igen.config_essential('/home/rei/nova/common/lib/ceil')
-igen.config_network('10.0.1.200', '255.255.255.0', '10.0.1.254', '166.111.8.28')
-igen.config_cluster("nova-0-1", "nova-cluster-name")
+igen.config_network('10.0.1.122', '255.255.255.0', '10.0.1.254', '166.111.8.28')
+igen.config_cluster("node1", "nova-cluster-name")
 igen.config_package_server('santa:santa@10.0.1.223', '8000', 'ftp')
 igen.config_key_server('santa:santa@10.0.1.223', '8000', 'ftp')
-igen.config_nodelist("10.0.1.200 node1\n10.0.1.211 node2")
+igen.config_nodelist("10.0.1.122 node1\n10.0.1.211 node2")
 igen.config_softlist("common ssh-nopass hadoop")
 igen.generate('/var/vm1', '/home/rei/test.iso')
 =end
