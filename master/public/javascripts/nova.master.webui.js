@@ -235,13 +235,17 @@ function load_worker_machines() {
           } else {
             html += "<td>" + hostname + "</td>";
           }
+
+          html += "<td>";
           if (pm_status == "failure") {
-            html += "<td><b><font color='red'>failure</font></b></td>";
+            html += "<b><font color='red'>failure</font></b>";
           } else if (pm_status == "retired") {
-            html += "<td><font color='gray'>retired</font></td>";
+            html += "<font color='gray'>retired</font>";
           } else {
-            html += "<td>" + pm_status + "</td>";
+            html += pm_status;
           }
+          html += "</td>";
+
           html += "<td><a href='#' onclick='change_worker_capacity(\"" + ip + "\", \"" + row_id + "-capacity\")' id='" + row_id + "-capacity'>" + vm_capacity + "</a></td>";
           html += "<td>" + vm_preparing + "</td>";
           html += "<td>" + vm_running + "</td>";
@@ -253,9 +257,11 @@ function load_worker_machines() {
           } else if (pm_status == "working") {
             // TODO
           } else if (pm_status == "retired") {
-            // TODO
+            html += "<button type='button' class='btn' onclick='reconnect_worker_machine(\"" + ip + "\")'><span><span>reuse</span></span></button> ";
+            html += "<button type='button' class='btn' onclick='delete_worker_machine(\"" + ip + "\")'><span><span><font color='red'>delete</font></span></span></button>";
           } else if (pm_status == "failure") {
-            // TODO
+            html += "<button type='button' class='btn' onclick='reconnect_worker_machine(\"" + ip + "\")'><span><span>reconnect</span></span></button> ";
+            html += "<button type='button' class='btn' onclick='delete_worker_machine(\"" + ip + "\")'><span><span><font color='red'>delete</font></span></span></button>";
           }
           html += "</td></tr>";
 
@@ -268,6 +274,56 @@ function load_worker_machines() {
     error: function() {
       $("#worker_machines_container").unblock();
       do_message("failure", "Request failed (worker machines)", "Please check your network connection!");
+    }
+  });
+}
+
+function delete_worker_machine(ip) {
+  $("#worker_machines_container").block();
+  $.ajax({
+    async: false,
+    url: "/pmachines/delete",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: ip
+    },
+    success: function(result) {
+      $("#worker_machines_container").unblock();
+      if (result.success) {
+        load_worker_machines();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#worker_machines_container").unblock();
+      do_message("failure", "Request failed (delete worker)", "Please check your network connection!");
+    }
+  });
+}
+
+function reconnect_worker_machine(ip) {
+  $("#worker_machines_container").block();
+  $.ajax({
+    async: false,
+    url: "/pmachines/reconnect",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: ip
+    },
+    success: function(result) {
+      $("#worker_machines_container").unblock();
+      if (result.success) {
+        load_worker_machines();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#worker_machines_container").unblock();
+      do_message("failure", "Request failed (reconnect worker)", "Please check your network connection!");
     }
   });
 }
