@@ -23,16 +23,26 @@ namespace :nova do
       FileUtils.mkdir_p "#{RAILS_ROOT}/tmp/pids"
     end
 
+    # Controls the daemon processes
+    #
+    # Since::     0.3
+    def all_daemons action
+      Dir["#{RAILS_ROOT}/lib/daemons/*_ctl"].each do |f|
+        my_exec "#{f} #{action}"
+      end
+    end
+
     # TODO add storage server controller, or merge it into "master"?
 
     desc "Start Nova master"
     task :start do
       prepare_folders
       puts "Starting Nova master..."
-
       my_exec "cd #{RAILS_ROOT}/lib && make" # prepare tools
 
       conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
+      # boot the daemons
+      all_daemons "start"
 
       if conf["master_use_swiftiply"]
         # use swiftiply
@@ -64,6 +74,8 @@ namespace :nova do
     task :stop do
       prepare_folders
       kill_by_pid_file "#{File.dirname __FILE__}/tmp/pids/server.pid"
+
+      all_daemons "stop"
       
       my_exec "killall swiftiply"
       my_exec "killall mongrel_rails"
