@@ -87,7 +87,6 @@
         html += "<button type='button' class='btn' onclick='delete_pmachine(\"#{pm.ip}\")'><span><span><font color='red'>Delete</font></span></span></button> "
       end
     when "working"
-      html += "<button type='button' class='btn' onclick=''><span><span>Toggle detail</span></span></button> "
       html += "<button type='button' class='btn' onclick='retire_pmachine(\"#{pm.ip}\")'><span><span>Retire</span></span></button> "
     when "retired"
       html += "<button type='button' class='btn' onclick='reuse_pmachine(\"#{pm.ip}\")'><span><span>Reuse</span></span></button> "
