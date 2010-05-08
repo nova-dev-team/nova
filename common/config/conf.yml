@@ -5,7 +5,7 @@
 master_port:                    3000
 
 # should master node use swiftiply? it will enhance master performace
-master_use_swiftiply:           true
+master_use_swiftiply:           false
 
 # the first port for swiftiply, necessary if 'master_use_swiftiply' is 'true'
 master_swiftiply_first_port:    10000

@@ -135,6 +135,7 @@ function system_load_settings(setting_count) {
   $.ajax({
     url: "/settings/index",
     type: "POST",
+    async: false,
     dataType: "json",
     data: {
       items: "key,value,editable,for_worker"
@@ -201,18 +202,137 @@ function system_setting_edit(key) {
   });
 }
 
+function load_worker_machines() {
+  html = "<table id='worker_machines' width='100%'>"
+  html += "<tr class='row_type_0'><td><b>IP</b></td><td><b>Hostname</b></td><td><b>Status</b></td>"
+  html += "<td><b>VM capacity</b> (click to change)</td><td><b>VM preparing</b></td><td><b>VM running</b></td><td><b>VM failure</b></td>"
+  html += "<td><b>Actions</b></td></tr>"
+  html += "</table>"
+  $("#worker_machines_container").html(html);
+  $("#worker_machines_container").block();
+  $.ajax({
+    url: "/pmachines/list.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    success: function(result) {
+      $("#worker_machines_container").unblock();
+      if (result.success) {
+        for (i = 0; i < result.data.length; i++) {
+          ip = result.data[i].ip;
+          hostname = result.data[i].hostname;
+          pm_status = result.data[i].status;
+          vm_capacity = result.data[i].vm_capacity;
+          vm_failure = result.data[i].vm_failure;
+          vm_preparing = result.data[i].vm_preparing;
+          vm_running = result.data[i].vm_running;
+
+          row_id = "worker_machines_rid_" + i;
+          html = "<tr class='row_type_" + ((i + 1) % 2) + "' id='" + row_id + "'>";
+          html += "<td>" + ip + "</td>";
+          if (hostname == null) {
+            html += "<td><i>(Unknown)</i></td>";
+          } else {
+            html += "<td>" + hostname + "</td>";
+          }
+          html += "<td>" + pm_status + "</td>";
+          html += "<td><a href='#' onclick='change_worker_capacity(\"" + ip + "\", \"" + row_id + "-capacity\")' id='" + row_id + "-capacity'>" + vm_capacity + "</a></td>";
+          html += "<td>" + vm_preparing + "</td>";
+          html += "<td>" + vm_running + "</td>";
+          html += "<td>" + vm_failure + "</td>";
+
+          html += "<td>"
+          if (pm_status == "pending") {
+            html += "&nbsp";
+          } else if (pm_status == "working") {
+            // TODO
+          } else if (pm_status == "retired") {
+            // TODO
+          } else if (pm_status == "failure") {
+            // TODO
+          }
+          html += "</td></tr>";
+
+          $("#worker_machines > tbody:last").append(html);
+        }
+      } else {
+        do_message("failure", "Error occurred!", result.message);
+      }
+    },
+    error: function() {
+      $("#worker_machines_container").unblock();
+      do_message("failure", "Request failed (worker machines)", "Please check your network connection!");
+    }
+  });
+}
+
+function change_worker_capacity(ip, elem_id) {
+  old_val = $("#" + elem_id).html();
+  new_val = prompt("Please provide new capacity:");
+  $.ajax({
+    url: "/pmachines/edit_capacity",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: ip,
+      vm_capacity: new_val
+    },
+    success: function(result) {
+      if (result.success) {
+        $("#" + elem_id).html(new_val);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed (edit capacity)", "Please check your network connection!");
+    }
+  });
+}
+
+function pmachine_add() {
+  var pm_ip = $("#new_worker_machine_ip").val();
+  var vm_cap = $("#new_worker_machine_capacity").val();
+  if (pm_ip == "" || pm_ip == null) {
+    alert("Please provide 'Worker IP'!");
+    return;
+  } else if (vm_cap == "" || vm_cap == null) {
+    alert("Please provide 'VM capacity'!");
+    return;
+  }
+  $.ajax({
+    url: "/pmachines/add",
+    type: "POST",
+    dataType: "json",
+    data: {
+      vm_capacity: vm_cap,
+      ip: pm_ip
+    },
+    success: function(result) {
+      if (result.success) {
+        do_message("success", "Added new woker", result.message);
+        load_worker_machines();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed (add new worker)", "Please check your network connection!");
+    }
+  });
+}
+
 
 function port_mapping_load() {
-  if ($("#port_mappings_container").html() == "") {
-    html = "<table id='port_mappings' width='100%'>"
-    html += "<tr class='row_type_0'><td><b>Proxy port</b> (click to delete)</td><td><b>Destination IP</b></td><td><b>Destination port</b></td></tr>"
-    html += "</table>"
-    $("#port_mappings_container").html(html);
-  }
+  html = "<table id='port_mappings' width='100%'>"
+  html += "<tr class='row_type_0'><td><b>Proxy port</b> (click to delete)</td><td><b>Destination IP</b></td><td><b>Destination port</b></td></tr>"
+  html += "</table>"
+  $("#port_mappings_container").html(html);
   $("#port_mappings_container").block();
   $.ajax({
     url: "/misc/list_port_mapping",
     type: "POST",
+    async: false,
     dataType: "json",
     success: function(result) {
       $("#port_mappings_container").unblock();

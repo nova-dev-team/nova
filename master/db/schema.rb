@@ -12,12 +12,10 @@
 ActiveRecord::Schema.define(:version => 20090812091810) do
 
   create_table "pmachines", :force => true do |t|
-    t.string   "addr"
-    t.integer  "vnc_first"
-    t.integer  "vnc_last"
-    t.string   "status"
-    t.string   "machine_name"
-    t.boolean  "retired",      :default => false
+    t.string   "ip",          :limit => 20,                :null => false
+    t.string   "status",                                   :null => false
+    t.string   "hostname"
+    t.integer  "vm_capacity",               :default => 2
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -4,6 +4,7 @@
 $(document).ready(function() {
   system_load_settings(<%= Setting.count %>);
   port_mapping_load();
+  load_worker_machines();
 });
 </script>
 
@@ -20,20 +21,22 @@ $(document).ready(function() {
 <hr>
 <p/>
 
-<b>Worker machines</b> <a href='#' onclick="alert('TODO')">(refresh)</a><p/>
+<b>Worker machines</b> <a href='#' onclick="load_worker_machines()">(refresh)</a><p/>
 
 <%
 # don't add any thing inside the <div></div>
 %>
 <div id="worker_machines_container"></div>
 
-Worker IP: <input type="text" id="new_worker_machine_ip" /> <%= spacing 2 %> <button type="button" class='btn'><span><span>Add new worker</span></span></button>
+Worker IP: <input type="text" id="new_worker_machine_ip" /> <%= spacing 2 %>
+VM capacity: <input type="text" id="new_worker_machine_capacity" /> <%= spacing 2 %>
+<button type="button" class='btn' onclick='pmachine_add()'><span><span>Add new worker</span></span></button>
 
 <p/>
 <hr>
 <p/>
 
-<b>Port mappings</b> <a href='#' onclick="alert('TODO')">(refresh)</a><p/>
+<b>Port mappings</b> <a href='#' onclick="port_mapping_load()">(refresh)</a><p/>
 
 <%
 # don't add any thing inside the <div></div>

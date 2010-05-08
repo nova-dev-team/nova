@@ -8,6 +8,40 @@ require "utils.rb"
 
 class PmachinesController < ApplicationController
 
+  before_filter :root_required
+
+  # List all the running VMs
+  #
+  # Since::     0.3
+  def list
+    list_data = []
+    Pmachine.all.each do |pm|
+      pm_data = {
+        :ip => pm.ip,
+        :hostname => pm.hostname,
+        :status => pm.status,
+        :vm_capacity => pm.vm_capacity
+      }
+      vm_preparing = 0
+      vm_failure = 0
+      vm_running = 0
+      pm.vmachines.each do |vm|
+        if vm.status.downcase == "preparing"
+          vm_preparing += 1
+        elsif vm.status.downcase == "failure"
+          vm_failure += 1
+        elsif vm.status.downcase == "running"
+          vm_running += 1
+        end
+      end
+      pm_data[:vm_preparing] = vm_preparing
+      pm_data[:vm_failure] = vm_failure
+      pm_data[:vm_running] = vm_running
+      list_data << pm_data
+    end
+    reply_success "query successful!", :data => list_data
+  end
+
   # Add a new pmachine entry.
   #
   # Since::     0.3

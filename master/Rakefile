@@ -30,7 +30,7 @@ namespace :nova do
       prepare_folders
       puts "Starting Nova master..."
 
-      my_exec "cd #{RALIS_ROOT}/lib && make" # prepare tools
+      my_exec "cd #{RAILS_ROOT}/lib && make" # prepare tools
 
       conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
 
