@@ -90,13 +90,15 @@ namespace :nova do
 
       Dir.foreach("#{RAILS_ROOT}/log") do |entry|
         if entry.end_with? ".pid"
-          kill_by_pid_file entry
+          fpath = "#{File.dirname __FILE__}/log/#{entry}"
+          kill_by_pid_file fpath
         end
       end
 
       Dir.foreach("#{RAILS_ROOT}/tmp/pids") do |entry|
         if entry.end_with? ".pid"
-          kill_by_pid_file entry
+          fpath = "#{File.dirname __FILE__}/tmp/pids/#{entry}"
+          kill_by_pid_file fpath
         end
       end
     end
