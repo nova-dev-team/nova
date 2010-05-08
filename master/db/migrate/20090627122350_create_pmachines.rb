@@ -1,12 +1,21 @@
 class CreatePmachines < ActiveRecord::Migration
   def self.up
     create_table :pmachines do |t|
-      t.column :addr, :string # "ip:port" # TODO use this column instead of ip & column
-      t.column :vnc_first, :integer # the first usable vnc port
-      t.column :vnc_last, :integer   # the last usable vnc port
-      t.column :status, :string # whether the pmachine is connected
-      t.column :machine_name, :string # helper, naming the pmachine
-      t.column :retired, :boolean, :default => false # 'retire' mark, whether the new vms should be allocated to this pmachine
+
+      # The IP address of the physical machine
+      t.column :ip,             :string, :limit => 20, :null => false
+      
+      # The status of the physical machine.
+      # Possible values are "pending", "working", "failure", "retired".
+      t.column :status,         :string, :null => false
+
+      # The host name of physical machine.
+      t.column :hostname,       :string
+
+      # The limit of running VMs on this machine.
+      # It is not a hard limit, but creating VMs more than this limit will result in low performance.
+      t.column :vm_capacity,    :integer, :default => 2
+
       t.timestamps
     end
   end

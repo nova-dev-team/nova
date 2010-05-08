@@ -26,6 +26,18 @@ class MiscController < ApplicationController
     end
   end
 
+  # Get the hostname of the machine.
+  #
+  # Since::     0.3
+  def hostname
+    if File.exists? "#{RAILS_ROOT}/tmp/hostname"
+      hostname = File.read("#{RAILS_ROOT}/tmp/hostname").strip
+      reply_success "Hostname is '#{hostname}'", :hostname => hostname
+    else
+      reply_failure "Failed to get hostname!"
+    end
+  end
+
 
   # Removes deprecated VM image.
   #

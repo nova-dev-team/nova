@@ -37,7 +37,7 @@ class PmachinesController < ApplicationController
     else
       pm.status = "pending"
       pm.save
-      reply_success "Pmachine with IP=#{params[:ip]} changed to 'pending' statuus."
+      reply_success "Pmachine with IP=#{params[:ip]} changed to 'pending' status."
     end
   end
 
@@ -48,6 +48,10 @@ class PmachinesController < ApplicationController
     reconnect # reuse is basically "reconnect"
   end
 
+
+  # Mark a machine as "retired".
+  #
+  # Since::     0.3
   def retire
     return unless valid_ip?
     pm = Pmachine.find_by_ip params[:ip]
@@ -56,7 +60,7 @@ class PmachinesController < ApplicationController
     else
       pm.status = "retired"
       pm.save
-      reply_success "Pmachine with IP=#{params[:ip]} changed to 'retired' statuus."
+      reply_success "Pmachine with IP=#{params[:ip]} changed to 'retired' status."
     end
   end
 
@@ -76,6 +80,10 @@ class PmachinesController < ApplicationController
   end
 
   # Delete the pmachine, use with care!
+  # It is only possible when those conditions met:
+  #
+  #  * no VM running on the machine.
+  #  * the machine is "retired" or in "failure" status.
   #
   # Since::     0.3
   def delete
@@ -83,6 +91,10 @@ class PmachinesController < ApplicationController
     pm = Pmachine.find_by_ip params[:ip]
     if pm == nil
       reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    elsif pm.vmachines.length != 0
+      reply_failure "Cannot delete the pmachine, since there is still #{pm.vmachines.length} VM running on it."
+    elsif pm.status != "retired" and pm.status != "failure"
+      reply_failure "The pmachine could be deleted only if it is in 'retired' or 'failure' status!"
     else
       Pmachine.delete pm
       reply_success "Pmachine with IP=#{params[:ip]} deleted."

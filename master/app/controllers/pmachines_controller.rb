@@ -1,109 +1,128 @@
-require 'rubygems'
-require 'rest_client'
+# The controller for physical machines.
+# It is adapted from "vm_pool" component.
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
+
+require "utils.rb"
 
 class PmachinesController < ApplicationController
 
-#  before_filter :require_admin_privilege
+  # Add a new pmachine entry.
+  #
+  # Since::     0.3
+  def add
+    return unless valid_capacity? and valid_ip?
 
-  def index
-    result = []
-    Pmachine.all.each do |pmachine|
-      result << {
-        :addr => pmachine.addr,
-        :vnc_first => pmachine.vnc_first,
-        :vnc_last => pmachine.vnc_last,
-        :machine_name => pmachine.machine_name
-      }
-    end
-
-    render_data result
-  end
-
-  def create
-    register_pmachine params
-  end
-
-  def new
-    register_pmachine params
-  end
-
-  def edit
-    if params[:addr] != nil
-      pm = Pmachine.find_by_addr params[:addr]
-      if params[:machine_name] != nil
-        pm.machine_name = params[:machine_name]
-        pm.save
-      end
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm != nil
+      reply_failure "Pmachine with IP=#{params[:ip]} already added!"
+    else
+      pm = Pmachine.new
+      pm.ip = params[:ip]
+      pm.vm_capacity = params[:vm_capacity].to_i
+      pm.status = "pending"
+      pm.save
+      reply_success "Pmachine added. It is now in 'pending' status, and will be connected very soon."
     end
   end
 
+  # Mark the pmachine as "to be reconnected". The connection job is left for background processes.
+  #
+  # Since::     0.3
+  def reconnect
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm == nil
+      reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    else
+      pm.status = "pending"
+      pm.save
+      reply_success "Pmachine with IP=#{params[:ip]} changed to 'pending' status."
+    end
+  end
+
+  # Mark pmachines with "retired" tag as "to be reconnected".
+  #
+  # Since::     0.3
+  def reuse
+    reconnect # reuse is basically "reconnect"
+  end
+
+  # Mark a machine as "retired".
+  #
+  # Since::     0.3
   def retire
-    pm = Pmachine.find_by_addr params[:addr]
-    pm.retire
-    render_success "Successfully retired pmachine at #{pm.addr}!"
-  end
-
-  def undo_retire
-    pm = Pmachine.find_by_addr params[:addr]
-    pm.undo_retire
-    render_success "Successfully undo retire pmachine at #{pm.addr}!"
-  end
-
-  def show
-    pm = Pmachine.find_by_addr params[:addr]
-    vm_info = pm.vmachines.collect do |vm|
-      {
-        :id => vm.id,
-        :mem_size => vm.memory_size,
-        :cpu_count => vm.cpu_count,
-        :arch => vm.arch,
-        :hda => vm.hda,
-        :status => vm.status
-      }
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm == nil
+      reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    else
+      pm.status = "retired"
+      pm.save
+      reply_success "Pmachine with IP=#{params[:ip]} changed to 'retired' status."
     end
-    result = {
-      :id => pm.id,
-      :addr => pm.addr,
-      :retired => pm.retired,
-      :vm_info => vm_info,
-      :vnc_first => pm.vnc_first,
-      :vnc_last => pm.vnc_last
-    }
-
-    render_data result
   end
 
-  def update
+  # Change the "vm_capacity" of this pmachine.
+  #
+  # Since::     0.3
+  def edit_capacity
+    return unless valid_capacity? and valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm == nil
+      reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    else
+      pm.vm_capacity = params[:vm_capacity].to_i
+      pm.save
+      reply_success "Pmachine with IP=#{params[:ip]} has changed 'vm_capacity' to #{pm.vm_capacity}."
+    end
   end
 
-  def destroy
+  # Delete the pmachine, use with care!
+  # It is only possible when these conditions met:
+  # 
+  #   * no VM running on the physical machine.
+  #   * the machine is retired or in 'failure' status.
+  #
+  # Since::     0.3
+  def delete
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    if pm == nil
+      reply_failure "Pmachine with IP=#{params[:ip]} not found!"
+    elsif pm.vmachines.length != 0
+      reply_failure "Cannot delte the pmachine, since there is still #{pm.vmachines.length} VM running on it!"
+    elsif pm.status != "retired" and pm.status != "failure"
+      reply_failure "The pmachine could only be deleted when it is 'retired' or in 'failure' status!"
+    else
+      Pmachine.delete pm
+      reply_success "Pmachine with IP=#{params[:ip]} deleted."
+    end
   end
 
 private
 
-  def register_pmachine params
-    # require vnc port information
-    if params[:vnc_first] == nil || params[:vnc_last] == nil
-      render_failure "Please provide VNC port range!"
-      return
+  # Check if provided valid ip address.
+  #
+  # Since::     0.3
+  def valid_ip?
+    unless valid_param? params[:ip] and params[:ip].is_ip_addr?
+      reply_failure "Invalid ip address!"
+      return false
     end
+    return true
+  end
 
-    if PmachinesHelper::Helper.vnc_collision? params[:vnc_first], params[:vnc_last]
-      render_failure "VNC ports range #{params[:vnc_first]}-#{params[:vnc_last]} has already been used! You should try this range: #{PmachinesHelper::Helper.vnc_recommendation}"
-      return
+  # Check if provided valid 'vm_capacity'.
+  #
+  # Since::     0.3
+  def valid_capacity?
+    unless valid_param? params[:vm_capacity] and params[:vm_capacity].to_i.to_s == params[:vm_capacity]
+      reply_failure "Invalid 'vm_capacity'!"
+      return false
     end
-
-    if params[:ip] # check if ip is provided
-      port = params[:port] || "3000" # default port is 3000
-      addr = "#{params[:ip]}:#{port}"
-      if (Pmachine.register :addr => addr, :machine_name => params[:machine_name], :vnc_first => params[:vnc_first], :vnc_last => params[:vnc_last])
-        render_success "Successfully registered pmachine: #{addr}."
-      else
-        render_failure "Failed to register pmachine: #{addr}."
-      end
-    else
-      render_failure "Please provide the ip of new pmachine!"
-    end
+    return true
   end
 
 end

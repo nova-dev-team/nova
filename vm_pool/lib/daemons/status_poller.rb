@@ -40,7 +40,7 @@ while($running) do
   Pmachine.all.each do |pm|
     if pm.status == "pending"
       begin
-        timeout 5 do
+        timeout 10 do
           begin
             write_log "Trying to connect pmachine #{pm.ip}"
             raw_reply = RestClient.get "#{pm.root_url}/misc/role.json"
@@ -51,6 +51,14 @@ while($running) do
               write_log "Failed to connect #{pm.ip}, raw reply is '#{raw_reply}'"
             else
               pm.status = "working"
+
+              # update hostname
+              raw_reply = RestClient.get "#{pm.root_url}/misc/hostname.json"
+              reply = JSON.parse raw_reply
+              if reply["success"] == true
+                pm.hostname = reply["hostname"]
+              end
+
               pm.save
             end
           rescue
