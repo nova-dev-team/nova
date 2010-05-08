@@ -29,7 +29,7 @@ namespace :nova do
     def all_daemons action, rails_env = nil
       Dir["#{RAILS_ROOT}/lib/daemons/*_ctl"].each do |f|
         if rails_env != nil
-          my_exec "RAILS_ENV=#{rails_env} #{f} #{action}"
+          my_exec "#{f} #{action} RAILS_ENV=#{rails_env}"
         else
           my_exec "#{f} #{action}"
         end
