@@ -117,7 +117,7 @@ LFTP_SCRIPT
       my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
       my_exec "#{RAILS_ROOT}/lib/image_pool_maintainer #{RAILS_ROOT}/tmp/pids/image_pool_maintainer.pid #{RAILS_ROOT}/lib/image_pool_maintainer.conf #{conf["run_root"]}/image_pool"
       my_exec "#{RAILS_ROOT}/lib/trash_cleaner #{RAILS_ROOT}/log #{conf["run_root"]}"
-      my_exec "#{RAILS_ROOT}/script/server -d -p #{service_port} &"
+      my_exec "RAILS_ENV=development #{RAILS_ROOT}/script/server -d -p #{service_port} &"
     end
 
     desc "Start Nova worker"

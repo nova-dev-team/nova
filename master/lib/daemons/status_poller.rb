@@ -36,9 +36,11 @@ def write_log message
 end
 
 while($running) do
+  write_log "daemon woke up"
   # connect pending pmachines  
   Pmachine.all.each do |pm|
     if pm.status == "pending"
+      write_log "contacting pmachine with ip=#{pm.ip}"
       begin
         timeout 10 do
           begin

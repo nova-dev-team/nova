@@ -26,6 +26,13 @@ class MiscController < ApplicationController
     end
   end
 
+  # Returns the running rails environtment.
+  #
+  # Since::   0.3
+  def rails_env
+    reply_success "Rails environment is '#{Rails.env}'", :env => Rails.env
+  end
+
   # Get the hostname of the machine.
   #
   # Since::     0.3

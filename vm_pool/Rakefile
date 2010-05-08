@@ -24,9 +24,13 @@ namespace :nova do
       FileUtils.mkdir_p "#{RAILS_ROOT}/tmp/pids"
     end
 
-    def all_daemons action
+    def all_daemons action, rails_env = nil
       Dir["#{RAILS_ROOT}/lib/daemons/*_ctl"].each do |f|
-        my_exec "#{f} #{action}"
+        if rails_env != nil
+          my_exec "RAILS_ENV=#{rails_env} #{f} #{action}"
+        else
+          my_exec "#{f} #{action}"
+        end
       end
     end
 
@@ -45,10 +49,16 @@ namespace :nova do
       unless File.exists? "#{RAILS_ROOT}/log"
         FileUtils.mkdir_p "#{RAILS_ROOT}/log"
       end
-      # boot the daemons
-      all_daemons "start"
 
       conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+      if conf["master_use_swiftiply"]
+        rails_env = "production"
+      else
+        rails_env = "development"
+      end
+
+      # boot the daemons
+      all_daemons "start", rails_env
       if conf["master_use_swiftiply"]
         # use swiftiply
         # regenerate swiftiply.conf
@@ -65,10 +75,12 @@ namespace :nova do
             end
           end
         end
+
+        # swiftiply will start in 'production' mode
         my_exec "swiftiply_mongrel_rails -n #{conf["master_swiftiply_cluster_size"]} -p #{conf["master_swiftiply_first_port"]} -d &"
       else
         # don't use swiftiply
-        my_exec "#{RAILS_ROOT}/script/server -d -p #{conf["master_port"]} &"
+        my_exec "RAILS_ENV=#{rails_env} #{RAILS_ROOT}/script/server -d -p #{conf["master_port"]} &"
       end
 
       # start vnc_proxy

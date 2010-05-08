@@ -26,6 +26,13 @@ class MiscController < ApplicationController
     end
   end
 
+  # Returns the running Rails environment.
+  #
+  # Since::   0.3
+  def rails_env
+    reply_success "Rails environment is '#{Rails.env}'", :env => Rails.env
+  end
+
   # Reply the role of current user.
   # Possible return values: "root", "admin", "normal user". If user not logged in, an failure will be returned.
   #

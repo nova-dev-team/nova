@@ -29,6 +29,13 @@ class MiscController < ApplicationController
     end
   end
 
+  # Reply the running environment of Rails.
+  #
+  # Since::   0.3
+  def rails_env
+    reply_success "Running environment is '#{Rails.env}'", :env => Rails.env
+  end
+
   # Use the 'port_mapper' tool to add a port forwarding.
   #
   # Since::     0.3
