@@ -10,8 +10,14 @@ require 'timeout'
 require 'json'
 require 'uuidtools'
 require 'fileutils'
+require 'yaml'
 
-ENV["RAILS_ENV"] ||= "production"
+conf = YAML::load File.read "#{File.dirname __FILE__}/../../../common/config/conf.yml"
+if conf["master_use_swiftiply"]
+  ENV["RAILS_ENV"] ||= "production"
+else
+  ENV["RAILS_ENV"] ||= "development"
+end
 
 require File.dirname(__FILE__) + "/../../config/environment"
 

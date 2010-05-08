@@ -235,7 +235,13 @@ function load_worker_machines() {
           } else {
             html += "<td>" + hostname + "</td>";
           }
-          html += "<td>" + pm_status + "</td>";
+          if (pm_status == "failure") {
+            html += "<td><b><font color='red'>failure</font></b></td>";
+          } else if (pm_status == "retired") {
+            html += "<td><font color='gray'>retired</font></td>";
+          } else {
+            html += "<td>" + pm_status + "</td>";
+          }
           html += "<td><a href='#' onclick='change_worker_capacity(\"" + ip + "\", \"" + row_id + "-capacity\")' id='" + row_id + "-capacity'>" + vm_capacity + "</a></td>";
           html += "<td>" + vm_preparing + "</td>";
           html += "<td>" + vm_running + "</td>";
