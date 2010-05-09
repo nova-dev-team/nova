@@ -147,11 +147,17 @@ function system_load_settings(setting_count) {
           s = result.data[i];
           $("#system_settings-r" + i + "-key").html(s.key);
 
+          if (s.value != null) {
+            s_value_html = s.value;
+          } else {
+            s_value_html = "<i>(none)</i>";
+          }
+
           if (s.editable) {
-            html = "<a href='#' onclick='system_setting_edit(\"" + s.key + "\")'><div id='system_settings-key-" + s.key + "'>" + s.value + "</div></a>"
+            html = "<a href='#' onclick='system_setting_edit(\"" + s.key + "\")'><div id='system_settings-key-" + s.key + "'>" + s_value_html + "</div></a>"
             $("#system_settings-r" + i + "-value").html(html);
           } else {
-            $("#system_settings-r" + i + "-value").html(s.value);
+            $("#system_settings-r" + i + "-value").html(s_value_html);
           }
 
           if (s.for_worker) {
@@ -174,6 +180,9 @@ function system_load_settings(setting_count) {
 
 function system_setting_edit(key) {
   old_value = $("#system_settings-key-" + key).html();
+  if (old_value == "<i>(none)</i>") {
+    old_value = "";
+  }
   new_value = prompt("Please provide new value for '" + key + "'", old_value);
   if (new_value == null) {
     return;

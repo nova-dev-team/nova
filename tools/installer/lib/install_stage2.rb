@@ -31,7 +31,7 @@ system "
 "
 
 puts
-puts "Phase 4: Installing Nova master module..."
+puts "Phase 4: Installing Nova modules..."
 
 conf = YAML::load File.read "#{File.dirname __FILE__}/../../../common/config/conf.yml"
 puts "Target dir: #{conf["system_root"]}"
@@ -40,6 +40,12 @@ system "
   cd #{File.dirname __FILE__}/../../..
   mkdir -p #{conf["system_root"]}
   cp -r * #{conf["system_root"]}
+  cd #{conf["system_root"]}/master
+  rake nova:master:init
+  cd #{conf["system_root"]}/vm_pool
+  rake nova:vm_pool:init
+  cd #{conf["system_root"]}/worker
+  rake nova:worker:init
 "
 
 puts "Everything done!"

@@ -1,34 +1,89 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-# one:
-#   column: value
 #
-# two:
-#   column: value
+# Author::  Santa Zhang (mailto:santa1987@gmail.com)
+# Since::   0.3
 
+<%
+require 'yaml'
+conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+%>
+
+# Where is the Nova code stored.
+#
+# Since::   0.3
+system_root:
+  key: system_root
+  value: <%= conf["system_root"] %>
+  editable: false
+  for_worker: false
+
+# Where is the vm running.
+#
+# Since::   0.3
+run_root:
+  key: run_root
+  value: <%= conf["run_root"] %>
+  editable: false
+  for_worker: false
+
+# Where is the storage server running.
+#
+# Since::   0.3
 storage_server:
   key: storage_server
-  value: ftp://nova:novaftp@166.111.131.32/
+<%
+storage_server_value = "ftp://user:passwd@somewhere.com/"
+# Writes the storage_server settings to config/storage_server.conf
+File.open("#{RAILS_ROOT}/config/storage_server.conf", "w") do |f|
+  f.write storage_server_value
+end
+
+%>
+  value: <%= storage_server_value %>
+  editable: true
   for_worker: true
 
-master_intranet_ip:
-  key: master_intranet_ip
-  value: 10.0.5.254
-
-master_internet_ip:
-  key: master_internet_ip
-  value: 166.111.131.32
-
-image_pooling:
-  key: image_pooling
-  value: "true"
-
-image_pooling_count:
-  key: image_pooling_count
+# Number of disk image copies to be maintained in the background.
+#
+# Since::   0.3
+image_pool_size:
+  key: image_pool_size
   value: 5
+  editable: true
+  for_worker: true
 
-software_package_storage:
-  key: software_package_storage
-  value: /home/ftp/packages
+
+# The DNS server which will be send to worker machines.
+#
+# Since::   0.3
+vm_dns_server:
+  key: vm_dns_server
+  value: 
+  editable: true
+  for_worker: false
+
+
+# The subnet mask for VM
+#
+# Since::   0.3
+vm_subnet_mask:
+  key: vm_subnet_mask
+  value: 255.255.255.0
+  editable: true
+  for_worker: false
+
+# The first IP for VM
+vm_first_ip:
+  key: vm_first_ip
+  value: 10.0.1.1
+  editable: true
+  for_worker: false
+
+# The gateway for VM
+vm_gateway:
+  key: vm_gateway
+  value: 10.0.1.254
+  editable: true
+  for_worker: false
 
 
