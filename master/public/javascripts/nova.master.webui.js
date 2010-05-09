@@ -264,7 +264,7 @@ function load_worker_machines() {
           if (pm_status == "pending") {
             html += "&nbsp";
           } else if (pm_status == "working") {
-            // TODO
+            html += "<button type='button' class='btn' onclick='retire_worker_machine(\"" + ip + "\")'><span><span>retire</span></span></button>";
           } else if (pm_status == "retired") {
             html += "<button type='button' class='btn' onclick='reconnect_worker_machine(\"" + ip + "\")'><span><span>reuse</span></span></button> ";
             html += "<button type='button' class='btn' onclick='delete_worker_machine(\"" + ip + "\")'><span><span><font color='red'>delete</font></span></span></button>";
@@ -283,6 +283,31 @@ function load_worker_machines() {
     error: function() {
       $("#worker_machines_container").unblock();
       do_message("failure", "Request failed (worker machines)", "Please check your network connection!");
+    }
+  });
+}
+
+function retire_worker_machine(ip) {
+  $("#worker_machines_container").block();
+  $.ajax({
+    async: false,
+    url: "/pmachines/retire",
+    type: "POST",
+    dataType: "json",
+    data: {
+      ip: ip
+    },
+    success: function(result) {
+      $("#worker_machines_container").unblock();
+      if (result.success) {
+        load_worker_machines();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#worker_machines_container").unblock();
+      do_message("failure", "Request failed (retire worker)", "Please check your network connection!");
     }
   });
 }
