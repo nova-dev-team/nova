@@ -1,7 +1,7 @@
 # Model for physical machines.
 #
 # Author::  Santa Zhang (mailto:santa1987@gmail.com)
-# Sinc::    0.3
+# Since::    0.3
 
 require 'yaml'
 
@@ -31,6 +31,9 @@ class Pmachine < ActiveRecord::Base
   end
 
 
+  # A helper function, returns the root url of the worker module.
+  #
+  # Since::   0.3
   def root_url
     conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
     return "http://#{self.ip}:#{conf["worker_port"]}"

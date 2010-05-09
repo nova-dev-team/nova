@@ -41,6 +41,15 @@ namespace :nova do
     desc "Start Nova master"
     task :start => :stop do
       prepare_folders
+      
+      unless File.exists? "#{RAILS_ROOT}/config/INIT_DONE"
+        puts "!!!"
+        puts "!!! The master module has not been initialized yet!"
+        puts "!!! Run 'rake nova:master:init' to initialize the master module."
+        puts "!!!"
+        exit
+      end
+
       puts "Starting Nova master..."
       my_exec "cd #{RAILS_ROOT}/lib && make" # prepare tools
 
@@ -115,6 +124,7 @@ namespace :nova do
       puts "Loading data..."
       my_exec "rake db:fixtures:load RAILS_ENV=production"
       my_exec "rake db:fixtures:load RAILS_ENV=development"
+      my_exec "touch #{RAILS_ROOT}/config/INIT_DONE"
     end
 
   end

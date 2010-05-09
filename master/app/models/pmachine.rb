@@ -1,3 +1,8 @@
+# Model for physical machines.
+#
+# Author::  Santa Zhang (mailto:santa1987@gmail.com)
+# Since::    0.3
+
 require 'rubygems'
 require 'rest_client'
 require 'pp'
@@ -8,6 +13,17 @@ class Pmachine < ActiveRecord::Base
 
   has_many :vmachines
 
+  # A helper function, returns the root url of the worker module.
+  #
+  # Since::   0.3
+  def root_url
+    conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+    return "http://#{self.ip}:#{conf["worker_port"]}"
+  end
+
+
+
+=begin
   # start an vmachine on this pmachine
   # TODO error handling
   def start_vm vm
@@ -182,5 +198,6 @@ private
       raise e
     end
   end
+=end
 
 end
