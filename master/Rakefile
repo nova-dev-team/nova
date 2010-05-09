@@ -19,6 +19,8 @@ namespace :nova do
     #
     # Since::     0.3
     def prepare_folders
+      conf = YAML::load File.read "#{File.dirname __FILE__}/../common/config/conf.yml"
+      FileUtils.mkdir_p conf["run_root"]
       FileUtils.mkdir_p "#{RAILS_ROOT}/log"
       FileUtils.mkdir_p "#{RAILS_ROOT}/tmp/pids"
     end
@@ -61,6 +63,24 @@ namespace :nova do
       end
       # boot the daemons
       all_daemons "start", rails_env
+
+      # boot the ftp files list updater
+      File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
+        f.write <<LFTP_SCRIPT
+set net:timeout 10
+set net:max-retries 2
+set net:reconnect-interval-base 1
+open #{File.read "#{RAILS_ROOT}/config/storage_server.conf"}
+cd /vdisks
+pwd
+ls
+cd /agent_packages
+pwd
+ls
+LFTP_SCRIPT
+      end
+
+      my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
 
       if conf["master_use_swiftiply"]
         # use swiftiply

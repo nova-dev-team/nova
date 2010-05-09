@@ -18,7 +18,7 @@ $(document).ready(function() {
 
 <center>
 
-<b>System settings</b> <a href='#' onclick="system_load_settings(<%= Setting.count %>);">(refresh)</a><p/>
+<h2>System settings</h2> <a href='#' onclick="system_load_settings(<%= Setting.count %>);">(refresh)</a><p/>
 
 <%
 # don't add any thing inside the <div></div>
@@ -29,7 +29,7 @@ $(document).ready(function() {
 <hr>
 <p/>
 
-<b>Worker machines</b> <a href='#' onclick="load_worker_machines()">(refresh)</a><p/>
+<h2>Worker machines</h2> <a href='#' onclick="load_worker_machines()">(refresh)</a><p/>
 
 <%
 # don't add any thing inside the <div></div>
@@ -44,7 +44,7 @@ VM capacity: <input type="text" id="new_worker_machine_capacity" /> <%= spacing 
 <hr>
 <p/>
 
-<b>Port mappings</b> <a href='#' onclick="port_mapping_load()">(refresh)</a><p/>
+<h2>Port mappings</h2> <a href='#' onclick="port_mapping_load()">(refresh)</a><p/>
 
 <%
 # don't add any thing inside the <div></div>
@@ -56,8 +56,77 @@ Proxy port: <input type="text" id="port_mapping_proxy_port"/> <%= spacing 2 %>
 Destination IP: <input type="text" id="port_mapping_ip" /> <%= spacing 2 %>
 Destination Port: <input type="text" id="port_mapping_dest_port"/> <%= spacing 2 %>
 <button type="button" class='btn' onclick="add_port_mapping()"><span><span>Add new mapping</span></span></button>
+<p/>
+<hr/>
+
+<h2>Storage server</h2>
+(reload the page to refresh)<br>
+<%
+def pretty_server_file_list text
+  ret = ""
+
+  item_counter = 0
+  group_counter = 0
+
+  text.each_line do |line|
+    if line.start_with? "ftp://"
+      if group_counter > 0
+        if item_counter == 0
+          ret += "(nothing)"
+        end
+        ret += "</pre></td></tr></table><br>\n"
+      end
+
+      idx = line.index "/", 6
+      folder = line[idx..-1].strip
+      ret += "Resource in folder: <b>" + folder + "</b><br>\n"
+      item_counter = 0
+      ret += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>\n"
+      group_counter += 1
+    else
+      splt = line.split
+      fn = splt[8]
+      size = splt[4].to_i
+      next if fn.start_with? "."
+      ret += "%-10s%s\n" % [size.to_pretty_file_size, fn]
+      item_counter += 1
+    end
+  end
+
+  if item_counter == 0
+    ret += "(nothing)"
+  end
+  ret += "</pre></td></tr></table>\n"
+
+  return ret
+end
+%>
+
+<%=
+  html_str = ""
+  if File.exists? "#{Setting.run_root}/ftp_server_files_list"
+    list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
+    if list_data =~ /Fatal error: max-retries exceeded/
+      html_str = "<b><font color='red'>The storage server is probably down!</font></b>"
+    elsif list_data =~ /Not connected/ or list_data =~ /Name or service not known/
+      html_str = "<b><font color='red'>Failed to connect to storage server!</font></b>"
+    else
+      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
+      if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
+        html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead!</font>"
+      end
+      html_str += "</b>"
+      html_str += "<br>\n"
+
+      html_str += pretty_server_file_list list_data
+    end
+  else
+    html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
+  end
+  html_str
+%>
+
 
 </center>
-
 
 <% end %>

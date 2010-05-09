@@ -7,6 +7,9 @@ require 'fileutils'
 
 class Setting < ActiveRecord::Base
 
+  # Intercepts savings for "storage_server" and "image_pool_size", and updates corresponding configs.
+  #
+  # Since::   0.3
   def save
     if self.key == "storage_server"
       # update also write to config/storage_server.conf
