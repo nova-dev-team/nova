@@ -13,6 +13,8 @@ $(document).ready(function() {
   system_load_settings(<%= Setting.count %>);
   port_mapping_load();
   load_worker_machines();
+  load_software_packages();
+  load_vdisk_images();
 });
 </script>
 
@@ -126,7 +128,24 @@ end
   html_str
 %>
 
+<hr/>
+<h2>Software packages</h2>
+<div id="software_packages_container"></div>
+<p/>
+You can register new software packages. Make sure you have uploaded software packages to storage server first.<br/>
+Display name: <input type='text' id="new_soft_display" /> <%= spacing 4 %> File name: <input type='text' id="new_soft_fname" /> <%= spacing 4 %>
+OS family: <select id="new_soft_os">
+<option value='windows'>windows</option>
+<option value='linux'>linux</option>
+<option value='none'>(none)</option>
+</select><br/>
+Description: <input type='text' size=80 id='new_soft_desc'/> <%= spacing 4 %>
+<button type='button' class='btn' onclick='register_new_software()'><span><span>Register software</span></span></button>
+
+<hr/>
+<h2>Vdisk images</h2>
+<div id="vdisk_images_container"></div>
 
 </center>
-
 <% end %>
+

@@ -16,20 +16,20 @@ function do_message(type, title, msg) {
 
 function load_user_list(page, page_size) {
   if ($("#user_table_container").html() == "") {
-    html = "<table id='user_table' width='100%'>"
-    html += "<tr class='row_type_0'><td><b>#</b></td><td><b>Login</b></td><td><b>Privilege</b></td><td><b>Activated</b></td><td><b>Name</b></td><td><b>Email</b></td></tr>"
+    html = "<table id='user_table' width='100%'>";
+    html += "<tr class='row_type_0'><td><b>#</b></td><td><b>Login</b></td><td><b>Privilege</b></td><td><b>Activated</b></td><td><b>Name</b></td><td><b>Email</b></td></tr>";
     for (i = 0; i < page_size; i++) {
-      html += "<tr id='user_table-r" + i + "' class='row_type_" + ((i + 1) % 2) + "'>"
-      html += "<td id='user_table-r" + i + "-id'>&nbsp;</td>"
-      html += "<td id='user_table-r" + i + "-login'>&nbsp;</td>"
-      html += "<td id='user_table-r" + i + "-privilege'>&nbsp;</td>"
-      html += "<td id='user_table-r" + i + "-activated'>&nbsp;</td>"
-      html += "<td id='user_table-r" + i + "-name'>&nbsp;</td>"
-      html += "<td id='user_table-r" + i + "-email'>&nbsp;</td>"
-      html += "</tr>"
+      html += "<tr id='user_table-r" + i + "' class='row_type_" + ((i + 1) % 2) + "'>";
+      html += "<td id='user_table-r" + i + "-id'>&nbsp;</td>";
+      html += "<td id='user_table-r" + i + "-login'>&nbsp;</td>";
+      html += "<td id='user_table-r" + i + "-privilege'>&nbsp;</td>";
+      html += "<td id='user_table-r" + i + "-activated'>&nbsp;</td>";
+      html += "<td id='user_table-r" + i + "-name'>&nbsp;</td>";
+      html += "<td id='user_table-r" + i + "-email'>&nbsp;</td>";
+      html += "</tr>";
     }
-    html += "</table>"
-    html += "<div id='user_table_pager'></div>"
+    html += "</table>";
+    html += "<div id='user_table_pager'></div>";
     $("#user_table_container").html(html);
   }
   $("#user_table_container").block();
@@ -119,16 +119,16 @@ function user_set_activated(user_login) {
 
 function system_load_settings(setting_count) {
   if ($("#system_settings_container").html() == "") {
-    html = "<table id='system_settings' width='100%'>"
-    html += "<tr class='row_type_0'><td><b>Key</b></td><td><b>Value</b> (click to edit)</td><td><b>For worker?</b></td></tr>"
+    html = "<table id='system_settings' width='100%'>";
+    html += "<tr class='row_type_0'><td><b>Key</b></td><td><b>Value</b> (click to edit)</td><td><b>For worker?</b></td></tr>";
     for (i = 0; i < setting_count; i++) {
-      html += "<tr id='system_settings-r" + i + "' class='row_type_" + ((i + 1) % 2) + "'>"
-      html += "<td id='system_settings-r" + i + "-key'>&nbsp;</td>"
-      html += "<td id='system_settings-r" + i + "-value'>&nbsp;</td>"
-      html += "<td id='system_settings-r" + i + "-for_worker'>&nbsp;</td>"
-      html += "</tr>"
+      html += "<tr id='system_settings-r" + i + "' class='row_type_" + ((i + 1) % 2) + "'>";
+      html += "<td id='system_settings-r" + i + "-key'>&nbsp;</td>";
+      html += "<td id='system_settings-r" + i + "-value'>&nbsp;</td>";
+      html += "<td id='system_settings-r" + i + "-for_worker'>&nbsp;</td>";
+      html += "</tr>";
     }
-    html += "</table>"
+    html += "</table>";
     $("#system_settings_container").html(html);
   }
   $("#system_settings_container").block();
@@ -212,11 +212,11 @@ function system_setting_edit(key) {
 }
 
 function load_worker_machines() {
-  html = "<table id='worker_machines' width='100%'>"
-  html += "<tr class='row_type_0'><td><b>IP</b></td><td><b>Hostname</b></td><td><b>Status</b></td>"
-  html += "<td><b>VM capacity</b> (click to change)</td><td><b>VM preparing</b></td><td><b>VM running</b></td><td><b>VM failure</b></td>"
-  html += "<td><b>Actions</b></td></tr>"
-  html += "</table>"
+  html = "<table id='worker_machines' width='100%'>";
+  html += "<tr class='row_type_0'><td><b>IP</b></td><td><b>Hostname</b></td><td><b>Status</b></td>";
+  html += "<td><b>VM capacity</b> (click to change)</td><td><b>VM preparing</b></td><td><b>VM running</b></td><td><b>VM failure</b></td>";
+  html += "<td><b>Actions</b></td></tr>";
+  html += "</table>";
   $("#worker_machines_container").html(html);
   $("#worker_machines_container").block();
   $.ajax({
@@ -420,9 +420,9 @@ function pmachine_add() {
 
 
 function port_mapping_load() {
-  html = "<table id='port_mappings' width='100%'>"
-  html += "<tr class='row_type_0'><td><b>Proxy port</b> (click to delete)</td><td><b>Destination IP</b></td><td><b>Destination port</b></td></tr>"
-  html += "</table>"
+  html = "<table id='port_mappings' width='100%'>";
+  html += "<tr class='row_type_0'><td><b>Proxy port</b> (click to delete)</td><td><b>Destination IP</b></td><td><b>Destination port</b></td></tr>";
+  html += "</table>";
   $("#port_mappings_container").html(html);
   $("#port_mappings_container").block();
   $.ajax({
@@ -504,6 +504,133 @@ function add_port_mapping() {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
+}
+
+
+function load_software_packages() {
+  html = "<table id='software_packages' width='100%'>";
+  html += "<tr class='row_type_0'><td><b>Display name</b></td><td><b>File name</b></td><td><b>OS family</b></td><td><b>Description</b></td><td><b>Actions</b></td></tr>";
+  html += "</table>";
+  $("#software_packages_container").html(html);
+  $("#software_packages").block();
+  $.ajax({
+    url: "/softwares/list",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    success: function(result) {
+      $("#software_packages").unblock();
+      if (result.success) {
+        for (i = 0; i < result.data.length; i++) {
+          display_name = result.data[i].display_name;
+          file_name = result.data[i].file_name;
+          desc = result.data[i].description;
+          if (desc == null) {
+            desc = "";
+          }
+          os_family = result.data[i].os_family;
+
+          row_id = "software_packages_rid_" + i;
+          html = "<tr class='row_type_" + ((i + 1) % 2) + "' id='" + row_id + "'>";
+          html += "<td>" + display_name + "</td>";
+          html += "<td>" + file_name + "</td>";
+          html += "<td>" + os_family + "</td>";
+          html += "<td>" + desc + "</td>";
+          html += "<td><button type='button' class='btn' onclick='soft_apply_to_vdisk(\"" + file_name + "\")'><span><span>Apply to Vdisks</span></span></button>&nbsp;<button type='button' class='btn' onclick='soft_delete(\"" + file_name + "\")'><span><span><font color='red'>Delete!</font></span></span></button></td>";
+          html += "</tr>";
+          $("#software_packages > tbody:last").append(html);
+        }
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#software_packages").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function soft_delete(soft_fname) {
+  $.ajax({
+    url: "/softwares/remove",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      file_name: soft_fname,
+    },
+    success: function(result) {
+      if (result.success) {
+        do_message("success", "Request successful", result.message);
+        load_vdisk_images();
+        load_software_packages();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function soft_apply_to_vdisk(soft_fname) {
+  $.ajax({
+    url: "/softwares/apply_to_vdisks",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      file_name: soft_fname,
+    },
+    success: function(result) {
+      if (result.success) {
+        do_message("success", "Request successful", result.message);
+        load_vdisk_images();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function register_new_software() {
+  disp_name = $("#new_soft_display").val();
+  fname = $("#new_soft_fname").val();
+  os_family = $("#new_soft_os").val();
+  if (os_family == "none") {
+    os_family = "";
+  }
+  desc = $("#new_soft_desc").val();
+  $.ajax({
+    url: "/softwares/register",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      display_name: disp_name,
+      file_name: fname,
+      os_family: os_family,
+      description: desc
+    },
+    success: function(result) {
+      if (result.success) {
+        load_software_packages();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function load_vdisk_images() {
 }
 
 //
