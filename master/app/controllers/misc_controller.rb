@@ -7,6 +7,8 @@ require 'utils'
 
 class MiscController < ApplicationController
 
+  include FtpServerFilesListHelper
+
   # Reply the role of this node.
   #
   # Since::   0.3
@@ -152,6 +154,43 @@ class MiscController < ApplicationController
 
     if File.exists? port_file
       FileUtils.rm port_file
+    end
+  end
+
+  # Handles requests for storage server.
+  #
+  # Since::   0.3
+  def storage_server
+    return unless root_required
+    unless valid_param? params[:req]
+      reply_failure "Please provide the 'req' parameter!"
+    end
+    case params[:req]
+    when "try_update"
+      ftp_server_try_update
+      reply_success "Tried to update ftp server files list."
+    when "server_down"
+      if ftp_server_down?
+        reply_success "Ftp server is down!"
+      else
+        reply_success "Ftp server is up and running!"
+      end
+    when "vdisk_list"
+      vdisk_list = ftp_server_vdisks_list
+      if vdisk_list == nil
+        reply_failure "Ftp server is down! Cannot retrieve list!"
+      else
+        reply_success "List of vdisks successfully retrieved!", :data => vdisk_list
+      end
+    when "soft_list"
+      soft_list = ftp_server_soft_list
+      if soft_list == nil
+        reply_failure "Ftp server is down! Cannot retrieve list!"
+      else
+        reply_success "List of soft successfully retrieved!", :data => soft_list
+      end
+    else
+      reply_failure "Unknown request '#{params[:req]}'"
     end
   end
 

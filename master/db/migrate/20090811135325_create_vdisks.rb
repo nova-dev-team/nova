@@ -16,7 +16,7 @@ class CreateVdisks < ActiveRecord::Migration
 
       # Type (format) of this image.
       # Could be "qcow2", "iso".
-      t.column :type,             :string
+      t.column :format,             :string
 
       # The kind of operation system of this image.
       # Could be "windows", "linux".
@@ -30,6 +30,9 @@ class CreateVdisks < ActiveRecord::Migration
       #
       # If the image has nothing to do with operation system (such as a .iso data cd), this value should be set to null.
       t.column :os_name,          :string, :null => true, :default => nil
+
+      # Ths list of softwares for this vdisk. Separated by comma.
+      t.column :soft_list,        :string
 
       t.timestamps
     end

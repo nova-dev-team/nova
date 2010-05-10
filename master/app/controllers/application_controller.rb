@@ -30,4 +30,18 @@ protected
     end
   end
 
+  # Check if all params are provided.
+  # 'params' is provided as a string, separated by spaces.
+  #
+  # Since::   0.3
+  def params_required params_str
+    params_str.split.each do |par|
+      unless valid_param? params[par]
+        reply_failure "Please provide '#{par}' parameter!"
+        return false
+      end
+    end
+    return true
+  end
+
 end

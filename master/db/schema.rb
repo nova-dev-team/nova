@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090812091810) do
+ActiveRecord::Schema.define(:version => 20100510120715) do
 
   create_table "pmachines", :force => true do |t|
     t.string   "ip",          :limit => 20,                :null => false
@@ -25,6 +25,15 @@ ActiveRecord::Schema.define(:version => 20090812091810) do
     t.string   "value"
     t.boolean  "editable",                 :default => true,  :null => false
     t.boolean  "for_worker",               :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "softwares", :force => true do |t|
+    t.string   "file_name",    :limit => 100, :null => false
+    t.string   "display_name",                :null => false
+    t.string   "description"
+    t.string   "os_family"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -66,9 +75,10 @@ ActiveRecord::Schema.define(:version => 20090812091810) do
     t.string   "file_name",    :limit => 100
     t.string   "display_name"
     t.string   "description"
-    t.string   "type"
+    t.string   "format"
     t.string   "os_family"
     t.string   "os_name"
+    t.string   "soft_list"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
