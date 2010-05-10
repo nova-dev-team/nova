@@ -16,7 +16,7 @@ class CreateVdisks < ActiveRecord::Migration
 
       # Type (format) of this image.
       # Could be "qcow2", "iso".
-      t.column :format,             :string
+      t.column :disk_format,             :string
 
       # The kind of operation system of this image.
       # Could be "windows", "linux".

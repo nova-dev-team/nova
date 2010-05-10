@@ -146,6 +146,22 @@ Description: <input type='text' size=80 id='new_soft_desc'/> <%= spacing 4 %>
 <h2>Vdisk images</h2>
 <div id="vdisk_images_container"></div>
 
+<p/>
+You can register new vdisk images. Make sure you have uploaded vdisk images to storage server first.<br/>
+Display name: <input type="text" id='new_vdisk_display' /><%= spacing 4 %> File name: <input type="text" id='new_vdisk_fname' /><%= spacing 4%>
+Image type: <select id="new_vdisk_format">
+<option>qcow2</option>
+<option>iso</option>
+</select><%= spacing 4%>
+OS family: <select id="new_vdisk_os_family">
+<option value='windows'>windows</option>
+<option value='linux'>linux</option>
+<option value='none'>(none)</option>
+</select><br/>
+OS name: <input type="text" id="new_vdisk_os_name"/> <%=spacing 4%> Description: <input type="text" id="new_vdisk_desc" size=60 /><br/>
+<button type="button" class='btn' onclick='register_new_vdisk()'><span><span>Register vdisk</span></span></button>
+
+
 </center>
 <% end %>
 

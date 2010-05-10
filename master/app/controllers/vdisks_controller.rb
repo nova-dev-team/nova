@@ -14,7 +14,7 @@ class VdisksController < ApplicationController
   #
   # Since::     0.3
   def list
-    reply_model Vdisk, :items => ["file_name", "display_name", "description", "format", "os_family", "os_name", "soft_list"]
+    reply_model Vdisk, :items => ["file_name", "display_name", "description", "disk_format", "os_family", "os_name", "soft_list"]
   end
 
   # Register a new vdisk.
@@ -22,7 +22,7 @@ class VdisksController < ApplicationController
   # Since::     0.3
   def register
     return unless root_required
-    return unless params_required "file_name display_name format"
+    return unless params_required "file_name display_name disk_format"
 
     # Check if file exists, by checking the 'ftp_server_files_list'
     vdisk_list = ftp_server_vdisks_list
@@ -45,7 +45,7 @@ class VdisksController < ApplicationController
     vd.file_name = params[:file_name]
     vd.display_name = params[:display_name]
     vd.description = params[:description]
-    vd.format = params[:format]
+    vd.disk_format = params[:disk_format]
     vd.os_family = params[:os_family]
     vd.os_name = params[:os_name]
     vd.save
@@ -88,7 +88,7 @@ class VdisksController < ApplicationController
       return
     end
 
-    soft_list = params[:soft_list].split ','
+    soft_list = params[:soft_list].split /,| /
     soft_not_found = []
     soft_list.each do |soft|
       unless Software.find_by_file_name soft
@@ -100,6 +100,7 @@ class VdisksController < ApplicationController
       return
     end
     vd.soft_list = soft_list.join ","
+    vd.save
     reply_success "Updated list of software for '#{params[:file_name]}'", :vdisk => params[:file_name], :soft_list => soft_list
   end
 end

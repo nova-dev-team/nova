@@ -630,7 +630,160 @@ function register_new_software() {
   });
 }
 
+function white_spacing(count) {
+  space = "";
+  for (var j = 0; j < count; j++) {
+    space += "&nbsp;";
+  }
+  return space;
+}
+
 function load_vdisk_images() {
+  html = "<table id='vdisk_images_table' width='100%'><tr></tr>";
+  html += "</table>";
+  $("#vdisk_images_container").html(html);
+  $("#vdisk_images_container").block();
+  $.ajax({
+    url: "/vdisks/list",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    success: function(result) {
+      $("#vdisk_images_container").unblock();
+      if (result.success) {
+        for (var i = 0; i < result.data.length; i++) {
+          display_name = result.data[i].display_name;
+          file_name = result.data[i].file_name;
+          desc = result.data[i].description;
+          if (desc == null) {
+            desc = "";
+          }
+          img_format = result.data[i].disk_format;
+          os_family = result.data[i].os_family;
+          if (os_family == null) {
+            os_family = "";
+          }
+          os_name = result.data[i].os_name;
+          if (os_name == null) {
+            os_name = "";
+          }
+          soft_list = result.data[i].soft_list;
+          if (soft_list == null) {
+            soft_list = "";
+          }
+
+          row_id = "vdisk_image_rid_" + i;
+          html = "<tr class='row_type_" + (i % 2) + "'>";
+          html += "<td>";
+
+          html += "Display name: <b>" + display_name + "</b>" + white_spacing(5);
+          html += "File name: <b>" + file_name + "</b>" + white_spacing(5);
+          html += "Image format: <b>" + img_format + "</b>" + white_spacing(5);
+          html += "OS family: <b>" + os_family + "</b>" + white_spacing(5);
+          html += "OS name: <b>" + os_name + "</b>" + white_spacing(5) + "<br/>";
+          html += "Description: " + desc + "<br/>";
+          html += "Software packages: <input type='text' size=90 value='" + soft_list + "' id='" + row_id + "_soft_list'/>";
+          html += white_spacing(3) + "<button type='button' class='btn' onclick='edit_vdisk_soft_list(\"" + file_name + "\", \"" + row_id + "\")'><span><span>Update</span></span></button> &nbsp;&nbsp; (separate with comma)";
+
+          html += white_spacing(5) + "<a href='#' onclick='remove_vdisk(\"" + file_name + "\")'><font color='red'>Delete vdisk!</font></a>"
+
+          html += "<br/>";
+          html += "</td>";
+          html += "</tr>";
+          $("#vdisk_images_table > tbody:last").append(html);
+        }
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#vdisk_images_container").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function register_new_vdisk() {
+  var file_name = $("#new_vdisk_fname").val();
+  var display_name = $("#new_vdisk_display").val();
+  var format = $("#new_vdisk_format").val();
+  var os_name = $("#new_vdisk_os_name").val();
+  var os_family = $("#new_vdisk_os_family").val();
+  if (os_family == "none") {
+    os_family = null;
+  }
+  var desc = $("#new_vdisk_desc").val();
+
+  $.ajax({
+    url: "/vdisks/register.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      file_name: file_name,
+      display_name: display_name,
+      disk_format: format,
+      os_name: os_name,
+      os_family: os_family,
+      description: desc
+    },
+    success: function(result) {
+      if (result.success) {
+        load_vdisk_images();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function remove_vdisk(vdisk_fname) {
+  $.ajax({
+    url: "/vdisks/remove",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      file_name: vdisk_fname,
+    },
+    success: function(result) {
+      if (result.success) {
+        location.reload();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function edit_vdisk_soft_list(vdisk_fname, row_id) {
+  var soft_list = $("#" + row_id + "_soft_list").val();
+  $.ajax({
+    url: "/vdisks/edit_soft_list",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      file_name: vdisk_fname,
+      soft_list: soft_list
+    },
+    success: function(result) {
+      if (result.success) {
+        load_software_packages();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
 }
 
 //

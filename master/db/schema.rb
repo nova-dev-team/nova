@@ -75,7 +75,7 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
     t.string   "file_name",    :limit => 100
     t.string   "display_name"
     t.string   "description"
-    t.string   "format"
+    t.string   "disk_format"
     t.string   "os_family"
     t.string   "os_name"
     t.string   "soft_list"
