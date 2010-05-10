@@ -775,7 +775,7 @@ function edit_vdisk_soft_list(vdisk_fname, row_id) {
     },
     success: function(result) {
       if (result.success) {
-        load_software_packages();
+        load_vdisk_images();
       } else {
         do_message("failure", "Error occurred", result.message);
       }
