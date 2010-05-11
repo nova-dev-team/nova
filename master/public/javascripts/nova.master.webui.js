@@ -786,6 +786,7 @@ function edit_vdisk_soft_list(vdisk_fname, row_id) {
   });
 }
 
+
 //
 // "Account info" page
 //
