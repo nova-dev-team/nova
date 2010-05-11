@@ -36,7 +36,7 @@ class MiscController < ApplicationController
   end
 
   # Reply the role of current user.
-  # Possible return values: "root", "admin", "normal user". If user not logged in, an failure will be returned.
+  # Possible return values: "root", "admin", "normal_user". If user not logged in, an failure will be returned.
   #
   # Since::   0.3
   def my_privilege

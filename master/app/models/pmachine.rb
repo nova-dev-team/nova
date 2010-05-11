@@ -8,6 +8,7 @@ require 'rest_client'
 require 'pp'
 require 'json'
 require 'timeout'
+require "worker_proxy"
 
 class Pmachine < ActiveRecord::Base
 
@@ -21,183 +22,34 @@ class Pmachine < ActiveRecord::Base
     return "http://#{self.ip}:#{conf["worker_port"]}"
   end
 
-
-
-=begin
-  # start an vmachine on this pmachine
-  # TODO error handling
-  def start_vm vm
-    print "Starting:"
-    used_vnc = self.vmachines.collect {|v| v.vnc_port}
-    print "Used_vnc = "
-    pp used_vnc
-    usable_vnc = (self.vnc_first..self.vnc_last).reject {|port| used_vnc.include? port}
-    print "Candidate Vnc = "
-    pp usable_vnc
-    vm.vnc_port = usable_vnc[0]
-    vm.save
-    result = json_rest_request "vmachines/start", {
-      :arch => vm.arch,
-      :name => "vm#{vm.id}",
-      :vcpu => vm.cpu_count,
-      :mem_size => vm.memory_size,
-      :mac => vm.mac,
-      :uuid => vm.uuid,
-      :boot_dev => vm.boot_device,
-      :hda => vm.hda,
-      :hdb => vm.hdb,
-      :cdrom => vm.cdrom,
-      :vnc_port => vm.vnc_port
-    }
-    self.vmachines << vm
-    self.save
-    return self
-  end
-
-  # do scheduling and start a vmachine
-  # 1 return nil if no available pmachine found
-  # 2 return the json return value from server
+  # Start a VM. A very simple schedule process will be taken.
+  # The hosting pmachine will be returned.
+  # On sched error, nil will be returned.
+  #
+  # Since::   0.3
   def Pmachine.start_vm vm
-    if Pmachine.count == 0 # no pmachine available
-      return nil
-    end
-
-    # simple scheduling method, find pmachine with lowest load
-    pm_sched = (Pmachine.all_usable.sort {|pm1, pm2| pm1.vmachines.count <=> pm2.vmachines.count}).first
-    pm_sched.start_vm vm
-  end
-
-  def destroy_vm vm
-    json_rest_request "vmachines/destroy", :uuid => vm.uuid
-    self.vmachines.delete vm
-  end
-
-  def suspend_vm vm
-    json_rest_request "vmachines/suspend", :uuid => vm.uuid
-  end
-
-  def resume_vm vm
-    json_rest_request "vmachines/resume", :uuid => vm.uuid
-  end
-
-  ## register a new pmachine. if the pmachine is already registered, nothing will be changed
-  ## behave as a factory method, and could be used as heartbeat
-  def Pmachine.register params
-    if (Pmachine.find_by_addr params[:addr]) == nil
-      pm = Pmachine.new
-      pm.addr = params[:addr]
-      pm.vnc_first = params[:vnc_first]
-      pm.vnc_last = params[:vnc_last]
-      pm.machine_name = params[:machine_name]
-
-      if pm.connected? # pm.connected? will not create premature database record. save it manually and safely
-        pm.save
-        puts "[Pmachine.register] Successfully registered new pmachine: #{pm.addr}."
-        return true
-      else
-        puts "[Pmachine.register] Cannot connect to pmachine: #{pm.addr}."
-        return false
+    logger.info "[pm.sched] starting sched"
+    sorted_pm = Pmachine.all.sort {|pm1, pm2| pm1.vmachines.length <=> pm2.vmachines.length}
+    logger.info "[pm.sched] sorting done"
+    sched_pm = nil
+    sorted_pm.each do |pm|
+      if pm.vmachines.length < pm.vm_capacity
+        sched_pm = pm
+        break
       end
-    else
-      # already registered this pmachine, so we do nothing here, not even 'undo_retire' the pmachine!
-      # this could be used as heartbeat message
-      puts "[Pmachine.register] Pmachine already registered: #{params[:addr]}."
-      return true
     end
-  end
-
-
-  ## retire pmachine
-  def retire
-    self.retired = true
-    self.save
-  end
-
-  # undo retiring of pmachine
-  def undo_retire
-    self.retired = false
-    update_settings # update settings to it
-    self.save
-  end
-
-  ## check if a pmachine is working correctly (connected)
-  def connected?
-    begin
-      puts "[connected?] #{self.addr}"
-      json_rest_request "misc/hi"
-      mark_connected
-      return true
-    rescue => e
-      puts e.message
-      puts e.backtrace.join "\n"
-      mark_unconnected
-      return false
+    logger.info "[pm.sched] target found"
+    if sched_pm != nil
+      conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+      wp = WorkerProxy.new "#{sched_pm.ip}:#{conf["worker_port"]}"
+      logger.info "[pm.info] worker proxy created"
+      # TODO start vm
+      sched_pm.vmachines << vm
+      sched_pm.save
+      vm.save
+      logger.info "[pm.info] safe round"
     end
+    return sched_pm
   end
-
-
-  ## find all pmachines that are not retired and connected
-  def Pmachine.all_usable
-    Pmachine.all_not_retired.select {|pm| pm.status == "connected"}
-  end
-
-  ## return all pmachines that are not 'retired'
-  def Pmachine.all_not_retired
-    Pmachine.find_all_by_retired false
-  end
-
-  ## return all pmachines that are 'retired'
-  def Pmachine.all_retired
-    Pmachine.find_all_by_retired true
-  end
-
-private
-
-  def mark_unconnected
-    self.status = "unconnected"
-    self.save if self.id != nil # prevent prematurely creating new pmachine records in database, as in 'register' function
-  end
-
-  def mark_connected
-    was_connected = (self.status == "unconnected")
-    self.status = "connected"
-    self.save if self.id != nil # prevent prematurely creating new pmachine records in database, as in 'register' function
-    if was_connected
-      # the pmachine was unconnected, on re-connection, sync settings and vm status to it
-      update_settings
-      update_vm_status
-    end
-  end
-
-  # sync settings on master to pmachines
-  def update_settings
-    Setting.all_for_worker.each do |setting|
-      json_rest_request "settings/edit", :key => setting.key, :value => setting.value, :test_connection => false
-    end
-  end
-
-  # TODO make sure all vm on the pmachine has same status as in the master db
-  def update_vm_status
-  end
-
-  # send a request to this pmachine, and will also record 'health' condition of this pmachine
-  def json_rest_request method, args = nil, test_connection = true
-
-    pp "json request, method=#{method}, args=#{args.pretty_inspect}"
-    begin
-      method += ".json" unless method.end_with? ".json" # make sure this is a json call
-      url = "http://#{self.addr}/#{method}"
-      result = nil # forward declaration of the 'result' variable
-      timeout(20) { result = args ? (RestClient.post url, args) : (RestClient.get url) }
-      mark_connected if test_connection
-      JSON.parse result
-    rescue => e
-      puts e.message
-      puts e.backtrace.join("\n")
-      mark_unconnected if test_connection
-      raise e
-    end
-  end
-=end
 
 end

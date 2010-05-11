@@ -1,73 +1,107 @@
+# This is the controller for VMachines.
+#
+# Author::  Santa Zhang (mailto:santa1987@gmail.com)
+# Since::   0.3
+  
 class VmachinesController < ApplicationController
 
   before_filter :login_required
 
-  def index
-    result = []
-    Vmachine.all.each do |vmachine|
-      result << "vm#{vmachine.id}:#{vmachine.uuid}"
-    end
-
-    render_data result
-  end
-
-  def show
-    vm = Vmachine.find_by_id params[:id]
-    if vm == nil
-      vm = Vmachine.find_by_uuid params[:id] # try finding by uuid
-    end
-    result = {
-      :id => vm.id,
-      :mem_size => vm.memory_size,
-      :cpu_count => vm.cpu_count,
-      :uuid => vm.uuid,
-      :hda => vm.hda,
-      :hdb => vm.hdb,
-      :cdrom => vm.cdrom,
-      :boot_device => vm.boot_device,
-      :arch => vm.arch,
-      :pmachine_addr => (vm.pmachine ? vm.pmachine.addr : nil),
-      :vcluster_id => vm.vcluster.id,
-      :vcluster_name => vm.vcluster.cluster_name,
-      :soft_list => vm.vcluster.package_list,
-      :status => vm.status,
-      :mac_addr => vm.mac,
-      :vnc_port => vm.vnc_port,
-      :ceil_progress => vm.ceil_progress,
-      :last_ceil_message => vm.last_ceil_message
-    }
-    render_data result
-  end
-
-  # vnc view
-  def observe
-    respond_to do |accept|
-      accept.html {render :template => 'vmachines/observe'}
+  # Change settings of the VM.
+  #
+  # Since::   0.3
+  def edit
+    vm = load_vm
+    return if vm == nil
+    if valid_param? params[:item]
+      case params[:item]
+      when "name"
+        vm.name = vm.vcluster.cluster_name + "-" + params[:value]
+      when "cpu_count"
+        vm.cpu_count = params[:value]
+      when "mem_size"
+        vm.memory_size = params[:value]
+      else
+        reply_failure "Cannot understand item '#{params[:item]}'!"
+        return false
+      end
+      if vm.save
+        reply_success "VM settings updated."
+      else
+        reply_failure "Failed to edit VM settings!"
+      end
+    else
+      reply_failure "Please provide 'item' and 'value' parameters!"
     end
   end
 
+  # Change a VM's status from 'shut-off' to 'start-pending'.
+  #
+  # Since::   0.3
   def start
-    vm = Vmachine.find_by_uuid params[:uuid]
-    vm.start
-    render_success "Successfully started vmachine with UUID #{params[:uuid]}."
+    vm = load_vm
+    return if vm == nil
+    if vm.status != "shut-off"
+      reply_failure "The VM with UUID='#{params[:uuid]}' is not in 'shut-off' status!"
+      return false
+    else
+      vm.status = "start-pending"
+      vm.save
+      reply_success "The VM with UUID='#{params[:uuid]}' is now pending start."
+    end
   end
 
-  def stop
-    vm = Vmachine.find_by_uuid params[:uuid]
-    vm.stop
-    render_success "Successfully stopped vmachine with UUID #{params[:uuid]}."
+  # Force the VM to be in 'shut-off' status.
+  # Could be used in those status: start-pending, start-preparing, running, suspended, connect-failure.
+  #
+  # Since::   0.3
+  def shut_off
+    vm = load_vm
+    return if vm == nil
+    case vm.status
+    when "start-pending"
+      vm.status = "shut-off"
+      vm.save
+      reply_success "The VM with UUID='#{params[:uuid]}' is now shut off."
+    when "start-preparing", "running", "suspended", "connect-failure"
+      vm.status = "shutdown-pending"
+      vm.save
+      reply_success "The VM with UUID='#{params[:uuid]}' is now pending shut off."
+    else
+      reply_failure "Cannot do this on VM with status='#{vm.status}'!"
+    end
   end
 
-  def resume
-    vm = Vmachine.find_by_uuid params[:uuid]
-    vm.resume
-    render_success "Successfully resumed vmachines with UUID #{params[:uuid]}"
+private
+
+  # Check if current user has enough privilege to manipulate the VM.
+  #
+  # Since::   0.3
+  def check_privilege vm
+    # if user is not root, check privileges
+    if @current_user.privilege != "root"
+      unless vm.user == @current_user
+        reply_failure "You are not allowed to do this!"
+        return false
+      end
+    end
+    return true
   end
 
-  def suspend
-    vm = Vmachine.find_by_uuid params[:uuid]
-    vm.suspend
-    render_success "Successfully suspended vmachine with UUID #{params[:uuid]}."
+  # Get the VM from user's request.
+  #
+  # Since::   0.3
+  def load_vm
+    if valid_param? params[:uuid]
+      vm = Vmachine.find_by_uuid params[:uuid]
+      if vm == nil
+        reply_failure "Cannot find VM with UUID='#{params[:uuid]}'!"
+      end
+      return vm
+    else
+      reply_failure "Please provide the 'uuid' parameter!"
+      return nil
+    end
   end
 
 end

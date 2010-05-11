@@ -1,23 +1,36 @@
 class CreateVclusters < ActiveRecord::Migration
   def self.up
     create_table :vclusters do |t|
+      # Author::    Santa Zhang
+      
       t.column :cluster_name,                     :string
-      t.column :package_list,                     :text
 
-      # the owner's id
+      # The first IP allocated to this cluster.
+      # The VM's IP are determined according to this value.
+      #
+      # Since::     0.3
+      t.column :first_ip,                         :string
+
+      # Maximum size of this cluster. It is the limit of vmachines in this cluster.
+      #
+      # Since::     0.3
+      t.column :cluster_size,                     :integer
+
+      # The owner's id
+      #
+      # Since::     0.3
       t.column :user_id,                          :integer
 
-      # TODO default vmachine settings
-      t.column :cpu_count,      :integer
-      t.column :memory_size,    :integer
-      t.column :hda,            :string
-      t.column :hdb,            :string
-      t.column :cdrom,          :string
-      t.column :boot_device,    :string
-      t.column :arch,           :string
-      t.column :net_segment_id, :integer
+      # The public key for ssh.
+      #
+      # Since::     0.3
+      t.column :ssh_public_key,                   :string
 
-      t.column :destroyed,      :boolean, :default => false # whether this vcluster has been destroyed
+      # The private key for ssh.
+      #
+      # Since::     0.3
+      t.column :ssh_private_key,                  :string
+      
       t.timestamps
     end
   end

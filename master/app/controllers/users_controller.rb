@@ -14,7 +14,7 @@ class UsersController < ApplicationController
     @user = User.new(params)
     if @user
       if params[:privilege] != "admin"
-        @user.privilege = "normal user"
+        @user.privilege = "normal_user"
       else
         @user.privilege = "admin"
       end
@@ -65,7 +65,7 @@ class UsersController < ApplicationController
     if @current_user.privilege == "root"
       users_list = User.all
     elsif @current_user.privilege == "admin"
-      users_list = User.find(:all, :conditions => ["privilege = 'normal user' or login = ?", @current_user.login])
+      users_list = User.find(:all, :conditions => ["privilege = 'normal_user' or login = ?", @current_user.login])
     else
       users_list = [@current_user]
     end

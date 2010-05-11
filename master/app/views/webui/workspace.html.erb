@@ -1,3 +1,29 @@
 <% content_for :page do %>
-TODO: content for workspace
+
+<script type='text/javascript'>
+$(document).ready(function() {
+  load_workspace_clusters_list();
+  <% if params[:vcluster_name] != nil and params[:vcluster_name] != "" %>
+  load_cluster_content("<%= params[:vcluster_name] %>");
+  <% end-%>
+});
+</script>
+
+<table width="100%">
+<tr><td valign="top" width='20%'>
+List of clusters: <a href='#' onclick='load_workspace_clusters_list()'>(reload)</a>
+<p/>
+<div id='clusters-list'/>
+</td><td valign='top'>
+<div id='cluster-content'>
+<center>
+<h2>
+Please select a cluster from left panel. <br/>
+To create a new cluster/machine, use the 'wizard' page.
+</h2>
+</center>
+</div>
+</td></tr>
+</table>
+
 <% end %>

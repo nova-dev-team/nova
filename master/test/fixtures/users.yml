@@ -28,5 +28,5 @@ santa:
   crypted_password:           3096bce0027d0ec9026ba948c32ae388e619168f # 'monkey'
   created_at:                 <%= 1.days.ago.to_s :db %>
   activated:                  true
-  privilege:                  "normal user"
+  privilege:                  normal_user
 

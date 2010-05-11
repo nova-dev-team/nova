@@ -1,115 +1,164 @@
+# Controller for virtual clusters
+#
+# Author::    Santa Zhang (mailto:santa1987@gmail.com)
+# Since::     0.3
+
+require 'utils'
+require 'uuidtools'
+
 class VclustersController < ApplicationController
 
   before_filter :login_required
 
-  def index
-    result = []
-    Vcluster.all.each do |vcluster|
-      vm_list = vcluster.vmachines.collect do |vm|
-        {
-          :id => vm.id,
-          :pm_addr => (vm.pmachine ? vm.pmachine.addr : nil)
+  # List all the clusters visible for current user.
+  # root and admin could see all clusters, while users can only see his own clusters.
+  #
+  # Since::     0.3
+  def list
+    if @current_user.privilege == "normal_user"
+      vcluster_list = @current_user.vclusters
+    else
+      vcluster_list = Vcluster.all
+    end
+    vcluster_info = vcluster_list.collect do |vc|
+      {
+        "name" => vc.cluster_name,
+        "first_ip" => vc.first_ip,
+        "size" => vc.cluster_size
+      }
+    end
+    reply_success "query successful!", :data => vcluster_info
+  end
+
+  # Create a new virtual cluster with given cluster size.
+  # Will reply failure if cannot create such a big cluster.
+  #
+  # Since::     0.3
+  def create
+    unless valid_param? params[:name] and valid_param? params[:size] and params[:size].to_i.to_s == params[:size] and params[:size].to_i > 0 and valid_param? params[:machines]
+      reply_failure "Please provide valid 'name', 'size' and 'machines' parameter!"
+      return
+    end
+    ret = Vcluster.alloc_cluster params[:name], params[:size].to_i, @current_user
+    if ret[:success] == true
+      vc = ret[:vcluster]
+
+      # create vmachines
+      vm_counter = 0
+      begin
+        vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil}
+        params[:machines].each_line do |line|
+          line = line.strip
+          if line == "" and vm_info[:name] != nil
+            vm = Vmachine.new
+            vm.name = vc.cluster_name + "-" + vm_info[:name]
+            vm.uuid = UUIDTools::UUID.random_create.to_s
+            vm.cpu_count = vm_info[:cpu_count].to_i
+            vm.memory_size = vm_info[:mem_size].to_i
+            vm.soft_list = vm_info[:soft_list]
+            vm.hda = vm_info[:vdisk_fname]
+            vm.ip = IpTools.i_to_ipv4(IpTools.ipv4_to_i(vc.first_ip) + vm_counter)
+
+            vm.vcluster = vc
+            vc.vmachines << vm
+
+            raise "Failed to create vmachine!" unless vm.save
+            vm_counter += 1
+            
+            vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil}
+          else
+            case line
+            when /^vdisk_fname=/
+              vm_info[:vdisk_fname] = line[12..-1]
+            when /^machine_name=/
+              vm_info[:name] = line[13..-1]
+            when /^cpu_count=/
+              vm_info[:cpu_count] = line[10..-1]
+            when /^mem_size=/
+              vm_info[:mem_size] = line[9..-1]
+            when /^soft_list=/
+              vm_info[:soft_list] = line[10..-1]
+            else
+              raise "Wrong parameter for 'machines'!"
+            end
+          end
+        end
+      rescue Exception => e
+        # revert the creation of vcluster
+        Vcluster.delete vc rescue nil
+        reply_failure "Exception occurred! Message: '#{e.to_s}'. The cluster is not created!"
+        return
+      end
+
+      reply_success ret[:message]
+    else
+      reply_failure ret[:message]
+    end
+  end
+
+  # Display detail info about a cluster.
+  #
+  # Since::     0.3
+  def show
+    unless valid_param? params[:name]
+      reply_failure "Please provide valid 'name' parameter!"
+      return
+    end
+    vc = Vcluster.find_by_cluster_name params[:name]
+    if vc
+      if @current_user.privilege != "root" and (@current_user.vclusters.include? vc) == false
+        reply_failure "You are not allowed to do this!"
+        return
+      end
+      machines_info = []
+      vc.vmachines.each do |vm|
+        machines_info << {
+          :name => vm.hostname,
+          :uuid => vm.uuid,
+          :cpu_count => vm.cpu_count,
+          :mem_size => vm.memory_size,
+          :disk_image => (Vdisk.find_by_file_name vm.hda).display_name,
+          :soft_list => vm.soft_list,
+          :status => vm.status
         }
       end
-      result << {
-        :id => vcluster.id,
-        :name => vcluster.cluster_name,
-        :vm_list => vm_list
-      }
-    end
 
-    render_data result
-  end
-
-  def create
-    if params[:name] and params[:size] and params[:soft_list]
-      # format params list
-      params[:soft_list] = params[:soft_list].split.join "\n"
-      #params[:soft_list] = " + params[:soft_list] unless params[:soft_list].start_with? "common\nssh-nopass\n" # make sure common & ssh-nopass is selected
-
-
-
-      puts "Soft to be installed:\n#{params[:soft_list]}\n"
-      if params[:start_now]
-        pp "[start_now]"
-        vc = Vcluster.create_and_start params
-      else
-        vc = Vcluster.create params
-      end
-
-      vc.user = current_user # mark vcluster ownership
-      vc.save
-      render_data vc
+      reply_success "Query successful!",
+        :name => vc.cluster_name,
+        :size => vc.cluster_size,
+        :owner => vc.user.login,
+        :first_ip => vc.first_ip,
+        :last_ip => (IpTools.i_to_ipv4(IpTools.ipv4_to_i(vc.first_ip) + vc.cluster_size - 1)),
+        :machines => machines_info
     else
-      render_failure "Please provide 'size', 'name', 'soft_list' parameters"
+      reply_failure "Cannot find vcluster with name '#{params[:name]}'!"
     end
   end
 
-  def show
-    vc = Vcluster.find params[:id]
-    vm_info = vc.vmachines.collect do |vm|
-      {
-        :id => vm.id,
-        :mem_size => vm.memory_size,
-        :cpu_count => vm.cpu_count,
-        :arch => vm.arch,
-        :hda => vm.hda,
-        :status => vm.status
-      }
-    end
-    result = {
-      :id => vc.id,
-      :soft_list => vc.package_list,
-      :name => vc.cluster_name,
-      :size => vc.vmachines.size,
-      :vm_info => vm_info
-    }
-    render_data result
-  end
-
-  def vm_list
-    list = []
-    vc = Vcluster.find_by_id params[:id]
-    #vm = Vmachine.find_by_id params[:id]
-    #if vm == nil
-    #  vm = Vmachine.find_by_uuid params[:id] # try finding by uuid
-    #end
-    vc.vmachines.all.each do |vm|
-      result = {
-        :id => vm.id,
-        :mem_size => vm.memory_size,
-        :cpu_count => vm.cpu_count,
-        :uuid => vm.uuid,
-        :hda => vm.hda,
-        :hdb => vm.hdb,
-        :cdrom => vm.cdrom,
-        :boot_device => vm.boot_device,
-        :arch => vm.arch,
-        :pmachine_addr => (vm.pmachine ? vm.pmachine.addr : nil),
-        :vcluster_id => vm.vcluster.id,
-        :vcluster_name => vm.vcluster.cluster_name,
-        :soft_list => vm.vcluster.package_list,
-        :status => vm.status,
-        :mac_addr => vm.mac,
-        :vnc_port => vm.vnc_port
-      }
-      list << result
-    end
-    render_data list
-  end
-
-  def modify
-  end
-
-  # delete a whole cluster
+  # Destroy a cluster.
+  #
+  # Since::     0.3
   def destroy
-    vc = Vcluster.find params[:id]
-    vc.vmachines.each do |vm|
-      vm.stop
+    unless valid_param? params[:name]
+      reply_failure "Please provide valid 'name' parameter!"
+      return
     end
-    render_success "Successfully destroyed vcluster named '#{vc.cluster_name}'"
-    vc.destroy!
-    Vcluster.delete vc
+    vc = Vcluster.find_by_cluster_name params[:name]
+    if vc
+      if @current_user.privilege != "root" and (@current_user.vclusters.include? vc) == false
+        reply_failure "You are not allowed to do this!"
+        return
+      end
+      vc.vmachines.each do |vm|
+        Vmachine.delete vm
+      end
+      # TODO notify the background daemon to destroy vmachines
+      Vcluster.delete vc
+      reply_success "Destroyed vcluster with name '#{params[:name]}'."
+    else
+      reply_failure "Cannot find vcluster with name '#{params[:name]}'!"
+    end
   end
 
 end
+

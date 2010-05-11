@@ -1,121 +1,84 @@
-require "ceil_conf"
-require "uuidtools"
+# Model for virtual clusters.
+#
+# Author::    Santa Zhang
+# Since::     0.3
 
-require "#{CEIL_ROOT}/server/cluster_config_creator"
+require "uuidtools"
+require 'utils'
 
 class Vcluster < ActiveRecord::Base
-  has_one :net_segment
+
   belongs_to :user
   has_many :vmachines
 
+  # Try to allocate a cluster.
+  # Returns {success, message} pair.
+  #
+  # Since::   0.3
+  def Vcluster.alloc_cluster name, size, owner
+    if Vcluster.find_by_cluster_name name
+      return {:success => false, :message => "There is already a cluster named '#{name}'!"}
+    end
 
-  #usage
-  #
-  #   vc = Vcluster.allocate("nova-test-1", "common\nssh-nopass\nmpich2\nhadoop\n", 4)
-  #
-  #allocate a vcluster named nova-test-1, has 4 nodes(1master/3slaves)
-  #then use ceil to install common/ssh-nopass/mpich2/hadoop package
-  #
-  #return nil if fails
-  #   
-  #   vc.vmachines.each do |vm|
-  #     puts vm.mac      # <---vm's mac must be set to this for dhcp
-  #     puts vm.ip + " " + vm.hostname # <--vm info
-  #     puts vm.ceil_progress   # <--ceil installation progress, -1 means not started, 100means finished
-  #     puts vm.last_ceil_message # <--last message from ceil client on vmachine
-  #   end
-  #
+    # make sure 'size' is integer
+    size = size.to_i
 
-  def Vcluster.alloc(cluster_name, package_list, machine_count)
+    # determine 'first_ip'
+    first_ip = nil
+
+    # (start_ip_ival, end_ip_ival), end_ip_ival is inclusive
+    used_ip_segments = []
+
+    # gateway takes 1 ip
+    gateway_ip_ival = IpTools.ipv4_to_i Setting.vm_gateway
+    used_ip_segments << [gateway_ip_ival, gateway_ip_ival]
+    Vcluster.all.each do |vcluster|
+      used_first_ip = IpTools.ipv4_to_i vcluster.first_ip
+      used_ip_segments << [used_first_ip, used_first_ip + vcluster.cluster_size - 1]
+    end
+    used_ip_segments.sort! {|a, b| a[0] <=> b[0]} # sort the segments
+
+    first_usable_ip_ival = IpTools.ipv4_to_i Setting.vm_first_ip
+    last_usable_ip_ival = IpTools.ipv4_to_i(IpTools.last_ip_in_subnet Setting.vm_first_ip, Setting.vm_subnet_mask)
+
+    test_ip_ival = first_usable_ip_ival
+    while test_ip_ival + size - 1 < last_usable_ip_ival do
+      test_segment = [test_ip_ival, test_ip_ival + size - 1]
+      usable = true # whether this test segment is usable
+      used_ip_segments.each do |used_seg|
+        unless test_segment[1] < used_seg[0] or test_segment[0] > used_seg[1]
+          # the test segment collides with some used segment
+          usable = false
+          break
+        end
+      end
+      if usable
+        # found a usable segment
+        break
+      else
+        # try to find another segment
+        used_ip_segments.each do |used_seg|
+          if used_seg[1] + 1 > test_ip_ival
+            test_ip_ival = used_seg[1] + 1
+            break
+          end
+        end
+      end
+    end
+
+    unless test_ip_ival + size - 1 < last_usable_ip_ival
+      return {:success => false, :message => "There is not enough IP available for VMs!"}
+    end
+
     vc = Vcluster.new
-    vc.cluster_name = cluster_name
-    vc.package_list = package_list
+    vc.user = owner
+    vc.first_ip = IpTools.i_to_ipv4 test_ip_ival
+    vc.cluster_size = size
+    vc.cluster_name = name
     vc.save
 
-    net = NetSegment.alloc(machine_count)
-
-    if (!net)
-      vc.delete
-      return nil
-    end
-
-    net.vcluster = vc
-    net.save
-
-    list = net.list
-    node_list = ""
-
-    list.each do |node|
-      vm = Vmachine.new
-      vm.uuid = UUIDTools::UUID.random_create.to_s
-      vm.hostname = node[:hostname]
-
-      dup_vms = Vmachine.find_all_by_ip node[:ip]  # FIX avoid ip duplication
-      dup_vms.each {|dup_vm| Vmachine.delete dup_vm}
-
-      vm.ip = node[:ip]
-      vm.mac = node[:mac]
-      vm.vcluster = vc
-      vm.save
-
-      node_list = node_list + "#{vm.ip}\t#{vm.hostname}\n"
-      machine_count -= 1
-      break if machine_count <= 0
-    end
-
-    ccc = ClusterConfigurationCreator.new(node_list, package_list, cluster_name)
-    ccc.create
-
-    return vc
-  end
-
-  ## create a new vcluster according to the params
-  def Vcluster.create params
-    vc = Vcluster.alloc params[:name], params[:soft_list], params[:size].to_i
-    vc.vmachines.each do |vm|
-      vm.cpu_count = params[:cpu_count].to_i if params[:cpu_count]
-      vm.cpu_count = 1 if vm.cpu_count == 0
-
-      vm.memory_size = params[:memory_size].to_i if params[:memory_size]
-      vm.hda = params[:hda]
-      vm.hdb = params[:hdb]
-      vm.cdrom = params[:cdrom]
-      vm.boot_device = params[:boot_device] if params[:boot_device]
-      vm.arch = params[:arch] if params[:arch]
-      vm.save
-    end
-    vc.save
-    return vc
-  end
-
-  ## create a new vcluster, and also starts all vmachines of it
-  def Vcluster.create_and_start params
-    pm_message = []
-    vc = Vcluster.create params
-    pp vc
-    vc.vmachines.each do |vm|
-      pp vm
-      vm.save
-      pm_message << vm.start
-    end
-    pp pm_message
-    vc.save
-    return vc
-  end
-
-  ## TODO destroy this vcluster, and also all vmachines inside it (no going back)
-  def destroy!
-    self.vmachines.each {|vm| vm.destroy}
-    self.net_segment.free if self.net_segment
-    self.destroy
-    ## TODO release net segment & allcated vnc
-  end
-
-  def Vcluster.all_not_destroyed
-    Vcluster.find_all_by_destroyed true
+    return {:success => true, :message => "Successfully created cluster '#{name}' with size of #{size}!", :vcluster => vc}
   end
 
 end
-
-
 

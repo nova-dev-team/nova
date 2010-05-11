@@ -204,7 +204,7 @@ end
 #
 # Authro::    Santa Zhang (santa1987@gmail.com)
 # Since::     0.3
-def prepare_agent_package storage_server, package_pool, vm_dir, package_name
+def prepare_agent_package storage_server, package_pool, vm_dir, package_name = ""
   # make sure the package pool exists
   FileUtils.mkdir_p package_pool unless File.exists? package_pool
 
@@ -214,7 +214,12 @@ def prepare_agent_package storage_server, package_pool, vm_dir, package_name
 
   unless File.exists? "#{vm_dir}/agent-cd/packages"
     FileUtils.mkdir_p "#{vm_dir}/agent-cd/packages"
+    write_log "create dir: #{vm_dir}/agent-cd/packages"
+  else
+    write_log "folder already exists: #{vm_dir}/agent-cd/packages"
   end
+
+  return if package_name == ""
 
   if File.exists? package_dir and (File.exists? copying_lock) == false
     # package already available
@@ -303,6 +308,9 @@ def do_prepare rails_root, storage_server, vm_dir
 
   if File.exists? "agent_packages" or File.exists? "nodelist"
     write_log "preparing required packages"
+
+    # just create the folders (package name not provided)
+    prepare_agent_package storage_server, package_pool_dir, vm_dir
     File.read("agent_packages").each_line do |line|
       pkg = line.strip
       prepare_agent_package storage_server, package_pool_dir, vm_dir, pkg
@@ -340,7 +348,24 @@ def do_prepare rails_root, storage_server, vm_dir
 
       # setup cluster name, so the agent could retrieve keys
       vm_name = File.basename vm_dir
-      igen.config_cluster(vm_name, cluster_name)
+
+      # note that, the name used here must agree with nodelist file
+      node_name = ""
+      File.read("nodelist").each_line do |line|
+        splt = line.split
+        next if splt.length != 2
+        if splt[0] == agent_ip
+          node_name = splt[1]
+          break
+        end
+      end
+
+      if node_name == ""
+        write_log "error: ip address not found in node list!"
+      end
+
+      write_log "config_cluster: #{node_name}, #{cluster_name}"
+      igen.config_cluster(node_name, cluster_name)
 
       # set user name, password, etc. and read server info from "storage_server" variable
       server_uri = URI::parse storage_server
@@ -363,6 +388,9 @@ def do_prepare rails_root, storage_server, vm_dir
       igen.config_softlist(software_packages.join " ")
 
       igen.generate("#{vm_dir}/agent-cd", "#{vm_dir}/agent-cd.iso")
+      unless File.exists? "#{vm_dir}/agent-cd.iso"
+        write_log "Failed to create agent-cd.iso!"
+      end
     rescue Exception => e
       write_log "Exception: #{e.to_s}"
     end

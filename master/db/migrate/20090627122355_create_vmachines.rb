@@ -4,16 +4,14 @@ class CreateVmachines < ActiveRecord::Migration
 
       # Author::    Santa Zhang
       # Since::     0.3
-
+      t.column :name,              :string
       t.column :uuid,              :string, :limit => 40, :null => false
       t.column :cpu_count,         :integer, :default => 1
+      t.column :soft_list,         :string, :default => ""
 
       # Unit of memory size is MB
       t.column :memory_size,       :integer, :default => 256
       t.column :hda,               :string, :limit => 40
-
-      # TODO support secondary disk
-      t.column :hdb,               :string, :limit => 40
 
       t.column :cdrom,             :string, :limit => 40
 
@@ -24,18 +22,30 @@ class CreateVmachines < ActiveRecord::Migration
       # The architecture of the VM.
       # Could be "i686" or "x86_64", etc.
       t.column :arch,              :string, :limit => 10, :default => "i686"
-      t.column :ip,                :string, :limit => 20, :unique => true
-      t.column :mac,               :string, :limit => 24
-      t.column :hostname,          :string, :limit => 40
-      t.column :vcluster_id,       :integer
-      t.column :ceil_progress,     :integer, :default => -1
-      t.column :last_ceil_message, :text
+
+      t.column :ip,                :string, :limit => 20
       t.column :vcluster_id,       :integer
       t.column :pmachine_id,       :integer
-      t.column :destroyed,         :boolean, :default => false  # whether this vmachine has been destroyed
-      t.column :status,            :string, :default => "not running" # could be "running", "not running", "suspended", "unknown". set to "unknown" when hosting pmachine is down
 
+      # The status of the vmachine.
+      # Could be:
+      #   * shut-off: the machine is not running
+      #   * start-pending: the machine is waiting to be started
+      #   * start-preparing: the machine is preparing for resources
+      #   * suspended: the machine is suspended
+      #   * running: the machine is up and running
+      #   * shutdown-pending: the machine is waiting to be shut off
+      #   * connect-failure: failed to connect to the hosting pmachine
+      #   * boot-failure: failed to start the vmachine
+      #
+      # Since::     0.3
+      t.column :status,            :string, :default => "shut-off"
+
+      # The VNC port for the VM.
+      #
+      # Since::     0.3
       t.column :vnc_port,          :integer
+
       t.timestamps
     end
   end
@@ -44,3 +54,4 @@ class CreateVmachines < ActiveRecord::Migration
     drop_table :vmachines
   end
 end
+

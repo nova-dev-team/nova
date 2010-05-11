@@ -17,7 +17,7 @@ class CreateUsers < ActiveRecord::Migration
       # Author::    Santa Zhang (santa1987@gmail.com)
       # Since::     0.3
       #
-      # The user's privilege. Could be "root", "admin" or "normal user".
+      # The user's privilege. Could be "root", "admin" or "normal_user".
       t.column :privilege,                  :string, :limit => 20, :null => false
 
     end

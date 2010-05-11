@@ -290,7 +290,6 @@ function load_worker_machines() {
 function retire_worker_machine(ip) {
   $("#worker_machines_container").block();
   $.ajax({
-    async: false,
     url: "/pmachines/retire",
     type: "POST",
     dataType: "json",
@@ -315,7 +314,6 @@ function retire_worker_machine(ip) {
 function delete_worker_machine(ip) {
   $("#worker_machines_container").block();
   $.ajax({
-    async: false,
     url: "/pmachines/delete",
     type: "POST",
     dataType: "json",
@@ -340,7 +338,6 @@ function delete_worker_machine(ip) {
 function reconnect_worker_machine(ip) {
   $("#worker_machines_container").block();
   $.ajax({
-    async: false,
     url: "/pmachines/reconnect",
     type: "POST",
     dataType: "json",
@@ -609,7 +606,6 @@ function register_new_software() {
   $.ajax({
     url: "/softwares/register",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       display_name: disp_name,
@@ -717,7 +713,6 @@ function register_new_vdisk() {
   $.ajax({
     url: "/vdisks/register.json",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       file_name: file_name,
@@ -744,7 +739,6 @@ function remove_vdisk(vdisk_fname) {
   $.ajax({
     url: "/vdisks/remove",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       file_name: vdisk_fname,
@@ -767,7 +761,6 @@ function edit_vdisk_soft_list(vdisk_fname, row_id) {
   $.ajax({
     url: "/vdisks/edit_soft_list",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       file_name: vdisk_fname,
@@ -775,12 +768,257 @@ function edit_vdisk_soft_list(vdisk_fname, row_id) {
     },
     success: function(result) {
       if (result.success) {
-        load_software_packages();
+        load_vdisk_images();
       } else {
         do_message("failure", "Error occurred", result.message);
       }
     },
     error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+//
+// "Wizard" page
+//
+
+function create_cluster() {
+  var cluster_size = parseInt($("#new_cluster_size").val());
+  var cluster_name = $("#new_cluster_name").val();
+
+  var vm_list = "";
+
+  for (var machine_id = 1; machine_id <= cluster_size; machine_id++) {
+    vm_list += "vdisk_fname=" + $("#cluster_machine_vdisk-" + machine_id).val() + "\n";
+    vm_list += "machine_name=" + $("#cluster_machine_name-" + machine_id).val() + "\n";
+    vm_list += "cpu_count=" + $("#cluster_cpu_count-" + machine_id).val() + "\n";
+    vm_list += "mem_size=" + $("#cluster_mem_size-" + machine_id).val() + "\n";
+    vm_list += "soft_list=" + $("#cluster_soft_list-" + machine_id).val() + "\n\n";
+  }
+
+  $.blockUI();
+  $.ajax({
+    url: "/vclusters/create.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: cluster_name,
+      size: cluster_size,
+      machines: vm_list
+    },
+    success: function(result) {
+      $.unblockUI();
+      if (result.success) {
+        window.location = "/webui/workspace.html?vcluster_name=" + cluster_name;
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $.unblockUI();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+
+}
+
+function create_single_machine() {
+  var machine_name = $("#new_single_machine_name").val();
+  var vdisk_fname = $("#new_single_machine_image").val();
+  var cpu_count = $("#new_single_machine_cpu_count").val();
+  var mem_size = $("#new_single_machine_mem_size").val();
+  var soft_list = $("#new_single_machine_soft_list_input").val();
+
+  var vm_list = "";
+  vm_list += "vdisk_fname=" + vdisk_fname + "\n";
+  vm_list += "machine_name=" + machine_name + "\n";
+  vm_list += "cpu_count=" + cpu_count + "\n";
+  vm_list += "mem_size=" + mem_size + "\n";
+  vm_list += "soft_list=" + soft_list + "\n\n";
+
+  $.blockUI();
+  $.ajax({
+    url: "/vclusters/create.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: machine_name,
+      size: 1,
+      machines: vm_list
+    },
+    success: function(result) {
+      $.unblockUI();
+      if (result.success) {
+        window.location = "/webui/workspace.html?vcluster_name=" + machine_name;
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $.unblockUI();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+
+//
+// "Workspace" page
+//
+
+function load_workspace_clusters_list() {
+  $("#clusters-list").block();
+  $.ajax({
+    url: "/vclusters/list.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    success: function(result) {
+      $("#clusters-list").unblock();
+      if (result.success) {
+        html = "";
+        for (var i = 0; i < result.data.length; i++) {
+          html += "<a href='#' onclick='load_cluster_content(\"" + result.data[i]["name"] + "\")'>" + result.data[i]["name"] + "</a><br/>"
+        }
+        $("#clusters-list").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#clusters-list").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+
+function load_cluster_content(cluster_name) {
+  $("#cluster-content").block();
+  $.ajax({
+    url: "/vclusters/show.json",
+    type: "POST",
+    dataType: "json",
+    async: false,
+    data: {
+      name: cluster_name
+    },
+    success: function(result) {
+      $("#cluster-content").unblock();
+      if (result.success) {
+        html = "<h2>Cluster: " + result.name + "</h2>";
+        html += "<b>Cluster size:</b> " + result.size + "</br>";
+        html += "<b>Owner:</b> " + result.owner + "</br>";
+        if (result.size == 1) {
+          html += "<b>IP range:</b> " + result.first_ip + "</br>";
+        } else {
+          html += "<b>IP range:</b> " + result.first_ip + " ~ " + result.last_ip + "</br>";
+        }
+        html += "<a href='#' onclick='destroy_cluster(\"" + result.name + "\")'><font color='red'>Destroy cluster!</font></a></br>";
+        html += "<p/>";
+        html += "<table width='100%'>";
+
+        var tmp_spacing = "&nbsp;&nbsp;&nbsp;&nbsp;";
+        for (var j = 0; j < result.machines.length; j++) {
+          m_info = result.machines[j];
+          html += "<tr class='row_type_" + (j % 2) + "'><td>";
+          html += "<td><h2>" + (j + 1) + "</h2></td><td>";
+          html += "Machine name: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"name\", \"" + m_info["name"] + "\")'>" + m_info["name"] + "</a></b>" + tmp_spacing;
+          html += "CPU Count: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"cpu_count\", \"" + m_info["cpu_count"] + "\")'>" + m_info["cpu_count"] + "</a></b>" + tmp_spacing;
+          html += "Memory size: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"mem_size\", \"" + m_info["mem_size"] + "\")'>" + m_info["mem_size"] + " MB</a></b>" + tmp_spacing;
+          html += "Machine image: <b>" + m_info["disk_image"] + "</b><br/>";
+          html += "UUID: <b>" + m_info["uuid"] + "</b></br>";
+          html += "Software list: <b>" + m_info["soft_list"] + "</b><br/>";
+          html += "Status: <b>" + m_info["status"] + "</b>" + tmp_spacing + "Actions: ";
+
+          // TODO add actions for different status
+          if (m_info["status"] == "shut-off") {
+            html += "<button type='button' class='btn' onclick='start_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Start</span></span></button>";
+          } else if (m_info["status"] == "start-pending") {
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Cancel start</span></span></button>";
+          } else if (m_info["status"] == "start-preparing") {
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Cancel start</span></span></button>";
+          } else if (m_info["status"] == "running") {
+            // TODO
+          } else if (m_info["status"] == "suspended") {
+            // TODO
+          } else if (m_info["status"] == "boot-failure") {
+            // TODO
+          }
+          html += "</td></tr>";
+        }
+        html += "</table>";
+        $("#cluster-content").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#cluster-content").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function vm_ajax(cluster_name, url, data_map) {
+  $.ajax({
+    url: url,
+    type: "POST",
+    dataType: "json",
+    data: data_map,
+    success: function(result) {
+      if (result.success) {
+        load_cluster_content(cluster_name);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function shut_off_vm(cluster_name, uuid) {
+  vm_ajax(cluster_name, "/vmachines/shut_off.json", {uuid: uuid});
+}
+
+function start_vm(cluster_name, uuid) {
+  vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid});
+}
+
+function edit_vm_setting(cluster_name, uuid, item, old_value) {
+  var new_value = prompt("Changing property of VM with UUID='" + uuid + "'\nPlease provide new value for '" + item + "'", old_value);
+  if (new_value == null && new_value != old_value) {
+    return;
+  }
+  vm_ajax(cluster_name, "/vmachines/edit.json", {
+    uuid: uuid,
+    item: item,
+    value: new_value
+  });
+}
+
+function destroy_cluster(cluster_name) {
+  $("#cluster-content").block();
+  $.ajax({
+    url: "/vclusters/destroy.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: cluster_name
+    },
+    success: function(result) {
+      $("#cluster-content").unblock();
+      if (result.success) {
+        window.location = "/webui/workspace.html";
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#cluster-content").unblock();
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });

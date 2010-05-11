@@ -9,11 +9,7 @@ class VmachineTest < ActiveSupport::TestCase
   test "log file creation" do
     vm_name = "dummy_vm_for_test"
     Vmachine.log vm_name, "Testing"
-    assert File.exist? "#{Setting.vmachines_root}/#{vm_name}/log"
-  end
-
-  test "show dummy xml desc" do
-    puts Vmachine.emit_domain_xml Vmachine.default_params
+    assert File.exist? "#{Setting.vm_root}/#{vm_name}/log"
   end
 
 end

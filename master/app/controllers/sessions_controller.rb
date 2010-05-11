@@ -28,8 +28,8 @@ class SessionsController < ApplicationController
         # button. Uncomment if you understand the tradeoffs.
         # reset_session
         self.current_user = user
-        #new_cookie_flag = (params[:remember_me] == "1")
-        #handle_remember_cookie! new_cookie_flag
+        new_cookie_flag = (params[:remember_me] == "1")
+        handle_remember_cookie! new_cookie_flag
 
         respond_to do |accept|
           accept.html { redirect_back_or_default("/") }
