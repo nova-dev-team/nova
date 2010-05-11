@@ -56,17 +56,9 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
 
   create_table "vclusters", :force => true do |t|
     t.string   "cluster_name"
-    t.text     "package_list"
+    t.string   "first_ip"
+    t.integer  "cluster_size"
     t.integer  "user_id"
-    t.integer  "cpu_count"
-    t.integer  "memory_size"
-    t.string   "hda"
-    t.string   "hdb"
-    t.string   "cdrom"
-    t.string   "boot_device"
-    t.string   "arch"
-    t.integer  "net_segment_id"
-    t.boolean  "destroyed",      :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

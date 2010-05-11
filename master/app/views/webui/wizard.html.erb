@@ -1,6 +1,15 @@
 <% content_for :page do %>
 
 <center>
+
+<% if Vdisk.count == 0 %>
+  <% if @current_user.privilege == 'root' %>
+    <b><font color='red'>Warning: no vdisk has been registed! Regist a vdisk in 'system' page!</font></b><p/>
+  <% else %>
+    <b><font color='red'>Warning: sorry, no machine image available now, you cannot create new VM!</font></b><p/>
+  <% end-%>
+<% else %>
+
 <h2>Create a single machine</h2>
 </center>
 <table width='100%'><tr><td>
@@ -163,4 +172,6 @@ Cluster size: <input type='text' size=4 id='new_cluster_size' />
 
 
 </center>
+<% end-%>
+
 <% end %>
