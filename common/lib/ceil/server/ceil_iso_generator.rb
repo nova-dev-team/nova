@@ -14,6 +14,8 @@ CEIL_ISO_FILENAME_NODELIST = 'node.list'
 CEIL_ISO_FILENAME_SOFTLIST = 'soft.list'
 
 CEIL_ISO_CONFIG_PATH = '/config'
+CEIL_ISO_PACKAGE_PATH = '/packages'
+CEIL_ISO_KEY_PATH = '/keys'
 
 #require 'dir'
 	
@@ -21,6 +23,8 @@ PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -f -l -o '
 PATH_GENISO = '/usr/bin/genisoimage'
 
 CONFIG_PATH = CEIL_ISO_CONFIG_PATH
+PACKAGE_PATH = CEIL_ISO_PACKAGE_PATH
+KEY_PATH = CEIL_ISO_KEY_PATH
 
 FILENAME_SERVERS = CEIL_ISO_FILENAME_SERVERS
 FILENAME_NETWORK = CEIL_ISO_FILENAME_NETWORK
@@ -52,10 +56,27 @@ class CeilIsoGenerator
 		@softlist = nil
 		@hostname = 'nova'
 		@clustername = 'nova-cluster'
+		@id_rsa_content = nil
+		@id_rsa_pub_content = nil
+
+		@changelist_username = []
+		@changelist_origin_pwd = []
+		@changelist_new_pwd = []
 
 		#softlist string: appnames seperated by space
 		#example
 		# softlist = "hg hj hx hz"
+	end
+
+	def config_ssh_key(id_rsa_content, id_rsa_pub_content)
+		@id_rsa_content = id_rsa_content
+		@id_rsa_pub_content = id_rsa_pub_content
+	end
+
+	def config_change_passwd(username, origin_pwd, new_pwd)
+		@changelist_username << username;
+		@changelist_origin_pwd << origin_pwd;
+		@changelist_new_pwd << new_pwd;
 	end
 
 	def config_essential(ceil_base_path) 
@@ -128,7 +149,11 @@ class CeilIsoGenerator
 		end
 
 		# create config files
-		FileUtils.mkdir(tmpdir + CONFIG_PATH)
+		begin
+			FileUtils.mkdir(tmpdir + CONFIG_PATH)
+		rescue
+		end
+		
 		#DirTool.mkdir()
 
 		filename_servers = tmpdir + CONFIG_PATH + '/' + FILENAME_SERVERS
@@ -170,6 +195,10 @@ class CeilIsoGenerator
 			file.puts @clustername
 		end
 
+		if @id_rsa_content
+			
+		end
+
 		#3.pack tmpdir
 		cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
 		result = system cmdline
@@ -186,11 +215,14 @@ end
 igen = CeilIsoGenerator.new
 igen.config_essential('/home/rei/nova/common/lib/ceil')
 igen.config_network('10.0.1.122', '255.255.255.0', '10.0.1.254', '166.111.8.28')
+# vm_addr  vm_netmask vm_gateway vm_nameserver
 igen.config_cluster("node1", "nova-cluster-name")
+# vm_nodename  vm_clustername
 igen.config_package_server('santa:santa@10.0.1.223', '8000', 'ftp')
 igen.config_key_server('santa:santa@10.0.1.223', '8000', 'ftp')
 igen.config_nodelist("10.0.1.122 node1\n10.0.1.211 node2")
 igen.config_softlist("common ssh-nopass hadoop")
 igen.generate('/var/vm1', '/home/rei/test.iso')
+# parse '/var/vm1' into '/home/rei/test.iso'
 =end
 
