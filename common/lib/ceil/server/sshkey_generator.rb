@@ -1,5 +1,5 @@
-SHELL_EXPECT = '/usr/bin/expect'
-SSH_EXPECT = File.dirname(__FILE__) + '/ssh.exp'
+#SHELL_EXPECT = '/usr/bin/expect'
+#SSH_EXPECT = File.dirname(__FILE__) + '/ssh.exp'
 
 require 'fileutils'
 
@@ -10,7 +10,7 @@ module SSHKeyGenerator
 		rescue
 		end		
 		filename = base_path + '/id_rsa'
-		system "expect #{SSH_EXPECT} #{filename}"
+		system "ssh-keygen -N \"\" -f #{filename}"
 	end
 end
 
