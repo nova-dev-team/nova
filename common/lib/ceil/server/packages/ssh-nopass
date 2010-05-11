@@ -1,0 +1,11 @@
+#! /bin/sh
+
+NODELIST=config/node.list
+SSH_PATH=/root/.ssh
+AUTHORIZED_KEYS=${SSH_PATH}/authorized_keys
+
+cp id_rsa ${SSH_PATH}
+cp id_rsa.pub ${SSH_PATH}
+
+cat id_rsa.pub >> $AUTHORIZED_KEYS
+exit 0

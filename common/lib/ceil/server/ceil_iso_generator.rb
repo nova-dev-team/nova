@@ -150,8 +150,9 @@ class CeilIsoGenerator
 
 		# create config files
 		begin
-
       FileUtils.mkdir_p(tmpdir + CONFIG_PATH)
+      #FileUtils.mkdir_p(tmpdir + PACKAGE_PATH)
+      FileUtils.mkdir_p(tmpdir + KEY_PATH)
 		rescue
     end
     #DirTool.mkdir()
@@ -196,7 +197,24 @@ class CeilIsoGenerator
 		end
 
 		if @id_rsa_content
-			
+			sshkey_path = tmpdir + KEY_PATH + '/ssh-nopass' 
+			begin
+	      FileUtils.mkdir_p(sshkey_path)
+			rescue
+			end
+			File.open(sshkey_path + '/id_rsa', 'w') do |file|
+				file.puts @id_rsa_content
+			end
+			File.open(sshkey_path + '/id_rsa.pub', 'w') do |file|
+				file.puts @id_rsa_pub_content
+			end
+
+			attach_filename = File.dirname(__FILE__) + '/packages/ssh-nopass'
+			attach_destname = sshkey_path + '/attach.sh'	
+			begin
+				FileUtils.cp(attach_filename, attach_destname) 
+			rescue
+			end
 		end
 
 		#3.pack tmpdir
@@ -213,17 +231,26 @@ end
 
 =begin
 igen = CeilIsoGenerator.new
-igen.config_essential('/nova/system/common/lib/ceil')
+
+igen.config_essential('/home/rei/nova/common/lib/ceil')
 igen.config_network('10.0.1.122', '255.255.255.0', '10.0.1.254', '166.111.8.28')
 # vm_addr  vm_netmask vm_gateway vm_nameserver
 igen.config_cluster("node1", "nova-cluster-name")
 # vm_nodename  vm_clustername
+
 igen.config_package_server('santa:santa@10.0.1.223', '8000', 'ftp')
+
 igen.config_key_server('santa:santa@10.0.1.223', '8000', 'ftp')
+
 igen.config_nodelist("10.0.1.122 node1\n10.0.1.211 node2")
+
 igen.config_softlist("common ssh-nopass hadoop")
 
-igen.generate('/var/vm1/packages', '/home/test.iso')
+igen.config_ssh_key("jklfdsjkljailgjweklgjklwdjgkl;d", "fsdkhgklsdad;gjdkslgjsdkl;gjsdklgjkl;g")
+#private_key_content, public_key_content
+
+igen.generate('/var/vm1/', '/home/test.iso')
+
 puts "fin"
 =end
 
