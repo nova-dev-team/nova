@@ -125,6 +125,7 @@ class VclustersController < ApplicationController
       reply_success "Query successful!",
         :name => vc.cluster_name,
         :size => vc.cluster_size,
+        :owner => vc.user.login,
         :first_ip => vc.first_ip,
         :last_ip => (IpTools.i_to_ipv4(IpTools.ipv4_to_i(vc.first_ip) + vc.cluster_size - 1)),
         :machines => machines_info

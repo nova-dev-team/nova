@@ -917,7 +917,8 @@ function load_cluster_content(cluster_name) {
       $("#cluster-content").unblock();
       if (result.success) {
         html = "<h2>Cluster: " + result.name + "</h2>";
-        html += "<b>Cluster size:</b>" + result.size + "</br>";
+        html += "<b>Cluster size:</b> " + result.size + "</br>";
+        html += "<b>Owner:</b> " + result.owner + "</br>";
         if (result.size == 1) {
           html += "<b>IP range:</b> " + result.first_ip + "</br>";
         } else {
