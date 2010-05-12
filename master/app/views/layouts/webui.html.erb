@@ -49,14 +49,14 @@ html = ""
   ["admin",         "user",         "Users"],
   ["root",          "system",       "System"],
   ["admin",         "monitor",      "Monitor"],
-  ["normal user",   "workspace",    "Workspace"],
-  ["normal user",   "wizard",       "Wizard"],
-  ["normal user",   "account",      "My Account"],
+  ["normal_user",   "workspace",    "Workspace"],
+  ["normal_user",   "wizard",       "Wizard"],
+  ["normal_user",   "account",      "My Account"],
 ].each do |item|
   priv, link, title = item
   if @current_user.privilege == "admin"
     next if priv == "root"
-  elsif @current_user.privilege == "normal user"
+  elsif @current_user.privilege == "normal_user"
     next if priv == "root" or priv == "admin"
   end
   header_link_class = "header_link"

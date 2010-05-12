@@ -87,77 +87,6 @@ class Bignum
 end
 
 
-module Util
-
-  def Util.split_userinfo userinfo
-    index = userinfo.index ":"
-    username = userinfo[0...index]
-    password = userinfo[(index + 1)..-1]
-    return username, password
-  end
-
-  def split_userinfo userinfo
-    Util.split_userinfo
-  end
-
-end
-
-
-module VdiskNaming
-
-  def VdiskNaming.system_disk? filename
-    (VdiskNaming.vdisk_type filename) == "sys" or (VdiskNaming.vdisk_type filename) == "sys.cow"
-  end
-
-  def VdiskNaming.vdisk_type filename
-    begin
-      split = filename.split "-"
-      return split[1]
-    rescue
-      raise "'#{filename}' is not in correct form!"
-    end
-  end
-
-  # return a string representing the type of vdisk
-  # could be "iso", "sys", "sys.cow", "usr", "usr.cow"
-  def vdisk_type filename
-    VdiskNaming.vdisk_type filename
-  end
-
-  def vdisk_id filename
-    begin
-      split = filename.split "-"
-      return split[0][2..-1].to_i
-    rescue
-      raise "'#{filename}' is not in correct form!"
-    end
-  end
-
-  # return nil in case of failure
-  def vdisk_cow? filename
-    begin
-      split = filename.split "-"
-      return split[1].end_with? "cow"
-    rescue
-      raise "'#{filename}' is not in correct form!"
-    end
-  end
-
-  def vdisk_cow_base filename
-    raise "'#{filename}' is not Copy-On-Write!" unless vdisk_cow? filename
-
-    begin
-      split = filename.split "-"
-      split_again = split[2].split "."
-      return split_again[1].to_i
-    rescue
-      raise "'#{filename}' is not in correct form!"
-    end
-  end
-
-end
-
-
 # Execute a shell command, prints the command it self, and the output message.
 #
 # Since::     0.3
@@ -209,5 +138,34 @@ def random_token length = 5
     token += alphabets[idx..idx]
   end
   return token
+end
+
+
+# A collection of helpers for manipulating IP address.
+#
+# Since::    0.3
+module IpTools
+
+  # Convert an ipV4 address to int value.
+  #
+  # Since::     0.3
+  def ipv4_to_i ip_str
+    splt = ip_str.split "."
+    ((splt[0].to_i * 256 + splt[1].to_i) * 256 + splt[2].to_i) * 256 + splt[3].to_i
+  end
+
+  # Convert an integer to ipV4 address.
+  #
+  # Since::     0.3
+  def i_to_ipv4 i_val
+    ip_seg = []
+    1.upto(4) do |n|
+      ip_seg << (i_val % 256)
+      i_val = i_val / 256
+    end
+    ip_seg = ip_seg.reverse
+    return ip_seg.join "."
+  end
+
 end
 

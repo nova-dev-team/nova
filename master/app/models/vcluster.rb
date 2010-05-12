@@ -4,8 +4,11 @@
 # Since::     0.3
 
 require "uuidtools"
+require 'utils'
 
 class Vcluster < ActiveRecord::Base
+
+  include IpTools
 
   belongs_to :user
   has_many :vmachines
