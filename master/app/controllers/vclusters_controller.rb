@@ -110,11 +110,24 @@ class VclustersController < ApplicationController
         reply_failure "You are not allowed to do this!"
         return
       end
+      machines_info = []
+      vc.vmachines.each do |vm|
+        machines_info << {
+          :name => vm.hostname,
+          :cpu_count => vm.cpu_count,
+          :mem_size => vm.memory_size,
+          :disk_image => (Vdisk.find_by_file_name vm.hda).display_name,
+          :soft_list => vm.soft_list,
+          :status => vm.status
+        }
+      end
+
       reply_success "Query successful!",
         :name => vc.cluster_name,
         :size => vc.cluster_size,
         :first_ip => vc.first_ip,
-        :last_ip => (IpTools.i_to_ipv4(IpTools.ipv4_to_i(vc.first_ip) + vc.cluster_size - 1))
+        :last_ip => (IpTools.i_to_ipv4(IpTools.ipv4_to_i(vc.first_ip) + vc.cluster_size - 1)),
+        :machines => machines_info
     else
       reply_failure "Cannot find vcluster with name '#{params[:name]}'!"
     end

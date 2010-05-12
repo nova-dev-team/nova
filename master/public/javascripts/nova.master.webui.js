@@ -924,6 +924,23 @@ function load_cluster_content(cluster_name) {
           html += "<b>IP range:</b> " + result.first_ip + " ~ " + result.last_ip + "</br>";
         }
         html += "<a href='#' onclick='destroy_cluster(\"" + result.name + "\")'><font color='red'>Destroy cluster!</font></a></br>";
+        html += "<p/>";
+        html += "<table width='100%'>";
+
+        var tmp_spacing = "&nbsp;&nbsp;&nbsp;&nbsp;";
+        for (var j = 0; j < result.machines.length; j++) {
+          m_info = result.machines[j];
+          html += "<tr class='row_type_" + (j % 2) + "'><td>";
+          html += "<td><h2>" + (j + 1) + "</h2></td><td>";
+          html += "Machine name: <b>" + m_info["name"] + "</b>" + tmp_spacing;
+          html += "CPU Count: <b>" + m_info["cpu_count"] + "</b>" + tmp_spacing;
+          html += "Memory size: <b>" + m_info["mem_size"] + " MB</b>" + tmp_spacing;
+          html += "Machine image: <b>" + m_info["disk_image"] + "</b><br/>";
+          html += "Software list: <b>" + m_info["soft_list"] + "</b><br/>";
+          html += "Status: <b>" + m_info["status"] + "</b>";
+          html += "</td></tr>";
+        }
+        html += "</table>";
         $("#cluster-content").html(html);
       } else {
         do_message("failure", "Error occurred", result.message);
