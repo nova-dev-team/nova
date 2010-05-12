@@ -4,6 +4,7 @@
 # Since::     0.3
 
 require 'utils'
+require 'uuidtools'
 
 class VclustersController < ApplicationController
 
@@ -40,6 +41,55 @@ class VclustersController < ApplicationController
     end
     ret = Vcluster.alloc_cluster params[:name], params[:size].to_i, @current_user
     if ret[:success] == true
+      vc = ret[:vcluster]
+
+      # create vmachines
+      vm_counter = 0
+      begin
+        vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil}
+        params[:machines].each_line do |line|
+          line = line.strip
+          if line == "" and vm_info[:name] != nil
+            vm = Vmachine.new
+            vm.name = vc.cluster_name + "-" + vm_info[:name]
+            vm.uuid = UUIDTools::UUID.random_create.to_s
+            vm.cpu_count = vm_info[:cpu_count].to_i
+            vm.memory_size = vm_info[:mem_size].to_i
+            vm.soft_list = vm_info[:soft_list]
+            vm.hda = vm_info[:vdisk_fname]
+            vm.ip = IpTools.i_to_ipv4(IpTools.ipv4_to_i(vc.first_ip) + vm_counter)
+
+            vm.vcluster = vc
+            vc.vmachines << vm
+
+            raise "Failed to create vmachine!" unless vm.save
+            vm_counter += 1
+            
+            vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil}
+          else
+            case line
+            when /^vdisk_fname=/
+              vm_info[:vdisk_fname] = line[12..-1]
+            when /^machine_name=/
+              vm_info[:name] = line[13..-1]
+            when /^cpu_count=/
+              vm_info[:cpu_count] = line[10..-1]
+            when /^mem_size=/
+              vm_info[:mem_size] = line[9..-1]
+            when /^soft_list=/
+              vm_info[:soft_list] = line[10..-1]
+            else
+              raise "Wrong parameter for 'machines'!"
+            end
+          end
+        end
+      rescue Exception => e
+        # revert the creation of vcluster
+        Vcluster.delete vc rescue nil
+        reply_failure "Exception occurred! Message: '#{e.to_s}'. The cluster is not created!"
+        return
+      end
+
       reply_success ret[:message]
     else
       reply_failure ret[:message]
@@ -84,6 +134,10 @@ class VclustersController < ApplicationController
         reply_failure "You are not allowed to do this!"
         return
       end
+      vc.vmachines.each do |vm|
+        Vmachine.delete vm
+      end
+      # TODO notify the background daemon to destroy vmachines
       Vcluster.delete vc
       reply_success "Destroyed vcluster with name '#{params[:name]}'."
     else

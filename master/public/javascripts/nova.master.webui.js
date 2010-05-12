@@ -831,6 +831,46 @@ function create_cluster() {
 
 }
 
+function create_single_machine() {
+  var machine_name = $("#new_single_machine_name").val();
+  var vdisk_fname = $("#new_single_machine_image").val();
+  var cpu_count = $("#new_single_machine_cpu_count").val();
+  var mem_size = $("#new_single_machine_mem_size").val();
+  var soft_list = $("#new_single_machine_soft_list_input").val();
+
+  var vm_list = "";
+  vm_list += "vdisk_fname=" + vdisk_fname + "\n";
+  vm_list += "machine_name=" + machine_name + "\n";
+  vm_list += "cpu_count=" + cpu_count + "\n";
+  vm_list += "mem_size=" + mem_size + "\n";
+  vm_list += "soft_list=" + soft_list + "\n\n";
+
+  $.blockUI();
+  $.ajax({
+    url: "/vclusters/create.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      name: machine_name,
+      size: 1,
+      machines: vm_list
+    },
+    success: function(result) {
+      $.unblockUI();
+      if (result.success) {
+        window.location = "/webui/workspace.html?vcluster_name=" + machine_name;
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $.unblockUI();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
 
 //
 // "Workspace" page
@@ -907,7 +947,7 @@ function destroy_cluster(cluster_name) {
     },
     success: function(result) {
       if (result.success) {
-        location.reload();
+        window.location = "/webui/workspace.html";
       } else {
         do_message("failure", "Error occurred", result.message);
       }

@@ -2,10 +2,8 @@ class CreateVmachineInfos < ActiveRecord::Migration
   def self.up
     create_table :vmachine_infos do |t|
       t.column :vmachine_id,        :integer
-      t.column :category,           :string, :limit => 20 # set max length to 20
-      t.column :status,             :integer, :default => -1
+      t.column :category,           :string
       t.column :message,            :string
-      t.column :vnc_port,           :integer
       t.timestamps
     end
     add_index :vmachine_infos, :vmachine_id, :unique => false

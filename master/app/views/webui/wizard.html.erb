@@ -29,7 +29,7 @@ CPU Count: <select id="new_single_machine_cpu_count">
 <option>4</option>
 </select><%= spacing 4 %>
 Memory size: <input type='text' size=6 id='new_single_machine_mem_size' /> MB<br/>
-Software (separate with comma):<br/>
+Software (package file name, separate with comma):<br/>
 <input type='txt' size=45 id='new_single_machine_soft_list_input' />
 </td>
 
@@ -52,6 +52,7 @@ function single_machine_image_selected(vdisk_fname) {
       "<%= soft.file_name %>": {
         "display_name": "<%= soft.display_name %>",
         "os_family": "<%= soft.os_family %>",
+        "file_name": "<%= soft.file_name %>",
         "desc": "<%=h soft.description %>",
       },
     <% end-%>
@@ -87,6 +88,7 @@ function single_machine_image_selected(vdisk_fname) {
     }
     var soft = soft_info[soft_fname];
     html += "<b>" + soft["display_name"] + "</b><br/>";
+    html += "File name (use it for packages list): <font color='blue'>" + soft["file_name"] + "</font><br/>";
     html += "Description: " + soft["desc"] + "<br/>";
     html += "<p/>";
   }
@@ -94,15 +96,6 @@ function single_machine_image_selected(vdisk_fname) {
   $("#new_single_machine_soft_list").html(html);
 }
 
-function create_single_machine() {
-  var machine_name = $("#new_single_machine_name").val();
-  var vdisk_fname = $("#new_single_machine_image").val();
-  var cpu_count = $("#new_single_machine_cpu_count").val();
-  var mem_size = $("#new_single_machine_mem_size").val();
-  var soft_list = $("#new_single_machine_soft_list_input").val();
-
-  // TODO ajax request
-}
 
 $(document).ready(function() {
   single_machine_image_selected($("#new_single_machine_image").val());
@@ -128,7 +121,7 @@ function on_change_cluster_size() {
     html += "<option>1</option><option>2</option><option>4</option></select>";
     html += "<%= spacing 4%>";
     html += "Memory size: <input type='text' id='cluster_mem_size-" + machine_id + "'> MB<br/>";
-    html += "Software (separate with comma): <input type='text' size=120 id='cluster_soft_list-" + machine_id + "'>";
+    html += "Software (package file name, separate with comma): <input type='text' size=120 id='cluster_soft_list-" + machine_id + "'>";
     html += "<%= spacing 4%>";
     html += "<button type='button' class='btn' onclick='cluster_setting_apply_down(" + machine_id + ", " + cluster_size + ")'><span><span>Apply down</span></span></button>";
     html += "</td></tr>";

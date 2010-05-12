@@ -61,7 +61,7 @@ html = ""
   end
   header_link_class = "header_link"
   header_link_class += "_active" if link == params[:action]
-  html += "<td class='#{header_link_class}' onclick='window.location=\"#{link}\"'><a class='#{header_link_class}' href='#{link}'>#{spacing(4) + title + spacing(4)}</a></td>"
+  html += "<td class='#{header_link_class}'><a class='#{header_link_class}' href='#{link}'>#{spacing(4) + title + spacing(4)}</a></td>"
 end
 
 html

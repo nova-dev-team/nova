@@ -204,7 +204,12 @@ module IpTools
     last_bits = []
     (0..31).each do |i|
       if submask_bits[i] == 0
-        last_bits << 1
+        if i == 0
+          # note that ip cannot be all '1', which is reserved for broadcasting
+          last_bits << 0
+        else
+          last_bits << 1
+        end
       else
         last_bits << first_ip_bits[i]
       end

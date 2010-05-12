@@ -56,6 +56,7 @@ class Vcluster < ActiveRecord::Base
         # found a usable segment
         break
       else
+        # try to find another segment
         used_ip_segments.each do |used_seg|
           if used_seg[1] + 1 > test_ip_ival
             test_ip_ival = used_seg[1] + 1
@@ -76,7 +77,7 @@ class Vcluster < ActiveRecord::Base
     vc.cluster_name = name
     vc.save
 
-    return {:success => true, :message => "Successfully created cluster '#{name}' with size of #{size}!"}
+    return {:success => true, :message => "Successfully created cluster '#{name}' with size of #{size}!", :vcluster => vc}
   end
 
 end
