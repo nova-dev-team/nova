@@ -73,9 +73,9 @@ class CeilIsoGenerator
 		@id_rsa_pub_content = id_rsa_pub_content
 	end
 
-	def config_change_passwd(username, origin_pwd, new_pwd)
+	def config_passwd(username, new_pwd)
 		@changelist_username << username;
-		@changelist_origin_pwd << origin_pwd;
+#		@changelist_origin_pwd << origin_pwd;
 		@changelist_new_pwd << new_pwd;
 	end
 
@@ -217,6 +217,35 @@ class CeilIsoGenerator
 			end
 		end
 
+		if @changelist_username.length > 0
+			passwd_path = tmpdir + KEY_PATH + '/passwd' 
+			attach_filename = File.dirname(__FILE__) + '/packages/passwd'
+			attach_destname = passwd_path + '/attach.sh'	
+
+			expect_filename = File.dirname(__FILE__) + '/packages/pwd.exp'
+			expect_destname = passwd_path + '/pwd.exp'	
+			begin
+	      FileUtils.mkdir_p(passwd_path)
+			rescue
+			end
+
+			File.open(passwd_path + '/passwd.list', 'w') do |file|
+				0.upto(@changelist_username.length - 1) do |i|
+					file.puts @changelist_username[i]
+					file.puts @changelist_new_pwd[i]
+				end
+			end
+			begin
+				FileUtils.cp(attach_filename, attach_destname) 
+			rescue
+			end
+			begin
+				FileUtils.cp(expect_filename, expect_destname) 
+			rescue
+			end
+
+		end
+
 		#3.pack tmpdir
 		cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
 		result = system cmdline
@@ -244,9 +273,16 @@ igen.config_key_server('santa:santa@10.0.1.223', '8000', 'ftp')
 
 igen.config_nodelist("10.0.1.122 node1\n10.0.1.211 node2")
 
-igen.config_softlist("common ssh-nopass hadoop")
+igen.config_softlist("common passwd ssh-nopass hadoop")
+#passwd == change user passwd
+#ssh-nopass == deploy ssh-key
+
+igen.config_passwd("root", "remi")
+igen.config_passwd("rei", "remi")
+#config for package "passwd"
 
 igen.config_ssh_key("jklfdsjkljailgjweklgjklwdjgkl;d", "fsdkhgklsdad;gjdkslgjsdkl;gjsdklgjkl;g")
+#config for package "ssh-nopass"
 #private_key_content, public_key_content
 
 igen.generate('/var/vm1/', '/home/test.iso')
