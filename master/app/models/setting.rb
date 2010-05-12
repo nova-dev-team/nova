@@ -87,5 +87,12 @@ LFTP_SCRIPT
     (Setting.find_by_key "vm_gateway").value
   end
 
+  # Get the subnet mask for the VMs.
+  #
+  # Since::   0.3
+  def Setting.vm_subnet_mask
+    (Setting.find_by_key "vm_subnet_mask").value
+  end
+
 end
 

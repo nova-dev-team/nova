@@ -45,5 +45,22 @@ class VclustersController < ApplicationController
 
   end
 
+  # Destroy a cluster.
+  #
+  # Since::     0.3
+  def destroy
+    unless valid_param? params[:name]
+      reply_failure "Please provide valid 'name' parameter!"
+      return
+    end
+    vc = Vcluster.find_by_cluster_name params[:name]
+    if vc
+      Vcluster.delete vc
+      reply_success "Destroyed vcluster with name '#{params[:name]}'."
+    else
+      reply_failure "Cannot find vcluster with name '#{params[:name]}'!"
+    end
+  end
+
 end
 
