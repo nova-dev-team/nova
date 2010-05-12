@@ -34,8 +34,8 @@ class VclustersController < ApplicationController
   #
   # Since::     0.3
   def create
-    unless valid_param? params[:name] and valid_param? params[:size] and params[:size].to_i.to_s == params[:size] and params[:size].to_i > 0
-      reply_failure "Please provide valid 'name' and 'size' parameter!"
+    unless valid_param? params[:name] and valid_param? params[:size] and params[:size].to_i.to_s == params[:size] and params[:size].to_i > 0 and valid_param? params[:machines]
+      reply_failure "Please provide valid 'name', 'size' and 'machines' parameter!"
       return
     end
     ret = Vcluster.alloc_cluster params[:name], params[:size].to_i, @current_user

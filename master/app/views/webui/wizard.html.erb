@@ -153,12 +153,6 @@ function cluster_setting_apply_down(machine_id, cluster_size) {
   }
 }
 
-function create_cluster() {
-  var cluster_size = parseInt($("#new_cluster_size").val());
-  var cluster_name = $("#new_cluster_name").val();
-  alert(cluster_size);
-  alert(cluster_name);
-}
 </script>
 
 <hr/>
@@ -169,7 +163,6 @@ Cluster size: <input type='text' size=4 id='new_cluster_size' />
 <button type='button' class='btn' onclick='on_change_cluster_size()'><span><span>OK</span></span></button>
 
 <div id='create_cluster_container' />
-
 
 </center>
 <% end-%>

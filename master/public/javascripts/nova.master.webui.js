@@ -787,6 +787,52 @@ function edit_vdisk_soft_list(vdisk_fname, row_id) {
 }
 
 //
+// "Wizard" page
+//
+
+function create_cluster() {
+  var cluster_size = parseInt($("#new_cluster_size").val());
+  var cluster_name = $("#new_cluster_name").val();
+
+  var vm_list = "";
+
+  for (var machine_id = 1; machine_id <= cluster_size; machine_id++) {
+    vm_list += "vdisk_fname=" + $("#cluster_machine_vdisk-" + machine_id).val() + "\n";
+    vm_list += "machine_name=" + $("#cluster_machine_name-" + machine_id).val() + "\n";
+    vm_list += "cpu_count=" + $("#cluster_cpu_count-" + machine_id).val() + "\n";
+    vm_list += "mem_size=" + $("#cluster_mem_size-" + machine_id).val() + "\n";
+    vm_list += "soft_list=" + $("#cluster_soft_list-" + machine_id).val() + "\n\n";
+  }
+
+  $.blockUI();
+  $.ajax({
+    url: "/vclusters/create.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      name: cluster_name,
+      size: cluster_size,
+      machines: vm_list
+    },
+    success: function(result) {
+      $.unblockUI();
+      if (result.success) {
+        window.location = "/webui/workspace.html?vcluster_name=" + cluster_name;
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $.unblockUI();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+
+}
+
+
+//
 // "Workspace" page
 //
 
@@ -837,6 +883,7 @@ function load_cluster_content(cluster_name) {
         } else {
           html += "<b>IP range:</b> " + result.first_ip + " ~ " + result.last_ip + "</br>";
         }
+        html += "<a href='#' onclick='destroy_cluster(\"" + result.name + "\")'><font color='red'>Destroy cluster!</font></a></br>";
         $("#cluster-content").html(html);
       } else {
         do_message("failure", "Error occurred", result.message);
@@ -844,6 +891,28 @@ function load_cluster_content(cluster_name) {
     },
     error: function() {
       $("#cluster-content").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function destroy_cluster(cluster_name) {
+  $.ajax({
+    url: "/vclusters/destroy.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      name: cluster_name
+    },
+    success: function(result) {
+      if (result.success) {
+        location.reload();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });

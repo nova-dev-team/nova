@@ -3,6 +3,9 @@
 <script type='text/javascript'>
 $(document).ready(function() {
   load_workspace_clusters_list();
+  <% if params[:vcluster_name] != nil and params[:vcluster_name] != "" %>
+  load_cluster_content("<%= params[:vcluster_name] %>");
+  <% end-%>
 });
 </script>
 
