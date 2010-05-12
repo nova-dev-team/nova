@@ -66,9 +66,26 @@ LFTP_SCRIPT
     @@RUN_ROOT = (Setting.find_by_key "run_root").value
   end
 
-  # get all settings that are intended for worker
+  # Get all settings that are intended for worker
+  #
+  # Since::   0.3
   def Setting.all_for_worker
     Setting.find_all_by_for_worker true
   end
 
+  # Get the first ip address for VMs.
+  #
+  # Since::   0.3
+  def Setting.vm_first_ip
+    (Setting.find_by_key "vm_first_ip").value
+  end
+
+  # Get the gateway for the VMs.
+  #
+  # Since::   0.3
+  def Setting.vm_gateway
+    (Setting.find_by_key "vm_gateway").value
+  end
+
 end
+

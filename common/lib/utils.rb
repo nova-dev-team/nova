@@ -149,15 +149,43 @@ module IpTools
   # Convert an ipV4 address to int value.
   #
   # Since::     0.3
-  def ipv4_to_i ip_str
+  def IpTools.ipv4_to_i ip_str
     splt = ip_str.split "."
     ((splt[0].to_i * 256 + splt[1].to_i) * 256 + splt[2].to_i) * 256 + splt[3].to_i
+  end
+
+  # Convert an ipV4 address to bits array.
+  # The loweset bit will be at the beginning of the bits array.
+  #
+  # Since::     0.3
+  def IpTools.ipv4_to_bits ip_str
+    bits_array = []
+    ival = IpTools.ipv4_to_i ip_str
+    1.upto(32) do
+      b = ival % 2
+      bits_array << b
+      ival = ival / 2
+    end
+    bits_array
+  end
+
+  # Convert an bits arary back to ip address.
+  #
+  # Since::   0.3
+  def IpTools.bits_to_ipv4 bits_array
+    ival = 0
+    w = 1
+    bits_array.each do |b|
+      ival += b * w
+      w *= 2
+    end
+    return IpTools.i_to_ipv4 ival
   end
 
   # Convert an integer to ipV4 address.
   #
   # Since::     0.3
-  def i_to_ipv4 i_val
+  def IpTools.i_to_ipv4 i_val
     ip_seg = []
     1.upto(4) do |n|
       ip_seg << (i_val % 256)
@@ -165,6 +193,23 @@ module IpTools
     end
     ip_seg = ip_seg.reverse
     return ip_seg.join "."
+  end
+
+  # Get the last ip address in the subnet.
+  #
+  # Since::   0.3
+  def IpTools.last_ip_in_subnet first_ip, submask
+    first_ip_bits = IpTools.ipv4_to_bits first_ip
+    submask_bits = IpTools.ipv4_to_bits submask
+    last_bits = []
+    (0..31).each do |i|
+      if submask_bits[i] == 0
+        last_bits << 1
+      else
+        last_bits << first_ip_bits[i]
+      end
+    end
+    IpTools.bits_to_ipv4 last_bits
   end
 
 end
