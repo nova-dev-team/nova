@@ -15,7 +15,7 @@ class Vcluster < ActiveRecord::Base
   # Returns {success, message} pair.
   #
   # Since::   0.3
-  def Vcluster.alloc_cluster name, size
+  def Vcluster.alloc_cluster name, size, owner
     if Vcluster.find_by_cluster_name name
       return {:success => false, :message => "There is already a cluster named '#{name}'!"}
     end
@@ -70,6 +70,7 @@ class Vcluster < ActiveRecord::Base
     end
 
     vc = Vcluster.new
+    vc.user = owner
     vc.first_ip = IpTools.i_to_ipv4 test_ip_ival
     vc.cluster_size = size
     vc.cluster_name = name

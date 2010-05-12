@@ -786,6 +786,68 @@ function edit_vdisk_soft_list(vdisk_fname, row_id) {
   });
 }
 
+//
+// "Workspace" page
+//
+
+function load_workspace_clusters_list() {
+  $("#clusters-list").block();
+  $.ajax({
+    url: "/vclusters/list.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    success: function(result) {
+      $("#clusters-list").unblock();
+      if (result.success) {
+        html = "";
+        for (var i = 0; i < result.data.length; i++) {
+          html += "<a href='#' onclick='load_cluster_content(\"" + result.data[i]["name"] + "\")'>" + result.data[i]["name"] + "</a><br/>"
+        }
+        $("#clusters-list").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#clusters-list").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+
+function load_cluster_content(cluster_name) {
+  $("#cluster-content").block();
+  $.ajax({
+    url: "/vclusters/show.json",
+    type: "POST",
+    async: false,
+    dataType: "json",
+    data: {
+      name: cluster_name
+    },
+    success: function(result) {
+      $("#cluster-content").unblock();
+      if (result.success) {
+        html = "<h2>Cluster: " + result.name + "</h2>";
+        html += "<b>Cluster size:</b>" + result.size + "</br>";
+        if (result.size == 1) {
+          html += "<b>IP range:</b> " + result.first_ip + "</br>";
+        } else {
+          html += "<b>IP range:</b> " + result.first_ip + " ~ " + result.last_ip + "</br>";
+        }
+        $("#cluster-content").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      $("#cluster-content").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
 
 //
 // "Account info" page
