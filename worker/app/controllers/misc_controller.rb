@@ -103,9 +103,9 @@ class MiscController < ApplicationController
           has_revoked_some_files = true
         end
         if has_revoked_some_files
-          reply_success "Package with name='#{params[:image_name]}' is revoked!"
+          reply_success "Package with name='#{params[:package_name]}' is revoked!"
         else
-          reply_success "Package with name='#{params[:image_name]}' not found, nothing revoked!"
+          reply_success "Package with name='#{params[:package_name]}' not found, nothing revoked!"
         end
       end
     end

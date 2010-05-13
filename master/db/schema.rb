@@ -87,7 +87,7 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
 
   create_table "vmachines", :force => true do |t|
     t.string   "name"
-    t.string   "uuid",        :limit => 40,                        :null => false
+    t.string   "uuid",        :limit => 40,                         :null => false
     t.integer  "cpu_count",                 :default => 1
     t.string   "soft_list",                 :default => ""
     t.integer  "memory_size",               :default => 256
@@ -98,7 +98,7 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
     t.string   "ip",          :limit => 20
     t.integer  "vcluster_id"
     t.integer  "pmachine_id"
-    t.string   "status",                    :default => "pending"
+    t.string   "status",                    :default => "shut-off"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
