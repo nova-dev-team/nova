@@ -290,7 +290,6 @@ function load_worker_machines() {
 function retire_worker_machine(ip) {
   $("#worker_machines_container").block();
   $.ajax({
-    async: false,
     url: "/pmachines/retire",
     type: "POST",
     dataType: "json",
@@ -315,7 +314,6 @@ function retire_worker_machine(ip) {
 function delete_worker_machine(ip) {
   $("#worker_machines_container").block();
   $.ajax({
-    async: false,
     url: "/pmachines/delete",
     type: "POST",
     dataType: "json",
@@ -340,7 +338,6 @@ function delete_worker_machine(ip) {
 function reconnect_worker_machine(ip) {
   $("#worker_machines_container").block();
   $.ajax({
-    async: false,
     url: "/pmachines/reconnect",
     type: "POST",
     dataType: "json",
@@ -609,7 +606,6 @@ function register_new_software() {
   $.ajax({
     url: "/softwares/register",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       display_name: disp_name,
@@ -717,7 +713,6 @@ function register_new_vdisk() {
   $.ajax({
     url: "/vdisks/register.json",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       file_name: file_name,
@@ -744,7 +739,6 @@ function remove_vdisk(vdisk_fname) {
   $.ajax({
     url: "/vdisks/remove",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       file_name: vdisk_fname,
@@ -767,7 +761,6 @@ function edit_vdisk_soft_list(vdisk_fname, row_id) {
   $.ajax({
     url: "/vdisks/edit_soft_list",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       file_name: vdisk_fname,
@@ -808,7 +801,6 @@ function create_cluster() {
   $.ajax({
     url: "/vclusters/create.json",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       name: cluster_name,
@@ -849,7 +841,6 @@ function create_single_machine() {
   $.ajax({
     url: "/vclusters/create.json",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       name: machine_name,
@@ -908,8 +899,8 @@ function load_cluster_content(cluster_name) {
   $.ajax({
     url: "/vclusters/show.json",
     type: "POST",
-    async: false,
     dataType: "json",
+    async: false,
     data: {
       name: cluster_name
     },
@@ -955,15 +946,16 @@ function load_cluster_content(cluster_name) {
 }
 
 function destroy_cluster(cluster_name) {
+  $("#cluster-content").block();
   $.ajax({
     url: "/vclusters/destroy.json",
     type: "POST",
-    async: false,
     dataType: "json",
     data: {
       name: cluster_name
     },
     success: function(result) {
+      $("#cluster-content").unblock();
       if (result.success) {
         window.location = "/webui/workspace.html";
       } else {
@@ -971,6 +963,7 @@ function destroy_cluster(cluster_name) {
       }
     },
     error: function() {
+      $("#cluster-content").unblock();
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });

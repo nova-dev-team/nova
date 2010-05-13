@@ -120,7 +120,7 @@ function on_change_cluster_size() {
     html += "CPU count: <select id='cluster_cpu_count-" + machine_id + "'>";
     html += "<option>1</option><option>2</option><option>4</option></select>";
     html += "<%= spacing 4%>";
-    html += "Memory size: <input type='text' id='cluster_mem_size-" + machine_id + "'> MB<br/>";
+    html += "Memory size: <input type='text' id='cluster_mem_size-" + machine_id + "' value='256' /> MB<br/>";
     html += "Software (package file name, separate with comma): <input type='text' size=120 id='cluster_soft_list-" + machine_id + "'>";
     html += "<%= spacing 4%>";
     html += "<button type='button' class='btn' onclick='cluster_setting_apply_down(" + machine_id + ", " + cluster_size + ")'><span><span>Apply down</span></span></button>";

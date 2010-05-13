@@ -29,13 +29,17 @@ class CreateVmachines < ActiveRecord::Migration
 
       # The status of the vmachine.
       # Could be:
-      #   pending: the status is not known
-      #   not running: the vm is not running
-      #   suspended: the vm is suspended
-      #   running: the vm is up and running
+      #   * shut-off: the machine is not running
+      #   * start-pending: the machine is waiting to be started
+      #   * start-preparing: the machine is preparing for resources
+      #   * suspended: the machine is suspended
+      #   * running: the machine is up and running
+      #   * shutdown-pending: the machine is waiting to be shut off
+      #   * connect-failure: failed to connect to the hosting pmachine
+      #   * boot-failure: failed to start the vmachine
       #
       # Since::     0.3
-      t.column :status,            :string, :default => "pending"
+      t.column :status,            :string, :default => "shut-off"
 
       t.timestamps
     end
