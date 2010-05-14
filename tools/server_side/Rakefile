@@ -438,10 +438,14 @@ end
 }
 
 #{
-if BUILD_MODES.first[0] != ""
-"default: " + BUILD_MODES.first[0]
+default_build_mode = BUILD_MODES.first[0]
+if defined? DEFAULT_BUILD_MODE
+  default_build_mode = DEFAULT_BUILD_MODE
+end
+if default_build_mode != ""
+"default: " + default_build_mode
 else
-"default: #{my_join '-', ['bin', BUILD_MODES.first[0]]} #{my_join '-', ['obj', BUILD_MODES.first[0]]} #{DEFAULT_BUILD_MODULES.collect {|mod| (my_join '-', [mod, BUILD_MODES.first[0]]) + ' '}}"
+"default: #{my_join '-', ['bin', default_build_mode]} #{my_join '-', ['obj', default_build_mode]} #{DEFAULT_BUILD_MODULES.collect {|mod| (my_join '-', [mod, default_build_mode]) + ' '}}"
 end
 }
 
@@ -499,17 +503,25 @@ end
 
 #{
 # default test targets
-if defined? TEST_MODULES and BUILD_MODES.first[0] != ""
+default_build_mode = BUILD_MODES.first[0]
+if defined? DEFAULT_BUILD_MODE
+  default_build_mode = DEFAULT_BUILD_MODE
+end
+if defined? TEST_MODULES and default_build_mode != ""
   TEST_MODULES.collect do |mod|
-    "run#{mod}: #{my_join "-", ["run#{mod}", BUILD_MODES.first[0]]}\n\n"
+    "run#{mod}: #{my_join "-", ["run#{mod}", default_build_mode]}\n\n"
   end
 end
 }
 
 #{
-if BUILD_MODES.first[0] != ""
+default_build_mode = BUILD_MODES.first[0]
+if defined? DEFAULT_BUILD_MODE
+  default_build_mode = DEFAULT_BUILD_MODE
+end
+if default_build_mode != ""
   BUILD_MODULES.collect do |mod|
-    "#{mod}: #{my_join "-", [mod, BUILD_MODES.first[0]]}\n\n"
+    "#{mod}: #{my_join "-", [mod, default_build_mode]}\n\n"
   end
 end
 }
@@ -539,10 +551,14 @@ end
 }
 
 #{
-if BUILD_MODES.first[0] != ""
-"default: " + BUILD_MODES.first[0]
+default_build_mode = BUILD_MODES.first[0]
+if defined? DEFAULT_BUILD_MODE
+  default_build_mode = DEFAULT_BUILD_MDOE
+end
+if default_build_mode != ""
+"default: " + default_build_mode
 else
-"default: #{my_join '-', ['bin', BUILD_MODES.first[0]]} #{my_join '-', ['obj', BUILD_MODES.first[0]]} #{DEFAULT_BUILD_MODULES.collect {|mod| (my_join '-', [mod, BUILD_MODES.first[0]]) + ' '}}"
+"default: #{my_join '-', ['bin', default_build_mode]} #{my_join '-', ['obj', default_build_mode]} #{DEFAULT_BUILD_MODULES.collect {|mod| (my_join '-', [mod, default_build_mode]) + ' '}}"
 end
 }
 
@@ -602,9 +618,26 @@ end
 }
 
 #{
-if BUILD_MODES.first[0] != ""
+# default test targets
+default_build_mode = BUILD_MODES.first[0]
+if defined? DEFAULT_BUILD_MODE
+  default_build_mode = DEFAULT_BUILD_MDOE
+end
+if defined? TEST_MODULES and default_build_mode != ""
+  TEST_MODULES.collect do |mod|
+    "run#{mod}: #{my_join "-", ["run#{mod}", default_build_mode]}\n\n"
+  end
+end
+}
+
+#{
+default_build_mode = BUILD_MODES.first[0]
+if defined? DEFAULT_BUILD_MODE
+  default_build_mode = DEFAULT_BUILD_MDOE
+end
+if default_build_mode != ""
   BUILD_MODULES.collect do |mod|
-    "#{mod}: #{my_join "-", [mod, BUILD_MODES.first[0]]}\n\n"
+    "#{mod}: #{my_join "-", [mod, default_build_mode]}\n\n"
   end
 end
 }
