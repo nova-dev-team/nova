@@ -114,6 +114,7 @@ class VclustersController < ApplicationController
       vc.vmachines.each do |vm|
         machines_info << {
           :name => vm.hostname,
+          :uuid => vm.uuid,
           :cpu_count => vm.cpu_count,
           :mem_size => vm.memory_size,
           :disk_image => (Vdisk.find_by_file_name vm.hda).display_name,
