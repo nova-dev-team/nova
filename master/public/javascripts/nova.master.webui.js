@@ -929,7 +929,11 @@ function load_cluster_content(cluster_name) {
           html += "Memory size: <b>" + m_info["mem_size"] + " MB</b>" + tmp_spacing;
           html += "Machine image: <b>" + m_info["disk_image"] + "</b><br/>";
           html += "Software list: <b>" + m_info["soft_list"] + "</b><br/>";
-          html += "Status: <b>" + m_info["status"] + "</b>";
+          html += "Status: <b>" + m_info["status"] + "</b>" + tmp_spacing + "Actions: ";
+          // TODO
+          if (m_info["status"] == "shut-off") {
+            html += "<button type='button' class='btn'><span><span>Start</span></span></button>";
+          }
           html += "</td></tr>";
         }
         html += "</table>";

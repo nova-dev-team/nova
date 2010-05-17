@@ -59,6 +59,8 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
     t.string   "first_ip"
     t.integer  "cluster_size"
     t.integer  "user_id"
+    t.string   "ssh_public_key"
+    t.string   "ssh_private_key"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
