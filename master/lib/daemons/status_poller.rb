@@ -115,6 +115,8 @@ while($running) do
         if vm_found == false and vm.status != "start-pending" and vm.status != "boot-failure" and vm.status != "connect-failure"
           write_log "VM '#{vm.name}' is not running any more!"
           vm.status = "shut-off"
+          vm.pmachine.vmachines.delete vm
+          vm.pmachine = nil
           vm.save
         end
       end
@@ -140,6 +142,8 @@ while($running) do
             write_log "VM '#{real_vm["name"]}' is to be shut off"
             RestClient.post "#{pm.root_url}/vmachines/destroy.json", :uuid => vm.uuid
             vm.status = "shut-off"
+            vm.pmachine.vmachines.delete vm
+            vm.pmachine = nil
             vm.save
           else
             if real_vm["vnc_port"] != nil
@@ -152,8 +156,11 @@ while($running) do
               vm.status = "running"
             when "suspended"
               vm.status = "suspended"
-            when "failure"
-              vm.status = "boot-failure"
+            when "not running"
+              if vm.status != "shut-off"
+                # check if cleared error message
+                vm.status = "boot-failure"
+              end
             else
               # ignore
             end
@@ -190,6 +197,8 @@ while($running) do
     wp = vm.pmachine.worker_proxy
     wp.destroy_vm vm.uuid
     vm.status = "shut-off"
+    vm.pmachine.vmachines.delete vm
+    vm.pmachine = nil
     vm.save
   end
   
