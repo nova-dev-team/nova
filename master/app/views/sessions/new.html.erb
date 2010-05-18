@@ -401,7 +401,7 @@ window.onload = function() {
   decorate_fields([$("#signup_user_id")], "3~20 characters", "wait_for_input");
   decorate_fields([$("#signup_password"), $("#signup_password_confirm")], "", "wait_for_input");
   decorate_fields([$("#signup_email")], "6~40 characters", "wait_for_input");
-  decorate_fields([$("#signup_fullname")], "<= 40 characters", "wait_for_input");
+  decorate_fields([$("#signup_fullname")], "< 40 characters", "wait_for_input");
 
   // apply iphone style each time, so that the iphone checkbox has correct geometry
   $("#signup_window_link").click(function(){
@@ -491,9 +491,9 @@ window.onload = function() {
       <tr>
         <td colspan=3>
           <font style='font-size:10px'>
-          Fields with * is required<br />
+          Field with * is required<br />
           Allowed user id characters include: a-z, 0-9, '.' and '_' (must start with a-z)<br />
-          Password should have length 6~40 characters
+          Password should have length of 6~40 characters
           </font>
         </td>
       </tr>

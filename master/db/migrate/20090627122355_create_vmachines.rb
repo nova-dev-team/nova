@@ -41,6 +41,11 @@ class CreateVmachines < ActiveRecord::Migration
       # Since::     0.3
       t.column :status,            :string, :default => "shut-off"
 
+      # The VNC port for the VM.
+      #
+      # Since::     0.3
+      t.column :vnc_port,          :integer
+
       t.timestamps
     end
   end

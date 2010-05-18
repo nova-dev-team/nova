@@ -20,6 +20,16 @@ class CreateVclusters < ActiveRecord::Migration
       #
       # Since::     0.3
       t.column :user_id,                          :integer
+
+      # The public key for ssh.
+      #
+      # Since::     0.3
+      t.column :ssh_public_key,                   :string
+
+      # The private key for ssh.
+      #
+      # Since::     0.3
+      t.column :ssh_private_key,                  :string
       
       t.timestamps
     end

@@ -924,12 +924,28 @@ function load_cluster_content(cluster_name) {
           m_info = result.machines[j];
           html += "<tr class='row_type_" + (j % 2) + "'><td>";
           html += "<td><h2>" + (j + 1) + "</h2></td><td>";
-          html += "Machine name: <b>" + m_info["name"] + "</b>" + tmp_spacing;
-          html += "CPU Count: <b>" + m_info["cpu_count"] + "</b>" + tmp_spacing;
-          html += "Memory size: <b>" + m_info["mem_size"] + " MB</b>" + tmp_spacing;
+          html += "Machine name: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"name\", \"" + m_info["name"] + "\")'>" + m_info["name"] + "</a></b>" + tmp_spacing;
+          html += "CPU Count: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"cpu_count\", \"" + m_info["cpu_count"] + "\")'>" + m_info["cpu_count"] + "</a></b>" + tmp_spacing;
+          html += "Memory size: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"mem_size\", \"" + m_info["mem_size"] + "\")'>" + m_info["mem_size"] + " MB</a></b>" + tmp_spacing;
           html += "Machine image: <b>" + m_info["disk_image"] + "</b><br/>";
+          html += "UUID: <b>" + m_info["uuid"] + "</b></br>";
           html += "Software list: <b>" + m_info["soft_list"] + "</b><br/>";
-          html += "Status: <b>" + m_info["status"] + "</b>";
+          html += "Status: <b>" + m_info["status"] + "</b>" + tmp_spacing + "Actions: ";
+
+          // TODO add actions for different status
+          if (m_info["status"] == "shut-off") {
+            html += "<button type='button' class='btn' onclick='start_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Start</span></span></button>";
+          } else if (m_info["status"] == "start-pending") {
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Cancel start</span></span></button>";
+          } else if (m_info["status"] == "start-preparing") {
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Cancel start</span></span></button>";
+          } else if (m_info["status"] == "running") {
+            // TODO
+          } else if (m_info["status"] == "suspended") {
+            // TODO
+          } else if (m_info["status"] == "boot-failure") {
+            // TODO
+          }
           html += "</td></tr>";
         }
         html += "</table>";
@@ -942,6 +958,45 @@ function load_cluster_content(cluster_name) {
       $("#cluster-content").unblock();
       do_message("failure", "Request failed", "Please check your network connection!");
     }
+  });
+}
+
+function vm_ajax(cluster_name, url, data_map) {
+  $.ajax({
+    url: url,
+    type: "POST",
+    dataType: "json",
+    data: data_map,
+    success: function(result) {
+      if (result.success) {
+        load_cluster_content(cluster_name);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function shut_off_vm(cluster_name, uuid) {
+  vm_ajax(cluster_name, "/vmachines/shut_off.json", {uuid: uuid});
+}
+
+function start_vm(cluster_name, uuid) {
+  vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid});
+}
+
+function edit_vm_setting(cluster_name, uuid, item, old_value) {
+  var new_value = prompt("Changing property of VM with UUID='" + uuid + "'\nPlease provide new value for '" + item + "'", old_value);
+  if (new_value == null && new_value != old_value) {
+    return;
+  }
+  vm_ajax(cluster_name, "/vmachines/edit.json", {
+    uuid: uuid,
+    item: item,
+    value: new_value
   });
 }
 

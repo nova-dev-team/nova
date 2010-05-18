@@ -11,6 +11,7 @@ require 'json'
 require 'uuidtools'
 require 'fileutils'
 require 'yaml'
+require "#{File.dirname __FILE__}/../worker_proxy"
 
 conf = YAML::load File.read "#{File.dirname __FILE__}/../../../common/config/conf.yml"
 if conf["master_use_swiftiply"]
@@ -111,9 +112,10 @@ while($running) do
             break
           end
         end
-        unless vm_found
+        if vm_found == false and vm.status != "start-pending" and vm.status != "boot-failure" and vm.status != "connect-failure"
           write_log "VM '#{vm.name}' is not running any more!"
-          Vmachine.delete vm
+          vm.status = "shut-off"
+          vm.save
         end
       end
 
@@ -133,32 +135,59 @@ while($running) do
 
         if vm_already_in_db
           write_log "VM '#{real_vm["name"]}' already in DB"
-          if vm.status == "garbaged"
-            # destroy VM if it is used too many times
-            write_log "VM '#{real_vm["name"]}' is used too many times, garbage collecting..."
+          if vm.status == "shutdown-pending"
+            # destroy VM if it is pending shut-off
+            write_log "VM '#{real_vm["name"]}' is to be shut off"
             RestClient.post "#{pm.root_url}/vmachines/destroy.json", :uuid => vm.uuid
+            vm.status = "shut-off"
+            vm.save
           else
-            vm.status = real_vm["status"]
             if real_vm["vnc_port"] != nil
               vm.vnc_port = real_vm["vnc_port"].to_i
+            end
+            case real_vm["status"].downcase
+            when "preparing"
+              vm.status = "start-preparing"
+            when "running"
+              vm.status = "running"
+            when "suspended"
+              vm.status = "suspended"
+            when "failure"
+              vm.status = "boot-failure"
+            else
+              # ignore
             end
             vm.save
           end
         else
-          write_log "VM '#{real_vm["name"]}' not in DB"
-          vm = Vmachine.new
-          vm.name = real_vm["name"]
-          vm.uuid = real_vm["uuid"]
-          vm.status = real_vm["status"]
-          if real_vm["vnc_port"] != nil
-            vm.vnc_port = real_vm["vnc_port"].to_i
-          end
-          pm.vmachines << vm
-          vm.save
+          write_log "VM '#{real_vm["name"]}' not in DB, ignored!"
         end
       end
     rescue
     end
+  end
+
+  # OK, now works on all the VM. It is prefered to group VM on same host, so that the cost of worker_proxy
+  # will be smaller.
+  Vmachine.find(:all, :conditions =>'status = "start-pending"').each do |vm|
+    write_log "trying to start vm #{vm.name}"
+    pm = Pmachine.start_vm vm
+    if pm == nil
+      # not enough machines
+      vm.status = "boot-failure"
+      vm.save
+      write_log "failed to boot #{vm.name}, mark status as 'boot-failure'"
+      # TODO set up vm info here
+    else
+      # TODO check the vm, if it is in "running" or "preparing" or 'failure' staus
+      vm.status = "start-preparing"
+      vm.save
+      write_log "triggered #{vm.name}, mark status as 'start-preparing'"
+    end
+  end
+
+  Vmachine.find(:all, :conditions =>'status = "shutdown-pending"').each do |vm|
+    # TODO
   end
   
   sleep 10
