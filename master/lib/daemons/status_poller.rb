@@ -179,17 +179,20 @@ while($running) do
       write_log "failed to boot #{vm.name}, mark status as 'boot-failure'"
       # TODO set up vm info here
     else
-      # TODO check the vm, if it is in "running" or "preparing" or 'failure' staus
       vm.status = "start-preparing"
       vm.save
       write_log "triggered #{vm.name}, mark status as 'start-preparing'"
     end
   end
 
+  # close VMs.
   Vmachine.find(:all, :conditions =>'status = "shutdown-pending"').each do |vm|
-    # TODO
+    wp = vm.pmachine.worker_proxy
+    wp.destroy_vm vm.uuid
+    vm.status = "shut-off"
+    vm.save
   end
   
-  sleep 10
+  sleep 1
 end
 

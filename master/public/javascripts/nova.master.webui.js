@@ -945,6 +945,7 @@ function load_cluster_content(cluster_name) {
             // TODO
           } else if (m_info["status"] == "boot-failure") {
             // TODO
+            html += "<button type='button' class='btn' onclick='clear_error_of_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Clear error</span></span></button>";
           }
           html += "</td></tr>";
         }
@@ -978,6 +979,10 @@ function vm_ajax(cluster_name, url, data_map) {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
+}
+
+function clear_error_of_vm(cluster_name, uuid) {
+  vm_ajax(cluster_name, "/vmachines/reset_error.json", {uuid: uuid});
 }
 
 function shut_off_vm(cluster_name, uuid) {

@@ -30,7 +30,17 @@ class CreateVclusters < ActiveRecord::Migration
       #
       # Since::     0.3
       t.column :ssh_private_key,                  :string
-      
+
+      # The username for the OS.
+      #
+      # Since::     0.3
+      t.column :os_username,                      :string
+
+      # The password for the OS.
+      #
+      # Since::     0.3
+      t.column :os_passwd,                        :string
+ 
       t.timestamps
     end
   end

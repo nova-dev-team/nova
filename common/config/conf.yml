@@ -7,7 +7,7 @@ master_port:                    3000
 # should master node use swiftiply? it will enhance master performace.
 # note that, if this is set to 'true', then master/vm_pool module will be running in 'production' mode.
 # if this is set to 'false', then master/vm_pool module will be running in 'development' mode.
-master_use_swiftiply:           true
+master_use_swiftiply:           false
 
 # the first port for swiftiply, necessary if 'master_use_swiftiply' is 'true'
 master_swiftiply_first_port:    10000

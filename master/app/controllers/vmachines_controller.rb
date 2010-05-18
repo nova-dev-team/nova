@@ -72,6 +72,22 @@ class VmachinesController < ApplicationController
     end
   end
 
+  # remove the error messages for the VM.
+  #
+  # Since::   0.3
+  def reset_error
+    vm = load_vm
+    return if vm == nil
+    case vm.status
+    when "boot-failure", "connect-failure"
+      vm.status = "shut-off"
+      vm.save
+      reply_success "The error status of VM with UUID='#{params[:uuid]}' has been cleaned."
+    else
+      reply_failure "Could only do this on VMs in failure status!"
+    end
+  end
+
 private
 
   # Check if current user has enough privilege to manipulate the VM.

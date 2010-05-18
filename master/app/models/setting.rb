@@ -94,5 +94,10 @@ LFTP_SCRIPT
     (Setting.find_by_key "vm_subnet_mask").value
   end
 
+
+  def Setting.vm_dns_server
+    (Setting.find_by_key "vm_dns_server").value
+  end
+
 end
 

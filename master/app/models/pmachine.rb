@@ -22,6 +22,15 @@ class Pmachine < ActiveRecord::Base
     return "http://#{self.ip}:#{conf["worker_port"]}"
   end
 
+  # Create a worker proxy for the physical machine.
+  #
+  # Since::   0.3
+  def worker_proxy
+    conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+    wp = WorkerProxy.new "#{self.ip}:#{conf["worker_port"]}"
+    return wp
+  end
+
   # Start a VM. A very simple schedule process will be taken.
   # The hosting pmachine will be returned.
   # On sched error, nil will be returned.
@@ -43,10 +52,33 @@ class Pmachine < ActiveRecord::Base
       conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
       wp = WorkerProxy.new "#{sched_pm.ip}:#{conf["worker_port"]}"
       logger.info "[pm.info] worker proxy created"
-      # TODO start vm
       sched_pm.vmachines << vm
       sched_pm.save
       vm.save
+      logger.info "[pm.info] starting the VM"
+      nodelist = (vm.vcluster.vmachines.collect {|vm| "#{vm.hostname} #{vm.ip}"}).join ","
+      logger.info "[pm.info] node list is: #{nodelist}"
+
+      # start vm
+      ret = wp.start_vm :uuid => vm.uuid,
+        :name => vm.name,
+        :cpu_count => vm.cpu_count,
+        :memory_size => vm.memory_size,
+        :vdisk_fname => vm.hda,
+        :packages => vm.soft_list,
+        :cluster_name => vm.vcluster.cluster_name,
+        :nodelist => nodelist,
+        :ip => vm.ip,
+        :submask => Setting.vm_subnet_mask,
+        :gateway => Setting.vm_gateway,
+        :dns => Setting.vm_dns_server
+      
+      if ret == nil
+        logger.error "[pm.error] failed to start vm"
+      else
+        logger.info "[pm.info] started vm! raw reply is: #{ret}"
+      end
+
       logger.info "[pm.info] safe round"
     end
     return sched_pm
