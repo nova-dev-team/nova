@@ -38,7 +38,9 @@ class Pmachine < ActiveRecord::Base
   # Since::   0.3
   def Pmachine.start_vm vm
     logger.info "[pm.sched] starting sched"
-    sorted_pm = Pmachine.all.sort {|pm1, pm2| pm1.vmachines.length <=> pm2.vmachines.length}
+    all_not_retired = Pmachine.all.select {|pm| pm.status == "working"}
+    logger.info "[pm.sched] machines not retired: count=#{all_not_retired.size}"
+    sorted_pm = all_not_retired.sort {|pm1, pm2| pm1.vmachines.length <=> pm2.vmachines.length}
     logger.info "[pm.sched] sorting done"
     sched_pm = nil
     sorted_pm.each do |pm|
