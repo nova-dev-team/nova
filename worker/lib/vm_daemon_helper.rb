@@ -536,6 +536,7 @@ def do_cleanup storage_server, vm_dir
 
     parent_dir = File.join vm_dir, ".."
     Dir.chdir parent_dir
+    FileUtils.rm_rf "../vm_archive/#{name}.#{uuid}"
     FileUtils.mv vm_dir, "../vm_archive/#{name}.#{uuid}"
   else
     # delete everything, since we don't have any info to archive the VM

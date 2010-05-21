@@ -14,6 +14,8 @@ CEIL_ISO_FILENAME_NODELIST = 'node.list'
 CEIL_ISO_FILENAME_SOFTLIST = 'soft.list'
 
 CEIL_ISO_CONFIG_PATH = '/config'
+CEIL_ISO_PACKAGE_PATH = '/packages'
+CEIL_ISO_KEY_PATH = '/keys'
 
 #require 'dir'
 	
@@ -21,6 +23,8 @@ PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -f -l -o '
 PATH_GENISO = '/usr/bin/genisoimage'
 
 CONFIG_PATH = CEIL_ISO_CONFIG_PATH
+PACKAGE_PATH = CEIL_ISO_PACKAGE_PATH
+KEY_PATH = CEIL_ISO_KEY_PATH
 
 FILENAME_SERVERS = CEIL_ISO_FILENAME_SERVERS
 FILENAME_NETWORK = CEIL_ISO_FILENAME_NETWORK
@@ -52,10 +56,27 @@ class CeilIsoGenerator
 		@softlist = nil
 		@hostname = 'nova'
 		@clustername = 'nova-cluster'
+		@id_rsa_content = nil
+		@id_rsa_pub_content = nil
+
+		@changelist_username = []
+		@changelist_origin_pwd = []
+		@changelist_new_pwd = []
 
 		#softlist string: appnames seperated by space
 		#example
 		# softlist = "hg hj hx hz"
+	end
+
+	def config_ssh_key(id_rsa_content, id_rsa_pub_content)
+		@id_rsa_content = id_rsa_content
+		@id_rsa_pub_content = id_rsa_pub_content
+	end
+
+	def config_passwd(username, new_pwd)
+		@changelist_username << username;
+#		@changelist_origin_pwd << origin_pwd;
+		@changelist_new_pwd << new_pwd;
 	end
 
 	def config_essential(ceil_base_path) 
@@ -130,6 +151,8 @@ class CeilIsoGenerator
 		# create config files
 		begin
       FileUtils.mkdir_p(tmpdir + CONFIG_PATH)
+      #FileUtils.mkdir_p(tmpdir + PACKAGE_PATH)
+      FileUtils.mkdir_p(tmpdir + KEY_PATH)
 		rescue
     end
     #DirTool.mkdir()
@@ -173,6 +196,56 @@ class CeilIsoGenerator
 			file.puts @clustername
 		end
 
+		if @id_rsa_content
+			sshkey_path = tmpdir + KEY_PATH + '/ssh-nopass' 
+			begin
+	      FileUtils.mkdir_p(sshkey_path)
+			rescue
+			end
+			File.open(sshkey_path + '/id_rsa', 'w') do |file|
+				file.puts @id_rsa_content
+			end
+			File.open(sshkey_path + '/id_rsa.pub', 'w') do |file|
+				file.puts @id_rsa_pub_content
+			end
+
+			attach_filename = File.dirname(__FILE__) + '/packages/ssh-nopass'
+			attach_destname = sshkey_path + '/attach.sh'	
+			begin
+				FileUtils.cp(attach_filename, attach_destname) 
+			rescue
+			end
+		end
+
+		if @changelist_username.length > 0
+			passwd_path = tmpdir + KEY_PATH + '/passwd' 
+			attach_filename = File.dirname(__FILE__) + '/packages/passwd'
+			attach_destname = passwd_path + '/attach.sh'	
+
+			expect_filename = File.dirname(__FILE__) + '/packages/pwd.exp'
+			expect_destname = passwd_path + '/pwd.exp'	
+			begin
+	      FileUtils.mkdir_p(passwd_path)
+			rescue
+			end
+
+			File.open(passwd_path + '/passwd.list', 'w') do |file|
+				0.upto(@changelist_username.length - 1) do |i|
+					file.puts @changelist_username[i]
+					file.puts @changelist_new_pwd[i]
+				end
+			end
+			begin
+				FileUtils.cp(attach_filename, attach_destname) 
+			rescue
+			end
+			begin
+				FileUtils.cp(expect_filename, expect_destname) 
+			rescue
+			end
+
+		end
+
 		#3.pack tmpdir
 		cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
 		result = system cmdline
@@ -187,14 +260,33 @@ end
 
 =begin
 igen = CeilIsoGenerator.new
-igen.config_essential('/nova/system/common/lib/ceil')
+
+igen.config_essential('/home/rei/nova/common/lib/ceil')
 igen.config_network('10.0.1.122', '255.255.255.0', '10.0.1.254', '166.111.8.28')
+# vm_addr  vm_netmask vm_gateway vm_nameserver
 igen.config_cluster("node1", "nova-cluster-name")
+# vm_nodename  vm_clustername
+
 igen.config_package_server('santa:santa@10.0.1.223', '8000', 'ftp')
+
 igen.config_key_server('santa:santa@10.0.1.223', '8000', 'ftp')
+
 igen.config_nodelist("10.0.1.122 node1\n10.0.1.211 node2")
-igen.config_softlist("common ssh-nopass hadoop")
-igen.generate('/var/vm1/packages', '/home/test.iso')
+
+igen.config_softlist("common passwd ssh-nopass hadoop")
+#passwd == change user passwd
+#ssh-nopass == deploy ssh-key
+
+igen.config_passwd("root", "remi")
+igen.config_passwd("rei", "remi")
+#config for package "passwd"
+
+igen.config_ssh_key("jklfdsjkljailgjweklgjklwdjgkl;d", "fsdkhgklsdad;gjdkslgjsdkl;gjsdklgjkl;g")
+#config for package "ssh-nopass"
+#private_key_content, public_key_content
+
+igen.generate('/var/vm1/', '/home/test.iso')
+
 puts "fin"
 =end
 

@@ -5,7 +5,7 @@ require 'pp'
 require 'uuidtools'
 require File.dirname(__FILE__) + "/worker_proxy.rb"
 
-WORKER_ADDR = "166.111.131.10:3003"
+WORKER_ADDR = "166.111.131.10:3004"
 
 wp = WorkerProxy.new WORKER_ADDR
 puts "Created worker proxy for '#{WORKER_ADDR}'"
