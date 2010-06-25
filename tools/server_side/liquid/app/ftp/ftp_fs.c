@@ -21,6 +21,11 @@
 #define PROFILE_FTP_FS 1
 #endif  // PROFILE_FTP_FS
 
+// disable sendfile function for MacOS
+#ifdef __APPLE__
+#define USE_LINUX_SENDFILE 0
+#endif  // __APPLE__
+
 // if this is set to 1, then sendfile() of Linux will be used
 #ifndef USE_LINUX_SENDFILE
 #define USE_LINUX_SENDFILE 1
