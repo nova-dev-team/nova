@@ -8,7 +8,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef __APPLE__
 #include <malloc.h>
+#endif  // __APPLE__
+
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>

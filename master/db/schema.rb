@@ -61,6 +61,8 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
     t.integer  "user_id"
     t.string   "ssh_public_key"
     t.string   "ssh_private_key"
+    t.string   "os_username"
+    t.string   "os_passwd"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -101,6 +103,7 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
     t.integer  "vcluster_id"
     t.integer  "pmachine_id"
     t.string   "status",                    :default => "shut-off"
+    t.integer  "vnc_port"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
