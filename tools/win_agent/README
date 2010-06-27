@@ -1,0 +1,4 @@
+This folder contains the Nova agent for Windows system.
+The agent is in charge of configuring a new VM, including IP address & software installation.
+It is written by Huang Gang (herokuankuan@gmail.com).
+

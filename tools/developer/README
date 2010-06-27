@@ -1,0 +1,13 @@
+This folder contains useful tools for developers.
+
+clear-whitespace.rb
+  Clear all trailing white space in a file.
+  Usage: ./clear-whiltespace.rb <path-to-file>
+
+nova.vimrc
+  This file provides some useful settings for vim.
+
+style-check.rb
+  Check coding style of all source code files in Nova.
+  Usage: ./style-check.rb
+
