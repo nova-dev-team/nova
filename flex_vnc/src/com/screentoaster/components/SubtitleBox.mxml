@@ -3,7 +3,7 @@
 		backgroundAlpha="0.7"
 		backgroundColor="#ccdcec"
 		borderColor="#555555"
-		borderThickness="1"
+		
 		borderStyle="outset"
 		paddingBottom="5"
 		paddingLeft="5"
