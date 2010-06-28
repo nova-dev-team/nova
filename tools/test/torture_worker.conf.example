@@ -1,0 +1,6 @@
+# This is the configuration file for "torture_worker.rb" script.
+# Santa Zhang (santa1987@gmail.com)
+
+WORKER_ADDR = "127.0.0.1"
+VM_COUNT = 4
+
