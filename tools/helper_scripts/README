@@ -11,3 +11,7 @@ ssh_nopass_cleanup.rb
 
 ssh_nopass_all2all.rb
   Configure ssh nopass visiting in a cluster.
+
+make_tar.py
+  Create a tar.gz package for nova. It will be placed at nova source code root.
+
