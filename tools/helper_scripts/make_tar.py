@@ -21,7 +21,8 @@ def rand_str(length = 5):
   return str
 
 # git clone to a temp dir in "/tmp"
-clone_folder = "/tmp/nova-make-tar." + rand_str() + "/nova"
+clone_folder_parent = "/tmp/nova-make-tar." + rand_str()
+clone_folder = clone_folder_parent + "/nova"
 source_root = os.getcwd() + os.path.sep + os.path.split(__file__)[0] + "/../../"
 print source_root
 my_exec("git clone %s %s" % (source_root, clone_folder))
@@ -30,5 +31,5 @@ my_exec("rm -Rf %s/.git" % clone_folder)
 tar_fn = "%s/nova.tar.gz" % source_root
 my_exec("rm -f %s" % tar_fn)
 my_exec("cd %s && tar pczf %s nova" % (clone_folder + "/..", tar_fn))
-my_exec("rm -Rf %s" % clone_folder)
+my_exec("rm -Rf %s" % clone_folder_parent)
 
