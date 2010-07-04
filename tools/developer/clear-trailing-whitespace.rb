@@ -5,9 +5,10 @@
 
 # drop trailing white space
 def trim_right line
-  line = line.chomp # trim newline char
-  while line.end_with? ' ' or line.end_with? '\t'
-    line = line[0...line.length]
+  line = line.chomp
+  if (line.end_with? ' ') or (line.end_with? '\t')
+    line.chop!
+    return (trim_right line)
   end
   line
 end
@@ -24,7 +25,7 @@ f = ARGV[0]
 all_lines = File.read f
 File.open(f, "w") do |f_out|
   all_lines.each_line do |line|
-    f_out.write line
+    f_out.write trim_right(line) + "\n"
   end
 end
 

@@ -25,7 +25,7 @@ CEIL_STATUS = {
 100 => "ceil exited"
 }
 
-#max app installation id 
+#max app installation id
 #for calc progress
 CEIL_APP_STATUS_MAX = 80
 #steps to install an app
