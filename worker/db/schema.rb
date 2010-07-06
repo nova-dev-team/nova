@@ -21,11 +21,6 @@ ActiveRecord::Schema.define(:version => 20091006045143) do
   end
 
   create_table "vmachines", :force => true do |t|
-    t.string   "hypervisor"
-    t.string   "migrate_from"
-    t.string   "migrate_to"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
 end
