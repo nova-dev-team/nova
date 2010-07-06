@@ -1,8 +1,11 @@
 class CreateSettings < ActiveRecord::Migration
   def self.up
     create_table :settings do |t|
-      t.column :key, :string, :limit => 40, :null => false
-      t.column :value, :string, :null => false
+      t.column :key,          :string, :limit => 40, :null => false
+      t.column :value,        :string, :null => false
+
+      # Comment on the setting.
+      t.column :info,         :string
 
       # "readonly" is used by ActiveRecord, so I have to use this name
       t.column :editable, :boolean, :default => true, :null => false

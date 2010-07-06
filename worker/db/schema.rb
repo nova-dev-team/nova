@@ -14,12 +14,18 @@ ActiveRecord::Schema.define(:version => 20091006045143) do
   create_table "settings", :force => true do |t|
     t.string   "key",        :limit => 40,                   :null => false
     t.string   "value",                                      :null => false
+    t.string   "info"
     t.boolean  "editable",                 :default => true, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "vmachines", :force => true do |t|
+    t.string   "hypervisor"
+    t.string   "migrate_from"
+    t.string   "migrate_to"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end
