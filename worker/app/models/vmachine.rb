@@ -476,5 +476,21 @@ private
     end
   end
 
+  def Vmachine.xen_live_migrate params
+    #TODO:we can have a type in params to divide xen and kvm
+    if params[:dst] != nil and params[:dst] != "" 
+      if params[:uuid] != nil and params[:uuid] != ""
+        Vmachine.libvirt_call_by_uuid "migrate --live " + params[:uuid].to_s + \
+          " xen:/// xenmigr:/// " + params[:dst].to_s, params[:uuid]
+      elsif params[:name] != nil and params[:name] != ""
+         Vmachine.libvirt_call_by_name "migrate --live " + params[:name].to_s + \
+          " xen:/// xenmigr:/// " + params[:dst].to_s, params[:name]
+      else
+        raise "Please provide either uuid or name!"
+      end
+    else
+      raise "Please provide a destination machine ip or url!"
+    end
+  end
 end
 
