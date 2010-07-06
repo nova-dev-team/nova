@@ -79,6 +79,9 @@ namespace :nova do
       my_exec "modprobe kvm_intel"
       my_exec "modprobe kvm_amd"
 
+      # make sure libvirtd is running
+      my_exec "service libvirt-bin start"
+
       # make sure there is network bridge
       my_exec "./lib/create_br.rb"
 
@@ -148,6 +151,9 @@ LFTP_SCRIPT
       if File.exists? "#{RAILS_ROOT}/tmp/hostname"
         FileUtils.rm "#{RAILS_ROOT}/tmp/hostname"
       end
+
+      # shutdown libvirt
+      my_exec "stop libvirt-bin"
     end
 
     desc "Stop Nova worker"
