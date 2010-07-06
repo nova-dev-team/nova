@@ -8,6 +8,6 @@ require "#{File.dirname __FILE__}/../../common/lib/utils.rb"
 
 # returns the common config in common/config/conf.yml
 def common_conf
-  YAML.load File.read("#{File.dirname __FILE__}/../config/conf.yml")
+  YAML.load File.read("#{File.dirname __FILE__}/../../common/config/conf.yml")
 end
 

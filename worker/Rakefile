@@ -15,7 +15,7 @@ require 'rake/rdoctask'
 
 require 'tasks/rails'
 
-require "#{File.dirname __FILE__}/../common/lib/utils.rb"
+require "#{File.dirname __FILE__}/lib/utils.rb"
 require 'fileutils'
 require 'yaml'
 
@@ -34,7 +34,7 @@ namespace :nova do
     #
     # Since::     0.3
     def read_config
-      conf = common_config
+      conf = common_conf
     end
 
     # Initialize system, create database, loads default values.
