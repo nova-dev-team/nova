@@ -7,6 +7,9 @@ class CreateSettings < ActiveRecord::Migration
       t.column :key,            :string, :limit => 40
       t.column :value,          :string
 
+      # Comments on the setting.
+      t.column :info,           :string
+
       # "readonly" is used by ActiveRecord, so I have to use this name instead.
       t.column :editable,       :boolean, :default => true, :null => false
 

@@ -35,3 +35,6 @@ vm_network_interface:           eth0
 # it will be created on installation
 vm_network_bridge:              br0
 
+# the supported hypervisors, separate by comma
+hypervisors:                    kvm,xen
+

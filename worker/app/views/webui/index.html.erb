@@ -195,7 +195,9 @@ Name (a-z, 0-9, '_', '-', '.'): <input type="text" id="new_vm_name" size=28 valu
 UUID: <input type="text" id="new_vm_uuid" size=47 value="<%= UUIDTools::UUID.random_create.to_s %>"/><br>
 
 Hypervisor: <select id="new_vm_hypervisor">
-<option value='kvm'>KVM</option>
+<% Utils.supported_hypervisors.each do |hyp| %>
+<option><%=hyp%></option>
+<% end %>
 </select><%= spacing 12 %>
 
 Architecture: <select id="new_vm_arch">
@@ -215,7 +217,7 @@ Memory size (in MB): <input type="text" size="6" id="new_vm_mem_size" value="512
 
 Hard disk image: <input type="text" id="new_vm_hda_image" size=40 /><%= spacing 6%>
 
-Save to (optional): <input type="text" id="new_vm_hda_save_to" size=40 /><br>
+Save to (optional, only for kvm): <input type="text" id="new_vm_hda_save_to" size=40 /><br>
 
 <input type="checkbox" name="chk_mount_iso" onclick="toggle_mount_iso()" /> Mount .iso CD image?<br>
 
@@ -400,7 +402,7 @@ Current page will be reloaded when clicked.
 <hr>
 
 This is the "worker" module of the Nova system. <b>Intended for developers only!</b><p>
-&copy;2009-2010 <a href="mailto:santa1987@gmail.com">Santa Zhang</a> &amp; <a href="mailto:herokuankuan@gmail.com">Huang Gang</a>.
+&copy;2009-2010 <a href="mailto:nova-develop@googlegroups.com">Nova Development Team</a>.
 
 </body>
 </html>

@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
   create_table "settings", :force => true do |t|
     t.string   "key",        :limit => 40
     t.string   "value"
+    t.string   "info"
     t.boolean  "editable",                 :default => true,  :null => false
     t.boolean  "for_worker",               :default => false
     t.datetime "created_at"
@@ -91,19 +92,22 @@ ActiveRecord::Schema.define(:version => 20100510120715) do
 
   create_table "vmachines", :force => true do |t|
     t.string   "name"
-    t.string   "uuid",        :limit => 40,                         :null => false
-    t.integer  "cpu_count",                 :default => 1
-    t.string   "soft_list",                 :default => ""
-    t.integer  "memory_size",               :default => 256
-    t.string   "hda",         :limit => 40
-    t.string   "cdrom",       :limit => 40
-    t.string   "boot_device", :limit => 10, :default => "hd"
-    t.string   "arch",        :limit => 10, :default => "i686"
-    t.string   "ip",          :limit => 20
+    t.string   "uuid",         :limit => 40,                         :null => false
+    t.integer  "cpu_count",                  :default => 1
+    t.string   "soft_list",                  :default => ""
+    t.integer  "memory_size",                :default => 256
+    t.string   "hda",          :limit => 40
+    t.string   "cdrom",        :limit => 40
+    t.string   "boot_device",  :limit => 10, :default => "hd"
+    t.string   "arch",         :limit => 10, :default => "i686"
+    t.string   "ip",           :limit => 20
     t.integer  "vcluster_id"
     t.integer  "pmachine_id"
-    t.string   "status",                    :default => "shut-off"
+    t.string   "status",                     :default => "shut-off"
     t.integer  "vnc_port"
+    t.string   "hypervisor"
+    t.string   "migrate_from"
+    t.string   "migrate_to"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
