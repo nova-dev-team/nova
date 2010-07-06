@@ -4,6 +4,7 @@ require 'libvirt'
 require 'cgi'
 require 'xmlsimple'
 require 'uuidtools'
+require 'utils'
 %>
 
 <html>
@@ -195,9 +196,7 @@ Name (a-z, 0-9, '_', '-', '.'): <input type="text" id="new_vm_name" size=28 valu
 UUID: <input type="text" id="new_vm_uuid" size=47 value="<%= UUIDTools::UUID.random_create.to_s %>"/><br>
 
 Hypervisor: <select id="new_vm_hypervisor">
-<% Utils.supported_hypervisors.each do |hyp| %>
-<option><%=hyp%></option>
-<% end %>
+<option><%= common_config["hypervisor"] %></option>
 </select><%= spacing 12 %>
 
 Architecture: <select id="new_vm_arch">

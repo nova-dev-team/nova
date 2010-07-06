@@ -34,7 +34,7 @@ namespace :nova do
     #
     # Since::     0.3
     def read_config
-      conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+      conf = common_config
     end
 
     # Initialize system, create database, loads default values.
@@ -82,15 +82,20 @@ namespace :nova do
       # make sure libvirtd is running
       my_exec "service libvirt-bin start"
 
-      # make sure there is network bridge
-      # my_exec "./lib/create_br.rb"
-      # in CentOS5.4 Xen, peth0 is the bridge
+      if conf["hypervisor"] == "kvm"
+        # if using kvm, we need to create the network bridge
+        # make sure there is network bridge
+        my_exec "./lib/create_br.rb"
+      else
+        # in CentOS5.4 Xen, peth0 is the bridge
+        # xen will create bridge for us, so we just do nothing
+      end
 
       service_port = conf["worker_port"]
       puts "Writing hostname into tmp/hostname..."
       FileUtils.mkdir_p "#{RAILS_ROOT}/tmp"
       
-      # my_exec "hostname > #{RAILS_ROOT}/tmp/hostname"
+      my_exec "hostname > #{RAILS_ROOT}/tmp/hostname"
       puts "Starting Nova worker on port #{service_port}..."
 
       FileUtils.mkdir_p "#{conf["run_root"]}/vm"
