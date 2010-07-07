@@ -37,6 +37,9 @@ vm_network_interface:           eth0
 # this option only used by kvm
 vm_network_bridge:              br0
 
+# whether enables VM migration, currently only works for XEN+NFS
+vm_enable_migration:                   true
+
 # the hypervisor to be used, could be xen or kvm
 hypervisor:                     xen
 
