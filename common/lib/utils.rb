@@ -140,6 +140,15 @@ def random_token length = 5
   return token
 end
 
+# returns the common config in common/config/conf.yml
+# 
+# Since::     0.3
+def common_conf
+  require 'yaml'
+  YAML.load File.read("#{File.dirname __FILE__}/../config/conf.yml")
+end
+
+
 
 # A collection of helpers for manipulating IP address.
 #
