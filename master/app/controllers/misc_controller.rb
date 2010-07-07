@@ -28,6 +28,17 @@ class MiscController < ApplicationController
     end
   end
 
+  # Show the features of Nova platform.
+  #
+  # Since::   0.3
+  def feat
+    conf = common_conf
+    reply_success "Query successful!", :feat => {
+      :enable_migration => conf["vm_enable_migration"],
+      :hypervisor => conf["hypervisor"]
+    }
+  end
+
   # Returns the running Rails environment.
   #
   # Since::   0.3
@@ -163,7 +174,8 @@ class MiscController < ApplicationController
   def storage_server
     return unless root_required
     unless valid_param? params[:req]
-      reply_failure "Please provide the 'req' parameter!"
+      reply_failure "Please provide the 'req' parameter! Could be 'try_update', 'server_down', 'vdisk_list' or 'soft_list'."
+      return
     end
     case params[:req]
     when "try_update"

@@ -14,6 +14,17 @@ class MiscController < ApplicationController
     reply_success "worker"
   end
 
+  # Show the features of Nova platform.
+  #
+  # Since::   0.3
+  def feat
+    conf = common_conf
+    reply_success "Query successful!", :feat => {
+      :enable_migration => conf["vm_enable_migration"],
+      :hypervisor => conf["hypervisor"]
+    }
+  end
+
   # Reply the current version of Nova platform.
   #
   # Since::   0.3
