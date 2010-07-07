@@ -232,7 +232,6 @@ end
       <target dev='vif-1.0'/>
     </interface>
     <graphics type='vnc' port='-1' listen='0.0.0.0'/>
-    <input type='tablet' bus='usb'/>
   </devices>
 </domain>
 XML_DESC
