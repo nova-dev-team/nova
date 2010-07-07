@@ -19,7 +19,7 @@ class Vmachine < ActiveRecord::Base
   #
   # Since::   0.3
   ## @@virt_conn = Libvirt::open("qemu:///system")
-  temply switch to xen:///
+  #temply switch to xen:///
   @@virt_conn = Libvirt::open("xen:///")
 
   # Get the connection to libvirt.
@@ -183,6 +183,9 @@ end
 </domain>
 XML_DESC
     puts xml_desc
+    File.open("/var/xml_desc.log", "w") do |f|
+        f.puts xml_desc
+    end
     return xml_desc
   end
 
