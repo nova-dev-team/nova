@@ -476,5 +476,30 @@ private
     end
   end
 
+  def Vmachine.xen_live_migrate params
+    #TODO:we can have a type in params to divide xen and kvm
+    if params[:dst] != nil and params[:dst] != "" 
+      if params[:uuid] != nil and params[:uuid] != ""
+        begin
+          system "virsh migrate --live " + params[:uuid].to_s + \
+            " xen:/// xenmigr://" + params[:dst].to_s
+        rescue
+          raise "xen live migrate failed! Can't migrate #{params[:uuid]} to #{params[:dst]}"
+        end
+        return {:success => true}
+      elsif params[:name] != nil and params[:name] != ""
+        begin
+          system "virsh migrate --live " + params[:name].to_s + \
+            " xen:/// xenmigr://" + params[:dst].to_s
+        rescue
+          raise "xen live migrate failed! Can't migrate #{params[:name]} to #{params[:dst]}"         
+        end
+      else
+        raise "Please provide either uuid or name!"
+      end
+    else
+      raise "Please provide a destination machine ip or url!"
+    end
+  end
 end
 
