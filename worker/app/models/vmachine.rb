@@ -480,11 +480,20 @@ private
     #TODO:we can have a type in params to divide xen and kvm
     if params[:dst] != nil and params[:dst] != "" 
       if params[:uuid] != nil and params[:uuid] != ""
-        Vmachine.libvirt_call_by_uuid "migrate --live " + params[:uuid].to_s + \
-          " xen:/// xenmigr:/// " + params[:dst].to_s, params[:uuid]
+        begin
+          system "virsh migrate --live " + params[:uuid].to_s + \
+            " xen:/// xenmigr://" + params[:dst].to_s
+        rescue
+          raise "xen live migrate failed! Can't migrate #{params[:uuid]} to #{params[:dst]}"
+        end
+        return {:success => true}
       elsif params[:name] != nil and params[:name] != ""
-         Vmachine.libvirt_call_by_name "migrate --live " + params[:name].to_s + \
-          " xen:/// xenmigr:/// " + params[:dst].to_s, params[:name]
+        begin
+          system "virsh migrate --live " + params[:name].to_s + \
+            " xen:/// xenmigr://" + params[:dst].to_s
+        rescue
+          raise "xen live migrate failed! Can't migrate #{params[:name]} to #{params[:dst]}"         
+        end
       else
         raise "Please provide either uuid or name!"
       end
