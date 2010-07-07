@@ -13,6 +13,7 @@ class VmachinesController < ApplicationController
   def edit
     vm = load_vm
     return if vm == nil
+    return unless check_privilege vm
     if valid_param? params[:item]
       case params[:item]
       when "name"
@@ -41,6 +42,7 @@ class VmachinesController < ApplicationController
   def start
     vm = load_vm
     return if vm == nil
+    return unless check_privilege vm
     if vm.status != "shut-off"
       reply_failure "The VM with UUID='#{params[:uuid]}' is not in 'shut-off' status!"
       return false
@@ -58,6 +60,7 @@ class VmachinesController < ApplicationController
   def shut_off
     vm = load_vm
     return if vm == nil
+    return unless check_privilege vm
     case vm.status
     when "start-pending"
       vm.status = "shut-off"
@@ -78,6 +81,7 @@ class VmachinesController < ApplicationController
   def reset_error
     vm = load_vm
     return if vm == nil
+    return unless check_privilege vm
     case vm.status
     when "boot-failure", "connect-failure"
       vm.status = "shut-off"
@@ -86,6 +90,52 @@ class VmachinesController < ApplicationController
     else
       reply_failure "Could only do this on VMs in failure status!"
     end
+  end
+
+  # Get the ip of the Hosting Pmachine.
+  # * API: /vmachines/host_ip?uuid=<uuid of vm>
+  #
+  # Since::   0.3
+  def host_ip
+    vm = load_vm
+    return if vm == nil
+    return unless check_privilege vm
+    reply_success "Request successful!", :host_ip => vm.pmachine.ip
+  end
+
+  # Get the migration status of a VM.
+  # * API: /vmachines/migration_status?uuid=<uuid of vm>
+  # * Return: {success,message,status="no migration"|"migrate in"|"migrate out",[migrate_from|migrate_to]}
+  #
+  # Since::   0.3
+  def migration_status
+    vm = load_vm
+    return if vm == nil
+    return unless check_privilege vm
+    if vm.migrate_from != nil
+      reply_success "Vmachine '#{vm.name}' is being migrated in from '#{vm.migrate_from}'", :status => "migrate in", :migrate_from => vm.migrate_from
+    elsif vm.migrate_to != nil
+      reply_success "Vmachine '#{vm.name}' is being migrated out to '#{vm.migrate_to}'", :status => "migrate out", :migrate_to => vm.migrate_to
+    else
+      reply_success "Vmachine '#{vm.name}' is not being migrated.", :status => "no migration"
+    end
+  end
+
+  # Start migrating to another machine.
+  # * API: /vmachines/migrate_to?uuid=<uuid of vm>&target_ip=<target pmachine ip>
+  #
+  # Since::   0.3
+  def migrate_to
+    unless params[:target_ip] != nil and params[:target_ip].is_ip_addr?
+      reply_failure "Please provide the IP of target machine!"
+      return
+    end
+    vm = load_vm
+    return if vm == nil
+    return unless check_privilege vm
+    vm.migrate_to = params[:target_ip]
+    vm.save
+    # TODO create a 'migrate in' place holder in dest machine, and do migration
   end
 
 private
