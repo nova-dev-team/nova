@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-	<mx:RichTextEditor x="0" y="0" title="Title" width="100%" height="100%">
-	</mx:RichTextEditor>
+	<mx:AdvancedDataGrid x="91" y="54" id="userList" designViewDataType="flat" width="921" height="437">
+		<mx:columns>
+			<mx:AdvancedDataGridColumn dataField="id" headerText="#" width="40"/>
+			<mx:AdvancedDataGridColumn dataField="login" headerText="Login"/>
+			<mx:AdvancedDataGridColumn dataField="privilege" headerText="Privilege"/>
+			<mx:AdvancedDataGridColumn dataField="activated" headerText="Activated"/>
+			<mx:AdvancedDataGridColumn dataField="fullname" headerText="Full Name"/>
+			<mx:AdvancedDataGridColumn dataField="email" headerText="Email"/>
+		</mx:columns>
+	</mx:AdvancedDataGrid>
+	<mx:HSlider x="91" y="513" width="722"/>
+	<mx:TextInput x="833" y="502" width="108"/>
+	<mx:Button x="949" y="502" label="Go" width="63"/>
 </mx:Canvas>

@@ -1,13 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
 	<mx:Accordion x="0" y="0" width="100%" height="100%">
-		<mx:Canvas label="Resource Management 1" width="100%" height="100%">
+		<mx:Canvas label="System settings" width="100%" height="100%">
+			<mx:AdvancedDataGrid x="26" y="10" id="sys_setting" designViewDataType="flat" width="1029" height="506">
+				<mx:columns>
+					<mx:AdvancedDataGridColumn headerText="Key" dataField="key"/>
+					<mx:AdvancedDataGridColumn headerText="Value" dataField="value"/>
+					<mx:AdvancedDataGridColumn headerText="Information" dataField="info"/>
+					<mx:AdvancedDataGridColumn dataField="for_worker" headerText="For worker?"/>
+				</mx:columns>
+			</mx:AdvancedDataGrid>
 		</mx:Canvas>
-		<mx:Canvas label="Resource Management 2" width="100%" height="100%">
+		<mx:Canvas label="Worker machines" width="100%" height="100%">
+			<mx:AdvancedDataGrid x="39" y="23" id="worker_machines" designViewDataType="flat" width="1025" height="389">
+				<mx:columns>
+					<mx:AdvancedDataGridColumn headerText="IP" dataField="ip"/>
+					<mx:AdvancedDataGridColumn headerText="Hostname" dataField="hostname"/>
+					<mx:AdvancedDataGridColumn headerText="Status" dataField="status"/>
+					<mx:AdvancedDataGridColumn dataField="vm_capacity" headerText="VM capacity"/>
+					<mx:AdvancedDataGridColumn dataField="vm_preparing" headerText="VM preparing"/>
+					<mx:AdvancedDataGridColumn dataField="vm_running" headerText="VM running"/>
+					<mx:AdvancedDataGridColumn dataField="vm_failure" headerText="VM failure"/>
+					<mx:AdvancedDataGridColumn headerText="Actions"/>
+				</mx:columns>
+			</mx:AdvancedDataGrid>
+			<mx:Button x="520" y="421" label="Add new worker"/>
+			<mx:TextInput x="109" y="420"/>
+			<mx:TextInput x="352" y="421"/>
+			<mx:Label x="40" y="422" text="Worker IP:"/>
+			<mx:Label x="277" y="422" text="VM capacity:"/>
 		</mx:Canvas>
-		<mx:Canvas label="Resource Management 3" width="100%" height="100%">
+		<mx:Canvas label="Port mappings" width="100%" height="100%">
+			<mx:Button x="856" y="476" label="Button"/>
+			<mx:AdvancedDataGrid x="19" y="23" id="port_mappings" designViewDataType="flat" width="1035" height="429">
+				<mx:columns>
+					<mx:AdvancedDataGridColumn headerText="Proxy port" dataField="proxy_port"/>
+					<mx:AdvancedDataGridColumn headerText="Destination IP" dataField="ip"/>
+					<mx:AdvancedDataGridColumn dataField="dest_port" headerText="Destination port"/>
+				</mx:columns>
+			</mx:AdvancedDataGrid>
+			<mx:TextInput x="81" y="479"/>
+			<mx:TextInput x="384" y="476"/>
+			<mx:Label x="286" y="480" text="Destination IP:"/>
+			<mx:Label x="19" y="482" text="Proxy port:"/>
+			<mx:TextInput x="681" y="476"/>
+			<mx:Label x="565" y="483" text="Destination port:"/>
 		</mx:Canvas>
-		<mx:Canvas label="Resource Management 4" width="100%" height="100%">
+		<mx:Canvas label="Storage server" width="100%" height="100%">
+		</mx:Canvas>
+		<mx:Canvas label="Software packages" width="100%" height="100%">
+			<mx:AdvancedDataGrid x="49" y="30" id="soft_package" designViewDataType="flat" width="974" height="284">
+				<mx:columns>
+					<mx:AdvancedDataGridColumn headerText="Display name" dataField="display_name"/>
+					<mx:AdvancedDataGridColumn headerText="File name" dataField="filename"/>
+					<mx:AdvancedDataGridColumn headerText="OS family" dataField="os_family"/>
+					<mx:AdvancedDataGridColumn dataField="description" headerText="Description"/>
+					<mx:AdvancedDataGridColumn headerText="Actions"/>
+				</mx:columns>
+			</mx:AdvancedDataGrid>
+			<mx:Button x="693" y="398" label="Register software"/>
+			<mx:Label x="61" y="371" text="Display name:"/>
+			<mx:Label x="61" y="343" text="You can register new software packages. Make sure you have uploaded software packages to storage server first."/>
+			<mx:TextInput x="156" y="371"/>
+			<mx:Label x="350" y="371" text="Filename:"/>
+			<mx:TextInput x="445" y="371"/>
+			<mx:Label x="61" y="399" text="Description"/>
+			<mx:TextInput x="156" y="399" width="449"/>
+			<mx:Label x="640" y="371" text="OS family:"/>
+			<mx:ComboBox x="708" y="371" editable="false"></mx:ComboBox>
+		</mx:Canvas>
+		<mx:Canvas label="Vdisk images" width="100%" height="100%">
+			<mx:AdvancedDataGrid x="49" y="30" id="vdisk_images" designViewDataType="flat" width="974" height="284">
+				<mx:columns>
+					<mx:AdvancedDataGridColumn headerText="Display name" dataField="display_name"/>
+					<mx:AdvancedDataGridColumn headerText="File name" dataField="filename"/>
+					<mx:AdvancedDataGridColumn headerText="OS family" dataField="os_family"/>
+					<mx:AdvancedDataGridColumn dataField="description" headerText="Description"/>
+					<mx:AdvancedDataGridColumn headerText="Actions"/>
+				</mx:columns>
+			</mx:AdvancedDataGrid>
+			<mx:Button x="923" y="397" label="Register vdisk"/>
+			<mx:Label x="61" y="371" text="Display name:"/>
+			<mx:Label x="61" y="343" text="You can register new vdisk images. Make sure you have uploaded vdisk images to storage server first."/>
+			<mx:TextInput x="156" y="371"/>
+			<mx:Label x="61" y="399" text="OS name:"/>
+			<mx:TextInput x="156" y="399"/>
+			<mx:Label x="350" y="371" text="Filename:"/>
+			<mx:TextInput x="445" y="371"/>
+			<mx:Label x="354" y="399" text="Description:"/>
+			<mx:TextInput x="432" y="397" width="449"/>
+			<mx:Label x="640" y="371" text="Image type:"/>
+			<mx:ComboBox x="721" y="370" editable="false" width="111"></mx:ComboBox>
+			<mx:Label x="855" y="370" text="OS family:"/>
+			<mx:ComboBox x="923" y="370" editable="false" width="100"></mx:ComboBox>
 		</mx:Canvas>
 	</mx:Accordion>
 </mx:Canvas>

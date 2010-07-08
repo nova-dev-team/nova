@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-	<mx:RichTextEditor x="0" y="0" title="Title" width="100%" height="100%">
-	</mx:RichTextEditor>
+	<mx:Button x="78" y="44" label="TODO: Overview"/>
 </mx:Canvas>

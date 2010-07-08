@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-	<mx:RichTextEditor x="0" y="0" title="Title" width="100%" height="100%">
-	</mx:RichTextEditor>
+	<mx:List x="28" y="31" height="601"></mx:List>
+	<mx:List x="232" y="30" height="602" width="801"></mx:List>
 </mx:Canvas>
