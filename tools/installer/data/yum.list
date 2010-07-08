@@ -1,0 +1,11 @@
+hmaccalc
+ncurses-devel
+unifdef
+gettext-devel
+expat-devel
+curl-devel
+zlib-devel
+openssl-devel
+libvirt
+libvirt-devel
+sqlite-devel

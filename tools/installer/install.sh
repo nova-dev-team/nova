@@ -34,12 +34,14 @@ clear
 echo "Phase 1: Installing depended software packages..."
 echo
 
+# where is the script?
+SCRIPT_ROOT=$(dirname $0)
+RUNNING_ROOT=$(pwd)
+
 # determine distribution, and do corresponding installing work
 if grep -q "Ubuntu" "/etc/issue" ; then
   echo "Current Linux distribution is Ubuntu."
 
-# where is the script?
-  SCRIPT_ROOT=$(dirname $0)
   DEBS_LIST=$SCRIPT_ROOT/data/debs.list
   DEBS_DIR=$SCRIPT_ROOT/data/debs
 
@@ -49,8 +51,26 @@ if grep -q "Ubuntu" "/etc/issue" ; then
 
 elif grep -q "CentOS" "/etc/issue" ; then
   echo "Current Linux distribution is CentOS."
-# TODO CentOS installer
-  exit 0
+  yum makecache
+  yum groupinstall "Development Tools"
+
+  # install a few packages directly by yum
+  YUM_LIST=$SCRIPT_ROOT/data/yum.list
+  all_yum=( $( cat $YUM_LIST ) )
+  yum install -y ${all_yum[@]} || exit 1
+
+  # install ruby from src directory
+  cp $SCRIPT_ROOT/data/src/ruby-1.8.7-p249.tar.gz /tmp
+  cd /tmp
+  tar zxf ruby-1.8.7-p249.tar.gz
+  cd ruby-1.8.7-p249
+  ./configure --prefix=/usr
+  make
+  make install
+
+  # get back to where I were
+  cd $RUNNING_ROOT
+
 else
   echo "Sorry, your Linux distribution is not supported!"
   exit 1
