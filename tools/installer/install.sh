@@ -13,9 +13,11 @@ fi
 
 clear
 echo
-echo "This script installs the Nova platform. Currently it only supports Ubuntu and CentOS distribution."
+echo "This script installs the Nova platform."
+echo "Currently it only supports Ubuntu and CentOS distribution."
 echo
-echo "You may want to modify '../../common/config/conf.yml' according to your needs."
+echo You may want to modify '../../common/config/conf.yml' according to
+echo your needs.
 echo
 echo "The installation process:"
 echo "1: Install depended software packages"
@@ -26,9 +28,10 @@ echo "5: Create worker node installer"
 echo "6: Configure the Nova system"
 echo "7: Install Nova worker module"
 echo
-echo "This script does steps 1~4 for you. You will have to do step 5~7 by hand. See README for more info."
+echo This script does steps 1~4 for you. You will have to do step 5~7
+echo by hand. See README for more info.
 echo
-read -p "Press any key to start installation, or press Ctrl+C to quit..."
+read -p "Press ENTER to start installation, or press Ctrl+C to quit..."
 
 clear
 echo "Phase 1: Installing depended software packages..."
