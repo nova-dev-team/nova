@@ -18,7 +18,9 @@ class Vmachine < ActiveRecord::Base
   # Connection to libvirt.
   #
   # Since::   0.3
-  @@virt_conn = Libvirt::open("qemu:///system")
+  ## @@virt_conn = Libvirt::open("qemu:///system")
+  #temply switch to xen:///
+  @@virt_conn = Libvirt::open("xen:///")
 
   # Get the connection to libvirt.
   #
@@ -115,8 +117,12 @@ class Vmachine < ActiveRecord::Base
   # Since::     0.3
   def Vmachine.emit_domain_xml params
     nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
-    xml_desc = <<XML_DESC
-<domain type='kvm'>
+
+    xml_desc = ""
+    case params[:hypervisor]
+    when "kvm"
+      xml_desc = <<XML_DESC
+<domain type='#{params[:hypervisor]}'>
   <name>#{params[:name]}</name>
   <uuid>#{params[:uuid]}</uuid>
   <memory>#{params[:mem_size].to_i * 1024}</memory>
@@ -137,15 +143,7 @@ end
     <acpi/>
   </features>
   <devices>
-    <emulator>#{
-# determine emulator from "hypervisor" param
-case params[:hypervisor]
-when "kvm"
-  "/usr/bin/kvm"
-else
-  raise "hypervisor '#{params[:hypervisor]}' not supported!"
-end
-}</emulator>
+    <emulator>"/usr/bin/kvm"</emulator>
     <disk type='file' device='disk'>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
       <target dev='hda'/>
@@ -179,7 +177,74 @@ end
   </devices>
 </domain>
 XML_DESC
+    when "xen"
+      xml_desc = <<XML_DESC
+<domain type='#{params[:hypervisor]}'>
+  <name>#{params[:name]}</name>
+  <uuid>#{params[:uuid]}</uuid>
+  <memory>#{params[:mem_size].to_i * 1024}</memory>
+  <vcpu>#{params[:cpu_count]}</vcpu>
+  <os>
+    <type arch='#{params[:arch]}' machine='pc'>linux</type>
+    <boot dev='#{
+# if used user's custom cd image, we boot from cdrom
+if params[:cd_image] != nil and params[:cd_image] != ""
+  "cdrom"
+else
+  "hd"
+end
+}'/>
+  </os>
+  <features>
+    <pae/>
+    <acpi/>
+  </features>
+  <devices>
+    <disk type='file' device='disk'>
+      <driver name='tap' type='aio'/>
+      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
+      <target dev='xvda' bus='xen'/>
+    </disk>
+#{
+# determine cdrom
+if params[:run_agent].to_s == "true"
+"    <disk type='file' device='cdrom'>
+      <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
+      <target dev='hdc'/>
+    </disk>
+"
+elsif params[:cd_image] != nil and params[:cd_image] != ""
+"    <disk type='file' device='cdrom'>
+      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
+      <target dev='hdc'/>
+      <readonly/>
+    </disk>
+"
+end
+}    <interface type='bridge'>
+      <source bridge='xenbr0'/>
+      <mac address='54:7E:#{
+# generate random mac address
+# note that mac address has some format requirements
+((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
+}'/>
+      <script path='/etc/xen/scripts/vif-bridge'/>
+      <target dev='vif-1.0'/>
+    </interface>
+    <graphics type='vnc' port='-1' listen='0.0.0.0'/>
+  </devices>
+</domain>
+XML_DESC
+    else 
+      raise "hypervisor #{params[:hypervisor]} not supported!"
+    end
+    File.open("/var/xml_desc.log", "w") do |f|
+      f.puts xml_desc
+    end
     puts xml_desc
+    File.open("/var/xml_desc.log", "w") do |f|
+        f.puts xml_desc
+    end
     return xml_desc
   end
 

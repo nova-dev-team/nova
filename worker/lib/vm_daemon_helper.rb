@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 
+require 'rubygems'
 require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
@@ -297,12 +298,16 @@ def do_prepare rails_root, storage_server, vm_dir
       elsif img.end_with? ".iso"
         write_log "preparing iso image '#{img}'"
         prepare_iso_image storage_server, image_pool_dir, vm_dir, img
+      elsif img.end_with? ".img"
+        write_log "preparing img image '#{img}'"
+        prepare_hda_image storage_server, image_pool_dir, vm_dir, img
       else
         write_log "[warning] don't know how to prepare image '#{img}'!"
       end
     end
   end
 
+  write_log "image has been prepared"
 
   # TODO check if download success
 
@@ -401,8 +406,10 @@ def do_prepare rails_root, storage_server, vm_dir
   write_log "starting vmachine"
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
-  virt_conn = Libvirt::open("qemu:///system")
-
+  #virt_conn = Libvirt::open("qemu:///system")
+  virt_conn = Libvirt::open("xen:///")
+  # temporarily switch to xen
+  
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
     dom.create
@@ -477,11 +484,12 @@ def do_poll storage_server, vm_dir
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
 
-  virt_conn = Libvirt::open("qemu:///system")
+  virt_conn = Libvirt::open("xen:///")
+  
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
 
-    if dom.info.state == LIBVIRT_RUNNING or dom.info.state == LIBVIRT_SUSPENDED
+    if dom.info.state != LIBVIRT_NOT_RUNNING
       return  # the vm is still running, skip the following actions
     else
       write_log "detected VM shutdown, saving it"
@@ -526,7 +534,7 @@ def do_cleanup storage_server, vm_dir
     end
 
     # make sure the vm domain is destroyed
-    virt_conn = Libvirt::open("qemu:///system")
+    virt_conn = Libvirt::open("xen:///")
     dom = virt_conn.lookup_domain_by_uuid(uuid) rescue nil
     dom.destroy rescue nil
     dom.undefine rescue nil
