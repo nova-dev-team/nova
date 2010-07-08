@@ -54,6 +54,35 @@ if grep -q "CentOS" "/etc/issue" ; then
   else
     wget http://mirror.centos.org/centos/5.4/updates/SRPMS/kernel-2.6.18-164.15.1.el5.src.rpm
   fi
+  # get back to where I were
+  cd $RUNNING_ROOT
+
+  echo ===========================
+  echo Phase 3: Unpack source code
+  echo ===========================
+  cd $SCRIPT_ROOT/data/src
+  cp xen-3.3.1.tar.gz /tmp
+  cd /tmp
+  tar xzf xen-3.3.1.tar.gz
+  # get back to where I were
+  cd $RUNNING_ROOT
+  cd $SRCIPT_ROOT/data/src
+  rpm -i kernel-2.6.18-164.15.1.el5.src.rpm
+  cd /usr/src/redhat
+  rpmbuild -bp --with xenonly SPECS/kernel-2.6.spec
+  mkdir /tmp/kernel_src
+  cp -r BUILD/kernel-2.6.18/linux-2.6.18.x86_64 /tmp/kernel_src
+
+  echo ================
+  echo Phase 4: Compile
+  echo ================
+  
+  cd /tmp/xen-3.3.1
+  make xen tools
+  cd /tmp/kernel_src
+  cp configs/kernel-2.6.18-x86_64-xen.config .config
+  make
+
 
   # get back to where I were
   cd $RUNNING_ROOT
