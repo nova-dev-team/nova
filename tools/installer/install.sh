@@ -13,12 +13,13 @@ fi
 
 clear
 echo
-echo "This script installs the Nova platform. Currently it only supports Ubuntu distribution."
+echo "This script installs the Nova platform. Currently it only supports Ubuntu and CentOS distribution."
+echo
 echo "You may want to modify '../../common/config/conf.yml' according to your needs."
 echo
 echo "The installation process:"
-echo "1: Install depended .deb packages"
-echo "2: Install depended .gem packages"
+echo "1: Install depended software packages"
+echo "2: Install depended rubygems packages"
 echo "3: Compile utility tools"
 echo "4: Install Nova master module"
 echo "5: Create worker node installer"
@@ -30,17 +31,30 @@ echo
 read -p "Press any key to start installation, or press Ctrl+C to quit..."
 
 clear
-echo "Phase 1: Installing depended .deb packages..."
+echo "Phase 1: Installing depended software packages..."
 echo
 
-# where is the script?
-SCRIPT_ROOT=$(dirname $0)
-DEBS_LIST=$SCRIPT_ROOT/data/debs.list
-DEBS_DIR=$SCRIPT_ROOT/data/debs
+# determine distribution, and do corresponding installing work
+if grep -q "Ubuntu" "/etc/issue" ; then
+  echo "Current Linux distribution is Ubuntu."
 
-apt-get update
-all_debs=( $( cat $DEBS_LIST ) )
-apt-get install -y ${all_debs[@]} || exit 1
+# where is the script?
+  SCRIPT_ROOT=$(dirname $0)
+  DEBS_LIST=$SCRIPT_ROOT/data/debs.list
+  DEBS_DIR=$SCRIPT_ROOT/data/debs
+
+  apt-get update
+  all_debs=( $( cat $DEBS_LIST ) )
+  apt-get install -y ${all_debs[@]} || exit 1
+
+elif grep -q "CentOS" "/etc/issue" ; then
+  echo "Current Linux distribution is CentOS."
+# TODO CentOS installer
+  exit 0
+else
+  echo "Sorry, your Linux distribution is not supported!"
+  exit 1
+fi
 
 # switch to ruby script
 echo
