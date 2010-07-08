@@ -1,8 +1,9 @@
 require 'fileutils'
+
 class FsController < ApplicationController
   def  listdir
     if valid_param? params[:dir]
-      dir = params[:dir]
+      dir = "#{RAILS_ROOT}/../../storage"+params[:dir]
       list = ""
        Dir.foreach(dir.to_s) do |entry|
          list += entry.to_s
