@@ -17,3 +17,5 @@ worker/db/*.sqlite3
 worker/log/
 worker/tmp/
 tools/installer/data/all-in-one/
+tools/developer/data
+
