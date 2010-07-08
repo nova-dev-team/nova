@@ -67,6 +67,8 @@ elif grep -q "CentOS" "/etc/issue" ; then
   ./configure --prefix=/usr
   make
   make install
+  cd ..
+  rm -rf ruby-1.8.7-p249 ruby-1.8.7-p249.tar.gz
 
   # get back to where I were
   cd $RUNNING_ROOT
