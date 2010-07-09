@@ -55,5 +55,33 @@ class MiscController < ApplicationController
     end
 
     def revoke_package
-      unless valid_param? params[:]
+      dir = "#{RAILS_ROOT}/../../run/package_pool"
+      pkg_path = ""
+      unless valid_param? params[:package_name]
+        reply_failure "Please provide 'package_name'!"
+      else
+        pkg_path = dir + "/" + params[:package_name]
+        pkg_copying_lock = "#{pkg_path}.copying"
+        pkg_lftp_log = "#{pkg_path}.lftp.log"
+        if File.exists? pkg_copying_lock
+          reply_failure "Cannot revoke package '#{params[:package_name]}', it is being used now."
+        else
+          has_revoked_some_files = false
+          if File.exists? pkg_lftp_log
+            FileUtils.rm_rf pkg_lftp_log
+            has_revoked_some_files = true
+          end
+          if File.exists? pkg_path
+            FileUtils.rm_rf pkg_path
+            has_revoked_some_files = true
+          end
+          if has_revoked_some_files
+            reply_success "Package with name = '#{params[:package_name]}' is revoked!"
+          else
+            reply_success "Package with name = '#{params[:package_name]}' not found, nothing revoked!"
+          end
+        end
+      end
+    end
+
   end
