@@ -14,7 +14,7 @@ else
 fi
 
 yum makecache
-yum groupinstall "Development Tools"
+yum groupinstall -y "Development Tools"
 yum install -y gettext-devel expat-devel curl-devel zlib-devel openssl-devel
 
 mkdir -p data

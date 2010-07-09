@@ -31,7 +31,7 @@ if grep -q "CentOS" "/etc/issue" ; then
   echo Phase 1: prepare depended packages
   echo ==================================
   yum makecache
-  yum groupinstall "Development Tools"
+  yum groupinstall -y "Development Tools"
 
   # install a few packages directly by yum
   YUM_LIST=$SCRIPT_ROOT/data/yum.list
