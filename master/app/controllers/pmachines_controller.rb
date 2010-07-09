@@ -115,7 +115,7 @@ class PmachinesController < ApplicationController
 
   # Delete the pmachine, use with care!
   # It is only possible when these conditions met:
-  # 
+  #
   #   * no VM running on the physical machine.
   #   * the machine is retired or in 'failure' status.
   #

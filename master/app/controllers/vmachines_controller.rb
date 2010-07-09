@@ -2,7 +2,7 @@
 #
 # Author::  Santa Zhang (mailto:santa1987@gmail.com)
 # Since::   0.3
-  
+
 class VmachinesController < ApplicationController
 
   before_filter :login_required

@@ -20,7 +20,7 @@ class NetworkSegment
 
 
     req.sort
-    req.each do |seg_len, seg_num| 
+    req.each do |seg_len, seg_num|
       puts "seglen=#{seg_len}"
       puts "segnum=#{seg_num}"
 
@@ -36,8 +36,8 @@ class NetworkSegment
 
         seg_len.times {
           segment_begin = IpV4Address.calc_next(segment_begin)
-          dhcp.add("nova-#{global_net_id}-#{segment_machine_id}", 
-             IpV4Address.generate_mac(segment_begin), 
+          dhcp.add("nova-#{global_net_id}-#{segment_machine_id}",
+             IpV4Address.generate_mac(segment_begin),
              segment_begin,
              seg_net_mask)
           segment_machine_id += 1

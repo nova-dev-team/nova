@@ -74,7 +74,7 @@ class Pmachine < ActiveRecord::Base
         :submask => Setting.vm_subnet_mask,
         :gateway => Setting.vm_gateway,
         :dns => Setting.vm_dns_server
-      
+
       if ret == nil
         logger.error "[pm.error] failed to start vm"
       else

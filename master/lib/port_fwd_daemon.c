@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 
   // prevent zombies
   signal(SIGCHLD, SIG_IGN);
-  
+
   // first fork, make this process deamonized
   pid = fork();
   if (pid != 0) {

@@ -198,7 +198,7 @@ void cleanup_image_pool_dir() {
         } else {
           item_info.has_copying_lock = false;
         }
-        
+
         if (my_stat(image_pool_path, p_dirent->d_name, ".log", &st) == 0) {
           item_info.has_logfile = true;
           do_log("log file found for '%s'\n", p_dirent->d_name);
@@ -246,7 +246,7 @@ void cleanup_image_pool_dir() {
             item_info.last_filesize = st.st_size;
             g_image_pool_dir[p_dirent->d_name] = item_info;
           }
-          
+
         } else {
           // well, I think this is not going to happen...
           do_log("Error: '%s' found but cannot stat it!\n", p_dirent->d_name);

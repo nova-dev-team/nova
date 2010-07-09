@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # Makes all node ssh nopass in a cluster.
-# 
+#
 # Author::      Santa Zhang (santa1987@gmail.com)
 # Since::       0.3
 
@@ -123,7 +123,7 @@ def update_etc_hosts(nodelist):
       elif line.strip().startswith("#"):
         # normal comment lines
         info = None # clears info
-        file_info += (line, info), 
+        file_info += (line, info),
 
       else:
         # handles general lines

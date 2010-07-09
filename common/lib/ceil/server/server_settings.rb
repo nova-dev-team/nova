@@ -12,7 +12,7 @@ SERVER_NETWORK_INTERFACE_FILE_PATH = "/etc/network/interfaces"
 
 module ServerSettings
   def ServerSettings.write(content, config_file)
-		content << "#end"
+    content << "#end"
     content << ""
     content << "# #{`date`}"
     content << ""

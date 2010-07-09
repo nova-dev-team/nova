@@ -185,7 +185,7 @@ xbool xstr_eql(xstr xstr1, xstr xstr2);
 /**
   @brief
     Strip an xstr.
-  
+
   @param xs
     The xstr object to be stripped.
   @param strip_set

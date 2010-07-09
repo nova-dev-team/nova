@@ -14,7 +14,7 @@ public
   # Since::     0.3
   def index
     doms_list = []
-    Vmachine.all_domains.each do |dom| 
+    Vmachine.all_domains.each do |dom|
       dom_info = {}
 
       # extract info by using "send"

@@ -140,7 +140,7 @@ class MiscController < ApplicationController
         # kill broken mappings
         kill_by_pid_file "#{RAILS_ROOT}/log/#{entry}"
       end
-      
+
     end
     reply_success "query successful", :data => mappings
   end

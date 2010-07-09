@@ -98,7 +98,7 @@ static void node_server_acceptor(xsocket client_xs, void* args) {
       xlog_error("failure: command not recognized: '%s'", xstr_get_cstr(req_xstr));
     }
   }
- 
+
   xlog_info("connection to client %s closed", xsocket_get_host_cstr(client_xs));
 
   xstr_delete(req_xstr);

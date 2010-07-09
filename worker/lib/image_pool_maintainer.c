@@ -133,7 +133,7 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
         long long usec;
         gettimeofday(&end_time, NULL);
         usec = (end_time.tv_sec - begin_time.tv_sec) * 1000 * 1000 + (end_time.tv_usec - begin_time.tv_usec);
-        
+
         if (bytes_copied < 1.024 * 1.024 * mbps * usec) {
           // copying too slow
           sleep_usec /= 1.1;
@@ -155,7 +155,7 @@ int copy_with_speed_limit(char* old_fn, char* new_fn, int mbps) {
     } else {
       // no speed limit
       // check if need to limit speed, if so, change "should_limit_speed" to 1, and sets the begin_time
-      
+
       if (has_vm_running()) {
         gettimeofday(&begin_time, NULL);
         sleep_usec = 1;
@@ -297,7 +297,7 @@ void maintain_image_count(char* image_fn) {
       fp = fopen(test_fn, "w");
       fclose(fp);
       printf("created lock file %s\n", test_fn);
-      
+
       sprintf(test_fn, "%s.pool.%d", image_fn, copy_id);
       printf("copying %s --> %s with speed limit %d MB/s (speed will boost if no VM is running)\n", image_fn, test_fn, g_mbps);
       copy_with_speed_limit(image_fn, test_fn, g_mbps);

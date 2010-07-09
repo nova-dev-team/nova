@@ -141,7 +141,7 @@ def random_token length = 5
 end
 
 # returns the common config in common/config/conf.yml
-# 
+#
 # Since::     0.3
 def common_conf
   require 'yaml'

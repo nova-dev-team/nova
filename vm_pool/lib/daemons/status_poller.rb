@@ -22,7 +22,7 @@ end
 require File.dirname(__FILE__) + "/../../config/environment"
 
 $running = true
-Signal.trap("TERM") do 
+Signal.trap("TERM") do
   $running = false
 end
 
@@ -42,7 +42,7 @@ def write_log message
 end
 
 while($running) do
-  # connect pending pmachines  
+  # connect pending pmachines
   Pmachine.all.each do |pm|
     if pm.status == "pending"
       begin
@@ -200,7 +200,7 @@ while($running) do
     next if port == nil
     system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl add -p #{pwd} -d #{ip}:#{port} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
   end
-  
+
   sleep 10
 end
 

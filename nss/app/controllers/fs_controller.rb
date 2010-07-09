@@ -11,7 +11,7 @@ class FsController < ApplicationController
        end
     reply_success "List: #{list}"
     end
-#   render :text => params[:path] 
+#   render :text => params[:path]
  #   p = params[:dir]
   #  reply_success "Blah #{p}"
 #render :text => Dir.entries(dir.to_s).join("   ")

@@ -255,7 +255,7 @@ void xstr_strip(xstr xs, char* strip_set) {
       break;
     }
   }
-  
+
   stripped_cstr = xmalloc_ty(new_end - new_begin + 1, char);
   memcpy(stripped_cstr, xs->str + new_begin, new_end - new_begin);
   stripped_cstr[new_end - new_begin] = '\0';

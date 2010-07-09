@@ -36,7 +36,7 @@ typedef int (*keep_alive_func)(int argc, char* argv[]);
     Number of arguments, should be directly given from main().
   @param argv
     Array of arguments, should be directly given from main().
-    
+
 
   @return
     Returns what func might return.

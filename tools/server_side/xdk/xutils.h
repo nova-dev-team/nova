@@ -94,7 +94,7 @@ char* xcstr_strip(char* str);
   @param str
     The string that will contain text representation of the IP value.
     It must have enough size (>= 16).
-  
+
   @return
     -1 if convert failure, otherwise 0.
 
@@ -288,7 +288,7 @@ int xhash_hash_xstr(void* key);
     A key to be compared.
 
   @return
-    Whether the 2 xstr is equal. 
+    Whether the 2 xstr is equal.
 */
 xbool xhash_eql_xstr(void* key1, void* key2);
 

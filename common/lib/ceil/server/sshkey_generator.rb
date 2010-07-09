@@ -4,14 +4,14 @@
 require 'fileutils'
 
 module SSHKeyGenerator
-	def SSHKeyGenerator.generate(base_path)
-		begin
-			FileUtils.mkdir_p(base_path)
-		rescue
-		end		
-		filename = base_path + '/id_rsa'
-		system "ssh-keygen -N \"\" -f #{filename}"
-	end
+  def SSHKeyGenerator.generate(base_path)
+    begin
+      FileUtils.mkdir_p(base_path)
+    rescue
+    end		
+    filename = base_path + '/id_rsa'
+    system "ssh-keygen -N \"\" -f #{filename}"
+  end
 end
 
 =begin

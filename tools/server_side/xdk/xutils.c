@@ -35,7 +35,7 @@ char* xitoa(int value, char* buf, int base) {
 
   if (v < 0)
     *ptr++ = '-';
-  
+
   *ptr-- = '\0';
   while (ptr1 < ptr) {
     ch = *ptr;
@@ -67,7 +67,7 @@ char* xltoa(long long value, char* buf, int base) {
 
   if (v < 0)
     *ptr++ = '-';
-  
+
   *ptr-- = '\0';
   while (ptr1 < ptr) {
     ch = *ptr;
@@ -111,7 +111,7 @@ char* xcstr_strip(char* str) {
     str[i] = str[begin + i];
   }
   str[i] = '\0';
-  
+
   return str;
 }
 
@@ -242,7 +242,7 @@ xbool xfilesystem_is_dir(const char* path, xsuccess* optional_succ) {
 xsuccess xfilesystem_rmrf(const char* path) {
   xsuccess ret = XSUCCESS;
   if (xfilesystem_is_dir(path, NULL) == XTRUE) {
-    // TODO detect loops incurred by soft links (or just ignore folder link?)    
+    // TODO detect loops incurred by soft links (or just ignore folder link?)
     xstr subpath = xstr_new();
     DIR* p_dir = opendir(path);
 
@@ -294,7 +294,7 @@ xsuccess xfilesystem_path_cdup(xstr norm_path) {
     char sep = xsys_fs_sep_char; // filesystem separator
     char* new_cstr_path = xmalloc_ty(new_len + 1, char);
     strcpy(new_cstr_path, xstr_get_cstr(norm_path));
-    
+
     // skip the trailing '/'
     if (new_cstr_path[index] == sep) {
       index--;

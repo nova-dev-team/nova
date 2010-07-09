@@ -168,7 +168,7 @@ void list_vnc_proxy() {
     char* buf = xmalloc_ty(buf_len, char);
     int cnt;
     xstr msg = xstr_new();
-    
+
     strcpy(buf, "list\r\n");
     send(sockfd, buf, strlen(buf) + 1, 0);
 
@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
     printf("       for 'list' action, add '-v' to show more info.\n");
     exit(0);
   }
-    
+
   for (i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-p") == 0) {
       if (i + 1 < argc) {

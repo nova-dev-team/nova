@@ -53,7 +53,7 @@ static void ensure_max_size(xvec xv, int max_size) {
 int xvec_put(xvec xv, int index, void* data) {
   if (index < 0 || index > xv->size)
     return -1;
-  
+
   ensure_max_size(xv, index + 1);
   if (index == xv->size) {
     xv->size++; // append new data
@@ -93,7 +93,7 @@ int xvec_remove(xvec xv, int index) {
   int i;
   if (index < 0 || index >= xv->size)
     return -1;
-  
+
   xv->xvfree(xv->data[index]);
   for (i = index; i < xv->size - 1; i++) {
     xv->data[i] = xv->data[i + 1];

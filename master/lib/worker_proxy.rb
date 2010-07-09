@@ -38,7 +38,7 @@ class WorkerProxy
   #
   # Since::   0.3
   attr_reader :status
-  
+
   # The most recent error message.
   #
   # Since::   0.3
@@ -251,7 +251,7 @@ AGENT_HINT
   end
 
 private
-  
+
   # Send a POST request.
   # On exception return nil, otherwise return result data.
   #
@@ -276,7 +276,7 @@ private
         @status = "failure"
         @error_message = "Timeout connecting '#{@addr}'!"
         return nil
-      end      
+      end
     end
   end
 
@@ -300,7 +300,7 @@ private
         @status = "failure"
         @error_message = "Timeout connecting '#{@addr}'!"
         return nil
-      end      
+      end
     end
   end
 

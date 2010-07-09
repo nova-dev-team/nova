@@ -153,7 +153,7 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
 
     // NOTE We don't use xmalloc here, because this will trigger a false warning on "memeory leak"
     // Because when forking the service process, we set the mem counter to 0, after the creation of the xsocket.
-    // So everything inside the client_xsocket should not be counted. However, if we use xmalloc here, 
+    // So everything inside the client_xsocket should not be counted. However, if we use xmalloc here,
     // the readline_buf will be counted, which is not what we wanted.
     xs->readline_buf = (char *) malloc(xs->readline_buf_size);
     xs->readline_buf_start = 0;
@@ -161,7 +161,7 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
   }
 
   xstr_set_cstr(line, "");
-  // fetch data from buffer into the req_xstr 
+  // fetch data from buffer into the req_xstr
   for (;;) {
     if (xs->readline_buf_start == xs->readline_buf_end) {
       // no data in buffer
@@ -172,7 +172,7 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
         xs->readline_buf_end = 0;
       } else {
         // could read data into the buffer
-        // TODO use select(), add time out 
+        // TODO use select(), add time out
         int cnt = read(xs->sockfd, xs->readline_buf + xs->readline_buf_start, xs->readline_buf_size - xs->readline_buf_start);
         //printf("cnt = %d\n", cnt);
         if (cnt <= 0) {
@@ -444,7 +444,7 @@ xsuccess xserver_serve(xserver xs) {
 #endif  // #if PROFILE_XSERVER == 1
 
         xs->acceptor(client_xs, xs->args);
-        
+
         if (xmem_usage(stdout) != 0) {
           xlog_warning("[xdk] possible memory leak in xserver's service process!\n");
         }
@@ -454,7 +454,7 @@ xsuccess xserver_serve(xserver xs) {
 
       } else {
         // parent process
-        
+
         // tricky here, reset rand seed, prevent sub process from rand value collisions
         srand(pid);
 

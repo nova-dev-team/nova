@@ -23,7 +23,7 @@ end
 require File.dirname(__FILE__) + "/../../config/environment"
 
 $running = true
-Signal.trap("TERM") do 
+Signal.trap("TERM") do
   $running = false
 end
 
@@ -44,7 +44,7 @@ end
 
 while($running) do
   write_log "daemon woke up"
-  # connect pending pmachines  
+  # connect pending pmachines
   Pmachine.all.each do |pm|
     if pm.status == "pending"
       write_log "contacting pmachine with ip=#{pm.ip}"
@@ -201,7 +201,7 @@ while($running) do
     vm.pmachine = nil
     vm.save
   end
-  
+
   sleep 1
 end
 

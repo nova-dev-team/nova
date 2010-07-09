@@ -115,7 +115,7 @@ xbool ftp_session_is_logged_in(ftp_session session);
 
   @param session
     User's connection session.
-  
+
   @return
     XTRUE or XFALSE.
 */
@@ -164,7 +164,7 @@ const char* ftp_session_get_user_identifier_cstr(ftp_session session);
     User's connection session.
   @param password
     User's password, in plain text.
-  
+
   @return
     XTRUE or XFALSE indicating if the info is correct.
 */
@@ -273,7 +273,7 @@ void ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data
 /**
   @brief
     Check if data service is ready.
-  
+
   @param session
     The ftp session.
 

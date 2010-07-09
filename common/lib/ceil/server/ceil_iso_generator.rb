@@ -1,6 +1,6 @@
 #! /usr/local/bin/ruby
 #packing ceil iso
-# iso content = 
+# iso content =
 #    ceil_base_path/* + node.list + soft.list + network.conf + server.conf
 require 'fileutils'
 
@@ -18,7 +18,7 @@ CEIL_ISO_PACKAGE_PATH = '/packages'
 CEIL_ISO_KEY_PATH = '/keys'
 
 #require 'dir'
-	
+
 PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -f -l -o '
 PATH_GENISO = '/usr/bin/genisoimage'
 
@@ -33,228 +33,228 @@ FILENAME_NODELIST = CEIL_ISO_FILENAME_NODELIST
 FILENAME_SOFTLIST = CEIL_ISO_FILENAME_SOFTLIST
 
 class CeilIsoGenerator
-	def initialize
-		@net_ipaddr = nil
-		@net_netmask = nil
-		@net_gateway = nil
-		@net_dns = nil
+  def initialize
+    @net_ipaddr = nil
+    @net_netmask = nil
+    @net_gateway = nil
+    @net_dns = nil
 
-		@base_path = nil #ceil_base_path
+    @base_path = nil #ceil_base_path
 
-		@server_package = nil
-		@server_key = nil #ipaddr of package/key server
+    @server_package = nil
+    @server_key = nil #ipaddr of package/key server
 
-		@port_package = nil
-		@port_key = nil
+    @port_package = nil
+    @port_key = nil
 
-		@server_type_key = nil
-		@server_type_package = nil #server type, ie. FTP, NFS, BLAH..
+    @server_type_key = nil
+    @server_type_package = nil #server type, ie. FTP, NFS, BLAH..
 
-		@nodelist = nil 
-		#nodelist string
+    @nodelist = nil
+    #nodelist string
 
-		@softlist = nil
-		@hostname = 'nova'
-		@clustername = 'nova-cluster'
-		@id_rsa_content = nil
-		@id_rsa_pub_content = nil
+    @softlist = nil
+    @hostname = 'nova'
+    @clustername = 'nova-cluster'
+    @id_rsa_content = nil
+    @id_rsa_pub_content = nil
 
-		@changelist_username = []
-		@changelist_origin_pwd = []
-		@changelist_new_pwd = []
+    @changelist_username = []
+    @changelist_origin_pwd = []
+    @changelist_new_pwd = []
 
-		#softlist string: appnames seperated by space
-		#example
-		# softlist = "hg hj hx hz"
-	end
+    #softlist string: appnames seperated by space
+    #example
+    # softlist = "hg hj hx hz"
+  end
 
-	def config_ssh_key(id_rsa_content, id_rsa_pub_content)
-		@id_rsa_content = id_rsa_content
-		@id_rsa_pub_content = id_rsa_pub_content
-	end
+  def config_ssh_key(id_rsa_content, id_rsa_pub_content)
+    @id_rsa_content = id_rsa_content
+    @id_rsa_pub_content = id_rsa_pub_content
+  end
 
-	def config_passwd(username, new_pwd)
-		@changelist_username << username;
+  def config_passwd(username, new_pwd)
+    @changelist_username << username;
 #		@changelist_origin_pwd << origin_pwd;
-		@changelist_new_pwd << new_pwd;
-	end
+    @changelist_new_pwd << new_pwd;
+  end
 
-	def config_essential(ceil_base_path) 
-		@base_path = ceil_base_path
-	end
+  def config_essential(ceil_base_path)
+    @base_path = ceil_base_path
+  end
 
-	def config_network(ipaddr, netmask, gateway, nameserver)
-		@net_ipaddr = ipaddr
-		@net_netmask = netmask
-		@net_gateway = gateway
-		@net_dns = nameserver
-	end
+  def config_network(ipaddr, netmask, gateway, nameserver)
+    @net_ipaddr = ipaddr
+    @net_netmask = netmask
+    @net_gateway = gateway
+    @net_dns = nameserver
+  end
 
-	def config_package_server(server_package, port_package, server_type_package)
-		@server_package = server_package
-		@port_package = port_package
-		@server_type_package = server_type_package
-	end
+  def config_package_server(server_package, port_package, server_type_package)
+    @server_package = server_package
+    @port_package = port_package
+    @server_type_package = server_type_package
+  end
 
-	def config_key_server(server_key, port_key, server_type_key)
-		@server_key = server_key
-		@port_key = port_key
-		@server_type_key = server_type_key
-	end
+  def config_key_server(server_key, port_key, server_type_key)
+    @server_key = server_key
+    @port_key = port_key
+    @server_type_key = server_type_key
+  end
 
-	def config_nodelist(nodelist) 
-		@nodelist = nodelist		
-	end
+  def config_nodelist(nodelist)
+    @nodelist = nodelist		
+  end
 
-	def config_softlist(softlist)
-		@softlist = softlist
-	end
+  def config_softlist(softlist)
+    @softlist = softlist
+  end
 
-	def config_cluster(hostname, clustername)
-		@hostname = hostname
-		@clustername = clustername
-	end
+  def config_cluster(hostname, clustername)
+    @hostname = hostname
+    @clustername = clustername
+  end
 
-	def generate(tmp_path, iso_path)
-		#	1.get tmp_path
-		# 2.cp files to tmp dir
-		# 3.geniso
+  def generate(tmp_path, iso_path)
+    #	1.get tmp_path
+    # 2.cp files to tmp dir
+    # 3.geniso
     tmpdir = tmp_path
-		try_count = 0
+    try_count = 0
 
 =begin
-		begin
-			#tmpdir = DirTool.temp_dir("iso#{try_count}")
-			try_count = try_count + 1
-			#puts try_count
-			result = 0
-			begin
-			  Dir.mkdir(tmpdir)
-			rescue SystemCallError
-				result = 1
-			end
-		end until (result == 0 || try_count > 3)
-		
-		if try_count > 3
-			puts "Cannot create tempdir"
-			return nil
-		end
+    begin
+      #tmpdir = DirTool.temp_dir("iso#{try_count}")
+      try_count = try_count + 1
+      #puts try_count
+      result = 0
+      begin
+        Dir.mkdir(tmpdir)
+      rescue SystemCallError
+        result = 1
+      end
+    end until (result == 0 || try_count > 3)
+
+    if try_count > 3
+      puts "Cannot create tempdir"
+      return nil
+    end
 =end
 
-		# link base_path to tmpdir/
-		#FileUtils.cp_r(@base_path, tmpdir)
-		begin	
-			FileUtils.ln_s(@base_path, tmpdir)
-		rescue
-		end
+    # link base_path to tmpdir/
+    #FileUtils.cp_r(@base_path, tmpdir)
+    begin	
+      FileUtils.ln_s(@base_path, tmpdir)
+    rescue
+    end
 
-		# create config files
-		begin
+    # create config files
+    begin
       FileUtils.mkdir_p(tmpdir + CONFIG_PATH)
       #FileUtils.mkdir_p(tmpdir + PACKAGE_PATH)
       FileUtils.mkdir_p(tmpdir + KEY_PATH)
-		rescue
+    rescue
     end
     #DirTool.mkdir()
 
-		filename_servers = tmpdir + CONFIG_PATH + '/' + FILENAME_SERVERS
-		filename_network = tmpdir + CONFIG_PATH + '/' + FILENAME_NETWORK
-		filename_nodelist = tmpdir + CONFIG_PATH + '/' + FILENAME_NODELIST
-		filename_softlist = tmpdir + CONFIG_PATH + '/' + FILENAME_SOFTLIST
-		filename_cluster = tmpdir + CONFIG_PATH + '/' + FILENAME_CLUSTER
+    filename_servers = tmpdir + CONFIG_PATH + '/' + FILENAME_SERVERS
+    filename_network = tmpdir + CONFIG_PATH + '/' + FILENAME_NETWORK
+    filename_nodelist = tmpdir + CONFIG_PATH + '/' + FILENAME_NODELIST
+    filename_softlist = tmpdir + CONFIG_PATH + '/' + FILENAME_SOFTLIST
+    filename_cluster = tmpdir + CONFIG_PATH + '/' + FILENAME_CLUSTER
 
-		File.open(filename_servers, 'w') do |file|
-			content = ""
-			content << @server_package << "\n"
-			content << @port_package << "\n"
-			content << @server_type_package << "\n"
-			content << @server_key << "\n"
-			content << @port_key << "\n"
-			content << @server_type_key << "\n"
-			file.puts content
-		end
+    File.open(filename_servers, 'w') do |file|
+      content = ""
+      content << @server_package << "\n"
+      content << @port_package << "\n"
+      content << @server_type_package << "\n"
+      content << @server_key << "\n"
+      content << @port_key << "\n"
+      content << @server_type_key << "\n"
+      file.puts content
+    end
 
-		File.open(filename_network, 'w') do |file|
-			content = ""
-			content << @net_ipaddr << "\n"
-			content << @net_netmask << "\n"
-			content << @net_gateway << "\n"
-			content << @net_dns << "\n"
-			file.puts content
-		end
+    File.open(filename_network, 'w') do |file|
+      content = ""
+      content << @net_ipaddr << "\n"
+      content << @net_netmask << "\n"
+      content << @net_gateway << "\n"
+      content << @net_dns << "\n"
+      file.puts content
+    end
 
-		File.open(filename_nodelist, 'w') do |file|
-			file.puts @nodelist
-		end
+    File.open(filename_nodelist, 'w') do |file|
+      file.puts @nodelist
+    end
 
-		File.open(filename_softlist, 'w') do |file|
-			file.puts @softlist
-		end
-		
-		File.open(filename_cluster, 'w') do |file|
-			file.puts @hostname
-			file.puts @clustername
-		end
+    File.open(filename_softlist, 'w') do |file|
+      file.puts @softlist
+    end
 
-		if @id_rsa_content
-			sshkey_path = tmpdir + KEY_PATH + '/ssh-nopass' 
-			begin
-	      FileUtils.mkdir_p(sshkey_path)
-			rescue
-			end
-			File.open(sshkey_path + '/id_rsa', 'w') do |file|
-				file.puts @id_rsa_content
-			end
-			File.open(sshkey_path + '/id_rsa.pub', 'w') do |file|
-				file.puts @id_rsa_pub_content
-			end
+    File.open(filename_cluster, 'w') do |file|
+      file.puts @hostname
+      file.puts @clustername
+    end
 
-			attach_filename = File.dirname(__FILE__) + '/packages/ssh-nopass'
-			attach_destname = sshkey_path + '/attach.sh'	
-			begin
-				FileUtils.cp(attach_filename, attach_destname) 
-			rescue
-			end
-		end
+    if @id_rsa_content
+      sshkey_path = tmpdir + KEY_PATH + '/ssh-nopass'
+      begin
+        FileUtils.mkdir_p(sshkey_path)
+      rescue
+      end
+      File.open(sshkey_path + '/id_rsa', 'w') do |file|
+        file.puts @id_rsa_content
+      end
+      File.open(sshkey_path + '/id_rsa.pub', 'w') do |file|
+        file.puts @id_rsa_pub_content
+      end
 
-		if @changelist_username.length > 0
-			passwd_path = tmpdir + KEY_PATH + '/passwd' 
-			attach_filename = File.dirname(__FILE__) + '/packages/passwd'
-			attach_destname = passwd_path + '/attach.sh'	
+      attach_filename = File.dirname(__FILE__) + '/packages/ssh-nopass'
+      attach_destname = sshkey_path + '/attach.sh'	
+      begin
+        FileUtils.cp(attach_filename, attach_destname)
+      rescue
+      end
+    end
 
-			expect_filename = File.dirname(__FILE__) + '/packages/pwd.exp'
-			expect_destname = passwd_path + '/pwd.exp'	
-			begin
-	      FileUtils.mkdir_p(passwd_path)
-			rescue
-			end
+    if @changelist_username.length > 0
+      passwd_path = tmpdir + KEY_PATH + '/passwd'
+      attach_filename = File.dirname(__FILE__) + '/packages/passwd'
+      attach_destname = passwd_path + '/attach.sh'	
 
-			File.open(passwd_path + '/passwd.list', 'w') do |file|
-				0.upto(@changelist_username.length - 1) do |i|
-					file.puts @changelist_username[i]
-					file.puts @changelist_new_pwd[i]
-				end
-			end
-			begin
-				FileUtils.cp(attach_filename, attach_destname) 
-			rescue
-			end
-			begin
-				FileUtils.cp(expect_filename, expect_destname) 
-			rescue
-			end
+      expect_filename = File.dirname(__FILE__) + '/packages/pwd.exp'
+      expect_destname = passwd_path + '/pwd.exp'	
+      begin
+        FileUtils.mkdir_p(passwd_path)
+      rescue
+      end
 
-		end
+      File.open(passwd_path + '/passwd.list', 'w') do |file|
+        0.upto(@changelist_username.length - 1) do |i|
+          file.puts @changelist_username[i]
+          file.puts @changelist_new_pwd[i]
+        end
+      end
+      begin
+        FileUtils.cp(attach_filename, attach_destname)
+      rescue
+      end
+      begin
+        FileUtils.cp(expect_filename, expect_destname)
+      rescue
+      end
 
-		#3.pack tmpdir
-		cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
-		result = system cmdline
-		if result 
-			return iso_path
-		else
-			return nil
-		end
-	end
+    end
+
+    #3.pack tmpdir
+    cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
+    result = system cmdline
+    if result
+      return iso_path
+    else
+      return nil
+    end
+  end
 
 end
 
