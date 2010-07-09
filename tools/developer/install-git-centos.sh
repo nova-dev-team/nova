@@ -15,7 +15,7 @@ fi
 
 yum makecache
 yum groupinstall "Development Tools"
-yum install gettext-devel expat-devel curl-devel zlib-devel openssl-devel
+yum install -y gettext-devel expat-devel curl-devel zlib-devel openssl-devel
 
 mkdir -p data
 
