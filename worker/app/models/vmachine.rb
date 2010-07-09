@@ -15,12 +15,20 @@ class Vmachine < ActiveRecord::Base
   LIBVIRT_SUSPENDED = 3
   LIBVIRT_NOT_RUNNING = 5
 
+  HYPERVISOR=common_conf["hypervisor"]
+  # hypervisor used by nova
   # Connection to libvirt.
   #
   # Since::   0.3
-  ## @@virt_conn = Libvirt::open("qemu:///system")
-  #temply switch to xen:///
-  @@virt_conn = Libvirt::open("xen:///")
+  @@virt_conn = nil
+  case HYPERVISOR
+  when "xen"
+    @@virt_conn = Libvirt::open("xen:///")
+  when "kvm"
+    @@virt_conn = Libvirt::open("qemu:///system")
+  else
+    raise "vmachine initial: unsupported hypervisor: #{HYPERVISOR}"
+  end
 
   # Get the connection to libvirt.
   #
