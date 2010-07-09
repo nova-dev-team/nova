@@ -18,7 +18,9 @@ class Vmachine < ActiveRecord::Base
   # Connection to libvirt.
   #
   # Since::   0.3
-  @@virt_conn = Libvirt::open("qemu:///system")
+  ## @@virt_conn = Libvirt::open("qemu:///system")
+  temply switch to xen:///
+  @@virt_conn = Libvirt::open("xen:///")
 
   # Get the connection to libvirt.
   #
@@ -142,6 +144,7 @@ end
 case params[:hypervisor]
 when "kvm"
   "/usr/bin/kvm"
+when "xen"
 else
   raise "hypervisor '#{params[:hypervisor]}' not supported!"
 end
