@@ -1,6 +1,10 @@
 hmaccalc
 ncurses-devel
 unifdef
+libX11-devel
+glibc-devel
+python-devel
+SDL-devel
 gettext-devel
 expat-devel
 curl-devel
