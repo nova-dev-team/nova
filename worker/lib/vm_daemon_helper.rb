@@ -13,7 +13,7 @@ LIBVIRT_RUNNING = 1
 LIBVIRT_SUSPENDED = 3
 LIBVIRT_NOT_RUNNING = 5
 
-HYPERVISOR = common_conf[:hypervisor]
+HYPERVISOR = common_conf["hypervisor"]
 
 def my_exec cmd
   puts "[cmd] #{cmd}"

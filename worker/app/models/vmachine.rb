@@ -15,7 +15,7 @@ class Vmachine < ActiveRecord::Base
   LIBVIRT_SUSPENDED = 3
   LIBVIRT_NOT_RUNNING = 5
 
-  HYPERVISOR=common_conf[:hypervisor]
+  HYPERVISOR=common_conf["hypervisor"]
   # hypervisor used by nova
   # Connection to libvirt.
   #
