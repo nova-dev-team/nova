@@ -22,10 +22,10 @@ end
 
 
 def libvirt_connect_local
-  when HYPERVISOR    
-  case "xen"
+  case HYPERVISOR    
+  when "xen"
     return Libvirt::open("xen:///")
-  case "kvm"
+  when "kvm"
     return Libvirt::open("qemu:///system")
   else
     raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."

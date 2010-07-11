@@ -21,10 +21,10 @@ class Vmachine < ActiveRecord::Base
   #
   # Since::   0.3
   @@virt_conn = nil
-  when HYPERVISOR
-  case "xen"
+  case HYPERVISOR
+  when "xen"
     @@virt_conn = Libvirt::open("xen:///")
-  case "kvm"
+  when "kvm"
     @@virt_conn = Libvirt::open("qemu:///system")
   else
     raise "vmachine initial: unsupported hypervisor: #{HYPERVISOR}"
