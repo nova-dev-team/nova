@@ -97,7 +97,7 @@ if grep -q "CentOS" "/etc/issue" ; then
 
   echo ====================================================================
   echo
-  echo *** Finished installing Xen and Linux kernel.
+  echo "*** Finished installing Xen and Linux kernel."
   echo
   echo The compiled binary is in '/tmp/nova_build' directory.
   echo Now, you need to config the Grub loader.
