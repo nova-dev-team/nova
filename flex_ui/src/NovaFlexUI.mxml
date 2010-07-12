@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*" creationComplete="init()">
 	<mx:Script>
 		<![CDATA[
 			
 			import mx.rpc.events.ResultEvent;
 			import com.adobe.serialization.json.JSON;
-			
+			import mx.controls.Alert;
 			import nova.GlobalConst;
 			
 			[Embed(source="assets/logo.svg")]
@@ -18,8 +18,15 @@
 			[Bindable]
 			public var myPrivilege : String = "root";
 			
-			public function misc_WhoAmI_JSON(event : ResultEvent) : void {
-				logout();
+			public function init():void {
+				Alert.show("Welcome to Nova platform!");
+				misc_WhoAmI_Request.send();
+			}
+			
+			public function misc_WhoAmI_JSON(event:ResultEvent) : void {
+				myUsername = "blah";
+				myPrivilege = "priv";
+				Alert.show(event.message.body.toString());
 			}
 			
 			private function logout() : void {
@@ -29,6 +36,8 @@
 		]]>
 	</mx:Script>
 	<mx:HTTPService id="misc_WhoAmI_Request" url="{GlobalConst.misc_WhoAmI}" useProxy="false" method="GET" resultFormat="text" result="misc_WhoAmI_JSON(event)" />
+	
+	
 	<mx:VBox x="0" y="0" width="100%" height="100%" minHeight="480" minWidth="640">
 		<mx:Canvas width="100%" height="30">
 			<mx:HBox right="0" top="0">
