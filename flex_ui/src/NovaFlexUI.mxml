@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*" creationComplete="init()">
 	<mx:Script>
 		<![CDATA[
 			
 			import mx.rpc.events.ResultEvent;
 			import com.adobe.serialization.json.JSON;
-			
+			import mx.controls.Alert;
 			import nova.GlobalConst;
 			
 			[Embed(source="assets/logo.svg")]
@@ -18,8 +18,15 @@
 			[Bindable]
 			public var myPrivilege : String = "root";
 			
-			public function misc_WhoAmI_JSON(event : ResultEvent) : void {
-				logout();
+			public function init():void {
+				Alert.show("Welcome to Nova platform!");
+				misc_WhoAmI_Request.send();
+			}
+			
+			public function misc_WhoAmI_JSON(event:ResultEvent) : void {
+				myUsername = "blah";
+				myPrivilege = "priv";
+				Alert.show(event.message.body.toString());
 			}
 			
 			private function logout() : void {

@@ -2,8 +2,10 @@ package nova
 {
 	public class GlobalConst
 	{
-		public static var logoutURL : String = "/logout";
+		public static const urlBase:String = "http://localhost:3000";
 		
-		public static var misc_WhoAmI : String = "/misc/who_am_i.json"
+		public static const logoutURL:String = urlBase+ "/logout";
+		
+		public static const misc_WhoAmI:String = urlBase+ "/misc/who_am_i.json"
 	}
 }
