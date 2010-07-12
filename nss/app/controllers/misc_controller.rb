@@ -1,10 +1,14 @@
+# This contoller is used to do miscellanous works. Generally speaking, it supports other controllers.
+
 require "fileutils"
 
 class MiscController < ApplicationController
+# Reply the role of this node. When adding storages, master uses this service to "authenticate" workers.
   def role
     reply_success "storage"
   end
 
+# Reply the current version of Nova platform.
   def version
     if File.exists? "#{RAILS_ROOT}/../VERSION"
       ver = File.read("#{RAILS_ROOT}/../VERSION").strip
@@ -14,6 +18,7 @@ class MiscController < ApplicationController
     end
   end
 
+# Get the hostname of the machine.
   def hostname
     if File.exists? "#{RAILS_ROOT}/tmp/hostname"
       hostname = File.read("#{RAILS_ROOT}/tmp/hostname").strip
@@ -23,6 +28,7 @@ class MiscController < ApplicationController
     end
   end
 
+# Removes deprecated VM image.
   def revoke_vm_image
     dir = "#{RAILS_ROOT}/../../run/image_pool"
     fpath = ""
@@ -54,6 +60,7 @@ class MiscController < ApplicationController
       end
     end
 
+# Removes deprecated VM packages.
     def revoke_package
       dir = "#{RAILS_ROOT}/../../run/package_pool"
       pkg_path = ""

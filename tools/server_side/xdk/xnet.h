@@ -69,7 +69,7 @@ const char* xsocket_get_host_cstr(xsocket xs);
 /**
   @brief
     Get host machine's service port.
-  
+
   @param xs
     The xsocket object containing the port number.
 

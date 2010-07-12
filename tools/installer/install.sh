@@ -55,7 +55,7 @@ if grep -q "Ubuntu" "/etc/issue" ; then
 elif grep -q "CentOS" "/etc/issue" ; then
   echo "Current Linux distribution is CentOS."
   yum makecache
-  yum groupinstall "Development Tools"
+  yum groupinstall -y "Development Tools"
 
   # install a few packages directly by yum
   YUM_LIST=$SCRIPT_ROOT/data/yum.list

@@ -9,7 +9,7 @@ class CeilController < ApplicationController
   # login not required, if virtual machine has fixed IP
   #  see: remote_ip = request.remote_ip
   def test
-      remote_ip = params[:rip] 
+      remote_ip = params[:rip]
       remote_ip = remote_ip.chomp
       vm = Vmachine.all #find_by_ip(remote_ip)
       miao = Vmachine.find_by_ip(remote_ip)
@@ -71,22 +71,22 @@ class CeilController < ApplicationController
       character << "worker"
       character << "master" if vm.master?
 
-      cjson = {"host_name" => host_name, 
-               "cluster_name" => cluster_name, 
-               "node_list" => node_list, 
+      cjson = {"host_name" => host_name,
+               "cluster_name" => cluster_name,
+               "node_list" => node_list,
                "package_list" => package_list,
                "package_server" => server_addr,
                "package_server_type" => CEIL_PACKAGE_SERVER_TYPE,
                "key_server" => server_addr,
                "key_server_type" => CEIL_KEY_SERVER_TYPE,
-               "character" => character} 
+               "character" => character}
 
       accept.json { render :json => cjson }
       accept.html { render :text => cjson.to_json }
 
       #accept.ip { render :text => request.remote_ip() }
       #accept.config { render :text => request.remote_ip() }
-    end      
+    end
 
   end
 
@@ -104,7 +104,7 @@ class CeilController < ApplicationController
     remote_ip = pp[:rip].chomp
    # request.remote_ip
     vm = Vmachine.find_by_ip(remote_ip)
-    if vm 
+    if vm
       log = VmachineInfo.new
 
       log.status = log_status

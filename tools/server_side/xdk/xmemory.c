@@ -72,7 +72,7 @@ void xmem_log_table_delete(xmem_log_table* xl) {
   int actual_size = (xl->base_size << xl->extend_level) + xl->extend_ptr;
   xmem_log_table_entry* p;
   xmem_log_table_entry* q;
-  
+
   for (i = 0; i < actual_size; i++) {
     p = xl->slot[i];
     while (p != NULL) {
@@ -237,7 +237,7 @@ int xmem_log_table_remove(xmem_log_table* xl, void* ptr) {
       q = p->next;
       if (q == NULL)
         return XFAILURE;
-      
+
       if (ptr == q->ptr) {
         // q is target
         p->next = q->next;
@@ -260,7 +260,7 @@ void xmem_log_table_visit(xmem_log_table* xl, xmem_log_table_visitor visitor, vo
   int actual_size = (xl->base_size << xl->extend_level) + xl->extend_ptr;
   xbool should_continue = XTRUE;
   xmem_log_table_entry* p;
-  
+
   for (i = 0; i < actual_size && should_continue == XTRUE; i++) {
     p = xl->slot[i];
     while (p != NULL && should_continue == XTRUE) {

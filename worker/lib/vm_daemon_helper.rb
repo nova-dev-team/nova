@@ -5,6 +5,7 @@ require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
 require 'ceil_iso_generator'
+require 'utils'
 require 'uri'
 
 # libvirt status constants
@@ -12,9 +13,23 @@ LIBVIRT_RUNNING = 1
 LIBVIRT_SUSPENDED = 3
 LIBVIRT_NOT_RUNNING = 5
 
+HYPERVISOR = common_conf["hypervisor"]
+
 def my_exec cmd
   puts "[cmd] #{cmd}"
   system cmd
+end
+
+
+def libvirt_connect_local
+  case HYPERVISOR
+  when "xen"
+    return Libvirt::open("xen:///")
+  when "kvm"
+    return Libvirt::open("qemu:///system")
+  else
+    raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
+  end
 end
 
 def write_log message
@@ -94,7 +109,7 @@ def prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
       # create downloading lock
       File.open(base_image_copying_lock, "w") {|f|}
       write_log "created copying lock"
-      
+
       lftp_script_file = File.join image_pool_dir, "#{hda_name}.lftp"
       File.open(lftp_script_file, "w") do |f|
         f.write <<LFTP_SCRIPT_FILE
@@ -274,7 +289,7 @@ LFTP_SCRIPT_FILE
     write_log "retry preparing precess"
     prepare_agent_package storage_server, package_pool, vm_dir, package_name
   end
-end 
+end
 
 
 ###############################################################################################
@@ -406,10 +421,10 @@ def do_prepare rails_root, storage_server, vm_dir
   write_log "starting vmachine"
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
-  #virt_conn = Libvirt::open("qemu:///system")
-  virt_conn = Libvirt::open("xen:///")
-  # temporarily switch to xen
-  
+
+  virt_conn = libvirt_connect_local
+  # connect to local libvirtd
+
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
     dom.create
@@ -484,8 +499,8 @@ def do_poll storage_server, vm_dir
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
 
-  virt_conn = Libvirt::open("xen:///")
-  
+  virt_conn = libvirt_connect_local
+
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
 
@@ -534,7 +549,7 @@ def do_cleanup storage_server, vm_dir
     end
 
     # make sure the vm domain is destroyed
-    virt_conn = Libvirt::open("xen:///")
+    virt_conn = libvirt_connect_local
     dom = virt_conn.lookup_domain_by_uuid(uuid) rescue nil
     dom.destroy rescue nil
     dom.undefine rescue nil

@@ -218,7 +218,7 @@ xsuccess ftp_fs_retr_file(xsocket xsock, const xstr root_jail, const xstr curren
   if (S_ISDIR(st.st_mode)) {
     // send dir
     xstr ls_data = xstr_new();
-    
+
     // the param here should be unjailed, since it will be jailed again inside ftp_fs_list_into_xstr
     if (ftp_fs_list_into_xstr(root_jail, unjailed_fullpath, ls_data, error_msg) != XSUCCESS) {
       ret = XFAILURE;
@@ -460,7 +460,7 @@ xsuccess ftp_fs_dele(const xstr root_jail, const char* current_dir, const char* 
 
   xjoin_path_cstr(unjailed_fullpath, current_dir, dirname);
   jail_path(jailed_fullpath, root_jail, unjailed_fullpath);
-  
+
   if (xfilesystem_rmrf(xstr_get_cstr(jailed_fullpath)) != XSUCCESS) {
     xstr_set_cstr(error_msg, "500 error occured during DELE execution\r\n");
     ret = XFAILURE;
@@ -613,8 +613,8 @@ xsuccess ftp_fs_site_cmd(const xstr root_jail, const char* current_dir, const ch
     xstr unjailed_fullpath = xstr_new();
     xstr jailed_fullpath = xstr_new();
     xstr fn = xstr_new();
-    
-    
+
+
     for (i = 0; i < 14; i++) {
       if (cmd[i + 6] < '0' || cmd[i + 6] > '9') {
         has_error = XTRUE;
@@ -682,7 +682,7 @@ xsuccess ftp_fs_site_cmd(const xstr root_jail, const char* current_dir, const ch
     }
 
     xlog_debug("[site chmod] new mode value is %o\n", mode_val);
-    
+
     xstr_set_cstr(fn, cmd + i);
     xstr_strip(fn, " \t");
 

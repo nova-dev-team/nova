@@ -73,7 +73,7 @@ void xhash_delete(xhash xh) {
   int actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
   xhash_entry* p;
   xhash_entry* q;
-  
+
   for (i = 0; i < actual_size; i++) {
     p = xh->slot[i];
     while (p != NULL) {
@@ -227,7 +227,7 @@ int xhash_remove(xhash xh, void* key) {
       q = p->next;
       if (q == NULL)
         return XFAILURE;
-      
+
       if (xh->eql_func(key, q->key)) {
         // q is target
         p->next = q->next;
@@ -251,7 +251,7 @@ void xhash_visit(xhash xh, xhash_visitor visitor, void* args) {
   int actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
   xbool should_continue = XTRUE;
   xhash_entry* p;
-  
+
   for (i = 0; i < actual_size && should_continue == XTRUE; i++) {
     p = xh->slot[i];
     while (p != NULL && should_continue == XTRUE) {

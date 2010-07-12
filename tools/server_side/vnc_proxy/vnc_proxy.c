@@ -198,7 +198,7 @@ static void vnc_proxy_acceptor(xsocket client_xs, void* args) {
     // handshake vnc version
     cnt = xsocket_read(vnc_xs, buf, 12);
     xsocket_write(vnc_xs, "RFB 003.008\n", 12);
-   
+
     xsocket_read(vnc_xs, buf, 1);
     auth_type_count = buf[0];
     xlog_info("real VNC server has %d types of auth\n", auth_type_count);
@@ -219,7 +219,7 @@ static void vnc_proxy_acceptor(xsocket client_xs, void* args) {
     if (has_none_auth == XTRUE) {
       // tell server to use none_auth
       xsocket_write(vnc_xs, "\1", 1);
-  
+
     } else if (has_vnc_auth == XTRUE) {
       buf[0] = (unsigned char) 2;
       xsocket_write(vnc_xs, buf, 1);  // tell vnc server: use vnc auth
@@ -514,7 +514,7 @@ static void* ipc_server(void* arg) {
     xlog_info("client disconnected\n");
     close(client_sockfd);
   }
-  
+
   xfree(buf);
   xfree(args[0]); // args[0] is an int*
   xfree(args);

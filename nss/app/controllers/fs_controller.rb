@@ -1,7 +1,13 @@
+# Controller for file system operation.
+
 require 'fileutils'
 
-class FsController < ApplicationController
- 
+class FsController < ApplicationControlleri
+
+# Show a listing of file directory.
+# * params[:dir]: directory name of items relativing to /nova/storage, eg: 
+#    /fs/listdir?dir=vdisks
+
   def  listdir
     if valid_param? params[:dir]
       dir = "#{RAILS_ROOT}/../../storage"+params[:dir]
@@ -19,11 +25,13 @@ class FsController < ApplicationController
           end
         end
        data += "]"
-    reply_success "Query successful! Data: #{data}"
+    reply_success "Query successful!", :Data => data
     end
+
   end
 
-
+# Delete a file or a directory.
+# * params[:path]: path of the file(directory) to be deleted.
   def rm
     if valid_param? params[:path]
       path = params[:path]
@@ -32,15 +40,21 @@ class FsController < ApplicationController
     end
   end
 
+# Move a file or a directory.
+# * params[:from]: the src path of the file(directory);
+# * params[:to]: the dest path of the file(directory).
   def mv
     if (valid_param? params[:from]) && (valid_param? params[:to])
       from = params[:from]
       to = params[:to]
       FileUtils.mv(from.to_s, to.to_s)
-      reply_success "Remove successful!"
+      reply_success "Move successful!"
     end
   end
 
+# Copy a file.
+# * params[:from]: the src path of the file;
+# * params[:to]: the dest path of the file.
   def cp
     if (valid_param? params[:from]) && (valid_param? params[:to])
       from = params[:from]

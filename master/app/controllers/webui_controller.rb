@@ -7,7 +7,7 @@ class WebuiController < ApplicationController
 
   before_filter :login_required
   layout "webui"
- 
+
   # A tricky handler, immediately redirects to a full url. This prevents broken relative address.
   #
   # Since::   0.3

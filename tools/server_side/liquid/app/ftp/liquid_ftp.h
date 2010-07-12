@@ -22,7 +22,7 @@
     Number of command line arguments. Should be directly given from main(argc, argv).
   @param argv
     Array of command line arguments. Should be directly given from main(argc, argv).
-  
+
   @return
     Whether the service is successful.
 */

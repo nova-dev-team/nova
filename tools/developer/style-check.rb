@@ -1,6 +1,8 @@
 #!/usr/bin/ruby
 
 # This is the style checker for Nova project.
+# Run with option '-f' to fix style warnings.
+#
 # Santa Zhang (santa1987@gmail.com)
 
 require 'find'
@@ -8,6 +10,17 @@ require 'find'
 load File.join File.dirname(__FILE__), 'style-check.conf'
 
 NOVA_SRC_ROOT = "../.."
+
+# run a command
+def my_exec cmd
+  puts "[cmd] #{cmd}"
+  system cmd
+end
+
+# whether we should try fixing the style warnings
+def should_fix?
+  ARGV.include? "-f"
+end
 
 # check if should skip some files
 def should_skip? f
@@ -44,6 +57,9 @@ def warn_trailing_whitespace f
     line = line.chomp
     if line.end_with? " "
       report_warning f, "contains trailing whitespace"
+      if should_fix?
+        my_exec "./clear-trailing-whitespace.rb #{f}"
+      end
       break
     end
   end
@@ -55,6 +71,9 @@ def warn_tab_indents f
     line = line.chomp
     if line.start_with? "\t"
       report_warning f, "contains tab indents"
+      if should_fix?
+        my_exec "./replace-tab-to-space.rb #{f}"
+      end
       break
     end
   end
@@ -123,3 +142,6 @@ Find.find(NOVA_SRC_ROOT) do |f|
   end
 end
 
+unless should_fix?
+  puts "*** You can fix style warnings with an '-f' option."
+end

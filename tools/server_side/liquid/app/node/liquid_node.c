@@ -85,7 +85,7 @@ static xsuccess liquid_node_real(int argc, char* argv[]) {
 
   xoption_delete(xopt);
 
-  
+
   conf.bind_addr = bind_addr;
   conf.bind_port = port;
   conf.basefolder = basefolder;

@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     print_help();
     return 1;
   }
-  
+
   pid_file = argv[1];
   run_root = argv[2];
 

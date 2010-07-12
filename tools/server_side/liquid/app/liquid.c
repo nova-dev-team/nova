@@ -6,7 +6,7 @@
   TODO intro doc
 
   @section Features
-  
+
   TODO feat doc
 */
 
@@ -42,7 +42,7 @@ void* g_actions[] = {
 
   "dftp", "Run as an distributed ftp server", liquid_dftp, liquid_dftp_help,
 
-  "ftp", "Run as an local ftp server", liquid_ftp, liquid_ftp_help, 
+  "ftp", "Run as an local ftp server", liquid_ftp, liquid_ftp_help,
 
   "help", "Display help message", print_help, help_on_help,
 
@@ -92,7 +92,7 @@ static xsuccess print_help(int argc, char* argv[]) {
         return XSUCCESS;
       }
     }
-    
+
     printf("liquid: '%s' is not a valid help topic. See 'liquid help'.\n", argv[2]);
     return XFAILURE;
   }

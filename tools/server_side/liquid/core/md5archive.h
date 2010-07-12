@@ -9,7 +9,7 @@
 /**
   @brief
     Helper to store/retrieve contents from disk. File and folder names are determined by the md5 value given.
-  
+
   @file
     md5archive.h
 

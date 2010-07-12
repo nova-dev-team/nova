@@ -21,9 +21,9 @@ class Ceil
       @cc = ClusterConfiguration.new(@env.local_addr)
       server_addr = @env.default_gateway
       local_addr = @env.local_addr
-      
+
       #server_addr = "192.168.0.110"
-			
+
       if ! @cc.fetch_by_iso
         puts "Cannot find config files in cdrom"
         return nil
@@ -34,7 +34,7 @@ class Ceil
         File.open(ubuntu_filename_hostname, 'wb') do |file|
           file.puts @cc.host_name
         end
-				@env.reconfig_network('eth0')
+        @env.reconfig_network('eth0')
       rescue
       end
 
@@ -98,7 +98,7 @@ class Ceil
             temp_path = @package_downloader.package_by_nfs(app_name)
           when "ftp"
             temp_path = @package_downloader.package_by_ftp(app_name)
-          else 
+          else
             @log.send("-10", "#{app_name}", "package server type #{@cc.package_server_type} not supported.")
             puts "package server type #{@cc.package_server_type} not supported."
             break
@@ -126,7 +126,7 @@ class Ceil
             temp_path = @key_downloader.key_by_nfs(@cc.cluster_name, app_name)
           when "ftp"
             temp_path = @key_downloader.key_by_ftp(@cc.cluster_name, app_name)
-          else 
+          else
             @log.send("-50", "#{app_name}", "key server type #{@cc.key_server_type} not supported.")
             puts "key server type #{@cc.key_server_type} not supported."
             next

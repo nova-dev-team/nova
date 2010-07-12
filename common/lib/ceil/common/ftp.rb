@@ -33,9 +33,9 @@ class FTPTransfer
   def initialize(server_addr, port = '21', usr = 'anonymous', passwd = 'CeilClient')
     BasicSocket.do_not_reverse_lookup = true
     @server_addr = server_addr
-		@server_port = port
-		@usr = usr
-		@passwd = passwd
+    @server_port = port
+    @usr = usr
+    @passwd = passwd
   end
 
   def download_file(remote_path, file_name, local_path)
@@ -55,14 +55,14 @@ class FTPTransfer
         puts "	FILE: #{file}"
         if @conn.cd(remote_path + "/" + file)
           puts "[#{file}] is a dir, now dip into it"
-					Rescue.ignore {
+          Rescue.ignore {
             download_recursive(remote_path + "/" + file, local_path + sp + file)
-					}
+          }
         else
           puts "[#{file}] is a file, now download #{remote_path}/#{file} to #{local_path}"
-					Rescue.ignore {
+          Rescue.ignore {
             download_file(remote_path, file, local_path)
-					}
+          }
         end
       end
     }
@@ -70,7 +70,7 @@ class FTPTransfer
   def download_dir(remote_path, local_path, sp = "/")
     puts "DOWN DIR #{remote_path}"
     @conn = Net::FTP.new #(@server_addr)
-		@conn.connect(@server_addr, @server_port)
+    @conn.connect(@server_addr, @server_port)
 
     Rescue.ignore {
       @conn.login(@usr, @passwd)

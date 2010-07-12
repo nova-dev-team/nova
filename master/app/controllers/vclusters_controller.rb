@@ -64,7 +64,7 @@ class VclustersController < ApplicationController
 
             raise "Failed to create vmachine!" unless vm.save
             vm_counter += 1
-            
+
             vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil}
           else
             case line

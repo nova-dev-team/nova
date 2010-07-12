@@ -15,12 +15,20 @@ class Vmachine < ActiveRecord::Base
   LIBVIRT_SUSPENDED = 3
   LIBVIRT_NOT_RUNNING = 5
 
+  HYPERVISOR=common_conf["hypervisor"]
+  # hypervisor used by nova
   # Connection to libvirt.
   #
   # Since::   0.3
-  ## @@virt_conn = Libvirt::open("qemu:///system")
-  #temply switch to xen:///
-  @@virt_conn = Libvirt::open("xen:///")
+  @@virt_conn = nil
+  case HYPERVISOR
+  when "xen"
+    @@virt_conn = Libvirt::open("xen:///")
+  when "kvm"
+    @@virt_conn = Libvirt::open("qemu:///system")
+  else
+    raise "vmachine initial: unsupported hypervisor: #{HYPERVISOR}"
+  end
 
   # Get the connection to libvirt.
   #
@@ -42,7 +50,7 @@ class Vmachine < ActiveRecord::Base
   def Vmachine.all_domains
     virt_conn = Vmachine.virt_conn
     all_domains = []
-    
+
     Dir.foreach(Setting.vm_root) do |vm_entry|
       vm_dir_path = File.join Setting.vm_root, vm_entry
       next if vm_entry.start_with? "."
@@ -98,7 +106,7 @@ class Vmachine < ActiveRecord::Base
         raise "incorrect \"#{cpu_count}\" value!"
       end
     end
-    
+
     unless params["uuid"].is_uuid?
       raise "malformed uuid!"
     end
@@ -106,7 +114,7 @@ class Vmachine < ActiveRecord::Base
     unless ["x86", "x86_64", "amd64", "i686"].include? params["arch"]
       raise "unsupported architecture"
     end
-    
+
   end
 
   # Generate XML definition on VM params. It will be used by libvirt.
@@ -235,7 +243,7 @@ end
   </devices>
 </domain>
 XML_DESC
-    else 
+    else
       raise "hypervisor #{params[:hypervisor]} not supported!"
     end
     File.open("/var/xml_desc.log", "w") do |f|
@@ -471,7 +479,7 @@ private
         f.write "\n"
       end
     end
-    
+
     # write the 'hda_save_to' file, which indicates the hda image will be saved
     if params[:hda_save_to] != nil and params[:hda_save_to] != ""
       Vmachine.open_vm_file(params[:name], "hda_save_to") do |f|
@@ -543,7 +551,7 @@ private
 
   def Vmachine.xen_live_migrate params
     #TODO:we can have a type in params to divide xen and kvm
-    if params[:dst] != nil and params[:dst] != "" 
+    if params[:dst] != nil and params[:dst] != ""
       if params[:uuid] != nil and params[:uuid] != ""
         begin
           system "virsh migrate --live " + params[:uuid].to_s + \
@@ -557,7 +565,7 @@ private
           system "virsh migrate --live " + params[:name].to_s + \
             " xen:/// xenmigr://" + params[:dst].to_s
         rescue
-          raise "xen live migrate failed! Can't migrate #{params[:name]} to #{params[:dst]}"         
+          raise "xen live migrate failed! Can't migrate #{params[:name]} to #{params[:dst]}"
         end
       else
         raise "Please provide either uuid or name!"

@@ -90,7 +90,7 @@ class MiscController < ApplicationController
       end
     end
   end
-  
+
   # Removes deprecated VM packages.
   #
   # Since::     0.3

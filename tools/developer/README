@@ -9,5 +9,6 @@ nova.vimrc
 
 style-check.rb
   Check coding style of all source code files in Nova.
+  You can fix all the bad styles with an '-f' option.
   Usage: ./style-check.rb
 

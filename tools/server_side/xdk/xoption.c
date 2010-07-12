@@ -41,7 +41,7 @@ static void opt_free(void* key, void* value) {
   // but xopt->optlen hash table entry ("h", 0). This means we can always xfree
   // the pointer to "h", from xopt->optlen hash table. So the key is left to be xfree'd in xoptlen_free.
   // See add_short_option for details.
-  
+
   // value is pointer to const c-string, so they don't need to be free'd
 }
 

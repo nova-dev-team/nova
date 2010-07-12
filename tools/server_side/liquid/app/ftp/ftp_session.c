@@ -27,7 +27,7 @@ struct ftp_session_impl {
   char trans_type;  ///< @brief Transmission type, 'A':ASCII, 'I':BINARY/IMAGE.
   char trans_mode;  ///< @brief Transmission mode, 'P':passive (only support this).
   xserver data_server;  ///< @brief Data server.
-  
+
   int rand_data_port; ///< @brief A helper variable for allocating data server's service port.
   off_t start_offset; ///< @brief Starting offset for RETR and STOR command.
 };

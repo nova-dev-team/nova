@@ -68,7 +68,7 @@ module AuthenticatedSystem
           redirect_to new_session_path
         end
         # format.any doesn't work in rails version < http://dev.rubyonrails.org/changeset/8987
-        # Add any other API formats here.  (Some browsers, notably IE6, send Accept: */* and trigger 
+        # Add any other API formats here.  (Some browsers, notably IE6, send Accept: */* and trigger
         # the 'format.any' block incorrectly. See http://bit.ly/ie6_borken or http://bit.ly/ie6_borken2
         # for a workaround.)
         format.any(:json, :xml) do
@@ -161,7 +161,7 @@ module AuthenticatedSystem
 
     def valid_remember_cookie?
       return nil unless @current_user
-      (@current_user.remember_token?) && 
+      (@current_user.remember_token?) &&
         (cookies[:auth_token] == @current_user.remember_token)
     end
 
@@ -170,7 +170,7 @@ module AuthenticatedSystem
       return unless @current_user
       case
       when valid_remember_cookie? then @current_user.refresh_token # keeping same expiry date
-      when new_cookie_flag        then @current_user.remember_me 
+      when new_cookie_flag        then @current_user.remember_me
       else                             @current_user.forget_me
       end
       send_remember_cookie!
