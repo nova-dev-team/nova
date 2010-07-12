@@ -126,7 +126,7 @@ LFTP_SCRIPT
 
       my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
       my_exec "#{RAILS_ROOT}/lib/image_pool_maintainer #{RAILS_ROOT}/tmp/pids/image_pool_maintainer.pid #{RAILS_ROOT}/lib/image_pool_maintainer.conf #{conf["run_root"]}/image_pool"
-      my_exec "#{RAILS_ROOT}/lib/trash_cleaner #{RAILS_ROOT}/log #{conf["run_root"]}"
+      my_exec "#{RAILS_ROOT}/lib/trash_cleaner #{RAILS_ROOT}/log #{conf["run_root"]} #{conf["hypervisor"]}"
       my_exec "RAILS_ENV=development #{RAILS_ROOT}/script/server -d -p #{service_port} &"
     end
 
@@ -177,7 +177,18 @@ LFTP_SCRIPT
       
       my_exec "Rake nova:worker:stop"
 
-      virt_conn = Libvirt::open("qemu:///system")
+      conf = read_config
+      virt_conn_uri = nil
+      case conf["hypervisor"]
+      when "kvm"
+        virt_conn_uri = "qemu:///system"
+      when
+        virt_conn_uri = "xen:///"
+      else
+        raise "nova:worker:reset: unsupported hypervisor #{conf["hypervisor"]}"
+      end
+
+      virt_conn = Libvirt::open(virt_conn_uri)
       virt_conn.list_defined_domains.each do |domain_name|
         puts "Destroying domain '#{domain_name}'"
         begin
