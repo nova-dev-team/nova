@@ -352,3 +352,31 @@ function change_hda_save_to(vm_name, old_value) {
   });
 }
 
+function live_migrate_to(vm_name) {
+  target_addr = prompt("Input destination worker's addr", "destintaion");
+  if (target_addr == null) {
+    return;
+  }
+
+  $.ajax({
+    url: "/vmachines/live_migrate_to.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: vm_name,
+      migrate_dest: target_addr
+    },
+    success: function(result) {
+      $("#sys_settings_panel").unblock();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      $("#sys_settings_panel").unblock();
+      alert("Request failed!");
+    }
+  });
+}
