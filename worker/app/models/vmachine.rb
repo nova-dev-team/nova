@@ -549,11 +549,18 @@ private
     end
   end
 
-  def Vmachine.live_migrate_to vm_name, migrate_dest
+  def Vmachine.live_migrate_to vm_name, migrate_dest, migrate_src
     migrate_to_fn = File.join Setting.vm_root, vm_name, "migrate_to"
     File.open(migrate_to_fn, "w") do |f|
       f.write migrate_dest
     end
+    migrate_from_fn = File.join Setting.vm_root, vm_name, "migrate_from"
+    if migrate_src
+      File.open(migrate_from_fn, "w") do |f|
+        f.write migrate_src
+      end
+    end
+
     Vmachine.log vm_name, "prepare migrating to #{migrate_dest}"
     return {:success => true, :message => "Vmachine '#{vm_name}' is preparing migrate to worker '#{migrate_dest}'"}
   end

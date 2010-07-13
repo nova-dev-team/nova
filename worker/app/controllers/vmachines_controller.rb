@@ -108,7 +108,7 @@ public
 
   def live_migrate_to
     if valid_param? params[:name] and valid_param? params[:migrate_dest]
-      result = Vmachine.live_migrate_to params[:name], params[:migrate_dest]
+      result = Vmachine.live_migrate_to params[:name], params[:migrate_dest], params[:migrate_src]
       if result == nil
         reply_failure "call to Vmachine.live_migrate_to failed"
       elsif result[:success]
