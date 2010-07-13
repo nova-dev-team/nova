@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" xmlns:settings="services.settings.*">
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			
+			protected function sys_setting_creationCompleteHandler(event:FlexEvent):void
+			{
+				listSettingsResult.token = settings.listSettings();
+			}
+			
+		]]>
+	</mx:Script>
 	<mx:Accordion x="0" y="0" width="100%" height="100%">
 		<mx:Canvas label="System settings" width="100%" height="100%">
-			<mx:AdvancedDataGrid x="26" y="10" id="sys_setting" designViewDataType="flat" width="1029" height="506">
+			<mx:AdvancedDataGrid x="26" y="10" id="sys_setting" designViewDataType="flat" width="1029" height="506" creationComplete="sys_setting_creationCompleteHandler(event)" dataProvider="{listSettingsResult.lastResult}">
 				<mx:columns>
 					<mx:AdvancedDataGridColumn headerText="Key" dataField="key"/>
 					<mx:AdvancedDataGridColumn headerText="Value" dataField="value"/>
 					<mx:AdvancedDataGridColumn headerText="Information" dataField="info"/>
 					<mx:AdvancedDataGridColumn dataField="for_worker" headerText="For worker?"/>
+					<mx:AdvancedDataGridColumn headerText="message" dataField="message"/>
+					<mx:AdvancedDataGridColumn headerText="data" dataField="data"/>
+					<mx:AdvancedDataGridColumn headerText="success" dataField="success"/>
 				</mx:columns>
 			</mx:AdvancedDataGrid>
 		</mx:Canvas>
@@ -95,4 +110,6 @@
 			<mx:ComboBox x="923" y="370" editable="false" width="100"></mx:ComboBox>
 		</mx:Canvas>
 	</mx:Accordion>
+	<mx:CallResponder id="listSettingsResult"/>
+	<settings:Settings id="settings" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
 </mx:Canvas>

@@ -1,45 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*">
-=======
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*" creationComplete="init()">
->>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
 	<mx:Script>
 		<![CDATA[
 			
-			import mx.rpc.events.ResultEvent;
 			import com.adobe.serialization.json.JSON;
-<<<<<<< HEAD
-			
-=======
 			import mx.controls.Alert;
->>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
+			import mx.rpc.events.ResultEvent;
 			import nova.GlobalConst;
 			
 			[Embed(source="assets/logo.svg")]
 			[Bindable]
 			public var logo : Class;
 			
-			[Bindable]
-			public var myUsername : String = "root";
-			
-			[Bindable]
-			public var myPrivilege : String = "root";
-			
-<<<<<<< HEAD
-			public function misc_WhoAmI_JSON(event : ResultEvent) : void {
-				logout();
-=======
 			public function init():void {
-				Alert.show("Welcome to Nova platform!");
 				misc_WhoAmI_Request.send();
 			}
 			
 			public function misc_WhoAmI_JSON(event:ResultEvent) : void {
-				myUsername = "blah";
-				myPrivilege = "priv";
-				Alert.show(event.message.body.toString());
->>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
+				var ret:Object = JSON.decode(event.message.body.toString());
+				GlobalConst.myLogin = ret.login;
+				GlobalConst.myPrivilege = ret.privilege;
+				GlobalConst.myEmail = ret.email;
+				GlobalConst.myFullname = ret.name;
 			}
 			
 			private function logout() : void {
@@ -52,7 +34,7 @@
 	<mx:VBox x="0" y="0" width="100%" height="100%" minHeight="480" minWidth="640">
 		<mx:Canvas width="100%" height="30">
 			<mx:HBox right="0" top="0">
-				<mx:Label text="user: {myUsername}, privilege: {myPrivilege}" />
+				<mx:Label text="user: {GlobalConst.myLogin}, privilege: {GlobalConst.myPrivilege}" />
 				<mx:LinkButton label="Logout" id="logout_btn" click="logout()" />
 			</mx:HBox>
 		</mx:Canvas>

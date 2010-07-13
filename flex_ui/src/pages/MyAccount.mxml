@@ -1,40 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-<<<<<<< HEAD
-=======
 
 	<mx:Script>
 		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
 			import flash.events.TimerEvent;
 			import flash.utils.Timer;
 			
 			import mx.controls.Alert;
 			import mx.rpc.events.ResultEvent;
 			
+			import nova.GlobalConst;
+			
 			protected function updateInfo_btn_clickHandler(event:MouseEvent):void
 			{
-				Alert.show("updating user info");
+				user_UpdateProfile_Request.send({
+					"login" : GlobalConst.myLogin,
+					"name" : GlobalConst.myFullname,
+					"email" : GlobalConst.myEmail
+				});
 			}
 
 			protected function changePwd_btn_clickHandler(event:MouseEvent):void
 			{
 				
-				changePwd.url = "http://www.google.com";
-				//Alert.show("change user password");
-				changePwd.send();
+				var passwdMinLength:Number = 4;
 				
+				if (curPwd.text.length == 0) {
+					Alert.show("Please provide your current password!");
+					return;
+				} else if (newPwd.text.length == 0) {
+					Alert.show("Please provide a new password!");
+					return;
+				} else if (newPwd.text.length < passwdMinLength) {
+					Alert.show("Your new password is too short!");
+					return;
+				} else if (newPwd.text != newPwdConfirm.text) {
+					Alert.show("Your password is not correctly typed, the 2 inputs does not agree!");
+					return;
+				}
+				user_ChangePwd_Request.send({
+					"login" : GlobalConst.myLogin,
+					"old_password" : curPwd.text,
+					"new_password" : newPwd.text,
+					"new_password_confirm" : newPwdConfirm.text
+				});
 			}
 			
 			protected function changePwdHandle(e:ResultEvent):void {
-				Alert.show("Blah...");
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					Alert.show("Your password has been changed.");
+					curPwd.text = "";
+					newPwd.text = "";
+					newPwdConfirm.text = "";
+				} else {
+					Alert.show("Failed to change your password!\nError message: " + ret.message);
+				}
+			}
+			
+			protected function updateProfileHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					Alert.show("Your profile has been updated.");
+				} else {
+					Alert.show("Failed to update your profile!\nError message: " +  + ret.message);
+				}
 			}
 			
 		]]>
 	</mx:Script>
 	
-	<mx:HTTPService id="changePwd" result="changePwdHandle(event);" showBusyCursor="true" />
-
->>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
+	<mx:HTTPService id="user_ChangePwd_Request" url="{GlobalConst.user_ChangePwd}" useProxy="false" method="POST" resultFormat="text" result="changePwdHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="user_UpdateProfile_Request" url="{GlobalConst.user_UpdateProfile}" useProxy="false" method="POST" resultFormat="text" result="updateProfileHandle(event);" showBusyCursor="true" />
+	
 	<mx:Label x="78" y="52" text="This is your account info:"/>
 	<mx:HRule x="78" y="80" width="444"/>
 	<mx:HRule x="79" y="314" width="444"/>
@@ -42,22 +82,17 @@
 	<mx:Label x="80" y="142" text="Privilege:"/>
 	<mx:Label x="80" y="193" text="Full Name:"/>
 	<mx:Label x="80" y="234" text="Email:"/>
-	<mx:Label x="200" y="103" text="TODO"/>
-	<mx:Label x="200" y="142" text="TODO"/>
-	<mx:TextInput x="196" y="192" text="Root Almighty"/>
-	<mx:TextInput x="196" y="228" text="root@somewhere.com"/>
+	<mx:Label x="200" y="103" text="{GlobalConst.myLogin}"/>
+	<mx:Label x="200" y="142" text="{GlobalConst.myPrivilege}"/>
+	<mx:TextInput x="196" y="192" text="{GlobalConst.myFullname}"/>
+	<mx:TextInput x="196" y="228" text="{GlobalConst.myEmail}"/>
 	<mx:Label x="85" y="368" text="Current password:"/>
 	<mx:Label x="85" y="409" text="New password"/>
-	<mx:TextInput x="260" y="367" displayAsPassword="true"/>
-	<mx:TextInput x="260" y="403" displayAsPassword="true"/>
+	<mx:TextInput x="260" y="367" displayAsPassword="true" id="curPwd"/>
+	<mx:TextInput x="260" y="403" displayAsPassword="true" id="newPwd"/>
 	<mx:Label x="85" y="441" text="Confirm new password:"/>
-	<mx:TextInput x="260" y="435" displayAsPassword="true"/>
-<<<<<<< HEAD
-	<mx:Button x="147" y="275" label="Update Info"/>
-	<mx:Button x="149" y="497" label="Change password"/>
-=======
+	<mx:TextInput x="260" y="435" displayAsPassword="true" id="newPwdConfirm"/>
 	<mx:Button x="147" y="275" label="Update Info" id="updateInfo_btn" click="updateInfo_btn_clickHandler(event)"/>
 	<mx:Button x="149" y="497" label="Change password" id="changePwd_btn" click="changePwd_btn_clickHandler(event)"/>
->>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
 	<mx:Label x="85" y="335" text="Change your password:"/>
 </mx:Canvas>
