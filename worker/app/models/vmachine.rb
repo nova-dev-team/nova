@@ -554,7 +554,7 @@ private
     File.open(migrate_to_fn, "w") do |f|
       f.write migrate_dest
     end
-    return {:success => true, :message => "Vmachine '#{vm_name}' is preparing migrate to worker '#{migrate_dest}'"
+    return {:success => true, :message => "Vmachine '#{vm_name}' is preparing migrate to worker '#{migrate_dest}'"}
   end
 
   def Vmachine.xen_live_migrate params

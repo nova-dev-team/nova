@@ -146,7 +146,7 @@ elsif dom.info.state == Vmachine::LIBVIRT_SUSPENDED
   "<button type='button' class='btn' onclick=\"resume_vmachine('#{dom.uuid}')\"><span><span>Resume</span></span></button>\n"
 end
 }
-<button type='button' class='btn' onclick=\"live_migrate_to('#{dom.name}')\"><span><span>Migrate</span></span></button>
+<button type='button' class='btn' onclick="live_migrate_to('#{dom.name}')"><span><span>Migrate</span></span></button>
 <button type='button' class='btn' onclick=\"destroy_vmachine('#{dom.name}', '#{dom.uuid}')\"><span><span><font color='red'><b>Destroy !!!</b></font></span></span></button>
 </td>
 </tr>
