@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+<<<<<<< HEAD
+	<mx:Button x="78" y="44" label="TODO: Overview"/>
+=======
 	<mx:Button x="78" y="44" label="TODO: Wizard"/>
+>>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
 </mx:Canvas>

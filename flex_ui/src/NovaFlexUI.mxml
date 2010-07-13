@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*">
+=======
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" xmlns:pages="pages.*" creationComplete="init()">
+>>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
 	<mx:Script>
 		<![CDATA[
 			
 			import mx.rpc.events.ResultEvent;
 			import com.adobe.serialization.json.JSON;
+<<<<<<< HEAD
+			
+=======
 			import mx.controls.Alert;
+>>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
 			import nova.GlobalConst;
 			
 			[Embed(source="assets/logo.svg")]
@@ -18,6 +26,10 @@
 			[Bindable]
 			public var myPrivilege : String = "root";
 			
+<<<<<<< HEAD
+			public function misc_WhoAmI_JSON(event : ResultEvent) : void {
+				logout();
+=======
 			public function init():void {
 				Alert.show("Welcome to Nova platform!");
 				misc_WhoAmI_Request.send();
@@ -27,6 +39,7 @@
 				myUsername = "blah";
 				myPrivilege = "priv";
 				Alert.show(event.message.body.toString());
+>>>>>>> 76ee7cff0d1c95cdbe5a171bf306e3965653b413
 			}
 			
 			private function logout() : void {
