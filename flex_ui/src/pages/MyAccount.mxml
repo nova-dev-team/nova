@@ -85,8 +85,8 @@
 	<mx:Label x="80" y="142" text="Privilege:"/>
 	<mx:Label x="80" y="193" text="Full Name:"/>
 	<mx:Label x="80" y="234" text="Email:"/>
-	<mx:Label x="200" y="103" text="{GlobalConst.myLogin}"/>
-	<mx:Label x="200" y="142" text="{GlobalConst.myPrivilege}"/>
+	<mx:Label x="200" y="103" text="{GlobalConst.myLogin}" fontWeight="bold"/>
+	<mx:Label x="200" y="142" text="{GlobalConst.myPrivilege}" fontWeight="bold"/>
 	<mx:TextInput x="196" y="192" id="myFullname" text="{GlobalConst.myFullname}"/>
 	<mx:TextInput x="196" y="228" id="myEmail" text="{GlobalConst.myEmail}"/>
 	<mx:Label x="85" y="368" text="Current password:"/>
