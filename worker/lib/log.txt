@@ -1,0 +1,3 @@
+CPU using:  7.1   memTotal:1695MB  memFree:30MB   Rece: 235.0B/s Tran:   0.0B/s   
+CPU using:  5.2   memTotal:1695MB  memFree:20MB   Rece:   0.0B/s Tran:   0.0B/s   
+CPU using:  4.6   memTotal:1695MB  memFree:27MB   Rece: 724.0B/s Tran: 324.0B/s   

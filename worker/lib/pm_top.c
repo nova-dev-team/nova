@@ -5,6 +5,8 @@
 #include<sys/stat.h>
 #include<fcntl.h> 
 #include<unistd.h>
+#include <unistd.h>
+#include <signal.h>
 
 #define NCPUSTATES 5
 #define LOGSIZE 1000
@@ -59,8 +61,16 @@ long percentages_cpu(int cnt, int *out, register long *new, register long *old, 
     return(total_change); 
 } 
 
-int main(void)
+// command line args:
+// pm_top <pid_file> <log_file> <update_interval>
+int main(int argc, char* argv[])
 { 
+
+  // default sleep interval is 1 second
+  int update_interval = 1;
+  char* pid_file;
+  char* log_file;
+
 	/*Initialization*/
 	int fd, len; 
 	FILE * fw;
@@ -69,6 +79,32 @@ int main(void)
 	long mem_total, mem_free, buffers, cached;
 	long rece_total, tran_total, rece_old, tran_old;
 	double rece_diff, tran_diff;
+
+  printf("This is pm_top!\n");
+  if (argc < 3 || argc > 4) {
+    printf("Usage: pm_top <pid_file> <log_file> [update_interval]\n");
+    return 1;
+  } else {
+    pid_file = argv[1];
+    log_file = argv[2];
+  }
+
+  if (argc == 4) {
+    update_interval = atoi(argv[3]);
+  }
+
+  // prevent zombie child process
+  signal(SIGCHLD, SIG_IGN);
+  int pid = fork();
+  if (pid == 0) {
+    // child process, do nothing, falls through
+  } else {
+    // parent process
+    FILE* pid_fp = fopen(pid_file, "w");
+    fprintf(pid_fp, "%d", pid);
+    fclose(pid_fp);
+    exit(0);
+  }
 
 	for(i = 0; i < NCPUSTATES; i++){ 
 		cpu_states[i] = 0; 
@@ -96,9 +132,9 @@ int main(void)
 
 		percentages_cpu(NCPUSTATES, cpu_states, cp_time, cp_old, cp_diff);
 		if(j%LOGSIZE == 0)
-			fw = fopen("log.txt","w+"); 
+			fw = fopen(log_file,"w+"); 
 		else
-			fw = fopen("log.txt","a+");
+			fw = fopen(log_file,"a+");
 		if(j != 1)
 		//fprintf(stderr, "cpu  used:%4.1f nice:%4.1f sys:%4.1f idle:%4.1f iowait:%4.1f   ",cpu_states[0]/10.0,cpu_states[1]/10.0,cpu_states[2]/10.0,cpu_states[3]/10.0,cpu_states[4]/10.0); 
 		fprintf(fw, "CPU using:%5.1f   ",100-cpu_states[3]/10.0); 
@@ -172,7 +208,7 @@ int main(void)
 		fclose(fw);
 		rece_old = rece_total;
 		tran_old = tran_total;
-		sleep(1);
+		sleep(update_interval);
 	} 
 return 0;
 }
