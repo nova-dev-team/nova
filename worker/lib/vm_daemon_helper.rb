@@ -505,7 +505,14 @@ def do_migrate vm_uuid
     write_log "changed VM status to 'migrating'"
     begin
       cmd = "virsh migrate --live " + vm_uuid + " xen:/// xenmigr://" + migrate_dest
-      my_exec cmd
+      result = my_exec cmd
+
+      if result
+        write_log "migrating success!"
+      else
+        write_log "migrating failed!"
+      end
+
     rescue
       write_log "live migrate failed!"
     end
