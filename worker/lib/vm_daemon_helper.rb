@@ -493,6 +493,35 @@ HDA_SAVE_TO_LFTP
   end
 end
 
+def do_migrate vm_uuid
+  migrate_dest = File.read "migrate_to"
+  if migrate_dest && migrate_dest.length > 0
+    write_log "now migrate vm<#{vm_uuid}> to worker '#{migrate_dest}'"
+    old_status = File.read "status"
+    File.open("status", "w") do |f|
+      f.write "status"
+    end
+
+    write_log "changed VM status to 'migrating'"
+    begin
+      cmd = "virsh migrate --live " + vm_uuid + " xen:/// xenmigr://" + migrate_dest
+      my_exec cmd
+    rescue
+      write_log "live migrate failed!"
+    end
+
+    write_log "migrating finished, remove migrating tag"
+    FileUtils.rm_f "migrate_to"
+
+    File.open("status", "w") do |f|
+      f.write old_status
+    end
+
+  else
+    #FileUtils.rm_f "migrate_to"
+    #invalid params
+  end
+end
 
 
 def do_poll storage_server, vm_dir
@@ -505,7 +534,13 @@ def do_poll storage_server, vm_dir
     dom = virt_conn.lookup_domain_by_uuid(uuid)
 
     if dom.info.state != LIBVIRT_NOT_RUNNING
-      return  # the vm is still running, skip the following actions
+      
+      if File.exists? "migrate_to"
+        write_log "found migrate tag while polling"
+        do_migrate uuid
+      end
+      return  
+      # the vm is still running, skip the following actions
     else
       write_log "detected VM shutdown, saving it"
       begin
