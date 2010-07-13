@@ -2,19 +2,40 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" xmlns:settings="services.settings.*">
 	<mx:Script>
 		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
+			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.events.FlexEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import nova.GlobalConst;
+			
+			[Bindable]
+			protected var settingsListData:ArrayCollection = new ArrayCollection();
 			
 			protected function sys_setting_creationCompleteHandler(event:FlexEvent):void
 			{
-				listSettingsResult.token = settings.listSettings();
+				list_settings_Request.send();
+			}
+			
+			protected function listSettingsHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					settingsListData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						settingsListData.addItem(ret.data[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of settings!");	
+				}
 			}
 			
 		]]>
 	</mx:Script>
 	<mx:Accordion x="0" y="0" width="100%" height="100%">
 		<mx:Canvas label="System settings" width="100%" height="100%">
-			<mx:AdvancedDataGrid x="26" y="10" id="sys_setting" designViewDataType="flat" width="1029" height="506" creationComplete="sys_setting_creationCompleteHandler(event)" dataProvider="{listSettingsResult.lastResult.data}">
+			<mx:AdvancedDataGrid x="26" y="10" id="sys_setting" designViewDataType="flat" width="1029" height="506" creationComplete="sys_setting_creationCompleteHandler(event)" dataProvider="{settingsListData}">
 				<mx:columns>
 					<mx:AdvancedDataGridColumn headerText="Key" dataField="key"/>
 					<mx:AdvancedDataGridColumn headerText="Value" dataField="value"/>
@@ -107,6 +128,7 @@
 			<mx:ComboBox x="923" y="370" editable="false" width="100"></mx:ComboBox>
 		</mx:Canvas>
 	</mx:Accordion>
-	<mx:CallResponder id="listSettingsResult"/>
-	<settings:Settings id="settings" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+	
+	<mx:HTTPService id="list_settings_Request" url="{GlobalConst.settings_list}" useProxy="false" method="POST" resultFormat="text" result="listSettingsHandle(event);" showBusyCursor="true" />
+	
 </mx:Canvas>

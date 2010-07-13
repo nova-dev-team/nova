@@ -2,29 +2,57 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" xmlns:users="services.users.*">
 	<mx:Script>
 		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
+			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.events.FlexEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import nova.GlobalConst;
+			
+			[Bindable]
+			protected var userListData:ArrayCollection = new ArrayCollection();
 			
 			protected function userList_creationCompleteHandler(event:FlexEvent):void
 			{
-				listUsersResult.token = users.listUsers();
+				users_list_Request.send();
 			}
 			
+			protected function listUsersHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					userListData.removeAll();
+					for (var i:Number = 0; i < ret.users.length; i++) {
+						userListData.addItem(ret.users[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of users!");	
+				}
+			}
+			
+			protected function refresh_btn_clickHandler(event:MouseEvent):void
+			{
+				users_list_Request.send();
+			}
+
 		]]>
 	</mx:Script>
-	<mx:AdvancedDataGrid x="89" y="56" id="userList" designViewDataType="flat" width="921" height="437" creationComplete="userList_creationCompleteHandler(event)" dataProvider="{listUsersResult.lastResult.users}">
+	<mx:AdvancedDataGrid x="89" y="56" id="userList" designViewDataType="flat" width="921" height="437" creationComplete="userList_creationCompleteHandler(event)" dataProvider="{userListData}">
 		<mx:columns>
 			<mx:AdvancedDataGridColumn dataField="id" headerText="#" width="40"/>
 			<mx:AdvancedDataGridColumn dataField="login" headerText="Login"/>
 			<mx:AdvancedDataGridColumn dataField="privilege" headerText="Privilege"/>
-			<mx:AdvancedDataGridColumn dataField="activated" headerText="Activated"/>
 			<mx:AdvancedDataGridColumn dataField="name" headerText="Full Name"/>
 			<mx:AdvancedDataGridColumn dataField="email" headerText="Email"/>
+			<mx:AdvancedDataGridColumn dataField="activated" headerText="Activated"/>
 		</mx:columns>
 	</mx:AdvancedDataGrid>
-	<mx:HSlider x="91" y="513" width="722"/>
+	<mx:HSlider x="199" y="513" width="614"/>
 	<mx:TextInput x="833" y="502" width="108"/>
 	<mx:Button x="949" y="502" label="Go" width="63"/>
-	<mx:CallResponder id="listUsersResult"/>
-	<users:Users id="users" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+	<mx:Button x="89" y="502" id="refresh_btn" label="Refresh" width="76" click="refresh_btn_clickHandler(event)"/>
+	
+	<mx:HTTPService id="users_list_Request" url="{GlobalConst.users_list}" useProxy="false" method="POST" resultFormat="text" result="listUsersHandle(event);" showBusyCursor="true" />
+	
 </mx:Canvas>
