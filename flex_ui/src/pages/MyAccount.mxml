@@ -9,6 +9,7 @@
 			import flash.utils.Timer;
 			
 			import mx.controls.Alert;
+			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
 			import nova.GlobalConst;
@@ -72,11 +73,17 @@
 				}
 			}
 			
+
+			protected function requestFailureHandle(event:FaultEvent):void
+			{
+				Alert.show("Request failure! Check your network connection!");
+			}
+
 		]]>
 	</mx:Script>
 	
-	<mx:HTTPService id="user_ChangePwd_Request" url="{GlobalConst.user_ChangePwd}" useProxy="false" method="POST" resultFormat="text" result="changePwdHandle(event);" showBusyCursor="true" />
-	<mx:HTTPService id="user_UpdateProfile_Request" url="{GlobalConst.user_UpdateProfile}" useProxy="false" method="POST" resultFormat="text" result="updateProfileHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="user_ChangePwd_Request" url="{GlobalConst.user_ChangePwd}" useProxy="false" method="POST" resultFormat="text" result="changePwdHandle(event);" fault="requestFailureHandle(event)" showBusyCursor="true" />
+	<mx:HTTPService id="user_UpdateProfile_Request" url="{GlobalConst.user_UpdateProfile}" useProxy="false" method="POST" resultFormat="text" result="updateProfileHandle(event);" fault="requestFailureHandle(event)" showBusyCursor="true" />
 	
 	<mx:Label x="78" y="52" text="This is your account info:"/>
 	<mx:HRule x="78" y="80" width="444"/>
