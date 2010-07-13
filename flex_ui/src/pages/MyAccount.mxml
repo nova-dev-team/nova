@@ -15,6 +15,8 @@
 			
 			protected function updateInfo_btn_clickHandler(event:MouseEvent):void
 			{
+				GlobalConst.myEmail = myEmail.text;
+				GlobalConst.myFullname = myFullname.text;
 				user_UpdateProfile_Request.send({
 					"login" : GlobalConst.myLogin,
 					"name" : GlobalConst.myFullname,
@@ -64,6 +66,7 @@
 				var ret:Object = JSON.decode(e.message.body.toString());
 				if (ret.success) {
 					Alert.show("Your profile has been updated.");
+					
 				} else {
 					Alert.show("Failed to update your profile!\nError message: " +  + ret.message);
 				}
@@ -84,8 +87,8 @@
 	<mx:Label x="80" y="234" text="Email:"/>
 	<mx:Label x="200" y="103" text="{GlobalConst.myLogin}"/>
 	<mx:Label x="200" y="142" text="{GlobalConst.myPrivilege}"/>
-	<mx:TextInput x="196" y="192" text="{GlobalConst.myFullname}"/>
-	<mx:TextInput x="196" y="228" text="{GlobalConst.myEmail}"/>
+	<mx:TextInput x="196" y="192" id="myFullname" text="{GlobalConst.myFullname}"/>
+	<mx:TextInput x="196" y="228" id="myEmail" text="{GlobalConst.myEmail}"/>
 	<mx:Label x="85" y="368" text="Current password:"/>
 	<mx:Label x="85" y="409" text="New password"/>
 	<mx:TextInput x="260" y="367" displayAsPassword="true" id="curPwd"/>

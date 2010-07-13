@@ -10,21 +10,16 @@
 				listUsersResult.token = users.listUsers();
 			}
 			
-			
 		]]>
 	</mx:Script>
-	<mx:AdvancedDataGrid x="89" y="56" id="userList" designViewDataType="flat" width="921" height="437" creationComplete="userList_creationCompleteHandler(event)" dataProvider="{listUsersResult.lastResult}">
+	<mx:AdvancedDataGrid x="89" y="56" id="userList" designViewDataType="flat" width="921" height="437" creationComplete="userList_creationCompleteHandler(event)" dataProvider="{listUsersResult.lastResult.users}">
 		<mx:columns>
-			<mx:AdvancedDataGridColumn dataField="users" headerText="#" width="40"/>
-			<mx:AdvancedDataGridColumn dataField="users" headerText="Login"/>
-			<mx:AdvancedDataGridColumn dataField="users.privilege" headerText="Privilege"/>
+			<mx:AdvancedDataGridColumn dataField="id" headerText="#" width="40"/>
+			<mx:AdvancedDataGridColumn dataField="login" headerText="Login"/>
+			<mx:AdvancedDataGridColumn dataField="privilege" headerText="Privilege"/>
 			<mx:AdvancedDataGridColumn dataField="activated" headerText="Activated"/>
-			<mx:AdvancedDataGridColumn dataField="fullname" headerText="Full Name"/>
+			<mx:AdvancedDataGridColumn dataField="name" headerText="Full Name"/>
 			<mx:AdvancedDataGridColumn dataField="email" headerText="Email"/>
-			<mx:AdvancedDataGridColumn headerText="message" dataField="message"/>
-			<mx:AdvancedDataGridColumn headerText="users" dataField="users"/>
-			<mx:AdvancedDataGridColumn headerText="pages_total" dataField="pages_total"/>
-			<mx:AdvancedDataGridColumn headerText="success" dataField="success"/>
 		</mx:columns>
 	</mx:AdvancedDataGrid>
 	<mx:HSlider x="91" y="513" width="722"/>
@@ -32,5 +27,4 @@
 	<mx:Button x="949" y="502" label="Go" width="63"/>
 	<mx:CallResponder id="listUsersResult"/>
 	<users:Users id="users" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
-	<mx:CallResponder id="listUsersResult2"/>
 </mx:Canvas>
