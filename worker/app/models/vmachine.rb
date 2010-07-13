@@ -549,6 +549,14 @@ private
     end
   end
 
+  def Vmachine.live_migrate_to vm_name, migrate_dest
+    migrate_to_fn = File.join Setting.vm_root, vm_name, "migrate_to"
+    File.open(migrate_to_fn, "w") do |f|
+      f.write migrate_dest
+    end
+    return {:success => true, :message => "Vmachine '#{vm_name}' is preparing migrate to worker '#{migrate_dest}'"
+  end
+
   def Vmachine.xen_live_migrate params
     #TODO:we can have a type in params to divide xen and kvm
     if params[:dst] != nil and params[:dst] != ""

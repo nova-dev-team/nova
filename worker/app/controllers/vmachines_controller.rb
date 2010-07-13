@@ -90,7 +90,7 @@ public
   #
   # Since::     0.3
   def change_hda_save_to
-    if valid_param? params[:name] and valid_param? params[:hda_save_to]
+    if valid_param? params[:name] # and valid_param? params[:hda_save_to]
       result = Vmachine.change_hda_save_to params[:name], params[:hda_save_to]
       if result == nil
         reply_failure "call to Vmachine.change_hda_save_to failed"
@@ -101,6 +101,24 @@ public
       end
     else
       reply_failure "Please provide 'name' and 'hda_save_to' params!"
+    end
+  end
+
+  # Tell vm_daemon to prepare migrate
+
+  def live_migrate_to
+    if valid_param? params[:name] and valid_param? params[:migrate_dest]
+      result = Vmachine.live_migrate_to params[:name], params[:migrate_dest]
+      if result == nil
+        reply_failure "call to Vmachine.live_migrate_to failed"
+      elsif result[:success]
+        reply_success result[:message]
+      else
+        reply_failure result[:message]
+      end
+
+    else
+      reply_failure "live_migrate_to: invalid params"
     end
   end
 
