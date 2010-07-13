@@ -28,6 +28,9 @@ run_root:                       /nova/run
 # where is the system installed
 system_root:                    /nova/system
 
+# storage root, used by NFS & FTP
+storage_root:                   /nova/storage
+
 # the network interface that will be utilized by virtual machines
 # this option only used by kvm
 vm_network_interface:           eth0
@@ -38,8 +41,11 @@ vm_network_interface:           eth0
 vm_network_bridge:              br0
 
 # whether enables VM migration, currently only works for XEN+NFS
-vm_enable_migration:                   true
+vm_enable_migration:            true
 
 # the hypervisor to be used, could be xen or kvm
 hypervisor:                     xen
+
+# storage server type, could be ftp or nfs
+storage_type:                   nfs
 
