@@ -32,7 +32,7 @@ struct ImagePoolItemInfo {
 };
 
 char* g_run_root;
-char* hypervisor; 
+char* hypervisor;
 //argv[3], indicated by nova worker
 //either 'xen' or 'kvm', if null, consider it's 'xen' by default
 
@@ -268,7 +268,7 @@ void cleanup_vm_dir() {
   if (hypervisor == NULL) connStr = "qemu:///system";
   if (strcmp(hypervisor, "xen") == 0) connStr = "xen:///";
   if (strcmp(hypervisor, "kvm") == 0) connStr = "qemu:///system";
-  
+
   const char *conn = connStr.c_str();
   if (g_virt_conn == NULL) {
     g_virt_conn = virConnectOpen(conn);

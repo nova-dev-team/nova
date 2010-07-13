@@ -62,9 +62,9 @@
 			</mx:Canvas>
 		</mx:TabNavigator>
 	</mx:VBox>
-	<mx:Canvas x="0" y="0">
+	<mx:Canvas x="4" y="4">
 		<mx:VBox>
-			<mx:Image source="{logo}" height="64" />
+			<mx:Image source="{logo}" height="60" />
 		</mx:VBox>	
 	</mx:Canvas>
 </mx:Application>

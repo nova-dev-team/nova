@@ -5,7 +5,7 @@ require 'fileutils'
 class FsController < ApplicationControlleri
 
 # Show a listing of file directory.
-# * params[:dir]: directory name of items relativing to /nova/storage, eg: 
+# * params[:dir]: directory name of items relativing to /nova/storage, eg:
 #    /fs/listdir?dir=vdisks
 
   def  listdir
@@ -21,7 +21,7 @@ class FsController < ApplicationControlleri
                data += "true }"
             else
                data += "false }"
-            end 
+            end
           end
         end
        data += "]"
@@ -65,7 +65,7 @@ class FsController < ApplicationControlleri
         File.delete(to.to_s + ".copying")
       end
     reply_success "Copy successful!"
-    end 
+    end
   end
 
 end

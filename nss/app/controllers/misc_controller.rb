@@ -53,7 +53,7 @@ class MiscController < ApplicationController
        has_revoked_some_files = true
        end
        if has_revoked_some_files == true
-        reply_success "Image with name = '#{params[:image_name]}' is revoked!" 
+        reply_success "Image with name = '#{params[:image_name]}' is revoked!"
        else
         reply_success "Image with name = '#{params[:image_name]}' not found, nothing revoked!"
        end

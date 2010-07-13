@@ -22,7 +22,7 @@ class SettingsController < ApplicationController
     if valid_param? params[:items]
       params[:items] = params[:items].split ',' # make sure params[:items] is an array, if provided
     else
-      params[:items] = ["key", "value"]
+      params[:items] = ["key", "value", "for_worker"]
     end
     reply_model Setting, :items => params[:items]
   end

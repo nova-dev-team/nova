@@ -13,6 +13,10 @@ package nova
 		
 		public static const user_UpdateProfile:String = urlBase + "/users/edit.json";
 		
+		public static const users_list:String = urlBase + "/users/list.json";
+		
+		public static const settings_list:String = urlBase + "/settings/index.json";
+		
 		[Bindable]
 		public static var myLogin:String = "";
 		
