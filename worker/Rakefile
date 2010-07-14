@@ -127,7 +127,9 @@ LFTP_SCRIPT
       my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
       my_exec "#{RAILS_ROOT}/lib/image_pool_maintainer #{RAILS_ROOT}/tmp/pids/image_pool_maintainer.pid #{RAILS_ROOT}/lib/image_pool_maintainer.conf #{conf["run_root"]}/image_pool"
       my_exec "#{RAILS_ROOT}/lib/trash_cleaner #{RAILS_ROOT}/log #{conf["run_root"]} #{conf["hypervisor"]}"
-      my_exec "#{RAILS_ROOT}/lib/pm_top #{RAILS_ROOT}/tmp/pids/pm_top.pid #{RAILS_ROOT}/log/pm_top.log 5"
+      log_interval = 5 # read performance meters every 5 seconds
+      log_max_count = 720 # the limit on log counts. 720 * 5 sec = 1 hour
+      my_exec "#{RAILS_ROOT}/lib/pm_top #{RAILS_ROOT}/tmp/pids/pm_top.pid #{RAILS_ROOT}/log/pm_top.log #{log_interval} #{log_max_count}"
       my_exec "RAILS_ENV=development #{RAILS_ROOT}/script/server -d -p #{service_port} &"
     end
 

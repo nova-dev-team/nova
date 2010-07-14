@@ -113,6 +113,7 @@ int main(int argc, char* argv[])
     FILE* pid_fp = fopen(pid_file, "w");
     fprintf(pid_fp, "%d", pid);
     fclose(pid_fp);
+    printf("Background daemon running with pid=%d\n", pid);
     exit(0);
   }
 
@@ -151,10 +152,11 @@ int main(int argc, char* argv[])
       fw = fopen(log_file,"w+");
     else
       fw = fopen(log_file,"a+");
-    if(j != 1)
-    //fprintf(stderr, "cpu  used:%4.1f nice:%4.1f sys:%4.1f idle:%4.1f iowait:%4.1f   ",cpu_states[0]/10.0,cpu_states[1]/10.0,cpu_states[2]/10.0,cpu_states[3]/10.0,cpu_states[4]/10.0);
-    fprintf(fw, "%s", time_str);
-    fprintf(fw, "CPU using:%5.1f   ",100-cpu_states[3]/10.0);
+    if(j != 1) {
+      //fprintf(stderr, "cpu  used:%4.1f nice:%4.1f sys:%4.1f idle:%4.1f iowait:%4.1f   ",cpu_states[0]/10.0,cpu_states[1]/10.0,cpu_states[2]/10.0,cpu_states[3]/10.0,cpu_states[4]/10.0);
+      fprintf(fw, "Time: %s\t", time_str);
+      fprintf(fw, "CPU: %5.1f\t",100-cpu_states[3]/10.0);
+    }
 
     /*Read information of memory from "/proc/meminfo"*/
  		fd = open("/proc/meminfo", O_RDONLY);
@@ -181,7 +183,7 @@ int main(int argc, char* argv[])
     cached = strtoul(p, &p, 0);*/
                	
     if(j != 1)
-      fprintf(fw, "memTotal:%ldMB  memFree:%ldMB   ", mem_total/1024, mem_free/1024);
+      fprintf(fw, "memTotal: %ldMB\tmemFree: %ldMB\t", mem_total/1024, mem_free/1024);
     
     /*Read information of network from "/proc/nev/dev"*/
     fd = open("/proc/net/dev", O_RDONLY);
@@ -214,13 +216,13 @@ int main(int argc, char* argv[])
       tran_diff = (double)tran_total-tran_old;
       
       if(rece_diff < 1024 && tran_diff < 1024)
-        fprintf(fw, "Rece:%6.1fB/s Tran:%6.1fB/s   \n", rece_diff, tran_diff);
+        fprintf(fw, "Rece:%6.1fB/s\tTran:%6.1fB/s\n", rece_diff, tran_diff);
       else if(rece_diff >= 1024 && tran_diff < 1024)
-        fprintf(fw, "Rece:%6.1fkB/s Tran:%6.1fB/s   \n", rece_diff/1024, tran_diff);
+        fprintf(fw, "Rece:%6.1fkB/s\tTran:%6.1fB/s\n", rece_diff/1024, tran_diff);
       else if(rece_diff < 1024 && tran_diff >= 1024)
-        fprintf(fw, "Rece:%6.1fB/s Tran:%6.1fkB/s   \n", rece_diff, tran_diff/1024);
+        fprintf(fw, "Rece:%6.1fB/s\tTran:%6.1fkB/s\n", rece_diff, tran_diff/1024);
       else
-        fprintf(fw, "Rece:%6.1fkB/s Tran:%6.1fkB/s   \n", rece_diff/1024, tran_diff/1024);
+        fprintf(fw, "Rece:%6.1fkB/s\tTran:%6.1fkB/s\n", rece_diff/1024, tran_diff/1024);
     }
     fclose(fw);
     rece_old = rece_total;
