@@ -4,7 +4,12 @@ class LogsController < ApplicationController
   
   def show
     if File.exists?(LogFilePath)
-      logs = Log.get_tail({:path => LogFilePath, :time => params[:time]})
+      logs = []
+      if(params[:time] != nil) 
+        logs = Log.get_tail({:path => LogFilePath, :time => params[:time]})
+      else
+        logs = Log.get_tail({:path => LogFilePath })
+      end
       reply_success "Get Log Successful!", :data => logs
     else
       reply_failure "Log File not exist!"

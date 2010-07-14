@@ -1,7 +1,7 @@
 class Log < ActiveRecord::Base
 
 	
-  # get the logs which is written after params[:time] in log file
+  # get the logs which is written after params[:time] in log file, if you don't give the time we will show all logs
   # params[:path] is the log file path
   # use binary serach to seach the first log to show
   def Log.get_tail params
@@ -15,15 +15,19 @@ class Log < ActiveRecord::Base
       file = File.new(params[:path])
       strs = file.readlines[i]
     end
-    head = 0
-    tail = ori_logs.size
-    middle = (head + tail) / 2
-    index = binary_search({:head => head, :middle => middle, :tail => tail, :array => ori_logs, :time => params[:time]})
+    index = 0
+    if params[:time] != nil
+      head = 0
+      tail = ori_logs.size
+      middle = (head + tail) / 2
+      index = binary_search({:head => head, :middle => middle, :tail => tail, :array => ori_logs, :time => params[:time]})
+    end
     logs = []
     i = 0
     while index < ori_logs.size
       
-      time_value = ori_logs[index].slice(6, 15) 
+      time_value = ori_logs[index].slice(6, 15)
+      time_value = time_value.delete("-") 
       
       cpu_value = get_value({:log => ori_logs[index], :key => "CPU", :offset => 5})
       memTotal_value = get_value({:log => ori_logs[index], :key => "memTotal", :offset => 10})
