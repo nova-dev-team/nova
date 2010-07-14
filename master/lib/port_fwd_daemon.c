@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   char* fwd_addr;
   char* log_folder;
   char* path_to_port_mapper;
-  char* fpath = (char *) malloc(sizeof(char) * (100 + 2 * strlen(log_folder)));
+  char* fpath;
   int pid;
   printf("This is port_fwd_daemon!\n");
   if (argc < 5) {
@@ -65,6 +65,7 @@ int main(int argc, char* argv[]) {
   fwd_addr = argv[3];
   log_folder = argv[4];
   path_to_port_mapper = argv[5];
+  fpath = (char *) malloc(sizeof(char) * (100 + 2 * strlen(log_folder)));
 
   // prevent zombies
   signal(SIGCHLD, SIG_IGN);

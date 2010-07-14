@@ -24,9 +24,6 @@
 					GlobalConst.myEmail = ret.email;
 					GlobalConst.myFullname = ret.name;
 					
-					if (GlobalConst.myPrivilege == "root") {
-						// TODO !!!
-					}
 				} else {
 					// not logged in
 					Alert.show("You are not logged in!");
