@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 
     /*Record number*/
     j++;
-    
+
     /*Read information of CPU from "/proc/stat"*/
     fd = open("/proc/stat", O_RDONLY);
     len = read(fd, buffer, sizeof(buffer)-1);
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
 
     p = skip_token(buffer);
     mem_total = strtoul(p, &p, 0);
-  
+
     while(*p != '\n') p++;
     p++;
     p = skip_token(p);
@@ -201,20 +201,20 @@ int main(int argc, char* argv[])
     p++;
     while(*p != ':') p++;
     p++;		
-  
+
     rece_total = strtoul(p, &p, 0);
-    
+
     /*Skip seven words*/
     for(k = 0; k < 7; k++)	
       strtoul(p, &p, 0);
-        
+
     tran_total = strtoul(p, &p, 0);
-    
+
     if(j != 1)
     {
       rece_diff = (double)rece_total-rece_old;
       tran_diff = (double)tran_total-tran_old;
-      
+
       if(rece_diff < 1024 && tran_diff < 1024)
         fprintf(fw, "Rece: %.1fB/s Tran: %.1fB/s\n", rece_diff, tran_diff);
       else if(rece_diff >= 1024 && tran_diff < 1024)

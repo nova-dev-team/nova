@@ -7,6 +7,8 @@
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.events.SliderEvent;
 			import mx.rpc.events.ResultEvent;
 			
 			import nova.GlobalConst;
@@ -16,7 +18,10 @@
 			
 			protected function userList_creationCompleteHandler(event:FlexEvent):void
 			{
-				users_list_Request.send();
+				users_list_Request.send({
+					"page" : page_slider.value,
+					"page_size" : page_size_cbx.value
+				});
 			}
 			
 			protected function listUsersHandle(e:ResultEvent):void {
@@ -29,11 +34,43 @@
 				} else {
 					Alert.show("Failed to retrieve list of users!");	
 				}
+				
+				if (ret.pages_total) {
+					page_slider.enabled = true;
+					page_slider.maximum = ret.pages_total;
+					pager_value.text = "page " + page_slider.value + " of " + ret.pages_total;
+				} else {
+					page_slider.enabled = false;
+				}
 			}
 			
 			protected function refresh_btn_clickHandler(event:MouseEvent):void
 			{
-				users_list_Request.send();
+				users_list_Request.send({
+					"page" : page_slider.value,
+					"page_size" : page_size_cbx.value
+				});
+			}
+
+
+			protected function page_slider_changeHandler(event:SliderEvent):void
+			{
+				users_list_Request.send({
+					"page" : page_slider.value,
+					"page_size" : page_size_cbx.value
+				});
+			}
+
+
+			protected function page_size_cbx_changeHandler(event:ListEvent):void
+			{
+				if (page_size_cbx.text.length > 0) {
+					page_slider.value = 1;
+					users_list_Request.send({
+						"page" : page_slider.value,
+						"page_size" : page_size_cbx.value
+					});
+				}
 			}
 
 		]]>
@@ -48,11 +85,20 @@
 			<mx:AdvancedDataGridColumn dataField="activated" headerText="Activated"/>
 		</mx:columns>
 	</mx:AdvancedDataGrid>
-	<mx:HSlider x="199" y="513" width="614"/>
-	<mx:TextInput x="833" y="502" width="108"/>
-	<mx:Button x="949" y="502" label="Go" width="63"/>
+	<mx:HSlider id="page_slider" x="205" y="508" width="424" value="1"  minimum="1" change="page_slider_changeHandler(event)" snapInterval="1"/>
 	<mx:Button x="89" y="502" id="refresh_btn" label="Refresh" width="76" click="refresh_btn_clickHandler(event)"/>
 	
 	<mx:HTTPService id="users_list_Request" url="{GlobalConst.users_list}" useProxy="false" method="POST" resultFormat="text" result="listUsersHandle(event);" showBusyCursor="true" />
+	<mx:Label x="632" y="503" text="page x of y" id="pager_value"/>
+	<mx:ComboBox x="873" y="501" editable="false" width="137" id="page_size_cbx" change="page_size_cbx_changeHandler(event)">
+		<mx:dataProvider>
+			<mx:Array>
+				<mx:Number>5</mx:Number>
+				<mx:Number>10</mx:Number>
+				<mx:Number>20</mx:Number>
+			</mx:Array>
+		</mx:dataProvider>
+	</mx:ComboBox>
+	<mx:Label x="770" y="501" text="Users per page:"/>
 	
 </mx:Canvas>
