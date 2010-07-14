@@ -14,6 +14,12 @@
 			
 			public function init():void {
 				misc_WhoAmI_Request.send();
+				misc_NovaVersion_Request.send();
+			}
+			
+			public function misc_NovaVersion_JSON(event:ResultEvent) : void {
+				var ret:Object = JSON.decode(event.message.body.toString());
+				GlobalConst.novaVersion = ret.version;
 			}
 			
 			public function misc_WhoAmI_JSON(event:ResultEvent) : void {
@@ -53,6 +59,7 @@
 		]]>
 	</mx:Script>
 	<mx:HTTPService id="misc_WhoAmI_Request" url="{GlobalConst.misc_WhoAmI}" useProxy="false" method="GET" resultFormat="text" result="misc_WhoAmI_JSON(event)" fault="connection_fault()"/>
+	<mx:HTTPService id="misc_NovaVersion_Request" url="{GlobalConst.misc_version}" useProxy="false" method="GET" resultFormat="text" result="misc_NovaVersion_JSON(event)" fault="connection_fault()"/>
 	<mx:VBox x="0" y="0" width="100%" height="100%" minHeight="480" minWidth="640">
 		<mx:Canvas width="100%" height="30">
 			<mx:HBox right="0" top="0">
@@ -86,9 +93,8 @@
 		
 	</mx:VBox>
 	<mx:Canvas x="4" y="4">
-		<mx:VBox>
-			<mx:Image source="{logo}" height="60" />
-		</mx:VBox>	
+		<mx:Image source="{logo}" height="60" />
+		<mx:Label text="{GlobalConst.novaVersion}" x="80" />
 	</mx:Canvas>
 </mx:Application>
 
