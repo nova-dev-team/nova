@@ -17,6 +17,22 @@ package nova
 		
 		public static const settings_list:String = urlBase + "/settings/index.json";
 		
+		public static const pmachine_list:String = urlBase + "/pmachines/list.json";
+		
+		public static const pmachine_add:String = urlBase + "/pmachines/add.json";
+		
+		public static const portmappings_list:String = urlBase + "/misc/list_port_mapping.json";
+		
+		public static const portmappings_add:String = urlBase + "/misc/add_port_mapping.json";
+		
+		public static const soft_packages_list:String = urlBase + "/softwares/list.json";
+		
+		public static const soft_packages_add:String = urlBase + "/softwares/register.json";
+		
+		public static const vdisks_list:String = urlBase + "/vdisks/list.json";
+		
+		public static const vdisks_add:String = urlBase + "/vdisks/register.json";
+		
 		[Bindable]
 		public static var myLogin:String = "";
 		

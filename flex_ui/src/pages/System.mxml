@@ -14,6 +14,18 @@
 			[Bindable]
 			protected var settingsListData:ArrayCollection = new ArrayCollection();
 			
+			[Bindable]
+			protected var workerMachinesListData:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			protected var portMappingsListData:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			protected var softPackagesListData:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			protected var vdiskListData:ArrayCollection = new ArrayCollection();
+			
 			protected function sys_setting_creationCompleteHandler(event:FlexEvent):void
 			{
 				list_settings_Request.send();
@@ -31,10 +43,212 @@
 				}
 			}
 			
+			
+			protected function listWorkerMachinesHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					workerMachinesListData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						workerMachinesListData.addItem(ret.data[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of worker machines!");	
+				}
+			}
+			
+			protected function addWorkerMachinesHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					Alert.show("Successfully added new worker machine.");
+				} else {
+					Alert.show("Failed to add new worker machine!");	
+				}
+				list_workerMachines_Request.send();
+			}
+			
+			protected function listPortMappingsHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					portMappingsListData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						portMappingsListData.addItem(ret.data[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of port mappings!");	
+				}
+			}
+			
+			protected function addPortMappingsHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					Alert.show("Successfully added new port mapping.");
+				} else {
+					Alert.show("Failed to add new port mapping!");	
+				}
+				list_portMappings_Request.send();
+			}
+			
+			protected function listSoftPackagesHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					softPackagesListData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						softPackagesListData.addItem(ret.data[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of software packages!");	
+				}
+			}
+			
+			protected function addSoftPackagesHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					Alert.show("Successfully added new software package.");
+				} else {
+					Alert.show("Failed to add new software package!");	
+				}
+				list_softPackages_Request.send();
+			}
+			
+			protected function addVdisksHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					Alert.show("Successfully added new vdisk.");
+				} else {
+					Alert.show("Failed to add new vdisk!");	
+				}
+				list_softPackages_Request.send();
+			}
+			
+			protected function listVdisksHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					vdiskListData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						vdiskListData.addItem(ret.data[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of vdisks!");	
+				}
+			}
+			
 
 			protected function refresh_btn_clickHandler(event:MouseEvent):void
 			{
 				list_settings_Request.send();
+			}
+
+
+			protected function worker_machines_creationCompleteHandler(event:FlexEvent):void
+			{
+				list_workerMachines_Request.send();
+			}
+
+
+			protected function pm_refresh_btn_clickHandler(event:MouseEvent):void
+			{
+				list_workerMachines_Request.send();
+			}
+
+
+			protected function add_pmachine_clickHandler(event:MouseEvent):void
+			{
+				if (new_pm_ip.text.match("[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+") == false) {
+					Alert.show("Malformed IP address!");
+					return;
+				}
+				if (new_pm_cap.text.match("[0-9]+") == false) {
+					Alert.show("Malformed capacity!");
+					return;
+				}
+				
+				add_workerMachines_Request.send({
+					"ip" : new_pm_ip.text,
+					"vm_capacity" : new_pm_cap.text
+				});
+			}
+
+
+			protected function port_mappings_creationCompleteHandler(event:FlexEvent):void
+			{
+				list_portMappings_Request.send();
+			}
+
+
+			protected function portMappings_refresh_btn_clickHandler(event:MouseEvent):void
+			{
+				list_portMappings_Request.send();
+			}
+
+
+			protected function add_portmapping_btn_clickHandler(event:MouseEvent):void
+			{
+				if (new_portmapping_dest_ip.text.match("[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+") == false) {
+					Alert.show("Malformed IP address!");
+					return;
+				}
+				if (new_portmapping_proxy_port.text.match("[0-9]+") == false || new_portmapping_dest_port.text.match("[0-9]+") == false) {
+					Alert.show("Malformed port number!");
+					return;
+				}
+				
+				add_portMappings_Request.send({
+					"local_port" : new_portmapping_proxy_port.text,
+					"ip" : new_portmapping_dest_ip.text,
+					"port" : new_portmapping_dest_port.text
+				});
+			}
+
+
+			protected function soft_package_creationCompleteHandler(event:FlexEvent):void
+			{
+				list_softPackages_Request.send();
+			}
+
+
+			protected function soft_package_refresh_clickHandler(event:MouseEvent):void
+			{
+				list_softPackages_Request.send();
+			}
+
+
+			protected function soft_package_add_clickHandler(event:MouseEvent):void
+			{
+				// TODO param checking
+				
+				add_softPackages_Request.send({
+					"display_name" : new_soft_disp_name.text,
+					"file_name" : new_soft_fname.text,
+					"description" : new_soft_desc.text,
+					"os_family" : new_soft_os.text
+				});
+			}
+
+
+			protected function vdisk_images_creationCompleteHandler(event:FlexEvent):void
+			{
+				list_vdisks_Request.send();
+			}
+
+
+			protected function vdisk_reg_btn_clickHandler(event:MouseEvent):void
+			{
+				// TODO check params
+				
+				add_vdisks_Request.send({
+					"display_name" : new_vdisk_disp_name.text,
+					"file_name" : new_vdisk_fname.text,
+					"description" : new_vdisk_desc.text,
+					"disk_format" : new_vdisk_img_type.text,
+					"os_family" : new_vdisk_os_family.text,
+					"os_name" : new_vdisk_os_name.text
+				});
+			}
+
+
+			protected function refresh_vdisk_clickHandler(event:MouseEvent):void
+			{
+				list_vdisks_Request.send();
 			}
 
 		]]>
@@ -52,7 +266,7 @@
 			<mx:Button x="20" y="32" label="Refresh" id="refresh_btn" click="refresh_btn_clickHandler(event)"/>
 		</mx:Canvas>
 		<mx:Canvas label="Worker machines" width="100%" height="100%">
-			<mx:AdvancedDataGrid x="10" y="10" id="worker_machines" designViewDataType="flat" width="971" height="303">
+			<mx:AdvancedDataGrid x="10" y="10" id="worker_machines" designViewDataType="flat" width="971" height="303" creationComplete="worker_machines_creationCompleteHandler(event)" dataProvider="{workerMachinesListData}">
 				<mx:columns>
 					<mx:AdvancedDataGridColumn headerText="IP" dataField="ip"/>
 					<mx:AdvancedDataGridColumn headerText="Hostname" dataField="hostname"/>
@@ -64,54 +278,64 @@
 					<mx:AdvancedDataGridColumn headerText="Actions"/>
 				</mx:columns>
 			</mx:AdvancedDataGrid>
-			<mx:Button x="491" y="343" label="Add new worker"/>
-			<mx:Button x="910" y="343" label="Refresh" id="pm_refresh_btn"/>
-			<mx:TextInput x="80" y="342"/>
-			<mx:TextInput x="323" y="343"/>
+			<mx:Button x="491" y="343" id="add_pmachine_btn" label="Add new worker" click="add_pmachine_clickHandler(event)"/>
+			<mx:Button x="910" y="343" label="Refresh" id="pm_refresh_btn" click="pm_refresh_btn_clickHandler(event)"/>
+			<mx:TextInput x="80" y="342" id="new_pm_ip"/>
+			<mx:TextInput x="323" y="343" id="new_pm_cap"/>
 			<mx:Label x="11" y="344" text="Worker IP:"/>
 			<mx:Label x="248" y="344" text="VM capacity:"/>
 		</mx:Canvas>
 		<mx:Canvas label="Port mappings" width="100%" height="100%">
-			<mx:Button x="856" y="301" label="Button"/>
-			<mx:AdvancedDataGrid x="19" y="23" id="port_mappings" designViewDataType="flat" width="1003" height="256">
+			<mx:Button x="856" y="301" label="Add" id="add_portmapping_btn" click="add_portmapping_btn_clickHandler(event)"/>
+			<mx:Button x="951" y="301" id="portMappings_refresh_btn" label="Refresh" click="portMappings_refresh_btn_clickHandler(event)"/>
+			<mx:AdvancedDataGrid x="19" y="23" id="port_mappings" designViewDataType="flat" width="1003" height="256" creationComplete="port_mappings_creationCompleteHandler(event)" dataProvider="{portMappingsListData}">
 				<mx:columns>
-					<mx:AdvancedDataGridColumn headerText="Proxy port" dataField="proxy_port"/>
+					<mx:AdvancedDataGridColumn headerText="Proxy port" dataField="local_port"/>
 					<mx:AdvancedDataGridColumn headerText="Destination IP" dataField="ip"/>
-					<mx:AdvancedDataGridColumn dataField="dest_port" headerText="Destination port"/>
+					<mx:AdvancedDataGridColumn dataField="port" headerText="Destination port"/>
 				</mx:columns>
 			</mx:AdvancedDataGrid>
-			<mx:TextInput x="94" y="304" width="147"/>
-			<mx:TextInput x="384" y="301"/>
+			<mx:TextInput x="94" y="304" width="147" id="new_portmapping_proxy_port"/>
+			<mx:TextInput x="384" y="301" id="new_portmapping_dest_ip"/>
 			<mx:Label x="286" y="305" text="Destination IP:"/>
 			<mx:Label x="19" y="307" text="Proxy port:"/>
-			<mx:TextInput x="681" y="301"/>
+			<mx:TextInput x="681" y="301" id="new_portmapping_dest_port"/>
 			<mx:Label x="565" y="308" text="Destination port:"/>
 		</mx:Canvas>
 		<mx:Canvas label="Storage server" width="100%" height="100%">
 		</mx:Canvas>
 		<mx:Canvas label="Software packages" width="100%" height="100%">
-			<mx:AdvancedDataGrid x="25" y="25" id="soft_package" designViewDataType="flat" width="974" height="198">
+			<mx:AdvancedDataGrid x="25" y="25" id="soft_package" designViewDataType="flat" width="974" height="198" creationComplete="soft_package_creationCompleteHandler(event)" dataProvider="{softPackagesListData}">
 				<mx:columns>
 					<mx:AdvancedDataGridColumn headerText="Display name" dataField="display_name"/>
-					<mx:AdvancedDataGridColumn headerText="File name" dataField="filename"/>
+					<mx:AdvancedDataGridColumn headerText="File name" dataField="file_name"/>
 					<mx:AdvancedDataGridColumn headerText="OS family" dataField="os_family"/>
 					<mx:AdvancedDataGridColumn dataField="description" headerText="Description"/>
 					<mx:AdvancedDataGridColumn headerText="Actions"/>
 				</mx:columns>
 			</mx:AdvancedDataGrid>
-			<mx:Button x="659" y="293" label="Register software"/>
+			<mx:Button x="604" y="294" label="Register software" id="soft_package_add" click="soft_package_add_clickHandler(event)"/>
+			<mx:Button x="871" y="294" label="Refresh" id="soft_package_refresh" click="soft_package_refresh_clickHandler(event)"/>
 			<mx:Label x="27" y="266" text="Display name:"/>
 			<mx:Label x="27" y="238" text="You can register new software packages. Make sure you have uploaded software packages to storage server first."/>
-			<mx:TextInput x="122" y="266"/>
+			<mx:TextInput x="122" y="266" id="new_soft_disp_name"/>
 			<mx:Label x="316" y="266" text="Filename:"/>
-			<mx:TextInput x="411" y="266"/>
+			<mx:TextInput x="411" y="266" id="new_soft_fname"/>
 			<mx:Label x="27" y="294" text="Description"/>
-			<mx:TextInput x="122" y="294" width="449"/>
+			<mx:TextInput x="122" y="294" width="449" id="new_soft_desc"/>
 			<mx:Label x="606" y="266" text="OS family:"/>
-			<mx:ComboBox x="674" y="266" editable="false"></mx:ComboBox>
+			<mx:ComboBox x="674" y="266" editable="false" id="new_soft_os">
+				<mx:dataProvider>
+					<mx:Array>
+						<mx:String>windows</mx:String>
+						<mx:String>linux</mx:String>
+						<mx:String>none</mx:String>
+					</mx:Array>
+				</mx:dataProvider>
+			</mx:ComboBox>
 		</mx:Canvas>
 		<mx:Canvas label="Vdisk images" width="100%" height="100%">
-			<mx:AdvancedDataGrid x="26" y="19" id="vdisk_images" designViewDataType="flat" width="974" height="185">
+			<mx:AdvancedDataGrid x="26" y="19" id="vdisk_images" designViewDataType="flat" width="974" height="185" creationComplete="vdisk_images_creationCompleteHandler(event)" dataProvider="{vdiskListData}">
 				<mx:columns>
 					<mx:AdvancedDataGridColumn headerText="Display name" dataField="display_name"/>
 					<mx:AdvancedDataGridColumn headerText="File name" dataField="filename"/>
@@ -120,23 +344,49 @@
 					<mx:AdvancedDataGridColumn headerText="Actions"/>
 				</mx:columns>
 			</mx:AdvancedDataGrid>
-			<mx:Button x="893" y="284" label="Register vdisk"/>
+			<mx:Button x="893" y="284" label="Register vdisk" id="vdisk_reg_btn" click="vdisk_reg_btn_clickHandler(event)"/>
+			<mx:Button x="893" y="208" label="Refresh" id="refresh_vdisk" click="refresh_vdisk_clickHandler(event)"/>
 			<mx:Label x="31" y="258" text="Display name:"/>
 			<mx:Label x="31" y="230" text="You can register new vdisk images. Make sure you have uploaded vdisk images to storage server first."/>
-			<mx:TextInput x="126" y="258"/>
+			<mx:TextInput x="126" y="258" id="new_vdisk_disp_name"/>
 			<mx:Label x="31" y="283" text="OS name:"/>
-			<mx:TextInput x="126" y="286"/>
+			<mx:TextInput x="126" y="286" id="new_vdisk_os_name"/>
 			<mx:Label x="320" y="258" text="Filename:"/>
-			<mx:TextInput x="415" y="258"/>
+			<mx:TextInput x="415" y="258" id="new_vdisk_fname"/>
 			<mx:Label x="324" y="286" text="Description:"/>
-			<mx:TextInput x="402" y="284" width="449"/>
+			<mx:TextInput x="402" y="284" width="449" id="new_vdisk_desc"/>
 			<mx:Label x="610" y="258" text="Image type:"/>
-			<mx:ComboBox x="691" y="257" editable="false" width="111"></mx:ComboBox>
+			<mx:ComboBox x="691" y="257" editable="false" width="111" id="new_vdisk_img_type">
+				<mx:dataProvider>
+					<mx:Array>
+						<mx:String>qcow2</mx:String>
+						<mx:String>img</mx:String>
+						<mx:String>none</mx:String>
+					</mx:Array>
+				</mx:dataProvider>
+			</mx:ComboBox>
 			<mx:Label x="825" y="257" text="OS family:"/>
-			<mx:ComboBox x="893" y="257" editable="false" width="100"></mx:ComboBox>
+			<mx:ComboBox x="893" y="257" editable="false" width="100" id="new_vdisk_os_family">
+				<mx:dataProvider>
+					<mx:Array>
+						<mx:String>windows</mx:String>
+						<mx:String>linux</mx:String>
+						<mx:String>none</mx:String>
+					</mx:Array>
+				</mx:dataProvider>
+			</mx:ComboBox>
 		</mx:Canvas>
 	</mx:Accordion>
 	
-	<mx:HTTPService id="list_settings_Request" url="{GlobalConst.settings_list}" useProxy="false" method="POST" resultFormat="text" result="listSettingsHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="list_settings_Request" url="{GlobalConst.settings_list}" useProxy="false" method="GET" resultFormat="text" result="listSettingsHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="list_workerMachines_Request" url="{GlobalConst.pmachine_list}" useProxy="false" method="GET" resultFormat="text" result="listWorkerMachinesHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="add_workerMachines_Request" url="{GlobalConst.pmachine_add}" useProxy="false" method="POST" resultFormat="text" result="addWorkerMachinesHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="list_portMappings_Request" url="{GlobalConst.portmappings_list}" useProxy="false" method="GET" resultFormat="text" result="listPortMappingsHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="add_portMappings_Request" url="{GlobalConst.portmappings_add}" useProxy="false" method="POST" resultFormat="text" result="addPortMappingsHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="list_softPackages_Request" url="{GlobalConst.soft_packages_list}" useProxy="false" method="GET" resultFormat="text" result="listSoftPackagesHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="add_softPackages_Request" url="{GlobalConst.soft_packages_add}" useProxy="false" method="POST" resultFormat="text" result="addSoftPackagesHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="list_vdisks_Request" url="{GlobalConst.vdisks_list}" useProxy="false" method="GET" resultFormat="text" result="listVdisksHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="add_vdisks_Request" url="{GlobalConst.vdisks_add}" useProxy="false" method="POST" resultFormat="text" result="addVdisksHandle(event);" showBusyCursor="true" />
+	
 	
 </mx:Canvas>
