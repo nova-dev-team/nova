@@ -1,4 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-	<mx:Label x="105" y="95" text="This shall be done!" fontSize="36"/>
+	<mx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import nova.GlobalConst;
+			
+			[Bindable]
+			protected var vdiskListData:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			protected var vdiskDisplayNamesData:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			protected var availableSoftList:ArrayList = new ArrayList();
+			
+			[Bindable]
+			protected var softPackagesListData:ArrayCollection = new ArrayCollection();
+			
+			
+			protected function listVdisksHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					vdiskListData.removeAll();
+					vdiskDisplayNamesData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						vdiskListData.addItem(ret.data[i]);
+						vdiskDisplayNamesData.addItem(ret.data[i].display_name);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of vdisks!");	
+				}
+				list_softPackages_Request.send();
+				
+			}
+			
+
+			protected function do_init(event:FlexEvent):void
+			{
+				list_vdisks_Request.send();
+			}
+			
+			protected function updateImageInfo():void {
+				var idx:Number = vdisk_img_selector.selectedIndex;
+				os_family.text = vdiskListData[idx].os_family;
+				vdisk_os_name.text = vdiskListData[idx].os_name;
+				vdisk_img_format.text = vdiskListData[idx].disk_format;
+				vdisk_desc.text = vdiskListData[idx].description;
+				
+				var softList:Array = vdiskListData[idx].soft_list.split();
+				availableSoftList.removeAll();
+				for (var i:Number = 0; i < softPackagesListData.length; i++) {
+					if (softList.indexOf(softPackagesListData[i].file_name) != -1) {
+						availableSoftList.addItem({
+							"display_name" : softPackagesListData[i].display_name,
+							"description" : softPackagesListData[i].description
+						});
+					}
+				}	
+			}
+
+			protected function vdisk_img_selector_changeHandler(event:ListEvent):void
+			{
+				updateImageInfo();
+			}
+			
+			
+			protected function listSoftPackagesHandle(e:ResultEvent):void {
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					softPackagesListData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						softPackagesListData.addItem(ret.data[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of software packages!");	
+				}
+				updateImageInfo();
+			}
+
+		]]>
+	</mx:Script>
+	
+	<mx:Accordion x="0" y="0" width="100%" height="100%" creationComplete="do_init(event)">
+		<mx:Canvas label="Create a single machine" width="100%" height="100%">
+			<mx:Label x="47" y="48" text="Machine image:"/>
+			<mx:Label x="48" y="117" text="OS family:"/>
+			<mx:Label x="176" y="117" id="os_family"/>
+			<mx:Label x="176" y="143" id="vdisk_os_name"/>
+			<mx:Label x="176" y="169" id="vdisk_img_format"/>
+			<mx:Label x="337" y="351" width="69" id="new_vm_mem"/>
+			<mx:Label x="176" y="195" width="272" height="109" id="vdisk_desc"/>
+			<mx:Label x="48" y="169" text="Image format:"/>
+			<mx:Label x="48" y="195" text="Description:"/>
+			<mx:Label x="48" y="143" text="OS name:"/>
+			<mx:ComboBox x="169" y="48" editable="false" dataProvider="{vdiskDisplayNamesData}" id="vdisk_img_selector" change="vdisk_img_selector_changeHandler(event)"></mx:ComboBox>
+			<mx:ComboBox x="159" y="348" editable="false" width="60" id="cpu_count_cbx">
+				<mx:dataProvider>
+					<mx:Array>
+						<mx:String>1</mx:String>
+						<mx:String>2</mx:String>
+						<mx:String>4</mx:String>
+					</mx:Array>
+				</mx:dataProvider>
+			</mx:ComboBox>
+			<mx:Label x="457" y="48" text="Available softwares"/>
+			<mx:Label x="46" y="326" text="Machine name:"/>
+			<mx:Label x="46" y="352" text="CPU count:"/>
+			<mx:Label x="249" y="351" text="Memory size:"/>
+			<mx:Label x="420" y="352" text="MB"/>
+			<mx:Button x="512" y="323" label="Create machine!" id="btn_new_single_vm"/>
+			<mx:TextInput x="145" y="324" width="315" id="new_vm_name"/>
+			<mx:DataGrid x="467" y="94" width="479" height="210" dataProvider="{availableSoftList}">
+				<mx:columns>
+					<mx:DataGridColumn headerText="Check"/>
+					<mx:DataGridColumn headerText="Name" dataField="display_name"/>
+					<mx:DataGridColumn headerText="Description" dataField="description"/>
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:Canvas>
+		<mx:Canvas label="Create a cluster" width="100%" height="100%">
+			<mx:Button x="751" y="39" label="OK"/>
+			<mx:Label x="116" y="41" text="Cluster name:"/>
+			<mx:Label x="453" y="41" text="Cluster size:"/>
+			<mx:TextInput x="220" y="39"/>
+			<mx:TextInput x="542" y="39"/>
+		</mx:Canvas>
+	</mx:Accordion>
+	
+	<mx:HTTPService id="list_vdisks_Request" url="{GlobalConst.vdisks_list}" useProxy="false" method="GET" resultFormat="text" result="listVdisksHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="list_softPackages_Request" url="{GlobalConst.soft_packages_list}" useProxy="false" method="GET" resultFormat="text" result="listSoftPackagesHandle(event);" showBusyCursor="true" />	
 </mx:Canvas>

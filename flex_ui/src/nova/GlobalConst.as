@@ -9,6 +9,8 @@ package nova
 		
 		public static const misc_WhoAmI:String = urlBase + "/misc/who_am_i.json";
 		
+		public static const misc_version:String = urlBase + "/misc/version.json";
+		
 		public static const user_ChangePwd:String = urlBase + "/users/edit.json";
 		
 		public static const user_UpdateProfile:String = urlBase + "/users/edit.json";
@@ -44,6 +46,9 @@ package nova
 		
 		[Bindable]
 		public static var myFullname:String = "";
+		
+		[Bindable]
+		public static var novaVersion:String = "";
 
 	}
 }
