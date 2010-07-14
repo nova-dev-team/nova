@@ -28,9 +28,13 @@
 				navigateToURL(new URLRequest(GlobalConst.logoutURL), "_self");
 			}
 			
+			private function connection_fault():void {
+				Alert.show("Failed to connect to server!");
+			}
+			
 		]]>
 	</mx:Script>
-	<mx:HTTPService id="misc_WhoAmI_Request" url="{GlobalConst.misc_WhoAmI}" useProxy="false" method="GET" resultFormat="text" result="misc_WhoAmI_JSON(event)" />
+	<mx:HTTPService id="misc_WhoAmI_Request" url="{GlobalConst.misc_WhoAmI}" useProxy="false" method="GET" resultFormat="text" result="misc_WhoAmI_JSON(event)" fault="connection_fault()"/>
 	<mx:VBox x="0" y="0" width="100%" height="100%" minHeight="480" minWidth="640">
 		<mx:Canvas width="100%" height="30">
 			<mx:HBox right="0" top="0">

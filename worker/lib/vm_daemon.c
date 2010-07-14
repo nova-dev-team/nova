@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
       c_mode = argv[4];
       if (strcmp(c_mode, "NORMAL") == 0) {
         mode = 0;
-      } else 
+      } else
       if (strcmp(c_mode, "RECOVER") == 0) {
         mode = 1;
       } else
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     printf("Running Mode(0-NORMAL, 1-RECOVER, 2-RECEIVE) == %d\n", mode);
 
     sprintf(pid_fn, "%s/vm_daemon.pid", vm_dir);
-    if (mode != 2) {    
+    if (mode != 2) {
       fp = fopen(pid_fn, "w");
       if (fp == NULL) {
         printf("error: cannot open pid file %s!\n", pid_fn);
@@ -97,14 +97,14 @@ int main(int argc, char* argv[]) {
     // after vm booted, we don't do anything for 30 seconds
     // this is necessary, because libvirt takes some time do boot the vm
       sleep(30);
-    } 
+    }
 
     if (mode == 2) {
       sprintf(cmd, "./vm_daemon_helper.rb %s %s %s receive 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
       printf("[cmd] %s\n", cmd);
       system(cmd);
     }
-  
+
     sprintf(status_fn, "%s/status", vm_dir);
     for (;;) {
       FILE* status_fp = NULL;

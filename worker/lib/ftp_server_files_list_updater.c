@@ -9,7 +9,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef __APPLE__
 #include <malloc.h>
+#endif // __APPLE__
+
 #include <string.h>
 
 #include <unistd.h>

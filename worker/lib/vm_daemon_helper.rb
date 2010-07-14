@@ -18,7 +18,7 @@ HYPERVISOR = common_conf["hypervisor"]
 MIGRATION_TIMEOUT_HANDSHAKE=5
 # 5min timeout for handshake
 MIGRATION_TIMEOUT_PROCEEDING=-1
-# 
+#
 
 def my_exec cmd
   puts "[cmd] #{cmd}"
@@ -500,7 +500,7 @@ end
 
 
 # when a incoming migration occurs, worker would run vm_daemon RECEIVE first
-# then call to here 
+# then call to here
 # migration can be done in 3 steps
 # 1. handshake, src worker put file 'migrate_request' in vm_dir, and waiting dst worker put file 'migrate_accept'
 #      if time out, migration fail
@@ -524,7 +524,7 @@ def do_receive storage_server, vm_dir
     sleep 6 #check it every 6 sec
   end
   return false if timeout == 0
-  
+
   begin
     File.open("migrate_accept", "w") do |f|
       f.write "blah"  #can write some useful message?
@@ -533,7 +533,7 @@ def do_receive storage_server, vm_dir
     # fuckingly cannot write file, handshake fail, exit
     return false
   end
-     
+
   #2.when src worker see migrate_accept, it will call libvirt::migrate
   #  after migration finished, file 'migrate_to' will be removed
   #  spin wait for 'migrate_to' disappear
@@ -542,7 +542,7 @@ def do_receive storage_server, vm_dir
   while timeout != 0
     if File.exists? "migrate_to"
     else
-      break      
+      break
     end
     timeout = timeout - 1
     sleep 6
@@ -604,12 +604,12 @@ def do_poll storage_server, vm_dir
     dom = virt_conn.lookup_domain_by_uuid(uuid)
 
     if dom.info.state != LIBVIRT_NOT_RUNNING
-      
+
       if File.exists? "migrate_to"
         write_log "found migrate tag while polling"
         do_migrate uuid
       end
-      return  
+      return
       # the vm is still running, skip the following actions
     else
       write_log "detected VM shutdown, saving it"
