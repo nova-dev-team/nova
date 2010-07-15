@@ -5,7 +5,7 @@ class VdiskPool < ActiveRecord::Base
 
 # Intercepts savings for "vdisk_pool", and updates corresponding configs.
   def save
-      File.open("#{RAILS_ROOT}/../misc/pool_size/" + self.basename, "w") do |f|
+      File.open("#{RAILS_ROOT}/../../misc/pool_size/" + self.basename, "w") do |f|
         f.write self.pool_size
       end
     super

@@ -284,7 +284,7 @@ void refresh_config(char* conf_path) {
 void read_pool_size(char* image_fn){
   struct stat st;
   char* pool_size_fn = (char*) malloc(sizeof(char) *(strlen(image_fn) + 128));
-  sprintf(pool_size_fn, "/nova/system/misc/pool_size/%s", image_fn);
+  sprintf(pool_size_fn, "/nova/misc/pool_size/%s", image_fn);
   printf("checking if %s pool_size config exists.", pool_size_fn);
   if(lstat(pool_size_fn, &st) == 0){
     FILE* fp;
