@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-	<mx:List x="28" y="30" height="456"></mx:List>
-	<mx:List x="232" y="30" height="456" width="742"></mx:List>
+	<mx:List x="25" y="73" height="456"></mx:List>
+	<mx:List x="221" y="73" height="456" width="742"></mx:List>
+	<mx:Label x="29" y="38" text="Clusters"/>
+	<mx:Label x="226" y="39" text="Machines inside cluster"/>
+	<mx:Button x="25" y="537" label="+"/>
+	<mx:Button x="77" y="537" label="Refresh"/>
+	<mx:Button x="892" y="537" label="Refresh"/>
 </mx:Canvas>
