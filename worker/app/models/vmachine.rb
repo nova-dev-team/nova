@@ -368,7 +368,10 @@ XML_DESC
         Vmachine.libvirt_call_by_uuid "destroy", params[:uuid]
       rescue
       end
-      Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
+      begin
+        Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
+      rescue
+      end
       return {:success => true, :message => "destroyed vm with uuid #{params[:uuid]}."}
 
     elsif params[:name] != nil and params[:name] != ""
@@ -378,7 +381,10 @@ XML_DESC
         Vmachine.libvirt_call_by_name "destroy", params[:name]
       rescue
       end
-      Vmachine.libvirt_call_by_name "undefine", params[:name]
+      begin
+        Vmachine.libvirt_call_by_name "undefine", params[:name]
+      rescue
+      end
       return {:success => true, :message => "destroyed vm named '#{params[:name]}'."}
 
     else
