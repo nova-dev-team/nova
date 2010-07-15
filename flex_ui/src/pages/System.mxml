@@ -303,6 +303,7 @@
 			<mx:Label x="565" y="308" text="Destination port:"/>
 		</mx:Canvas>
 		<mx:Canvas label="Storage server" width="100%" height="100%">
+			<mx:Label x="52" y="38" text="This shall be done" fontSize="36"/>
 		</mx:Canvas>
 		<mx:Canvas label="Software packages" width="100%" height="100%">
 			<mx:AdvancedDataGrid x="25" y="25" id="soft_package" designViewDataType="flat" width="974" height="198" creationComplete="soft_package_creationCompleteHandler(event)" dataProvider="{softPackagesListData}">
