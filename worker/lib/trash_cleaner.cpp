@@ -32,6 +32,9 @@ struct ImagePoolItemInfo {
 };
 
 char* g_run_root;
+char* hypervisor; 
+//argv[3], indicated by nova worker
+//either 'xen' or 'kvm', if null, consider it's 'xen' by default
 
 // listing of the image pool dir. filename -> item info
 // only VM disk image files are included in the list
@@ -261,7 +264,12 @@ void cleanup_image_pool_dir() {
 }
 
 void cleanup_vm_dir() {
-  const char* conn = "qemu:///system";
+  string connStr = "";
+  if (hypervisor == NULL) connStr = "qemu:///system";
+  if (strcmp(hypervisor, "xen") == 0) connStr = "xen:///";
+  if (strcmp(hypervisor, "kvm") == 0) connStr = "qemu:///system";
+  
+  const char *conn = connStr.c_str();
   if (g_virt_conn == NULL) {
     g_virt_conn = virConnectOpen(conn);
     if (g_virt_conn == NULL) {
@@ -325,7 +333,7 @@ void cleanup_vm_dir() {
 int main(int argc, char* argv[]) {
   printf("This is trash_cleaner!\n");
   if (argc < 3) {
-    printf("Usage: trash_cleaner <log_folder> <run_root>\n");
+    printf("Usage: trash_cleaner <log_folder> <run_root> <hypervisor>\n");
     exit(0);
   }
 
@@ -354,7 +362,7 @@ int main(int argc, char* argv[]) {
     fprintf(p_pidf, "%d", getpid());
     fclose(p_pidf);
     g_run_root = argv[2];
-
+    hypervisor = argv[3];
     // ok, start to do cleanup work
     for (;;) {
       do_log("Doing cleanup work...\n");
