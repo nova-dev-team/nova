@@ -519,7 +519,9 @@ def do_receive storage_server, vm_dir
 
   timeout = MIGRATION_TIMEOUT_HANDSHAKE * 10
   while timeout != 0
-    if File.exists? "migrate_request" break;
+    if File.exists? "migrate_request" 
+      break
+    end
     timeout = timeout - 1
     sleep 6 #check it every 6 sec
   end
