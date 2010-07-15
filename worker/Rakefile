@@ -14,6 +14,7 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 require 'tasks/rails'
+require 'uuidtools'
 
 require "#{File.dirname __FILE__}/lib/utils.rb"
 require 'fileutils'
@@ -52,6 +53,7 @@ namespace :nova do
       puts "Loading data..."
       my_exec "rake db:fixtures:load RAILS_ENV=production"
       my_exec "rake db:fixtures:load RAILS_ENV=development"
+      my_exec "echo \"#{UUIDTools::UUID.random_create.to_s}\" > config/worker.uuid"
     end
 
     desc "Initialize system"

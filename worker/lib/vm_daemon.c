@@ -106,17 +106,18 @@ int main(int argc, char* argv[]) {
     // else, polling vm_daemon_helper.rb each XX sec
     // actions should be done by vm_daemon_helper
 
-    for (;;) {
+    // run once!!
+//    for (;;) {
       if (virDomainLookupByName(g_virt_conn, vm_name) != NULL) {
         sprintf(cmd, "./vm_daemon_helper.rb %s %s %s 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
         printf("[cmd] %s\n", cmd);
         system(cmd);
       } else {
         // vm not exists, call cleanup
-        break;
+//        break;
       }
-      sleep(1);
-    }
+//      sleep(1);
+//    }
 
     if (hypervisor == 0) { //KVM
       sprintf(cmd, "./vm_daemon_helper.rb %s %s %s cleanup 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);

@@ -530,15 +530,24 @@ private
     Vmachine.log vm_name, "vm_daemon started for '#{vm_name}'"
   end
 
-  def Vmachine.restart_vm_daemon params
-    vm_dir = File.join Setting.vm_root, params[:name]
+  def Vmachine.restart_vm_daemon vm_name
+    vm_dir = File.join Setting.vm_root, vm_name
     vm_daemon_pid_fn = File.join vm_dir, "vm_daemon.pid"
     vm_daemon_pid = File.read vm_daemon_pid_fn
     if vm_daemon_pid
-      system "pkill #{vm_daemon_pid}"
+      begin
+        Process.kill 0, pid
+        Vmachine.log vm_name, "[debug] vm_daemon exists, pid is #{vm_daemon_pid}"
+      rescue
+        # start new vm daemon
+        Vmachine.log vm_name, "[debug] vm_daemon doesn't exist, restart it"
+        FileUtils.rm_f vm_daemon_pid_fn rescue nil
+        start_vm_daemon vm_name
+      end
+    else
+        Vmachine.log vm_name, "[debug] vm_daemon doesn't exist, restart it"
+        start_vm_daemon vm_name
     end
-    #FileUtils.rm_f vm_daemon_pid_fn
-    start_vm_daemon params[:name]
   end
 
   # Write logs for the virtual machine.
@@ -586,6 +595,8 @@ private
         f.write migrate_src
       end
     end
+
+    Vmachine.restart_vm_daemon vm_name
 
     Vmachine.log vm_name, "prepare migrating to #{migrate_dest}"
     return {:success => true, :message => "Vmachine '#{vm_name}' is preparing migrate to worker '#{migrate_dest}'"}
