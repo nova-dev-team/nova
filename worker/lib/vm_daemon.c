@@ -31,6 +31,7 @@ int main(int argc, char* argv[]) {
     // there's no need to free those malloc'd pointers
     char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) * 2 + strlen(storage_server) * 2 + 200));
     char* pid_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
+    char* lock_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_info = (char *) malloc(sizeof(char) * 100);
 
@@ -40,6 +41,7 @@ int main(int argc, char* argv[]) {
     // 1 -- XEN
     
     FILE* fp = NULL;
+    FILE* lfp = NULL;  //lock
 
     if (argc >= 6) {
       c_mode = argv[5];
@@ -53,19 +55,29 @@ int main(int argc, char* argv[]) {
 
     cmd[0] = '\0';
     pid_fn[0] = '\0';
+    lock_fn[0] = '\0';
     status_fn[0] = '\0';
-
+    
     printf("This is vm_daemon!\n");
     printf("Running with pid = %d\n", pid);
     printf("Hypervisor(0--KVM, 1--Xen) = %d\n", hypervisor);
 
     sprintf(pid_fn, "%s/vm_daemon.pid", vm_dir);
-
+    sprintf(lock_fn, "%s/vm_daemon.lock", vm_dir);
+    
+    lfp = fopen(lock_fn, "w");
+    if (lfp == NULL) {
+      printf("error: cannot obtain daemon lock!\n");
+      exit(1);
+    }
+    fprintf(lfp, "hahahahhhaa\n");
+    
     fp = fopen(pid_fn, "w");
     if (fp == NULL) {
       printf("error: cannot open pid file %s!\n", pid_fn);
       exit(1);
     }
+
     fprintf(fp, "%d", pid);
     fclose(fp);
 
@@ -109,6 +121,7 @@ int main(int argc, char* argv[]) {
       printf("[cmd] %s\n", cmd);
       system(cmd);
     }
+    fclose(lfp);
     return 0;
   }
 

@@ -12,6 +12,7 @@ class Vmachine < ActiveRecord::Base
 
   # libvirt VM status
   LIBVIRT_RUNNING = 1
+  LIBVIRT_BLOCK = 2
   LIBVIRT_SUSPENDED = 3
   LIBVIRT_NOT_RUNNING = 5
 
@@ -313,7 +314,7 @@ XML_DESC
     end
 
     begin
-      # start background helpe
+      # start background helper
       Vmachine.prepare_vm_dir params
       Vmachine.start_vm_daemon params[:name]
     rescue => e
