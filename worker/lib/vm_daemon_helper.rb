@@ -43,7 +43,7 @@ def libvirt_connect_local
   when "kvm"
     return Libvirt::open("qemu:///system")
   else
-    raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
+    raise "vm_daemon_helper[#{Process.pid}]: unsupported hypervisor: #{HYPERVISOR}."
   end
 end
 
@@ -727,13 +727,13 @@ def do_action action
 
   case action
   when "prepare"
-    write_log "vm_daemon_helper action: prepare"
+    write_log "vm_daemon_helper[#{Process.pid}] action: prepare"
     do_prepare rails_root, storage_server, vm_dir
   when "receive"
     write_log "vm_daemon_helper action: receive"
     do_receive storage_server, vm_dir
   when "migrate"
-    write_log "vm_daemon_helper action: migrate"
+    write_log "vm_daemon_helper[#{Process.pid}] action: migrate"
     do_migrate 
   when "poll"
 #    write_log "vm_daemon_helper action: poll"
