@@ -588,7 +588,6 @@ def do_migrate
     write_log "vm #{vm_uuid} not running! cannot live migrate!"
     return -1
   end
-  write_log "2"
 
   migrate_dest = File.read "migrate_to"
   if migrate_dest && migrate_dest.length > 0
