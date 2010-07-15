@@ -20,7 +20,7 @@ int g_mbps = 1;
 int g_interval = 1;
 
 // global image pool size
-int g_pool_size = 5;
+int g_pool_size = 0;
 
 // return 1 if there is vm running.
 int has_vm_running() {
@@ -284,8 +284,8 @@ void refresh_config(char* conf_path) {
 void read_pool_size(char* image_fn){
   struct stat st;
   char* pool_size_fn = (char*) malloc(sizeof(char) *(strlen(image_fn) + 128));
-  sprintf(pool_size_fn, "/nova/misc/pool_size/%s", image_fn);
-  printf("checking if %s pool_size config exists.", pool_size_fn);
+  sprintf(pool_size_fn, "/nova/misc/pool_size/%s.size", image_fn);
+  printf("checking if %s pool_size config exists.\n", pool_size_fn);
   if(lstat(pool_size_fn, &st) == 0){
     FILE* fp;
     fp = fopen(pool_size_fn, "r");
@@ -295,7 +295,7 @@ void read_pool_size(char* image_fn){
     g_pool_size = atoi(buf);
   }
   else
-    g_pool_size = 5;
+    g_pool_size = 0;
 }
 
 void maintain_image_count(char* image_fn) {

@@ -5,7 +5,7 @@ class VdiskPool < ActiveRecord::Base
 
 # Intercepts savings for "vdisk_pool", and updates corresponding configs.
   def save
-      File.open("#{RAILS_ROOT}/../../misc/pool_size/" + self.basename, "w") do |f|
+      File.open("#{RAILS_ROOT}/../../misc/pool_size/" + self.basename + ".size", "w") do |f|
         f.write self.pool_size
       end
     super
@@ -29,6 +29,6 @@ class VdiskPool < ActiveRecord::Base
 # Delete the specified rows from VdiskPool table.
   def VdiskPool.del (basename)
      VdiskPool.delete_all(["basename = ?", basename])
-    File.delete("#{RAILS_ROOT}/../misc/pool_size/" + basename)
+     File.delete("#{RAILS_ROOT}/../../misc/pool_size/" + basename + ".size")
   end
 end

@@ -12,10 +12,8 @@
 ActiveRecord::Schema.define(:version => 20100712054428) do
 
   create_table "vdisk_pools", :force => true do |t|
-    t.string   "basename",   :limit => 40,                   :null => false
-    t.integer  "pool_size",                                  :null => false
-    t.string   "info"
-    t.boolean  "editable",                 :default => true, :null => false
+    t.string   "basename",   :limit => 40, :null => false
+    t.integer  "pool_size",                :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
