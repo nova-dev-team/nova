@@ -536,7 +536,7 @@ private
     vm_daemon_pid = File.read vm_daemon_pid_fn
     if vm_daemon_pid
       begin
-        Process.kill 0, pid
+        Process.kill 0, vm_daemon_pid
         Vmachine.log vm_name, "[debug] vm_daemon exists, pid is #{vm_daemon_pid}"
       rescue
         # start new vm daemon
@@ -627,5 +627,7 @@ private
       raise "Please provide a destination machine ip or url!"
     end
   end
+
+
 end
 
