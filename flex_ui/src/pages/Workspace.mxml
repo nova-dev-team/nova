@@ -47,20 +47,16 @@
 					
 					for (var i:Number = 0; i < ret.machines.length; i++) {
 						machineListData.addItem(ret.machines[i]);
-						
-						
 						var row:GridRow = new GridRow();
-						
 						var col1:GridItem = new GridItem();
-						
 						var lbl:Label = new Label();
 						lbl.text = String(i);
 						col1.addChild(lbl);
 						var col2:GridItem = new GridItem();
-						
-						col2.addChild(new WorkspaceClusterMachine());
-						
-						
+						var machineSection:WorkspaceClusterMachine = new WorkspaceClusterMachine();
+						var machine:Object = ret.machines[i];
+						machineSection.setMachineParams(machine.name, machine.cpu_count, machine.mem_size, machine.disk_image, machine.uuid, machine.soft_list, machine.status);
+						col2.addChild(machineSection);
 						row.addChild(col1);
 						row.addChild(col2);
 						machines_holder.addChild(row);
