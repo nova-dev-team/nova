@@ -605,6 +605,8 @@ def do_migrate vm_uuid
 
       if result
         write_log "migrating success!"
+        sleep 30
+        #sleep 30sec wait for local vm disapper
       else
         write_log "migrating failed!"
       end
