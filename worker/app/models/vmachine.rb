@@ -520,7 +520,7 @@ private
     end
 
     Process.detach pid  # prevent zombie process
-    Vmachine.log params[:name], "vm_daemon started for '#{params[:name]}'"
+    Vmachine.log vm_name, "vm_daemon started for '#{vm_name}'"
   end
 
   def Vmachine.restart_vm_daemon params
