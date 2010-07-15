@@ -594,7 +594,7 @@ def do_migrate
     write_log "now migrate vm<#{vm_uuid}> to worker '#{migrate_dest}'"
     old_status = File.read "status"
     File.open("status", "w") do |f|
-      f.write "status"
+      f.write "migrating"
     end
 
     write_log "changed VM status to 'migrating'"

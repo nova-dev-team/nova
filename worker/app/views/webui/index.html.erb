@@ -104,12 +104,22 @@ end
 <td>
 #{
 case dom.info.state
+vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
 when Vmachine::LIBVIRT_RUNNING
-  "Running"
+  if vm_daemon_status == "migrating"
+    "<font color='red'><b>Migrating</b></font>"
+  else
+    "Running"
+  end
+when Vmachine::LIBVIRT_BLOCK
+  if vm_daemon_status == "migrating"
+    "<font color='red'><b>Migrating</b></font>"
+  else
+    "Running"
+  end
 when Vmachine::LIBVIRT_SUSPENDED
   "<b>Suspended</b>"
 when Vmachine::LIBVIRT_NOT_RUNNING
-  vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
   if vm_daemon_status == "preparing"
     "Preparing"
   elsif vm_daemon_status == "saving"

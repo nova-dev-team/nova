@@ -14,5 +14,6 @@ tmp/
 .hgignore
 *.orig.*
 lazy.sh
+update.sh
 .yardoc/
 nova.tar.gz

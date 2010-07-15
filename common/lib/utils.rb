@@ -148,8 +148,6 @@ def common_conf
   YAML.load File.read("#{File.dirname __FILE__}/../config/conf.yml")
 end
 
-
-
 # A collection of helpers for manipulating IP address.
 #
 # Since::    0.3
