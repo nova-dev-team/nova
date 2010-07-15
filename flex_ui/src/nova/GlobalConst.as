@@ -35,6 +35,10 @@ package nova
 		
 		public static const vdisks_add:String = urlBase + "/vdisks/register.json";
 		
+		public static const vclusters_list:String = urlBase + "/vclusters/list.json";
+		
+		public static const vclusters_show:String = urlBase + "/vclusters/show.json";
+		
 		[Bindable]
 		public static var myLogin:String = "";
 		

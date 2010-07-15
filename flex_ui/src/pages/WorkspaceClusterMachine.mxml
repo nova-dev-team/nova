@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="800" height="98">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Label x="40" y="10" text="Machine name:"/>
+	<s:Label x="287" y="10" text="CPU count:"/>
+	<s:Label x="507" y="10" text="Memory size:"/>
+	<s:Label x="39" y="31" text="Machine image:"/>
+	<s:Label x="294" y="31" text="UUID:"/>
+	<s:Label x="29" y="51" text="Software list:"/>
+	<s:Label x="24" y="73" text="Status"/>
+	<s:Label x="256" y="73" text="Actions:"/>
+	<s:Button x="316" y="62" label="Start"/>
+</s:Group>
