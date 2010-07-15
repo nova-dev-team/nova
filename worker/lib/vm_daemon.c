@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     // there's no need to free those malloc'd pointers
     char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) * 2 + strlen(storage_server) * 2 + 200));
     char* pid_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
-    char* lock_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
+    //char* lock_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_info = (char *) malloc(sizeof(char) * 100);
 
@@ -63,14 +63,16 @@ int main(int argc, char* argv[]) {
     printf("Hypervisor(0--KVM, 1--Xen) = %d\n", hypervisor);
 
     sprintf(pid_fn, "%s/vm_daemon.pid", vm_dir);
-    sprintf(lock_fn, "%s/vm_daemon.lock", vm_dir);
+    //sprintf(lock_fn, "%s/vm_daemon.lock", vm_dir);
     
+    /*
     lfp = fopen(lock_fn, "w");
     if (lfp == NULL) {
       printf("error: cannot obtain daemon lock!\n");
       exit(1);
     }
     fprintf(lfp, "hahahahhhaa\n");
+    */
     
     fp = fopen(pid_fn, "w");
     if (fp == NULL) {
@@ -121,7 +123,7 @@ int main(int argc, char* argv[]) {
       printf("[cmd] %s\n", cmd);
       system(cmd);
     }
-    fclose(lfp);
+    //fclose(lfp);
     return 0;
   }
 
