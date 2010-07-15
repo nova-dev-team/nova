@@ -578,17 +578,17 @@ def do_receive storage_server, vm_dir
 end
 
 
-def do_migrate vm_uuid
+def do_migrate
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   vm_uuid = xml_desc["uuid"][0]
-
   virt_conn = libvirt_connect_local
-  dom = virt_conn.lookup_domain_by_uuid(uuid)
+  dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
 
   if dom.info.state == LIBVIRT_NOT_RUNNING
     write_log "vm #{vm_uuid} not running! cannot live migrate!"
     return -1
   end
+  write_log "2"
 
   migrate_dest = File.read "migrate_to"
   if migrate_dest && migrate_dest.length > 0
@@ -621,6 +621,7 @@ def do_migrate vm_uuid
     end
 
   else
+    write_log "invalid params, migrating failed"
     #FileUtils.rm_f "migrate_to"
     #invalid params
   end
@@ -734,7 +735,7 @@ def do_action action
     write_log "vm_daemon_helper action: migrate"
     do_migrate 
   when "poll"
-    write_log "vm_daemon_helper action: poll"
+#    write_log "vm_daemon_helper action: poll"
     do_poll storage_server, vm_dir
   when "save"
     write_log "vm_daemon_helper action: save"
