@@ -367,7 +367,10 @@ XML_DESC
         Vmachine.libvirt_call_by_uuid "destroy", params[:uuid]
       rescue
       end
-      Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
+      begin
+        Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
+      rescue
+      end
       return {:success => true, :message => "destroyed vm with uuid #{params[:uuid]}."}
 
     elsif params[:name] != nil and params[:name] != ""
@@ -377,7 +380,10 @@ XML_DESC
         Vmachine.libvirt_call_by_name "destroy", params[:name]
       rescue
       end
-      Vmachine.libvirt_call_by_name "undefine", params[:name]
+      begin
+        Vmachine.libvirt_call_by_name "undefine", params[:name]
+      rescue
+      end
       return {:success => true, :message => "destroyed vm named '#{params[:name]}'."}
 
     else
@@ -495,7 +501,7 @@ private
     Vmachine.log params[:name], "changed vmachine status to 'unprepared'"
 
     # instruction file, so vm_daemon_helper will do preparing
-    Vmachine.open_vm_file(params[:name], "preparing") do |f|
+    Vmachine.open_vm_file(params[:name], "prepare") do |f|
       f.write "go!"
     end
 
@@ -520,7 +526,7 @@ private
     end
 
     Process.detach pid  # prevent zombie process
-    Vmachine.log params[:name], "vm_daemon started for '#{params[:name]}'"
+    Vmachine.log vm_name, "vm_daemon started for '#{vm_name}'"
   end
 
   def Vmachine.restart_vm_daemon params
