@@ -103,33 +103,33 @@ end
 </a></td>
 <td>
 #{
-case dom.info.state
 vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
-when Vmachine::LIBVIRT_RUNNING
-  if vm_daemon_status == "migrating"
-    "<font color='red'><b>Migrating</b></font>"
+  case dom.info.state
+  when Vmachine::LIBVIRT_RUNNING
+    if vm_daemon_status == "migrating"
+      "<font color='red'><b>Migrating</b></font>"
+    else
+      "Running"
+    end
+  when Vmachine::LIBVIRT_BLOCK
+    if vm_daemon_status == "migrating"
+      "<font color='red'><b>Migrating</b></font>"
+    else
+      "Running"
+    end
+  when Vmachine::LIBVIRT_SUSPENDED
+    "<b>Suspended</b>"
+  when Vmachine::LIBVIRT_NOT_RUNNING
+    if vm_daemon_status == "preparing"
+      "Preparing"
+    elsif vm_daemon_status == "saving"
+      "Saving"
+    else
+      "<font color='red'><b>Not running</b></font>"
+    end
   else
-    "Running"
+    dom.info.state.to_s
   end
-when Vmachine::LIBVIRT_BLOCK
-  if vm_daemon_status == "migrating"
-    "<font color='red'><b>Migrating</b></font>"
-  else
-    "Running"
-  end
-when Vmachine::LIBVIRT_SUSPENDED
-  "<b>Suspended</b>"
-when Vmachine::LIBVIRT_NOT_RUNNING
-  if vm_daemon_status == "preparing"
-    "Preparing"
-  elsif vm_daemon_status == "saving"
-    "Saving"
-  else
-    "<font color='red'><b>Not running</b></font>"
-  end
-else
-  dom.info.state.to_s
-end
 }
 </td>
 <td>
