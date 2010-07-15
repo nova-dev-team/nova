@@ -12,6 +12,7 @@ class Vmachine < ActiveRecord::Base
 
   # libvirt VM status
   LIBVIRT_RUNNING = 1
+  LIBVIRT_BLOCK = 2
   LIBVIRT_SUSPENDED = 3
   LIBVIRT_NOT_RUNNING = 5
 
@@ -313,7 +314,7 @@ XML_DESC
     end
 
     begin
-      # start background helpe
+      # start background helper
       Vmachine.prepare_vm_dir params
       Vmachine.start_vm_daemon params[:name]
     rescue => e
@@ -495,7 +496,7 @@ private
     Vmachine.log params[:name], "changed vmachine status to 'unprepared'"
 
     # instruction file, so vm_daemon_helper will do preparing
-    Vmachine.open_vm_file(params[:name], "preparing") do |f|
+    Vmachine.open_vm_file(params[:name], "prepare") do |f|
       f.write "go!"
     end
 
@@ -520,7 +521,7 @@ private
     end
 
     Process.detach pid  # prevent zombie process
-    Vmachine.log params[:name], "vm_daemon started for '#{params[:name]}'"
+    Vmachine.log vm_name, "vm_daemon started for '#{vm_name}'"
   end
 
   def Vmachine.restart_vm_daemon params
