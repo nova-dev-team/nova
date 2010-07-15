@@ -4,9 +4,9 @@ class CreateVdiskPools < ActiveRecord::Migration
       t.column :basename,       :string, :limit => 40, :null => false
       t.column :pool_size,      :int, :null => false
 
-      t.column :info,      :string
+     # t.column :info,      :string
 
-      t.column :editable,     :boolean, :default => true, :null =>false
+     # t.column :editable,     :boolean, :default => true, :null =>false
 
       t.timestamps
     end

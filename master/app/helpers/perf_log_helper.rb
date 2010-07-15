@@ -1,0 +1,2 @@
+module PerfLogHelper
+end

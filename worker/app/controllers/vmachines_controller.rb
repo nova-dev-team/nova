@@ -8,7 +8,6 @@ require 'xmlsimple'
 class VmachinesController < ApplicationController
 
 public
-
   # Show a listing of all VM
   #
   # Since::     0.3
@@ -29,17 +28,25 @@ public
         dom_info["vnc_port"] = xml_desc["devices"][0]["graphics"][0]["port"]
       end
 
+      vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
       case dom.info.state
       when Vmachine::LIBVIRT_RUNNING
         dom_info["status"] = "Running"
+      when Vmachine::LIBVIRT_BLOCK
+        if vm_daemon_status == "migrating"
+          dom_info["status"] = "Migrating"
+        else
+          dom_info["status"] = "Running"
+        end
       when Vmachine::LIBVIRT_SUSPENDED
         dom_info["status"] = "Suspended"
       when Vmachine::LIBVIRT_NOT_RUNNING
-        vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
         if vm_daemon_status == "preparing"
           dom_info["status"] = "Preparing"
         elsif vm_daemon_status == "saving"
           dom_info["status"] = "Saving"
+        elsif vm_daemon_status == "migrating"
+          dom_info["status"] = "Migrating"
         else
           dom_info["status"] = "Not running"
         end

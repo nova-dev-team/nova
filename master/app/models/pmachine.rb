@@ -13,6 +13,7 @@ require "worker_proxy"
 class Pmachine < ActiveRecord::Base
 
   has_many :vmachines
+  has_many :perf_logs
 
   # A helper function, returns the root url of the worker module.
   #
