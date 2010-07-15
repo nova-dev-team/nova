@@ -1,0 +1,2 @@
+class PerfLogController < ApplicationController
+end

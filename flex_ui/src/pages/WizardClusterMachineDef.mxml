@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="846" height="140">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:TextInput x="273" y="11"/>
+	<s:TextInput x="204" y="67" width="58"/>
+	<s:ComboBox x="98" y="7"/>
+	<s:ComboBox x="65" y="64" width="50"/>
+	<s:Label x="7" y="10" text="Machine image"/>
+	<s:Label x="232" y="20" text="name"/>
+	<s:Label x="26" y="77" text="cpu"/>
+	<s:Label x="127" y="73" text="memory size"/>
+	<s:Label x="270" y="71" text="MB"/>
+	<mx:DataGrid x="457" y="10" height="99">
+		<mx:columns>
+			<mx:DataGridColumn headerText="Checkbox" dataField="col1"/>
+			<mx:DataGridColumn headerText="Software" dataField="col2"/>
+			<mx:DataGridColumn headerText="Description" dataField="col3"/>
+		</mx:columns>
+	</mx:DataGrid>
+	<s:Button x="311" y="71" label="Apply down"/>
+</s:Group>

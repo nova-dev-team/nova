@@ -7,7 +7,7 @@ trash_cleaner: trash_cleaner.cpp
 	g++ trash_cleaner.cpp -o trash_cleaner -lvirt
 
 vm_daemon: vm_daemon.c
-	gcc vm_daemon.c -o vm_daemon
+	gcc vm_daemon.c -o vm_daemon -lvirt
 
 image_pool_maintainer: image_pool_maintainer.c
 	gcc image_pool_maintainer.c -o image_pool_maintainer

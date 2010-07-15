@@ -371,7 +371,8 @@ int main(int argc, char* argv[]) {
       cleanup_image_pool_dir();
 
       // cleanup the running VMs
-      cleanup_vm_dir();
+      // temperarily disabled.. 
+      // cleanup_vm_dir();
 
       // do cleanup every 3 minutes
       sleep(3 * 60);
