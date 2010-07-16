@@ -11,6 +11,64 @@ function do_message(type, title, msg) {
 }
 
 //
+// "Overview" page
+//
+
+function load_overview_info() {
+  $("#overview_info").block();
+  $.ajax({
+    url: "/misc/overview",
+    type: "GET",
+    dataType: "json",
+    data: {
+    },
+    success: function(result) {
+      if (result.success) {
+        var html = "";
+        html += "The following overview info is generated for '<font color='blue'>" + result.data.privilege + "</font>' user";
+
+        // users info
+        html += "<h3>Users:</h3>";
+        html += "<font color='blue'>" + result.data.users_total + "</font> in total, ";
+        html += "<font color='blue'>" + result.data.users_root + "</font> root user, ";
+        html += "<font color='" + (result.data.users_admin == 0 ? "red" : "blue") + "'>" + result.data.users_admin + "</font> admin user, ";
+        html += "<font color='" + (result.data.users_normal == 0 ? "red" : "blue") + "'>" + result.data.users_normal + "</font> normal user, ";
+        html += "<font color='" + (result.data.users_not_activated != 0 ? "red" : "blue") + "'>" + result.data.users_not_activated + "</font> not activated.<p/><p/>";
+
+        if (result.data.privilege == "root") {
+          // pmachine detail info, if current user is root
+          html += "<h3>Pmachines:</h3>";
+          html += "<font color='" + (result.data.pmachine_total == 0 ? "red" : "blue") + "'>" + result.data.pmachine_total + "</font> in total, ";
+          html += "<font color='blue'>" + result.data.pmachine_working + "</font> working, ";
+          html += "<font color='" + (result.data.pmachine_failure != 0 ? "red" : "blue") + "'>" + result.data.pmachine_failure + "</font> has failed, ";
+          html += "<font color='blue'>" + result.data.pmachine_retired + "</font> retired.<p/><p/>";
+        } else {
+          // admin users
+          if (result.data.pmachine_failure != 0) {
+            html += "<h3><font color='red'> There is something wrong with the physical machines! " + result.data.pmachine_failure + " of them is down! Please contact 'root' user as soon as possible!</font></h3>";
+          }
+        }
+
+        // other info
+        html += "<h3>Other info</h3>";
+        html += "<font color='blue'>" + result.data.vclusters_count + "</font> vclusters, ";
+        html += "<font color='blue'>" + result.data.vmachines_total + "</font> vmachines in total, ";
+        html += "<font color='blue'>" + result.data.vmachines_running + "</font> vmachines running.";
+        
+        $("#overview_info").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#overview_info").unblock();
+    },
+    error: function() {
+      $("#overview_info").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+//
 // "Users" page
 //
 

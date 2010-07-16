@@ -215,6 +215,7 @@ class MiscController < ApplicationController
     return unless root_or_admin_required
     users_total = User.count
     reply_data = {
+      :privilege => @current_user.privilege,
       :users_total => users_total,
       :users_root => 1,
       :users_admin => User.find_all_by_privilege("admin").count,
@@ -222,15 +223,17 @@ class MiscController < ApplicationController
       :users_not_activated => User.find(:all, :conditions => ["activated=?", false]).count,
       :vclusters_count => Vcluster.count,
       :vmachines_total => Vmachine.count,
-      :vmachines_running => Vmachine.find(:all, :conditions => ["status=?", "running"]).count
+      :vmachines_running => Vmachine.find(:all, :conditions => ["status=?", "running"]).count,
+      :pmachine_failure => Pmachine.find(:all, :conditions => ["status=?", "failure"]).count
     }
     if @current_user.privilege == "root"
+      # pmachine info only available for root users
       reply_data[:pmachine_total] = Pmachine.count
       reply_data[:pmachine_working] = Pmachine.find(:all, :conditions => ["status=?", "working"]).count
-      reply_data[:pmachine_failure] = Pmachine.find(:all, :conditions => ["status=?", "failure"]).count
       reply_data[:pmachine_retired] = Pmachine.find(:all, :conditions => ["status=?", "retired"]).count
     else
       # current user is "admin"
+      # do nothing more
     end
     reply_success "Query successful!", :data => reply_data
   end

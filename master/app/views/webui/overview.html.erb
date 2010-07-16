@@ -1,7 +1,18 @@
 <% content_for :page do %>
 
+<script type="text/javascript">
+$(document).ready(function() {
+  load_overview_info();
+});
+</script>
 
+<p/>
 
+<div id="overview_info">
+</div>
 
+<p/>
+
+<a href="#" onclick="load_overview_info()">Refresh</a>
 
 <% end %>
