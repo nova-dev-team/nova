@@ -55,7 +55,6 @@ int main(int argc, char* argv[]) {
 
     cmd[0] = '\0';
     pid_fn[0] = '\0';
-    lock_fn[0] = '\0';
     status_fn[0] = '\0';
     
     printf("This is vm_daemon!\n");
