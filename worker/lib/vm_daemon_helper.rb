@@ -593,6 +593,7 @@ def do_migrate
   if migrate_dest && migrate_dest.length > 0
     write_log "now migrate vm<#{vm_uuid}> to worker '#{migrate_dest}'"
     old_status = File.read "status"
+
     File.open("status", "w") do |f|
       f.write "migrating"
     end
@@ -604,22 +605,26 @@ def do_migrate
 
       if result
         write_log "migrating success!"
+        File.open("status", "w") do |f|
+          f.write "using"
+        end
         sleep 30
         #sleep 30sec wait for local vm disapper
       else
         write_log "migrating failed!"
+        File.open("status", "w") do |f|
+          f.write "old_status"
+        end
       end
-
     rescue
       write_log "live migrate failed!"
+      File.open("status", "w") do |f|
+        f.write "old_status"
+      end
     end
 
     write_log "migrating finished, remove migrating tag"
     FileUtils.rm_f "migrate_to"
-
-    File.open("status", "w") do |f|
-      f.write old_status
-    end
 
   else
     write_log "invalid params, migrating failed"
