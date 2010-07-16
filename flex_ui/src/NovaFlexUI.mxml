@@ -17,6 +17,16 @@
 				misc_NovaVersion_Request.send();
 			}
 			
+			protected var retryWhoAmI_Count:Number = 0;
+			private function retry_whoAmI():void {
+				if (retryWhoAmI_Count < 3) {
+					retryWhoAmI_Count++;
+					misc_WhoAmI_Request.send();
+				} else {
+					connection_fault();
+				}
+			}
+			
 			public function misc_NovaVersion_JSON(event:ResultEvent) : void {
 				var ret:Object = JSON.decode(event.message.body.toString());
 				GlobalConst.novaVersion = ret.version;
@@ -46,6 +56,7 @@
 					tab_navi.removeChild(users_page);
 					tab_navi.removeChild(system_page);
 				}
+				
 			}
 			
 			private function logout() : void {
@@ -58,7 +69,7 @@
 			
 		]]>
 	</mx:Script>
-	<mx:HTTPService id="misc_WhoAmI_Request" url="{GlobalConst.misc_WhoAmI}" useProxy="false" method="GET" resultFormat="text" result="misc_WhoAmI_JSON(event)" fault="connection_fault()"/>
+	<mx:HTTPService id="misc_WhoAmI_Request" url="{GlobalConst.misc_WhoAmI}" useProxy="false" method="GET" resultFormat="text" result="misc_WhoAmI_JSON(event)" fault="retry_whoAmI()"/>
 	<mx:HTTPService id="misc_NovaVersion_Request" url="{GlobalConst.misc_version}" useProxy="false" method="GET" resultFormat="text" result="misc_NovaVersion_JSON(event)" fault="connection_fault()"/>
 	<mx:VBox x="0" y="0" width="100%" height="100%" minHeight="480" minWidth="640">
 		<mx:Canvas width="100%" height="30">
@@ -69,7 +80,7 @@
 		</mx:Canvas>
 		<mx:TabNavigator id="tab_navi" horizontalAlign="right" x="0" y="0" width="100%" height="100%">
 			<mx:Canvas id="overview_page" label="Overview" width="100%" height="100%">
-				<pages:Overview x="0" y="0" />
+				<pages:Overview x="0" y="0"/>
 			</mx:Canvas>
 			<mx:Canvas id="users_page" label="Users" width="100%" height="100%">
 				<pages:Users x="0" y="0" />

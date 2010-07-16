@@ -183,9 +183,9 @@ class MiscController < ApplicationController
       reply_success "Tried to update ftp server files list."
     when "server_down"
       if ftp_server_down?
-        reply_success "Ftp server is down!"
+        reply_success "Ftp server is down!", :server_down => true
       else
-        reply_success "Ftp server is up and running!"
+        reply_success "Ftp server is up and running!", :server_down => false
       end
     when "vdisk_list"
       vdisk_list = ftp_server_vdisks_list
@@ -204,6 +204,41 @@ class MiscController < ApplicationController
     else
       reply_failure "Unknown request '#{params[:req]}'"
     end
+  end
+
+  # Handles requests for overview info:
+  # * users (root, admin, normal_user, not_activated)
+  # * machines (up, down, total)
+  #
+  # Since::     0.3
+  def overview
+    return unless root_or_admin_required
+    users_total = User.count
+    reply_data = {
+      :privilege => @current_user.privilege,
+      :users_total => users_total,
+      :users_root => 1,
+      :users_admin => User.find_all_by_privilege("admin").count,
+      :users_normal => User.find_all_by_privilege("normal_user").count,
+      :users_not_activated => User.find(:all, :conditions => ["activated=?", false]).count,
+      :vclusters_count => Vcluster.count,
+      :vmachines_total => Vmachine.count,
+      :vmachines_running => Vmachine.find(:all, :conditions => ["status=?", "running"]).count,
+      :pmachine_failure => Pmachine.find(:all, :conditions => ["status=?", "failure"]).count,
+      :storage_server_down => ftp_server_down?,
+      :vdisks_count => Vdisk.count,
+      :software_count => Software.count
+    }
+    if @current_user.privilege == "root"
+      # pmachine info only available for root users
+      reply_data[:pmachine_total] = Pmachine.count
+      reply_data[:pmachine_working] = Pmachine.find(:all, :conditions => ["status=?", "working"]).count
+      reply_data[:pmachine_retired] = Pmachine.find(:all, :conditions => ["status=?", "retired"]).count
+    else
+      # current user is "admin"
+      # do nothing more
+    end
+    reply_success "Query successful!", :data => reply_data
   end
 
 private

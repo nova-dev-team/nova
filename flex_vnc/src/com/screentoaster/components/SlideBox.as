@@ -7,7 +7,7 @@ package com.screentoaster.components
 	import flash.utils.Timer;
 	
 	import mx.containers.Box;
-	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import mx.events.FlexEvent;
 	import mx.logging.ILogger;
 	import mx.logging.Log;
@@ -36,7 +36,7 @@ package com.screentoaster.components
 			//logger.debug(">> handleCreationCompleted()");
 			
 			removeEventListener(FlexEvent.CREATION_COMPLETE, handleCreationCompleted);
-			Application.application.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
+			FlexGlobals.topLevelApplication.addEventListener(MouseEvent.MOUSE_MOVE, handleMouseMove);
 			timer = new Timer(3000,0);
 			timer.addEventListener(TimerEvent.TIMER, handleTimerComplete);
 			timer.start();
@@ -47,7 +47,7 @@ package com.screentoaster.components
 		private function handleTimerComplete(event:TimerEvent):void {
 			//logger.debug(">> handleTimerComplete()");
 			
-			if (!Application.application.parent) {
+			if (!FlexGlobals.topLevelApplication.parent) {
 				Mouse.hide();
 			}
 			slideDown();

@@ -39,6 +39,8 @@ package nova
 		
 		public static const vclusters_show:String = urlBase + "/vclusters/show.json";
 		
+		public static const misc_overview:String = urlBase + "/misc/overview.json";
+		
 		[Bindable]
 		public static var myLogin:String = "";
 		

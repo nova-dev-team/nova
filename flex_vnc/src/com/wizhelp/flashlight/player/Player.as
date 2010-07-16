@@ -45,7 +45,7 @@ package com.wizhelp.flashlight.player
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	
-	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import mx.logging.ILogger;
 	import mx.logging.Log;
 	
@@ -96,7 +96,7 @@ package com.wizhelp.flashlight.player
 				if (!playing) {
 					playing = true;
 					if ( playerThread == null) {
-						Thread.systemManager = Application.application.systemManager;
+						Thread.systemManager = FlexGlobals.topLevelApplication.systemManager;
 						
 						var rfb:RFBReader = new RFBReader(this,true);
 						

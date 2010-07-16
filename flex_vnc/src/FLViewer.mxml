@@ -32,9 +32,9 @@
 			[Bindable] private var autoConnect:Boolean =  false;
 
 			private function init():void {
-				host = parameters.host ? parameters.host : 'localhost';
-				port = parameters.port ? parameters.port : 5900;
-				password = parameters.password ? parameters.password : null;
+				host = parameters.host ? parameters.host : '166.111.131.10';
+				port = parameters.port ? parameters.port : 5999;
+				password = parameters.password ? parameters.password : "1-23";
 				securityPort = parameters.securityPort ? parameters.securityPort : -1;
 				shared = parameters.shared ? parameters.shared : false;
 				viewOnly = parameters.viewOnly ? parameters.viewOnly : false;
