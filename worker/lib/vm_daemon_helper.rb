@@ -666,6 +666,7 @@ end
 
 def do_cleanup storage_server, vm_dir
   write_log "doing cleanup work"
+  FileUtils.rm_f "destroy"
 
   if File.exists? "xml_desc.xml"
     # if the vm has xml_desc.xml, we could retrieve the uuid & name, and could archive the running info
@@ -722,6 +723,7 @@ end
 def get_action
   return "prepare" if File.exists? "prepare"
   return "migrate" if File.exists? "migrate_to"
+  return "cleanup" if File.exists? "destroy"
   return "poll"
 end
 
