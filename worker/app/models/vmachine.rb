@@ -316,7 +316,7 @@ XML_DESC
     begin
       # start background helper
       Vmachine.prepare_vm_dir params
-      Vmachine.start_vm_daemon params[:name]
+      #Vmachine.start_vm_daemon params[:name]
     rescue => e
       return {:success => false, :message => e.to_s}
     end
@@ -579,7 +579,13 @@ private
   def Vmachine.check_vm_daemon vm_name
     vm_dir = File.join Setting.vm_root, vm_name
     vm_daemon_pid_fn = File.join vm_dir, "vm_daemon.pid"
-    vm_daemon_pid = File.read vm_daemon_pid_fn
+    vm_daemon_pid = nil
+    begin
+      vm_daemon_pid = File.read vm_daemon_pid_fn
+    rescue
+      vm_daemon_pid = nil
+    end
+
     if vm_daemon_pid
       begin
         Process.kill 0, vm_daemon_pid
