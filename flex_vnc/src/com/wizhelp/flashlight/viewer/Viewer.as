@@ -54,9 +54,11 @@ package com.wizhelp.flashlight.viewer
 	import flash.utils.getTimer;
 	import flash.utils.setTimeout;
 	
-	import mx.core.Application;
+	import mx.core.FlexGlobals;
 	import mx.logging.ILogger;
 	import mx.logging.Log;
+	
+	import mx.controls.Alert;
 	
 	public class Viewer extends VNCBase
 	{	
@@ -108,7 +110,7 @@ package com.wizhelp.flashlight.viewer
 					
 					rfbReader = new RFBReader(this,false);
 					
-					Thread.systemManager = Application.application.systemManager;
+					Thread.systemManager = FlexGlobals.topLevelApplication.systemManager;
 					viewerThread = new ViewerThread(rfbReader,socket);
 					viewerThread.start();
 				}

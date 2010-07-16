@@ -12,6 +12,8 @@
 			import mx.logging.Log;
 			import mx.logging.ILogger;
 			
+			import mx.core.FlexGlobals;
+			
 			[Embed(source="/assets/fitToScreen.png")] [Bindable] private var fitToScreenIcon:Class;
 			[Embed(source="/assets/fitToWindow.png")] [Bindable] private var fitToWindowIcon:Class;
 			
@@ -24,12 +26,12 @@
 				try {
 					if (isFullScreen) {
 						isFullScreen = false;
-						Application.application.stage.removeEventListener(FullScreenEvent.FULL_SCREEN,handleSwitchFullScreen);
-						Application.application.stage.displayState = StageDisplayState.NORMAL;
+						FlexGlobals.topLevelApplication.stage.removeEventListener(FullScreenEvent.FULL_SCREEN,handleSwitchFullScreen);
+						FlexGlobals.topLevelApplication.stage.displayState = StageDisplayState.NORMAL;
 					} else {
 						isFullScreen = true;
-						Application.application.stage.displayState = StageDisplayState.FULL_SCREEN;
-						Application.application.stage.addEventListener(FullScreenEvent.FULL_SCREEN,handleSwitchFullScreen);
+						FlexGlobals.topLevelApplication.stage.displayState = StageDisplayState.FULL_SCREEN;
+						FlexGlobals.topLevelApplication.stage.addEventListener(FullScreenEvent.FULL_SCREEN,handleSwitchFullScreen);
 					}
 				} catch (e:Error) {
 					logger.error("An unexpected error occured during handleSwitchFullScreen : "+e.errorID+" "+e.name+" "+e.message+" "+e.getStackTrace());

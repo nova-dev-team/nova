@@ -17,7 +17,6 @@
 				misc_NovaVersion_Request.send();
 			}
 			
-			
 			protected var retryWhoAmI_Count:Number = 0;
 			private function retry_whoAmI():void {
 				if (retryWhoAmI_Count < 3) {
