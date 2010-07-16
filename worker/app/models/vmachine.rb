@@ -481,7 +481,11 @@ private
         f.write instruction
       end
       Vmachine.log vm_name, "Instruction '#{instruction}' has been sent to #{vm_name}"
-      Vmachine.check_vm_daemon vm_name
+      begin
+        Vmachine.check_vm_daemon vm_name
+      rescue
+        Vmachine.log vm_name "Failed while checking vm_daemon for #{vm_name}!"
+      end
     rescue
       Vmachine.log vm_name, "Cannot send instruction '#{instruction}' to vm #{vm_name}!"
       raise "Cannot send instruction '#{instruction}' to vm #{vm_name}!"
