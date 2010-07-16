@@ -206,6 +206,35 @@ class MiscController < ApplicationController
     end
   end
 
+  # Handles requests for overview info:
+  # * users (root, admin, normal_user, not_activated)
+  # * machines (up, down, total)
+  #
+  # Since::     0.3
+  def overview
+    return unless root_or_admin_required
+    users_total = User.count
+    reply_data = {
+      :users_total => users_total,
+      :users_root => 1,
+      :users_admin => User.find_all_by_privilege("admin").count,
+      :users_normal => User.find_all_by_privilege("normal_user").count,
+      :users_not_activated => User.find(:all, :conditions => ["activated=?", false]).count,
+      :vclusters_count => Vcluster.count,
+      :vmachines_total => Vmachine.count,
+      :vmachines_running => Vmachine.find(:all, :conditions => ["status=?", "running"]).count
+    }
+    if @current_user.privilege == "root"
+      reply_data[:pmachine_total] = Pmachine.count
+      reply_data[:pmachine_working] = Pmachine.find(:all, :conditions => ["status=?", "working"]).count
+      reply_data[:pmachine_failure] = Pmachine.find(:all, :conditions => ["status=?", "failure"]).count
+      reply_data[:pmachine_retired] = Pmachine.find(:all, :conditions => ["status=?", "retired"]).count
+    else
+      # current user is "admin"
+    end
+    reply_success "Query successful!", :data => reply_data
+  end
+
 private
 
   # Check if the parameters for port mapper is correct.
