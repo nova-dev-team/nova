@@ -315,14 +315,18 @@ end
 
 
 def do_prepare rails_root, storage_server, vm_dir
+=begin
   begin
     FileUtils.rm_f "prepare"
   rescue
     puts "cannot remove instruction file 'prepare'!"
   end
   return nil if File.exists? "prepare"
-
+=end
   puts "preparing"
+  File.open "status" do |f|
+    f.write "preparing"
+  end
 
   image_pool_dir = File.join vm_dir, "../../image_pool"
   package_pool_dir = File.join vm_dir, "../../package_pool"
