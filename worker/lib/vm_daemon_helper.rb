@@ -323,9 +323,12 @@ def do_prepare rails_root, storage_server, vm_dir
   end
   return nil if File.exists? "prepare"
 =end
+  begin
+    File.open("status", "w") do |f|
+      f.write "preparing"
+    end
+  rescue
 
-  File.open "status" do |f|
-    f.write "preparing"
   end
 
   image_pool_dir = File.join vm_dir, "../../image_pool"
@@ -767,7 +770,7 @@ def do_action action
     write_log "vm_daemon_helper action: #{action}"
     do_cleanup storage_server, vm_dir
   else
-    puts "error: action '#{action}' not understood!"
+    write_log "error: action '#{action}' not understood!"
   end
 end
 
