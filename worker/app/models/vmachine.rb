@@ -384,12 +384,12 @@ XML_DESC
   # YO, non-blocking
   def Vmachine.destroy params
     vm_name = params[:name]
-  
     if vm_name and vm_name != ""
       Vmachine.send_instruction vm_name, "destroy"
     else
       raise "Please provide a name!"
     end
+
 =begin
     if params[:uuid] != nil and params[:uuid].is_uuid?
       begin
