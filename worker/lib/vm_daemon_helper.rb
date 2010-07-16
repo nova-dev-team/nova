@@ -43,7 +43,7 @@ def libvirt_connect_local
   when "kvm"
     return Libvirt::open("qemu:///system")
   else
-    raise "vm_daemon_helper[#{Process.pid}]: unsupported hypervisor: #{HYPERVISOR}."
+    raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
   end
 end
 
@@ -323,7 +323,7 @@ def do_prepare rails_root, storage_server, vm_dir
   end
   return nil if File.exists? "prepare"
 =end
-  puts "preparing"
+
   File.open "status" do |f|
     f.write "preparing"
   end
@@ -612,8 +612,8 @@ def do_migrate
         File.open("status", "w") do |f|
           f.write "using"
         end
-        sleep 30
-        #sleep 30sec wait for local vm disapper
+        sleep 10
+        #sleep 10sec
       else
         write_log "migrating failed!"
         File.open("status", "w") do |f|
@@ -643,7 +643,6 @@ def do_poll storage_server, vm_dir
   uuid = xml_desc["uuid"][0]
 
   virt_conn = libvirt_connect_local
-
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
 
@@ -651,7 +650,7 @@ def do_poll storage_server, vm_dir
       return
       # the vm is still running, skip the following actions
     else
-      write_log "detected VM shutdown, saving it"
+      # write_log "detected VM shutdown, saving it"
       begin
         dom.destroy
       ensure
@@ -659,9 +658,8 @@ def do_poll storage_server, vm_dir
       end
       do_save storage_server, vm_dir
     end
-
   rescue
-    write_log "failed to find domain while polling, saving the VM before destoying it"
+    #write_log "failed to find domain while polling, saving the VM before destoying it"
     do_save storage_server, vm_dir
   end
 end
@@ -670,7 +668,6 @@ end
 
 def do_cleanup storage_server, vm_dir
   write_log "doing cleanup work"
-  FileUtils.rm_f "destroy"
 
   if File.exists? "xml_desc.xml"
     # if the vm has xml_desc.xml, we could retrieve the uuid & name, and could archive the running info
@@ -752,17 +749,17 @@ def do_action action
 
   case action
   when "prepare"
-    write_log "vm_daemon_helper[#{Process.pid}] action: prepare"
+    write_log "vm_daemon_helper action: prepare"
     do_prepare rails_root, storage_server, vm_dir
   when "receive"
     write_log "vm_daemon_helper action: receive"
     do_receive storage_server, vm_dir
   when "migrate"
-    write_log "vm_daemon_helper[#{Process.pid}] action: migrate"
-    do_migrate 
+    write_log "vm_daemon_helper action: migrate"
+    do_migrate
   when "poll"
 #    write_log "vm_daemon_helper action: poll"
-#    do_poll storage_server, vm_dir
+    do_poll storage_server, vm_dir
   when "save"
     write_log "vm_daemon_helper action: save"
     do_save storage_server, vm_dir
