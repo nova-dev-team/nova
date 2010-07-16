@@ -329,6 +329,14 @@ XML_DESC
   #
   # Since::     0.3
   def Vmachine.suspend params
+    vm_name = params[:name]
+  
+    if vm_name and vm_name != ""
+      Vmachine.send_instruction vm_name, "suspend"
+    else
+      raise "Please provide a name!"
+    end
+=begin
     if params[:uuid] != nil and params[:uuid] != ""
       Vmachine.libvirt_call_by_uuid "suspend", params[:uuid]
     elsif params[:name] != nil and params[:name] != ""
@@ -336,13 +344,24 @@ XML_DESC
     else
       raise "Please provide either uuid or name!"
     end
+=end
   end
 
   # Resume a vmachine. This is a blocking call, but won't take a long time.
   # You must provide either uuid or name of the VM.
   #
   # Since::     0.3
+
+  # Now it's a non-blocking call, which only sends instruction and returns
   def Vmachine.resume params
+    vm_name = params[:name]
+  
+    if vm_name and vm_name != ""
+      Vmachine.send_instruction vm_name, "resume"
+    else
+      raise "Please provide a name!"
+    end
+=begin
     if params[:uuid] != nil and params[:uuid] != ""
       Vmachine.libvirt_call_by_uuid "resume", params[:uuid]
     elsif params[:name] != nil and params[:name] != ""
@@ -350,6 +369,7 @@ XML_DESC
     else
       raise "Please provide either uuid or name!"
     end
+=end
   end
 
   # Destroy a VM domain, either by name or by uuid. Its hda image will not be saved.
@@ -360,7 +380,17 @@ XML_DESC
   # * When both name & uuid is given, we work according to "uuid" value.
   #
   # Since::     0.3
+
+  # YO, non-blocking
   def Vmachine.destroy params
+    vm_name = params[:name]
+  
+    if vm_name and vm_name != ""
+      Vmachine.send_instruction vm_name, "destroy"
+    else
+      raise "Please provide a name!"
+    end
+=begin
     if params[:uuid] != nil and params[:uuid].is_uuid?
       begin
         # "destroy" must be performed on running vm, so when vm is not running,
@@ -390,6 +420,7 @@ XML_DESC
     else
       raise "you must provide either 'name' or 'uuid'!"
     end
+=end
   end
 
 private
@@ -439,6 +470,21 @@ private
     FileUtils.mkdir_p vm_dir unless File.exists? vm_dir
     File.open((File.join vm_dir, file_name), open_mode) do |f|
       yield f
+    end
+  end
+
+  # send instruction to vm_daemon by writing file 'action' in the vm_dir
+  # since all operation will be executed in async mode
+  def Vmachine.send_instruction vm_name, instruction
+    begin
+      Vmachine.open_vm_file(vm_name, "action") do |f|
+        f.write instruction
+      end
+      Vmachine.log vm_name, "Instruction '#{instruction}' has been sent to #{vm_name}"
+      Vmachine.check_vm_daemon vm_name
+    rescue
+      Vmachine.log vm_name, "Cannot send instruction '#{instruction}' to vm #{vm_name}!"
+      raise "Cannot send instruction '#{instruction}' to vm #{vm_name}!"
     end
   end
 
@@ -501,10 +547,8 @@ private
     end
     Vmachine.log params[:name], "changed vmachine status to 'unprepared'"
 
-    # instruction file, so vm_daemon_helper will do preparing
-    Vmachine.open_vm_file(params[:name], "prepare") do |f|
-      f.write "go!"
-    end
+    # write instruction file, so vm_daemon_helper will do preparing
+    Vmachine.send_instruction params[:name], "prepare"
 
   end
 
@@ -525,12 +569,14 @@ private
       end
       exec "./vm_daemon #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, vm_name} #{vm_name} #{HYPERVISOR}"
     end
-
     Process.detach pid  # prevent zombie process
     Vmachine.log vm_name, "vm_daemon started for '#{vm_name}'"
   end
 
-  def Vmachine.restart_vm_daemon vm_name
+  # check whether vm_daemon exists
+  # if not, restart it
+
+  def Vmachine.check_vm_daemon vm_name
     vm_dir = File.join Setting.vm_root, vm_name
     vm_daemon_pid_fn = File.join vm_dir, "vm_daemon.pid"
     vm_daemon_pid = File.read vm_daemon_pid_fn
@@ -545,7 +591,7 @@ private
         start_vm_daemon vm_name
       end
     else
-        Vmachine.log vm_name, "[debug] vm_daemon doesn't exist, restart it"
+        Vmachine.log vm_name, "[debug] vm_daemon doesn't exist, start it"
         start_vm_daemon vm_name
     end
   end
@@ -591,19 +637,22 @@ private
     end
     migrate_from_fn = File.join Setting.vm_root, vm_name, "migrate_from"
     if migrate_src
-      File.open(migrate_from_fn, "w") do |f|
+      File.open(migrate_from_fn, "a") do |f|
         f.write migrate_src
       end
     end
-
-    Vmachine.restart_vm_daemon vm_name
+    Vmachine.send_instruction vm_name, "migrate"
 
     Vmachine.log vm_name, "prepare migrating to #{migrate_dest}"
     return {:success => true, :message => "Vmachine '#{vm_name}' is preparing migrate to worker '#{migrate_dest}'"}
   end
 
+
+  # Since we use an async model, migration should be executed by vm_daemon_helper
+
   def Vmachine.xen_live_migrate params
     #TODO:we can have a type in params to divide xen and kvm
+    raise "Should not be here"
     if params[:dst] != nil and params[:dst] != ""
       if params[:uuid] != nil and params[:uuid] != ""
         begin

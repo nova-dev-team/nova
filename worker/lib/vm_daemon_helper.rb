@@ -628,7 +628,7 @@ def do_migrate
 
   else
     write_log "invalid params, migrating failed"
-    #FileUtils.rm_f "migrate_to"
+    FileUtils.rm_f "migrate_to"
     #invalid params
   end
 end
@@ -721,10 +721,24 @@ end
 
 
 def get_action
+  action = File.read "action"
+  if action
+    begin
+      FileUtils.rm_f "action"
+    rescue
+      #cannot remove instruction file, for safety, we do nothing
+      return "poll"
+    end
+    return action
+  else
+    return "poll"
+  end
+=begin
   return "prepare" if File.exists? "prepare"
   return "migrate" if File.exists? "migrate_to"
   return "cleanup" if File.exists? "destroy"
   return "poll"
+=end
 end
 
 def do_action action
@@ -744,12 +758,12 @@ def do_action action
     do_migrate 
   when "poll"
 #    write_log "vm_daemon_helper action: poll"
-    do_poll storage_server, vm_dir
+#    do_poll storage_server, vm_dir
   when "save"
     write_log "vm_daemon_helper action: save"
     do_save storage_server, vm_dir
-  when "cleanup"
-    write_log "vm_daemon_helper action: cleanup"
+  when "cleanup", "destroy"
+    write_log "vm_daemon_helper action: #{action}"
     do_cleanup storage_server, vm_dir
   else
     puts "error: action '#{action}' not understood!"
