@@ -183,9 +183,9 @@ class MiscController < ApplicationController
       reply_success "Tried to update ftp server files list."
     when "server_down"
       if ftp_server_down?
-        reply_success "Ftp server is down!"
+        reply_success "Ftp server is down!", :server_down => true
       else
-        reply_success "Ftp server is up and running!"
+        reply_success "Ftp server is up and running!", :server_down => false
       end
     when "vdisk_list"
       vdisk_list = ftp_server_vdisks_list
@@ -224,7 +224,10 @@ class MiscController < ApplicationController
       :vclusters_count => Vcluster.count,
       :vmachines_total => Vmachine.count,
       :vmachines_running => Vmachine.find(:all, :conditions => ["status=?", "running"]).count,
-      :pmachine_failure => Pmachine.find(:all, :conditions => ["status=?", "failure"]).count
+      :pmachine_failure => Pmachine.find(:all, :conditions => ["status=?", "failure"]).count,
+      :storage_server_down => ftp_server_down?,
+      :vdisks_count => Vdisk.count,
+      :software_count => Software.count
     }
     if @current_user.privilege == "root"
       # pmachine info only available for root users

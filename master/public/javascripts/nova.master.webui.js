@@ -49,12 +49,22 @@ function load_overview_info() {
           }
         }
 
+        // storage server
+        html += "<h3>Storage server</h3>";
+        if (result.data.storage_server_down) {
+          html += "<font color='red'>Storage server is probably down! Please contact 'root' user!</font>";
+        } else {
+          html += "<font color='blue'>Storage server is up and running.</font>"
+        }
+        
         // other info
         html += "<h3>Other info</h3>";
         html += "<font color='blue'>" + result.data.vclusters_count + "</font> vclusters, ";
         html += "<font color='blue'>" + result.data.vmachines_total + "</font> vmachines in total, ";
-        html += "<font color='blue'>" + result.data.vmachines_running + "</font> vmachines running.";
-        
+        html += "<font color='blue'>" + result.data.vmachines_running + "</font> vmachines running, ";
+        html += "<font color='" + (result.data.vdisks_count == 0 ? "red" : "blue") + "'>" + result.data.vdisks_count + "</font> vdisks available, ";
+        html += "<font color='" + (result.data.software_count == 0 ? "red" : "blue") + "'>" + result.data.software_count + "</font> software packages available.<p/>";
+
         $("#overview_info").html(html);
       } else {
         do_message("failure", "Error occurred", result.message);
