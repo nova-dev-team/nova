@@ -15,6 +15,11 @@ LIBVIRT_NOT_RUNNING = 5
 
 HYPERVISOR = common_conf["hypervisor"]
 
+MIGRATION_TIMEOUT_HANDSHAKE=5
+# 5min timeout for handshake
+MIGRATION_TIMEOUT_PROCEEDING=-1
+# 
+
 def my_exec cmd
   puts "[cmd] #{cmd}"
   system cmd
@@ -493,6 +498,64 @@ HDA_SAVE_TO_LFTP
   end
 end
 
+
+# when a incoming migration occurs, worker would run vm_daemon RECEIVE first
+# then call to here 
+# migration can be done in 3 steps
+# 1. handshake, src worker put file 'migrate_request' in vm_dir, and waiting dst worker put file 'migrate_accept'
+#      if time out, migration fail
+#      just exit, src worker will also timeout so migration ends
+# 2. wait for remote worker finish
+#      when finish, src worker removes file 'migrate_to'
+#      master should handle timeout here
+#      complicated situation..
+#      what happens when xen live migration fails?
+# 3. remove 'migrate_request' and 'migrate_accept'
+#      migration complete
+
+def do_receive storage_server, vm_dir
+  #1.handshake
+  #waiting for migrate_request
+
+  timeout = MIGRATION_TIMEOUT_HANDSHAKE * 10
+  while timeout != 0
+    if File.exists? "migrate_request" break;
+    timeout = timeout - 1
+    sleep 6 #check it every 6 sec
+  end
+  return false if timeout == 0
+  
+  begin
+    File.open("migrate_accept", "w") do |f|
+      f.write "blah"  #can write some useful message?
+    end
+  rescue
+    # fuckingly cannot write file, handshake fail, exit
+    return false
+  end
+     
+  #2.when src worker see migrate_accept, it will call libvirt::migrate
+  #  after migration finished, file 'migrate_to' will be removed
+  #  spin wait for 'migrate_to' disappear
+
+  timeout = MIGRATION_TIMEOUT_PROCEEDING * 10
+  while timeout != 0
+    if File.exists? "migrate_to"
+    else
+      break      
+    end
+    timeout = timeout - 1
+    sleep 6
+  end
+
+  # 3.yes you got it
+  #   remove 'migrate_request' & 'migrate_accept'
+  FileUtils.rm_f "migrate_accept"
+  FileUtils.rm_f "migrate_request"
+  return true
+end
+
+
 def do_migrate vm_uuid
   migrate_dest = File.read "migrate_to"
   if migrate_dest && migrate_dest.length > 0
@@ -636,6 +699,8 @@ Dir.chdir vm_dir
 case action
 when "prepare"
   do_prepare rails_root, storage_server, vm_dir
+when "receive"
+  do_receive storage_server, vm_dir
 when "poll"
   do_poll storage_server, vm_dir
 when "save"
