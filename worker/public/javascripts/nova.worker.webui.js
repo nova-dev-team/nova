@@ -232,18 +232,39 @@ function vm_ajax(url, uuid) {
   });
 }
 
-function destroy_vmachine(name, uuid) {
+function vm_ajax2(url, name) {
+  $.ajax({
+    url: url,
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: name
+    },
+    success: function(result) {
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      alert("Request failed!");
+    }
+  });
+}
+
+function destroy_vmachine(name) {
   if (confirm("Are you sure to destroy vmachine named '" + name + "'?")) {
-    vm_ajax("/vmachines/destroy.json", uuid);
+    vm_ajax2("/vmachines/destroy.json", name);
   }
 }
 
-function resume_vmachine(uuid) {
-  vm_ajax("/vmachines/resume.json", uuid);
+function resume_vmachine(name) {
+  vm_ajax2("/vmachines/resume.json", name);
 }
 
-function suspend_vmachine(uuid) {
-  vm_ajax("/vmachines/suspend.json", uuid);
+function suspend_vmachine(name) {
+  vm_ajax2("/vmachines/suspend.json", name);
 }
 
 function change_system_setting(key) {

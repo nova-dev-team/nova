@@ -270,13 +270,12 @@ void cleanup_vm_dir() {
   if (strcmp(hypervisor, "kvm") == 0) connStr = "qemu:///system";
 
   const char *conn = connStr.c_str();
+  g_virt_conn = virConnectOpen(conn);
   if (g_virt_conn == NULL) {
-    g_virt_conn = virConnectOpen(conn);
-    if (g_virt_conn == NULL) {
-      do_log("error: cannot open connection to '%s'", conn);
-      return;
-    }
+    do_log("error: cannot open connection to '%s'", conn);
+    return;
   }
+
   time_t now = time(NULL);
   char* vm_dir = new char[strlen(g_run_root) + 10];
   strcpy(vm_dir, g_run_root);
