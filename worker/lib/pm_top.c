@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
 	  dsize = buf->f_blocks*(buf->f_bsize/1024)/1024;
 	  davail =buf->f_bavail*(buf->f_bsize/1024)/1024;
     if(j != 1)
-	    fprintf(fw, "dSize: %lldMB, dAvail: %lldMB ",dsize, davail);
+	    fprintf(fw, "dSize: %lldMB dAvail: %lldMB ",dsize, davail);
 	  free(buf);   
 
  /*Read information of network from "/proc/nev/dev"*/
