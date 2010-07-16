@@ -31,11 +31,14 @@ class Log < ActiveRecord::Base
       
       cpu_value = get_value({:log => ori_logs[index], :key => "CPU", :offset => 5})
       memTotal_value = get_value({:log => ori_logs[index], :key => "memTotal", :offset => 10})
-      memFree_value = get_value({:log => ori_logs[index], :key => "memFree", :offset => 9})             
+      memFree_value = get_value({:log => ori_logs[index], :key => "memFree", :offset => 9})
+      dSize_value = get_value({:log => ori_logs[index], :key => "dSize", :offset => 7})
+      dAvail_value = get_value({:log => ori_logs[index], :key => "dAvail", :offset => 8})             
       rece_value = get_value({:log => ori_logs[index], :key => "Rece", :offset => 6})      
       tran_value = get_value({:log => ori_logs[index], :key => "Tran", :offset => 6})
       
-      logs[i] = { :Time => time_value, :CPU => cpu_value, :memTotal => memTotal_value, :memFree => memFree_value, :Rece => rece_value, :Tran => tran_value}
+      logs[i] = { :Time => time_value, :CPU => cpu_value, :memTotal => memTotal_value, \
+        :memFree => memFree_value, :dSize => dSize_value, :dAvail => dAvail_value, :Rece => rece_value, :Tran => tran_value}
       
       i +=1
       index += 1
