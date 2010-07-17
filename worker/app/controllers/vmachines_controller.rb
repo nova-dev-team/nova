@@ -40,6 +40,8 @@ public
           dom_info["status"] = "Preparing"
         elsif vm_daemon_status == "saving"
           dom_info["status"] = "Saving"
+        elsif vm_daemon_status == "migrating"
+          dom_info["status"] = "Migrating"
         else
           dom_info["status"] = "Not running"
         end

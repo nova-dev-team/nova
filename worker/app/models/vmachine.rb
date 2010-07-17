@@ -314,7 +314,8 @@ XML_DESC
 
     begin
       # start background helpe
-      Vmachine.start_vm_daemon params
+      Vmachine.prepare_vm_dir params
+      Vmachine.start_vm_daemon params[:name]
     rescue => e
       return {:success => false, :message => e.to_s}
     end
@@ -437,8 +438,8 @@ private
   # Start the background helper daemon, which prepares resource, and starts the vm.
   #
   # Since::   0.3
-  def Vmachine.start_vm_daemon params
 
+  def Vmachine.prepare_vm_dir params
     # the 'required_images' file contains all the required vdisk/iso image for the vm to boot
     Vmachine.open_vm_file(params[:name], "required_images") do |f|
       f.write "#{params[:hda_image]}\n"
@@ -489,11 +490,18 @@ private
 
     # change status to preparing
     Vmachine.open_vm_file(params[:name], "status") do |f|
-      f.write "preparing"
+      f.write "unprepared"
+    end
+    Vmachine.log params[:name], "changed vmachine status to 'unprepared'"
+
+    # instruction file, so vm_daemon_helper will do preparing
+    Vmachine.open_vm_file(params[:name], "preparing") do |f|
+      f.write "go!"
     end
 
-    Vmachine.log params[:name], "changed vmachine status to 'preparing'"
+  end
 
+  def Vmachine.start_vm_daemon vm_name
     # start the vm_daemon for the virtual machine
     pid = fork do
       Dir.chdir "#{RAILS_ROOT}/lib"
@@ -508,11 +516,22 @@ private
           end
         end
       end
-      exec "./vm_daemon #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, params[:name]}"
+      exec "./vm_daemon #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, vm_name} #{vm_name} #{HYPERVISOR}"
     end
-    Process.detach pid  # prevent zombie process
 
+    Process.detach pid  # prevent zombie process
     Vmachine.log params[:name], "vm_daemon started for '#{params[:name]}'"
+  end
+
+  def Vmachine.restart_vm_daemon params
+    vm_dir = File.join Setting.vm_root, params[:name]
+    vm_daemon_pid_fn = File.join vm_dir, "vm_daemon.pid"
+    vm_daemon_pid = File.read vm_daemon_pid_fn
+    if vm_daemon_pid
+      system "pkill #{vm_daemon_pid}"
+    end
+    #FileUtils.rm_f vm_daemon_pid_fn
+    start_vm_daemon params[:name]
   end
 
   # Write logs for the virtual machine.
