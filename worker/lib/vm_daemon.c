@@ -10,17 +10,24 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <libvirt/libvirt.h>
+#include <libvirt/virterror.h>
+
 int main(int argc, char* argv[]) {
-  if (argc < 4) {
-    printf("usage: vm_daemon <rails_root> <storage_server> <vm_dir> [running mode]\n");
+  if (argc < 5) {
+    printf("usage: vm_daemon <rails_root> <storage_server> <vm_dir> <vm_name> [hypervisor]\n");
     printf("depends on ruby, and must run with 'vm_daemon_helper.rb' in same dir!\n");
-    printf("running mode = (NORMAL, RECOVER, RECEIVE), which can be empty, default is NORMAL\n");
+    printf("hypervisor = (xen | kvm), default is kvm\n");
     return 1;
   } else {
+    virConnectPtr g_virt_conn = NULL;
     char* rails_root = argv[1];
     char* storage_server = argv[2];
     char* vm_dir = argv[3];
+    char* vm_name = argv[4];
+
     char* c_mode = NULL;
+
     // there's no need to free those malloc'd pointers
     char* cmd = (char *) malloc(sizeof(char) * (strlen(vm_dir) * 2 + strlen(storage_server) * 2 + 200));
     char* pid_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
@@ -28,24 +35,20 @@ int main(int argc, char* argv[]) {
     char* status_info = (char *) malloc(sizeof(char) * 100);
 
     int pid = getpid();
-    int mode = 0;
-    // 0 -- NORMAL
-    // 1 -- RECOVER
-    // 2 -- RECEIVE
-
+    int hypervisor = 0;
+    // 0 -- KVM
+    // 1 -- XEN
+    
     FILE* fp = NULL;
 
-    if (argc >= 5) {
-      c_mode = argv[4];
-      if (strcmp(c_mode, "NORMAL") == 0) {
-        mode = 0;
+    if (argc >= 6) {
+      c_mode = argv[5];
+      if (strcmp(c_mode, "kvm") == 0) {
+        hypervisor = 0;
       } else
-      if (strcmp(c_mode, "RECOVER") == 0) {
-        mode = 1;
-      } else
-      if (strcmp(c_mode, "RECEIVE") == 0) {
-        mode = 2;
-      }
+      if (strcmp(c_mode, "xen") == 0) {
+        hypervisor = 1;
+      } 
     }
 
     cmd[0] = '\0';
@@ -54,17 +57,26 @@ int main(int argc, char* argv[]) {
 
     printf("This is vm_daemon!\n");
     printf("Running with pid = %d\n", pid);
-    printf("Running Mode(0-NORMAL, 1-RECOVER, 2-RECEIVE) == %d\n", mode);
+    printf("Hypervisor(0--KVM, 1--Xen) = %d\n", hypervisor);
 
     sprintf(pid_fn, "%s/vm_daemon.pid", vm_dir);
-    if (mode != 2) {
-      fp = fopen(pid_fn, "w");
-      if (fp == NULL) {
-        printf("error: cannot open pid file %s!\n", pid_fn);
-        exit(1);
-      }
-      fprintf(fp, "%d", pid);
-      fclose(fp);
+
+    fp = fopen(pid_fn, "w");
+    if (fp == NULL) {
+      printf("error: cannot open pid file %s!\n", pid_fn);
+      exit(1);
+    }
+    fprintf(fp, "%d", pid);
+    fclose(fp);
+
+    if (hypervisor == 1)
+      g_virt_conn = virConnectOpen("xen:///"); 
+    else
+      g_virt_conn = virConnectOpen("qemu:///system");
+
+    if (g_virt_conn == NULL) {
+      printf("error: cannot open connection to libvirt\n");
+      return -1;
     }
 
     // forever loop, read current vm status, determine what to do next
@@ -75,20 +87,34 @@ int main(int argc, char* argv[]) {
     // 4 destroyed: vm destroyed, remove all resources
     // 5 failed: failed to start for some reason, should be moved to 'broken' directory?
 
-    // NORMAL ROUTE:
-    // 1 prepare
-    // 2 poll
-    // 3 clean
+    // running logic:
+    // if vm doesn't appear in libvirt's list, go to clean phase
+    // else, polling vm_daemon_helper.rb each XX sec
+    // actions should be done by vm_daemon_helper
 
-    // RECOVER ROUTE:
-    // 1 poll
-    // 2 clean
+    for (;;) {
+      if (virDomainLookupByName(g_virt_conn, vm_name) != NULL) {
+        sprintf(cmd, "./vm_daemon_helper.rb %s %s %s 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
+        printf("[cmd] %s\n", cmd);
+        system(cmd);
+      } else {
+        // vm not exists, call cleanup
+        break;
+      }
+      sleep(1);
+    }
 
-    // RECEIVE ROUTE:
-    // 1 receive migrating vm from remote worker
-    // 2 poll
-    // 3 clean
+    if (hypervisor == 0) { //KVM
+      sprintf(cmd, "./vm_daemon_helper.rb %s %s %s cleanup 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
+      printf("[cmd] %s\n", cmd);
+      system(cmd);
+    }
+    return 0;
+  }
 
+/*
+
+    //old routing
 
     if (mode == 0) {
       sprintf(cmd, "./vm_daemon_helper.rb %s %s %s prepare 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
@@ -133,8 +159,8 @@ int main(int argc, char* argv[]) {
     sprintf(cmd, "./vm_daemon_helper.rb %s %s %s cleanup 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
     printf("[cmd] %s\n", cmd);
     system(cmd);
-
     return 0;
   }
+  */
 }
 

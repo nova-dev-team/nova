@@ -14,11 +14,21 @@ LIBVIRT_SUSPENDED = 3
 LIBVIRT_NOT_RUNNING = 5
 
 HYPERVISOR = common_conf["hypervisor"]
+STORAGE_TYPE = common_conf["storage_type"]
 
 MIGRATION_TIMEOUT_HANDSHAKE=5
 # 5min timeout for handshake
 MIGRATION_TIMEOUT_PROCEEDING=-1
 #
+
+if ARGV.length < 3
+  puts "usage: vm_daemon_helper.rb <rails_root> <storage_server> <vm_dir> [action]"
+  exit 1
+end
+RAILS_ROOT = ARGV[0]
+STORAGE_SERVER = ARGV[1]
+VM_DIR = ARGV[2]
+ACTION = ARGV[3]
 
 def my_exec cmd
   puts "[cmd] #{cmd}"
@@ -305,7 +315,15 @@ end
 
 
 def do_prepare rails_root, storage_server, vm_dir
+  begin
+    FileUtils.rm_f "prepare"
+  rescue
+    puts "cannot remove instruction file 'prepare'!"
+  end
+  return nil if File.exists? "prepare"
+
   puts "preparing"
+
   image_pool_dir = File.join vm_dir, "../../image_pool"
   package_pool_dir = File.join vm_dir, "../../package_pool"
 
@@ -453,6 +471,10 @@ end
 
 
 def do_save storage_server, vm_dir
+  begin
+  rescue
+  end
+
   if File.exists? "hda_save_to"
     write_log "changed VM status to 'saving'"
     File.open("status", "w") do |f|
@@ -519,7 +541,7 @@ def do_receive storage_server, vm_dir
 
   timeout = MIGRATION_TIMEOUT_HANDSHAKE * 10
   while timeout != 0
-    if File.exists? "migrate_request" break;
+    break if File.exists? "migrate_request"
     timeout = timeout - 1
     sleep 6 #check it every 6 sec
   end
@@ -557,6 +579,17 @@ end
 
 
 def do_migrate vm_uuid
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  vm_uuid = xml_desc["uuid"][0]
+
+  virt_conn = libvirt_connect_local
+  dom = virt_conn.lookup_domain_by_uuid(uuid)
+
+  if dom.info.state == LIBVIRT_NOT_RUNNING
+    write_log "vm #{vm_uuid} not running! cannot live migrate!"
+    return -1
+  end
+
   migrate_dest = File.read "migrate_to"
   if migrate_dest && migrate_dest.length > 0
     write_log "now migrate vm<#{vm_uuid}> to worker '#{migrate_dest}'"
@@ -604,11 +637,6 @@ def do_poll storage_server, vm_dir
     dom = virt_conn.lookup_domain_by_uuid(uuid)
 
     if dom.info.state != LIBVIRT_NOT_RUNNING
-
-      if File.exists? "migrate_to"
-        write_log "found migrate tag while polling"
-        do_migrate uuid
-      end
       return
       # the vm is still running, skip the following actions
     else
@@ -684,30 +712,46 @@ end
 ###############################################################################################
 
 
-if ARGV.length < 3
-  puts "usage: vm_daemon_helper.rb <rails_root> <storage_server> <vm_dir> <action>"
-  exit 1
+def get_action
+  return "prepare" if File.exists? "prepare"
+  return "migrate" if File.exists? "migrate_to"
+  return "poll"
 end
 
-rails_root = ARGV[0]
-storage_server = ARGV[1]
-vm_dir = ARGV[2]
-action = ARGV[3]
+def do_action action
+  rails_root = RAILS_ROOT
+  storage_server = STORAGE_SERVER
+  vm_dir = VM_DIR
 
-Dir.chdir vm_dir
+  case action
+  when "prepare"
+    write_log "vm_daemon_helper action: prepare"
+    do_prepare rails_root, storage_server, vm_dir
+  when "receive"
+    write_log "vm_daemon_helper action: receive"
+    do_receive storage_server, vm_dir
+  when "migrate"
+    write_log "vm_daemon_helper action: migrate"
+    do_migrate 
+  when "poll"
+    write_log "vm_daemon_helper action: poll"
+    do_poll storage_server, vm_dir
+  when "save"
+    write_log "vm_daemon_helper action: save"
+    do_save storage_server, vm_dir
+  when "cleanup"
+    write_log "vm_daemon_helper action: cleanup"
+    do_cleanup storage_server, vm_dir
+  else
+    puts "error: action '#{action}' not understood!"
+  end
+end
 
-case action
-when "prepare"
-  do_prepare rails_root, storage_server, vm_dir
-when "receive"
-  do_receive storage_server, vm_dir
-when "poll"
-  do_poll storage_server, vm_dir
-when "save"
-  do_save storage_server, vm_dir
-when "cleanup"
-  do_cleanup storage_server, vm_dir
+Dir.chdir VM_DIR
+if ACTION
+  do_action ACTION
 else
-  puts "error: action '#{action}' not understood!"
+  action = get_action
+  do_action action  
 end
 
