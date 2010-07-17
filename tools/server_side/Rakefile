@@ -13,10 +13,38 @@ $g_targets = {}
 # acceptable source code extension
 $source_ext = [".c", ".cc", ".cpp", ".cxx" ]
 
+# randomly generate a token with alphabets, like 'acd', 'zfc', etc.
+def random_token length = 5
+  token = ""
+  alphabets = "abcdefghijklmnopqrstuvwxyz"
+  1.upto(length) do |i|
+    idx = rand(alphabets.length)
+    token += alphabets[idx..idx]
+  end
+  return token
+end
+
+# execute a command
+def my_exec cmds
+  cmds.each_line do |cmd|
+    cmd = cmd.strip
+    puts "[cmd] #{cmd}"
+    system cmd
+  end
+end
+
+# Join string list. Skip empty strings.
+def my_join join_str, str_list
+  stripped_str_list = str_list.select {|str| str.length != 0}
+  stripped_str_list.join join_str
+end
+
+# check if a source file has 'main()' function
 def has_main_entry? file
   File.open(file).read =~ /^int main\(/
 end
 
+# remove the extension from file path
 def drop_ext f
   ext = File.extname f
   f[0..-ext.length - 1]
@@ -89,6 +117,7 @@ def depended_header file
   return list
 end
 
+# get all build targets in a module, with a given build mode. it also sets up the final build targets
 def all_targets_in_module mod, build_mode
   depend = {mod => []}
   action = {mod => []}
@@ -242,7 +271,7 @@ def all_src_files
     Find.find(mod) do |path|
       if FileTest.directory? path
         # do nothing
-      elsif File.extname(path) == ".h" or $source_ext.include? (File.extname path)
+      elsif File.extname(path) == ".h" or $source_ext.include? File.extname(path)
         $g_all_src_files << path
       end
     end
@@ -309,6 +338,7 @@ def assert_src_header_pair
   end
 end
 
+# check if there is bad coding style
 def warn_bad_style
   flist = all_src_files
 
@@ -443,12 +473,6 @@ task :check do
   assert_src_header_pair
   puts "All source code files either has got a .h file, or they have main() entry"
   puts "Finished checking"
-end
-
-# Join string list. Skip empty strings.
-def my_join join_str, str_list
-  stripped_str_list = str_list.select {|str| str.length != 0}
-  stripped_str_list.join join_str
 end
 
 desc "Generate Makefile"
@@ -712,5 +736,28 @@ end
 task :default do
   puts "Run 'rake -T' to get list of functions"
   puts "Run 'rake gen' to generate Makefile"
+end
+
+desc "Make .tar.gz pack for source distribution"
+task :tar do
+  token = random_token
+
+  project_name = File.basename(File.expand_path(File.dirname(__FILE__)))
+  
+  # git clone to a temp dir in '/tmp'
+  clone_folder_parent = "/tmp/#{project_name}-make-tar.#{token}"
+  clone_folder = "#{clone_folder_parent}/#{project_name}"
+  source_root = File.dirname __FILE__
+
+  tar_fn = "#{source_root}/#{project_name}.tar.gz"
+
+  my_exec <<CMD
+git clone #{source_root} #{clone_folder}
+rm -Rf #{clone_folder}/.git
+rm -f #{tar_fn}
+cd #{clone_folder}/.. && tar pczf #{tar_fn} #{project_name}
+rm -Rf #{clone_folder_parent}
+CMD
+  puts "Created #{project_name}.tar.gz in source root folder!"
 end
 
