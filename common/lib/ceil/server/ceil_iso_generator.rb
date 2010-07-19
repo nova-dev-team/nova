@@ -21,6 +21,7 @@ CEIL_ISO_KEY_PATH = '/keys'
 
 PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -f -l -o '
 PATH_GENISO = '/usr/bin/genisoimage'
+PATH_MKISO = '/usr/bin/mkisofs'
 
 CONFIG_PATH = CEIL_ISO_CONFIG_PATH
 PACKAGE_PATH = CEIL_ISO_PACKAGE_PATH
@@ -247,7 +248,19 @@ class CeilIsoGenerator
     end
 
     #3.pack tmpdir
-    cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
+    generator = nil
+    if File.exists? PATH_GENISO
+      generator = PATH_GENISO
+    elsif File.exists? PATH_MKISO
+      generator = PATH_MKISO
+    end
+
+    if generator
+      cmdline = generator + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
+    else 
+      cmdline = "exit 1"
+    end
+    #puts cmdline
     result = system cmdline
     if result
       return iso_path
@@ -255,13 +268,12 @@ class CeilIsoGenerator
       return nil
     end
   end
-
 end
 
 =begin
 igen = CeilIsoGenerator.new
 
-igen.config_essential('/home/rei/nova/common/lib/ceil')
+igen.config_essential('/nova/system/common/lib/ceil')
 igen.config_network('10.0.1.122', '255.255.255.0', '10.0.1.254', '166.111.8.28')
 # vm_addr  vm_netmask vm_gateway vm_nameserver
 igen.config_cluster("node1", "nova-cluster-name")
@@ -285,8 +297,7 @@ igen.config_ssh_key("jklfdsjkljailgjweklgjklwdjgkl;d", "fsdkhgklsdad;gjdkslgjsdk
 #config for package "ssh-nopass"
 #private_key_content, public_key_content
 
-igen.generate('/var/vm1/', '/home/test.iso')
+igen.generate('/var/vm1/', '/root/jk.iso')
 
 puts "fin"
 =end
-
