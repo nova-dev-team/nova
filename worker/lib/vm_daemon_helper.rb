@@ -83,6 +83,10 @@ def find_available_copy image_pool_dir, hda_name
   return copy_list[0]
 end
 
+
+def get_vm_uuid
+end
+
 def prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
   # be care of the .copying lock!
   #
@@ -772,6 +776,44 @@ def do_action action
   else
     write_log "error: action '#{action}' not understood!"
   end
+end
+
+
+#compare vm's host uuid to local uuid
+#equal -> do action
+#not equal -> fix it(vm running on local can be seen in libvirt) | undefine(vm shuted-off)
+
+begin
+  worker_uuid_fn = File.join RAILS_ROOT, config, worker.uuid
+  vm_worker_uuid_fn = File.join VM_DIR, host.uuid
+
+  host_uuid = File.read(worker_uuid_fn)
+  vm_host_uuid = File.read(vm_worker_uuid_fn)
+
+  # if vm is running on local, fix host.uuid
+  # this is caused by migration
+  # if vm is shut-off, kill it in 'do_poll'
+
+  if host_uuid != vm_host_uuid
+    begin
+      vm_xml_fn = File.join VM_DIR, "xml_desc.xml"
+      xml_desc = XmlSimple.xml_in(File.read vm_xml_fn)
+      vm_uuid = xml_desc["uuid"][0]
+      virt_conn = libvirt_connect_local
+      dom = virt_conn.lookup_domain_by_uuid(uuid)
+      if dom.info.state != LIBVIRT_NOT_RUNNING
+        File.open(vm_host_uuid, "w") do |f|
+          f.write host_uuid
+        end
+      end
+    rescue
+      
+    end
+  end
+rescue
+  ## couldn't get it, consider a bad machine so trash cleaner will handle it
+  ## should exit here
+  # exit 1
 end
 
 Dir.chdir VM_DIR
