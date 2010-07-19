@@ -259,7 +259,7 @@ class CeilIsoGenerator
 
     # /etc/sysconfig/network-scripts/ifcfg-eth0
     # rhel5_path/ifcfg-eth0
-    File.open(File.join(rhel5_path, 'ifcfg-eth0'), 'w') do |f|
+    File.open(File.join(rhel5_path, 'ifcfg_eth0'), 'w') do |f|
       content = <<IFCFG
 DEVICE=eth0
 BOOTPROTO=static
@@ -272,8 +272,8 @@ IFCFG
       f.puts content
     end
 
-    # /etc/resolve.conf
-    File.open(File.join(rhel5_path, 'resolve.conf'), 'w') do |f|
+    # /etc/resolv.conf
+    File.open(File.join(rhel5_path, 'resolv.conf'), 'w') do |f|
       @net_dns.split(" ").each do |dns|
         f.puts "nameserver #{dns}"
       end
@@ -302,7 +302,25 @@ NCFG
         f.write @id_rsa_pub_content
       end
     end
-    
+
+    #change passwd scripts
+    #cfg-passwd
+    if @changelist_username.length > 0
+      File.open(File.join(rhel5_path, 'passwd.list'), 'w') do |f|
+        0.upto(@changelist_username.length - 1) do |i|
+          f.puts @changelist_username[i]
+          f.puts @changelist_new_pwd[i]
+        end
+      end
+    end
+
+    #/etc/hosts
+    if @nodelist
+      File.open(File.join(rhel5_path, 'node.list'), 'w') do |f|
+        f.puts @nodelist
+      end  
+    end
+
     #3.pack tmpdir
     generator = nil
     if File.exists? PATH_GENISO
@@ -357,3 +375,4 @@ igen.generate('/tmp/vm1/', '/tmp/jk.iso')
 
 puts "fin"
 =end
+
