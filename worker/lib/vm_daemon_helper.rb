@@ -651,7 +651,7 @@ def do_poll storage_server, vm_dir
 
   virt_conn = libvirt_connect_local
   begin
-    dom = virt_conn.lookup_domain_by_uuid(uuid)
+    dom = virt_conn.lookup_domain_by_uuid(uuid) 
 
     if dom.info.state != LIBVIRT_NOT_RUNNING
       return
@@ -730,7 +730,9 @@ end
 
 def get_action
   Dir.chdir VM_DIR
-  action = File.read "action"
+  action = nil
+  action = File.read "action" rescue nil
+
   if action
     begin
       FileUtils.rm_f "action"
@@ -766,7 +768,7 @@ def do_action action
     write_log "vm_daemon_helper action: migrate"
     do_migrate
   when "poll"
-#    write_log "vm_daemon_helper action: poll"
+  #  write_log "vm_daemon_helper action: poll"
     do_poll storage_server, vm_dir
   when "save"
     write_log "vm_daemon_helper action: save"
@@ -785,8 +787,11 @@ end
 #not equal -> fix it(vm running on local can be seen in libvirt) | undefine(vm shuted-off)
 
 begin
-  worker_uuid_fn = File.join RAILS_ROOT, config, worker.uuid
-  vm_worker_uuid_fn = File.join VM_DIR, host.uuid
+  worker_uuid_fn = File.join RAILS_ROOT, 'config', 'worker.uuid'
+  vm_worker_uuid_fn = File.join VM_DIR, 'host.uuid'
+  
+  puts worker_uuid_fn
+  puts vm_worker_uuid_fn
 
   host_uuid = File.read(worker_uuid_fn)
   vm_host_uuid = File.read(vm_worker_uuid_fn)
@@ -794,6 +799,8 @@ begin
   # if vm is running on local, fix host.uuid
   # this is caused by migration
   # if vm is shut-off, kill it in 'do_poll'
+  puts "host_uuid = #{host_uuid}"
+  puts "vm_host_uuid = #{vm_host_uuid}"
 
   if host_uuid != vm_host_uuid
     begin
@@ -812,6 +819,7 @@ begin
     end
   end
 rescue
+  puts "error!"
   ## couldn't get it, consider a bad machine so trash cleaner will handle it
   ## should exit here
   # exit 1
