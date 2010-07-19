@@ -483,8 +483,10 @@ private
       Vmachine.log vm_name, "Instruction '#{instruction}' has been sent to #{vm_name}"
       begin
         Vmachine.check_vm_daemon vm_name
+        return {:success => true, :message => "Instruction '#{instruction}' has been sent to #{vm_name}"}
       rescue
         Vmachine.log vm_name "Failed while checking vm_daemon for #{vm_name}!"
+        return {:success => false, :message => "failed while checking vm_daemon for #{vm_name}!"}
       end
     rescue
       Vmachine.log vm_name, "Cannot send instruction '#{instruction}' to vm #{vm_name}!"
