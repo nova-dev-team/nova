@@ -498,6 +498,18 @@ private
 
   def Vmachine.prepare_vm_dir params
     # the 'required_images' file contains all the required vdisk/iso image for the vm to boot
+    
+    # first write worker's uuid into vm_dir, this is helpfup to trash cleaner
+
+    begin
+      worker_uuid = File.read(RAILS_ROOT + '/config/worker.uuid')
+      Vmachine.open_vm_file(params[:name], "host.uuid") do |f|
+        f.write worker_uuid
+      end
+    rescue
+      raise "Couldn't get worker.uuid!"
+    end
+
     Vmachine.open_vm_file(params[:name], "required_images") do |f|
       f.write "#{params[:hda_image]}\n"
       if params[:cd_image] != nil and params[:cd_image] != ""
