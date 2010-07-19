@@ -13,6 +13,12 @@ ActiveRecord::Schema.define(:version => 20100715134626) do
 
   create_table "perf_logs", :force => true do |t|
     t.integer  "pmachine_id"
+    t.string   "time",        :limit => 14
+    t.string   "CPU",         :limit => 5
+    t.string   "memTotal",    :limit => 10
+    t.string   "memFree",     :limit => 10
+    t.string   "Rece",        :limit => 10
+    t.string   "Tran",        :limit => 10
     t.datetime "created_at"
     t.datetime "updated_at"
   end
