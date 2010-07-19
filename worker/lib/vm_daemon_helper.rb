@@ -729,6 +729,7 @@ end
 
 
 def get_action
+  Dir.chdir VM_DIR
   action = File.read "action"
   if action
     begin
