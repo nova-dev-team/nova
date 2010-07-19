@@ -76,7 +76,7 @@ while($running) do
               end
               time_now = Time.now
               time_str = (time_now - 3600).strftime("%Y%m%d%H%M%S")
-              PerfLog.delete_all(["time < ?", time_str)
+              PerfLog.delete_all(["time < ?", time_str])
               
               ##############################end of get workers' log and write these logs to database#####################################
               pm.save
