@@ -65,6 +65,9 @@ module IpV4Address
     return integer_to_string((string_to_integer(ip_addr) & string_to_integer(net_mask)))
   end
 
+  def IpV4Address.calc_broadcast(ip_addr, net_mask)
+    return integer_to_string(string_to_integer(ip_addr) | (~string_to_integer(net_mask)))
+  end
   def IpV4Address.calc_next_segment(current_addr, segment_length)
     count = calc_segment_bits(segment_length)
     addr = string_to_integer(current_addr)
