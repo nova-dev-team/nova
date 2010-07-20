@@ -38,8 +38,6 @@ namespace :nova do
       end
     end
 
-    # TODO add storage server controller, or merge it into "master"?
-
     desc "Start Nova master"
     task :start => :stop do
       prepare_folders
