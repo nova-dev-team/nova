@@ -160,7 +160,7 @@ class CeilIsoGenerator
       FileUtils.mkdir_p(tmpdir + RHEL5_CONFIG_PATH)
     rescue
     end
-    
+
     rhel5_path = File.join(tmpdir, RHEL5_CONFIG_PATH)
 
     filename_servers = tmpdir + CONFIG_PATH + '/' + FILENAME_SERVERS
@@ -318,7 +318,7 @@ NCFG
     if @nodelist
       File.open(File.join(rhel5_path, 'node.list'), 'w') do |f|
         f.puts @nodelist
-      end  
+      end
     end
 
     #3.pack tmpdir
@@ -331,7 +331,7 @@ NCFG
 
     if generator
       cmdline = generator + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
-    else 
+    else
       cmdline = "exit 1"
     end
     puts cmdline

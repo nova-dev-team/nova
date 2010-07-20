@@ -1,6 +1,6 @@
 class Log < ActiveRecord::Base
 
-	
+  
   # get the logs which is written after params[:time] in log file, if you don't give the time we will show all logs
   # params[:path] is the log file path
   # use binary serach to seach the first log to show
@@ -25,27 +25,27 @@ class Log < ActiveRecord::Base
     logs = []
     i = 0
     while index < ori_logs.size
-      
+
       time_value = ori_logs[index].slice(6, 15)
-      time_value = time_value.delete("-") 
-      
+      time_value = time_value.delete("-")
+
       cpu_value = get_value({:log => ori_logs[index], :key => "CPU", :offset => 5})
       memTotal_value = get_value({:log => ori_logs[index], :key => "memTotal", :offset => 10})
       memFree_value = get_value({:log => ori_logs[index], :key => "memFree", :offset => 9})
       dSize_value = get_value({:log => ori_logs[index], :key => "dSize", :offset => 7})
-      dAvail_value = get_value({:log => ori_logs[index], :key => "dAvail", :offset => 8})             
-      rece_value = get_value({:log => ori_logs[index], :key => "Rece", :offset => 6})      
+      dAvail_value = get_value({:log => ori_logs[index], :key => "dAvail", :offset => 8})
+      rece_value = get_value({:log => ori_logs[index], :key => "Rece", :offset => 6})
       tran_value = get_value({:log => ori_logs[index], :key => "Tran", :offset => 6})
-      
+
       logs[i] = { :Time => time_value, :CPU => cpu_value, :memTotal => memTotal_value, \
         :memFree => memFree_value, :dSize => dSize_value, :dAvail => dAvail_value, :Rece => rece_value, :Tran => tran_value}
-      
+
       i +=1
       index += 1
     end
     logs
   end
-	
+  
   def Log.binary_search params
     time = params[:time]
     time.insert(8, "-")
@@ -68,7 +68,7 @@ class Log < ActiveRecord::Base
       return tail
     end
   end
-  
+
   def Log.get_value params
     log = params[:log]
     log_pos_b = log.index(params[:key]) + params[:offset]

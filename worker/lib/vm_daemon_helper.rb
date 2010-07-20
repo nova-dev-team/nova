@@ -651,7 +651,7 @@ def do_poll storage_server, vm_dir
 
   virt_conn = libvirt_connect_local
   begin
-    dom = virt_conn.lookup_domain_by_uuid(uuid) 
+    dom = virt_conn.lookup_domain_by_uuid(uuid)
 
     if dom.info.state != LIBVIRT_NOT_RUNNING
       return
@@ -789,7 +789,7 @@ end
 begin
   worker_uuid_fn = File.join RAILS_ROOT, 'config', 'worker.uuid'
   vm_worker_uuid_fn = File.join VM_DIR, 'host.uuid'
-  
+
   puts worker_uuid_fn
   puts vm_worker_uuid_fn
 
@@ -815,7 +815,7 @@ begin
         end
       end
     rescue
-      
+
     end
   end
 rescue
@@ -830,6 +830,6 @@ if ACTION
   do_action ACTION
 else
   action = get_action
-  do_action action  
+  do_action action
 end
 
