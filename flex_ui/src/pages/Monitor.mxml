@@ -1,15 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
-	<mx:LineChart x="57" y="115" id="linechart1">
-		<mx:series>
-			<mx:LineSeries displayName="Series 1" yField=""/>
-		</mx:series>
-	</mx:LineChart>
-	<mx:Legend dataProvider="{linechart1}"/>
-	<mx:AreaChart x="537" y="115" id="areachart1">
-		<mx:series>
-			<mx:AreaSeries displayName="Series 1" yField=""/>
-		</mx:series>
-	</mx:AreaChart>
-	<mx:Legend dataProvider="{areachart1}"/>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="1400" height="800" creationComplete="do_init(event)">
+	<mx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
+			import mx.collections.ArrayCollection;
+			import mx.containers.Grid;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import nova.GlobalConst;		
+						
+			[Bindable]
+			protected var workerMachinesListData:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			protected var monitorInfoData:ArrayCollection = new ArrayCollection();
+						
+			protected function listWorkerMachinesHandle(e:ResultEvent):void 
+			{
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if (ret.success) {
+					workerMachinesListData.removeAll();
+					for (var i:Number = 0; i < ret.data.length; i++) {
+						workerMachinesListData.addItem(ret.data[i]);
+					}
+				} else {
+					Alert.show("Failed to retrieve list of worker machines!");	
+				}
+			}
+			
+			protected function getMonitorInfoHandler(e:ResultEvent):void
+			{
+				var ret:Object = JSON.decode(e.message.body.toString());
+				if(ret.success)
+				{
+					monitorInfoData = new ArrayCollection();
+					for(var i:Number = ret.data.length-16; i < ret.data.length; i++)
+						monitorInfoData.addItem(ret.data[i]);
+				}		
+				
+			}
+			
+			protected function do_init(event:FlexEvent):void
+			{
+				list_workerMachines_Request.send();
+				monitor_info_Request.send();
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				prepareMachinePrefs(workerMachinesListData.length);
+			}
+					
+			protected function prepareMachinePrefs(count:Number):void {
+				holder.removeAllChildren();
+				for (var i:Number = 1; i <= count; i++) {
+					var row:GridRow = new GridRow();
+					
+					var col1:GridItem = new GridItem();
+					
+					var lbl:Label = new Label();
+					lbl.text = String(i);
+					col1.addChild(lbl);
+					var col2:GridItem = new GridItem();
+					
+					var monitorDef:MonitorWorkerMachineDef = new MonitorWorkerMachineDef();
+					monitorDef.getParams(monitorInfoData);
+					col2.addChild(monitorDef);
+					
+					row.addChild(col1);
+					row.addChild(col2);
+					holder.addChild(row);
+				}
+			}
+			
+		]]>
+	</mx:Script>
+	
+			<mx:VBox x="0" y="0" width="100%" height="100%">
+				<mx:Canvas width="100%" height="100">
+					<mx:Button x="751" y="39" label="OK" click="button1_clickHandler(event)"/>
+					<mx:Label x="116" y="41" text="Cluster name:"/>
+					<mx:Label x="453" y="41" text="Cluster size:"/>
+					<mx:TextInput x="220" y="39"/>
+					<mx:TextInput x="542" y="39" id="new_cluster_size"/>
+				</mx:Canvas>
+				<mx:Canvas width="100%" height="100%">
+					<mx:Grid x="0" y="0" width="100%" height="100%" id="holder">
+						<mx:GridRow width="100%" height="100%">
+							<mx:GridItem width="30" height="100%">
+							</mx:GridItem>
+							<mx:GridItem height="100%">
+							</mx:GridItem>
+						</mx:GridRow>
+					</mx:Grid>
+				</mx:Canvas>
+			</mx:VBox>
+	
+	<mx:HTTPService id="list_workerMachines_Request" url="{GlobalConst.pmachine_list}" useProxy="false" method="GET" resultFormat="text" result="listWorkerMachinesHandle(event);" showBusyCursor="true" />
+	<mx:HTTPService id="monitor_info_Request" url="{GlobalConst.monitor_info}" useProxy="false" method="GET" resultFormat="text" result="getMonitorInfoHandler(event);" showBusyCursor="true" />	
 </mx:Canvas>
