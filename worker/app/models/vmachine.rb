@@ -330,7 +330,7 @@ XML_DESC
   # Since::     0.3
   def Vmachine.suspend params
     vm_name = params[:name]
-  
+
     if vm_name and vm_name != ""
       Vmachine.send_instruction vm_name, "suspend"
     else
@@ -355,7 +355,7 @@ XML_DESC
   # Now it's a non-blocking call, which only sends instruction and returns
   def Vmachine.resume params
     vm_name = params[:name]
-  
+
     if vm_name and vm_name != ""
       Vmachine.send_instruction vm_name, "resume"
     else
@@ -500,7 +500,7 @@ private
 
   def Vmachine.prepare_vm_dir params
     # the 'required_images' file contains all the required vdisk/iso image for the vm to boot
-    
+
     # first write worker's uuid into vm_dir, this is helpfup to trash cleaner
 
     begin
