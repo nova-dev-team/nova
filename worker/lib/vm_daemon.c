@@ -9,6 +9,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
@@ -34,14 +35,17 @@ int main(int argc, char* argv[]) {
     //char* lock_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_fn = (char *) malloc(sizeof(char) * (strlen(vm_dir) + 100));
     char* status_info = (char *) malloc(sizeof(char) * 100);
+    char* pid_str = (char *) malloc(sizeof(char) * 100);
 
     int pid = getpid();
     int hypervisor = 0;
+    int fd;
+    int res;
+    struct flock lock;
     // 0 -- KVM
     // 1 -- XEN
 
     FILE* fp = NULL;
-    FILE* lfp = NULL;  //lock
 
     if (argc >= 6) {
       c_mode = argv[5];
@@ -62,25 +66,34 @@ int main(int argc, char* argv[]) {
     printf("Hypervisor(0--KVM, 1--Xen) = %d\n", hypervisor);
 
     sprintf(pid_fn, "%s/vm_daemon.pid", vm_dir);
-    //sprintf(lock_fn, "%s/vm_daemon.lock", vm_dir);
 
-    /*
-    lfp = fopen(lock_fn, "w");
-    if (lfp == NULL) {
-      printf("error: cannot obtain daemon lock!\n");
+    fd = open(pid_fn, O_WRONLY | O_CREAT | O_TRUNC);
+    if (fd < 0) {
+      printf("error: cannot open pid file %s!\n", pid_fn);
       exit(1);
     }
-    fprintf(lfp, "hahahahhhaa\n");
-    */
-
+/*
     fp = fopen(pid_fn, "w");
     if (fp == NULL) {
       printf("error: cannot open pid file %s!\n", pid_fn);
       exit(1);
     }
+*/
 
-    fprintf(fp, "%d", pid);
-    fclose(fp);
+//try to gain file lock in WRITE MODE
+//if failed, exit immediately
+    memset((void *)&lock, 0, sizeof(lock));
+    lock.l_type = F_WRLCK;
+    res = fcntl(fd, F_SETLK, &lock);
+    if (res != 0) {
+      printf("error: cannot gain lock! \n");
+      exit(1);
+    }
+
+//write pid file
+    pid_str[0] = '\0';
+    sprintf(pid_str, "%d", pid);
+    write(fd, pid_str, strlen(pid_str));
 
     if (hypervisor == 1)
       g_virt_conn = virConnectOpen("xen:///");
@@ -122,7 +135,11 @@ int main(int argc, char* argv[]) {
       }
       sleep(1);
     }
-    //fclose(lfp);
+
+//unleash lock then exits
+    lock.l_type = F_UNLCK;
+    fcntl(fd, F_SETLK, &lock);
+    close(fd);
     return 0;
   }
 
