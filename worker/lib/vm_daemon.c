@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     struct flock lock;
     // 0 -- KVM
     // 1 -- XEN
-    
+
     FILE* fp = NULL;
 
     if (argc >= 6) {
@@ -54,13 +54,13 @@ int main(int argc, char* argv[]) {
       } else
       if (strcmp(c_mode, "xen") == 0) {
         hypervisor = 1;
-      } 
+      }
     }
 
     cmd[0] = '\0';
     pid_fn[0] = '\0';
     status_fn[0] = '\0';
-    
+
     printf("This is vm_daemon!\n");
     printf("Running with pid = %d\n", pid);
     printf("Hypervisor(0--KVM, 1--Xen) = %d\n", hypervisor);
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
     write(fd, pid_str, strlen(pid_str));
 
     if (hypervisor == 1)
-      g_virt_conn = virConnectOpen("xen:///"); 
+      g_virt_conn = virConnectOpen("xen:///");
     else
       g_virt_conn = virConnectOpen("qemu:///system");
 

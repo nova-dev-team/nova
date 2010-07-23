@@ -6,12 +6,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <malloc.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <string.h>
 #include <time.h>
+
+#ifndef __APPLE__
+#include <malloc.h>
+#endif
+
 
 // global copy speed limit
 int g_mbps = 1;
@@ -284,7 +288,9 @@ void refresh_config(char* conf_path) {
 void read_pool_size(char* image_fn){
   struct stat st;
   char* pool_size_fn = (char*) malloc(sizeof(char) *(strlen(image_fn) + 128));
-  sprintf(pool_size_fn, "/nova/misc/pool_size/%s.size", image_fn);
+
+  // NOTE: we are working in "vdisks" dir (see the chdir() call in main()), so "misc" dir will be "../misc"
+  sprintf(pool_size_fn, "../misc/pool_size/%s.size", image_fn);
   printf("checking if %s pool_size config exists.\n", pool_size_fn);
   if(lstat(pool_size_fn, &st) == 0){
     FILE* fp;
@@ -303,7 +309,7 @@ void maintain_image_count(char* image_fn) {
   struct stat st;
   int copy_id;
   char* test_fn = (char *) malloc(sizeof(char) * (strlen(image_fn) + 32));
-  
+
   read_pool_size(image_fn);
 
   for (copy_id = 1; copy_id <= g_pool_size; copy_id++) {
@@ -369,9 +375,9 @@ void maintain_pool_size() {
 }
 
 int main(int argc, char* argv[]) {
-  printf("This is image_pool_maintainer!\n");
+  printf("This is image_pool_maintainer for NSS module!\n");
   if (argc < 4) {
-    printf("usage: image_pool_maintainer <pid_file> <conf_file_path> <image_pool_dir>\n");
+    printf("usage: image_pool_maintainer <pid_file> <conf_file_path> <vdisks_dir>\n");
     return 1;
   } else {
     char* pid_fn = argv[1];

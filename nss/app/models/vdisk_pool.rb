@@ -10,8 +10,8 @@ class VdiskPool < ActiveRecord::Base
       end
     super
   end
-  
-# Add rows into VdiskPool table.  
+
+# Add rows into VdiskPool table.
   def VdiskPool.add (basename, pool_size)
     rows = VdiskPool.new
     rows.basename = basename

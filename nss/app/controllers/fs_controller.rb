@@ -1,42 +1,58 @@
 # Controller for file system operation.
 
 require 'fileutils'
+require 'utils'
 
-class FsController < ApplicationControlleri
+class FsController < ApplicationController
 
 # Show a listing of file directory.
 # * params[:dir]: directory name of items relativing to /nova/storage, eg:
 #    /fs/listdir?dir=vdisks
 
   def  listdir
-    if valid_param? params[:dir]
-      dir = "#{RAILS_ROOT}/../../storage"+params[:dir]
-      data = "["
-       Dir.foreach(dir.to_s) do |entry|
-         if File.extname(dir.to_s + "/" + entry.to_s) == ".qcow2"
-            data += "{ filename: " + entry.to_s + ", "
-            fsize = File.size(dir.to_s + "/" + entry.to_s)
-            data += "size: " + fsize.to_s  + ", " + "is_dir: "
-            if File.ftype(dir.to_s + "/" + entry.to_s) == "directory"
-               data += "true }"
-            else
-               data += "false }"
-            end
-          end
-        end
-       data += "]"
-    reply_success "Query successful!", :Data => data
+    # by default, list the "vdisks" dir
+    params[:dir] = "vdisks" unless valid_param? params[:dir]
+    if params[:dir].start_with? "/"
+      # absolute path, use it directly
+      dir = params[:dir]
+    else
+      dir = File.join common_conf["storage_root"], params[:dir]
     end
-
+    begin
+      data = []
+      Dir.foreach(dir.to_s) do |entry|
+        next if entry.start_with? '.'
+        fpath = File.join dir, entry
+        data << {
+          :filename => entry,
+          :fsize => (File.size fpath),
+          :isdir => (File::directory? fpath)
+        }
+      end
+      reply_success "Query successful!", :data => data, :dir => dir
+    rescue Exception => e
+      reply_failure "Directory '#{dir}' not found! Raw error message: #{e.to_s}"
+    end
   end
 
 # Delete a file or a directory.
-# * params[:path]: path of the file(directory) to be deleted.
+# * params[:path]: path of the file(directory) to be deleted. (could be absolute path, or relative path to 'nova storage' dir)
   def rm
     if valid_param? params[:path]
-      path = params[:path]
-      File.delete(path.to_s)
-      reply_success " Delete successful!"
+      if params[:path].start_with? "/"
+        # absolute path, use it directly
+        path = params[:path]
+      else
+        path = File.join common_conf["storage_root"], params[:path]
+      end
+      begin
+        FileUtils.rm_r path.to_s
+        reply_success "Delete successful!", :path => params[:path]
+      rescue Exception => e
+        reply_success "Failed to remove '#{path}'. Raw error message: #{e.to_s}"
+      end
+    else
+      reply_failure "Please provide the 'path' parameter!"
     end
   end
 
@@ -59,12 +75,12 @@ class FsController < ApplicationControlleri
     if (valid_param? params[:from]) && (valid_param? params[:to])
       from = params[:from]
       to = params[:to]
-     fork do
+      fork do
         File.new(to.to_s + ".copying", "w")
         system("cp #{from.to_s} #{to.to_s}")
         File.delete(to.to_s + ".copying")
       end
-    reply_success "Copy successful!"
+    reply_success "Copying '#{from}' to '#{to}'."
     end
   end
 
