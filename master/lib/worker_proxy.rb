@@ -12,8 +12,8 @@ require 'fileutils'
 require 'yaml'
 require 'utils'
 
-conf = YAML::load File.read "#{File.dirname __FILE__}/../../common/config/conf.yml"
-if conf["master_use_swiftiply"]
+$conf = YAML::load File.read "#{File.dirname __FILE__}/../../common/config/conf.yml"
+if $conf["master_use_swiftiply"]
   ENV["RAILS_ENV"] ||= "production"
 else
   ENV["RAILS_ENV"] ||= "development"
@@ -62,8 +62,8 @@ class WorkerProxy
     timeout(WORKER_PROXY_TIMEOUT) do
       begin
         begin
-          raw_reply = RestClient.get "#{@root_url}/misc/role.json"
-          reply = JSON.parse raw_reply
+          raw_reply = (RestClient.get "#{@root_url}/misc/role.json").body
+          reply = JSON.parse raw_reply.to_s
           if reply["success"] != true or reply["message"] != "worker"
             @status = "failure"
             @error_message = "Failed to conenct '#{@addr}', raw reply is '#{raw_reply}'!"
@@ -123,7 +123,7 @@ class WorkerProxy
   # Since::   0.3
   def start_vm params
     real_params = {
-      :hypervisor => conf["hypervisor"],
+      :hypervisor => $conf["hypervisor"],
       :arch => "i686",
       :name => params[:name],
       :uuid => params[:uuid],
@@ -262,9 +262,9 @@ private
       begin
         begin
           if params != nil
-            raw_reply = RestClient.post "#{@root_url}/#{url}", params
+            raw_reply = (RestClient.post "#{@root_url}/#{url}", params).body
           else
-            raw_reply = RestClient.post "#{@root_url}/#{url}"
+            raw_reply = (RestClient.post "#{@root_url}/#{url}").body
           end
           @status = "running"
           reply = JSON.parse raw_reply
@@ -289,7 +289,7 @@ private
     timeout(WORKER_PROXY_TIMEOUT) do
       begin
         begin
-          raw_reply = RestClient.get "#{@root_url}/#{url}"
+          raw_reply = (RestClient.get "#{@root_url}/#{url}").body
           @status = "running"
           reply = JSON.parse raw_reply
           return reply

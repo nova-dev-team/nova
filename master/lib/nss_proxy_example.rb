@@ -14,6 +14,8 @@ puts "NSS proxy error message: '#{np.error_message}'"
 
 puts "--"
 puts "Request result for 'listdir':"
-pp np.listdir "vdisks"
+pp np.listdir "agent_packages"
 puts
+
+puts "NSS proxy error message: '#{np.error_message}'"
 
