@@ -1,12 +1,16 @@
 # The model for storages' image_pool.
 require 'fileutils'
-
+require 'utils'
 class VdiskPool < ActiveRecord::Base
 
 # Intercepts savings for "vdisk_pool", and updates corresponding configs.
   def save
-      File.open("#{RAILS_ROOT}/../../misc/pool_size/" + self.basename + ".size", "w") do |f|
-        f.write self.pool_size
+      basename_dir = File.join common_conf["storage_root"], "misc/pool_size", self.basename
+      begin
+        File.open(basename_dir + ".size", "w") do |f|
+          f.write self.pool_size
+        end
+      rescue Exception => e
       end
     super
   end
@@ -29,6 +33,10 @@ class VdiskPool < ActiveRecord::Base
 # Delete the specified rows from VdiskPool table.
   def VdiskPool.del (basename)
      VdiskPool.delete_all(["basename = ?", basename])
-     File.delete("#{RAILS_ROOT}/../../misc/pool_size/" + basename + ".size")
+     basename_dir = File.join common_conf["storage_root"], "misc/pool_size", basename
+     begin
+        File.delete(basename_dir + ".size")
+     rescue Exception => e
+    end
   end
 end
