@@ -22,6 +22,17 @@ end
 require File.dirname(__FILE__) + "/../config/environment"
 
 
+# Fetch the body from RestClient reply result.
+#
+# Since::   0.3
+def rep_body rep
+  begin
+    return rep.body
+  rescue
+    return rep
+  end
+end
+
 # NSS module proxy.
 #
 # Since::   0.3
@@ -62,7 +73,7 @@ class NssProxy
     timeout(NSS_PROXY_TIMEOUT) do
       begin
         begin
-          raw_reply = (RestClient.get "#{@root_url}/misc/role.json").body
+          raw_reply = rep_body(RestClient.get "#{@root_url}/misc/role.json")
           reply = JSON.parse raw_reply
           if reply["success"] != true or reply["message"] != "storage"
             @status = "failure"
@@ -100,9 +111,9 @@ private
       begin
         begin
           if params != nil
-            raw_reply = (RestClient.post "#{@root_url}/#{url}", params).body
+            raw_reply = rep_body(RestClient.post "#{@root_url}/#{url}", params)
           else
-            raw_reply = (RestClient.post "#{@root_url}/#{url}").body
+            raw_reply = rep_body(RestClient.post "#{@root_url}/#{url}")
           end
           @status = "running"
           reply = JSON.parse raw_reply
@@ -127,7 +138,7 @@ private
     timeout(NSS_PROXY_TIMEOUT) do
       begin
         begin
-          raw_reply = (RestClient.get "#{@root_url}/#{url}").body
+          raw_reply = rep_body(RestClient.get "#{@root_url}/#{url}")
           @status = "running"
           reply = JSON.parse raw_reply
           return reply
