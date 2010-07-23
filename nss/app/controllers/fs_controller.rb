@@ -61,10 +61,24 @@ class FsController < ApplicationController
 # * params[:to]: the dest path of the file(directory).
   def mv
     if (valid_param? params[:from]) && (valid_param? params[:to])
-      from = params[:from]
-      to = params[:to]
-      FileUtils.mv(from.to_s, to.to_s)
-      reply_success "Move successful!"
+      if params[:from].start_with? "/"
+        from = params[:from]
+      else
+        from = File.join common_conf["storage_root"], params[:from]
+      end
+      if params[:to].start_with? "/"
+        to = params[:to]
+      else
+        to = File.join common_conf["storage_root"], params[:to]
+      end
+      begin
+        FileUtils.mv(from.to_s, to.to_s)
+        reply_success "Move successful!", :from => params[:from], :to => params[:to]
+      rescue Exception => e
+        reply_failure "Failed to move '#{from}' to '#{to}'. Raw error message: #{e.to_s}"
+      end
+    else
+        reply_failure "Please provide the 'from' & 'to' parameters!"
     end
   end
 
@@ -73,15 +87,27 @@ class FsController < ApplicationController
 # * params[:to]: the dest path of the file.
   def cp
     if (valid_param? params[:from]) && (valid_param? params[:to])
-      from = params[:from]
-      to = params[:to]
+      if params[:from].start_with? "/"
+        from = params[:from]
+      else
+        from = File.join common_conf["storage_root"], params[:from]
+      end
+      if params[:to].start_with? "/"
+        to = params[:to]
+      else
+        to = File.join common_conf["storage_root"], params[:to]
+      end
       fork do
         File.new(to.to_s + ".copying", "w")
         system("cp #{from.to_s} #{to.to_s}")
         File.delete(to.to_s + ".copying")
       end
-    reply_success "Copying '#{from}' to '#{to}'."
+      reply_success "Copy successful!", :from => params[:from], :to => params[:to]
+      #  rescue Exception => e
+      #  reply_failure "Failed to copy '#{from}' to '#{to}'. Raw error message: #{e.to_s}"
+      #  end
+    else
+      reply_failure "Please provide the 'from' & 'to' parameters!"
     end
   end
-
 end

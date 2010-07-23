@@ -1,6 +1,6 @@
 # This contoller is used to do miscellanous works. Generally speaking, it supports other controllers.
-
 require "fileutils"
+require "utils"
 
 class MiscController < ApplicationController
 # Reply the role of this node. When adding storages, master uses this service to "authenticate" workers.
@@ -30,7 +30,7 @@ class MiscController < ApplicationController
 
 # Removes deprecated VM image.
   def revoke_vm_image
-    dir = "#{RAILS_ROOT}/../../run/image_pool"
+    dir = File.join common_conf["run_root"], "image_pool"
     fpath = ""
     unless valid_param? params[:image_name]
       reply_failure "Please provide 'image_name'"
@@ -62,7 +62,7 @@ class MiscController < ApplicationController
 
 # Removes deprecated VM packages.
     def revoke_package
-      dir = "#{RAILS_ROOT}/../../run/package_pool"
+      dir = File.join common_conf["run_root"], "package_pool"
       pkg_path = ""
       unless valid_param? params[:package_name]
         reply_failure "Please provide 'package_name'!"
