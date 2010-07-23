@@ -10,7 +10,7 @@ require 'rake/rdoctask'
 require 'tasks/rails'
 
 namespace :nova do
-  name space :nss do
+  namespace :nss do
 
     # Read common YAML config.
     #
