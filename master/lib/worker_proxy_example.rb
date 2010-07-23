@@ -13,9 +13,7 @@ puts "Worker proxy status: '#{wp.status}'"
 puts "Worker proxy error message: '#{wp.error_message}'"
 
 puts "--"
-puts "Request result for 'list_vm':"
-pp wp.list_vm
-puts
+puts "Request result for 'list_vm':" pp wp.list_vm puts
 
 puts "--"
 puts "Request result for 'get_hostname':"
