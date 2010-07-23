@@ -8,6 +8,7 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 require 'tasks/rails'
+require 'utils'
 
 namespace :nova do
   namespace :nss do
@@ -23,7 +24,7 @@ namespace :nova do
     #
     # Since::     0.3
     def prepare_folders
-      conf = read_conf
+      conf = read_config
       FileUtils.mkdir_p "#{conf["storage_root"]}/misc"
       FileUtils.mkdir_p "#{conf["storage_root"]}/vdisks"
       FileUtils.mkdir_p "#{conf["storage_root"]}/agent_packages"
@@ -43,7 +44,7 @@ namespace :nova do
         exit
       end
 
-      conf = read_conf
+      conf = read_config
 
       puts "Starting Nova NSS module..."
       my_exec "cd #{RAILS_ROOT}/lib && make" # prepare tools
