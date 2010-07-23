@@ -10,6 +10,7 @@ require 'timeout'
 require 'json'
 require 'fileutils'
 require 'yaml'
+require 'utils'
 
 conf = YAML::load File.read "#{File.dirname __FILE__}/../../common/config/conf.yml"
 if conf["master_use_swiftiply"]
@@ -122,7 +123,7 @@ class WorkerProxy
   # Since::   0.3
   def start_vm params
     real_params = {
-      :hypervisor => "kvm",
+      :hypervisor => conf["hypervisor"],
       :arch => "i686",
       :name => params[:name],
       :uuid => params[:uuid],

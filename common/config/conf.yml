@@ -16,8 +16,12 @@ master_swiftiply_first_port:    10000
 master_swiftiply_cluster_size:  5
 
 # which port will worker node serve the web services
-# master port will connect to worker nodes using this port
+# master module will connect to worker nodes using this port
 worker_port:                    4000
+
+# which port will NSS module serve the web services
+# master module will connect to NSS module using this port
+nss_port:                       5000
 
 # the vnc port used by vmachines
 vm_vnc_port:                    5900
@@ -29,6 +33,10 @@ run_root:                       /nova/run
 system_root:                    /nova/system
 
 # storage root, used by NFS & FTP
+# It should have those directories:
+#   * misc:             for NSS module, config image pool size
+#   * vdisks:           holds the vm disk images
+#   * agent_packages:   holds the software packages
 storage_root:                   /nova/storage
 
 # the network interface that will be utilized by virtual machines
