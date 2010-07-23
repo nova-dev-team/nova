@@ -31,7 +31,7 @@ protected
   end
 
   # Fileter to check if user logged in , and if current user is "root" or "admin".
-  # If current user is root or admin, returns true. Otherwise false is returned and error message is replied. 
+  # If current user is root or admin, returns true. Otherwise false is returned and error message is replied.
   #
   # Since::   0.3
   def root_or_admin_required

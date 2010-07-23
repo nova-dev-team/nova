@@ -1,10 +1,12 @@
-require "#{File.dirname __FILE__}/utils.rb"
-require 'cgi'
-
 # Helper module for both "master" and "worker" component.
 #
 # Author::    Santa Zhang (mailto:santa1987@gmail.com)
 # Since::     0.3
+
+
+require "#{File.dirname __FILE__}/utils.rb"
+require 'cgi'
+
 module ControllerUtility
 
 private

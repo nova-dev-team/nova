@@ -17,6 +17,7 @@ class PmachinesController < ApplicationController
     list_data = []
     Pmachine.all.each do |pm|
       pm_data = {
+        :id => pm.id,
         :ip => pm.ip,
         :hostname => pm.hostname,
         :status => pm.status,

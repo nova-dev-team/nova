@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     int hypervisor = 0;
     // 0 -- KVM
     // 1 -- XEN
-    
+
     FILE* fp = NULL;
     FILE* lfp = NULL;  //lock
 
@@ -50,20 +50,20 @@ int main(int argc, char* argv[]) {
       } else
       if (strcmp(c_mode, "xen") == 0) {
         hypervisor = 1;
-      } 
+      }
     }
 
     cmd[0] = '\0';
     pid_fn[0] = '\0';
     status_fn[0] = '\0';
-    
+
     printf("This is vm_daemon!\n");
     printf("Running with pid = %d\n", pid);
     printf("Hypervisor(0--KVM, 1--Xen) = %d\n", hypervisor);
 
     sprintf(pid_fn, "%s/vm_daemon.pid", vm_dir);
     //sprintf(lock_fn, "%s/vm_daemon.lock", vm_dir);
-    
+
     /*
     lfp = fopen(lock_fn, "w");
     if (lfp == NULL) {
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
     }
     fprintf(lfp, "hahahahhhaa\n");
     */
-    
+
     fp = fopen(pid_fn, "w");
     if (fp == NULL) {
       printf("error: cannot open pid file %s!\n", pid_fn);
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
     fclose(fp);
 
     if (hypervisor == 1)
-      g_virt_conn = virConnectOpen("xen:///"); 
+      g_virt_conn = virConnectOpen("xen:///");
     else
       g_virt_conn = virConnectOpen("qemu:///system");
 

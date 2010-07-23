@@ -1,11 +1,11 @@
 # The controller for maintaining VdiskPool.
 
 class VdiskPoolController < ApplicationController
-  
+
 # register an image pool.
 # * params[:basename]: file name of image template;
 #   params[:pool_size]: size of image pool to be registered.
-# eg: /vdisk_pool/register?basename=  &pool_size= 
+# eg: /vdisk_pool/register?basename=  &pool_size=
   def register
     if (valid_param? params[:basename]) && (valid_param? params[:pool_size])
       @row = VdiskPool.find(:first, :conditions => ["basename = ?", params[:basename]])

@@ -184,18 +184,18 @@ int main(int argc, char* argv[])
     cached = strtoul(p, &p, 0);*/
                	
     if(j != 1)
-      fprintf(fw, "memTotal: %ldMB memFree: %ldMB ", mem_total/1024, mem_free/1024);
-    
+      fprintf(fw, "memTotal: %ld memFree: %ld ", mem_total/1024, mem_free/1024); //MB
+
     struct statfs *buf;
-	  long long dsize, davail;
-	  buf = malloc(sizeof(struct statfs)+512);
-	  statfs("/nova",buf);
+    long long dsize, davail;
+    buf = malloc(sizeof(struct statfs)+512);
+    statfs("/nova",buf);
     //printf("bsize: %d\nblocks: %ld\nbavail: %ld\n", buf->f_bsize, buf->f_blocks, buf->f_bavail);
-	  dsize = buf->f_blocks*(buf->f_bsize/1024)/1024;
-	  davail =buf->f_bavail*(buf->f_bsize/1024)/1024;
+    dsize = buf->f_blocks*(buf->f_bsize/1024)/1024;
+    davail =buf->f_bavail*(buf->f_bsize/1024)/1024;
     if(j != 1)
-	    fprintf(fw, "dSize: %lldMB dAvail: %lldMB ",dsize, davail);
-	  free(buf);   
+      fprintf(fw, "dSize: %lld dAvail: %lld ",dsize, davail);  //MB
+    free(buf);
 
  /*Read information of network from "/proc/nev/dev"*/
     fd = open("/proc/net/dev", O_RDONLY);
@@ -227,14 +227,14 @@ int main(int argc, char* argv[])
       rece_diff = (double)rece_total-rece_old;
       tran_diff = (double)tran_total-tran_old;
 
-      if(rece_diff < 1024 && tran_diff < 1024)
-        fprintf(fw, "Rece: %.1fB/s Tran: %.1fB/s\n", rece_diff, tran_diff);
-      else if(rece_diff >= 1024 && tran_diff < 1024)
-        fprintf(fw, "Rece: %.1fkB/s Tran: %.1fB/s\n", rece_diff/1024, tran_diff);
-      else if(rece_diff < 1024 && tran_diff >= 1024)
-        fprintf(fw, "Rece: %.1fB/s Tran: %.1fkB/s\n", rece_diff, tran_diff/1024);
-      else
-        fprintf(fw, "Rece: %.1fkB/s Tran: %.1fkB/s\n", rece_diff/1024, tran_diff/1024);
+     // if(rece_diff < 1024 && tran_diff < 1024)
+     //   fprintf(fw, "Rece: %.1fB/s Tran: %.1fB/s\n", rece_diff, tran_diff);
+     // else if(rece_diff >= 1024 && tran_diff < 1024)
+     //  fprintf(fw, "Rece: %.1fkB/s Tran: %.1fB/s\n", rece_diff/1024, tran_diff);
+     // else if(rece_diff < 1024 && tran_diff >= 1024)
+     //   fprintf(fw, "Rece: %.1fB/s Tran: %.1fkB/s\n", rece_diff, tran_diff/1024);
+     // else
+         fprintf(fw, "Rece: %.1f Tran: %.1f\n", rece_diff/1024, tran_diff/1024);  //KB/s
     }
     fclose(fw);
     rece_old = rece_total;

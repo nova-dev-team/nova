@@ -2,11 +2,13 @@
 #packing ceil iso
 # iso content =
 #    ceil_base_path/* + node.list + soft.list + network.conf + server.conf
+
 require 'fileutils'
+require File.dirname(__FILE__) + '/../common/ip'
 
 #require File.dirname(__FILE__) + '/../common/dir'
 
-#require File.dirname(__FILE__) + '/../common/iso'
+
 CEIL_ISO_FILENAME_SERVERS = 'servers.conf'
 CEIL_ISO_FILENAME_NETWORK = 'network.conf'
 CEIL_ISO_FILENAME_CLUSTER = 'cluster.conf'
@@ -16,15 +18,18 @@ CEIL_ISO_FILENAME_SOFTLIST = 'soft.list'
 CEIL_ISO_CONFIG_PATH = '/config'
 CEIL_ISO_PACKAGE_PATH = '/packages'
 CEIL_ISO_KEY_PATH = '/keys'
+CEIL_RHEL5_CONFIG_PATH = '/rhel5'
 
 #require 'dir'
 
 PARAM_GENISO = ' -allow-lowercase -allow-multidot -D -L -f -l -o '
 PATH_GENISO = '/usr/bin/genisoimage'
+PATH_MKISO = '/usr/bin/mkisofs'
 
 CONFIG_PATH = CEIL_ISO_CONFIG_PATH
 PACKAGE_PATH = CEIL_ISO_PACKAGE_PATH
 KEY_PATH = CEIL_ISO_KEY_PATH
+RHEL5_CONFIG_PATH = CEIL_RHEL5_CONFIG_PATH
 
 FILENAME_SERVERS = CEIL_ISO_FILENAME_SERVERS
 FILENAME_NETWORK = CEIL_ISO_FILENAME_NETWORK
@@ -60,7 +65,6 @@ class CeilIsoGenerator
     @id_rsa_pub_content = nil
 
     @changelist_username = []
-    @changelist_origin_pwd = []
     @changelist_new_pwd = []
 
     #softlist string: appnames seperated by space
@@ -153,9 +157,11 @@ class CeilIsoGenerator
       FileUtils.mkdir_p(tmpdir + CONFIG_PATH)
       #FileUtils.mkdir_p(tmpdir + PACKAGE_PATH)
       FileUtils.mkdir_p(tmpdir + KEY_PATH)
+      FileUtils.mkdir_p(tmpdir + RHEL5_CONFIG_PATH)
     rescue
     end
-    #DirTool.mkdir()
+
+    rhel5_path = File.join(tmpdir, RHEL5_CONFIG_PATH)
 
     filename_servers = tmpdir + CONFIG_PATH + '/' + FILENAME_SERVERS
     filename_network = tmpdir + CONFIG_PATH + '/' + FILENAME_NETWORK
@@ -246,8 +252,89 @@ class CeilIsoGenerator
 
     end
 
+
+    ## generate well-done config-file for rhel5
+    # these files will be copied directly into vm's sysconfig folder
+    # by ceil scripts
+
+    # /etc/sysconfig/network-scripts/ifcfg-eth0
+    # rhel5_path/ifcfg-eth0
+    File.open(File.join(rhel5_path, 'ifcfg_eth0'), 'w') do |f|
+      content = <<IFCFG
+DEVICE=eth0
+BOOTPROTO=static
+BROADCAST=#{IpV4Address.calc_broadcast(@net_ipaddr, @net_netmask)}
+IPADDR=#{@net_ipaddr}
+NETMASK=#{@net_netmask}
+NETWORK=#{IpV4Address.calc_network(@net_ipaddr, @net_netmask)}
+ONBOOT=yes
+IFCFG
+      f.puts content
+    end
+
+    # /etc/resolv.conf
+    File.open(File.join(rhel5_path, 'resolv.conf'), 'w') do |f|
+      @net_dns.split(" ").each do |dns|
+        f.puts "nameserver #{dns}"
+      end
+    end
+
+    # /etc/sysconfig/network
+    File.open(File.join(rhel5_path, 'network'), 'w') do |f|
+      content = <<NCFG
+NETWORKING=yes
+HOSTNAME=#{@hostname}
+GATEWAY=#{@net_gateway}
+NCFG
+      f.puts content
+    end
+
+    #id_rsa & id_rsa.pub
+    #authorized_keys
+    if @id_rsa_content
+      File.open(File.join(rhel5_path, 'id_rsa'), 'w') do |f|
+        f.write @id_rsa_content
+      end
+      File.open(File.join(rhel5_path, 'id_rsa.pub'), 'w') do |f|
+        f.write @id_rsa_pub_content
+      end
+      File.open(File.join(rhel5_path, 'authorized_keys'), 'w') do |f|
+        f.write @id_rsa_pub_content
+      end
+    end
+
+    #change passwd scripts
+    #cfg-passwd
+    if @changelist_username.length > 0
+      File.open(File.join(rhel5_path, 'passwd.list'), 'w') do |f|
+        0.upto(@changelist_username.length - 1) do |i|
+          f.puts @changelist_username[i]
+          f.puts @changelist_new_pwd[i]
+        end
+      end
+    end
+
+    #/etc/hosts
+    if @nodelist
+      File.open(File.join(rhel5_path, 'node.list'), 'w') do |f|
+        f.puts @nodelist
+      end
+    end
+
     #3.pack tmpdir
-    cmdline = PATH_GENISO + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
+    generator = nil
+    if File.exists? PATH_GENISO
+      generator = PATH_GENISO
+    elsif File.exists? PATH_MKISO
+      generator = PATH_MKISO
+    end
+
+    if generator
+      cmdline = generator + PARAM_GENISO + iso_path + " " + tmpdir + " 2> /dev/null";
+    else
+      cmdline = "exit 1"
+    end
+    puts cmdline
     result = system cmdline
     if result
       return iso_path
@@ -255,14 +342,13 @@ class CeilIsoGenerator
       return nil
     end
   end
-
 end
 
 =begin
 igen = CeilIsoGenerator.new
 
-igen.config_essential('/home/rei/nova/common/lib/ceil')
-igen.config_network('10.0.1.122', '255.255.255.0', '10.0.1.254', '166.111.8.28')
+igen.config_essential('/nova/system/common/lib/ceil')
+igen.config_network('10.0.1.122', '255.255.255.0', '10.0.1.254', '166.111.8.28 166.111.8.29')
 # vm_addr  vm_netmask vm_gateway vm_nameserver
 igen.config_cluster("node1", "nova-cluster-name")
 # vm_nodename  vm_clustername
@@ -285,7 +371,7 @@ igen.config_ssh_key("jklfdsjkljailgjweklgjklwdjgkl;d", "fsdkhgklsdad;gjdkslgjsdk
 #config for package "ssh-nopass"
 #private_key_content, public_key_content
 
-igen.generate('/var/vm1/', '/home/test.iso')
+igen.generate('/tmp/vm1/', '/tmp/jk.iso')
 
 puts "fin"
 =end
