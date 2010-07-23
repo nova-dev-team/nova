@@ -22,15 +22,15 @@ end
 require File.dirname(__FILE__) + "/../config/environment"
 
 
-# Worker module proxy.
+# NSS module proxy.
 #
 # Since::   0.3
-class WorkerProxy
+class NssProxy
 
   # The timeout to worker modules.
   #
   # Since::   0.3
-  WORKER_PROXY_TIMEOUT = 10
+  NSS_PROXY_TIMEOUT = 10
 
   # The status of the proxy.
   # Could be:
@@ -45,12 +45,12 @@ class WorkerProxy
   # Since::   0.3
   attr_reader :error_message
 
-  # Create a worker proxy.
+  # Create an NSS proxy.
   # * worker_addr: the address of the worker, in "ip:port" format, like "10.0.1.2:3000".
   #
   # Since::   0.3
-  def initialize worker_addr
-    @addr = worker_addr
+  def initialize nss_addr
+    @addr = nss_addr
 
     # The URL to the root ('/') of the worker.
     @root_url = "http://#{@addr}"
@@ -59,12 +59,13 @@ class WorkerProxy
     @version = nil
     @rails_env = nil
 
-    timeout(WORKER_PROXY_TIMEOUT) do
+    timeout(NSS_PROXY_TIMEOUT) do
       begin
         begin
+          puts "GET: #{@root_url}/misc/role.json"
           raw_reply = RestClient.get "#{@root_url}/misc/role.json"
           reply = JSON.parse raw_reply
-          if reply["success"] != true or reply["message"] != "worker"
+          if reply["success"] != true or reply["message"] != "storage"
             @status = "failure"
             @error_message = "Failed to conenct '#{@addr}', raw reply is '#{raw_reply}'!"
           else
@@ -81,6 +82,11 @@ class WorkerProxy
     end
   end
 
+  def listdir dir=nil
+    ret = post_request "fs/listdir.json", dir
+  end
+
+=begin
   # Get a list of all the running VMs.
   # On error return nil.
   #
@@ -251,6 +257,9 @@ AGENT_HINT
     return {:success => false, :message => "Request to worker module failed!"}
   end
 
+=end
+
+
 private
 
   # Send a POST request.
@@ -258,7 +267,7 @@ private
   #
   # Since::     0.3
   def post_request url, params = nil
-    timeout(WORKER_PROXY_TIMEOUT) do
+    timeout(NSS_PROXY_TIMEOUT) do
       begin
         begin
           if params != nil
@@ -286,7 +295,7 @@ private
   #
   # Since::     0.3
   def get_request url
-    timeout(WORKER_PROXY_TIMEOUT) do
+    timeout(NSS_PROXY_TIMEOUT) do
       begin
         begin
           raw_reply = RestClient.get "#{@root_url}/#{url}"
@@ -304,6 +313,5 @@ private
       end
     end
   end
-
 end
 
