@@ -42,7 +42,8 @@ class VdiskPoolController < ApplicationController
       VdiskPool.del(params[:basename])
      # reply_success "Unregister successful!"
      reply_model VdiskPool
+     else
+       reply_failure "please input valid basename!"
     end
   end
-
 end
