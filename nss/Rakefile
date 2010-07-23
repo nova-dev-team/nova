@@ -8,3 +8,82 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 
 require 'tasks/rails'
+
+namespace :nova do
+  name space :nss do
+
+    # Read common YAML config.
+    #
+    # Since::     0.3
+    def read_config
+      conf = common_conf
+    end
+
+    # Make sure all folders are ready.
+    #
+    # Since::     0.3
+    def prepare_folders
+      conf = read_conf
+      FileUtils.mkdir_p "#{conf["storage_root"]}/misc"
+      FileUtils.mkdir_p "#{conf["storage_root"]}/vdisks"
+      FileUtils.mkdir_p "#{conf["storage_root"]}/agent_packages"
+      FileUtils.mkdir_p "#{RAILS_ROOT}/log"
+      FileUtils.mkdir_p "#{RAILS_ROOT}/tmp/pids"
+    end
+
+    desc "Start NSS module"
+    task :start => :stop do
+      prepare_folders
+
+      unless File.exists? "#{RAILS_ROOT}/config/INIT_DONE"
+        puts "!!!"
+        puts "!!! The master module has not been initialized yet!"
+        puts "!!! Run 'rake nova:master:init' to initialize the master module."
+        puts "!!!"
+        exit
+      end
+
+      conf = read_conf
+
+      puts "Starting Nova NSS module..."
+      my_exec "cd #{RAILS_ROOT}/lib && make" # prepare tools
+
+      # start image pool helper
+      my_exec "cd #{RAILS_ROOT}/lib && ./image_pool_maintainer ../tmp/pids/image_pool_maintainer.pid image_pool_maintainer.conf #{conf["storage_root"]}/vdisks"
+
+      # start the NSS module server
+      my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["nss_port"]} &"
+    end
+
+    desc "Stop NSS module"
+    task :stop do
+      prepare_folders
+
+      Dir.foreach("#{File.dirname __FILE__}/tmp/pids") do |entry|
+        if entry.end_with? ".pid"
+          fpath = "#{File.dirname __FILE__}/tmp/pids/#{entry}"
+          puts (File.read fpath)
+          kill_by_pid_file fpath
+        end
+      end
+
+    end
+
+
+    desc "Initialize system"
+    task :init do
+      prepare_folders
+      puts "Migrating database..."
+      my_exec "rake db:migrate RAILS_ENV=production"
+      my_exec "rake db:migrate RAILS_ENV=development"
+      my_exec "rake db:migrate:reset RAILS_ENV=production"
+      my_exec "rake db:migrate:reset RAILS_ENV=development"
+      puts "Loading data..."
+      my_exec "rake db:fixtures:load RAILS_ENV=production"
+      my_exec "rake db:fixtures:load RAILS_ENV=development"
+      my_exec "touch #{RAILS_ROOT}/config/INIT_DONE"
+    end
+  end
+end
+
+

@@ -27,7 +27,6 @@ class FsController < ApplicationControlleri
        data += "]"
     reply_success "Query successful!", :Data => data
     end
-
   end
 
 # Delete a file or a directory.
@@ -59,12 +58,12 @@ class FsController < ApplicationControlleri
     if (valid_param? params[:from]) && (valid_param? params[:to])
       from = params[:from]
       to = params[:to]
-     fork do
+      fork do
         File.new(to.to_s + ".copying", "w")
         system("cp #{from.to_s} #{to.to_s}")
         File.delete(to.to_s + ".copying")
       end
-    reply_success "Copy successful!"
+    reply_success "Copying '#{from}' to '#{to}'."
     end
   end
 
