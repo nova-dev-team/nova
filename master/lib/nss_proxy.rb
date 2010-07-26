@@ -92,12 +92,79 @@ class NssProxy
     end
   end
 
+  # List the content of some dir. If 'dir' is not given, then by default, this function will list contents
+  # of 'vdisks' folder. The 'dir' could be absolute path, or relative path to 'storage_root'.
+  #
+  # Since::   0.3
   def listdir dir = nil
     if dir
       ret = post_request "fs/listdir.json", :dir => dir
     else
       ret = get_request "fs/listdir.json"
     end
+  end
+
+  # Remove a file. The 'path' could be absolute path, or relative path to 'storage_root'.
+  #
+  # Since::   0.3
+  def rm path
+    ret = post_request "fs/rm.json", :path => path
+  end
+
+  # Move a file or directory. The path could be absolute path, or relative path to 'storage_root'.
+  #
+  # Since::   0.3
+  def mv from_path, to_path
+    ret = post_request "fs/mv.json", :from => from_path, :to => to_path
+  end
+
+  # Copy a file. The path could be absolute path, or relative path to 'storage_root'.
+  #
+  # Since::   0.3
+  def cp from_path, to_path
+    ret = post_request "fs/cp.json", :from => from_path, :to => to_path
+  end
+
+  # Get the role. The return value shoule be "storage"
+  #
+  # Since::   0.3
+  def role
+    ret = get_request "misc/role.json"
+  end
+
+  # Get the version of NSS module.
+  #
+  # Since::   0.3
+  def version
+    ret = get_request "misc/version.json"
+  end
+
+  # Get the hostname of NSS module.
+  #
+  # Since::   0.3
+  def hostname
+    ret = get_request "misc/hostname/json"
+  end
+
+  # Register a new vdisk.
+  #
+  # Since::   0.3
+  def register_vdisk basename, pool_size
+    ret = post_request "vdisk_pool/register.json", :basename => basename, :pool_size => pool_size
+  end
+
+  # Change the pool size of some vdisk image.
+  #
+  # Since::   0.3
+  def edit_vdisk basename, pool_size
+    ret = post_request "vdisk_pool/edit.json", :basename => basename, :pool_size => pool_size
+  end
+
+  # Unregister a image pool.
+  #
+  # Since::   0.3
+  def unregister_vdisk basename
+    ret = post_request "vdisk_pool/unregister.json", :basename => basename
   end
 
 private
