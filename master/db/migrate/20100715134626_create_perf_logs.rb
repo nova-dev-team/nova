@@ -8,6 +8,8 @@ class CreatePerfLogs < ActiveRecord::Migration
       t.column :memFree,      :string,   :limit => 10
       t.column :Rece,         :string,   :limit => 10
       t.column :Tran,         :string,   :limit => 10
+      t.column :dSize,        :string,   :limit => 20
+      t.column :dAvail,       :string,   :limit => 20
       t.timestamps
     end
   end
