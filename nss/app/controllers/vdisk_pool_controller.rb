@@ -34,17 +34,16 @@ class VdiskPoolController < ApplicationController
 #   params[:pool_size]: new size of image pool.
   def edit
     if (valid_param? params[:basename]) && (valid_param? params[:pool_size])
-        row = VdiskPool.find(:first, :conditions => ["basename = ?", params[:basename]])
-        if data != nil
+        @row = VdiskPool.find(:first, :conditions => ["basename = ?", params[:basename]])
+        if @row != nil
           VdiskPool.csize(params[:basename], params[:pool_size])
         # reply_success "Edit successful!"
-        reply_success "Query successful!", :data => data
+	        reply_success "Successfully modified pool size of '#{params[:basename]}' to #{params[:pool_size]}", :basename => params[:basename], :pool_size => params[:pool_size]
         else
           reply_failure "The template not exists!"
         end
       VdiskPool.csize(params[:basename], params[:pool_size])
       # reply_success "Edit successful!"
-      reply_success "Successfully modified pool size of '#{params[:basename]}' to #{params[:pool_size]}", :basename => params[:basename], :pool_size => params[:pool_size]
     else
       reply_failure "Please input valid basename & pool_size!"
     end
