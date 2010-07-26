@@ -7,7 +7,7 @@ class VdiskPoolController < ApplicationController
   #
   # Since::   0.3
   def list
-    reply_model VdiskPool, :items => [:basename, :pool_size]
+    reply_model VdiskPool, :items => ["basename", "pool_size"]
   end
 
 # register an image pool.
