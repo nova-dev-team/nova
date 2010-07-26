@@ -87,14 +87,34 @@ puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
 puts "--"
+puts "Request result for 'list_vdisk':"
+pp np.list_vdisk
+puts "NSS proxy error message: '#{np.error_message}'"
+puts
+
+
+puts "--"
 puts "Request result for 'register_vdisk':"
 pp np.unregister_vdisk "blah.qcow2"
 puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
 puts "--"
+puts "Request result for 'list_vdisk':"
+pp np.list_vdisk
+puts "NSS proxy error message: '#{np.error_message}'"
+puts
+
+
+puts "--"
 puts "Request result for 'register_vdisk':"
 pp np.register_vdisk "blah.qcow2", 5
+puts "NSS proxy error message: '#{np.error_message}'"
+puts
+
+puts "--"
+puts "Request result for 'list_vdisk':"
+pp np.list_vdisk
 puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
@@ -106,4 +126,9 @@ puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
 
+puts "--"
+puts "Request result for 'list_vdisk':"
+pp np.list_vdisk
+puts "NSS proxy error message: '#{np.error_message}'"
+puts
 
