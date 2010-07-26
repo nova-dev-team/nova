@@ -14,7 +14,7 @@ class VdiskPoolController < ApplicationController
         reply_failure "The template already exists!"
       else
         VdiskPool.add(params[:basename], params[:pool_size])
-        #reply_success "Register successful!"
+       # reply_success "Register successful!"
         reply_model VdiskPool
       end
     else
@@ -27,9 +27,15 @@ class VdiskPoolController < ApplicationController
 #   params[:pool_size]: new size of image pool.
   def edit
     if (valid_param? params[:basename]) && (valid_param? params[:pool_size])
-        VdiskPool.csize(params[:basename], params[:pool_size])
+        row = VdiskPool.find(:first, :conditions => ["basename = ?", params[:basename]])
+        if data != nil
+          VdiskPool.csize(params[:basename], params[:pool_size])
+          row = VdiskPool.find(:first, :conditions => ["basename = ?", params[:basename]])
         # reply_success "Edit successful!"
-        reply_model VdiskPool
+        reply_success "Query successful!", :data => data
+        else
+          reply_failure "The template not exists!"
+        end
     else
       reply_failure "Please input valid basename & pool_size!"
     end
@@ -46,4 +52,9 @@ class VdiskPoolController < ApplicationController
        reply_failure "please input valid basename!"
     end
   end
+
+  def listvdisk
+    reply_model VdiskPool
+  end
+
 end
