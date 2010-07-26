@@ -167,6 +167,14 @@ class NssProxy
     ret = post_request "vdisk_pool/unregister.json", :basename => basename
   end
 
+
+  # List all the vdisk image pool.
+  #
+  # Since::   0.3
+  def list_vdisk
+    ret = get_request "vdisk_pool/list.json"
+  end
+
 private
 
   # Send a POST request.
