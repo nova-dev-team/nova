@@ -1,8 +1,8 @@
 # The model for storages' image_pool.
 require 'fileutils'
 require 'utils'
-class VdiskPool < ActiveRecord::Base
 
+class VdiskPool < ActiveRecord::Base
 # Intercepts savings for "vdisk_pool", and updates corresponding configs.
   def save
       basename_dir = File.join common_conf["storage_root"], "misc/pool_size", self.basename
