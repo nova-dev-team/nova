@@ -61,6 +61,7 @@ class VdiskPoolController < ApplicationController
     end
   end
 
+# list all registered vdisks.
   def listvdisk
     reply_model VdiskPool
   end
