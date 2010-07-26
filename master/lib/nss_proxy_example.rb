@@ -40,7 +40,7 @@ puts
 
 puts "--"
 puts "Request result for 'mv':"
-pp np.cp "blah.qcow2.a", "blah.qcow2.b"
+pp np.mv "blah.qcow2.a", "blah.qcow2.b"
 puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
