@@ -27,10 +27,12 @@ puts
 
 puts "--"
 puts "Request result for 'cp':"
-pp np.cp "blah.qcow2", "blah.qcow2.a"
+pp np.cp "vdisks/blah.qcow2", "vdisks/blah.qcow2.a"
 puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
+puts "Sleep for 1 sec, waiting copying work"
+sleep 1
 
 puts "--"
 puts "Request result for 'listdir':"
@@ -40,7 +42,7 @@ puts
 
 puts "--"
 puts "Request result for 'mv':"
-pp np.mv "blah.qcow2.a", "blah.qcow2.b"
+pp np.mv "vdisks/blah.qcow2.a", "vdisks/blah.qcow2.b"
 puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
@@ -53,7 +55,7 @@ puts
 
 puts "--"
 puts "Request result for 'rm':"
-pp np.rm "blah.qcow2.b"
+pp np.rm "vdisks/blah.qcow2.b"
 puts "NSS proxy error message: '#{np.error_message}'"
 puts
 
