@@ -60,10 +60,4 @@ class VdiskPoolController < ApplicationController
       reply_failure "please input valid basename!"
     end
   end
-
-# list all registered vdisks.
-  def listvdisk
-    reply_model VdiskPool
-  end
-
 end
