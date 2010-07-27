@@ -26,8 +26,10 @@ class VdiskPool < ActiveRecord::Base
 # Change size of specified template in the VdiskPool table.
   def VdiskPool.csize (basename, pool_size)
     rows = VdiskPool.find(:first, :conditions => ["basename = ?",basename])
-    rows.pool_size = pool_size
-    rows.save
+    if rows != nil
+      rows.pool_size = pool_size
+      rows.save
+    end
   end
 
 # Delete the specified rows from VdiskPool table.
