@@ -34,7 +34,7 @@ if np.status == "running"
     if np.hostname != nil
       fp = File.open(fpath,"w+")
       if fp
-        fp.syswrite("hostname: #{np.hostname}")
+        fp.syswrite("VERSION: #{np.version}")
       else
         puts "Unable to open file: '#{fpath}'!" 
       end
