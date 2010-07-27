@@ -143,7 +143,7 @@ class NssProxy
   #
   # Since::   0.3
   def hostname
-    ret = get_request "misc/hostname/json"
+    ret = get_request "misc/hostname.json"
   end
 
   # Register a new vdisk.

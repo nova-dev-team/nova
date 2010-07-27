@@ -37,7 +37,7 @@ private
   #
   # Since::     0.3
   def ftp_server_try_update
-    fpath = File.join @@yaml_conf["run_root"], "ftp_server_files_list"
+    fpath = File.join @@yaml_conf["run_root"], "ftp_server_files_list_updater_lftp_script"
     if File.exists? fpath
       FileUtils.touch fpath
       return true

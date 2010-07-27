@@ -8,6 +8,7 @@ require 'utils'
 class MiscController < ApplicationController
 
   include FtpServerFilesListHelper
+  include NssFilesListHelper
 
   # Reply the role of this node.
   #
@@ -198,6 +199,40 @@ class MiscController < ApplicationController
       soft_list = ftp_server_soft_list
       if soft_list == nil
         reply_failure "Ftp server is down! Cannot retrieve list!"
+      else
+        reply_success "List of soft successfully retrieved!", :data => soft_list
+      end
+    else
+      reply_failure "Unknown request '#{params[:req]}'"
+    end
+  end
+  
+  def nss
+    unless valid_param? params[:req]
+      reply_failure "Please provide the 'req' parameter! Could be 'try_update', 'server_down', 'vdisk_list' or 'soft_list'."
+      return
+    end
+    case params[:req]
+    when "try_update"
+      nss_try_update
+      reply_success "Tried to update nss files list."
+    when "nss_down"
+      if nss_down?
+        reply_success "Nss is down!", :nss_down => true
+      else
+        reply_success "Nss is up and running!", :nss_down => false
+      end
+    when "vdisk_list"
+      vdisk_list = nss_vdisks_list
+      if vdisk_list == nil
+        reply_failure "Nss is down! Cannot retrieve list!"
+      else
+        reply_success "List of vdisks successfully retrieved!", :data => vdisk_list
+      end
+    when "soft_list"
+      soft_list = nss_soft_list
+      if soft_list == nil
+        reply_failure "Nss is down! Cannot retrieve list!"
       else
         reply_success "List of soft successfully retrieved!", :data => soft_list
       end
