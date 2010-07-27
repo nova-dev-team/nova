@@ -335,7 +335,7 @@ end
   storage_root = conf["storage_root"]  
 
   case storage_type
-  when "kvm"
+  when "ftp"
     if File.exists? "#{Setting.run_root}/ftp_server_files_list"
       list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
       if list_data =~ /Fatal error: max-retries exceeded/
@@ -355,7 +355,7 @@ end
     else
       html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
     end
-  when "xen"
+  when "nfs"
     html_str = pretty_du(File.join(storage_root, 'vdisks'), 1)
   else
     html_str = "Don't know storage type #{storage_type}"
