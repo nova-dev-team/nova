@@ -5,7 +5,7 @@ require 'pp'
 require 'uuidtools'
 require File.dirname(__FILE__) + "/worker_proxy.rb"
 
-WORKER_ADDR = "166.111.131.10:3004"
+WORKER_ADDR = "192.168.0.147:4000"
 
 wp = WorkerProxy.new WORKER_ADDR
 puts "Created worker proxy for '#{WORKER_ADDR}'"
@@ -85,13 +85,13 @@ pp wp.start_vm :name => "worker_proxy_test",
   :uuid => UUIDTools::UUID.random_create.to_s,
   :memory_size => 333,
   :cpu_count => 2,
-  :vdisk_fname => "ubuntu_ptp8_ceil_enabled.qcow2",
-  :ip => "10.0.4.222",
+  :vdisk_fname => "small.img.20",
+  :ip => "192.168.0.123",
   :submask => "255.255.255.0",
-  :gateway => "10.0.4.254",
+  :gateway => "192.168.0.254",
   :dns => "166.111.8.29",
-  :packages => "pkg_test,pkg_test2",
-  :nodelist => "10.0.4.222 nodex",
+  :packages => "",
+  :nodelist => "192.168.0.123 nodex",
   :cluster_name => "c_test1"
 
 
