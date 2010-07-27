@@ -45,10 +45,10 @@ if np.status == "running"
         if config_time != File.mtime(fspath)
           break;
         end
-          x = x - 1
-         # puts File.mtime(fpath)
-         # puts File.mtime(fspath)
-          sleep(1)
+        x = x - 1
+        # puts File.mtime(fpath)
+        # puts File.mtime(fspath)
+        sleep(1)
       end
     end
   end
