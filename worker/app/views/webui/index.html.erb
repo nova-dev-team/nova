@@ -5,6 +5,11 @@ require 'cgi'
 require 'xmlsimple'
 require 'uuidtools'
 require 'utils'
+
+conf = common_conf
+storage_type = conf["storage_type"]
+storage_root = conf["storage_root"]  
+
 %>
 
 <html>
@@ -46,6 +51,7 @@ $(document).ready(function () {
 
 <h1>Nova worker</h1>
 <%=
+
   node_hostname = ""
   if File.exists? "#{RAILS_ROOT}/tmp/hostname"
     node_hostname = "hostname: " + (File.read "#{RAILS_ROOT}/tmp/hostname") + "<br>"
@@ -329,10 +335,6 @@ end
 
 <%=
   html_str = ""
-  require "#{RAILS_ROOT}/lib/utils"
-  conf = common_conf
-  storage_type = conf["storage_type"]
-  storage_root = conf["storage_root"]  
 
   case storage_type
   when "ftp"
@@ -389,6 +391,7 @@ du -ah <%= Setting.package_pool_root %>
 </td></tr></table>
 <p>
 
+<% if storage_type == 'ftp' %>
 <b>Revoke image or package:</b><br>
 This utility is used to delete deprecated VM images or packages.<br>
 <li>If the image is being downloaded from storage server, the revoke request will be ignored.</li>
@@ -399,6 +402,7 @@ Current page will be reloaded when clicked.<br>
 Package name: <input type="text" id='revoke_package_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_package()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
 Current page will be reloaded when clicked.
 <hr>
+<% end-%>
 
 
 <h2>System settings</h2>
