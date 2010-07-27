@@ -116,6 +116,10 @@ bool is_vm_disk_image(const char* filename) {
   if (text_ends_with(filename, (char *) ".qcow2")) {
     return true;
   }
+  if (text_ends_with(filename, (char *) ".img")) {
+    return true;
+  }
+
   // check if .qcow2.pool.X
   int fn_len = strlen(filename);
   char* fname_copy = new char[fn_len + 1];
@@ -132,6 +136,9 @@ bool is_vm_disk_image(const char* filename) {
   }
   fname_copy[idx] = '\0';
   if (text_ends_with(fname_copy, (char *) ".qcow2.pool")) {
+    return true;
+  }
+  if (text_ends_with(fname_copy, (char *) ".img.pool")) {
     return true;
   }
   delete fname_copy;
