@@ -250,6 +250,40 @@ Node list (&quot;ip hostname&quot;, separate with comma): <input type="text" id=
 </div>
 <hr>
 
+<%
+def pretty_du dir, max_depth
+  FileUtils.mkdir_p dir # assure existance of dir
+  html = "<pre>"
+  pipe = IO.popen "cd #{dir} && du -ah --max-depth=#{max_depth} | grep -v \"\.log$\""
+  du_output = pipe.readlines.join.chomp
+  pipe.close
+
+  size_info = {}
+  du_output.each_line do |line|
+    splt = line.split
+    size_info[splt[1]] = splt[0]
+  end
+
+  du_data = du_output.collect {|line| line.split[1]}
+  du_sorted = du_data.sort
+
+  item_counter = 0
+  du_sorted.each do |item|
+    next if item == "."
+    html += "%-10s%s\n" % [size_info[item], item]
+    item_counter += 1
+  end
+
+  if item_counter == 0
+    html += "(nothing)"
+  end
+
+  html += "</pre>"
+  return html
+end
+
+
+%>
 
 <h2>Storage server</h2>
 <%
@@ -295,24 +329,36 @@ end
 
 <%=
   html_str = ""
-  if File.exists? "#{Setting.run_root}/ftp_server_files_list"
-    list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
-    if list_data =~ /Fatal error: max-retries exceeded/
-      html_str = "<b><font color='red'>The storage server is probably down!</font></b>"
-    elsif list_data =~ /Not connected/ or list_data =~ /Name or service not known/
-      html_str = "<b><font color='red'>Failed to connect to storage server!</font></b>"
-    else
-      html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
-      if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
-        html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead!</font>"
-      end
-      html_str += "</b>"
-      html_str += "<br>\n"
+  require "#{RAILS_ROOT}/lib/utils"
+  conf = common_conf
+  storage_type = conf["storage_type"]
+  storage_root = conf["storage_root"]  
 
-      html_str += pretty_server_file_list list_data
+  case storage_type
+  when "kvm"
+    if File.exists? "#{Setting.run_root}/ftp_server_files_list"
+      list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
+      if list_data =~ /Fatal error: max-retries exceeded/
+        html_str = "<b><font color='red'>The storage server is probably down!</font></b>"
+      elsif list_data =~ /Not connected/ or list_data =~ /Name or service not known/
+        html_str = "<b><font color='red'>Failed to connect to storage server!</font></b>"
+      else
+        html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
+        if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
+          html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead!</font>"
+        end
+        html_str += "</b>"
+        html_str += "<br>\n"
+
+        html_str += pretty_server_file_list list_data
+      end
+    else
+      html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
     end
+  when "xen"
+    html_str = pretty_du(File.join(storage_root, 'vdisks'), 1)
   else
-    html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
+    html_str = "Don't know storage type #{storage_type}"
   end
   html_str
 %>
@@ -320,40 +366,7 @@ end
 
 <h2>Local resource</h2>
 
-<%
-def pretty_du dir, max_depth
-  FileUtils.mkdir_p dir # assure existance of dir
-  html = "<pre>"
-  pipe = IO.popen "cd #{dir} && du -ah --max-depth=#{max_depth} | grep -v \"\.log$\""
-  du_output = pipe.readlines.join.chomp
-  pipe.close
 
-  size_info = {}
-  du_output.each_line do |line|
-    splt = line.split
-    size_info[splt[1]] = splt[0]
-  end
-
-  du_data = du_output.collect {|line| line.split[1]}
-  du_sorted = du_data.sort
-
-  item_counter = 0
-  du_sorted.each do |item|
-    next if item == "."
-    html += "%-10s%s\n" % [size_info[item], item]
-    item_counter += 1
-  end
-
-  if item_counter == 0
-    html += "(nothing)"
-  end
-
-  html += "</pre>"
-  return html
-end
-
-
-%>
 
 <b>Vmachines working directory:</b><br>
 du -ah <%=h Setting.vm_root %>
