@@ -11,7 +11,6 @@ require 'json'
 require 'uuidtools'
 require 'fileutils'
 require 'yaml'
-require "#{File.dirname __FILE__}/../worker_proxy"
 
 conf = YAML::load File.read "#{File.dirname __FILE__}/../../../common/config/conf.yml"
 if conf["master_use_swiftiply"]
@@ -21,12 +20,16 @@ else
 end
 
 require File.dirname(__FILE__) + "/../../config/environment"
+require "#{File.dirname __FILE__}/../worker_proxy"
 
 $running = true
 Signal.trap("TERM") do
   $running = false
 end
 
+# Write some logs into log/my_log
+#
+# Since::   0.3
 def write_log message
   unless File.exists? "#{RAILS_ROOT}/log"
     FileUtils.mkdir_p "#{RAILS_ROOT}/log"
@@ -42,8 +45,19 @@ def write_log message
   end
 end
 
+# Fetch the body from RestClient reply result.
+#
+# Since::   0.3
+def rep_body rep
+  begin
+    return rep.body
+  rescue
+    return rep
+  end
+end
+
 while($running) do
-  write_log "daemon woke up"
+  #write_log "daemon woke up"
   # connect pending pmachines
   Pmachine.all.each do |pm|
     if pm.status == "pending"
@@ -52,7 +66,7 @@ while($running) do
         timeout 10 do
           begin
             write_log "Trying to connect pmachine #{pm.ip}"
-            raw_reply = RestClient.get "#{pm.root_url}/misc/role.json"
+            raw_reply = rep_body(RestClient.get "#{pm.root_url}/misc/role.json")
             reply = JSON.parse raw_reply
             if reply["success"] != true or reply["message"] != "worker"
               pm.status = "failure"
@@ -62,29 +76,18 @@ while($running) do
               pm.status = "working"
 
               # update hostname
-              raw_reply = RestClient.get "#{pm.root_url}/misc/hostname.json"
+              raw_reply = rep_body(RestClient.get "#{pm.root_url}/misc/hostname.json")
               reply = JSON.parse raw_reply
               if reply["success"] == true
                 pm.hostname = reply["hostname"]
               end
-              ##############################get workers' log and write these logs to database#############################################
-
-              logs = RestClient.get "#{pm.root_url}/logs/show.json"
-              logs[data].each do |log|
-                log["pmachine_id"] = pm.id
-                PerfLog.create(log)
-              end
-              time_now = Time.now
-              time_str = (time_now - 3600).strftime("%Y%m%d%H%M%S")
-              PerfLog.delete_all(["time < ?", time_str])
-
-              ##############################end of get workers' log and write these logs to database#####################################
               pm.save
+              write_log "Successfully connected to #{pm.ip}, raw reply is '#{raw_reply}'"
             end
-          rescue
+          rescue Exception => e
             pm.status = "failure"
             pm.save
-            write_log "Time out connecting #{pm.ip}, raw reply is '#{raw_reply}'"
+            write_log "Time out connecting #{pm.ip}, raw reply is '#{raw_reply}'. Exception message: #{e.to_s}"
           end
         end
       rescue => e
@@ -100,17 +103,46 @@ while($running) do
 
     # sync the settings for "storage_server"
     begin
-      reply = JSON.parse RestClient.get "#{pm.root_url}/settings/show.json?key=storage_server"
+      reply = JSON.parse rep_body(RestClient.get "#{pm.root_url}/settings/show.json?key=storage_server")
       if reply["value"] != Setting.storage_server
+        write_log "sync setting for 'storage_server' to #{pm.ip}"
         RestClient.post "#{pm.root_url}/settings/edit", :key => "storage_server", :value => Setting.storage_server
       end
     rescue
     end
 
+    ##############################get workers' log and write these logs to database#############################################
+
+    begin
+      write_log "Fetching perflogs from #{pm.ip}"
+      logs = JSON.parse rep_body(RestClient.get "#{pm.root_url}/logs/show.json")
+      logs["data"].each do |log|
+        plog = PerfLog.new
+        plog.memFree = log["memFree"]
+        plog.pmachine_id = pm.id
+        plog.time = log["Time"]
+        plog.dSize = log["dSize"]
+        plog.dAvail = log["dAvail"]
+        plog.Rece = log["Rece"]
+        plog.CPU = log["CPU"]
+        plog.Tran = log["Tran"]
+        plog.memTotal = log["memTotal"]
+        plog.save
+      end
+      time_now = Time.now
+      time_str = (time_now - 3600).strftime("%Y%m%d%H%M%S")
+      PerfLog.delete_all(["time < ?", time_str])
+      write_log "finished syncing perf logs from #{pm.ip}"
+    rescue Exception => e
+      write_log "Exception happend when fetching perflogs from #{pm.ip}. Exception: #{e.to_s}"
+    end
+
+    ##############################end of get workers' log and write these logs to database#####################################
+
     # sync info on vm
     begin
       write_log "Sync VM statuses from #{pm.root_url}/vmachines/index.json"
-      raw_reply = RestClient.get "#{pm.root_url}/vmachines/index.json"
+      raw_reply = rep_body(RestClient.get "#{pm.root_url}/vmachines/index.json")
       reply = JSON.parse raw_reply
       write_log "Raw reply is: #{raw_reply}"
 

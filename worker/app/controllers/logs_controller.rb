@@ -1,5 +1,5 @@
 class LogsController < ApplicationController
-  
+
   LogFilePath = "#{RAILS_ROOT}/log/pm_top.log"
 
   def show
@@ -15,5 +15,5 @@ class LogsController < ApplicationController
       reply_failure "Log File not exist!"
     end
   end
-  
+
 end

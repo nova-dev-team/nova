@@ -46,6 +46,8 @@ system "
   rake nova:vm_pool:init
   cd #{conf["system_root"]}/worker
   rake nova:worker:init
+  cd #{conf["system_root"]}/nss
+  rake nova:nss:init
 "
 
 puts "Everything done!"

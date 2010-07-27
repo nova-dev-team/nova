@@ -38,7 +38,7 @@ class VdiskPoolController < ApplicationController
         if @row != nil
           VdiskPool.csize(params[:basename], params[:pool_size])
         # reply_success "Edit successful!"
-	        reply_success "Successfully modified pool size of '#{params[:basename]}' to #{params[:pool_size]}", :basename => params[:basename], :pool_size => params[:pool_size]
+          reply_success "Successfully modified pool size of '#{params[:basename]}' to #{params[:pool_size]}", :basename => params[:basename], :pool_size => params[:pool_size]
         else
           reply_failure "The template not exists!"
         end
