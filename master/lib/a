@@ -1,0 +1,34 @@
+#!/usr/bin/ruby
+
+require 'rubygems'
+require 'pp'
+require 'uuidtools'
+require 'fileutils'
+require 'utils'
+require 'json'
+require File.dirname(__FILE__) + "/nss_proxy.rb"
+
+NSS_ADDR = "127.0.0.1:5000"
+
+np = NssProxy.new NSS_ADDR
+puts "Created NSS proxy for '#{NSS_ADDR}'"
+puts "NSS proxy status: '#{np.status}'"
+puts "NSS proxy error message: '#{np.error_message}'"
+
+fpath = File.join common_conf["run_root"], "nss_is_run"
+File.new(fpath, "w+")
+
+#fork do
+  while 1 do
+    if np.hostname != nil
+      fp = File.open(path,"w+")
+      if fp
+        fp.syswrite("hostname: #{np.hostname} \n" )
+      else
+        puts "Unable to open file: '#{path}'!" 
+      end
+    end
+    #puts File.mtime(path)
+    sleep(1)
+  end
+#end
