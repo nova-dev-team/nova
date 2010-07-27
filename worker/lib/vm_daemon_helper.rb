@@ -94,7 +94,7 @@ def prepare_hda_image_directly image_pool_dir, vm_dir, hda_name
   if File.exists? base_image_name and (File.exists? base_image_copying_lock) == false
     my_exec "mv #{base_image_name} #{File.join vm_dir, hda_name}"
   else
-    write_log "image #{hda_name} is under copying, cannot use it"
+    write_log "image #{hda_name} is not prepared, cannot use it"
   end
 end
 
