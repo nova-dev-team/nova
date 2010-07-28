@@ -239,7 +239,7 @@ class MiscController < ApplicationController
       reply_failure "Unknown request '#{params[:req]}'"
     end
   end
-  
+
 
   # Handles requests for overview info:
   # * users (root, admin, normal_user, not_activated)

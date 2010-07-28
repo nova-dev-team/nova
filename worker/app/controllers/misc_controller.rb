@@ -38,7 +38,7 @@ class MiscController < ApplicationController
   # Reply the current version of Nova platform.
   #
   # Since::   0.3
-  
+
   def version
     if File.exists? "#{RAILS_ROOT}/../VERSION"
       ver = File.read("#{RAILS_ROOT}/../VERSION").strip
