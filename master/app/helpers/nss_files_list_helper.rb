@@ -4,15 +4,15 @@ require "nss_proxy.rb"
 
 module NssFilesListHelper
   private
-  
+
     @@yaml_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
-    
+
     # Because of NFS, nss use 127.0.0.1 for default.
     NSS_ADDR = "127.0.0.1:#{@@yaml_conf["nss_port"]}"
-    
+
     fspath = File.join @@yaml_conf["run_root"], "nss_is_run_updater_script"
     NSS_ADDR = "#{File.open(fspath).readline}:#{common_conf["nss_port"]}" if File.exist? fspath
-         
+
     # Check whether the nss is down.
     # Consider the nss to be down if it had been out of touch for 5 minutes, or connection to server failed.
     def nss_down?
@@ -30,7 +30,7 @@ module NssFilesListHelper
         return true
       end
     end
-   
+
     # Try to update the nss files list.
     # Just touch the file, so that the back ground process will handle the request.
     def nss_try_update
@@ -42,7 +42,7 @@ module NssFilesListHelper
         return false
       end
     end
-    
+
     # Get list of nss vdisks.
     def nss_vdisks_list
       vdisk_list = nil
