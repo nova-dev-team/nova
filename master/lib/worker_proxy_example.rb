@@ -81,11 +81,11 @@ end
 
 puts "--"
 puts "Trying to start a new vm"
-pp wp.start_vm :name => "worker_proxy_test",
+pp wp.start_vm :name => "worker_proxy_test2",
   :uuid => UUIDTools::UUID.random_create.to_s,
   :memory_size => 333,
   :cpu_count => 2,
-  :vdisk_fname => "small.img.20",
+  :vdisk_fname => "small.img.pool.10",
   :ip => "192.168.0.123",
   :submask => "255.255.255.0",
   :gateway => "192.168.0.254",

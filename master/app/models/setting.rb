@@ -19,8 +19,10 @@ class Setting < ActiveRecord::Base
 
       # update also write to run_root
       FileUtils.mkdir_p Setting.run_root
-      File.open("#{Setting.run_root}/ftp_server_files_list_updater_lftp_script", "w") do |f|
-        f.write <<LFTP_SCRIPT
+      conf = common_conf
+      if conf["storage_type"] == "ftp"
+        File.open("#{Setting.run_root}/ftp_server_files_list_updater_lftp_script", "w") do |f|
+          f.write <<LFTP_SCRIPT
 set net:timeout 10
 set net:max-retries 2
 set net:reconnect-interval-base 1
@@ -32,6 +34,11 @@ cd /agent_packages
 pwd
 ls
 LFTP_SCRIPT
+        end
+      elsif conf["storage_type"] == "nfs"
+        File.open("#{Setting.run_root}/nss_is_run_updater_script", "w") do |f|
+          f.write self.value
+        end
       end
 
       puts "Update to storage_server also forwarded to config/storage_server.conf!"
