@@ -28,6 +28,12 @@ fork do
     puts "Created NSS proxy for '#{NSS_ADDR}'"
     puts "NSS proxy status: '#{np.status}'"
     puts "NSS proxy error message: '#{np.error_message}'"
+    unless File.exists? fspath
+      # create default settings file
+      File.open(fspath, "w") do |f|
+        f.write "127.0.0.1"
+      end
+    end
     config_time = File.mtime(fspath)
     # Record the modify time of file "nss_is_run_updater_script".
     if np.status == "running"
