@@ -240,7 +240,8 @@ class MiscController < ApplicationController
       reply_failure "Unknown request '#{params[:req]}'"
     end
   end
- 
+
+=begin 
   def sstest
    # return unless root_required
     unless valid_param? params[:req]
@@ -300,6 +301,7 @@ class MiscController < ApplicationController
       reply_failure "Unknown request '#{params[:req]}'"
     end
   end
+=end
 
   # Handles requests for overview info:
   # * users (root, admin, normal_user, not_activated)

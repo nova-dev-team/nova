@@ -129,7 +129,29 @@ end
       html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
     end
   elsif conf["storage_type"] == "nfs"
-    html_str = "TODO"
+    html_str += "<b>Vdisks</b><br>"
+    html_str += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>\n"
+    vdisks_list = storage_server_vdisks_list
+    if vdisks_list == nil
+      html_str += "(nothing)"
+    else
+      vdisks_list.each do |vd|
+        html_str += vd + "\n"
+      end
+    end
+    html_str += "</pre></table><p/>\n"
+
+    html_str += "<b>Software packages</b><br>"
+    html_str += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>\n"
+    packages_list = storage_server_soft_list
+    if packages_list == nil
+      html_str += "(nothing)"
+    else
+      packages_list.each do |pkg|
+        html_str += pkg + "\n"
+      end
+    end
+    html_str += "</pre></table>"
 
   else
     html_str = "<font color='red'>Storage type '#{conf["storage_type"]}' not understood!"
