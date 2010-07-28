@@ -11,11 +11,11 @@
 <center>
 This feature is still under development. We are using the <a href='http://code.google.com/p/flot'>flot</a> library to plot the charts.<p/>
 
-Here is a demo graph:
-
 <% time_now = Time.now %>
-<% time_str = (time_now - 3600).strftime("%Y%m%d%H%M%S") %>
+<% time_offset = 3600 %>
+<% time_str = (time_now - time_offset).strftime("%Y%m%d%H%M%S") %>
 <% Pmachine.all.each do |pm| %>  
+  CPU_holder_<%= pm.id %>
   <div id="CPU_holder_<%= pm.id %>" style="width:300px;height:150px;"></div>
   <script type="text/javascript">
   $(function() {
@@ -24,7 +24,6 @@ Here is a demo graph:
     <% logs.each do |log| %>
       
       var time = <%= log["time"].delete("-").to_i %>;
-      
       var tmp = <%= log["CPU"].gsub(/[^0-9\.]/, "").to_f %>;
       CPU.push([time, tmp]);    
     <% end-%>
@@ -38,7 +37,8 @@ Here is a demo graph:
                   
   });
   </script>
-
+  
+  memory_holder_<%= pm.id %>
   <div id="memory_holder_<%= pm.id %>" style="width:300px;height:150px;"></div>
   <script type="text/javascript">
   $(function() {
@@ -68,6 +68,7 @@ Here is a demo graph:
   });
   </script>
 
+  network_holder_<%= pm.id %>
   <div id="network_holder_<%= pm.id %>" style="width:300px;height:150px;"></div>
   <script type="text/javascript">
   $(function() {
@@ -97,6 +98,7 @@ Here is a demo graph:
   });
   </script>
 
+  disk_holder <%= pm.id %>
   <div id="disk_holder_<%= pm.id %>" style="width:300px;height:150px;"></div>
   <script type="text/javascript">
   $(function() {
