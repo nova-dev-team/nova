@@ -9,6 +9,7 @@ class MiscController < ApplicationController
 
   include FtpServerFilesListHelper
   include NssFilesListHelper
+  include StorageManagementHelper
 
   # Reply the role of this node.
   #

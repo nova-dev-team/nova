@@ -11,7 +11,7 @@ module NssFilesListHelper
     NSS_ADDR = "127.0.0.1:#{@@yaml_conf["nss_port"]}"
 
     fspath = File.join @@yaml_conf["run_root"], "nss_is_run_updater_script"
-    NSS_ADDR = "#{File.open(fspath).readline}:#{common_conf["nss_port"]}" if File.exist? fspath
+    NSS_ADDR = "#{File.open(fspath).readline.chomp}:#{common_conf["nss_port"]}" if File.exist? fspath
 
     # Check whether the nss is down.
     # Consider the nss to be down if it had been out of touch for 5 minutes, or connection to server failed.
@@ -48,7 +48,9 @@ module NssFilesListHelper
       vdisk_list = nil
       if nss_down? == false
         np = NssProxy.new NSS_ADDR
-        vdisk_list = (np.listdir "vdisks")["data"].collect {|item| item["filename"]}
+        if np.listdir != nil
+          vdisk_list = (np.listdir "vdisks")["data"].collect {|item| item["filename"]}
+        end
       end
       return vdisk_list
     end
@@ -58,7 +60,9 @@ module NssFilesListHelper
       soft_list = nil
       if nss_down? == false
         np = NssProxy.new NSS_ADDR
-        soft_list = (np.listdir "agent_packages")["data"].collect {|item| item["filename"]}
+        if np.listdir "agent_packages" != nil
+          soft_list = (np.listdir "agent_packages")["data"].collect {|item| item["filename"]}
+        end
       end
       return soft_list
     end

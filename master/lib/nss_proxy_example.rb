@@ -5,7 +5,7 @@ require 'pp'
 require 'uuidtools'
 require File.dirname(__FILE__) + "/nss_proxy.rb"
 
-NSS_ADDR = "192.168.0.147:5000"
+NSS_ADDR = "127.0.0.1:5000"
 
 np = NssProxy.new NSS_ADDR
 puts "Created NSS proxy for '#{NSS_ADDR}'"

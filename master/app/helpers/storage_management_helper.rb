@@ -16,9 +16,9 @@ module StorageManagementHelper
   #
   # Since::     0.3
   def storage_server_try_update
-    if conf["storage_tpye"] == "ftp"
+    if @@conf["storage_tpye"] == "ftp"
       return ftp_server_try_update
-    elsif conf["storage_type"] == "nfs"
+    elsif @@conf["storage_type"] == "nfs"
       return nss_try_update
     else
       return nil
@@ -29,9 +29,9 @@ module StorageManagementHelper
   #
   # Since::     0.3
   def storage_server_down?
-    if conf["storage_tpye"] == "ftp"
+    if @@conf["storage_tpye"] == "ftp"
       return ftp_server_down?
-    elsif conf["storage_type"] == "nfs"
+    elsif @@conf["storage_type"] == "nfs"
       return nss_down?
     else
       return nil
@@ -42,9 +42,9 @@ module StorageManagementHelper
   #
   # Since::   0.3
   def storage_server_vdisks_list
-    if conf["storage_tpye"] == "ftp"
+    if @@conf["storage_tpye"] == "ftp"
       return ftp_server_vdisks_list
-    elsif conf["storage_type"] == "nfs"
+    elsif @@conf["storage_type"] == "nfs"
       return nss_vdisks_list
     else
       return nil
@@ -55,9 +55,9 @@ module StorageManagementHelper
   #
   # Since::   0.3
   def storage_server_soft_list
-    if conf["storage_tpye"] == "ftp"
+    if @@conf["storage_tpye"] == "ftp"
       return ftp_server_soft_list
-    elsif conf["storage_type"] == "nfs"
+    elsif @@conf["storage_type"] == "nfs"
       return nss_soft_list
     else
       return nil
