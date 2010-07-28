@@ -70,7 +70,15 @@ elif grep -q "CentOS" "/etc/issue" ; then
   ./configure --prefix=/usr
   make
   make install
-  cd ..
+
+  # compile readline
+  cd ext/readline
+  ruby extconf.rb
+  make
+  make install
+
+  # rm ruby source code
+  cd /tmp
   rm -rf ruby-1.8.7-p249 ruby-1.8.7-p249.tar.gz
 
   # get back to where I were
