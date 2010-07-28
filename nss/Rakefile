@@ -48,8 +48,10 @@ namespace :nova do
 
       puts "Writing hostname into tmp/hostname..."
       FileUtils.mkdir_p "#{RAILS_ROOT}/tmp"
+     
       
       my_exec "hostname > #{RAILS_ROOT}/tmp/hostname"
+      service_port = conf["nss_port"]
       puts "Starting Nova worker on port #{service_port}..."
 
       puts "Starting Nova NSS module..."
