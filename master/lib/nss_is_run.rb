@@ -4,9 +4,9 @@ require 'rubygems'
 require 'pp'
 require 'uuidtools'
 require 'fileutils'
-require 'utils'
 require 'json'
 require File.dirname(__FILE__) + "/nss_proxy.rb"
+require File.dirname(__FILE__) + "/utils.rb"
 
 # Sleep time, the unit is second.
 SLEEPTIME = 5
@@ -27,6 +27,10 @@ fp = File.new(fpath, "w+")
 if np.status == "running"
   # puts "OK"
   fork do
+    # write a pid file
+    File.open(File.dirname(__FILE__) + "/../tmp/pids/nss_is_run.pid", "w") do |f|
+      f.write Process.pid
+    end
     while 1 do
       # Record the modify time of file "nss_is_run_updater_script".
       config_time = File.mtime(fspath)

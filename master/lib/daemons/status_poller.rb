@@ -116,8 +116,7 @@ while($running) do
     begin
       write_log "Fetching perflogs from #{pm.ip}"
 
-      # TODO: only fetch perflogs not in db
-      logs = JSON.parse rep_body(RestClient.get "#{pm.root_url}/logs/show.json")
+      logs = JSON.parse rep_body(RestClient.post "#{pm.root_url}/logs/show.json", :time => (Time.now.to_i - 60))
       logs["data"].each do |log|
         next if PerfLog.find(:first, :conditions => {:pmachine_id => pm.id, :time => log["Time"]}) != nil # prevent duplicate entries
         plog = PerfLog.new
