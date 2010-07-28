@@ -30,6 +30,18 @@ protected
     end
   end
 
+  # Filter to check if user logged in, and if current user is "root" or "admin".
+  #
+  # Since::   0.3
+  def root_or_admin_required
+    unless logged_in? and (@current_user.privilege == "root" or @current_user.privilege == "admin")
+      reply_failure "You do not have enough privilege for this action!"
+      return false
+    else
+      return true
+    end
+  end
+
   # Fileter to check if user logged in , and if current user is "root" or "admin".
   # If current user is root or admin, returns true. Otherwise false is returned and error message is replied.
   #
