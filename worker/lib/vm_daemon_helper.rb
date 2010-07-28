@@ -87,6 +87,17 @@ end
 def get_vm_uuid
 end
 
+def prepare_hda_image_directly image_pool_dir, vm_dir, hda_name
+  #simply move image_poor_dir/hda_name to vm_dir
+  base_image_name = File.join image_pool_dir, hda_name
+  base_image_copying_lock = File.join image_pool_dir, "#{hda_name}.copying"
+  if File.exists? base_image_name and (File.exists? base_image_copying_lock) == false
+    my_exec "mv #{base_image_name} #{File.join vm_dir, hda_name}"
+  else
+    write_log "image #{hda_name} is not prepared, cannot use it"
+  end
+end
+
 def prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
   # be care of the .copying lock!
   #
@@ -351,7 +362,8 @@ def do_prepare rails_root, storage_server, vm_dir
         write_log "preparing img image '#{img}'"
         prepare_hda_image storage_server, image_pool_dir, vm_dir, img
       else
-        write_log "[warning] don't know how to prepare image '#{img}'!"
+        write_log "directly use image file '#{img}'"
+        prepare_hda_image_directly image_pool_dir, vm_dir, img
       end
     end
   end
