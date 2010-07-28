@@ -48,7 +48,7 @@ module NssFilesListHelper
       vdisk_list = nil
       if nss_down? == false
         np = NssProxy.new NSS_ADDR
-        vdisk_list = np.listdir
+        vdisk_list = (np.listdir "vdisks")["data"].collect {|item| item["filename"]}
       end
       return vdisk_list
     end
@@ -58,7 +58,7 @@ module NssFilesListHelper
       soft_list = nil
       if nss_down? == false
         np = NssProxy.new NSS_ADDR
-        soft_list = np.listdir "agent_packages"
+        soft_list = (np.listdir "agent_packages")["data"].collect {|item| item["filename"]}
       end
       return soft_list
     end

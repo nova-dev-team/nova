@@ -18,6 +18,7 @@ class MigrationController < ApplicationController
       }
       vm_all_data = []
       pm.vmachines.each do |vm|
+        # TODO add info of vm migration, such as migrate_from, migrate_to, etc.
         vm_data = {
           :name => vm.name
         }
