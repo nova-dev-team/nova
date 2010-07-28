@@ -101,20 +101,37 @@ while($running) do
   # connect all working vmachines
   Pmachine.find(:all, :conditions =>'status = "working"').each do |pm|
 
+    # test if worker is still running
+    begin
+      #write_log "Testing if worker #{pm.ip} is still running"
+      wp = pm.worker_proxy
+      if wp.status == "failure"
+        write_log "Worker #{pm.ip} is down"
+        pm.status = "failure"
+        pm.save
+        next # go on with next pmachine
+      else
+#        write_log "Worker #{pm.ip} still running"
+      end
+    rescue => e
+      write_log "Exception occured when testing liveness of #{pm.ip}: #{e.to_s}"
+    end
+
     # sync the settings for "storage_server"
     begin
       reply = JSON.parse rep_body(RestClient.get "#{pm.root_url}/settings/show.json?key=storage_server")
       if reply["value"] != Setting.storage_server
-        write_log "sync setting for 'storage_server' to #{pm.ip}"
+        #write_log "sync setting for 'storage_server' to #{pm.ip}"
         RestClient.post "#{pm.root_url}/settings/edit", :key => "storage_server", :value => Setting.storage_server
       end
-    rescue
+    rescue => e
+      write_log "Exception occured when fetching settings from #{pm.ip}: #{e.to_s}"
     end
 
     ##############################get workers' log and write these logs to database#############################################
 
     begin
-      write_log "Fetching perflogs from #{pm.ip}"
+      #write_log "Fetching perflogs from #{pm.ip}"
 
       logs = JSON.parse rep_body(RestClient.post "#{pm.root_url}/logs/show.json", :time => (Time.now.to_i - 60))
       logs["data"].each do |log|
@@ -134,7 +151,7 @@ while($running) do
       time_now = Time.now
       time_str = (time_now - 3600).strftime("%Y%m%d%H%M%S")
       PerfLog.delete_all(["time < ?", time_str])
-      write_log "finished syncing perf logs from #{pm.ip}"
+      #write_log "finished syncing perf logs from #{pm.ip}"
     rescue Exception => e
       write_log "Exception happend when fetching perflogs from #{pm.ip}. Exception: #{e.to_s}"
     end
@@ -143,10 +160,10 @@ while($running) do
 
     # sync info on vm
     begin
-      write_log "Sync VM statuses from #{pm.root_url}/vmachines/index.json"
+      #write_log "Sync VM statuses from #{pm.root_url}/vmachines/index.json"
       raw_reply = rep_body(RestClient.get "#{pm.root_url}/vmachines/index.json")
       reply = JSON.parse raw_reply
-      write_log "Raw reply is: #{raw_reply}"
+      #write_log "Raw reply is: #{raw_reply}"
 
       # remove VMs that are not runing any more
       pm.vmachines.each do |vm|
@@ -168,7 +185,7 @@ while($running) do
 
       # get status of actuall running VMs
       reply["data"].each do |real_vm|
-        write_log "Working on VM with name='#{real_vm["name"]}', uuid=#{real_vm["uuid"]}"
+        #write_log "Working on VM with name='#{real_vm["name"]}', uuid=#{real_vm["uuid"]}"
 
         vm_already_in_db = false
         vm = nil
@@ -181,7 +198,7 @@ while($running) do
         end
 
         if vm_already_in_db
-          write_log "VM '#{real_vm["name"]}' already in DB"
+          #write_log "VM '#{real_vm["name"]}' already in DB"
           if vm.status == "shutdown-pending"
             # destroy VM if it is pending shut-off
             write_log "VM '#{real_vm["name"]}' is to be shut off"
@@ -239,6 +256,7 @@ while($running) do
 
   # close VMs.
   Vmachine.find(:all, :conditions =>'status = "shutdown-pending"').each do |vm|
+    write_log "Shutting down vm '#{vm.name}'"
     wp = vm.pmachine.worker_proxy
     wp.destroy_vm vm.uuid
     vm.status = "shut-off"

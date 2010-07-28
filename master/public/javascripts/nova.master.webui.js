@@ -11,6 +11,51 @@ function do_message(type, title, msg) {
 }
 
 //
+// "Migration" page
+//
+function load_migration_view() {
+  $("#migration_view").block();
+  $.ajax({
+    url: "/migration/overview",
+    type: "GET",
+    dataType: "json",
+    data: {
+    },
+    success: function(result) {
+      if (result.success) {
+        var html = "";
+        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Vmachines</td></tr>";
+        
+        for (i = 0; i < result.data.length; i++) {
+          var pm_data = result.data[i];
+          html += "<tr class='row_type_" + ((i + 1) % 2) + "'><td>";
+          html += pm_data.ip;
+          html += "<font color='gray'> (" + pm_data.hostname + ")</font>"
+          html += "</td><td>";
+          html += pm_data.vm_capacity;
+          html += "</td><td>";
+          for (j = 0; j < pm_data.vmachines; j++) {
+            html += "";
+            // TODO write vmachine info here
+          }
+          html += "</td></tr>";
+        }
+
+        html += "</table>";
+        $("#migration_view").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#migration_view").unblock();
+    },
+    error: function() {
+      $("#migration_view").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+//
 // "Overview" page
 //
 

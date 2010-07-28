@@ -16,14 +16,14 @@ NSS_ADDR = "127.0.0.1:#{common_conf["nss_port"]}"
 fspath = File.join common_conf["run_root"], "nss_is_run_updater_script"
 fpath = File.join common_conf["run_root"], "nss_is_run"
 
-fork do   
+fork do
   # write a pid file
   File.open(File.dirname(__FILE__) + "/../tmp/pids/nss_is_run.pid", "w") do |f|
     f.write Process.pid
   end
   while 1 do
-	  fp = File.new(fpath, "w+")
-	  NSS_ADDR = "#{File.open(fspath).readline.chomp}:#{common_conf["nss_port"]}" if File.exist? fspath
+    fp = File.new(fpath, "w+")
+    NSS_ADDR = "#{File.open(fspath).readline.chomp}:#{common_conf["nss_port"]}" if File.exist? fspath
     np = NssProxy.new NSS_ADDR
     puts "Created NSS proxy for '#{NSS_ADDR}'"
     puts "NSS proxy status: '#{np.status}'"
@@ -43,7 +43,7 @@ fork do
         if fp
           fp.syswrite("hostname: #{np.hostname}")
         else
-          puts "Unable to open file: '#{fpath}'!" 
+          puts "Unable to open file: '#{fpath}'!"
         end
       end
     else
@@ -51,7 +51,7 @@ fork do
       fp = File.open(fpath, "w+")
       fp.syswrite(np.status)
     end
-    # Sleeping, at the meanwhile, check for config file modification every 1 second. 
+    # Sleeping, at the meanwhile, check for config file modification every 1 second.
     x = SLEEPTIME
     while x > 0 do
         #puts "OK"
