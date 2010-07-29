@@ -30,11 +30,6 @@ STORAGE_SERVER = ARGV[1]
 VM_DIR = ARGV[2]
 ACTION = ARGV[3]
 
-def my_exec cmd
-  puts "[cmd] #{cmd}"
-  system cmd
-end
-
 
 def libvirt_connect_local
   case HYPERVISOR
@@ -57,6 +52,12 @@ def write_log message
       end
     end
   end
+end
+
+
+def my_exec cmd
+  write_log "[cmd] #{cmd}"
+  system cmd
 end
 
 def find_available_copy image_pool_dir, hda_name
@@ -83,9 +84,6 @@ def find_available_copy image_pool_dir, hda_name
   return copy_list[0]
 end
 
-
-def get_vm_uuid
-end
 
 def prepare_hda_image_directly image_pool_dir, vm_dir, hda_name
   #simply move image_poor_dir/hda_name to vm_dir
@@ -330,14 +328,7 @@ end
 
 
 def do_prepare rails_root, storage_server, vm_dir
-=begin
-  begin
-    FileUtils.rm_f "prepare"
-  rescue
-    puts "cannot remove instruction file 'prepare'!"
-  end
-  return nil if File.exists? "prepare"
-=end
+
   begin
     File.open("status", "w") do |f|
       f.write "preparing"
