@@ -442,7 +442,9 @@ def do_prepare rails_root, storage_server, vm_dir
         end
       end
       write_log "config_softlist: #{software_packages.join " "}"
-      igen.config_softlist(software_packages.join " ")
+      if software_packages != nil
+        igen.config_softlist(software_packages.join " ")
+      end
 
       igen.generate("#{vm_dir}/agent-cd", "#{vm_dir}/agent-cd.iso")
       unless File.exists? "#{vm_dir}/agent-cd.iso"
