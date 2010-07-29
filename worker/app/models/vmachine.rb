@@ -630,7 +630,7 @@ private
       rescue
       end
       if vm_daemon_pid
-        Process.kill 9, vm_daemon_pid
+        my_exec "kill -9 #{vm_daemon_pid}"
       end
     else
       #host_uuid = nil
