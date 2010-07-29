@@ -17,14 +17,14 @@ COMMON_CONF = common_conf
 HYPERVISOR = COMMON_CONF["hypervisor"]
 STORAGE_TYPE = COMMON_CONF["storage_type"]
 
-
 #unused in current version
 #0.31
 MIGRATION_TIMEOUT_HANDSHAKE=5
 # 5min timeout for handshake
 MIGRATION_TIMEOUT_PROCEEDING=-1
-#
 
+$libvirt_connection = nil
+#
 
 
 ###################################INIT##############################################
@@ -43,12 +43,13 @@ pid = Process.pid
 #try to gain lock vm_dir/vm_daemon.pid
 #if failed, exits
 
-pid_fn = File.join(vm_dir, 'vm_daemon.pid')
+pid_fn = File.join(VM_DIR, 'vm_daemon.pid')
 pid_file = File.new(pid_fn, "w+")
 
 locked = pid_file.flock(File::LOCK_EX | File::LOCK_NB)
 if locked
   pid_file.write pid
+  pid_file.flush
 else
   puts "cannot gain file lock of #{pid_fn}, exits"
   exit 1
@@ -57,18 +58,20 @@ end
 ###################################END OF INIT##########################################
 
 
-
-
 def libvirt_connect_local
-  case HYPERVISOR
-  when "xen"
-    return Libvirt::open("xen:///")
-  when "kvm"
-    return Libvirt::open("qemu:///system")
-  else
-    raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
+  if $libvirt_connection == nil
+    case HYPERVISOR
+    when "xen"
+      $libvirt_connection = Libvirt::open("xen:///")
+    when "kvm"
+      $libvirt_connection = Libvirt::open("qemu:///system")
+    else
+      raise "vm_daemon: unsupported hypervisor: #{HYPERVISOR}."
+    end
   end
+  return $libvirt_connection
 end
+
 
 def write_log message
   File.open("log", "a") do |f|
@@ -512,6 +515,19 @@ def do_prepare rails_root, storage_server, vm_dir
   end
 end
 
+def do_restart vm_dir
+  # restart
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  vm_uuid = xml_desc["uuid"][0]
+  virt_conn = libvirt_connect_local
+  dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
+
+  if dom.info.state == LIBVIRT_NOT_RUNNING
+    write_log "restarting vmachine #{vm_uuid}"
+    dom.create
+  end
+
+end
 
 def do_save storage_server, vm_dir
   begin
@@ -783,28 +799,34 @@ def do_action action
   rails_root = RAILS_ROOT
   storage_server = STORAGE_SERVER
   vm_dir = VM_DIR
-
-  case action
-  when "prepare"
-    write_log "vm_daemon_helper action: prepare"
-    do_prepare rails_root, storage_server, vm_dir
-  when "receive"
-    write_log "vm_daemon_helper action: receive"
-    do_receive storage_server, vm_dir
-  when "migrate"
-    write_log "vm_daemon_helper action: migrate"
-    do_migrate
-  when "poll"
-  #  write_log "vm_daemon_helper action: poll"
-    do_poll storage_server, vm_dir
-  when "save"
-    write_log "vm_daemon_helper action: save"
-    do_save storage_server, vm_dir
-  when "cleanup", "destroy"
-    write_log "vm_daemon_helper action: #{action}"
-    do_cleanup storage_server, vm_dir
-  else
-    write_log "error: action '#{action}' not understood!"
+  begin
+    case action
+    when "prepare"
+      write_log "vm_daemon action: prepare"
+      do_prepare rails_root, storage_server, vm_dir
+    when "receive"
+      write_log "vm_daemon action: receive"
+      do_receive storage_server, vm_dir
+    when "migrate"
+      write_log "vm_daemon action: migrate"
+      do_migrate
+    when "poll"
+      #write_log "vm_daemon_helper action: poll"
+      do_poll storage_server, vm_dir
+    when "save"
+      write_log "vm_daemon action: save"
+      do_save storage_server, vm_dir
+    when "cleanup", "destroy"
+      write_log "vm_daemon action: #{action}"
+      do_cleanup storage_server, vm_dir
+    when "restart"
+      write_log "vm_daemon action: restart"
+      do_restart vm_dir
+    else
+      write_log "error: action '#{action}' not understood!"
+    end
+  rescue => e
+    write_log "vm_daemon error: #{e.to_s}"
   end
 end
 
@@ -818,8 +840,8 @@ def check_vm_host_uuid
     worker_uuid_fn = File.join RAILS_ROOT, 'config', 'worker.uuid'
     vm_worker_uuid_fn = File.join VM_DIR, 'host.uuid'
 
-    puts worker_uuid_fn
-    puts vm_worker_uuid_fn
+    #puts worker_uuid_fn
+    #puts vm_worker_uuid_fn
 
     host_uuid = File.read(worker_uuid_fn)
     vm_host_uuid = File.read(vm_worker_uuid_fn)
@@ -827,8 +849,8 @@ def check_vm_host_uuid
     # if vm is running on local, fix host.uuid
     # this is caused by migration
     # if vm is shut-off, kill it in 'do_poll'
-    puts "host_uuid = #{host_uuid}"
-    puts "vm_host_uuid = #{vm_host_uuid}"
+    #puts "host_uuid = #{host_uuid}"
+    #puts "vm_host_uuid = #{vm_host_uuid}"
 
     if host_uuid != vm_host_uuid
       begin
@@ -847,7 +869,7 @@ def check_vm_host_uuid
       end
     end
   rescue
-    puts "error!"
+    write_log "cannot rewrite host.uuid file!!"
     ## couldn't get it, consider a bad machine so trash cleaner will handle it
     ## should exit here
     # exit 1
@@ -867,19 +889,26 @@ while true
   rescue => e
     write_log e.to_s
   end
+
   begin
     virt_conn = libvirt_connect_local
+    
     dom = nil
-    dom = virt_conn.lookup_domain_by_name(VM_NAME) rescue nil
+    begin 
+      dom = virt_conn.lookup_domain_by_name(VM_NAME) 
+    rescue 
+    end
+
     if dom
       action = get_action
       do_action action
     else
       do_action "cleanup"
-      break
+      exit 0
     end
   rescue => e
     write_log e.to_s
   end
+  sleep 3
 end
 
