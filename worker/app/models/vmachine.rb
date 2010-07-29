@@ -585,7 +585,7 @@ private
           end
         end
       end
-      exec "./vm_daemon #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, vm_name} #{vm_name} #{HYPERVISOR}"
+      exec "./vm_daemon.rb #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, vm_name} #{vm_name} #{HYPERVISOR}"
     end
     Process.detach pid  # prevent zombie process
     Vmachine.log vm_name, "vm_daemon started for '#{vm_name}'"
