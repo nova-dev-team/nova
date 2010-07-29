@@ -17,6 +17,8 @@ class Vmachine < ActiveRecord::Base
   LIBVIRT_NOT_RUNNING = 5
 
   HYPERVISOR=common_conf["hypervisor"]
+  WORKER_UUID = File.read(File.join(RAILS_ROOT, "config", "worker.uuid"))
+
   # hypervisor used by nova
   # Connection to libvirt.
   #
@@ -328,6 +330,16 @@ XML_DESC
   # You must provide either uuid or name of the VM.
   #
   # Since::     0.3
+
+  def Vmachine.restart params
+    vm_name = params[:name]
+    if vm_name and vm_name != ""
+      Vmachine.send_instruction vm_name, "restart"
+    else
+      raise "Please provide a name!"
+    end
+  end
+
   def Vmachine.suspend params
     vm_name = params[:name]
 
@@ -381,10 +393,12 @@ XML_DESC
   #
   # Since::     0.3
 
-  # YO, non-blocking
+  # non-blocking Since 0.31
+
   def Vmachine.destroy params
     vm_name = params[:name]
     if vm_name and vm_name != ""
+      Vmachine.kill_vm_daemon vm_name
       Vmachine.send_instruction vm_name, "destroy"
     else
       raise "Please provide a name!"
@@ -593,6 +607,37 @@ private
 
   # check whether vm_daemon exists
   # if not, restart it
+
+  def Vmachine.kill_vm_daemon vm_name
+    #check host.uuid == worker.uuid?
+    #if not, cannot kill
+    
+    vm_dir = File.join Setting.vm_root, vm_name
+    host_uuid_fn = File.join vm_dir, "host.uuid"
+    
+    vm_daemon_pid_fn = File.join vm_dir, "vm_daemon.pid"
+    vm_daemon_pid = nil
+    host_uuid = nil
+    begin
+      host_uuid = File.read host_uuid_fn
+    rescue
+    end
+
+    if host_uuid and host_uuid == WORKER_UUID
+      
+      begin
+        vm_daemon_pid = File.read vm_daemon_pid_fn
+      rescue
+      end
+      if vm_daemon_pid
+        Process.kill 9, vm_daemon_pid
+      end
+    else
+      #host_uuid = nil
+      #this should be nutralized by cleaner!
+    end
+  end
+
 
   def Vmachine.check_vm_daemon vm_name
     vm_dir = File.join Setting.vm_root, vm_name

@@ -17,14 +17,13 @@ COMMON_CONF = common_conf
 HYPERVISOR = COMMON_CONF["hypervisor"]
 STORAGE_TYPE = COMMON_CONF["storage_type"]
 
-
 #unused in current version
 #0.31
 MIGRATION_TIMEOUT_HANDSHAKE=5
 # 5min timeout for handshake
 MIGRATION_TIMEOUT_PROCEEDING=-1
+libvirt_connection = nil
 #
-
 
 
 ###################################INIT##############################################
@@ -61,15 +60,19 @@ end
 
 
 def libvirt_connect_local
-  case HYPERVISOR
-  when "xen"
-    return Libvirt::open("xen:///")
-  when "kvm"
-    return Libvirt::open("qemu:///system")
-  else
-    raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
+  if libvirt_connection == nil
+    case HYPERVISOR
+    when "xen"
+      libvirt_connection = Libvirt::open("xen:///")
+    when "kvm"
+      libvirt_connection = Libvirt::open("qemu:///system")
+    else
+      raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
+    end
   end
+  return libvirt_connection
 end
+
 
 def write_log message
   File.open("log", "a") do |f|
@@ -513,6 +516,19 @@ def do_prepare rails_root, storage_server, vm_dir
   end
 end
 
+def do_restart vm_dir
+  # restart
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  vm_uuid = xml_desc["uuid"][0]
+  virt_conn = libvirt_connect_local
+  dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
+
+  if dom.info.state == LIBVIRT_NOT_RUNNING
+    write_log "restarting vmachine #{vm_uuid}"
+    dom.create
+  end
+
+end
 
 def do_save storage_server, vm_dir
   begin
@@ -784,28 +800,34 @@ def do_action action
   rails_root = RAILS_ROOT
   storage_server = STORAGE_SERVER
   vm_dir = VM_DIR
-
-  case action
-  when "prepare"
-    write_log "vm_daemon_helper action: prepare"
-    do_prepare rails_root, storage_server, vm_dir
-  when "receive"
-    write_log "vm_daemon_helper action: receive"
-    do_receive storage_server, vm_dir
-  when "migrate"
-    write_log "vm_daemon_helper action: migrate"
-    do_migrate
-  when "poll"
-  #  write_log "vm_daemon_helper action: poll"
-    do_poll storage_server, vm_dir
-  when "save"
-    write_log "vm_daemon_helper action: save"
-    do_save storage_server, vm_dir
-  when "cleanup", "destroy"
-    write_log "vm_daemon_helper action: #{action}"
-    do_cleanup storage_server, vm_dir
-  else
-    write_log "error: action '#{action}' not understood!"
+  begin
+    case action
+    when "prepare"
+      write_log "vm_daemon action: prepare"
+      do_prepare rails_root, storage_server, vm_dir
+    when "receive"
+      write_log "vm_daemon action: receive"
+      do_receive storage_server, vm_dir
+    when "migrate"
+      write_log "vm_daemon action: migrate"
+      do_migrate
+    when "poll"
+    #  write_log "vm_daemon_helper action: poll"
+      do_poll storage_server, vm_dir
+    when "save"
+      write_log "vm_daemon action: save"
+      do_save storage_server, vm_dir
+    when "cleanup", "destroy"
+      write_log "vm_daemon action: #{action}"
+      do_cleanup storage_server, vm_dir
+    when "restart"
+      write_log "vm_daemon action: restart"
+      do_restart vm_dir
+    else
+      write_log "error: action '#{action}' not understood!"
+    end
+  rescue => e
+    write_log "vm_daemon error: #{e.to_s}"
   end
 end
 

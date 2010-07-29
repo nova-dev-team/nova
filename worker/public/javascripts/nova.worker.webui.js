@@ -253,6 +253,10 @@ function vm_ajax2(url, name) {
   });
 }
 
+function restart_vmachine(name) {
+  vm_ajax2("/vmachines/restart.json", name);
+}
+
 function destroy_vmachine(name) {
   if (confirm("Are you sure to destroy vmachine named '" + name + "'?")) {
     vm_ajax2("/vmachines/destroy.json", name);
