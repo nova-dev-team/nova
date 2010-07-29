@@ -22,7 +22,8 @@ STORAGE_TYPE = COMMON_CONF["storage_type"]
 MIGRATION_TIMEOUT_HANDSHAKE=5
 # 5min timeout for handshake
 MIGRATION_TIMEOUT_PROCEEDING=-1
-libvirt_connection = nil
+
+$libvirt_connection = nil
 #
 
 
@@ -57,20 +58,18 @@ end
 ###################################END OF INIT##########################################
 
 
-
-
 def libvirt_connect_local
-  if libvirt_connection == nil
+  if $libvirt_connection == nil
     case HYPERVISOR
     when "xen"
-      libvirt_connection = Libvirt::open("xen:///")
+      $libvirt_connection = Libvirt::open("xen:///")
     when "kvm"
-      libvirt_connection = Libvirt::open("qemu:///system")
+      $libvirt_connection = Libvirt::open("qemu:///system")
     else
-      raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
+      raise "vm_daemon: unsupported hypervisor: #{HYPERVISOR}."
     end
   end
-  return libvirt_connection
+  return $libvirt_connection
 end
 
 
@@ -812,7 +811,7 @@ def do_action action
       write_log "vm_daemon action: migrate"
       do_migrate
     when "poll"
-    #  write_log "vm_daemon_helper action: poll"
+      #write_log "vm_daemon_helper action: poll"
       do_poll storage_server, vm_dir
     when "save"
       write_log "vm_daemon action: save"
@@ -893,8 +892,12 @@ while true
 
   begin
     virt_conn = libvirt_connect_local
+    
     dom = nil
-    begin dom = virt_conn.lookup_domain_by_name(VM_NAME) rescue nil end
+    begin 
+      dom = virt_conn.lookup_domain_by_name(VM_NAME) 
+    rescue 
+    end
 
     if dom
       action = get_action
