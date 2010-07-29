@@ -28,11 +28,11 @@ This feature is still under development. We are using the <a href='http://code.g
       CPU.push([time, tmp]);    
     <% end-%>
     $.plot($("#CPU_holder_<%= pm.id %>"), [
-     {
-       data: CPU,
-       lines: { show: true }
-     }
-    ]);   
+      { label: "CPU", data: CPU}
+    ],{
+        lines: {show: true}
+      }
+    );
     
                   
   });
@@ -56,15 +56,13 @@ This feature is still under development. We are using the <a href='http://code.g
       
     <% end-%>
     $.plot($("#memory_holder_<%= pm.id %>"), [
-     {
-       data: memTotal,
-       lines: { show: true }
-     },
-     {
-       data: memFree,
-       lines: { show: true }
-     }
-    ]);                    
+      { label: "Total Memory", data: memTotal},
+      { label: "Free Memory",  data: memFree}    
+    ],{
+        series: {
+          lines: {show: true}
+        }
+    });
   });
   </script>
 
@@ -86,15 +84,13 @@ This feature is still under development. We are using the <a href='http://code.g
       
     <% end-%>
     $.plot($("#network_holder_<%= pm.id %>"), [
-     {
-       data: Rece,
-       lines: { show: true }
-     },
-     {
-       data: Tran,
-       lines: { show: true }
-     }
-    ]);                    
+      { label: "Network Recevie", data: Rece},
+      { label: "Network Transfer", data: Tran}
+    ],{
+        series: {
+          lines: { show: true }
+        } 
+    });   
   });
   </script>
 
@@ -116,15 +112,13 @@ This feature is still under development. We are using the <a href='http://code.g
       
     <% end-%>
     $.plot($("#disk_holder_<%= pm.id %>"), [
-     {
-       data: dSize,
-       lines: { show: true }
-     },
-     {
-       data: dAvail,
-       lines: { show: true }
-     }
-    ]);                    
+      { label: "Disk Size", data: dSize },
+      { label: "Disk Available", data: dAvail }
+    ],{
+        series: {
+          lines: { show: true }
+        }
+    });
   });
   </script>
 <% end-%>
