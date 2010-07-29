@@ -5,6 +5,7 @@ require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
 require 'ceil_iso_generator'
+require 'yaml'
 require 'utils'
 require 'uri'
 
@@ -158,8 +159,6 @@ LFTP_SCRIPT_FILE
       FileUtils.rm_f lftp_script_file
       write_log "removed generated lftp download script"
 
-      # TODO use lftp log to detect whether download succeeded
-
       FileUtils.rm_f base_image_copying_lock
       write_log "removed copying lock"
 
@@ -209,7 +208,6 @@ def prepare_iso_image storage_server, image_pool_dir, vm_dir, iso_name
       File.open(base_image_copying_lock, "w") {|f|}
       write_log "created copying lock"
 
-      # TODO use lftp.log to detect whether download succeeded
       lftp_script_file = File.join image_pool_dir, "#{iso_name}.lftp"
       File.open(lftp_script_file, "w") do |f|
         f.write <<LFTP_SCRIPT_FILE
@@ -228,8 +226,6 @@ LFTP_SCRIPT_FILE
 
       FileUtils.rm_f lftp_script_file
       write_log "removed generated lftp download script"
-
-      # TODO use lftp log to detect whether download succeeded
 
       FileUtils.rm_f base_image_copying_lock
       write_log "removed copying lock"
@@ -361,8 +357,6 @@ def do_prepare rails_root, storage_server, vm_dir
 
   write_log "image has been prepared"
 
-  # TODO check if download success
-
   if File.exists? "agent_packages" or File.exists? "nodelist"
     write_log "preparing required packages"
 
@@ -424,12 +418,19 @@ def do_prepare rails_root, storage_server, vm_dir
       write_log "config_cluster: #{node_name}, #{cluster_name}"
       igen.config_cluster(node_name, cluster_name)
 
-      # set user name, password, etc. and read server info from "storage_server" variable
-      server_uri = URI::parse storage_server
-      server_user_pwd_host = "#{server_uri.user}:#{server_uri.password}@#{server_uri.host}"
-      igen.config_package_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
-      # set key server
-      igen.config_key_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
+      conf = YAML.dump File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+      if conf["storage_type"] == "ftp"
+        # set user name, password, etc. and read server info from "storage_server" variable
+        server_uri = URI::parse storage_server
+        server_user_pwd_host = "#{server_uri.user}:#{server_uri.password}@#{server_uri.host}"
+        igen.config_package_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
+        # set key server
+        igen.config_key_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
+      elsif conf["storage_type"] == "nfs"
+        # write dummy config
+        igen.config_package_server("", "", "")
+        igen.config_key_server("", "", "")
+      end
 
       igen.config_nodelist(File.read "nodelist")
 
@@ -452,10 +453,11 @@ def do_prepare rails_root, storage_server, vm_dir
       end
     rescue Exception => e
       write_log "Exception: #{e.to_s}"
+      e.backtrace.each do |bktrace|
+        write_log "Backtrace: #{bktrace}"
+      end
     end
   end
-
-  # TODO boot vm, handle failure if necessary
 
   write_log "starting vmachine"
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
