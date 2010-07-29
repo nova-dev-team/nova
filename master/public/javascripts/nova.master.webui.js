@@ -11,6 +11,161 @@ function do_message(type, title, msg) {
 }
 
 //
+// "Monitor" page
+//
+function load_all_monitor() {
+  $("#all_monitor_holder").block();
+  $.ajax({
+    url: "/perf_log/list_pm",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        var html = "";
+        html += "<table width='100%'>";
+
+        for (i = 0; i < result.data.length; i++) {
+          var dat = result.data[i];
+          html += "<tr class='row_type_0'><td>";
+          html += dat.ip + " <font color='gray'>(" + dat.hostname + ", id:" + dat.id + ")</font> ";
+          html += "status:";
+          if (dat.status == "failure") {
+            html += "<font color='red'>failure</font> ";
+          } else {
+            html += dat.status + " ";
+          }
+          html += "capacity:" + dat.vm_capacity;
+          html += " <a href='#' onclick='load_monitor(\"" + dat.ip + "\", " + dat.id + ")'>Refresh</a>";
+          html += "</td></tr>";
+
+          html += "<tr class='row_type_1'><td>";
+          html += "<div id='monitor_holder_" + dat.id + "'></div>"
+          html += "</td></tr>";
+        }
+
+        html += "</table>"
+        $("#all_monitor_holder").html(html);
+
+        for (i = 0; i < result.data.length; i++) {
+          var pm = result.data[i];
+          load_monitor(pm.ip, pm.id);
+        }
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#all_monitor_holder").unblock();
+    },
+    error: function() {
+      $("#all_monitor_holder").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function load_monitor(ip, pm_id) {
+  $("#monitor_holder_" + pm_id).block();
+  $.ajax({
+    url: "/perf_log/show",
+    type: "GET",
+    dataType: "json",
+//    async: false,
+    data: {
+      pm_ip: ip
+    },
+    success: function(result) {
+      if (result.success) {
+        var html = "";
+        html += "<center><table><tr><td>";
+        html += "<div id='CPU_holder_" + pm_id + "' style='width:240px;height:150px;'></div>";
+        html += "</td><td>";
+        html += "<div id='memory_holder_" + pm_id + "' style='width:240px;height:150px;'></div>";
+        html += "</td><td>";
+        html += "<div id='network_holder_" + pm_id + "' style='width:240px;height:150px;'></div>";
+        html += "</td><td>";
+        html += "<div id='disk_holder_" + pm_id + "' style='width:240px;height:150px;'></div>";
+        html += "</td></tr></table></center>";
+
+        $("#monitor_holder_" + pm_id).html(html);
+
+        var CPU = [], memTotal = [], memFree = [], Rece = [], Tran = [], dSize = [], dAvail = [];
+        for (i = 0; i < result.data.length; i++) {
+          var perf = result.data[i];
+          var tm = parseInt(perf.time);
+          CPU.push([tm, parseFloat(perf.CPU)]);
+          memTotal.push([tm, parseInt(perf.memTotal)]);
+          memFree.push([tm, parseInt(perf.memFree)]);
+          Rece.push([tm, parseFloat(perf.Rece)]);
+          Tran.push([tm, parseFloat(perf.Tran)]);
+          dAvail.push([tm, parseInt(perf.dAvail)]);
+          dSize.push([tm, parseInt(perf.dSize)]);
+        }
+        $.plot(
+          $("#CPU_holder_" + pm_id), [
+            { label: "CPU", data: CPU}
+          ],{
+            series: {
+              lines: {show:true}
+            },
+            xaxis: {
+              mode: "time", timeformat: "%H:%M"
+            }
+          }
+        );
+        $.plot(
+          $("#memory_holder_" + pm_id), [
+            { label: "Total Memory", data: memTotal},
+            { label: "Free Memory", data: memFree}
+          ],{
+            series: {
+              lines: {show:true}
+            },
+            xaxis: {
+              mode: "time", timeformat: "%H:%M"
+            }
+          }
+        );
+        $.plot(
+          $("#network_holder_" + pm_id), [
+            { label: "Network Receive", data: Rece},
+            { label: "Network Transfer", data: Tran}
+          ],{
+            series: {
+              lines: {show:true}
+            },
+            xaxis: {
+              mode: "time", timeformat: "%H:%M"
+            }
+          }
+        );
+        $.plot(
+          $("#disk_holder_" + pm_id), [
+            { label: "Disk Size", data: dSize},
+            { label: "Disk Available", data: dAvail}
+          ],{
+            series: {
+              lines: {show:true}
+            },
+            xaxis: {
+              mode: "time", timeformat: "%H:%M"
+            }
+          }
+        );
+
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#monitor_holder_" + pm_id).unblock();
+    },
+    error: function() {
+      $("#monitor_holder_" + pm_id).unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+
+//
 // "Migration" page
 //
 function load_migration_view() {
