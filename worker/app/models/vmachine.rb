@@ -51,9 +51,13 @@ class Vmachine < ActiveRecord::Base
   #
   # Since::   0.3
   def Vmachine.all_domains
+    vm_root = Setting.vm_root
     virt_conn = Vmachine.virt_conn
     all_domains = []
 
+    # no longer searching all dirs in the vm_root
+    # this will cause heavy burden to NFS server when lots of worker is running
+=begin
     Dir.foreach(Setting.vm_root) do |vm_entry|
       vm_dir_path = File.join Setting.vm_root, vm_entry
       next if vm_entry.start_with? "."
@@ -64,6 +68,38 @@ class Vmachine < ActiveRecord::Base
       rescue
         # when the VM is being prepared, or being saved, it will not be found by lookup_domain_by_name
         # in this case, we just ignore it
+      end
+    end
+=end
+    # steps:
+    # active list = virt_conn.list_domains, this returns id list, 0 is the dom-0(host OS)
+    # inactive list = virt_conn.list_defined_domains, this returns name-list
+    # handle 2 lists above, if vm_dir exists, add it into all_domains
+    active_list = virt_conn.list_domains
+    inactive_list = virt_conn.list_defined_domains
+    active_list.each do |vm_id|
+      if vm_id != 0 #ignore dom-0
+        begin
+          dom = virt_conn.lookup_domain_by_id(vm_id)
+          vm_dir_path = File.join vm_root, dom.name
+          if File.directory? vm_dir_path #TODO simple statement, checking xml file in the vm_dir_path and compare vm.uuid to dom.uuid is better
+            all_domains << dom
+          end
+        rescue
+          #do nothing
+        end        
+      end
+    end
+
+    inactive_list.each do |vm_name|
+      begin
+        dom = virt_conn.lookup_domain_by_name(vm_id)
+        vm_dir_path = File.join vm_root, dom.name
+        if File.directory? vm_dir_path
+          all_domains << dom
+        end
+      rescue
+
       end
     end
 
