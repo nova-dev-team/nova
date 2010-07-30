@@ -719,7 +719,36 @@ def do_poll storage_server, vm_dir
   end
 end
 
+def do_resume vm_dir
+  #suspend the vm running in vm_dir
+  Dir.chdir vm_dir
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  uuid = xml_desc["uuid"][0]
+  
+  virt_conn = libvirt_connect_local
+  begin
+    dom = virt_conn.lookup_domain_by_uuid(uuid)
+    dom.resume
+  rescue => e
+    write_log "error while resuming vmachine #{uuid}, message: #{e.to_s}" 
+  end
+end
 
+
+def do_suspend vm_dir
+  #suspend the vm running in vm_dir
+  Dir.chdir vm_dir
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  uuid = xml_desc["uuid"][0]
+  
+  virt_conn = libvirt_connect_local
+  begin
+    dom = virt_conn.lookup_domain_by_uuid(uuid)
+    dom.suspend
+  rescue => e
+    write_log "error while suspending vmachine #{uuid}, message: #{e.to_s}" 
+  end
+end
 
 def do_cleanup storage_server, vm_dir
   write_log "doing cleanup work"
@@ -822,6 +851,12 @@ def do_action action
     when "restart"
       write_log "vm_daemon action: restart"
       do_restart vm_dir
+    when "suspend"
+      write_log "vm_daemon action: suspend"
+      do_suspend vm_dir
+    when "resume"
+      write_log "vm_daemon action: resume"
+      do_resume vm_dir
     else
       write_log "error: action '#{action}' not understood!"
     end

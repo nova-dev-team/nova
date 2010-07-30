@@ -3615,3 +3615,5 @@
 [Fri Jul 30 00:12:15 +0800 2010] undefined local variable or method `libvirt_connection' for main:Object
 [Fri Jul 30 00:13:19 +0800 2010] undefined local variable or method `libvirt_connection' for main:Object
 [Fri Jul 30 00:13:22 +0800 2010] undefined local variable or method `libvirt_connection' for main:Object
+[Fri Jul 30 21:58:37 +0800 2010] cannot rewrite host.uuid file!!
+[Fri Jul 30 22:25:46 +0800 2010] cannot rewrite host.uuid file!!
