@@ -1222,11 +1222,11 @@ function load_cluster_content(cluster_name) {
           } else if (m_info["status"] == "start-preparing") {
             html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Cancel start</span></span></button>";
           } else if (m_info["status"] == "running") {
-            html += "<button type='button' class='btn' onclick='suspend_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Suspend</span></span></button>";
+            html += "<button type='button' class='btn' onclick='suspend_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"" + m_info["name"] + "\")'><span><span>Suspend</span></span></button>";
             html += white_spacing(4);
             html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
           } else if (m_info["status"] == "suspended") {
-            html += "<button type='button' class='btn' onclick='resume_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Suspend</span></span></button>";
+            html += "<button type='button' class='btn' onclick='resume_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"" + m_info["name"] + "\")'><span><span>Resume</span></span></button>";
             html += white_spacing(4);
             html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
           } else if (m_info["status"] == "boot-failure") {
@@ -1278,8 +1278,14 @@ function start_vm(cluster_name, uuid) {
   vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid});
 }
 
-function suspend_vm(cluster_name, uuid) {
+function suspend_vm(cluster_name, uuid, vm_name) {
   vm_ajax(cluster_name, "/vmachines/suspend.json", {uuid: uuid});
+  do_message("success", "Suspending " + vm_name, "It will take a few seconds, reload the page to see results.");
+}
+
+function resume_vm(cluster_name, uuid, vm_name) {
+  vm_ajax(cluster_name, "/vmachines/resume.json", {uuid: uuid});
+  do_message("success", "Resuming " + vm_name, "It will take a few seconds, reload the page to see results.");
 }
 
 function edit_vm_setting(cluster_name, uuid, item, old_value) {
