@@ -1215,7 +1215,6 @@ function load_cluster_content(cluster_name) {
           html += "Software list: <b>" + m_info["soft_list"] + "</b><br/>";
           html += "Status: <b>" + m_info["status"] + "</b>" + tmp_spacing + "Actions: ";
 
-          // TODO add actions for different status
           if (m_info["status"] == "shut-off") {
             html += "<button type='button' class='btn' onclick='start_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Start</span></span></button>";
           } else if (m_info["status"] == "start-pending") {
@@ -1223,11 +1222,14 @@ function load_cluster_content(cluster_name) {
           } else if (m_info["status"] == "start-preparing") {
             html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Cancel start</span></span></button>";
           } else if (m_info["status"] == "running") {
-            // TODO
+            html += "<button type='button' class='btn' onclick='suspend_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Suspend</span></span></button>";
+            html += white_spacing(4);
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
           } else if (m_info["status"] == "suspended") {
-            // TODO
+            html += "<button type='button' class='btn' onclick='resume_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Suspend</span></span></button>";
+            html += white_spacing(4);
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
           } else if (m_info["status"] == "boot-failure") {
-            // TODO
             html += "<button type='button' class='btn' onclick='clear_error_of_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Clear error</span></span></button>";
           }
           html += "</td></tr>";
@@ -1274,6 +1276,10 @@ function shut_off_vm(cluster_name, uuid) {
 
 function start_vm(cluster_name, uuid) {
   vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid});
+}
+
+function suspend_vm(cluster_name, uuid) {
+  vm_ajax(cluster_name, "/vmachines/suspend.json", {uuid: uuid});
 }
 
 function edit_vm_setting(cluster_name, uuid, item, old_value) {

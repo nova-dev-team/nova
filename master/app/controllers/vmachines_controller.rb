@@ -75,6 +75,44 @@ class VmachinesController < ApplicationController
     end
   end
 
+  # Suspend the VM, this is a blocking call
+  #
+  # Since::   0.3
+  def suspend
+    vm = load_vm
+    return if vm == nil
+    wp = vm.pmachine.worker_proxy
+    if wp.status == "failure"
+      reply_failure "Failed to connect to worker machine!"
+    else
+      rep = wp.suspend_vm vm.uuid
+      if rep["success"] == true
+        reply_success rep["message"]
+      else
+        reply_failure rep["message"]
+      end
+    end
+  end
+
+  # Resume the suspended VMs, this is a blocking call
+  #
+  # Since::   0.3
+  def resume
+    vm = load_vm
+    return if vm == nil
+    wp = vm.pmachine.worker_proxy
+    if wp.status == "failure"
+      reply_failure "Failed to connect to worker machine!"
+    else
+      rep = wp.resume_vm vm.name
+      if rep["success"] == true
+        reply_success rep["message"]
+      else
+        reply_failure rep["message"]
+      end
+    end
+  end
+
   # remove the error messages for the VM.
   #
   # Since::   0.3

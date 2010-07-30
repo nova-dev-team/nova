@@ -258,7 +258,7 @@ while($running) do
   Vmachine.find(:all, :conditions =>'status = "shutdown-pending"').each do |vm|
     write_log "Shutting down vm '#{vm.name}'"
     wp = vm.pmachine.worker_proxy
-    wp.destroy_vm vm.uuid
+    wp.destroy_vm vm.name
     vm.status = "shut-off"
     vm.pmachine.vmachines.delete vm
     vm.pmachine = nil
