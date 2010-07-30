@@ -7,12 +7,13 @@ require 'utils'
 
 SCAN_INTERVAL = 60 #every 60 min
 if ARGV.length < 2
-  puts "usage: vm_dir_cleaner <rails_root> <vm_root>"
+  puts "usage: vm_dir_cleaner <rails_root> <run_root>"
   exit 1
 end
 
 RAILS_ROOT = ARGV[0]
-VM_ROOT = ARGV[1]
+RUN_ROOT = ARGV[1]
+VM_ROOT = File.join(RUN_ROOT, "vm")
 
 WORKER_UUID = File.read(File.join(RAILS_ROOT, "config", "worker.uuid"))
 LOGFILE = File.join(RAILS_ROOT, "log", "vm_dir_cleaner.log")
