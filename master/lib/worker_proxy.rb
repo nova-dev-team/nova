@@ -40,7 +40,7 @@ class WorkerProxy
   # The timeout to worker modules.
   #
   # Since::   0.3
-  WORKER_PROXY_TIMEOUT = 10
+  WORKER_PROXY_TIMEOUT = 30
 
   # The status of the proxy.
   # Could be:
@@ -158,22 +158,22 @@ AGENT_HINT
   # Returns raw result. On error return nil.
   #
   # Since::   0.3
-  def suspend_vm uuid
-    get_request "vmachines/suspend/#{uuid}.json"
+  def suspend_vm name
+    post_request "vmachines/suspend.json", :name => name
   end
 
   # Resume a suspended vm.
   #
   # Since::   0.3
-  def resume_vm uuid
-    get_request "vmachines/resume/#{uuid}.json"
+  def resume_vm name
+    post_request "vmachines/resume.json", :name => name
   end
 
   # Destroy a running vm.
   #
   # Since::   0.3
-  def destroy_vm uuid
-    get_request "vmachines/destroy/#{uuid}.json"
+  def destroy_vm name
+    post_request "vmachines/destroy.json", :name => name
   end
 
   # Get the hostname of target machine.

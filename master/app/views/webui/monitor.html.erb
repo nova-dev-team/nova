@@ -6,145 +6,20 @@
 <% end %>
 
 <% content_for :page do %>
-<p/>
+  <p/>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  load_all_monitor();
+});
+</script>
+
+<a href='#' onclick="load_all_monitor()">Reload All</a>
 
 <center>
-This feature is still under development. We are using the <a href='http://code.google.com/p/flot'>flot</a> library to plot the charts.<p/>
-
-<% time_now = Time.now %>
-<% time_offset = 3600 %>
-<% time_str = (time_now - time_offset).strftime("%Y%m%d%H%M%S") %>
-<% Pmachine.all.each do |pm| %>  
-  CPU_holder_<%= pm.id %>
-  <div id="CPU_holder_<%= pm.id %>" style="width:400px;height:150px;"></div>
-  <script type="text/javascript">
-  $(function() {
-    <% logs = PerfLog.find(:all, :conditions => ["pmachine_id = ? and time > ?", pm.id, time_str] ) %>
-    var CPU = [];
-    <% logs.each do |log| %>
-      
-      <% time_s = log["time"].delete("-") %>
-      var time = <%= Time.mktime(time_s.slice(0,4).to_i, time_s.slice(4,2).to_i,time_s.slice(6,2).to_i, time_s.slice(8,2).to_i, time_s.slice(10,2).to_i, time_s.slice(12,2).to_i) - Time.at(0) %>;
-      time = time * 1000;      
-      var tmp = <%= log["CPU"].gsub(/[^0-9\.]/, "").to_f %>;
-      CPU.push([time, tmp]);    
-    <% end-%>
-    $.plot($("#CPU_holder_<%= pm.id %>"), [
-      { label: "CPU", data: CPU}
-    ],{
-        series: {
-          lines: {show: true}
-        },
-        xaxis: {
-          mode: "time", timeformat: "%M:%S"
-        }
-      }
-    );
-    
-                  
-  });
-  </script>
-  
-  memory_holder_<%= pm.id %>
-  <div id="memory_holder_<%= pm.id %>" style="width:400px;height:150px;"></div>
-  <script type="text/javascript">
-  $(function() {
-    var memTotal = [];
-    var memFree = [];
-    <% logs = PerfLog.find(:all, :conditions => ["pmachine_id = ? and time > ?", pm.id, time_str] ) %>
-    <% logs.each do |log| %>
-      <% time_s = log["time"].delete("-") %>
-      var time = <%= Time.mktime(time_s.slice(0,4).to_i, time_s.slice(4,2).to_i,time_s.slice(6,2).to_i, time_s.slice(8,2).to_i, time_s.slice(10,2).to_i, time_s.slice(12,2).to_i) - Time.at(0) %>;
-      time = time * 1000;      
-      
-      tmp = <%= log["memTotal"].gsub(/[^0-9\.]/, "").to_f %>;
-      memTotal.push([time, tmp]);
-      
-      tmp = <%= log["memFree"].gsub(/[^0-9\.]/, "").to_f %>;
-      memFree.push([time, tmp]);
-      
-    <% end-%>
-    $.plot($("#memory_holder_<%= pm.id %>"), [
-      { label: "Total Memory", data: memTotal},
-      { label: "Free Memory",  data: memFree}    
-    ],{
-        series: {
-          lines: {show: true}
-        },
-        xaxis: {
-          mode: "time", timeformat: "%M:%S"
-        }
-    });
-  });
-  </script>
-
-  network_holder_<%= pm.id %>
-  <div id="network_holder_<%= pm.id %>" style="width:400px;height:150px;"></div>
-  <script type="text/javascript">
-  $(function() {
-    var Rece = [];
-    var Tran = [];
-    <% logs = PerfLog.find(:all, :conditions => ["pmachine_id = ? and time > ?", pm.id, time_str] ) %>
-    <% logs.each do |log| %>
-      <% time_s = log["time"].delete("-") %>
-      var time = <%= Time.mktime(time_s.slice(0,4).to_i, time_s.slice(4,2).to_i,time_s.slice(6,2).to_i, time_s.slice(8,2).to_i, time_s.slice(10,2).to_i, time_s.slice(12,2).to_i) - Time.at(0) %>;
-      time = time * 1000;      
-      
-      tmp = <%= log["Rece"].gsub(/[^0-9\.]/, "").to_f %>;
-      Rece.push([time, tmp]);
-      
-      tmp = <%= log["Tran"].gsub(/[^0-9\.]/, "").to_f %>;
-      Tran.push([time, tmp]);
-      
-    <% end-%>
-    $.plot($("#network_holder_<%= pm.id %>"), [
-      { label: "Network Recevie", data: Rece},
-      { label: "Network Transfer", data: Tran}
-    ],{
-        series: {
-          lines: { show: true }
-        },
-        xaxis: {
-          mode: "time", timeformat: "%M:%S"
-        } 
-    });   
-  });
-  </script>
-
-  disk_holder <%= pm.id %>
-  <div id="disk_holder_<%= pm.id %>" style="width:400px;height:150px;"></div>
-  <script type="text/javascript">
-  $(function() {
-    var dSize = [];
-    var dAvail = [];
-    <% logs = PerfLog.find(:all, :conditions => ["pmachine_id = ? and time > ?", pm.id, time_str] ) %>
-    <% logs.each do |log| %>
-      <% time_s = log["time"].delete("-") %>
-      var time = <%= Time.mktime(time_s.slice(0,4).to_i, time_s.slice(4,2).to_i,time_s.slice(6,2).to_i, time_s.slice(8,2).to_i, time_s.slice(10,2).to_i, time_s.slice(12,2).to_i) - Time.at(0) %>;
-      time = time * 1000;      
-      
-      tmp = <%= log["dSize"].gsub(/[^0-9\.]/, "").to_f %>;
-      dSize.push([time, tmp]);
-      
-      tmp = <%= log["dAvail"].gsub(/[^0-9\.]/, "").to_f %>;
-      dAvail.push([time, tmp]);
-      
-    <% end-%>
-    $.plot($("#disk_holder_<%= pm.id %>"), [
-      { label: "Disk Size", data: dSize },
-      { label: "Disk Available", data: dAvail }
-    ],{
-        series: {
-          lines: { show: true }
-        },
-        xaxis: {
-          mode: "time", timeformat: "%M:%S"
-        }
-    });
-  });
-  </script>
-<% end-%>
+<div id='all_monitor_holder'></div>
 </center>
+
 <p/>
 <% end %>
 

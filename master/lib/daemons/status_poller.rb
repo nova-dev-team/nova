@@ -165,7 +165,7 @@ while($running) do
       reply = JSON.parse raw_reply
       #write_log "Raw reply is: #{raw_reply}"
 
-      # remove VMs that are not runing any more
+      # remove VMs that are not running any more
       pm.vmachines.each do |vm|
         vm_found = false
         reply["data"].each do |real_vm|
@@ -258,7 +258,7 @@ while($running) do
   Vmachine.find(:all, :conditions =>'status = "shutdown-pending"').each do |vm|
     write_log "Shutting down vm '#{vm.name}'"
     wp = vm.pmachine.worker_proxy
-    wp.destroy_vm vm.uuid
+    wp.destroy_vm vm.name
     vm.status = "shut-off"
     vm.pmachine.vmachines.delete vm
     vm.pmachine = nil
