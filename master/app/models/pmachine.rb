@@ -59,7 +59,7 @@ class Pmachine < ActiveRecord::Base
       sched_pm.save
       vm.save
       logger.info "[pm.info] starting the VM #{vm.name}"
-      nodelist = (vm.vcluster.vmachines.collect {|vm| "#{vm.ip} #{vm.hostname}"}).join ","
+      nodelist = (vm.vcluster.vmachines.collect {|v| "#{v.ip} #{v.hostname}"}).join ","
       logger.info "[pm.info] node list is: #{nodelist}"
 
       # start vm
