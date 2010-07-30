@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require 'rubygems'
+require 'posixlock'
 require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
@@ -46,7 +47,7 @@ pid = Process.pid
 pid_fn = File.join(VM_DIR, 'vm_daemon.pid')
 pid_file = File.new(pid_fn, "w+")
 
-locked = pid_file.flock(File::LOCK_EX | File::LOCK_NB)
+locked = pid_file.posixlock(File::LOCK_EX | File::LOCK_NB)
 if locked
   pid_file.write pid
   pid_file.flush
@@ -939,6 +940,8 @@ while true
       do_action action
     else
       do_action "cleanup"
+      pid_file.posixlock(File::LOCK_NB | File::LOCK_UN)
+      pid_file.close
       exit 0
     end
   rescue => e
