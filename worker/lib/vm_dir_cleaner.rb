@@ -4,6 +4,7 @@ require 'rubygems'
 require 'libvirt'
 require 'fileutils'
 require 'utils'
+require 'xmlsimple'
 
 SCAN_INTERVAL = 60 #every 60 min
 if ARGV.length < 2
@@ -62,7 +63,7 @@ while true
       host_uuid_fn = File.join vm_dir_path, "host.uuid"
       next if vm_entry.start_with? "."
       next unless File.directory? vm_dir_path
-      
+ 
       host_uuid = nil
       begin
         host_uuid = File.read(host_uuid_fn)
@@ -74,7 +75,7 @@ while true
         if host_uuid == WORKER_UUID
           uuid = nil
           begin
-            xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+            xml_desc = XmlSimple.xml_in(File.read(vm_xml_fn))
             uuid = xml_desc["uuid"][0]
           rescue
             uuid = nil
