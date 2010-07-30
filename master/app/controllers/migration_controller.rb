@@ -14,7 +14,8 @@ class MigrationController < ApplicationController
     reply_data = []
     Pmachine.all.each do |pm|
       pm_data = {
-        :ip => pm.ip, :hostname => pm.hostname, :vm_capacity => pm.vm_capacity
+        :ip => pm.ip, :hostname => pm.hostname, :vm_capacity => pm.vm_capacity,
+        :status => pm.status
       }
       vm_all_data = []
       pm.vmachines.each do |vm|

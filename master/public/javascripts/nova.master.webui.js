@@ -179,7 +179,7 @@ function load_migration_view() {
     success: function(result) {
       if (result.success) {
         var html = "";
-        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Vmachines</td></tr>";
+        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Status</td><td>Vmachines</td></tr>";
         
         for (i = 0; i < result.data.length; i++) {
           var pm_data = result.data[i];
@@ -189,8 +189,15 @@ function load_migration_view() {
           html += "</td><td>";
           html += pm_data.vm_capacity;
           html += "</td><td>";
-          for (j = 0; j < pm_data.vmachines; j++) {
-            html += "";
+          if (pm_data.status == "failure") {
+            html += "<font color='red'>failure</font>";
+          } else {
+            html += pm_data.status;
+          }
+          html += "</td><td>";
+          for (j = 0; j < pm_data.vmachines.length; j++) {
+            var vm = pm_data.vmachines[j];
+            html += "<a href='#' onclick='do_migrate_vm(\"" + pm_data.ip + "\", \"" + vm.name + "\")'>" + vm.name + "</a> &nbsp;&nbsp;&nbsp; ";
             // TODO write vmachine info here
           }
           html += "</td></tr>";
@@ -208,6 +215,10 @@ function load_migration_view() {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
+}
+
+function do_migrate_vm(pm_ip, vm_name) {
+  do_message("success", "TODO", "Migrate vm '" + vm_name + "' on " + pm_ip);
 }
 
 //
@@ -252,7 +263,11 @@ function load_overview_info() {
         // storage server
         html += "<h3>Storage server</h3>";
         if (result.data.storage_server_down) {
-          html += "<font color='red'>Storage server is probably down! Please contact 'root' user!</font>";
+          html += "<font color='red'>Storage server is probably down!";
+          if (result.data.privilege != "root") {
+            html += " Please contact 'root' user!";
+          }
+          html += "</font>";
         } else {
           html += "<font color='blue'>Storage server is up and running.</font>"
         }

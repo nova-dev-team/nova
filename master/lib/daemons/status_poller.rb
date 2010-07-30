@@ -165,7 +165,7 @@ while($running) do
       reply = JSON.parse raw_reply
       #write_log "Raw reply is: #{raw_reply}"
 
-      # remove VMs that are not runing any more
+      # remove VMs that are not running any more
       pm.vmachines.each do |vm|
         vm_found = false
         reply["data"].each do |real_vm|
