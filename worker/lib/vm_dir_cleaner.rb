@@ -3,7 +3,7 @@
 require 'rubygems'
 require 'libvirt'
 require 'fileutils'
-require 'utils'
+require "#{File.dirname __FILE__}/utils"
 require 'xmlsimple'
 
 SCAN_INTERVAL = 60 #every 60 min
@@ -42,7 +42,7 @@ end
 
 def cleanup vm_dir, reason
   write_log "removing useless vm_dir #{vm_dir}, because #{reason}"
-  FileUtils.rm_f vm_dir
+  FileUtils.rm_rf vm_dir
 end
 
 
