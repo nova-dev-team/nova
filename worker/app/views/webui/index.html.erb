@@ -140,11 +140,15 @@ vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
 </td>
 <td>
 #{
-vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
-if vnc_port == "-1"
-  vnc_port = "Not allocated"
+begin
+  vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
+  if vnc_port == "-1"
+    vnc_port = "Not allocated"
+  end
+  vnc_port
+rescue
+  "Not allocated"
 end
-vnc_port
 }
 </td>
 <td>
