@@ -93,7 +93,7 @@ class Vmachine < ActiveRecord::Base
 
     inactive_list.each do |vm_name|
       begin
-        dom = virt_conn.lookup_domain_by_name(vm_id)
+        dom = virt_conn.lookup_domain_by_name(vm_name)
         vm_dir_path = File.join vm_root, dom.name
         if File.directory? vm_dir_path
           all_domains << dom
@@ -102,7 +102,6 @@ class Vmachine < ActiveRecord::Base
 
       end
     end
-
     return all_domains
   end
 
