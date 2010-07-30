@@ -85,7 +85,7 @@ class VmachinesController < ApplicationController
     if wp.status == "failure"
       reply_failure "Failed to connect to worker machine!"
     else
-      rep = wp.suspend_vm vm.uuid
+      rep = wp.suspend_vm vm.name
       if rep["success"] == true
         reply_success rep["message"]
       else

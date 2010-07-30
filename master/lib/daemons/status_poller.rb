@@ -56,7 +56,7 @@ def rep_body rep
   end
 end
 
-while($running) do
+def loop_body
   #write_log "daemon woke up"
   # connect pending pmachines
   Pmachine.all.each do |pm|
@@ -202,7 +202,8 @@ while($running) do
           if vm.status == "shutdown-pending"
             # destroy VM if it is pending shut-off
             write_log "VM '#{real_vm["name"]}' is to be shut off"
-            RestClient.post "#{pm.root_url}/vmachines/destroy.json", :uuid => vm.uuid
+            pm.worker_proxy.destroy_vm vm.name
+            
             vm.status = "shut-off"
             vm.pmachine.vmachines.delete vm
             vm.pmachine = nil
@@ -246,7 +247,6 @@ while($running) do
       vm.status = "boot-failure"
       vm.save
       write_log "failed to boot #{vm.name}, mark status as 'boot-failure'"
-      # TODO set up vm info here
     else
       vm.status = "start-preparing"
       vm.save
@@ -257,14 +257,33 @@ while($running) do
   # close VMs.
   Vmachine.find(:all, :conditions =>'status = "shutdown-pending"').each do |vm|
     write_log "Shutting down vm '#{vm.name}'"
-    wp = vm.pmachine.worker_proxy
-    wp.destroy_vm vm.name
-    vm.status = "shut-off"
-    vm.pmachine.vmachines.delete vm
-    vm.pmachine = nil
-    vm.save
+    if vm.pmachine != nil
+      wp = vm.pmachine.worker_proxy
+      wp.destroy_vm vm.name if wp != nil
+      vm.status = "shut-off"
+      vm.pmachine.vmachines.delete vm
+      vm.pmachine.save
+      vm.pmachine = nil
+      vm.save
+    else
+      # pmachine is null, which is very unlikely
+      write_log "Warning: vm '#{vm.name}' does not have a pmachine!"
+      vm.status = "shut-off"
+      vm.save
+    end
   end
 
   sleep 1
 end
 
+
+while($running) do
+  begin
+    loop_body
+  rescue => e
+    write_log "Exception: #{e.to_s}"
+    e.backtrace.each_line do |line|
+      write_log "Backtrace: #{line}"
+    end
+  end
+end
