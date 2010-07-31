@@ -13,3 +13,4 @@ openssl-devel
 libvirt
 libvirt-devel
 sqlite-devel
+readline-devel

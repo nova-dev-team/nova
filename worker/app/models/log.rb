@@ -1,6 +1,6 @@
 class Log < ActiveRecord::Base
 
-  
+
   # get the logs which is written after params[:time] in log file, if you don't give the time we will show all logs
   # params[:path] is the log file path
   # use binary serach to seach the first log to show
@@ -45,7 +45,7 @@ class Log < ActiveRecord::Base
     end
     logs
   end
-  
+
   def Log.binary_search params
     time = params[:time]
     time.insert(8, "-")

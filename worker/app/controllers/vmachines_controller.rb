@@ -72,6 +72,10 @@ public
     action_request "start", params
   end
 
+  def restart
+    action_request "restart", params
+  end
+
   # Destroy a domain.
   #
   # Since::     0.3

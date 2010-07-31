@@ -15,6 +15,8 @@ if ARGV.length == 0
   puts ""
   puts "  git diff commit1..commit2 > my.diff"
   puts "  analyze-git-diff.rb my.diff"
+  puts ""
+  exit 0
 end
 
 dfname = ARGV[0]

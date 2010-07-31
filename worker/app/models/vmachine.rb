@@ -17,6 +17,8 @@ class Vmachine < ActiveRecord::Base
   LIBVIRT_NOT_RUNNING = 5
 
   HYPERVISOR=common_conf["hypervisor"]
+  WORKER_UUID = File.read(File.join(RAILS_ROOT, "config", "worker.uuid"))
+
   # hypervisor used by nova
   # Connection to libvirt.
   #
@@ -49,9 +51,13 @@ class Vmachine < ActiveRecord::Base
   #
   # Since::   0.3
   def Vmachine.all_domains
+    vm_root = Setting.vm_root
     virt_conn = Vmachine.virt_conn
     all_domains = []
 
+    # no longer searching all dirs in the vm_root
+    # this will cause heavy burden to NFS server when lots of worker is running
+=begin
     Dir.foreach(Setting.vm_root) do |vm_entry|
       vm_dir_path = File.join Setting.vm_root, vm_entry
       next if vm_entry.start_with? "."
@@ -64,7 +70,38 @@ class Vmachine < ActiveRecord::Base
         # in this case, we just ignore it
       end
     end
+=end
+    # steps:
+    # active list = virt_conn.list_domains, this returns id list, 0 is the dom-0(host OS)
+    # inactive list = virt_conn.list_defined_domains, this returns name-list
+    # handle 2 lists above, if vm_dir exists, add it into all_domains
+    active_list = virt_conn.list_domains
+    inactive_list = virt_conn.list_defined_domains
+    active_list.each do |vm_id|
+      if vm_id != 0 #ignore dom-0
+        begin
+          dom = virt_conn.lookup_domain_by_id(vm_id)
+          vm_dir_path = File.join vm_root, dom.name
+          if File.directory? vm_dir_path #TODO simple statement, checking xml file in the vm_dir_path and compare vm.uuid to dom.uuid is better
+            all_domains << dom
+          end
+        rescue
+          #do nothing
+        end        
+      end
+    end
 
+    inactive_list.each do |vm_name|
+      begin
+        dom = virt_conn.lookup_domain_by_name(vm_name)
+        vm_dir_path = File.join vm_root, dom.name
+        if File.directory? vm_dir_path
+          all_domains << dom
+        end
+      rescue
+
+      end
+    end
     return all_domains
   end
 
@@ -328,6 +365,16 @@ XML_DESC
   # You must provide either uuid or name of the VM.
   #
   # Since::     0.3
+
+  def Vmachine.restart params
+    vm_name = params[:name]
+    if vm_name and vm_name != ""
+      Vmachine.send_instruction vm_name, "restart"
+    else
+      raise "Please provide a name!"
+    end
+  end
+
   def Vmachine.suspend params
     vm_name = params[:name]
 
@@ -381,10 +428,12 @@ XML_DESC
   #
   # Since::     0.3
 
-  # YO, non-blocking
+  # non-blocking Since 0.31
+
   def Vmachine.destroy params
     vm_name = params[:name]
     if vm_name and vm_name != ""
+      Vmachine.kill_vm_daemon vm_name
       Vmachine.send_instruction vm_name, "destroy"
     else
       raise "Please provide a name!"
@@ -585,7 +634,7 @@ private
           end
         end
       end
-      exec "./vm_daemon #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, vm_name} #{vm_name} #{HYPERVISOR}"
+      exec "./vm_daemon.rb #{RAILS_ROOT} #{File.read "#{RAILS_ROOT}/config/storage_server.conf"} #{File.join Setting.vm_root, vm_name} #{vm_name} #{HYPERVISOR}"
     end
     Process.detach pid  # prevent zombie process
     Vmachine.log vm_name, "vm_daemon started for '#{vm_name}'"
@@ -593,6 +642,37 @@ private
 
   # check whether vm_daemon exists
   # if not, restart it
+
+  def Vmachine.kill_vm_daemon vm_name
+    #check host.uuid == worker.uuid?
+    #if not, cannot kill
+    
+    vm_dir = File.join Setting.vm_root, vm_name
+    host_uuid_fn = File.join vm_dir, "host.uuid"
+    
+    vm_daemon_pid_fn = File.join vm_dir, "vm_daemon.pid"
+    vm_daemon_pid = nil
+    host_uuid = nil
+    begin
+      host_uuid = File.read host_uuid_fn
+    rescue
+    end
+
+    if host_uuid and host_uuid == WORKER_UUID
+      
+      begin
+        vm_daemon_pid = File.read vm_daemon_pid_fn
+      rescue
+      end
+      if vm_daemon_pid
+        my_exec "kill -9 #{vm_daemon_pid}"
+      end
+    else
+      #host_uuid = nil
+      #this should be nutralized by cleaner!
+    end
+  end
+
 
   def Vmachine.check_vm_daemon vm_name
     vm_dir = File.join Setting.vm_root, vm_name

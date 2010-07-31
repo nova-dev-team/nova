@@ -10,7 +10,6 @@ require 'timeout'
 require 'json'
 require 'fileutils'
 require 'yaml'
-require 'utils'
 
 $conf = YAML::load File.read "#{File.dirname __FILE__}/../../common/config/conf.yml"
 if $conf["master_use_swiftiply"]
@@ -21,6 +20,7 @@ end
 
 require File.dirname(__FILE__) + "/../config/environment"
 
+require File.dirname(__FILE__) + '/utils.rb'
 
 # Fetch the body from RestClient reply result.
 #
@@ -143,7 +143,7 @@ class NssProxy
   #
   # Since::   0.3
   def hostname
-    ret = get_request "misc/hostname/json"
+    ret = get_request "misc/hostname.json"
   end
 
   # Register a new vdisk.

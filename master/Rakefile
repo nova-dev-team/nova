@@ -62,9 +62,10 @@ namespace :nova do
       # boot the daemons
       all_daemons "start", rails_env
 
-      # boot the ftp files list updater
-      File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
-        f.write <<LFTP_SCRIPT
+      if conf["storage_type"] == "ftp"
+        # boot the ftp files list updater
+        File.open("#{conf["run_root"]}/ftp_server_files_list_updater_lftp_script", "w") do |f|
+          f.write <<LFTP_SCRIPT
 set net:timeout 10
 set net:max-retries 2
 set net:reconnect-interval-base 1
@@ -76,9 +77,18 @@ cd /agent_packages
 pwd
 ls
 LFTP_SCRIPT
+        my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
+        end
+      elsif conf["storage_type"] == "nfs"
+        # boot the NSS monitor
+        my_exec "#{RAILS_ROOT}/lib/nss_is_run.rb &"
+      else
+        # storage type not known!
+        puts "!!!"
+        puts "!!! Server config error! Unknown storage type #{conf["storage_type"]}!"
+        puts "!!!"
+        exit 1
       end
-
-      my_exec "#{RAILS_ROOT}/lib/ftp_server_files_list_updater #{RAILS_ROOT}/tmp/pids/ftp_server_files_list_updater.pid #{conf["run_root"]}"
 
       if conf["master_use_swiftiply"]
         # use swiftiply

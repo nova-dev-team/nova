@@ -6,86 +6,20 @@
 <% end %>
 
 <% content_for :page do %>
-<p/>
-<center>
-This feature is still under development. We are using the <a href='http://code.google.com/p/flot'>flot</a> library to plot the charts.<p/>
-
-Here is a demo graph:
-
-<div id="chart_container" style="width:600px;height:300px;"></div>
+  <p/>
 
 <script type="text/javascript">
-$(function() {
-  <% Pmachine.all.each do |pm| %>
-    <% logs = PerfLog.find_all_by_pmachine_id(pm.id) %>
-    var CPU = []
-    var memTotal = []
-    var memFree = []
-    var Rece = []
-    var Tran = []
-    var dSize = []
-    var dAvail = []
-    <% logs.each do |log| %>
-      var time = <%= log["time"].delete("-").to_i %>
-      
-      var tmp = <%= log["CPU"].gsub(/[^0-9\.]/, "").to_f %>
-      CPU.push([time, tmp])
-      
-      var tmp = <%= log["memTotal"].gsub(/[^0-9\.]/, "").to_f %>
-      memTotal.put([time, tmp])
-      
-      var tmp = <%= log["memFree"].gsub(/[^0-9\.]/, "").to_f %>
-      memFree.put([time, tmp])
-      
-      var tmp = <%= log["Rece"].gsub(/[^0-9\.]/, "").to_f %>
-      Rece.put([time, tmp])
-      
-      var tmp = <%= log["Tran"].gsub(/[^0-9\.]/, "").to_f %>
-      Tran.put([time, tmp])
-      
-      var tmp = <%= log["dSize"].gsub(/[^0-9\.]/, "").to_f %>
-      dSize.put([time, tmp])
-      
-      var tmp = <%= log["dAvail"].gsub(/[^0-9\.]/, "").to_f %>
-      dAvail.put([time, tmp])
-      
-    <% end-%>
-    $.plot($("#chart_container"), [
-     {
-       data: CPU,
-       lines: { show: true, fill: true }
-     },
-     {
-       data: memTotal,
-       lines: { show: true, fill: true }
-     },
-     {
-       data: memFree,
-       lines: { show: true, fill: true }
-     },
-     {
-       data: Rece,
-       lines: { show: true, fill: true }
-     },
-     {
-       data: Tran,
-       lines: { show: true, fill: true }
-     },
-     {
-       data: dSize,
-       lines: { show: true, fill: true }
-     },
-     {
-       data: dAvail
-       lines: { show: true, fill: true}
-     }
-   ]);   
-    
-    
-  <% end-%>
-                  
+$(document).ready(function() {
+  load_all_monitor();
 });
 </script>
+
+<a href='#' onclick="load_all_monitor()">Reload All</a>
+
+<center>
+<div id='all_monitor_holder'></div>
 </center>
+
 <p/>
 <% end %>
+

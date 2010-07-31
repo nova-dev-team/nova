@@ -72,6 +72,14 @@ class CeilIsoGenerator
     # softlist = "hg hj hx hz"
   end
 
+  def s(str)
+    if str == nil
+      return ""
+    else
+      return str
+    end
+  end
+
   def config_ssh_key(id_rsa_content, id_rsa_pub_content)
     @id_rsa_content = id_rsa_content
     @id_rsa_pub_content = id_rsa_pub_content
@@ -171,35 +179,35 @@ class CeilIsoGenerator
 
     File.open(filename_servers, 'w') do |file|
       content = ""
-      content << @server_package << "\n"
-      content << @port_package << "\n"
-      content << @server_type_package << "\n"
-      content << @server_key << "\n"
-      content << @port_key << "\n"
-      content << @server_type_key << "\n"
+      content << s(@server_package) << "\n"
+      content << s(@port_package) << "\n"
+      content << s(@server_type_package) << "\n"
+      content << s(@server_key) << "\n"
+      content << s(@port_key) << "\n"
+      content << s(@server_type_key) << "\n"
       file.puts content
     end
 
     File.open(filename_network, 'w') do |file|
       content = ""
-      content << @net_ipaddr << "\n"
-      content << @net_netmask << "\n"
-      content << @net_gateway << "\n"
-      content << @net_dns << "\n"
+      content << s(@net_ipaddr) << "\n"
+      content << s(@net_netmask) << "\n"
+      content << s(@net_gateway) << "\n"
+      content << s(@net_dns) << "\n"
       file.puts content
     end
 
     File.open(filename_nodelist, 'w') do |file|
-      file.puts @nodelist
+      file.puts s(@nodelist)
     end
 
     File.open(filename_softlist, 'w') do |file|
-      file.puts @softlist
+      file.puts s(@softlist)
     end
 
     File.open(filename_cluster, 'w') do |file|
-      file.puts @hostname
-      file.puts @clustername
+      file.puts s(@hostname)
+      file.puts s(@clustername)
     end
 
     if @id_rsa_content
@@ -209,10 +217,10 @@ class CeilIsoGenerator
       rescue
       end
       File.open(sshkey_path + '/id_rsa', 'w') do |file|
-        file.puts @id_rsa_content
+        file.puts s(@id_rsa_content)
       end
       File.open(sshkey_path + '/id_rsa.pub', 'w') do |file|
-        file.puts @id_rsa_pub_content
+        file.puts s(@id_rsa_pub_content)
       end
 
       attach_filename = File.dirname(__FILE__) + '/packages/ssh-nopass'
@@ -237,8 +245,8 @@ class CeilIsoGenerator
 
       File.open(passwd_path + '/passwd.list', 'w') do |file|
         0.upto(@changelist_username.length - 1) do |i|
-          file.puts @changelist_username[i]
-          file.puts @changelist_new_pwd[i]
+          file.puts s(@changelist_username[i])
+          file.puts s(@changelist_new_pwd[i])
         end
       end
       begin
@@ -293,13 +301,13 @@ NCFG
     #authorized_keys
     if @id_rsa_content
       File.open(File.join(rhel5_path, 'id_rsa'), 'w') do |f|
-        f.write @id_rsa_content
+        f.write s(@id_rsa_content)
       end
       File.open(File.join(rhel5_path, 'id_rsa.pub'), 'w') do |f|
-        f.write @id_rsa_pub_content
+        f.write s(@id_rsa_pub_content)
       end
       File.open(File.join(rhel5_path, 'authorized_keys'), 'w') do |f|
-        f.write @id_rsa_pub_content
+        f.write s(@id_rsa_pub_content)
       end
     end
 
@@ -308,8 +316,8 @@ NCFG
     if @changelist_username.length > 0
       File.open(File.join(rhel5_path, 'passwd.list'), 'w') do |f|
         0.upto(@changelist_username.length - 1) do |i|
-          f.puts @changelist_username[i]
-          f.puts @changelist_new_pwd[i]
+          f.puts s(@changelist_username[i])
+          f.puts s(@changelist_new_pwd[i])
         end
       end
     end

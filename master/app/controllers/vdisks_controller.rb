@@ -7,6 +7,7 @@
 class VdisksController < ApplicationController
 
   include FtpServerFilesListHelper
+  include StorageManagementHelper
 
   before_filter :login_required
 
@@ -24,15 +25,33 @@ class VdisksController < ApplicationController
     return unless root_required
     return unless params_required "file_name display_name disk_format"
 
-    # Check if file exists, by checking the 'ftp_server_files_list'
-    vdisk_list = ftp_server_vdisks_list
-    if vdisk_list == nil
-      reply_failure "The storage server is probably down!"
-      return
-    end
-    unless vdisk_list.include? params[:file_name]
-      ftp_server_try_update
-      reply_failure "Cannot find '#{params[:file_name]}' on storage server. You might need to wait a few minutes if the file has just been uploaded."
+    conf = common_conf
+    if conf["storage_type"] == "ftp"
+      # Check if file exists, by checking the 'ftp_server_files_list'
+      vdisk_list = ftp_server_vdisks_list
+      if vdisk_list == nil
+        reply_failure "The storage server is probably down!"
+        return
+      end
+      unless vdisk_list.include? params[:file_name]
+        ftp_server_try_update
+        reply_failure "Cannot find '#{params[:file_name]}' on storage server. You might need to wait a few minutes if the file has just been uploaded."
+        return
+      end
+    elsif conf["storage_type"] == "nfs"
+      vdisk_list = storage_server_vdisks_list
+      if vdisk_list == nil
+        reply_failure "The storage server is probably down!"
+        return
+      end
+      unless vdisk_list.include? params[:file_name]
+        storage_server_try_update
+        reply_failure "Cannot find '#{params[:file_name]}' on storage server. You might need to wait a few minutes if the file has just been uploaded."
+        return
+      end
+
+    else
+      reply_failure "Storage server type '#{conf["storage_type"]}' not understood!"
       return
     end
 
