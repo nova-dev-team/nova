@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 
 require 'rubygems'
-require 'posixlock'
 require 'libvirt'
 require 'fileutils'
 require 'xmlsimple'
 require 'ceil_iso_generator'
+require 'yaml'
 require 'utils'
 require 'uri'
 
@@ -14,68 +14,37 @@ LIBVIRT_RUNNING = 1
 LIBVIRT_SUSPENDED = 3
 LIBVIRT_NOT_RUNNING = 5
 
-COMMON_CONF = common_conf
-HYPERVISOR = COMMON_CONF["hypervisor"]
-STORAGE_TYPE = COMMON_CONF["storage_type"]
+HYPERVISOR = common_conf["hypervisor"]
+STORAGE_TYPE = common_conf["storage_type"]
 
-#unused in current version
-#0.31
 MIGRATION_TIMEOUT_HANDSHAKE=5
 # 5min timeout for handshake
 MIGRATION_TIMEOUT_PROCEEDING=-1
-
-$libvirt_connection = nil
 #
 
-
-###################################INIT##############################################
-if ARGV.length < 4
-  puts "usage: vm_daemon_helper.rb <rails_root> <storage_server> <vm_dir> <vm_name>"
+if ARGV.length < 3
+  puts "usage: vm_daemon_helper.rb <rails_root> <storage_server> <vm_dir> [action]"
   exit 1
 end
-
 RAILS_ROOT = ARGV[0]
 STORAGE_SERVER = ARGV[1]
 VM_DIR = ARGV[2]
-VM_NAME = ARGV[3]
-
-pid = Process.pid
-
-#try to gain lock vm_dir/vm_daemon.pid
-#if failed, exits
-
-pid_fn = File.join(VM_DIR, 'vm_daemon.pid')
-pid_file = File.new(pid_fn, "w+")
-
-locked = pid_file.posixlock(File::LOCK_EX | File::LOCK_NB)
-if locked
-  pid_file.write pid
-  pid_file.flush
-else
-  puts "cannot gain file lock of #{pid_fn}, exits"
-  exit 1
-end
-
-###################################END OF INIT##########################################
+ACTION = ARGV[3]
 
 
 def libvirt_connect_local
-  if $libvirt_connection == nil
-    case HYPERVISOR
-    when "xen"
-      $libvirt_connection = Libvirt::open("xen:///")
-    when "kvm"
-      $libvirt_connection = Libvirt::open("qemu:///system")
-    else
-      raise "vm_daemon: unsupported hypervisor: #{HYPERVISOR}."
-    end
+  case HYPERVISOR
+  when "xen"
+    return Libvirt::open("xen:///")
+  when "kvm"
+    return Libvirt::open("qemu:///system")
+  else
+    raise "vm_daemon_helper: unsupported hypervisor: #{HYPERVISOR}."
   end
-  return $libvirt_connection
 end
 
-
 def write_log message
-  File.open(File.join(VM_DIR, "log"), "a") do |f|
+  File.open("log", "a") do |f|
     message.each_line do |line|
       if line.end_with? "\n"
         f.write "[#{Time.now}] #{line}"
@@ -190,8 +159,6 @@ LFTP_SCRIPT_FILE
       FileUtils.rm_f lftp_script_file
       write_log "removed generated lftp download script"
 
-      # TODO use lftp log to detect whether download succeeded
-
       FileUtils.rm_f base_image_copying_lock
       write_log "removed copying lock"
 
@@ -241,7 +208,6 @@ def prepare_iso_image storage_server, image_pool_dir, vm_dir, iso_name
       File.open(base_image_copying_lock, "w") {|f|}
       write_log "created copying lock"
 
-      # TODO use lftp.log to detect whether download succeeded
       lftp_script_file = File.join image_pool_dir, "#{iso_name}.lftp"
       File.open(lftp_script_file, "w") do |f|
         f.write <<LFTP_SCRIPT_FILE
@@ -260,8 +226,6 @@ LFTP_SCRIPT_FILE
 
       FileUtils.rm_f lftp_script_file
       write_log "removed generated lftp download script"
-
-      # TODO use lftp log to detect whether download succeeded
 
       FileUtils.rm_f base_image_copying_lock
       write_log "removed copying lock"
@@ -362,7 +326,7 @@ end
 def do_prepare rails_root, storage_server, vm_dir
 
   begin
-    File.open(File.join(vm_dir, "status"), "w") do |f|
+    File.open("status", "w") do |f|
       f.write "preparing"
     end
   rescue
@@ -372,7 +336,7 @@ def do_prepare rails_root, storage_server, vm_dir
   image_pool_dir = File.join vm_dir, "../../image_pool"
   package_pool_dir = File.join vm_dir, "../../package_pool"
 
-  File.open(File.join(vm_dir, "required_images")) do |f|
+  File.open "required_images" do |f|
     f.each_line do |line|
       img = line.strip
       if img.end_with? ".qcow2"
@@ -392,8 +356,6 @@ def do_prepare rails_root, storage_server, vm_dir
   end
 
   write_log "image has been prepared"
-
-  # TODO check if download success
 
   if File.exists? "agent_packages" or File.exists? "nodelist"
     write_log "preparing required packages"
@@ -456,13 +418,19 @@ def do_prepare rails_root, storage_server, vm_dir
       write_log "config_cluster: #{node_name}, #{cluster_name}"
       igen.config_cluster(node_name, cluster_name)
 
-      # set user name, password, etc. and read server info from "storage_server" variable
-      server_uri = URI::parse storage_server
-      server_user_pwd_host = "#{server_uri.user}:#{server_uri.password}@#{server_uri.host}"
-
-      igen.config_package_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
-      # set key server
-      igen.config_key_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
+      conf = YAML.dump File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+      if conf["storage_type"] == "ftp"
+        # set user name, password, etc. and read server info from "storage_server" variable
+        server_uri = URI::parse storage_server
+        server_user_pwd_host = "#{server_uri.user}:#{server_uri.password}@#{server_uri.host}"
+        igen.config_package_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
+        # set key server
+        igen.config_key_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
+      elsif conf["storage_type"] == "nfs"
+        # write dummy config
+        igen.config_package_server("", "", "")
+        igen.config_key_server("", "", "")
+      end
 
       igen.config_nodelist(File.read "nodelist")
 
@@ -475,7 +443,9 @@ def do_prepare rails_root, storage_server, vm_dir
         end
       end
       write_log "config_softlist: #{software_packages.join " "}"
-      igen.config_softlist(software_packages.join " ")
+      if software_packages != nil
+        igen.config_softlist(software_packages.join " ")
+      end
 
       igen.generate("#{vm_dir}/agent-cd", "#{vm_dir}/agent-cd.iso")
       unless File.exists? "#{vm_dir}/agent-cd.iso"
@@ -483,10 +453,11 @@ def do_prepare rails_root, storage_server, vm_dir
       end
     rescue Exception => e
       write_log "Exception: #{e.to_s}"
+      e.backtrace.each do |bktrace|
+        write_log "Backtrace: #{bktrace}"
+      end
     end
   end
-
-  # TODO boot vm, handle failure if necessary
 
   write_log "starting vmachine"
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
@@ -516,19 +487,6 @@ def do_prepare rails_root, storage_server, vm_dir
   end
 end
 
-def do_restart vm_dir
-  # restart
-  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
-  vm_uuid = xml_desc["uuid"][0]
-  virt_conn = libvirt_connect_local
-  dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
-
-  if dom.info.state == LIBVIRT_NOT_RUNNING
-    write_log "restarting vmachine #{vm_uuid}"
-    dom.create
-  end
-
-end
 
 def do_save storage_server, vm_dir
   begin
@@ -695,7 +653,6 @@ end
 
 
 def do_poll storage_server, vm_dir
-=begin
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
 
@@ -708,50 +665,20 @@ def do_poll storage_server, vm_dir
       # the vm is still running, skip the following actions
     else
       # write_log "detected VM shutdown, saving it"
-      #begin
-      #  dom.destroy
-      #ensure
-      #  dom.undefine rescue nil
-      #end
-      #do_save storage_server, vm_dir
+      begin
+        dom.destroy
+      ensure
+        dom.undefine rescue nil
+      end
+      do_save storage_server, vm_dir
     end
   rescue
     #write_log "failed to find domain while polling, saving the VM before destoying it"
-    #do_save storage_server, vm_dir
-  end
-=end
-end
-
-def do_resume vm_dir
-  #suspend the vm running in vm_dir
-  Dir.chdir vm_dir
-  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
-  uuid = xml_desc["uuid"][0]
-  
-  virt_conn = libvirt_connect_local
-  begin
-    dom = virt_conn.lookup_domain_by_uuid(uuid)
-    dom.resume
-  rescue => e
-    write_log "error while resuming vmachine #{uuid}, message: #{e.to_s}" 
+    do_save storage_server, vm_dir
   end
 end
 
 
-def do_suspend vm_dir
-  #suspend the vm running in vm_dir
-  Dir.chdir vm_dir
-  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
-  uuid = xml_desc["uuid"][0]
-  
-  virt_conn = libvirt_connect_local
-  begin
-    dom = virt_conn.lookup_domain_by_uuid(uuid)
-    dom.suspend
-  rescue => e
-    write_log "error while suspending vmachine #{uuid}, message: #{e.to_s}" 
-  end
-end
 
 def do_cleanup storage_server, vm_dir
   write_log "doing cleanup work"
@@ -824,7 +751,12 @@ def get_action
   else
     return "poll"
   end
-
+=begin
+  return "prepare" if File.exists? "prepare"
+  return "migrate" if File.exists? "migrate_to"
+  return "cleanup" if File.exists? "destroy"
+  return "poll"
+=end
 end
 
 def do_action action
@@ -832,43 +764,27 @@ def do_action action
   storage_server = STORAGE_SERVER
   vm_dir = VM_DIR
 
-
-  begin
-    case action
-    when "prepare"
-      write_log "vm_daemon action: prepare"
-      do_prepare rails_root, storage_server, vm_dir
-    when "receive"
-      write_log "vm_daemon action: receive"
-      do_receive storage_server, vm_dir
-    when "migrate"
-      write_log "vm_daemon action: migrate"
-      do_migrate
-    when "poll"
-      #write_log "vm_daemon_helper action: poll"
-      do_poll storage_server, vm_dir
-    when "save"
-      write_log "vm_daemon action: save"
-      do_save storage_server, vm_dir
-    when "cleanup", "destroy"
-      write_log "vm_daemon action: #{action}"
-      do_cleanup storage_server, vm_dir
-    when "restart"
-      write_log "vm_daemon action: restart"
-      do_restart vm_dir
-    when "suspend"
-      write_log "vm_daemon action: suspend"
-      do_suspend vm_dir
-    when "resume"
-      write_log "vm_daemon action: resume"
-      do_resume vm_dir
-    else
-      write_log "error: action '#{action}' not understood!"
-    end
-  rescue => e
-    if action != "poll" 
-      write_log "vm_daemon error: #{e.to_s}"
-    end
+  case action
+  when "prepare"
+    write_log "vm_daemon_helper action: prepare"
+    do_prepare rails_root, storage_server, vm_dir
+  when "receive"
+    write_log "vm_daemon_helper action: receive"
+    do_receive storage_server, vm_dir
+  when "migrate"
+    write_log "vm_daemon_helper action: migrate"
+    do_migrate
+  when "poll"
+  #  write_log "vm_daemon_helper action: poll"
+    do_poll storage_server, vm_dir
+  when "save"
+    write_log "vm_daemon_helper action: save"
+    do_save storage_server, vm_dir
+  when "cleanup", "destroy"
+    write_log "vm_daemon_helper action: #{action}"
+    do_cleanup storage_server, vm_dir
+  else
+    write_log "error: action '#{action}' not understood!"
   end
 end
 
@@ -877,82 +793,50 @@ end
 #equal -> do action
 #not equal -> fix it(vm running on local can be seen in libvirt) | undefine(vm shuted-off)
 
-def check_vm_host_uuid
-  begin
-    worker_uuid_fn = File.join RAILS_ROOT, 'config', 'worker.uuid'
-    vm_worker_uuid_fn = File.join VM_DIR, 'host.uuid'
+begin
+  worker_uuid_fn = File.join RAILS_ROOT, 'config', 'worker.uuid'
+  vm_worker_uuid_fn = File.join VM_DIR, 'host.uuid'
 
-    #puts worker_uuid_fn
-    #puts vm_worker_uuid_fn
+  puts worker_uuid_fn
+  puts vm_worker_uuid_fn
 
-    host_uuid = File.read(worker_uuid_fn)
-    vm_host_uuid = File.read(vm_worker_uuid_fn)
+  host_uuid = File.read(worker_uuid_fn)
+  vm_host_uuid = File.read(vm_worker_uuid_fn)
 
-    # if vm is running on local, fix host.uuid
-    # this is caused by migration
-    # if vm is shut-off, kill it in 'do_poll'
-    #puts "host_uuid = #{host_uuid}"
-    #puts "vm_host_uuid = #{vm_host_uuid}"
+  # if vm is running on local, fix host.uuid
+  # this is caused by migration
+  # if vm is shut-off, kill it in 'do_poll'
+  puts "host_uuid = #{host_uuid}"
+  puts "vm_host_uuid = #{vm_host_uuid}"
 
-    if host_uuid != vm_host_uuid
-      begin
-        vm_xml_fn = File.join VM_DIR, "xml_desc.xml"
-        xml_desc = XmlSimple.xml_in(File.read vm_xml_fn)
-        vm_uuid = xml_desc["uuid"][0]
-        virt_conn = libvirt_connect_local
-        dom = virt_conn.lookup_domain_by_uuid(uuid)
-        if dom.info.state != LIBVIRT_NOT_RUNNING
-          File.open(vm_host_uuid, "w") do |f|
-            f.write host_uuid
-          end
+  if host_uuid != vm_host_uuid
+    begin
+      vm_xml_fn = File.join VM_DIR, "xml_desc.xml"
+      xml_desc = XmlSimple.xml_in(File.read vm_xml_fn)
+      vm_uuid = xml_desc["uuid"][0]
+      virt_conn = libvirt_connect_local
+      dom = virt_conn.lookup_domain_by_uuid(uuid)
+      if dom.info.state != LIBVIRT_NOT_RUNNING
+        File.open(vm_host_uuid, "w") do |f|
+          f.write host_uuid
         end
-      rescue
-
       end
+    rescue
+
     end
-  rescue
-    write_log "cannot rewrite host.uuid file!!"
-    ## couldn't get it, consider a bad machine so trash cleaner will handle it
-    ## should exit here
-    # exit 1
   end
+rescue
+  puts "error!"
+  ## couldn't get it, consider a bad machine so trash cleaner will handle it
+  ## should exit here
+  # exit 1
 end
 
-
-#### main loop ####
-# 1.check vm exists in local libvirt
-# 2. if exists, do action, then goto 1
-# 3. else, do clean up and exits
-# 
-
-while true
-  begin
-    check_vm_host_uuid
-  rescue => e
-    write_log e.to_s
-  end
-
-  begin
-    virt_conn = libvirt_connect_local
-    
-    dom = nil
-    begin 
-      dom = virt_conn.lookup_domain_by_name(VM_NAME) 
-    rescue 
-    end
-
-    if dom
-      action = get_action
-      do_action action
-    else
-      do_action "cleanup"
-      pid_file.posixlock(File::LOCK_NB | File::LOCK_UN)
-      pid_file.close
-      exit 0
-    end
-  rescue => e
-    write_log e.to_s
-  end
-  sleep 3
+Dir.chdir VM_DIR
+if ACTION
+  do_action ACTION
+else
+  action = get_action
+  do_action action
 end
 

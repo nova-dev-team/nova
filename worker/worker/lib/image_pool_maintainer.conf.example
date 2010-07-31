@@ -1,0 +1,13 @@
+# This is config file for image_pool_maintainer.
+# Every config is written like "item=value".
+# White space is not allowed!
+# Enable this config file by renaming it to "image_pool_maintainer.conf".
+
+# sleep time during each polling round (in seconds)
+sleep_interval=10
+
+# image pool size, number of copies for each image
+# pool_size=6
+
+# copy speed limit, in MB/s
+copy_speed_limit=5
