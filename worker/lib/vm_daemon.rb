@@ -78,9 +78,9 @@ def write_log message
   File.open(File.join(VM_DIR, "log"), "a") do |f|
     message.each_line do |line|
       if line.end_with? "\n"
-        f.write "[#{Time.now}] #{line}"
+        f.write "[#{Time.now}][#{VM_NAME}] #{line}"
       else
-        f.write "[#{Time.now}] #{line}\n"
+        f.write "[#{Time.now}][#{VM_NAME}] #{line}\n"
       end
     end
   end
