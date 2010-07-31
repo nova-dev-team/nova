@@ -92,7 +92,8 @@ def read_node_list():
   nodelist = {}
   nodelist_file = os.path.dirname(__file__) + os.path.sep + "nodelist.txt"
   print "Reading '%s'." % nodelist_file
-  with open(nodelist_file, "r") as f:
+  f = open(nodelist_file, "r")
+  try:
     for line in f.readlines():
       ret = parse_node_info(line)
       if ret == None:
@@ -103,6 +104,8 @@ def read_node_list():
         nodelist[ip][1].update(hostnames)
       else:
         nodelist[ip] = (set([user]), set(hostnames))
+  finally:
+    f.close()
   return nodelist
 
 
@@ -113,7 +116,8 @@ def update_etc_hosts(nodelist):
   magic_header = "# by ssh_nopass_all2all.py:"
   file_info = [] # will contain (line, info) pairs
   info = None
-  with open(etc_hosts, "r") as f:
+  f = open(etc_hosts, "r")
+  try:
     for line in f.readlines():
       if line.strip().startswith(magic_header):
         # retireve info on magic comment lines
@@ -144,8 +148,11 @@ def update_etc_hosts(nodelist):
             nodelist[splt[0]] = None  # clean it up
         file_info += (line, info),
         info = None # clears info for following lines
+  finally:
+    f.close()
   # write back to /etc/hosts
-  with open(etc_hosts, "w") as f:
+  f = open(etc_hosts, "w")
+  try:
     for info_pair in file_info:
       line, info = info_pair
       if info != None:
@@ -158,7 +165,8 @@ def update_etc_hosts(nodelist):
         for hostname in nodelist[ip][1]:
           f.write(" %s" % hostname)
         f.write("\n")
-
+  finally:
+    f.close()
 
 def random_token(size = 5):
   alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -182,8 +190,11 @@ def config_ssh_nopass(nodelist):
   my_exec(ssh_keygen_cmd)
 
   my_pub_key = ""
-  with open(pub_fn, "r") as f:
+  f = open(pub_fn, "r")
+  try:
     my_pub_key = f.readline().strip()
+  finally:
+    f.close()
 
   # self-to-remote ssh nopass
   for ip in nodelist.keys():

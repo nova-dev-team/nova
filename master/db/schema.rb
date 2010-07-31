@@ -19,6 +19,8 @@ ActiveRecord::Schema.define(:version => 20100715134626) do
     t.string   "memFree",     :limit => 10
     t.string   "Rece",        :limit => 10
     t.string   "Tran",        :limit => 10
+    t.string   "dSize",       :limit => 20
+    t.string   "dAvail",      :limit => 20
     t.datetime "created_at"
     t.datetime "updated_at"
   end
