@@ -75,7 +75,7 @@ end
 
 
 def write_log message
-  File.open("log", "a") do |f|
+  File.open(File.join(VM_DIR, "log"), "a") do |f|
     message.each_line do |line|
       if line.end_with? "\n"
         f.write "[#{Time.now}] #{line}"
@@ -362,7 +362,7 @@ end
 def do_prepare rails_root, storage_server, vm_dir
 
   begin
-    File.open("status", "w") do |f|
+    File.open(File.join(vm_dir, "status"), "w") do |f|
       f.write "preparing"
     end
   rescue
@@ -372,7 +372,7 @@ def do_prepare rails_root, storage_server, vm_dir
   image_pool_dir = File.join vm_dir, "../../image_pool"
   package_pool_dir = File.join vm_dir, "../../package_pool"
 
-  File.open "required_images" do |f|
+  File.open(File.join(vm_dir, "required_images")) do |f|
     f.each_line do |line|
       img = line.strip
       if img.end_with? ".qcow2"
@@ -695,6 +695,7 @@ end
 
 
 def do_poll storage_server, vm_dir
+=begin
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
 
@@ -707,17 +708,18 @@ def do_poll storage_server, vm_dir
       # the vm is still running, skip the following actions
     else
       # write_log "detected VM shutdown, saving it"
-      begin
-        dom.destroy
-      ensure
-        dom.undefine rescue nil
-      end
-      do_save storage_server, vm_dir
+      #begin
+      #  dom.destroy
+      #ensure
+      #  dom.undefine rescue nil
+      #end
+      #do_save storage_server, vm_dir
     end
   rescue
     #write_log "failed to find domain while polling, saving the VM before destoying it"
-    do_save storage_server, vm_dir
+    #do_save storage_server, vm_dir
   end
+=end
 end
 
 def do_resume vm_dir
@@ -829,6 +831,8 @@ def do_action action
   rails_root = RAILS_ROOT
   storage_server = STORAGE_SERVER
   vm_dir = VM_DIR
+
+
   begin
     case action
     when "prepare"
@@ -862,7 +866,9 @@ def do_action action
       write_log "error: action '#{action}' not understood!"
     end
   rescue => e
-    write_log "vm_daemon error: #{e.to_s}"
+    if action != "poll" 
+      write_log "vm_daemon error: #{e.to_s}"
+    end
   end
 end
 

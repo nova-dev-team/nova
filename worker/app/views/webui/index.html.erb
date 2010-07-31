@@ -109,7 +109,12 @@ end
 </a></td>
 <td>
 #{
-vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+  vm_daemon_status = ""
+  begin
+    vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+  rescue
+  end
+
   case dom.info.state
   when Vmachine::LIBVIRT_RUNNING
     if vm_daemon_status == "migrating"
@@ -130,6 +135,8 @@ vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
       "Preparing"
     elsif vm_daemon_status == "saving"
       "Saving"
+    elsif vm_daemon_status == "unprepared"
+      "Not Prepared"
     else
       "<font color='red'><b>Not running</b></font>"
     end
