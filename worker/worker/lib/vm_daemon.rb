@@ -78,9 +78,9 @@ def write_log message
   File.open(File.join(VM_DIR, "log"), "a") do |f|
     message.each_line do |line|
       if line.end_with? "\n"
-        f.write "[#{Time.now}][#{VM_NAME}] #{line}"
+        f.write "[#{Time.now}] #{line}"
       else
-        f.write "[#{Time.now}][#{VM_NAME}] #{line}\n"
+        f.write "[#{Time.now}] #{line}\n"
       end
     end
   end
@@ -695,7 +695,6 @@ end
 
 
 def do_poll storage_server, vm_dir
-=begin
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
 
@@ -708,18 +707,17 @@ def do_poll storage_server, vm_dir
       # the vm is still running, skip the following actions
     else
       # write_log "detected VM shutdown, saving it"
-      #begin
-      #  dom.destroy
-      #ensure
-      #  dom.undefine rescue nil
-      #end
-      #do_save storage_server, vm_dir
+      begin
+        dom.destroy
+      ensure
+        dom.undefine rescue nil
+      end
+      do_save storage_server, vm_dir
     end
   rescue
     #write_log "failed to find domain while polling, saving the VM before destoying it"
-    #do_save storage_server, vm_dir
+    do_save storage_server, vm_dir
   end
-=end
 end
 
 def do_resume vm_dir
@@ -866,9 +864,7 @@ def do_action action
       write_log "error: action '#{action}' not understood!"
     end
   rescue => e
-    if action != "poll" 
-      write_log "vm_daemon error: #{e.to_s}"
-    end
+    write_log "vm_daemon error: #{e.to_s}"
   end
 end
 
