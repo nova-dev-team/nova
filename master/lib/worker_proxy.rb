@@ -261,6 +261,11 @@ AGENT_HINT
     return {:success => false, :message => "Request to worker module failed!"}
   end
 
+  def live_migrate_to vm_name, pm_ip
+    ret = post_request "vmachines/live_migrate_to.json", :name => vm_name, :migrate_dest => pm_ip
+    return ret
+  end
+
 private
 
   # Send a POST request.
