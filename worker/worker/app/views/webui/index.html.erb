@@ -1,0 +1,449 @@
+<%
+require 'fileutils'
+require 'libvirt'
+require 'cgi'
+require 'xmlsimple'
+require 'uuidtools'
+require 'utils'
+
+conf = common_conf
+storage_type = conf["storage_type"]
+storage_root = conf["storage_root"]  
+
+%>
+
+<html>
+<head>
+<title>Nova worker</title>
+
+<link type="text/css" rel="stylesheet" href="/stylesheets/SyntaxHighlighter.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/custom_buttons.css"></link>
+<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
+
+<script language="javascript" src="/javascripts/shCore.js"></script>
+<script language="javascript" src="/javascripts/shBrushXml.js"></script>
+<script type="text/javascript" src="/javascripts/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.blockUI.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.json-1.3.min.js"></script>
+<script type="text/javascript" src="/javascripts/nova.worker.webui.js"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function () {
+  dp.SyntaxHighlighter.HighlightAll('xml_code');
+
+  // these codes are necessary!
+  $("input[name=chk_mount_iso]").attr("checked", false);
+  $("input[name=chk_agent_cd]").attr("checked", false);
+
+  disable("new_vm_iso_cdrom");
+  disable("new_vm_ip_addr");
+  disable("new_vm_subnet_mask");
+  disable("new_vm_gateway");
+  disable("new_vm_dns");
+  disable("new_vm_agent_packages");
+});
+
+</script>
+</head>
+
+<body>
+
+<h1>Nova worker</h1>
+<%=
+
+  node_hostname = ""
+  if File.exists? "#{RAILS_ROOT}/tmp/hostname"
+    node_hostname = "hostname: " + (File.read "#{RAILS_ROOT}/tmp/hostname") + "<br>"
+  end
+  node_hostname
+%>
+<%=
+  version_name = ""
+  if File.exists? "#{RAILS_ROOT}/../VERSION"
+    version_name = "version: " + (File.read "#{RAILS_ROOT}/../VERSION") + "<br>"
+  end
+  version_name
+%>
+<hr>
+
+
+<h2>List of all vmachines</h2>
+
+
+<table width="100%">
+<tr>
+<td>Name</td>
+<td>UUID</td>
+<td>HDA save to (click to edit)</td>
+<td>Status</td>
+<td>VNC port</td>
+<td>Actions</td>
+</tr>
+<%=
+html = ""
+
+row_counter = 0
+Vmachine.all_domains.each do |dom|
+  xml_desc = XmlSimple.xml_in dom.xml_desc
+
+  hda_save_to_fn = File.join Setting.vm_root, dom.name, "hda_save_to"
+  if File.exists? hda_save_to_fn
+    hda_save_to = File.read hda_save_to_fn
+  else
+    hda_save_to = ""
+  end
+
+  html += <<VM_HTML
+<tr class='row_type_#{row_counter % 2}' height=30>
+<td>#{dom.name}</td>
+<td>#{dom.uuid}</td>
+<td><a href='#' onclick="change_hda_save_to('#{dom.name}', '#{hda_save_to}')">
+#{
+if hda_save_to == ""
+  "<font color='gray'><i>(none)</i></font>"
+else
+  hda_save_to
+end
+}
+</a></td>
+<td>
+#{
+  vm_daemon_status = ""
+  begin
+    vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+  rescue
+  end
+
+  case dom.info.state
+  when Vmachine::LIBVIRT_RUNNING
+    if vm_daemon_status == "migrating"
+      "<font color='red'><b>Migrating</b></font>"
+    else
+      "Running"
+    end
+  when Vmachine::LIBVIRT_BLOCK
+    if vm_daemon_status == "migrating"
+      "<font color='red'><b>Migrating</b></font>"
+    else
+      "Running"
+    end
+  when Vmachine::LIBVIRT_SUSPENDED
+    "<b>Suspended</b>"
+  when Vmachine::LIBVIRT_NOT_RUNNING
+    if vm_daemon_status == "preparing"
+      "Preparing"
+    elsif vm_daemon_status == "saving"
+      "Saving"
+    elsif vm_daemon_status == "unprepared"
+      "Not Prepared"
+    else
+      "<font color='red'><b>Not running</b></font>"
+    end
+  else
+    dom.info.state.to_s
+  end
+}
+</td>
+<td>
+#{
+begin
+  vnc_port = xml_desc['devices'][0]['graphics'][0]['port'].to_s
+  if vnc_port == "-1"
+    vnc_port = "Not allocated"
+  end
+  vnc_port
+rescue
+  "Not allocated"
+end
+}
+</td>
+<td>
+#{
+if dom.info.state != Vmachine::LIBVIRT_NOT_RUNNING
+  "<button type='button' class='btn' onclick=\"window.open('/vmachines/observe/#{dom.name}');return false;\"><span><span>Observe</span></span></button>\n"
+end
+}
+<button type='button' class='btn' onclick="$('#xml-def-#{dom.uuid}').toggle('fast')"><span><span>Toggle XML</span></span></button>
+<button type='button' class='btn' onclick="$('#vm-log-#{dom.uuid}').toggle('fast')"><span><span>Toggle Log</span></span></button>
+#{
+if dom.info.state == Vmachine::LIBVIRT_RUNNING || dom.info.state == Vmachine::LIBVIRT_BLOCK
+  "<button type='button' class='btn' onclick=\"suspend_vmachine('#{dom.name}')\"><span><span>Suspend</span></span></button>\n"
+elsif dom.info.state == Vmachine::LIBVIRT_SUSPENDED
+  "<button type='button' class='btn' onclick=\"resume_vmachine('#{dom.name}')\"><span><span>Resume</span></span></button>\n"
+elsif dom.info.state == Vmachine::LIBVIRT_NOT_RUNNING
+  "<button type='button' class='btn' onclick=\"restart_vmachine('#{dom.name}')\"><span><span>Restart</span></span></button>\n"
+end
+}
+<button type='button' class='btn' onclick="live_migrate_to('#{dom.name}')"><span><span>Migrate</span></span></button>
+<button type='button' class='btn' onclick="destroy_vmachine('#{dom.name}')"><span><span><font color='red'><b>Destroy</b></font></span></span></button>
+</td>
+</tr>
+<tr><td colspan=5>
+<div style="display:none;" id='xml-def-#{dom.uuid}'>
+<pre class='xml' name='xml_code' cols='160'>
+#{CGI.escapeHTML dom.xml_desc}
+</pre>
+</div>
+</td></tr>
+<tr><td colspan=5>
+<div style="display:none;" id='vm-log-#{dom.uuid}'>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<pre class='code'>
+#{
+begin
+  CGI.escapeHTML (File.read "#{Setting.vm_root}/#{dom.name}/log").strip
+rescue
+  "(failed to read logs)"
+end
+}
+</pre>
+</td></tr></table>
+</div>
+</td></tr>
+VM_HTML
+  row_counter += 1
+end
+
+html
+%>
+</table>
+<hr>
+
+
+<h2>Add new vmachine</h2>
+<div id="add_new_vmachine_div">
+<%
+def spacing count = 8
+  "&nbsp;" * count
+end
+%>
+Name (a-z, 0-9, '_', '-', '.'): <input type="text" id="new_vm_name" size=28 value="vm_<%=
+  time_now = Time.now
+  "%04d%02d%02d%02d%02d%02d" % [time_now.year, time_now.month, time_now.day, time_now.hour, time_now.min, time_now.sec]
+%>"/><%= spacing 16 %>
+
+UUID: <input type="text" id="new_vm_uuid" size=47 value="<%= UUIDTools::UUID.random_create.to_s %>"/><br>
+
+Hypervisor: <select id="new_vm_hypervisor">
+<option><%= common_conf["hypervisor"] %></option>
+</select><%= spacing 12 %>
+
+Architecture: <select id="new_vm_arch">
+<option value='i686'>i686</option>
+<option value='x86_64'>x86_64</option>
+</select><%= spacing 9 %>
+
+CPU count: <select id="new_vm_cpu_count">
+<%=
+html = ""
+(1..4).each {|v| html += "<option>#{v}</option>"}
+html
+%>
+</select><%= spacing 10 %>
+
+Memory size (in MB): <input type="text" size="6" id="new_vm_mem_size" value="512" /><br>
+
+Hard disk image: <input type="text" id="new_vm_hda_image" size=40 /><%= spacing 6%>
+
+Save to (optional, only for kvm): <input type="text" id="new_vm_hda_save_to" size=40 /><br>
+
+<input type="checkbox" name="chk_mount_iso" onclick="toggle_mount_iso()" /> Mount .iso CD image?<br>
+
+.iso CD image: <input type="text" id="new_vm_cd_image" size=42 disabled class='disabled_input' /><br>
+
+<input type="checkbox" name="chk_agent_cd" onclick="toggle_agent_cd()" /> Use agent CD?<br>
+
+IP: <input id="new_vm_ip_addr" type="text" size=15 disabled class='disabled_input' /><%= spacing 2 %>
+Subnet mask: <input id="new_vm_subnet_mask" type="text" size=15 value="255.255.255.0" disabled class='disabled_input' /><%= spacing 2 %>
+Gateway: <input id="new_vm_gateway" type="text" size=15 disabled class='disabled_input' /><%= spacing 2%>
+DNS (optional): <input id="new_vm_dns" type="text" size=15 disabled class='disabled_input' /><%= spacing 2%>
+Cluster name (optional): <input id="new_vm_cluster_name" type="text" size=15 disabled class='disabled_input' />
+<br>
+
+
+Packages to be installed (separate with comma or space): <input type="text" id="new_vm_agent_packages" size=119 disabled class='disabled_input' /><br>
+Node list (&quot;ip hostname&quot;, separate with comma): <input type="text" id="new_vm_nodelist" size=130 disabled class='disabled_input' /><br>
+
+<button type="button" class="btn" onclick="add_vmachine()"><span><span>Add new vmachine</span></span></button> <%= spacing 2 %> Current page will be reloaded when clicked.
+</div>
+<hr>
+
+<%
+def pretty_du dir, max_depth
+  FileUtils.mkdir_p dir # assure existance of dir
+  html = "<pre>"
+  pipe = IO.popen "cd #{dir} && du -ah --max-depth=#{max_depth} | grep -v \"\.log$\""
+  du_output = pipe.readlines.join.chomp
+  pipe.close
+
+  size_info = {}
+  du_output.each_line do |line|
+    splt = line.split
+    size_info[splt[1]] = splt[0]
+  end
+
+  du_data = du_output.collect {|line| line.split[1]}
+  du_sorted = du_data.sort
+
+  item_counter = 0
+  du_sorted.each do |item|
+    next if item == "."
+    html += "%-10s%s\n" % [size_info[item], item]
+    item_counter += 1
+  end
+
+  if item_counter == 0
+    html += "(nothing)"
+  end
+
+  html += "</pre>"
+  return html
+end
+
+
+%>
+
+<h2>Storage server</h2>
+<%
+def pretty_server_file_list text
+  ret = ""
+
+  item_counter = 0
+  group_counter = 0
+
+  text.each_line do |line|
+    if line.start_with? "ftp://"
+      if group_counter > 0
+        if item_counter == 0
+          ret += "(nothing)"
+        end
+        ret += "</pre></td></tr></table><br>\n"
+      end
+
+      idx = line.index "/", 6
+      folder = line[idx..-1].strip
+      ret += "Resource in folder: <b>" + folder + "</b><br>\n"
+      item_counter = 0
+      ret += "<table bgcolor='#EBEBEB' class='code' width='100%'><tr><td><pre>\n"
+      group_counter += 1
+    else
+      splt = line.split
+      fn = splt[8]
+      size = splt[4].to_i
+      next if fn.start_with? "."
+      ret += "%-10s%s\n" % [size.to_pretty_file_size, fn]
+      item_counter += 1
+    end
+  end
+
+  if item_counter == 0
+    ret += "(nothing)"
+  end
+  ret += "</pre></td></tr></table>\n"
+
+  return ret
+end
+%>
+
+<%=
+  html_str = ""
+
+  case storage_type
+  when "ftp"
+    if File.exists? "#{Setting.run_root}/ftp_server_files_list"
+      list_data = File.read "#{Setting.run_root}/ftp_server_files_list"
+      if list_data =~ /Fatal error: max-retries exceeded/
+        html_str = "<b><font color='red'>The storage server is probably down!</font></b>"
+      elsif list_data =~ /Not connected/ or list_data =~ /Name or service not known/
+        html_str = "<b><font color='red'>Failed to connect to storage server!</font></b>"
+      else
+        html_str = "<b>Updated at #{File.mtime "#{Setting.run_root}/ftp_server_files_list"}"
+        if Time.now - (File.mtime "#{Setting.run_root}/ftp_server_files_list") > 600
+          html_str += ", which is a long time ago, <font color='red'>the background file list updater is probably dead!</font>"
+        end
+        html_str += "</b>"
+        html_str += "<br>\n"
+
+        html_str += pretty_server_file_list list_data
+      end
+    else
+      html_str = "The list of server files will be updated later. If you see this message for a long time, the background updating process might be dead."
+    end
+  when "nfs"
+    html_str = pretty_du(File.join(storage_root, 'vdisks'), 1)
+  else
+    html_str = "Don't know storage type #{storage_type}"
+  end
+  html_str
+%>
+<hr>
+
+<h2>Local resource</h2>
+
+
+
+<b>Vmachines working directory:</b><br>
+du -ah <%=h Setting.vm_root %>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<%= pretty_du Setting.vm_root, 2 %>
+</td></tr></table>
+<p>
+
+<b>Image pool directory:</b><br>
+du -ah <%=h Setting.image_pool_root %>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<%= pretty_du Setting.image_pool_root, 2 %>
+</td></tr></table>
+<p>
+
+<b>Package pool directory:</b><br>
+du -ah <%= Setting.package_pool_root %>
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<%= pretty_du Setting.package_pool_root, 1 %>
+</td></tr></table>
+<p>
+
+<% if storage_type == 'ftp' %>
+<b>Revoke image or package:</b><br>
+This utility is used to delete deprecated VM images or packages.<br>
+<li>If the image is being downloaded from storage server, the revoke request will be ignored.</li>
+<li>If some VM creates its agent cd with some package which is being revoked, the generated agent cd will be broken.</li>
+<br>
+Image name: <input type="text" id='revoke_vm_image_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_image()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
+Current page will be reloaded when clicked.<br>
+Package name: <input type="text" id='revoke_package_name'/><%= spacing 2 %><button type='button' class='btn' onclick='revoke_vm_package()'><span><span><font color='red'>Revoke!</font></span></span></button><%= spacing 2 %>
+Current page will be reloaded when clicked.
+<hr>
+<% end-%>
+
+
+<h2>System settings</h2>
+<div id="sys_settings_panel">
+<%=
+  system_settings_html = "<table width='100%'>\n<tr><td>Key</td><td>Value</td><td>Actions</td></tr>\n"
+  counter = 0
+  (Setting.all.sort {|a, b| a.key <=> b.key}).each do |setting|
+    system_settings_html += "<tr class='row_type_#{counter % 2}' height=30><td>"
+    system_settings_html += setting.key
+    system_settings_html += "</td><td id='sys_setting_holder_#{setting.key}'>"
+    system_settings_html += setting.value
+    if setting.editable
+      system_settings_html += "</td><td><button type='button' class='btn' onclick='change_system_setting(\"#{setting.key}\")'><span><span>Change</span></span></button></td></tr>\n"
+    else
+      system_settings_html += "</td><td>READ ONLY</td></tr>\n"
+    end
+    counter += 1
+  end
+  system_settings_html += "</table>"
+  system_settings_html
+%>
+</div>
+<hr>
+
+This is the "worker" module of the Nova system. <b>Intended for developers only!</b><p>
+&copy;2009-2010 <a href="mailto:nova-develop@googlegroups.com">Nova Development Team</a>.
+
+</body>
+</html>
+
