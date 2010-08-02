@@ -666,15 +666,13 @@ def do_migrate
         File.open("status", "w") do |f|
           f.write "using"
         end
-        sleep 20
-        #sleep 20sec
         begin
           dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
 
           if dom.info.state == LIBVIRT_NOT_RUNNING
             write_log "cleaning #{vm_uuid} on source worker!"
             dom.destroy rescue nil
-            dom.undefined rescue nil
+            dom.undefine rescue nil
           end
           exit 0
         rescue => e
