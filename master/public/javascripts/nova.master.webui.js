@@ -179,7 +179,7 @@ function load_migration_view() {
     success: function(result) {
       if (result.success) {
         var html = "";
-        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Status</td><td>Vmachines</td></tr>";
+        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Status</td><td>Running Vmachines</td></tr>";
         
         for (i = 0; i < result.data.length; i++) {
           var pm_data = result.data[i];

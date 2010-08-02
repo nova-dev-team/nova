@@ -19,6 +19,8 @@ class MigrationController < ApplicationController
       }
       vm_all_data = []
       pm.vmachines.each do |vm|
+        # only running/suspended vmachines could be migrated
+        next unless vm.status == "running" or vm.status == "suspended"
         # TODO add info of vm migration, such as migrate_from, migrate_to, etc.
         vm_data = {
           :name => vm.name
