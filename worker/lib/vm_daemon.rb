@@ -676,6 +676,7 @@ def do_migrate
             dom.destroy rescue nil
             dom.undefined rescue nil
           end
+          exit 0
         rescue => e
           write_log "error: #{e.to_s}"
         end
@@ -917,7 +918,6 @@ def check_vm_host_uuid
           end
         end
       rescue
-
       end
     end
   rescue
@@ -955,7 +955,7 @@ while true
       action = get_action
       do_action action
     else
-      do_action "cleanup"
+      # do_action "cleanup"
       pid_file.posixlock(File::LOCK_NB | File::LOCK_UN)
       pid_file.close
       exit 0
