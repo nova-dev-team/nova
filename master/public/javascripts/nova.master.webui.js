@@ -1262,6 +1262,8 @@ function load_cluster_content(cluster_name) {
           } else if (m_info["status"] == "boot-failure") {
             html += "<button type='button' class='btn' onclick='clear_error_of_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Clear error</span></span></button>";
           }
+          html += white_spacing(4);
+          html += "<button type='button' class='btn' onclick='show_vm_log(\"" + m_info["uuid"] + "\")'><span><span><font color='blue'>Show Log</font></span></span></button>";
           html += "</td></tr>";
         }
         html += "</table>";
@@ -1294,6 +1296,10 @@ function vm_ajax(cluster_name, url, data_map) {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
+}
+
+function show_vm_log(vm_uuid) {
+  window.open("/vmachine_infos?uuid=" + vm_uuid, "_blank");
 }
 
 function observe_vm(vm_id) {

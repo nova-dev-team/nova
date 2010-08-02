@@ -19,10 +19,19 @@ class Vmachine < ActiveRecord::Base
     if self.pmachine == nil
       return false
     else
+      log "migration", "migrating from '#{self.pmachine.ip}' to '#{dest_ip}'"
       self.migrate_to = dest_ip
       self.migrate_from = self.pmachine.ip
       self.save
     end
+  end
+
+  def log category, message
+    info = VmachineInfo.new
+    info.category = category
+    info.message = message
+    info.vmachine = self
+    info.save
   end
 
 end

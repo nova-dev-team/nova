@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>Vmachine log</title>
+<link type="text/css" rel="stylesheet" href="/stylesheets/webui_style.css"></link>
+</head>
+<body>
+<% if params[:uuid] == nil %>
+<font color='red'>Please provide the 'uuid' parameter!</font>
+<% else %>
+<%
+  vm = Vmachine.find_by_uuid params[:uuid]
+%>
+<% if vm == nil%>
+<font color='red'>Vmachine with UUID='<%= params[:uuid] %>' not found!</font>
+<% else %>
+Log of Vmachine <font color='blue'><%= vm.name %></font>, UUID='<%= vm.uuid %>'.<p/>
+
+<table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
+<pre class='code'>
+<% vm.vmachine_infos.each do |info| %>
+<%= "[#{info.category}] #{info.message}" %>
+<% end %>
+</pre>
+</td></tr></table>
+<% end %>
+<% end %>
+</body>
+</html>
