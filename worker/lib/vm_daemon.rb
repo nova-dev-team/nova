@@ -682,7 +682,7 @@ def do_migrate
         end
 
       else
-        write_log "migrating failed!"
+        write_log "migrating failed! result = #{result}"
         File.open("status", "w") do |f|
           f.write "old_status"
         end
