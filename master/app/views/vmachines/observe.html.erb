@@ -5,17 +5,16 @@
 %>
 <html>
   <head>
-    <title>VNC for vm-<%= vm.id %></title>
+    <title>VNC for '<%= vm.hostname %>'</title>
   </head>
   <body>
-    You are observing vm-<%= vm.id %> via VNC on port <%= vm.vnc_port %>.<br>
     <hr>
     <applet CODE=VncViewer.class ARCHIVE=/vncviewer.jar WIDTH=1280 HEIGHT=900>
-      <param name=PORT value=<%= vm.vnc_port%>>
-      <param name=PASSWORD value='All your base are belong to us'>
+      <param name=PORT value=<%= common_conf["vm_vnc_port"] %>>
+      <param name=PASSWORD value='<%= vm.id %>'>
     </applet>
   </body>
 </html>
 <%else%>
-  Oops, you are not allowed to view this vmachine!
+  <font color='red'>Oops, you are not allowed to view this vmachine!</font>
 <%end-%>

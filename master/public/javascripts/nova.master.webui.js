@@ -1222,6 +1222,8 @@ function load_cluster_content(cluster_name) {
           } else if (m_info["status"] == "start-preparing") {
             html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Cancel start</span></span></button>";
           } else if (m_info["status"] == "running") {
+            html += "<button type='button' class='btn' onclick='observe_vm(" + m_info["id"] + ")'><span><span>Observe</span></span></button>";
+            html += white_spacing(4);
             html += "<button type='button' class='btn' onclick='suspend_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"" + m_info["name"] + "\")'><span><span>Suspend</span></span></button>";
             html += white_spacing(4);
             html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
@@ -1264,6 +1266,10 @@ function vm_ajax(cluster_name, url, data_map) {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
+}
+
+function observe_vm(vm_id) {
+  window.open("/vmachines/observe/" + vm_id, "vm observer");
 }
 
 function clear_error_of_vm(cluster_name, uuid) {
