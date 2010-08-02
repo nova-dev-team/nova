@@ -290,7 +290,7 @@ void read_pool_size(char* image_fn){
   char* pool_size_fn = (char*) malloc(sizeof(char) *(strlen(image_fn) + 128));
 
   // NOTE: we are working in "vdisks" dir (see the chdir() call in main()), so "misc" dir will be "../misc"
-  sprintf(pool_size_fn, "../misc/pool_size/%s.size", image_fn);
+  sprintf(pool_size_fn, "../../storage/misc/pool_size/%s.size", image_fn);
   printf("checking if %s pool_size config exists.\n", pool_size_fn);
   if(lstat(pool_size_fn, &st) == 0){
     FILE* fp;
@@ -301,7 +301,9 @@ void read_pool_size(char* image_fn){
     g_pool_size = atoi(buf);
   }
   else
+  {
     g_pool_size = 0;
+  }
 }
 
 void maintain_image_count(char* image_fn) {
