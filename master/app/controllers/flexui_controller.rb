@@ -12,7 +12,11 @@ class FlexuiController < ApplicationController
   #
   # Since::   0.3
   def index
-    redirect_to :controller => :flexui, :action => :ui
+    if File.exists? "#{RAILS_ROOT}/public/flexui/NovaFlexUI.html"
+      redirect_to :controller => :flexui, :action => :ui
+    else
+      redirect_to :controller => :webui, :action => :index
+    end
   end
 
   # The handler which renders the Flex container.
