@@ -1269,7 +1269,7 @@ function vm_ajax(cluster_name, url, data_map) {
 }
 
 function observe_vm(vm_id) {
-  window.open("/vmachines/observe/" + vm_id, "vm observer");
+  window.open("/vmachines/observe/" + vm_id, "_blank");
 }
 
 function clear_error_of_vm(cluster_name, uuid) {
