@@ -176,6 +176,13 @@ AGENT_HINT
     post_request "vmachines/destroy.json", :name => name
   end
 
+  # Live migration.
+  #
+  # Since::   0.3
+  def live_migrate vm_name, dest_ip
+    post_request "vmachines/live_migrate_to", :name => vm_name, :migrate_dest => dest_ip
+  end
+
   # Get the hostname of target machine.
   # Return nil on error.
   #
