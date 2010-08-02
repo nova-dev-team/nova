@@ -16,7 +16,8 @@ def ssh_nopass_cleanup(home_folder):
     os.system("cp %s %s~" % (auth_key_file, auth_key_file)) # do backup
     print "Cleaning duplicated authorized keys."
     duplicate_counter = 0
-    with open(auth_key_file, "r") as f:
+    f = open(auth_key_file, "r")
+    try:
       for line in f.readlines():
         if line.startswith("ssh-rsa") or line.startswith("rsa"):
           if ssh_lines.has_key(line):
@@ -25,15 +26,20 @@ def ssh_nopass_cleanup(home_folder):
             ssh_lines[line] = 1
         else:
           other_lines += line,
+    finally:
+      f.close()
     if duplicate_counter == 0:
       print "No duplicate entry found in '%s'." % auth_key_file
     else:
       print "%d duplicate entries found in '%s'." % (duplicate_counter, auth_key_file)
-      with open(auth_key_file, "w") as f:
+      f = open(auth_key_file, "w")
+      try:
         for line in ssh_lines.keys():
           f.write(line)
         for line in other_lines:
           f.write(line)
+      finally:
+        f.close()
       print "Re-written '%s'." % auth_key_file
     print "Done!"
   else: # "authorized_keys" file not found
