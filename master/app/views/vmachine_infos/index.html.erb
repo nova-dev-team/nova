@@ -18,7 +18,7 @@ Log of Vmachine <font color='blue'><%= vm.name %></font>, UUID='<%= vm.uuid %>'.
 <table bgcolor="#EBEBEB" class="code" width="100%"><tr><td>
 <pre class='code'>
 <% vm.vmachine_infos.each do |info| %>
-<%= "[#{info.category}] #{info.message}" %>
+<%= "#{info.created_at} [#{info.category}] #{info.message}" %>
 <% end %>
 </pre>
 </td></tr></table>
