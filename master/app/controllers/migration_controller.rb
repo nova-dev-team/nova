@@ -23,7 +23,8 @@ class MigrationController < ApplicationController
         next unless vm.status == "running" or vm.status == "suspended"
         # TODO add info of vm migration, such as migrate_from, migrate_to, etc.
         vm_data = {
-          :name => vm.name
+          :name => vm.name,
+          :uuid => vm.uuid
         }
         vm_all_data << vm_data
       end
@@ -31,6 +32,44 @@ class MigrationController < ApplicationController
       reply_data << pm_data
     end
     reply_success "Query successful!", :data => reply_data
+  end
+
+  def live_migrate
+    unless valid_param? params["vm_uuid"]
+      reply_failure "Please provide the 'vm_uuid' parameter!"
+      return
+    end
+    unless valid_param? params["dest_ip"]
+      reply_failure "Please provide the 'dest_ip' parameter!"
+      return
+    end
+    unless params["dest_ip"].to_s.is_ip_addr?
+      reply_failure "The 'dest_ip' is '#{params["dest_ip"]}, which is not a valid IP address!'"
+      return
+    end
+    pm = Pmachine.find_by_ip params["dest_ip"]
+    if pm == nil
+      reply_failure "Pmachine with IP='#{params["dest_ip"]}' not found!"
+      return
+    end
+    unless pm.status == "working"
+      reply_failure "Could only migrate to working pmachine!"
+      return
+    end
+    vm = Vmachine.find_by_uuid params["vm_uuid"]
+    if vm == nil
+      reply_failure "Vmachine with UUID='#{params["vm_uuid"]}' not found!"
+      return
+    end
+    unless vm.status == "running"
+      reply_failure "Only running vmachine could be migrated!"
+      return
+    end
+    if vm.live_migrate_to params["dest_ip"]
+      reply_success "The live migration will be done in a few seconds."
+    else
+      reply_failure "Failed to prepare the migration work!"
+    end
   end
 
 end

@@ -15,4 +15,14 @@ class Vmachine < ActiveRecord::Base
     self.name[(vc_name_length + 1)..-1]
   end
 
+  def live_migrate_to dest_ip
+    if self.pmachine == nil
+      return false
+    else
+      self.migrate_to = dest_ip
+      self.migrate_from = self.pmachine.ip
+      self.save
+    end
+  end
+
 end

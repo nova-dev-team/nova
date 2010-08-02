@@ -174,8 +174,6 @@ function load_migration_view() {
     url: "/migration/overview",
     type: "GET",
     dataType: "json",
-    data: {
-    },
     success: function(result) {
       if (result.success) {
         var html = "";
@@ -197,7 +195,7 @@ function load_migration_view() {
           html += "</td><td>";
           for (j = 0; j < pm_data.vmachines.length; j++) {
             var vm = pm_data.vmachines[j];
-            html += "<a href='#' onclick='do_migrate_vm(\"" + pm_data.ip + "\", \"" + vm.name + "\")'>" + vm.name + "</a> &nbsp;&nbsp;&nbsp; ";
+            html += "<a href='#' onclick='do_migrate_vm(\"" + vm.name + "\", \"" + vm.uuid + "\")'>" + vm.name + "</a> &nbsp;&nbsp;&nbsp; ";
             // TODO write vmachine info here
           }
           html += "</td></tr>";
@@ -217,8 +215,31 @@ function load_migration_view() {
   });
 }
 
-function do_migrate_vm(pm_ip, vm_name) {
-  do_message("success", "TODO", "Migrate vm '" + vm_name + "' on " + pm_ip);
+function do_migrate_vm(vm_name, vm_uuid) {
+  var dest_ip = prompt("Please input the migration destination");
+  if (dest_ip == "" || dest_ip == null) {
+    return;
+  } else {
+    $.ajax({
+      url: "/migration/live_migrate",
+      type: "POST",
+      dataType: "json",
+      data: {
+        dest_ip: dest_ip,
+        vm_uuid: vm_uuid
+      },
+      success: function(result) {
+        if (result.success) {
+          load_migration_view();
+        } else {
+          do_message("failure", "Error occurred", result.message);
+        }
+      },
+      error: function() {
+        do_message("failure", "Request failed", "Please check your network connection!");
+      }
+    });
+  }
 }
 
 //
