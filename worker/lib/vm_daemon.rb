@@ -668,8 +668,20 @@ def do_migrate
         File.open("status", "w") do |f|
           f.write "using"
         end
-        sleep 10
-        #sleep 10sec
+        sleep 20
+        #sleep 20sec
+        begin
+          dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
+
+          if dom.info.state == LIBVIRT_NOT_RUNNING
+            write_log "cleaning #{vm_uuid} on source worker!"
+            dom.destroy rescue nil
+            dom.undefined rescue nil
+          end
+        rescue => e
+          write_log "error: #{e.to_s}"
+        end
+
       else
         write_log "migrating failed!"
         File.open("status", "w") do |f|
