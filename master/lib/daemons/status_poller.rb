@@ -273,6 +273,16 @@ def loop_body
     end
   end
 
+  # update vnc_proxy
+  Vmachine.all.each do |vm|
+    next if vm.pmachine == nil
+    pwd = vm.id.to_s  # pwd is vm id
+    ip = vm.pmachine.ip.to_s
+    port = vm.vnc_port
+    next if port == nil
+    system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl add -p #{pwd} -d #{ip}:#{port} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
+  end
+
   sleep 1
 end
 

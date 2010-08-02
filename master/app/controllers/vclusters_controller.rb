@@ -113,6 +113,7 @@ class VclustersController < ApplicationController
       machines_info = []
       vc.vmachines.each do |vm|
         machines_info << {
+          :id => vm.id,
           :name => vm.hostname,
           :uuid => vm.uuid,
           :cpu_count => vm.cpu_count,

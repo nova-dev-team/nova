@@ -14,3 +14,4 @@ libvirt
 libvirt-devel
 sqlite-devel
 readline-devel
+mkisofs
