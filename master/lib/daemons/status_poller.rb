@@ -275,19 +275,24 @@ def loop_body
 
   # live migrations
   Vmachine.all.each do |vm|
-    next if vm.pmachine == nil
-    next if vm.migrate_to == nil
-    wp = vm.pmachine.worker_proxy
-    ret = wp.live_migrate vm.name, vm.migrate_to
+    begin
+      next if vm.pmachine == nil
+      next if vm.migrate_to == nil
+      wp = vm.pmachine.worker_proxy
+      ret = wp.live_migrate vm.name, vm.migrate_to
+      next if ret == nil
 
-    # change the vm's pmachine, if succesfully migrated
-    if ret["success"] == true
-      dest_pm = Pmachine.find_by_ip vm.migrate_to
-      vm.pmachine = dest_pm
+      # change the vm's pmachine, if succesfully migrated
+      if ret["success"] == true
+        dest_pm = Pmachine.find_by_ip vm.migrate_to
+        vm.pmachine = dest_pm
+      end
+      vm.migrate_to = nil
+      vm.migrate_from = nil
+      vm.save
+    rescue => e
+      write_log "[error] Exception when doing live migration: #{e.to_s}"
     end
-    vm.migrate_to = nil
-    vm.migrate_from = nil
-    vm.save
   end
 
   # update vnc_proxy

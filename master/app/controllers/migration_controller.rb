@@ -29,6 +29,8 @@ class MigrationController < ApplicationController
         vm_all_data << vm_data
       end
       pm_data[:vmachines] = vm_all_data
+      pm_data[:migrate_in] = (Vmachine.find_all_by_migrate_to pm.ip).collect {|vm| vm.name}
+      pm_data[:migrate_out] = (Vmachine.find_all_by_migrate_from pm.ip).collect {|vm| vm.name}
       reply_data << pm_data
     end
     reply_success "Query successful!", :data => reply_data

@@ -177,7 +177,7 @@ function load_migration_view() {
     success: function(result) {
       if (result.success) {
         var html = "";
-        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Status</td><td>Running Vmachines</td></tr>";
+        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Status</td><td>Running Vmachines</td><td>Migrate In</td><td>Migrate Out</td></tr>";
         
         for (i = 0; i < result.data.length; i++) {
           var pm_data = result.data[i];
@@ -196,7 +196,14 @@ function load_migration_view() {
           for (j = 0; j < pm_data.vmachines.length; j++) {
             var vm = pm_data.vmachines[j];
             html += "<a href='#' onclick='do_migrate_vm(\"" + vm.name + "\", \"" + vm.uuid + "\")'>" + vm.name + "</a> &nbsp;&nbsp;&nbsp; ";
-            // TODO write vmachine info here
+          }
+          html += "</td><td>";
+          for (j = 0; j < pm_data.migrate_in.length; j++) {
+            html += pm_data.migrate_in[j] + white_spacing(4);
+          }
+          html += "</td><td>";
+          for (j = 0; j < pm_data.migrate_out.length; j++) {
+            html += pm_data.migrate_out[j] + white_spacing(4);
           }
           html += "</td></tr>";
         }
