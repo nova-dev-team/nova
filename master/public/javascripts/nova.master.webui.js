@@ -174,12 +174,10 @@ function load_migration_view() {
     url: "/migration/overview",
     type: "GET",
     dataType: "json",
-    data: {
-    },
     success: function(result) {
       if (result.success) {
         var html = "";
-        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Status</td><td>Running Vmachines</td></tr>";
+        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Capacity</td><td>Status</td><td>Running Vmachines</td><td>Migrate In</td><td>Migrate Out</td></tr>";
         
         for (i = 0; i < result.data.length; i++) {
           var pm_data = result.data[i];
@@ -197,8 +195,15 @@ function load_migration_view() {
           html += "</td><td>";
           for (j = 0; j < pm_data.vmachines.length; j++) {
             var vm = pm_data.vmachines[j];
-            html += "<a href='#' onclick='do_migrate_vm(\"" + pm_data.ip + "\", \"" + vm.name + "\")'>" + vm.name + "</a> &nbsp;&nbsp;&nbsp; ";
-            // TODO write vmachine info here
+            html += "<a href='#' onclick='do_migrate_vm(\"" + vm.name + "\", \"" + vm.uuid + "\")'>" + vm.name + "</a> &nbsp;&nbsp;&nbsp; ";
+          }
+          html += "</td><td>";
+          for (j = 0; j < pm_data.migrate_in.length; j++) {
+            html += pm_data.migrate_in[j] + white_spacing(4);
+          }
+          html += "</td><td>";
+          for (j = 0; j < pm_data.migrate_out.length; j++) {
+            html += pm_data.migrate_out[j] + white_spacing(4);
           }
           html += "</td></tr>";
         }
@@ -217,8 +222,31 @@ function load_migration_view() {
   });
 }
 
-function do_migrate_vm(pm_ip, vm_name) {
-  do_message("success", "TODO", "Migrate vm '" + vm_name + "' on " + pm_ip);
+function do_migrate_vm(vm_name, vm_uuid) {
+  var dest_ip = prompt("Please input the migration destination");
+  if (dest_ip == "" || dest_ip == null) {
+    return;
+  } else {
+    $.ajax({
+      url: "/migration/live_migrate",
+      type: "POST",
+      dataType: "json",
+      data: {
+        dest_ip: dest_ip,
+        vm_uuid: vm_uuid
+      },
+      success: function(result) {
+        if (result.success) {
+          load_migration_view();
+        } else {
+          do_message("failure", "Error occurred", result.message);
+        }
+      },
+      error: function() {
+        do_message("failure", "Request failed", "Please check your network connection!");
+      }
+    });
+  }
 }
 
 //
@@ -1234,6 +1262,8 @@ function load_cluster_content(cluster_name) {
           } else if (m_info["status"] == "boot-failure") {
             html += "<button type='button' class='btn' onclick='clear_error_of_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Clear error</span></span></button>";
           }
+          html += white_spacing(4);
+          html += "<button type='button' class='btn' onclick='show_vm_log(\"" + m_info["uuid"] + "\")'><span><span><font color='blue'>Show Log</font></span></span></button>";
           html += "</td></tr>";
         }
         html += "</table>";
@@ -1266,6 +1296,10 @@ function vm_ajax(cluster_name, url, data_map) {
       do_message("failure", "Request failed", "Please check your network connection!");
     }
   });
+}
+
+function show_vm_log(vm_uuid) {
+  window.open("/vmachine_infos?uuid=" + vm_uuid, "_blank");
 }
 
 function observe_vm(vm_id) {
