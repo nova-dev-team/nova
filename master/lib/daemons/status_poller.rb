@@ -176,6 +176,7 @@ def loop_body
         end
         if vm_found == false and vm.status != "start-pending" and vm.status != "boot-failure" and vm.status != "connect-failure"
           write_log "VM '#{vm.name}' is not running any more!"
+          vm.log "info", "VM '#{vm.name}' is not running any more!"
           vm.status = "shut-off"
           vm.pmachine.vmachines.delete vm
           vm.pmachine = nil
@@ -202,6 +203,7 @@ def loop_body
           if vm.status == "shutdown-pending"
             # destroy VM if it is pending shut-off
             write_log "VM '#{real_vm["name"]}' is to be shut off"
+            vm.log "info", "VM '#{real_vm["name"]}' is to be shut off"
             pm.worker_proxy.destroy_vm vm.name
             
             vm.status = "shut-off"
@@ -241,22 +243,26 @@ def loop_body
   # will be smaller.
   Vmachine.find(:all, :conditions =>'status = "start-pending"').each do |vm|
     write_log "trying to start vm #{vm.name}"
+    vm.log "info", "Trying to start vm #{vm.name}"
     pm = Pmachine.start_vm vm
     if pm == nil
       # not enough machines
       vm.status = "boot-failure"
       vm.save
       write_log "failed to boot #{vm.name}, mark status as 'boot-failure'"
+      vm.log "info", "Failed to boot #{vm.name}, mark status as 'boot-failure'"
     else
       vm.status = "start-preparing"
       vm.save
       write_log "triggered #{vm.name}, mark status as 'start-preparing'"
+      vm.log "info", "Triggered #{vm.name}, mark status as 'start-preparing'"
     end
   end
 
   # close VMs.
   Vmachine.find(:all, :conditions =>'status = "shutdown-pending"').each do |vm|
     write_log "Shutting down vm '#{vm.name}'"
+    vm.log "info", "Shutting down vm '#{vm.name}'"
     if vm.pmachine != nil
       wp = vm.pmachine.worker_proxy
       wp.destroy_vm vm.name if wp != nil
@@ -268,6 +274,7 @@ def loop_body
     else
       # pmachine is null, which is very unlikely
       write_log "Warning: vm '#{vm.name}' does not have a pmachine!"
+      vm.log "warning", "Vmachine '#{vm.name}' does not have a pmachine!"
       vm.status = "shut-off"
       vm.save
     end
@@ -278,20 +285,29 @@ def loop_body
     begin
       next if vm.pmachine == nil
       next if vm.migrate_to == nil
+      vm.log "info", "Migrating from '#{vm.migrate_from}' to '#{vm.migrate_to}'"
       wp = vm.pmachine.worker_proxy
       ret = wp.live_migrate vm.name, vm.migrate_to
-      next if ret == nil
-
-      # change the vm's pmachine, if succesfully migrated
-      if ret["success"] == true
-        dest_pm = Pmachine.find_by_ip vm.migrate_to
-        vm.pmachine = dest_pm
+      if ret == nil
+        # migration failure
+        vm.log "error", "Error when migrating from '#{vm.migrate_from}' to '#{vm.migrate_to}'"
+      else
+        # migration finished, either success, or failure
+        # change the vm's pmachine, if succesfully migrated
+        if ret["success"] == true
+          dest_pm = Pmachine.find_by_ip vm.migrate_to
+          vm.pmachine = dest_pm
+          vm.log "info", "Successfully migrated from '#{vm.migrate_from}' to '#{vm.migrate_to}'"
+        else
+          vm.log "error", "Failed to migrate from '#{vm.migrate_from}' to '#{vm.migrate_to}'"
+        end
       end
       vm.migrate_to = nil
       vm.migrate_from = nil
       vm.save
     rescue => e
       write_log "[error] Exception when doing live migration: #{e.to_s}"
+      vm.log "exception", "When doing live migration: #{e.to_s}"
     end
   end
 
