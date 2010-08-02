@@ -522,12 +522,10 @@ def do_restart vm_dir
   vm_uuid = xml_desc["uuid"][0]
   virt_conn = libvirt_connect_local
   dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
-
   if dom.info.state == LIBVIRT_NOT_RUNNING
     write_log "restarting vmachine #{vm_uuid}"
-    dom.create
+    dom.reboot
   end
-
 end
 
 def do_save storage_server, vm_dir
