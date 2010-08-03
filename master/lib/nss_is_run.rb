@@ -56,10 +56,10 @@ fork do
     # Record the modify time of file "nss_is_run_updater_script".
     if np.status == "running"
       #puts "OK2"
-      if np.hostname != nil
+      if np.role != nil
         fp = File.open(fpath,"w+")
         if fp
-          fp.syswrite("hostname: #{np.hostname}")
+          fp.syswrite("role: #{np.role}")
           write_nss_log "Write nss info into file: '#{fpath}'!"
         else
           puts "Unable to open file: '#{fpath}'!"
