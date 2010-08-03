@@ -113,6 +113,7 @@ def loop_body
           pm.save
           next # go on with next pmachine
         else
+          retry_count += 1
           retry
         end
       else
