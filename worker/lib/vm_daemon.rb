@@ -375,18 +375,29 @@ def do_prepare rails_root, storage_server, vm_dir
   File.open(File.join(vm_dir, "required_images")) do |f|
     f.each_line do |line|
       img = line.strip
-      if img.end_with? ".qcow2"
-        write_log "preparing qcow2 image '#{img}'"
-        prepare_hda_image storage_server, image_pool_dir, vm_dir, img
-      elsif img.end_with? ".iso"
-        write_log "preparing iso image '#{img}'"
-        prepare_iso_image storage_server, image_pool_dir, vm_dir, img
-      elsif img.end_with? ".img"
-        write_log "preparing img image '#{img}'"
-        prepare_hda_image storage_server, image_pool_dir, vm_dir, img
-      else
-        write_log "directly use image file '#{img}'"
-        prepare_hda_image_directly image_pool_dir, vm_dir, img
+      img_fn = File.join vm_dir, img
+      retry_count = 5
+      
+      while retry_count > 0
+        retry_count = retry_count - 1
+        if img.end_with? ".qcow2"
+          write_log "preparing qcow2 image '#{img}'"
+          prepare_hda_image storage_server, image_pool_dir, vm_dir, img
+        elsif img.end_with? ".iso"
+          write_log "preparing iso image '#{img}'"
+          prepare_iso_image storage_server, image_pool_dir, vm_dir, img
+        elsif img.end_with? ".img"
+          write_log "preparing img image '#{img}'"
+          prepare_hda_image storage_server, image_pool_dir, vm_dir, img
+        else
+          write_log "directly use image file '#{img}'"
+          prepare_hda_image_directly image_pool_dir, vm_dir, img
+        end
+
+        break if File.exists(img_fn)
+
+        interval = rand(10) + 1
+        sleep interval
       end
     end
   end
