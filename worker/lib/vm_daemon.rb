@@ -379,7 +379,6 @@ def do_prepare rails_root, storage_server, vm_dir
       retry_count = 5
       
       while retry_count > 0
-        retry_count = retry_count - 1
         if img.end_with? ".qcow2"
           write_log "preparing qcow2 image '#{img}'"
           prepare_hda_image storage_server, image_pool_dir, vm_dir, img
@@ -394,8 +393,9 @@ def do_prepare rails_root, storage_server, vm_dir
           prepare_hda_image_directly image_pool_dir, vm_dir, img
         end
 
-        break if File.exists(img_fn)
+        break if File.exists?(img_fn)
 
+        retry_count = retry_count - 1
         interval = rand(10) + 1
         sleep interval
       end
