@@ -127,12 +127,13 @@ function load_monitor(ip, pm_id) {
               mode: "time", timeformat: "%M:%S"
             },
             yaxis: {
+              tickDecimals: 1,
               tickFormatter: function (v, axis) { 
                 if(v <  1024) {
-                  return v + "MB";
+                  return v.toFixed(axis.tickDecimals) + "MB";
                 } else {
                   v = v / 1024;
-                  return v + "GB";
+                  return v.toFixed(axis.tickDecimals) + "GB";
                 }
               }
             }
@@ -149,13 +150,14 @@ function load_monitor(ip, pm_id) {
             xaxis: {
               mode: "time", timeformat: "%M:%S"
             },
-            yaxis: { 
+            yaxis: {
+              tickDecimals: 1,
               tickFormatter: function (v, axis) {
                 if(v < 1024) {
-                  return v + "KB/s";
+                  return v.toFixed(axis.tickDecimals) + "KB/s";
                 } else {
                   v = v / 1024;
-                  return v + "MB/s";
+                  return v.toFixed(axis.tickDecimals) + "MB/s";
                 }
               }
             }
@@ -172,13 +174,14 @@ function load_monitor(ip, pm_id) {
             xaxis: {
               mode: "time", timeformat: "%M:%S"
             },
-            yaxis: { 
+            yaxis: {
+              tickDecimals: 1, 
               tickFormatter: function (v, axis) {
                 if(v < 1024) {
-                  return v + "MB";
+                  return v.toFixed(axis.tickDecimals) + "MB";
                 } else {
                   v = v / 1024;
-                  return v + "GB";
+                  return v.toFixed(axis.tickDecimals)  + "GB";
                 }
               }
             }

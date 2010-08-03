@@ -150,6 +150,13 @@ class VclustersController < ApplicationController
         reply_failure "You are not allowed to do this!"
         return
       end
+      # only allowed to destroy, when all machine is shut-down
+      vc.vmachines.each do |vm|
+        if vm.status != "shut-off"
+          reply_failure "You cannot destroy a cluster unless all machines are 'shut-off'!"
+          return
+        end
+      end
       vc.vmachines.each do |vm|
         Vmachine.delete vm
       end
