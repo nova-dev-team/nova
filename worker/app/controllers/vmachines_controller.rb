@@ -22,6 +22,7 @@ public
       end
 
       begin
+        xml_desc = XmlSimple.xml_in dom.xml_desc
         dom_info["vnc_port"] = xml_desc["devices"][0]["graphics"][0]["port"]
       rescue
       end
