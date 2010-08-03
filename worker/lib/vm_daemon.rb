@@ -417,6 +417,9 @@ def do_prepare rails_root, storage_server, vm_dir
       agent_gateway = ""
       agent_dns = ""
       cluster_name = ""
+      id_rsa = nil
+      id_rsa_pub = nil
+
       File.read("agent_hint").each_line do |line|
         line = line.strip
         if line.start_with? "ip="
@@ -429,6 +432,10 @@ def do_prepare rails_root, storage_server, vm_dir
           agent_dns = line[4..-1]
         elsif line.start_with? "cluster_name="
           cluster_name = line[13..-1]
+        elsif line.start_with? "id_rsa="
+          id_rsa = line[7..-1]
+        elsif line.start_with? "id_rsa_pub="
+          id_rsa_pub = line[11..-1]
         end
       end
 
@@ -465,6 +472,11 @@ def do_prepare rails_root, storage_server, vm_dir
       igen.config_key_server(server_user_pwd_host, server_uri.port.to_s, server_uri.scheme)
 
       igen.config_nodelist(File.read "nodelist")
+
+      #set ssh key
+      if id_rsa and id_rsa_pub
+        igen.config_ssh_key(id_rsa, id_rsa_pub)
+      end
 
       # set the software packages
       software_packages = ["common", "ssh-nopass"] # by default, install those 2 packages
