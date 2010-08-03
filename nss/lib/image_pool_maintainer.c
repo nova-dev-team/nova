@@ -311,10 +311,11 @@ void maintain_image_count(char* image_fn) {
   struct stat st;
   int copy_id;
   char* test_fn = (char *) malloc(sizeof(char) * (strlen(image_fn) + 32));
-
+ 
   read_pool_size(image_fn);
 
   for (copy_id = 1; copy_id <= g_pool_size; copy_id++) {
+    read_pool_size(image_fn);
     sprintf(test_fn, "%s.pool.%d", image_fn, copy_id);
     printf("checking if has copy %s\n", test_fn);
     if (lstat(test_fn, &st) != 0) {
