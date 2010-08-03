@@ -32,6 +32,7 @@ private
     end
     result = {:success => success, :message => message}.merge(additional_info)
     respond_to do |accept|
+      accept.xml {render :xml => result}
       accept.json {render :json => result}
       accept.html do
         # TODO better json result rendering
