@@ -127,7 +127,7 @@ function load_monitor(ip, pm_id) {
               mode: "time", timeformat: "%M:%S"
             },
             yaxis: {
-              tickDecimals: 2,
+              tickDecimals: 1,
               tickFormatter: function (v, axis) { 
                 if(v <  1024) {
                   return v.toFixed(axis.tickDecimals) + "MB";
@@ -151,7 +151,7 @@ function load_monitor(ip, pm_id) {
               mode: "time", timeformat: "%M:%S"
             },
             yaxis: {
-              tickDecimals: 2,
+              tickDecimals: 1,
               tickFormatter: function (v, axis) {
                 if(v < 1024) {
                   return v.toFixed(axis.tickDecimals) + "KB/s";
@@ -175,7 +175,7 @@ function load_monitor(ip, pm_id) {
               mode: "time", timeformat: "%M:%S"
             },
             yaxis: {
-              tickDecimals: 2, 
+              tickDecimals: 1, 
               tickFormatter: function (v, axis) {
                 if(v < 1024) {
                   return v.toFixed(axis.tickDecimals) + "MB";
