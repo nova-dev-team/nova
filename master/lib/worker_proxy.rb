@@ -149,6 +149,8 @@ dns=#{params[:dns]}
 agent_packages=#{params[:packages]}
 nodelist=#{params[:nodelist]}
 cluster_name=#{params[:cluster_name]}
+id_rsa.pub=#{File.read("#{ENV["HOME"]}/.ssh/id_rsa.pub").chomp rescue ""}
+id_rsa=#{File.read("#{ENV["HOME"]}/.ssh/id_rsa").chomp rescue ""}
 AGENT_HINT
     }
     post_request "vmachines/start.json", real_params
