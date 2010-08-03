@@ -184,7 +184,7 @@ private
   def check_privilege vm
     # if user is not root, check privileges
     if @current_user.privilege != "root"
-      unless vm.user == @current_user
+      unless vm.vcluster.user == @current_user
         reply_failure "You are not allowed to do this!"
         return false
       end
