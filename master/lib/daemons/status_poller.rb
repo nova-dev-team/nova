@@ -174,7 +174,7 @@ def loop_body
             break
           end
         end
-        if vm_found == false and vm.status != "start-pending" and vm.status != "boot-failure" and vm.status != "connect-failure"
+        if vm_found == false and vm.status != "start-pending" and vm.status != "boot-failure" and vm.status != "connect-failure" and vm.migrate_to != nil
           write_log "VM '#{vm.name}' is not running any more!"
           vm.log "info", "VM '#{vm.name}' is not running any more!"
           vm.status = "shut-off"
