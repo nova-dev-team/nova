@@ -102,14 +102,19 @@ def loop_body
   Pmachine.find(:all, :conditions =>'status = "working"').each do |pm|
 
     # test if worker is still running
+    retry_count = 0
     begin
       #write_log "Testing if worker #{pm.ip} is still running"
       wp = pm.worker_proxy
       if wp.status == "failure"
-        write_log "Worker #{pm.ip} is down"
-        pm.status = "failure"
-        pm.save
-        next # go on with next pmachine
+        if retry_count > 3
+          write_log "Worker #{pm.ip} is down"
+          pm.status = "failure"
+          pm.save
+          next # go on with next pmachine
+        else
+          retry
+        end
       else
 #        write_log "Worker #{pm.ip} still running"
       end
@@ -290,7 +295,7 @@ def loop_body
       ret = wp.live_migrate vm.name, vm.migrate_to
       if ret == nil
         # migration failure
-        vm.log "error", "Error when migrating from '#{vm.migrate_from}' to '#{vm.migrate_to}'"
+        vm.log "error", "Error when migrating from '#{vm.migrate_from}' to '#{vm.migrate_to}'; Worker error message: #{wp.error_message}"
       else
         # migration finished, either success, or failure
         # change the vm's pmachine, if succesfully migrated
