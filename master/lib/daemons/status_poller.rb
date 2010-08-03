@@ -331,7 +331,7 @@ def loop_body
     ip = vm.pmachine.ip.to_s
     port = vm.vnc_port
     next if port == nil
-    system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl del -p #{pwd}"
+    system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl del -p #{pwd} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
     system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl add -p #{pwd} -d #{ip}:#{port} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
   end
 
