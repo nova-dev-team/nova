@@ -21,11 +21,9 @@ public
         dom_info[property] = dom.send property
       end
 
-      # get the vnc port
-      if dom.info.state == Vmachine::LIBVIRT_RUNNING or dom.info.state == Vmachine::LIBVIRT_SUSPENDED
-        # only these 2 state has vnc port
-        xml_desc = XmlSimple.xml_in dom.xml_desc
+      begin
         dom_info["vnc_port"] = xml_desc["devices"][0]["graphics"][0]["port"]
+      rescue
       end
 
       vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
