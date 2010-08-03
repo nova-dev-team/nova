@@ -239,6 +239,13 @@ def loop_body
         else
           write_log "VM '#{real_vm["name"]}' not in DB, ignored!"
         end
+
+        # fix vnc port == -1
+        fix_vm = Vmachine.find_by_uuid real_vm["uuid"]
+        if fix_vm != nil and fix_vm.vnc_port.to_s == "-1"
+          fix_vm.vnc_port = real_vm["vnc_port"]
+          fix_vm.save
+        end
       end
     rescue
     end
