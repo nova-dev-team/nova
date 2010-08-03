@@ -113,6 +113,7 @@ def loop_body
           pm.save
           next # go on with next pmachine
         else
+          retry_count += 1
           retry
         end
       else
@@ -242,7 +243,7 @@ def loop_body
 
         # fix vnc port == -1
         fix_vm = Vmachine.find_by_uuid real_vm["uuid"]
-        if fix_vm != nil and fix_vm.vnc_port.to_s == "-1"
+        if fix_vm != nil and (fix_vm.vnc_port == nil or fix_vm.vnc_port.to_s == "-1")
           fix_vm.vnc_port = real_vm["vnc_port"]
           fix_vm.save
         end
@@ -330,6 +331,7 @@ def loop_body
     ip = vm.pmachine.ip.to_s
     port = vm.vnc_port
     next if port == nil
+    system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl del -p #{pwd} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
     system "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy_ctl add -p #{pwd} -d #{ip}:#{port} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock"
   end
 

@@ -180,7 +180,7 @@ AGENT_HINT
   #
   # Since::   0.3
   def live_migrate vm_name, dest_ip
-    post_request "vmachines/live_migrate_to", :name => vm_name, :migrate_dest => dest_ip
+    post_request "vmachines/live_migrate_to.json", :name => vm_name, :migrate_dest => dest_ip
   end
 
   # Get the hostname of target machine.
@@ -266,11 +266,6 @@ AGENT_HINT
     ret = post_request "settings/edit.json", :key => key, :value => value
     return ret if ret != nil
     return {:success => false, :message => "Request to worker module failed!"}
-  end
-
-  def live_migrate_to vm_name, pm_ip
-    ret = post_request "vmachines/live_migrate_to.json", :name => vm_name, :migrate_dest => pm_ip
-    return ret
   end
 
 private
