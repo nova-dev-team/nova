@@ -666,35 +666,37 @@ def do_migrate
         File.open("status", "w") do |f|
           f.write "using"
         end
-        begin
-          dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
-
-          if dom.info.state == LIBVIRT_NOT_RUNNING
-            write_log "cleaning #{vm_uuid} on source worker!"
-            dom.destroy rescue nil
-            dom.undefine rescue nil
-          end
-          exit 0
-        rescue => e
-          write_log "error: #{e.to_s}"
-        end
-
       else
-        write_log "migrating failed! result = #{result}"
+        write_log "migrating maybe failed! result = #{result}"
         File.open("status", "w") do |f|
           f.write "old_status"
         end
       end
+
+      #check local dom running status
+      #if running, migrate failed/migrate to self success, just skip
+      #if not running, undefine it, then exit
+
+      begin
+        dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
+        if dom.info.state == LIBVIRT_NOT_RUNNING
+          write_log "cleaning #{vm_uuid} on source worker!"
+          dom.destroy rescue nil
+          dom.undefine rescue nil
+        end
+        exit 0
+      rescue => e
+        write_log "[migration]: #{e.to_s}"
+      end
+
     rescue
-      write_log "live migrate failed!"
+      write_log "call to live migrate failed!"
       File.open("status", "w") do |f|
         f.write "old_status"
       end
     end
-
     write_log "migrating finished, remove migrating tag"
     FileUtils.rm_f "migrate_to"
-
   else
     write_log "invalid params, migrating failed"
     FileUtils.rm_f "migrate_to"
