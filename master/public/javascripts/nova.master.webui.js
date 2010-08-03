@@ -108,10 +108,10 @@ function load_monitor(ip, pm_id) {
               lines: {show:true}
             },
             xaxis: {
-              mode: "time", timeformat: "%H:%M"
+              mode: "time", timeformat: "%M:%S"
             },
             yaxis: {
-              tickFormatter: function (v, axis) { return v + "%" }
+              tickFormatter: function (v, axis) { return v + "%"; }
             }
           }
         );
@@ -124,10 +124,17 @@ function load_monitor(ip, pm_id) {
               lines: {show:true}
             },
             xaxis: {
-              mode: "time", timeformat: "%H:%M"
+              mode: "time", timeformat: "%M:%S"
             },
             yaxis: {
-              tickFormatter: function (v, axis) { return v + "MB" }
+              tickFormatter: function (v, axis) { 
+                if(v <  1024) {
+                  return v + "MB";
+                } else {
+                  v = v / 1024;
+                  return v + "GB";
+                }
+              }
             }
           }
         );
@@ -140,10 +147,17 @@ function load_monitor(ip, pm_id) {
               lines: {show:true}
             },
             xaxis: {
-              mode: "time", timeformat: "%H:%M"
+              mode: "time", timeformat: "%M:%S"
             },
             yaxis: { 
-              tickFormatter: function (v, axis) { return v + "KB/s" }
+              tickFormatter: function (v, axis) {
+                if(v < 1024) {
+                  return v + "KB/s";
+                } else {
+                  v = v / 1024;
+                  return v + "MB/s";
+                }
+              }
             }
           }
         );
@@ -156,10 +170,17 @@ function load_monitor(ip, pm_id) {
               lines: {show:true}
             },
             xaxis: {
-              mode: "time", timeformat: "%H:%M"
+              mode: "time", timeformat: "%M:%S"
             },
             yaxis: { 
-              tickFormatter: function (v, axis) { return v + "MB" }
+              tickFormatter: function (v, axis) {
+                if(v < 1024) {
+                  return v + "MB";
+                } else {
+                  v = v / 1024;
+                  return v + "GB";
+                }
+              }
             }
           }
         );
