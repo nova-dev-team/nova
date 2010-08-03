@@ -111,7 +111,6 @@ def loop_body
           write_log "Worker #{pm.ip} is down"
           pm.status = "failure"
           pm.save
-          next # go on with next pmachine
         else
           retry_count += 1
           retry
@@ -121,6 +120,15 @@ def loop_body
       end
     rescue => e
       write_log "Exception occured when testing liveness of #{pm.ip}: #{e.to_s}"
+      unless retry_count > 3
+        retry_count += 1
+        retry
+      end
+    end
+
+    if pm.status != "working"
+      # the pm status could be changed by the testing code above
+      next # go on with next pmachine
     end
 
     # sync the settings for "storage_server"
