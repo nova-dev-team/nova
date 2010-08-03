@@ -40,7 +40,7 @@ class WorkerProxy
   # The timeout to worker modules.
   #
   # Since::   0.3
-  WORKER_PROXY_TIMEOUT = 30
+  WORKER_PROXY_TIMEOUT = 10
 
   # The status of the proxy.
   # Could be:
