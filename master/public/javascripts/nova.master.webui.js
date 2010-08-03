@@ -109,6 +109,9 @@ function load_monitor(ip, pm_id) {
             },
             xaxis: {
               mode: "time", timeformat: "%H:%M"
+            },
+            yaxis: {
+              tickFormatter: function (v, axis) { return v + "%" }
             }
           }
         );
@@ -122,6 +125,9 @@ function load_monitor(ip, pm_id) {
             },
             xaxis: {
               mode: "time", timeformat: "%H:%M"
+            },
+            yaxis: {
+              tickFormatter: function (v, axis) { return v + "MB" }
             }
           }
         );
@@ -135,6 +141,9 @@ function load_monitor(ip, pm_id) {
             },
             xaxis: {
               mode: "time", timeformat: "%H:%M"
+            },
+            yaxis: { 
+              tickFormatter: function (v, axis) { return v + "KB/s" }
             }
           }
         );
@@ -148,6 +157,9 @@ function load_monitor(ip, pm_id) {
             },
             xaxis: {
               mode: "time", timeformat: "%H:%M"
+            },
+            yaxis: { 
+              tickFormatter: function (v, axis) { return v + "MB" }
             }
           }
         );
