@@ -55,6 +55,7 @@ fork do
     puts "NSS proxy error message: '#{np.error_message}'"
     write_nss_log "Created NSS proxy for '#{NSS_ADDR}', status: '#{np.status}', error message: '#{np.error_message}'"
 
+    config_time = File.mtime(fspath)
     # Record the modify time of file "nss_is_run_updater_script".
     if np.status == "running"
       #puts "OK2"
@@ -89,3 +90,4 @@ fork do
     end
   end
 end
+
