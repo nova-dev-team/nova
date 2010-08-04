@@ -154,7 +154,10 @@ def prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
     end
   else
     # base image does not exist, we have to download it
-    write_log "hda image is not ready, need to be downloaded"
+    write_log "hda image is not ready!"
+    return false
+    # disable copying from ftp directly
+
     if File.exists? base_image_name and File.exists? base_image_copying_lock
       # already being downloaded by other process, wait for it
       write_log "download already started by other process, waiting for it"
