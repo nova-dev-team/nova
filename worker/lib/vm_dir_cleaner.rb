@@ -91,7 +91,7 @@ while true
             end
             
             if dom == nil
-              cleanup(vm_dir_path, "vmachine not defined")
+              #cleanup(vm_dir_path, "vmachine not defined")
             end
             conn.close
           else

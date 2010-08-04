@@ -155,8 +155,6 @@ def prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
   else
     # base image does not exist, we have to download it
     write_log "hda image is not ready!"
-    return false
-    # disable copying from ftp directly
 
     if File.exists? base_image_name and File.exists? base_image_copying_lock
       # already being downloaded by other process, wait for it
@@ -200,8 +198,10 @@ LFTP_SCRIPT_FILE
 
       write_log "finished downloading hda image"
     end
-    write_log "retry preparing process"
-    prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
+    return false
+    # retry in outer loop
+#    write_log "retry preparing process"
+#    prepare_hda_image storage_server, image_pool_dir, vm_dir, hda_name
   end
 end
 
