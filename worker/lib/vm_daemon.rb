@@ -546,12 +546,18 @@ def do_restart vm_dir
   # restart
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   vm_uuid = xml_desc["uuid"][0]
+  write_log "restarting vmachine #{vm_uuid}"
+  system "virsh create xml_desc.xml"
+=begin
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  vm_uuid = xml_desc["uuid"][0]
   virt_conn = libvirt_connect_local
   dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
   if dom.info.state == LIBVIRT_NOT_RUNNING
     write_log "restarting vmachine #{vm_uuid}"
-    dom.reboot
+    dom.create
   end
+=end
 end
 
 def do_save storage_server, vm_dir

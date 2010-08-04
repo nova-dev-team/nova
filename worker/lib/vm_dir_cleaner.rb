@@ -65,6 +65,7 @@ while true
       next unless File.directory? vm_dir_path
  
       host_uuid = nil
+      sleep 1
       begin
         host_uuid = File.read(host_uuid_fn)
       rescue
@@ -102,6 +103,7 @@ while true
       else
         cleanup(vm_dir_path, "host.uuid not found")
       end
+
     rescue
     end
   end
