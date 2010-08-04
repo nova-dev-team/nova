@@ -246,7 +246,12 @@ def loop_body
             vm.save
           end
         else
-          write_log "VM '#{real_vm["name"]}' not in DB, ignored!"
+          write_log "VM '#{real_vm["name"]}' not in DB, destroying!"
+          begin
+            pm.worker_proxy.destroy_vm real_vm["name"]
+          rescue => e
+            write_log "Exception while destroying ophan '#{real_vm["name"]}': #{e.to_s}"
+          end
         end
 
         # fix vnc port == -1

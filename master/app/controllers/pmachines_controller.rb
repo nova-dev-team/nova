@@ -118,7 +118,7 @@ class PmachinesController < ApplicationController
   # It is only possible when these conditions met:
   #
   #   * no VM running on the physical machine.
-  #   * the machine is retired or in 'failure' status.
+  #   * or the machine is retired or in 'failure' status.
   #
   # Since::     0.3
   def delete
@@ -126,8 +126,6 @@ class PmachinesController < ApplicationController
     pm = Pmachine.find_by_ip params[:ip]
     if pm == nil
       reply_failure "Pmachine with IP=#{params[:ip]} not found!"
-    elsif pm.vmachines.length != 0
-      reply_failure "Cannot delte the pmachine, since there is still #{pm.vmachines.length} VM running on it!"
     elsif pm.status != "retired" and pm.status != "failure"
       reply_failure "The pmachine could only be deleted when it is 'retired' or in 'failure' status!"
     else
