@@ -39,12 +39,7 @@ fork do
   end
   while 1 do
     fp = File.new(fpath, "w+")
-    NSS_ADDR = "#{File.open(fspath).readline.chomp}:#{common_conf["nss_port"]}" if File.exist? fspath
-    np = NssProxy.new NSS_ADDR
-    puts "Created NSS proxy for '#{NSS_ADDR}'"
-    puts "NSS proxy status: '#{np.status}'"
-    puts "NSS proxy error message: '#{np.error_message}'"
-    write_nss_log "Created NSS proxy for '#{NSS_ADDR}', status: '#{np.status}', error message: '#{np.error_message}'"
+ 
     unless File.exists? fspath
       # create default settings file
       File.open(fspath, "w") do |f|
@@ -52,7 +47,14 @@ fork do
       end
       write_nss_log "'#{fspath}' not exist, create it and write '127.0.0.1'"
     end
-    config_time = File.mtime(fspath)
+ 
+    NSS_ADDR = "#{File.open(fspath).readline.chomp}:#{common_conf["nss_port"]}" if File.exist? fspath
+    np = NssProxy.new NSS_ADDR
+    puts "Created NSS proxy for '#{NSS_ADDR}'"
+    puts "NSS proxy status: '#{np.status}'"
+    puts "NSS proxy error message: '#{np.error_message}'"
+    write_nss_log "Created NSS proxy for '#{NSS_ADDR}', status: '#{np.status}', error message: '#{np.error_message}'"
+
     # Record the modify time of file "nss_is_run_updater_script".
     if np.status == "running"
       #puts "OK2"
