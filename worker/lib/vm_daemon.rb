@@ -690,7 +690,7 @@ def do_migrate
 
     write_log "changed VM status to 'migrating'"
     begin
-      cmd = "virsh migrate --live " + vm_uuid + " xen:/// xenmigr://" + migrate_dest
+      cmd = "virsh migrate --live " + vm_uuid + " xen:/// xenmigr://" + migrate_dest + " 2>&1 >> migration.log"
       result = my_exec cmd
 
       if result
@@ -701,7 +701,7 @@ def do_migrate
       else
         write_log "migrating maybe failed! result = #{result}"
         File.open("status", "w") do |f|
-          f.write "old_status"
+          f.write "#{old_status}"
         end
       end
 
@@ -724,7 +724,7 @@ def do_migrate
     rescue
       write_log "call to live migrate failed!"
       File.open("status", "w") do |f|
-        f.write "old_status"
+        f.write "#{old_status}"
       end
     end
     write_log "migrating finished, remove migrating tag"
