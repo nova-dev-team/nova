@@ -245,7 +245,7 @@ def loop_body
             end
             vm.save
           end
-        else
+        else if real_vm["status"] == "running"
           write_log "VM '#{real_vm["name"]}' not in DB, destroying!"
           begin
             pm.worker_proxy.destroy_vm real_vm["name"]
