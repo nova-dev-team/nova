@@ -279,6 +279,7 @@ def loop_body
       vm.log "info", "Failed to boot #{vm.name}, mark status as 'boot-failure'"
     else
       vm.status = "start-preparing"
+      vm.pmachine = pm
       vm.save
       write_log "triggered #{vm.name}, mark status as 'start-preparing'"
       vm.log "info", "Triggered #{vm.name}, mark status as 'start-preparing'"
