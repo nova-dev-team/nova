@@ -446,6 +446,7 @@ XML_DESC
     vm_name = params[:name]
     if vm_name and vm_name != ""
       Vmachine.kill_vm_daemon vm_name
+      sleep 1
       Vmachine.send_instruction vm_name, "destroy"
     else
       raise "Please provide a name!"
