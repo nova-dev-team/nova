@@ -245,7 +245,7 @@ def loop_body
             end
             vm.save
           end
-        else
+        elsif real_vm["status"] == "running"
           write_log "VM '#{real_vm["name"]}' not in DB, destroying!"
           begin
             pm.worker_proxy.destroy_vm real_vm["name"]
@@ -279,6 +279,7 @@ def loop_body
       vm.log "info", "Failed to boot #{vm.name}, mark status as 'boot-failure'"
     else
       vm.status = "start-preparing"
+      vm.pmachine = pm
       vm.save
       write_log "triggered #{vm.name}, mark status as 'start-preparing'"
       vm.log "info", "Triggered #{vm.name}, mark status as 'start-preparing'"
