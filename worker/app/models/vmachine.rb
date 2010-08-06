@@ -233,8 +233,8 @@ XML_DESC
   <os>
     <type arch='#{params[:arch]}' machine='pc'>linux</type>
     #{if params[:kernel] and params[:initrd]
-      "<kernel>#{params[:kernel]}</kernel>"
-      "<initrd>#{params[:initrd]}</initrd>"
+      "<kernel>#{params[:kernel]}</kernel>\n\
+       <initrd>#{params[:initrd]}</initrd>"
       end
      }
     <boot dev='#{
@@ -634,6 +634,7 @@ private
         fd = entry.to_i
         if fd > 2
           begin
+            Vmachine.log vm_name, "closing fd #{fd}"
             IO::new(fd).close
           rescue
           end
