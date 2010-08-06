@@ -691,7 +691,7 @@ private
 
     if vm_daemon_pid
       begin
-        Process.kill 0, vm_daemon_pid
+        Process.kill 0, vm_daemon_pid.to_i
         Vmachine.log vm_name, "[debug] vm_daemon exists, pid is #{vm_daemon_pid}"
       rescue
         # start new vm daemon
