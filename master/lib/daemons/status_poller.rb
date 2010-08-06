@@ -202,6 +202,7 @@ def loop_body
       reply["data"].each do |real_vm|
         #write_log "Working on VM with name='#{real_vm["name"]}', uuid=#{real_vm["uuid"]}"
 
+        real_vm["status"] = real_vm["status"].downcase
         vm_already_in_db = false
         vm = nil
         pm.vmachines.each do |vm_in_db|
