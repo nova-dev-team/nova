@@ -232,9 +232,10 @@ XML_DESC
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
     <type arch='#{params[:arch]}' machine='pc'>linux</type>
-    #{if params[:kernel] and params[:initrd]
-      "<kernel>#{params[:kernel]}</kernel>\n\
-       <initrd>#{params[:initrd]}</initrd>"
+    #{if params[:kernel] and params[:initrd] and params[:hda_dev]
+   "<kernel>#{params[:kernel]}</kernel>\n\
+    <initrd>#{params[:initrd]}</initrd>\n\
+    <cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
       end
      }
     <boot dev='#{
@@ -254,7 +255,13 @@ end
     <disk type='file' device='disk'>
       <driver name='file'/>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
-      <target dev='xvda' bus='xen'/>
+      #{
+        if params[:hda_dev]
+          "<target dev='#{params[:hda_dev]}' bus='scsi'/>"
+        else
+          "<target dev='xvda' bus='xen'/>"
+        end
+       }
     </disk>
 #{
 # determine cdrom
