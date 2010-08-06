@@ -642,7 +642,7 @@ private
         fd = entry.to_i
         if fd > 2
           begin
-            Vmachine.log vm_name, "closing fd #{fd}"
+            #Vmachine.log vm_name, "closing fd #{fd}"
             IO::new(fd).close
           rescue
           end
