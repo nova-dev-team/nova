@@ -1,3 +1,5 @@
+bridge-utils
+pciutils-devel
 hmaccalc
 ncurses-devel
 unifdef
