@@ -25,7 +25,7 @@ namespace :nova do
     # Since::     0.3
     def prepare_folders
       conf = read_config
-      FileUtils.mkdir_p "#{conf["storage_root"]}/misc"
+      FileUtils.mkdir_p "#{conf["storage_root"]}/misc/pool_size"
       FileUtils.mkdir_p "#{conf["storage_root"]}/vdisks"
       FileUtils.mkdir_p "#{conf["storage_root"]}/agent_packages"
       FileUtils.mkdir_p "#{RAILS_ROOT}/log"
