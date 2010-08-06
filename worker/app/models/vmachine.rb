@@ -232,6 +232,11 @@ XML_DESC
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
     <type arch='#{params[:arch]}' machine='pc'>linux</type>
+    #{if params[:kernel] and params[:initrd]
+      "<kernel>#{params[:kernel]}</kernel>"
+      "<initrd>#{params[:initrd]}</initrd>"
+      end
+     }
     <boot dev='#{
 # if used user's custom cd image, we boot from cdrom
 if params[:cd_image] != nil and params[:cd_image] != ""
@@ -247,7 +252,7 @@ end
   </features>
   <devices>
     <disk type='file' device='disk'>
-      <driver name='tap' type='aio'/>
+      <driver name='file'/>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
       <target dev='xvda' bus='xen'/>
     </disk>
