@@ -52,8 +52,8 @@ vm_network_bridge:              br0
 vm_enable_migration:            true
 
 # the hypervisor to be used, could be xen or kvm
-hypervisor:                     xen
+hypervisor:                     kvm
 
 # storage server type, could be ftp or nfs
-storage_type:                   nfs
+storage_type:                   ftp
 

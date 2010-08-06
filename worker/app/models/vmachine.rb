@@ -189,7 +189,7 @@ end
     <acpi/>
   </features>
   <devices>
-    <emulator>"/usr/bin/kvm"</emulator>
+    <emulator>/usr/bin/kvm</emulator>
     <disk type='file' device='disk'>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
       <target dev='hda'/>
