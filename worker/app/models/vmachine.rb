@@ -189,7 +189,7 @@ end
     <acpi/>
   </features>
   <devices>
-    <emulator>"/usr/bin/kvm"</emulator>
+    <emulator>/usr/bin/kvm</emulator>
     <disk type='file' device='disk'>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
       <target dev='hda'/>
@@ -232,6 +232,12 @@ XML_DESC
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
     <type arch='#{params[:arch]}' machine='pc'>linux</type>
+    #{if params[:kernel] and params[:initrd] and params[:hda_dev]
+   "<kernel>#{params[:kernel]}</kernel>\n\
+    <initrd>#{params[:initrd]}</initrd>\n\
+    <cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
+      end
+     }
     <boot dev='#{
 # if used user's custom cd image, we boot from cdrom
 if params[:cd_image] != nil and params[:cd_image] != ""
@@ -247,9 +253,15 @@ end
   </features>
   <devices>
     <disk type='file' device='disk'>
-      <driver name='tap' type='aio'/>
+      <driver name='file'/>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
-      <target dev='xvda' bus='xen'/>
+      #{
+        if params[:hda_dev]
+          "<target dev='#{params[:hda_dev]}' bus='scsi'/>"
+        else
+          "<target dev='xvda' bus='xen'/>"
+        end
+       }
     </disk>
 #{
 # determine cdrom
@@ -434,6 +446,7 @@ XML_DESC
     vm_name = params[:name]
     if vm_name and vm_name != ""
       Vmachine.kill_vm_daemon vm_name
+      sleep 1
       Vmachine.send_instruction vm_name, "destroy"
     else
       raise "Please provide a name!"
@@ -629,6 +642,7 @@ private
         fd = entry.to_i
         if fd > 2
           begin
+            #Vmachine.log vm_name, "closing fd #{fd}"
             IO::new(fd).close
           rescue
           end
@@ -686,7 +700,7 @@ private
 
     if vm_daemon_pid
       begin
-        Process.kill 0, vm_daemon_pid
+        Process.kill 0, vm_daemon_pid.to_i
         Vmachine.log vm_name, "[debug] vm_daemon exists, pid is #{vm_daemon_pid}"
       rescue
         # start new vm daemon
