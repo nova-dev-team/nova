@@ -25,7 +25,18 @@ function toggle_mount_iso() {
     disable("new_vm_cd_image");
   }
 }
-
+function toggle_kernel_options() {
+  var kernel_chk = $("input[name=chk_kernel_options]");
+  if (kernel_chk.is(":checked")  == true) {
+    enable("new_vm_kernel");
+    enable("new_vm_initrd");
+    enable("new_vm_hda_dev");
+  } else {
+    disable("new_vm_kernel");
+    disable("new_vm_initrd");
+    disable("new_vm_hda_dev");
+  }
+}
 function toggle_agent_cd() {
   var iso_chk = $("input[name=chk_mount_iso]");
   var agent_chk = $("input[name=chk_agent_cd]");
@@ -90,9 +101,16 @@ function add_vmachine() {
   var hda_save_to = $("#new_vm_hda_save_to").val();
   var run_agent = $("input[name=chk_agent_cd]").is(":checked");
   var mount_iso = $("input[name=chk_mount_iso]").is(":checked");
+  
+  var ex_kernel = $("input[name=chk_kernel_options]").is(":checked");
+
   var agent_hint = "";    // ip, subnet mask, gateway, dns, packages, nodelist, etc...
   var uuid = $("#new_vm_uuid").val();
   var cd_image = $("#new_vm_cd_image").val();
+  
+  var kernel = "";
+  var initrd = "";
+  var hda_dev = "";
 
   // check args
   if (hda_image == null || hda_image == "") {
@@ -124,6 +142,12 @@ function add_vmachine() {
     return;
   }
 
+  if (ex_kernel == true) {
+    kernel = $("#new_vm_kernel").val();
+    initrd = $("#new_vm_initrd").val();
+    hda_dev = $("#new_vm_hda_dev").val();
+  }
+
   if (mount_iso == true) {
     if (cd_image == null || cd_image == "") {
       alert("Please provide cdrom image, if you want to mount .iso files!");
@@ -137,6 +161,7 @@ function add_vmachine() {
     var agent_packages = $("#new_vm_agent_packages").val();
     var nodelist = $("#new_vm_nodelist").val();
     var cluster_name = $("#new_vm_cluster_name").val();
+    
     if (is_valid_ip(ip_addr) == false) {
       alert("Invalid IP address!");
       return;
@@ -175,6 +200,7 @@ function add_vmachine() {
       agent_hint += "cluster_name=" + cluster_name + "\n";
     }
   }
+  
   $("#add_new_vmachine_div").block();
 
   $.ajax({
@@ -193,7 +219,10 @@ function add_vmachine() {
       mount_iso: mount_iso,
       agent_hint: agent_hint,
       uuid: uuid,
-      cd_image: cd_image
+      cd_image: cd_image,
+      kernel: kernel,
+      initrd: initrd,
+      hda_dev: hda_dev
     },
     success: function(result) {
       $("#add_new_vmachine_div").unblock();

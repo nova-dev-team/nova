@@ -40,6 +40,10 @@ class Vmachine < ActiveRecord::Base
     @@virt_conn
   end
 
+  def Vmachine.valid str
+    str and str.length > 0
+  end
+
   # List all vmachines by their name.
   #
   # Since::   0.3
@@ -232,10 +236,13 @@ XML_DESC
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
     <type arch='#{params[:arch]}' machine='pc'>linux</type>
-    #{if params[:kernel] and params[:initrd] and params[:hda_dev]
+    #{if valid(params[:kernel]) and valid(params[:initrd])
    "<kernel>#{params[:kernel]}</kernel>\n\
-    <initrd>#{params[:initrd]}</initrd>\n\
-    <cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
+    <initrd>#{params[:initrd]}</initrd>\n"
+      end
+     }
+    #{if valid(params[:hda_dev])
+        "<cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
       end
      }
     <boot dev='#{
@@ -256,7 +263,7 @@ end
       <driver name='file'/>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
       #{
-        if params[:hda_dev]
+        if valid(params[:hda_dev])
           "<target dev='#{params[:hda_dev]}' bus='scsi'/>"
         else
           "<target dev='xvda' bus='xen'/>"

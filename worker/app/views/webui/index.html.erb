@@ -248,6 +248,12 @@ Hard disk image: <input type="text" id="new_vm_hda_image" size=40 /><%= spacing 
 
 Save to (optional, only for kvm): <input type="text" id="new_vm_hda_save_to" size=40 /><br>
 
+<input type="checkbox" name="chk_kernel_options" onclick="toggle_kernel_options()" /> Use Externel Kernel and Ramdisk? <br>
+
+Kernel File Location: <input type="text" id="new_vm_kernel" disabled class='disabled_input' size=40 /><br>
+Initrd File Location: <input type="text" id="new_vm_initrd" disabled class='disabled input' size=40 /><br>
+Hda_device_name: <input type="text" id="new_vm_hda_dev" disabled class='disabled input' size=10 /><br>
+
 <input type="checkbox" name="chk_mount_iso" onclick="toggle_mount_iso()" /> Mount .iso CD image?<br>
 
 .iso CD image: <input type="text" id="new_vm_cd_image" size=42 disabled class='disabled_input' /><br>
