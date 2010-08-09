@@ -232,10 +232,13 @@ XML_DESC
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
     <type arch='#{params[:arch]}' machine='pc'>linux</type>
-    #{if params[:kernel] and params[:initrd] and params[:hda_dev]
+    #{if params[:kernel] and params[:initrd]
    "<kernel>#{params[:kernel]}</kernel>\n\
-    <initrd>#{params[:initrd]}</initrd>\n\
-    <cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
+    <initrd>#{params[:initrd]}</initrd>\n"
+      end
+     }
+    #{if params[:hda_dev]
+        "<cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
       end
      }
     <boot dev='#{
