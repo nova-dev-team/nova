@@ -220,7 +220,7 @@ def loop_body
             write_log "VM '#{real_vm["name"]}' is to be shut off"
             vm.log "info", "VM '#{real_vm["name"]}' is to be shut off"
             pm.worker_proxy.destroy_vm vm.name
-            
+
             vm.status = "shut-off"
             vm.pmachine.vmachines.delete vm
             vm.pmachine = nil

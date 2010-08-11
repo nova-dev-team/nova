@@ -380,7 +380,7 @@ def do_prepare rails_root, storage_server, vm_dir
       img = line.strip
       img_fn = File.join vm_dir, img
       retry_count = 5
-      
+
       while retry_count > 0
         if img.end_with? ".qcow2"
           write_log "preparing qcow2 image '#{img}'"
@@ -770,13 +770,13 @@ def do_resume vm_dir
   Dir.chdir vm_dir
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
-  
+
   virt_conn = libvirt_connect_local
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
     dom.resume
   rescue => e
-    write_log "error while resuming vmachine #{uuid}, message: #{e.to_s}" 
+    write_log "error while resuming vmachine #{uuid}, message: #{e.to_s}"
   end
 end
 
@@ -786,13 +786,13 @@ def do_suspend vm_dir
   Dir.chdir vm_dir
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   uuid = xml_desc["uuid"][0]
-  
+
   virt_conn = libvirt_connect_local
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
     dom.suspend
   rescue => e
-    write_log "error while suspending vmachine #{uuid}, message: #{e.to_s}" 
+    write_log "error while suspending vmachine #{uuid}, message: #{e.to_s}"
   end
 end
 
@@ -909,7 +909,7 @@ def do_action action
       write_log "error: action '#{action}' not understood!"
     end
   rescue => e
-    if action != "poll" 
+    if action != "poll"
       write_log "vm_daemon error: #{e.to_s}"
     end
   end
@@ -965,7 +965,7 @@ end
 # 1.check vm exists in local libvirt
 # 2. if exists, do action, then goto 1
 # 3. else, do clean up and exits
-# 
+#
 
 while true
   begin
@@ -976,11 +976,11 @@ while true
 
   begin
     virt_conn = libvirt_connect_local
-    
+
     dom = nil
-    begin 
-      dom = virt_conn.lookup_domain_by_name(VM_NAME) 
-    rescue 
+    begin
+      dom = virt_conn.lookup_domain_by_name(VM_NAME)
+    rescue
     end
 
     if dom

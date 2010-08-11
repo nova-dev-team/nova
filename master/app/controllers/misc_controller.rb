@@ -241,7 +241,7 @@ class MiscController < ApplicationController
     end
   end
 
-=begin 
+=begin
   def sstest
    # return unless root_required
     unless valid_param? params[:req]
@@ -285,7 +285,7 @@ class MiscController < ApplicationController
         reply_success "List of vdisks successfully retrieved!", :data => vdisk_list
       end
     when "soft_list"
-      soft_list = nil 
+      soft_list = nil
       if conf["storage_type"] == "ftp"||"nfs"
         soft_list = storage_server_soft_list
       else

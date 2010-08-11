@@ -39,7 +39,7 @@ fork do
   end
   while 1 do
     fp = File.new(fpath, "w+")
- 
+
     unless File.exists? fspath
       # create default settings file
       File.open(fspath, "w") do |f|
@@ -47,7 +47,7 @@ fork do
       end
       write_nss_log "'#{fspath}' not exist, create it and write '127.0.0.1'"
     end
- 
+
     NSS_ADDR = "#{File.open(fspath).readline.chomp}:#{common_conf["nss_port"]}" if File.exist? fspath
     np = NssProxy.new NSS_ADDR
     puts "Created NSS proxy for '#{NSS_ADDR}'"

@@ -91,7 +91,7 @@ class Vmachine < ActiveRecord::Base
           end
         rescue
           #do nothing
-        end        
+        end
       end
     end
 
@@ -667,10 +667,10 @@ private
   def Vmachine.kill_vm_daemon vm_name
     #check host.uuid == worker.uuid?
     #if not, cannot kill
-    
+
     vm_dir = File.join Setting.vm_root, vm_name
     host_uuid_fn = File.join vm_dir, "host.uuid"
-    
+
     vm_daemon_pid_fn = File.join vm_dir, "vm_daemon.pid"
     vm_daemon_pid = nil
     host_uuid = nil
@@ -680,7 +680,7 @@ private
     end
 
     if host_uuid and host_uuid == WORKER_UUID
-      
+
       begin
         vm_daemon_pid = File.read vm_daemon_pid_fn
       rescue

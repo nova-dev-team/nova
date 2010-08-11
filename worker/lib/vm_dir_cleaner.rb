@@ -63,7 +63,7 @@ while true
       host_uuid_fn = File.join vm_dir_path, "host.uuid"
       next if vm_entry.start_with? "."
       next unless File.directory? vm_dir_path
- 
+
       host_uuid = nil
       sleep 1
       begin
@@ -90,7 +90,7 @@ while true
             rescue
               dom = nil
             end
-            
+
             if dom == nil
               #cleanup(vm_dir_path, "vmachine not defined")
             end
@@ -98,7 +98,7 @@ while true
           else
             cleanup(vm_dir_path, "xml_desc.xml is broken")
           end
-          
+
         end
       else
         cleanup(vm_dir_path, "host.uuid not found")
