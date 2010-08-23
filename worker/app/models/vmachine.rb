@@ -236,7 +236,7 @@ XML_DESC
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
     #{
-      if valid(params[:use_hvm]) and params[:use_hvm] == true
+      if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
         "<type arch='#{params[:arch]}' machine='pc'>hvm</type>\n\
         <loader>/usr/lib/xen/boot/hvmloader</loader>\n"
       else
