@@ -62,19 +62,55 @@ class Pmachine < ActiveRecord::Base
       nodelist = (vm.vcluster.vmachines.collect {|v| "#{v.ip} #{v.hostname}"}).join ","
       logger.info "[pm.info] node list is: #{nodelist}"
 
+      should_use_hvm = false
+      if conf["hypervisor"] == "xen"
+        vd = Vdisk.find_by_file_name vm.hda
+        if vd.os_family == "windows"
+          should_use_hvm = true
+        end
+      end
+
+      xen_kernel = nil
+      xen_initrd = nil
+      xen_hda_dev = nil
+
+      real_soft_list = []
+      vm.soft_list.split(",").each do |item|
+        item = item.strip
+        next if item == ""
+        if item.start_with? "__kernel="
+          xen_kernel = item[9..-1]
+        elsif item.start_with? "__initrd="
+          xen_initrd = item[9..-1]
+        elsif item.start_with? "__hda_dev="
+          xen_hda_dev = item[10..-1]
+        else
+          real_soft_list << item
+        end
+      end
+
       # start vm
-      ret = wp.start_vm :uuid => vm.uuid,
+      start_vm_params = {
+        :uuid => vm.uuid,
         :name => vm.name,
         :cpu_count => vm.cpu_count,
         :memory_size => vm.memory_size,
+        :use_hvm => should_use_hvm,
         :vdisk_fname => vm.hda,
-        :packages => vm.soft_list,
+        :packages => real_soft_list.join(","),
         :cluster_name => vm.vcluster.cluster_name,
         :nodelist => nodelist,
         :ip => vm.ip,
         :submask => Setting.vm_subnet_mask,
         :gateway => Setting.vm_gateway,
         :dns => Setting.vm_dns_server
+      }
+
+      start_vm_params[:kernel] = xen_kernel if xen_kernel != nil
+      start_vm_params[:initrd] = xen_initrd if xen_initrd != nil
+      start_vm_params[:hda_dev] = xen_hda_dev if xen_hda_dev != nil
+
+      ret = wp.start_vm start_vm_params
 
       if ret == nil
         logger.error "[pm.error] failed to start vm"

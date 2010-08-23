@@ -121,6 +121,7 @@ class WorkerProxy
   #  * memory_size:     Memory size in MB
   #  * name:            Machine name
   #  * uuid:            Machine UUID
+  #  * use_hvm:         Should hvm be used?
   #  * vdisk_fname:     Disk image file name
   #  * ip:              IP address.
   #  * submask:         Subnet mask.
@@ -137,6 +138,7 @@ class WorkerProxy
       :arch => "i686",
       :name => params[:name],
       :uuid => params[:uuid],
+      :use_hvm => params[:use_hvm],
       :mem_size => params[:memory_size],
       :cpu_count => params[:cpu_count],
       :hda_image => params[:vdisk_fname],
@@ -150,9 +152,14 @@ agent_packages=#{params[:packages]}
 nodelist=#{params[:nodelist]}
 cluster_name=#{params[:cluster_name]}
 id_rsa.pub=#{File.read("#{ENV["HOME"]}/.ssh/id_rsa.pub").chomp rescue ""}
-id_rsa=#{File.read("#{ENV["HOME"]}/.ssh/id_rsa").chomp rescue ""}
+id_rsa=#{(File.read("#{ENV["HOME"]}/.ssh/id_rsa").chomp.delete "\r\n") rescue ""}
 AGENT_HINT
     }
+    [:kernel, :initrd, :hda_dev].each do |item|
+      if params.keys.include? item
+        real_params[item] = params[item]
+      end
+    end
     post_request "vmachines/start.json", real_params
   end
 

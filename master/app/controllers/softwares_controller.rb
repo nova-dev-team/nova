@@ -7,6 +7,7 @@
 class SoftwaresController < ApplicationController
 
   include FtpServerFilesListHelper
+  include StorageManagementHelper
 
   before_filter :login_required
 
@@ -25,12 +26,14 @@ class SoftwaresController < ApplicationController
     return unless params_required "file_name display_name"
 
     # Check if file exists, by checking the 'ftp_server_files_list'
-    soft_list = ftp_server_soft_list
+    soft_list = storage_server_soft_list
     if soft_list == nil
       reply_failure "The storage server is probably down!"
       return
     end
-    unless soft_list.include? params[:file_name]
+
+    # file_name starting with __ is reserved
+    unless params[:file_name].start_with? "__" or soft_list.include? params[:file_name]
       ftp_server_try_update
       reply_failure "Cannot find '#{params[:file_name]}' on storage server. You might need to wait a few minutes if the file has just been uploaded."
       return
