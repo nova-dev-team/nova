@@ -301,7 +301,12 @@ void read_pool_size(char* image_fn){
       char *buf = (char *) malloc(sizeof(char) * buf_size);
       fget_nonempty_line(fp, buf, buf_size);
       g_pool_size = atoi(buf);
+      fclose(fp);
+    } else {
+      printf("*** failed to open file: %s\n", pool_size_fn);
     }
+  } else {
+    printf("*** failed to lstat file: %s\n", pool_size_fn);
   }
   if (g_pool_size < 0) {
     g_pool_size = 0;
