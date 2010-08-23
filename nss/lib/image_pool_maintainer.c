@@ -292,16 +292,18 @@ void read_pool_size(char* image_fn){
   // NOTE: we are working in "vdisks" dir (see the chdir() call in main()), so "misc" dir will be "../misc"
   sprintf(pool_size_fn, "../../storage/misc/pool_size/%s.size", image_fn);
   printf("checking if %s pool_size config exists.\n", pool_size_fn);
+  g_pool_size = 0;
   if(lstat(pool_size_fn, &st) == 0){
     FILE* fp;
     fp = fopen(pool_size_fn, "r");
-    int buf_size = 32;
-    char *buf = (char *) malloc(sizeof(char) * buf_size);
-    fget_nonempty_line(fp, buf, buf_size);
-    g_pool_size = atoi(buf);
+    if (fp != NULL) {
+      int buf_size = 32;
+      char *buf = (char *) malloc(sizeof(char) * buf_size);
+      fget_nonempty_line(fp, buf, buf_size);
+      g_pool_size = atoi(buf);
+    }
   }
-  else
-  {
+  if (g_pool_size < 0) {
     g_pool_size = 0;
   }
 }
