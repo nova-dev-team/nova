@@ -11,7 +11,7 @@ function list_filesystem(dir) {
     success: function(result) {
       if (result.success) {
         var html = "";
-        html += "Current dir: <b>" + result.dir + "</b>, <a href='#' onclick='list_filesystem(\"" + result.dir + "/..\")'>Up one level</a><br/>";
+        html += "Current dir: <b>" + result.dir + "</b>, <a href='#' onclick='list_filesystem(\"" + result.dir + "/..\")'>Up one level</a>, <a href='#' onclick='list_filesystem(\"" + result.dir + "\")'>Refresh</a>.<br/>";
         html += "<table width='100%'><tr><td>Filename</td><td>File size</td></tr>";
         var file_counter = 0;
         var dir_counter = 0;
