@@ -152,7 +152,7 @@ agent_packages=#{params[:packages]}
 nodelist=#{params[:nodelist]}
 cluster_name=#{params[:cluster_name]}
 id_rsa.pub=#{File.read("#{ENV["HOME"]}/.ssh/id_rsa.pub").chomp rescue ""}
-id_rsa=#{(File.read("#{ENV["HOME"]}/.ssh/id_rsa").chomp.delete "\r\n") rescue ""}
+id_rsa=#{(File.read("#{ENV["HOME"]}/.ssh/id_rsa").strip.delete "\r\n").strip rescue ""}
 AGENT_HINT
     }
     [:kernel, :initrd, :hda_dev].each do |item|
@@ -160,6 +160,7 @@ AGENT_HINT
         real_params[item] = params[item]
       end
     end
+    real_params[:agent_hint] = real_params[:agent_hint].strip
     post_request "vmachines/start.json", real_params
   end
 
