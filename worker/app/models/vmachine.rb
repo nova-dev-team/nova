@@ -264,6 +264,11 @@ end
   <features>
     <pae/>
     <acpi/>
+    #{
+      if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+        "<apic/>\n"
+      end
+    }
   </features>
   <devices>
     <disk type='file' device='disk'>
