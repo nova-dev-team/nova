@@ -46,14 +46,14 @@ int has_vm_running() {
 
   gettimeofday(&last_call_time, NULL);
 
-  p_dir = opendir("../vm");
+  p_dir = opendir("../../run/vm");
   if (p_dir != NULL) {
     struct dirent* p_dirent;
     while ((p_dirent = readdir(p_dir)) != NULL) {
       char* buffer = (char *) malloc(strlen(p_dirent->d_name) + 20);
       int should_break = 0;
       if (p_dirent->d_name[0] != '.') {
-        sprintf(buffer, "../vm/%s", p_dirent->d_name);
+        sprintf(buffer, "../../run/vm/%s", p_dirent->d_name);
         lstat(buffer, &st);
         if (S_ISDIR(st.st_mode)) {
           ret = 1;
@@ -66,6 +66,10 @@ int has_vm_running() {
       }
     }
     closedir(p_dir);
+//  } else {
+//    char* cwd = getcwd(NULL, 0);
+//    printf("*** failed to open the vm dir, cwd = '%s'\n", cwd);
+//    free(cwd);
   }
   last_ret = ret;
   return ret;
