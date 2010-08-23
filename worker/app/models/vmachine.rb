@@ -235,7 +235,14 @@ XML_DESC
   <memory>#{params[:mem_size].to_i * 1024}</memory>
   <vcpu>#{params[:cpu_count]}</vcpu>
   <os>
-    <type arch='#{params[:arch]}' machine='pc'>linux</type>
+    #{
+      if valid(params[:use_hvm]) and params[:use_hvm] == true
+        "<type arch='#{params[:arch]}' machine='pc'>hvm</type>\n\
+        <loader>/usr/lib/xen/boot/hvmloader</loader>\n"
+      else
+        "<type arch='#{params[:arch]}' machine='pc'>linux</type>"
+      end
+    }
     #{if valid(params[:kernel]) and valid(params[:initrd])
    "<kernel>#{params[:kernel]}</kernel>\n\
     <initrd>#{params[:initrd]}</initrd>\n"

@@ -96,6 +96,16 @@ function add_vmachine() {
   var mem_size = $("#new_vm_mem_size").val();
   var name = $("#new_vm_name").val();
   var hypervisor = $("#new_vm_hypervisor").val();
+  
+  var use_hvm = "";
+  if (hypervisor == "xen") {
+    if ($("#chk_use_hvm").is(":checked") == true) {
+      use_hvm = true;
+    } else {
+      use_hvm = false;
+    }
+  }
+
   var arch = $("#new_vm_arch").val();
   var hda_image = $("#new_vm_hda_image").val();
   var hda_save_to = $("#new_vm_hda_save_to").val();
@@ -222,7 +232,8 @@ function add_vmachine() {
       cd_image: cd_image,
       kernel: kernel,
       initrd: initrd,
-      hda_dev: hda_dev
+      hda_dev: hda_dev,
+      use_hvm: use_hvm
     },
     success: function(result) {
       $("#add_new_vmachine_div").unblock();
