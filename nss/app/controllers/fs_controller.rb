@@ -14,9 +14,9 @@ class FsController < ApplicationController
     params[:dir] = "vdisks" unless valid_param? params[:dir]
     if params[:dir].start_with? "/"
       # absolute path, use it directly
-      dir = params[:dir]
+      dir = Pathname.new(params[:dir]).cleanpath.to_s
     else
-      dir = File.join common_conf["storage_root"], params[:dir]
+      dir = Pathname.new(File.join common_conf["storage_root"], params[:dir]).cleanpath.to_s
     end
     begin
       data = []
