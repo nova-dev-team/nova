@@ -1262,6 +1262,8 @@ function load_cluster_content(cluster_name) {
         } else {
           html += "<b>IP range:</b> " + result.first_ip + " ~ " + result.last_ip + "</br>";
         }
+        html += "<a href='#' onclick='start_cluster_vm(\"" + result.name + "\")'>Start all VM</a>" + white_spacing(4);
+        html += "<a href='#' onclick='stop_cluster_vm(\"" + result.name + "\")'>Stop all VM</a>" + white_spacing(4);
         html += "<a href='#' onclick='destroy_cluster(\"" + result.name + "\")'><font color='red'>Destroy cluster!</font></a></br>";
         html += "<p/>";
         html += "<table width='100%'>";
@@ -1373,6 +1375,48 @@ function edit_vm_setting(cluster_name, uuid, item, old_value) {
     uuid: uuid,
     item: item,
     value: new_value
+  });
+}
+
+function start_cluster_vm(cluster_name) {
+  $.ajax({
+    url: "/vclusters/start_all_vm.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: cluster_name
+    },
+    success: function(result) {
+      if (result.success) {
+        load_cluster_content(cluster_name);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function stop_cluster_vm(cluster_name) {
+  $.ajax({
+    url: "/vclusters/stop_all_vm.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: cluster_name
+    },
+    success: function(result) {
+      if (result.success) {
+        load_cluster_content(cluster_name);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
   });
 }
 

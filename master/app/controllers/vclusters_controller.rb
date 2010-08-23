@@ -136,6 +136,61 @@ class VclustersController < ApplicationController
     end
   end
 
+  # Start all VM inside a cluster.
+  #
+  # Since::     0.3.1
+  def start_all_vm
+    unless valid_param? params[:name]
+      reply_failure "Please provide valid 'name' parameter!"
+      return
+    end
+    vc = Vcluster.find_by_cluster_name params[:name]
+    if vc
+      if @current_user.privilege != "root" and (@current_user.vclusters.include? vc) == false
+        reply_failure "You are not allowed to do this!"
+        return
+      end
+      vc.vmachines.each do |vm|
+        if vm.status == "shut-off" or vm.status == "boot-failure"
+          vm.status = "start-pending"
+          vm.save
+        end
+      end
+      reply_success "Starting all VM in vcluster with name '#{params[:name]}'."
+    else
+      reply_failure "Cannot find vcluster with name '#{params[:name]}'!"
+    end
+  end
+
+  # Stop all VM inside a cluster.
+  #
+  # Since::     0.3.1
+  def stop_all_vm
+    unless valid_param? params[:name]
+      reply_failure "Please provide valid 'name' parameter!"
+      return
+    end
+    vc = Vcluster.find_by_cluster_name params[:name]
+    if vc
+      if @current_user.privilege != "root" and (@current_user.vclusters.include? vc) == false
+        reply_failure "You are not allowed to do this!"
+        return
+      end
+      vc.vmachines.each do |vm|
+        if vm.status == "running" or vm.status == "suspended" or vm.status == "start-preparing"
+          vm.status = "shutdown-pending"
+          vm.save
+        elsif vm.status == "boot-failure"
+          vm.status = "shut-off"
+          vm.save
+        end
+      end
+      reply_success "Shutting down all VM in vcluster with name '#{params[:name]}'."
+    else
+      reply_failure "Cannot find vcluster with name '#{params[:name]}'!"
+    end
+  end
+
   # Destroy a cluster.
   #
   # Since::     0.3
