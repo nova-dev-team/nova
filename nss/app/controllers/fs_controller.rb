@@ -29,6 +29,7 @@ class FsController < ApplicationController
           :isdir => (File::directory? fpath)
         }
       end
+      data = data.sort {|x, y| x[:filename] <=> y[:filename]}
       reply_success "Query successful!", :data => data, :dir => dir
     rescue Exception => e
       reply_failure "Directory '#{dir}' not found! Raw error message: #{e.to_s}"
