@@ -24,7 +24,7 @@ worker_port:                    4000
 nss_port:                       5000
 
 # the vnc port used by vmachines
-vm_vnc_port:                    5900
+vm_vnc_port:                    5999
 
 # where is the working dir
 run_root:                       /nova/run
