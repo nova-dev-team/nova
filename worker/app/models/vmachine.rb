@@ -271,6 +271,11 @@ end
     }
   </features>
   <devices>
+    #{
+      if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+        "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
+      end
+    }
     <disk type='file' device='disk'>
       <driver name='file'/>
       <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
