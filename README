@@ -19,6 +19,10 @@ KVM+FTP mode:
 * The installer only works under Ubuntu Server.
 * Needs Internet connection for "apt-get install".
 
+XEN+NFS mode:
+* Only works in CentOS 5.4 or above.
+* Needs Internet connection for "yum install".
+
 
 Installation
 ============

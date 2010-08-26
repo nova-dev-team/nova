@@ -1,0 +1,11 @@
+v0.3.2:
++ added web UI for NSS module
++ added start/stop all link in master web UI
++ support Xen kernel/initrd/hda_dev options
+* a few bug fixes in image_pool_maintainer of NSS module
+
+v0.3.1:
+First public release.
++ Xen support (with live-migration)
++ added NSS module
+
