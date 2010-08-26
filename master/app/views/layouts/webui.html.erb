@@ -55,6 +55,9 @@ html = ""
   ["normal_user",   "account",      "My Account"],
 ].each do |item|
   priv, link, title = item
+  if link == "migrate" and common_conf["vm_enable_migration"] == false
+    next
+  end
   if @current_user.privilege == "admin"
     next if priv == "root"
   elsif @current_user.privilege == "normal_user"
