@@ -16,7 +16,7 @@ tmp/
 lazy.sh
 update.sh
 .yardoc/
-nova.tar.gz
+nova-*.tar.gz
 r147.sh
 r149.sh
 
