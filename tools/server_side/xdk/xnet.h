@@ -170,10 +170,8 @@ void xsocket_delete(xsocket xs);
     One of the xsockets.
   @param xs2
     One of the xsockets.
-  @param sleep_usec
-    The sleeping interval, in useconds (10e-6 second).
 */
-void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec);
+void xsocket_shortcut(xsocket xs1, xsocket xs2);
 
 struct xserver_impl;
 

@@ -240,7 +240,7 @@ void xsocket_delete(xsocket xs) {
   xfree(xs);
 }
 
-void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
+void xsocket_shortcut(xsocket xs1, xsocket xs2) {
   fd_set r_set;
   fd_set w_set;
   fd_set ex_set;
@@ -249,11 +249,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
   const int buf_len = 8192;
   char* buf = xmalloc_ty(buf_len, char);
   int cnt;
-
-  // make sure the sleeping time is valid (positive)
-  if (sleep_usec < 1) {
-    sleep_usec = 1;
-  }
 
   if (xs1->sockfd + 1 > maxfdp1) {
     maxfdp1 = xs1->sockfd + 1;
@@ -266,7 +261,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
   time_out.tv_usec = 50 * 1000; // 50msec time out
 
   for (;;) {
-    xbool has_activity = XFALSE;  // whether some data was sent in this round
     FD_ZERO(&r_set);
     FD_ZERO(&w_set);
     FD_ZERO(&ex_set);
@@ -277,7 +271,7 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
     FD_SET(xs2->sockfd, &r_set);
     FD_SET(xs1->sockfd, &ex_set);
 
-    if (select(maxfdp1, &r_set, &w_set, &ex_set, &time_out) == -1) {
+    if (select(maxfdp1, &r_set, &w_set, &ex_set, NULL) < 0) {
       xlog_debug("[info] select < 0\n");
       break;
     }
@@ -289,7 +283,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
           // TODO is "<=" correct?
           break;
         }
-        has_activity = XTRUE;
       } else if (cnt == 0) {
         break;  // is this correct?
       } else if (cnt < 0) {
@@ -304,7 +297,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
           // TODO is "<=" correct?
           break;
         }
-        has_activity = XTRUE;
       } else if (cnt == 0) {
         break;
       } else if (cnt < 0) {
@@ -316,11 +308,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
     if (FD_ISSET(xs1->sockfd, &ex_set) || FD_ISSET(xs2->sockfd, &ex_set)) {
       xlog_debug("[info] sock exception encountered!\n");
       break;
-    }
-
-    if (has_activity == XFALSE) {
-      // if no data was sent, sleep for a very short time, prevent high CPU usage
-      usleep(sleep_usec);
     }
   }
   xfree(buf);
