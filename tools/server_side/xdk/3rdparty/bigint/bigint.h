@@ -219,6 +219,7 @@ bigint_errno bigint_pow_by_int(bigint* p_bigint, int pow);
 
 
 // return -BIGINT_ILLEGAL_PARAM if p_src is zero
+// TODO division
 bigint_errno bigint_div_by(bigint* p_dst, bigint* p_src);
 
 
@@ -235,6 +236,7 @@ void bigint_div_by_pow_10(bigint* p_bigint, int pow);
 // change a bigint into the ceiling value of square root of its value
 // that is result * result >= value && (result - 1) * (result - 1) < value
 // if p_bigint is negative, return -BIGINT_ILLEGAL_EVALUATION
+// TODO
 bigint_errno bigint_square_root_ceiling(bigint* p_bigint);
 
 
@@ -242,18 +244,19 @@ bigint_errno bigint_square_root_ceiling(bigint* p_bigint);
 // change a bigint into the floor value of square root of its value
 // that is result * result <= value && (result + 1) * (result + 1) > value
 // if p_bigint is negative, return -BIGINT_ILLEGAL_EVALUATION
+// TODO
 bigint_errno bigint_square_root_floor(bigint* p_bigint);
 
 
+// TODO
+bigint_errno bigint_root_n_ceiling(bigint* p_bigint, int n);
 
-bigint_errno bigint_root_n_Ceiling(bigint* p_bigint, int n);
 
-
-
+// TODO
 bigint_errno bigint_root_n_floor(bigint* p_bigint, int n);
 
 
-
+// TODO
 void bigint_mod_by(bigint* p_dst, bigint* p_src);
 
 
@@ -265,7 +268,8 @@ void bigint_mod_by(bigint* p_dst, bigint* p_src);
 // which means '5 % 3 = 2', and '-5 % 3 = -2'
 // '5 % (-3) = -2', '(-5) % (-3) = 2'
 // if value is 0, then return -BIGINT_ILLEGAL_PARAM
-bigint_errno bigint_mod_int(bigint* p_bigint, int value, int* p_result);
+// TODO
+bigint_errno bigint_mod_by_int(bigint* p_bigint, int value, int* p_result);
 
 
 
