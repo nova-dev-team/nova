@@ -15,6 +15,8 @@
 #include "server.h"
 #include "token.h"
 
+#include "data_archive.h"
+
 /**
   @brief
     The server instance, descripting the server's parameters.
