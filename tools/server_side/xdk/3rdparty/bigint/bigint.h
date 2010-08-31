@@ -43,7 +43,7 @@ void bigint_init(bigint* p_bigint);
 
 
 
-// release a big int, free the raw data, and set it to 
+// release a big int, free the raw data, and set it to
 void bigint_release(bigint* p_bigint);
 
 
@@ -55,7 +55,7 @@ void bigint_from_int(bigint* p_bigint, int value);
 
 // set the bigint to a double value (the result has a precision of 18 digits)
 // the double value will be rounded towards the nearest int
-// 
+//
 // eg:
 // 0.1  ->  0
 // 0.51 ->  1
@@ -71,17 +71,17 @@ bigint_errno bigint_from_double(bigint* p_bigint, double value);
 
 // set the bigint to a double value in text
 // the double value will be rounded towards the nearest int
-// 
+//
 // eg:
 // 0.1  ->  0
 // 0.51 ->  1
 // -0.3  ->  0
 // -0.9  -> -1
-// 
+//
 // if the double is NaN or Inf, then the bigint will be set to 0, and
 // returned bigint_errno will be '-BIGINT_ILLEGAL_PARAM'
 // else, then returned bigint_errno will be 'BIGINT_NOERR' (0)
-// 
+//
 // example of supported string:
 // '0', '+0', '-0', '0.0'
 // '-234234', '0.3'
@@ -97,9 +97,9 @@ bigint_errno bigint_from_double(bigint* p_bigint, double value);
 //     the mantiss could have an optional sign, and space is NOT allowed
 //
 // grammar for a parse could be like:
-// 
+//
 // value ::= fixed friction_opt mantissa_opt ;
-// 
+//
 // fixed ::= ('+'|'-'|'')[0-9]+ ;
 //
 // friction_opt ::= '.'[0-9]+
@@ -273,7 +273,7 @@ bigint_errno bigint_mod_by_int(bigint* p_bigint, int value, int* p_result);
 
 
 
-// mod the bigint by some power of 10. this is like discarding 
+// mod the bigint by some power of 10. this is like discarding
 // some lower digits
 // the result of a negative bigint has the same magnitude as
 // positive bigint, only with a different sign,

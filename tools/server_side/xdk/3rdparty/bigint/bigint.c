@@ -113,17 +113,17 @@ static void bigint_pack_memory(bigint* p_bigint) {
 // check whether we splited a number correctly
 static int bigint_split_number_check(bigint* p_bigint, bigint* p_high,
                                       bigint* p_low, int low_len) {
-  
+
   bigint bi;
   int ret;
 //   char str[10000];
-// 
+//
 //   bigint_to_string(p_bigint, str);
 //   printf("CHECK SPLIT: %s is\n", str);
-// 
+//
 //   bigint_to_string(p_high, str);
 //   printf("%s ", str);
-// 
+//
 //   bigint_to_string(p_low, str);
 //   printf("%s\n", str);
 
@@ -219,7 +219,7 @@ void bigint_from_int(bigint* p_bigint, int value) {
     value = -value;
   }
 
-  
+
   if (value == 0) {
     // handle special case, value = 0
 
@@ -254,7 +254,7 @@ void bigint_from_int(bigint* p_bigint, int value) {
 
   // pack the memory, keep low memory usage
   bigint_pack_memory(p_bigint);
-  
+
 }
 
 
@@ -340,7 +340,7 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
 
   // we should construct a FSM to parst the string
   // the FSM has the following states: (end states are marked with *)
-  // 
+  //
   //  0: start state
   //  1: just read '+' or '-', waiting for 0-9
   // *2: has read some digits
@@ -349,12 +349,12 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
   //  5: just read 'E' or ''e, waiting for 0-9
   //  6: just read '+' or '-', waiting for 0-9
   // *7: has read some digits
-  // 
+  //
   // the transition actions are:
-  // 
+  //
   //  state 0 -> state 1 (read '+'/'-')
   //  state 0 -> state 2 (read 0-9)
-  // 
+  //
   //  state 1 -> state 2 (read 0-9)
   //
   //  state 2 -> state 2 (read 0-9)
@@ -362,7 +362,7 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
   //  state 2 -> state 5 (read 'E'/'e')
   //
   //  state 3 -> state 4 (read 0-9)
-  // 
+  //
   //  state 4 -> state 4 (read 0-9)
   //  state 4 -> state 5 (read 'E'/'e')
   //
@@ -482,11 +482,11 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
         break;
     }
 
-    
+
 //    printf("index=%d char=%c state=%d\n", index, ch, state);
 
     index++;
-// 
+//
 //     printf("fixed_begin = %d\n", fixed_begin);
 //     printf("fixed_end = %d\n", fixed_end);
 //     printf("fraction_begin = %d\n", fraction_begin);
@@ -549,7 +549,7 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
 
     // index in the str. 'index' is used in p_bigint's p_data
     int pos = 0;
-    
+
     // used to set the digit on a certain position
     int weight = 1;
 
@@ -583,7 +583,7 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
 
       // the number of digits to be dropped
       int drop = -mantissa_value;
-      
+
       // dropping
       while (drop > 0) {
 
@@ -597,7 +597,7 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
         } else {
           carry = 0;
         }
-        
+
         // drop digits in the lower part
         pos--;
 
@@ -665,7 +665,7 @@ bigint_errno bigint_from_string(bigint* p_bigint, char* str) {
       p_bigint->data_len = index + 1;
       bigint_pack_memory(p_bigint);
     }
-    
+
   }
 
   return -BIGINT_NOERR;
@@ -717,7 +717,7 @@ int bigint_string_length(bigint* p_bigint) {
   } else {
     return bigint_digit_count(p_bigint);
   }
-  
+
 }
 
 
@@ -753,7 +753,7 @@ void bigint_to_string(bigint* p_bigint, char* str) {
     value = p_bigint->p_data[index];
     while (value > 0) {
       first_seg_length++;
-      value /= 10;    
+      value /= 10;
     }
 
     // write the first segment
@@ -878,7 +878,7 @@ void bigint_copy(bigint* p_dst, bigint* p_src) {
 
   p_dst->data_len = p_src->data_len;
   p_dst->sign = p_src->sign;
-  
+
 }
 
 
@@ -912,7 +912,7 @@ void bigint_set_zero(bigint* p_bigint) {
   p_bigint->data_len = 1;
   p_bigint->p_data[0] = 0;
   p_bigint->sign = 0;
-  
+
   bigint_pack_memory(p_bigint);
 
   assert(bigint_is_zero(p_bigint));
@@ -988,7 +988,7 @@ void bigint_add_by(bigint* p_dst, bigint* p_src) {
     // bigint_pack_memory at the end
     p_dst->data_len = result_mem_size_bound;
 
-    // from then on, we put the 'sign' into p_data, and after the addition, 
+    // from then on, we put the 'sign' into p_data, and after the addition,
     // we determine the sign of result, and put it back into 'sign'.
     // also, we make all the p_data in result to be positive numbers (or 0)
 
@@ -1124,7 +1124,7 @@ void bigint_add_by_int(bigint* p_dst, int value) {
           }
           index++;
         }
-        
+
       } else {
         // different sign, do subtraction
         while (value != 0) {
@@ -1142,7 +1142,7 @@ void bigint_add_by_int(bigint* p_dst, int value) {
 
       bigint_pack_memory(p_dst);
     }
-   
+
   } else {
 
     // really big integer, use bigint to handle them
@@ -1244,7 +1244,7 @@ void bigint_mul_by(bigint* p_dst, bigint* p_src) {
       bigint_mul_by_trad(p_dst, p_src);
 
     } else if (p_dst->data_len <= BIGINT_MUL_THRESHOLD &&
-                p_src->data_len > BIGINT_MUL_THRESHOLD) {                  
+                p_src->data_len > BIGINT_MUL_THRESHOLD) {
 
       // src is long enough
       bigint bi;
@@ -1386,7 +1386,7 @@ void bigint_mul_by_int(bigint* p_bigint, int value) {
 
     // assure memory for more segments
     bigint_assure_memory(p_bigint, p_bigint->data_len + max_segment_incr);
- 
+
     if (value < 0) {
       bigint_change_sign(p_bigint);
       value = -value;
@@ -1422,7 +1422,7 @@ void bigint_mul_by_pow_10(bigint* p_bigint, int pow) {
   // we dont consider the case of pow = 1, where nothing should be done
   if (pow < 0) {
     bigint_div_by_pow_10(p_bigint, -pow);
-    
+
   } else if (pow > 0) {
     int approx_segments = pow / BIGINT_RADIX_LOG10 + 2 + p_bigint->data_len;
     int* p_new_data = BIGINT_ALLOC(sizeof(int) * (approx_segments));
@@ -1516,7 +1516,7 @@ bigint_errno bigint_div_by_int(bigint* p_bigint, int div) {
       p_bigint->p_data[index] = (int) (val / (long) (long) div);
       val = r * BIGINT_RADIX;
     }
-    
+
     bigint_pack_memory(p_bigint);
   }
 
@@ -1614,7 +1614,7 @@ void bigint_div_by_pow_10(bigint* p_bigint, int pow) {
         p_bigint->mem_size = approx_len;
 
       }
-      
+
     }
   }
 }
@@ -1737,8 +1737,8 @@ int bigint_compare(bigint* p_bigint1, bigint* p_bigint2) {
 
         return 0;
       }
-      
-    }    
+
+    }
   }
 }
 
@@ -1770,7 +1770,7 @@ int bigint_nth_digit(bigint* p_bigint, int nth) {
 
     // which segment is the value located
     int segment = nth / BIGINT_RADIX_LOG10;
-    
+
     // the offset in the segment
     int segment_offset = nth % BIGINT_RADIX_LOG10;
 
