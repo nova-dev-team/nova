@@ -32,9 +32,33 @@ typedef enum xsuccess {
 } xsuccess;
 
 /**
+ *  @brief
+ *    The byte type, used for storing binary data.
+ */
+typedef unsigned char xbyte;
+
+/**
   @brief
     When value range is non-negative, -1 could be used to act as a special mark for "unlimited" large value.
 */
 #define XUNLIMITED -1
+
+/**
+ *  @brief
+ *    Indicates the param is used for output (using pointers).
+ */
+#define XOUT
+
+/**
+ *  @brief
+ *    Indicates the param is used for input.
+ */
+#define XIN
+
+/**
+ *  @brief
+ *    Indicates the param is used both for input and output (using pointers).
+ */
+#define XINOUT
 
 #endif  // XDK_XDEF_H_
