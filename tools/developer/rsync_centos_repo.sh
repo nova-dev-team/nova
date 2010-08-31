@@ -36,7 +36,7 @@ $rsync $mirror/timestamp.txt $local
 mirror_xen=http://mirrors.unxmail.com/xen
 verlist_xen="xen3.3.1"
 local_xen=/tmp/mirror/xen
-wget="wget -m"
+wget="wget -m -np"
 for ver in $verlist_xen
 do
 	remote=$mirror_xen/$ver/
