@@ -16,7 +16,13 @@
   @brief
     The version of liquid node server, in c-string.
 */
-#define LIQUID_VER_CSTR "v0.0"
+#define LIQUID_VER_CSTR "0.1"
+
+/**
+  @brief
+    The version value of liquid node server, in XX.YY format.
+ */
+#define LIQUID_VER_VALUE 0x0001
 
 #endif  // #ifndef CORE_DEFS_H_
 
