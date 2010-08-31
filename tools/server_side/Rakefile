@@ -456,6 +456,16 @@ def warn_bad_style
         row += 1
       end
     end
+
+    # check if has trailing white space
+    File.read(path).each_line do |line|
+      line = line.chomp
+      if line.end_with? ' ' or line.end_with? '\t'
+        puts "style warning: #{path} has trailing whitespaces"
+        break
+      end
+    end
+
   end
 end
 
@@ -759,5 +769,30 @@ cd #{clone_folder}/.. && tar pczf #{tar_fn} #{project_name}
 rm -Rf #{clone_folder_parent}
 CMD
   puts "Created #{project_name}.tar.gz in source root folder!"
+end
+
+def trim_right line
+  line = line.chomp
+  if (line.end_with? ' ') or (line.end_with? '\t')
+    line.chop!
+    return (trim_right line)
+  end
+  line
+end
+
+desc "Fix bad styles"
+task :fix do
+  puts "fixing trailing whitespaces"
+
+  flist = all_src_files
+  flist.each do |path|
+    all_lines = File.read path
+    File.open(path, "w") do |f_out|
+      all_lines.each_line do |line|
+        f_out.write trim_right(line) + "\n"
+      end
+    end
+  end
+
 end
 
