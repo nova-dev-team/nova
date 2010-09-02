@@ -786,10 +786,29 @@ task :fix do
 
   flist = all_src_files
   flist.each do |path|
+    if defined? NO_STYLE_CHECK
+      should_skip = false
+      NO_STYLE_CHECK.each do |mod|
+        if path.start_with? mod
+          should_skip = true
+          break
+        end
+      end
+      next if should_skip
+    end
+
     all_lines = File.read path
     File.open(path, "w") do |f_out|
+      note_printed = false
       all_lines.each_line do |line|
-        f_out.write trim_right(line) + "\n"
+        trimmed_line = trim_right(line)
+        unless note_printed
+          if "#{trimmed_line}\n" != line
+            puts "removed trailing whitespace: #{path}"
+            note_printed = true
+          end
+        end
+        f_out.write "#{trimmed_line}\n"
       end
     end
   end
