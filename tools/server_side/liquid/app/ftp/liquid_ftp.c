@@ -14,6 +14,7 @@
 #include "xlog.h"
 #include "xoption.h"
 
+#include "ftp_acl.h"
 #include "ftp_session.h"
 #include "ftp_fs.h"
 
