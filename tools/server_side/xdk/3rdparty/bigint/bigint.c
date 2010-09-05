@@ -38,6 +38,7 @@ static int bigint_alloc_counter = 0;
 
 static void* bigint_alloc(int size) {
   bigint_alloc_counter++;
+  assert(size % sizeof(int) == 0);
   return malloc(size);
 }
 
@@ -677,6 +678,14 @@ int bigint_is_zero(bigint* p_bigint) {
   return p_bigint->sign == 0;
 }
 
+int bigint_is_one(bigint* p_bigint) {
+  return p_bigint->sign > 0 && p_bigint->data_len == 1 && p_bigint->p_data[0] == 1;
+}
+
+int bigint_is_neg_one(bigint* p_bigint) {
+  return p_bigint->sign < 0 && p_bigint->data_len == 1 && p_bigint->p_data[0] == 1;
+}
+
 void bigint_set_zero(bigint* p_bigint) {
   p_bigint->data_len = 1;
   p_bigint->p_data[0] = 0;
@@ -723,11 +732,13 @@ void bigint_add_by(bigint* p_dst, bigint* p_src) {
     // set the top segments to 0
     for (index = p_dst->data_len; index < result_mem_size_bound; index++) {
       p_dst->p_data[index] = 0;
+      assert(index < p_dst->mem_size);
     }
-    // from now on, we can extend the data length, though there might be
+    // from now on, we extend the data length, though there might be
     // leading zeros. we will get rid of the leading zeros by using
     // bigint_pack_memory at the end
     p_dst->data_len = result_mem_size_bound;
+    assert(p_dst->data_len <= p_dst->mem_size);
 
     // from now on, we put the 'sign' into p_data, and after the addition,
     // we determine the sign of result, and put it back into 'sign'.
@@ -1028,11 +1039,12 @@ void bigint_mul_by_int(bigint* p_bigint, int value) {
       p_bigint->p_data[index] = prod % BIGINT_RADIX;
     }
     p_bigint->data_len = index;
+    assert(carry == 0);
   }
 }
 
 void bigint_mul_by_pow_10(bigint* p_bigint, int pow) {
-  // we dont consider the case of pow = 1, where nothing should be done
+  // we dont consider the case of pow = 0, where nothing should be done
   if (pow < 0) {
     bigint_div_by_pow_10(p_bigint, -pow);
   } else if (pow > 0) {
@@ -1051,6 +1063,7 @@ void bigint_mul_by_pow_10(bigint* p_bigint, int pow) {
     for (index = 0; index < p_bigint->data_len; index++) {
       p_new_data[index + helper_var] = p_bigint->p_data[index];
     }
+    assert(index + helper_var <= approx_segments);
     p_bigint->data_len += helper_var;
     BIGINT_FREE(p_bigint->p_data);
     p_bigint->p_data = p_new_data;
@@ -1070,8 +1083,25 @@ bigint_errno bigint_pow_by_int(bigint* p_bigint, int pow) {
   if (pow < 0) {
     return -BIGINT_ILLEGAL_PARAM;
   } else if (pow == 0) {
+    // n^0 = 1
+    // note the special case of 0^0 = 1 is included (Concrete Math, D.Knuth)
     bigint_set_one(p_bigint);
   } else if (pow > 1) {
+    // special case of 0^n = 0 (n>1), 1^n = 1
+    if (bigint_is_zero(p_bigint) || bigint_is_one(p_bigint)) {
+      // do nothing
+      return -BIGINT_NOERR;
+    }
+    // special case of (-1)^n
+    if (bigint_is_neg_one(p_bigint)) {
+      if (pow % 2 == 0) {
+        // (-1)^(2n) = 1
+        bigint_set_one(p_bigint);
+      } else {
+        // (-1)^(2n - 1) = -1, leave nothing changed
+      }
+      return -BIGINT_NOERR;
+    }
     if (pow % 2 == 1) {
       bigint bi;
       bigint_init(&bi);
@@ -1254,7 +1284,7 @@ void bigint_div_by_pow_10(bigint* p_bigint, int pow) {
     } else {
       // throw unnecessary segments
       int div_int, i;
-      int* p_new_data = BIGINT_ALLOC(p_bigint->data_len - throw_segments);
+      int* p_new_data = BIGINT_ALLOC(sizeof(int) * (p_bigint->data_len - throw_segments));
       for (i = throw_segments; i < p_bigint->data_len; i++) {
         p_new_data[i - throw_segments] = p_bigint->p_data[i];
       }
