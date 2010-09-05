@@ -128,6 +128,12 @@ int bigint_is_negative(bigint* p_bigint);
 // test if zero. return 1 if yes, and 0 if not
 int bigint_is_zero(bigint* p_bigint);
 
+// test if = 1. return 1 if yes, and 0 if not
+int bigint_is_one(bigint* p_bigint);
+
+// test if = -1. return 1 if yes, and 0 if not
+int bigint_is_neg_one(bigint* p_bigint);
+
 // set a bigint to 0
 void bigint_set_zero(bigint* p_bigint);
 
