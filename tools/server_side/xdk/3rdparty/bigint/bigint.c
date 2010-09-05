@@ -70,7 +70,7 @@ static void bigint_assure_memory(bigint* p_bigint, int min_size) {
   assert(min_size > 0);
   // required size
   if (min_size > p_bigint->mem_size) {
-    bigint_set_memory_size(p_bigint, min_size * 2);
+    bigint_set_memory_size(p_bigint, min_size * 2 + 2);
   }
 }
 
@@ -115,16 +115,18 @@ static void bigint_split_number(bigint* p_bigint, bigint* p_high,
     bigint_copy(p_low, p_bigint);
   } else {
     int index;
+    int new_data_len = p_bigint->data_len - low_len;
     p_high->sign = p_bigint->sign;
-    p_high->data_len = p_bigint->data_len - low_len;
-    bigint_assure_memory(p_high, p_high->data_len);
+    bigint_assure_memory(p_high, new_data_len);
+    p_high->data_len = new_data_len;
     for (index = 0; index < p_high->data_len; index++) {
       p_high->p_data[index] = p_bigint->p_data[low_len + index];
     }
     bigint_pack_memory(p_high);
     p_low->sign = p_bigint->sign;
-    p_low->data_len = low_len;
-    bigint_assure_memory(p_low, p_low->data_len);
+    new_data_len = low_len;
+    bigint_assure_memory(p_low, new_data_len);
+    p_low->data_len = new_data_len;
     for (index = 0; index < p_low->data_len; index++) {
       p_low->p_data[index] = p_bigint->p_data[index];
     }
@@ -656,6 +658,7 @@ bigint_errno bigint_to_int(bigint* p_bigint, int* p_int) {
 
 void bigint_copy(bigint* p_dst, bigint* p_src) {
   bigint_assure_memory(p_dst, p_src->data_len);
+  assert(p_dst->mem_size >= p_src->data_len);
   memcpy(p_dst->p_data, p_src->p_data, sizeof(int) * p_src->data_len);
   p_dst->data_len = p_src->data_len;
   p_dst->sign = p_src->sign;
@@ -1149,10 +1152,10 @@ bigint_errno bigint_div_by_int(bigint* p_bigint, int div) {
 //
 // note: v should be adjusted so that first digit is in range 5~9 (1/2 ~ 1)
 static void bigint_newton_inversion(bigint* v, int n, bigint* z, int* m) {
-  bigint s, z2;
   int k = 0;
   int expo;
   double base;
+  bigint s, z2;
   bigint_init(&s);
   bigint_init(&z2);
   bigint_to_scientific(v, &base, &expo);
@@ -1180,6 +1183,7 @@ static void bigint_newton_inversion(bigint* v, int n, bigint* z, int* m) {
     }
     k++;
   }
+  printf("newton inversion, k = %d\n", k);
   bigint_release(&s);
   bigint_release(&z2);
 }
@@ -1199,16 +1203,13 @@ bigint_errno bigint_divmod(bigint* a, bigint* b, bigint* q, bigint* r) {
   bigint_init(&q2);
   bigint_init(&r2);
 
-  // TODO might need to change b to range (1/2 ~ 1)
+  // newton inversion, b_inv*10^b_inv_m ~= 1/b
   bigint_newton_inversion(b, bigint_string_length(a) + bigint_string_length(b) + 2, &b_inv, &b_inv_m);
 
   // set init q
   // q = a * (1/b)
   bigint_copy(q, a);
   bigint_mul_by(q, &b_inv);
-  printf("\n");
-  print_bigint(q);
-  printf("\ninv_m=%d\n", b_inv_m);
   bigint_mul_by_pow_10(q, b_inv_m);
 
   // set init r
@@ -1232,7 +1233,6 @@ bigint_errno bigint_divmod(bigint* a, bigint* b, bigint* q, bigint* r) {
     try_count++;
     assert(try_count < 20);
   }
-  printf("[div] barret try count = %d\n", try_count);
   bigint_release(&b_inv);
   bigint_release(&q2);
   bigint_release(&r2);
@@ -1269,7 +1269,7 @@ bigint_errno bigint_div_by(bigint* p_dst, bigint* p_src) {
 }
 
 void bigint_div_by_pow_10(bigint* p_bigint, int pow) {
-  // we don't consider the case of pow = 1, where nothing should be done
+  // we don't consider the case of pow = 0, where nothing should be done
   if (pow < 0) {
     bigint_mul_by_pow_10(p_bigint, -pow);
   } else if (pow > 0) {
@@ -1284,13 +1284,15 @@ void bigint_div_by_pow_10(bigint* p_bigint, int pow) {
     } else {
       // throw unnecessary segments
       int div_int, i;
-      int* p_new_data = BIGINT_ALLOC(sizeof(int) * (p_bigint->data_len - throw_segments));
+      int new_mem_size = p_bigint->data_len - throw_segments;
+      int* p_new_data = BIGINT_ALLOC(sizeof(int) * new_mem_size);
       for (i = throw_segments; i < p_bigint->data_len; i++) {
         p_new_data[i - throw_segments] = p_bigint->p_data[i];
       }
       BIGINT_FREE(p_bigint->p_data);
       p_bigint->p_data = p_new_data;
       p_bigint->data_len -= throw_segments;
+      p_bigint->mem_size = new_mem_size;
 
       // then divide by int value, one pass
       div_int = 1;
@@ -1461,6 +1463,7 @@ bigint_errno bigint_to_scientific(bigint* b, double* base, int* expo) {
       *base = -*base;
     }
   }
+  assert(*expo >= 0);
   return -BIGINT_NOERR;
 }
 
