@@ -53,6 +53,13 @@ int bigint_alloc_count() {
   return bigint_alloc_counter;
 }
 
+// make sure the sign is correct (mainly for 0)
+static void bigint_check_sign(bigint* p_bigint) {
+  if (p_bigint->data_len == 1 && p_bigint->p_data[0] == 0) {
+    p_bigint->sign = 0;
+  }
+}
+
 // used by bigint_assure_memory and bigint_pack_memory
 // it is made sure that new_mem_size >= p_bigint->data_len
 static void bigint_set_memory_size(bigint* p_bigint, int new_mem_size) {
@@ -85,6 +92,7 @@ static void bigint_pack_memory(bigint* p_bigint) {
   if (p_bigint->data_len * 4 < p_bigint->mem_size) {
     bigint_set_memory_size(p_bigint, p_bigint->data_len * 2);
   }
+  bigint_check_sign(p_bigint);
 }
 
 // check whether we splited a number correctly
@@ -545,6 +553,7 @@ void bigint_to_string(bigint* p_bigint, char* str) {
   int value;
   int first_seg_length = 0;
   int i;
+  bigint_check_sign(p_bigint);
   if (p_bigint->sign < 0) {
     // negative numbers
     *str = '-';
@@ -610,7 +619,7 @@ bigint_errno bigint_to_double(bigint* p_bigint, double* p_double) {
     *p_double += p_bigint->p_data[index];
     index--;
   }
-  if (p_bigint->sign == -1) {
+  if (bigint_is_negative(p_bigint)) {
     *p_double = -*p_double;
   }
   return -BIGINT_NOERR;
@@ -620,6 +629,7 @@ bigint_errno bigint_to_int(bigint* p_bigint, int* p_int) {
   int index;
   // used to test overflow
   long long overflow_tester = 0;
+  bigint_check_sign(p_bigint);
   if (p_bigint->sign > 0) {
     for (index = p_bigint->data_len - 1; index >= 0; index--) {
       overflow_tester *= (long long) BIGINT_RADIX;
@@ -640,13 +650,13 @@ bigint_errno bigint_to_int(bigint* p_bigint, int* p_int) {
 
   // we treat negative and positive differently, because they have
   // different maximum value (-2147483648 is valid, but +2147483648 is not)
-  if (p_bigint->sign == 1) {
+  if (bigint_is_positive(p_bigint)) {
     while (index >= 0) {
       *p_int *= BIGINT_RADIX;
       *p_int += p_bigint->p_data[index];
       index--;
     }
-  } else if (p_bigint->sign == -1) {
+  } else if (bigint_is_negative(p_bigint)) {
     while (index >= 0) {
       *p_int *= BIGINT_RADIX;
       *p_int -= p_bigint->p_data[index];
@@ -667,25 +677,31 @@ void bigint_copy(bigint* p_dst, bigint* p_src) {
 
 void bigint_change_sign(bigint* p_bigint) {
   p_bigint->sign = -p_bigint->sign;
+  bigint_check_sign(p_bigint);
 }
 
 int bigint_is_positive(bigint* p_bigint) {
+  bigint_check_sign(p_bigint);
   return p_bigint->sign > 0;
 }
 
 int bigint_is_negative(bigint* p_bigint) {
+  bigint_check_sign(p_bigint);
   return p_bigint->sign < 0;
 }
 
 int bigint_is_zero(bigint* p_bigint) {
+  bigint_check_sign(p_bigint);
   return p_bigint->sign == 0;
 }
 
 int bigint_is_one(bigint* p_bigint) {
+  bigint_check_sign(p_bigint);
   return p_bigint->sign > 0 && p_bigint->data_len == 1 && p_bigint->p_data[0] == 1;
 }
 
 int bigint_is_neg_one(bigint* p_bigint) {
+  bigint_check_sign(p_bigint);
   return p_bigint->sign < 0 && p_bigint->data_len == 1 && p_bigint->p_data[0] == 1;
 }
 
@@ -714,6 +730,7 @@ void bigint_add_by(bigint* p_dst, bigint* p_src) {
   } else if (bigint_is_zero(p_src)) {
     //source is zero, then we need to do nothing
   } else if (p_src->data_len == 1) {
+    bigint_check_sign(p_src);
     // if we got a small number, we could use quicker routine to handle that
     assert(p_src->sign != 0);
     if (p_src->sign < 0) {
@@ -906,6 +923,7 @@ void bigint_mul_by_trad(bigint* p_dst, bigint* p_src) {
     bigint_init(&bi);
     bigint_init(&bi_add);
     bigint_set_zero(&bi);
+    bigint_check_sign(p_src);
     if (p_src->sign < 0) {
       bigint_change_sign(p_dst);
     }
@@ -1122,10 +1140,13 @@ bigint_errno bigint_pow_by_int(bigint* p_bigint, int pow) {
 }
 
 bigint_errno bigint_div_by_int(bigint* p_bigint, int div) {
+  int div_was_neg = 0;
+  int orig_sign = p_bigint->sign;
   if (div == 0) {
     return -BIGINT_ILLEGAL_PARAM;
   }
   if (div < 0) {
+    div_was_neg = 1;
     div = -div;
     bigint_change_sign(p_bigint);
   }
@@ -1142,6 +1163,13 @@ bigint_errno bigint_div_by_int(bigint* p_bigint, int div) {
       val = r * BIGINT_RADIX;
     }
     bigint_pack_memory(p_bigint);
+
+    // final adjustment
+    // if not a clean division, and a & b has different sign
+    // we need to adjust the remainder
+    if (r != 0 && ((div_was_neg && orig_sign > 0) || (div_was_neg == 0 && orig_sign < 0))) {
+      bigint_sub_by_int(p_bigint, 1);
+    }
   }
   return -BIGINT_NOERR;
 }
@@ -1183,22 +1211,140 @@ static void bigint_newton_inversion(bigint* v, int n, bigint* z, int* m) {
     }
     k++;
   }
-  printf("newton inversion, k = %d\n", k);
   bigint_release(&s);
   bigint_release(&z2);
+}
+
+// check if a = b * q + r, and r has same sign as b
+static int bigint_divmod_check(bigint* a, bigint* b, bigint* q, bigint* r) {
+  bigint t;
+  bigint_init(&t);
+  bigint_copy(&t, b);
+  bigint_mul_by(&t, q);
+  bigint_add_by(&t, r);
+  assert(bigint_equal(&t, a));
+  bigint_release(&t);
+  bigint_check_sign(b);
+  bigint_check_sign(r);
+  assert(b->sign == r->sign || r->sign == 0);
+  return 1;
 }
 
 // This is a helper function which is used by div and mod function
 // a / b -> q
 // a % b -> r
+// r has same sign as b
 //
 // invariant: a = b * q + r
-//
-// TODO: support negative numbers, and handle special cases with faster algorithm
 bigint_errno bigint_divmod(bigint* a, bigint* b, bigint* q, bigint* r) {
   bigint b_inv, q2, r2;
   int b_inv_m;
   int try_count = 0;
+
+  if (bigint_is_zero(b)) {
+    return -BIGINT_ILLEGAL_PARAM;
+  }
+  if (bigint_is_negative(b)) {
+    int ret;
+    // make sure r has same sign as b, so we change the signs
+
+    bigint_change_sign(b);
+    ret = bigint_divmod(a, b, q, r);
+    assert(bigint_divmod_check(a, b, q, r));
+    bigint_change_sign(b);
+    bigint_change_sign(q);
+    if (bigint_is_zero(r) == 0) {
+      // if the remainder is not 0, we have to do a little math for it
+      bigint_change_sign(r);
+      bigint_sub_by(r, b);
+      bigint_change_sign(r);
+      bigint_sub_by_int(q, 1);
+    }
+    assert(bigint_divmod_check(a, b, q, r));
+    return ret;
+  }
+
+  // from now on, b could only be positive number
+  
+  if (b->data_len == 1) {
+    // deal with small divisor
+    int r_int;
+    int b_small = b->p_data[0];
+    assert(b_small > 0);
+    bigint_copy(q, a);
+    bigint_div_by_int(q, b_small);
+    bigint_mod_by_int(a, b_small, &r_int);
+    if (r_int < 0) {
+      // keep r to be positive, since it has same sign as b
+      r_int += b_small;
+      bigint_sub_by_int(q, 1);
+    }
+    bigint_from_int(r, r_int);
+    assert(bigint_divmod_check(a, b, q, r));
+    return -BIGINT_NOERR;
+  }
+
+  // handle the case where |a| < |b|
+  if (bigint_is_negative(a)) {
+    int should_ret = 0;
+    // make sure a is also positive
+    bigint_change_sign(a);
+
+    // both a and b are positive
+    switch (bigint_compare(a, b)) {
+      case -1:
+        // -a < b, so q = -1, r = b + a
+        bigint_from_int(q, -1);
+        bigint_copy(r, a);  // the a here is actually "-a"
+        bigint_change_sign(r);  // now we got the actual "a" into r
+        bigint_add_by(r, b);
+        should_ret = 1;
+        break;
+      case 0:
+        // -a == b, so q = -1, r = 0
+        bigint_from_int(q, -1);
+        bigint_set_zero(r);
+        should_ret = 1;
+        break;
+      case 1:
+        // go on processing
+        break;
+      default:
+        assert(0);  // should not reach here
+    }
+
+    // change back the sign of a
+    bigint_change_sign(a);
+
+    if (should_ret != 0) {
+      // work done, should directly return
+      assert(bigint_divmod_check(a, b, q, r));
+      return -BIGINT_NOERR;
+    }
+  } else {
+    // both a and b are positive
+    switch (bigint_compare(a, b)) {
+      case -1:
+        // a < b, so q = 0, r = a
+        bigint_set_zero(q);
+        bigint_copy(r, a);
+        assert(bigint_divmod_check(a, b, q, r));
+        return -BIGINT_NOERR;
+      case 0:
+        // a == b, so q = 1, r = 0
+        bigint_set_one(q);
+        bigint_set_zero(r);
+        assert(bigint_divmod_check(a, b, q, r));
+        return -BIGINT_NOERR;
+      case 1:
+        // go on processing
+        break;
+      default:
+        assert(0);  // should not reach here
+    }
+  }
+
+  // from now on, we consider the division of really big numbers
   bigint_init(&b_inv);
   bigint_init(&q2);
   bigint_init(&r2);
@@ -1237,18 +1383,7 @@ bigint_errno bigint_divmod(bigint* a, bigint* b, bigint* q, bigint* r) {
   bigint_release(&q2);
   bigint_release(&r2);
 
-#if 1
-  {
-    // test the invariant a = b * q + r
-    bigint t;
-    bigint_init(&t);
-    bigint_copy(&t, b);
-    bigint_mul_by(&t, q);
-    bigint_add_by(&t, r);
-    assert(bigint_equal(&t, a));
-    bigint_release(&t);
-  }
-#endif
+  assert(bigint_divmod_check(a, b, q, r));
   return -BIGINT_NOERR;
 }
 
@@ -1304,6 +1439,162 @@ void bigint_div_by_pow_10(bigint* p_bigint, int pow) {
   }
 }
 
+bigint_errno bigint_square_root_ceiling(bigint* p_bigint) {
+  return bigint_root_n_ceiling(p_bigint, 2);
+}
+
+bigint_errno bigint_square_root_floor(bigint* p_bigint) {
+  return bigint_root_n_floor(p_bigint, 2);
+}
+
+// b should be positive
+static void bigint_approx_root_n(bigint* b, bigint* root, int n) {
+  double base, base_r;
+  int expo, expo_r, i;
+  bigint_to_scientific(b, &base, &expo);
+  expo_r = expo / n;
+  base_r = pow(10, log10(base) / n + (expo % n) / ((double) n));
+  bigint_from_scientific(root, base_r, expo_r);
+}
+
+static void bigint_newton_root_n(bigint* b, bigint* root, int n) {
+  int is_neg = 0;
+  int k;
+  int nth = bigint_digit_count(b);
+  bigint div, a, r2;
+  if (bigint_is_negative(b)) {
+    is_neg = 1;
+    bigint_change_sign(b);
+  }
+  // from now on, b is positive
+
+  // get an approximate value of root
+  bigint_approx_root_n(b, root, n);
+
+  bigint_init(&a);
+  bigint_init(&div);
+  bigint_init(&r2);
+  k = 0;
+  for (;;) {
+    bigint_copy(&a, root);
+    bigint_pow_by_int(&a, n);
+    bigint_mul_by_int(&a, n - 1);
+    bigint_add_by(&a, b);
+    bigint_copy(&div, root);
+    bigint_pow_by_int(&div, n - 1);
+    bigint_mul_by_int(&div, n);
+    bigint_div_by(&a, &div);
+    bigint_copy(&r2, &a);
+    if (bigint_compare(root, &r2) == 0) {
+      break;
+    }
+    bigint_copy(root, &r2);
+    if (k > nth * 3.4 * n) {
+      break;
+    }
+    k++;
+  }
+
+  bigint_release(&a);
+  bigint_release(&div);
+  bigint_release(&r2);
+  if (is_neg) {
+    bigint_change_sign(root);
+  }
+}
+
+// assert that b lies in root^n and (root + d)^n, d = +/- 1
+static int bigint_root_n_assert(bigint* b, bigint* root, int d, int n) {
+  bigint t;
+  int cmp1, cmp2;
+  assert(d == -1 || d == 1);
+  bigint_init(&t);
+  bigint_copy(&t, root);
+  bigint_pow_by_int(&t, n);
+  cmp1 = bigint_compare(&t, b);
+  bigint_copy(&t, root);
+  bigint_add_by_int(&t, d);
+  bigint_pow_by_int(&t, n);
+  cmp2 = bigint_compare(&t, b);
+  if (d == 1) {
+    assert(cmp1 <= 0 && cmp2 > 0);
+  } else { // d == -1
+    assert(cmp1 >= 0 && cmp2 < 0);
+  }
+  bigint_release(&t);
+  return 1;
+}
+
+bigint_errno bigint_root_n_ceiling(bigint* b, int n) {
+  bigint root, t;
+  if (n % 2 == 0 && bigint_is_negative(b)) {
+    return -BIGINT_ILLEGAL_PARAM;
+  }
+  bigint_init(&root);
+  bigint_newton_root_n(b, &root, n);
+
+  // adjust the result, the following loop will run only a few rounds
+  bigint_init(&t);
+  for (;;) {
+    int cmp1, cmp2;
+    bigint_copy(&t, &root);
+    bigint_pow_by_int(&t, n);
+    cmp1 = bigint_compare(&t, b);
+    bigint_copy(&t, &root);
+    bigint_sub_by_int(&t, 1);
+    bigint_pow_by_int(&t, n);
+    cmp2 = bigint_compare(&t, b);
+    if (cmp1 < 0) {
+      bigint_add_by_int(&root, 1);
+    } else if (cmp2 >= 0) {
+      bigint_sub_by_int(&root, 1);
+    } else {
+      break;
+    }
+  }
+  assert(bigint_root_n_assert(b, &root, -1, n));
+
+  bigint_copy(b, &root);
+  bigint_release(&root);
+  bigint_release(&t);
+  return -BIGINT_NOERR;
+}
+
+bigint_errno bigint_root_n_floor(bigint* b, int n) {
+  bigint root, t;
+  if (n % 2 == 0 && bigint_is_negative(b)) {
+    return -BIGINT_ILLEGAL_PARAM;
+  }
+  bigint_init(&root);
+  bigint_newton_root_n(b, &root, n);
+
+  // adjust the result, the following loop will run only a few rounds
+  bigint_init(&t);
+  for (;;) {
+    int cmp1, cmp2;
+    bigint_copy(&t, &root);
+    bigint_pow_by_int(&t, n);
+    cmp1 = bigint_compare(&t, b);
+    bigint_copy(&t, &root);
+    bigint_add_by_int(&t, 1);
+    bigint_pow_by_int(&t, n);
+    cmp2 = bigint_compare(&t, b);
+    if (cmp1 > 0) {
+      bigint_sub_by_int(&root, 1);
+    } else if (cmp2 <= 0) {
+      bigint_add_by_int(&root, 1);
+    } else {
+      break;
+    }
+  }
+  assert(bigint_root_n_assert(b, &root, 1, n));
+
+  bigint_copy(b, &root);
+  bigint_release(&root);
+  bigint_release(&t);
+  return -BIGINT_NOERR;
+}
+
 bigint_errno bigint_mod_by(bigint* p_dst, bigint* p_src) {
   bigint_errno ret;
   bigint q, r;
@@ -1329,10 +1620,21 @@ bigint_errno bigint_mod_by_int(bigint* p_bigint, int value, int* p_result) {
   for (i = p_bigint->data_len - 1; i >= 0; i--) {
     r = (r * BIGINT_RADIX + p_bigint->p_data[i]) % value;
   }
+  bigint_check_sign(p_bigint);
   if (p_bigint->sign < 0) {
     r = -r;
   }
-  assert(-2147483648ll <= r && r < 2147483648ull);
+
+  // make sure that r has same sign as the divisor
+  if (value < 0 && r > 0) {
+    r += value;
+  } else if (value > 0 && r < 0) {
+    r += value;
+  }
+
+  // assert that r has same sign as the divisor
+  assert(value < 0 ? r <= 0 : r >= 0);
+  assert(r < 0 ? (-r <= 2147483648ll) : r < 2147483648ull);
   *p_result = (int) r;
   return -BIGINT_NOERR;
 }
@@ -1363,6 +1665,8 @@ bigint_errno bigint_mod_by_pow_10(bigint* p_bigint, int pow) {
 }
 
 int bigint_compare(bigint* p_bigint1, bigint* p_bigint2) {
+  bigint_check_sign(p_bigint1);
+  bigint_check_sign(p_bigint2);
   if (p_bigint1->sign < p_bigint2->sign) {
     return -1;
   } else if (p_bigint1->sign > p_bigint2->sign) {
