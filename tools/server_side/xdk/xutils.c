@@ -135,6 +135,9 @@ xsuccess xinet_ip2str(int ip, char* str) {
 
 xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr) {
   in_addr_t a;
+  if (host == NULL) {
+    return XFAILURE;
+  }
   bzero(addr, sizeof(*addr));
   addr->sin_family = AF_INET;
   a = inet_addr(host);
