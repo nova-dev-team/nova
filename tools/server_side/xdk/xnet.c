@@ -326,13 +326,17 @@ xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor,
   gettimeofday(&start_time, NULL);
 #endif  // PROFILE_XSERVER
 
-  xs->sock = xsocket_new(host, port);
   xs->backlog = backlog;
   xs->acceptor = acceptor;
   xs->serv_count = serv_count;
   xs->serv_mode = serv_mode;
   xs->args = args;
-  if (bind(xs->sock->sockfd, (struct sockaddr *) &(xs->sock->addr), sizeof(struct sockaddr)) < 0) {
+  xs->sock = xsocket_new(host, port);
+  if (xs->sock == NULL) {
+    xserver_delete(xs);
+    xs = NULL;
+  }
+  if (xs != NULL && bind(xs->sock->sockfd, (struct sockaddr *) &(xs->sock->addr), sizeof(struct sockaddr)) < 0) {
     perror("error in bind()");
     xserver_delete(xs);
     xs = NULL;
@@ -354,12 +358,9 @@ static void* acceptor_wrapper(void* pthread_arg) {
   xserver xserver = arglist[0];
   xsocket client_xs = arglist[1];
   void* args = arglist[2];
-
+  xfree(pthread_arg); // need to free this as soon as possible
   xserver->acceptor(client_xs, args);
-
-  xfree(pthread_arg);
   xsocket_delete(client_xs);
-
   xmem_usage(stdout);
   pthread_exit(NULL);
   return NULL;
