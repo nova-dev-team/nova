@@ -221,7 +221,6 @@ int xhash_remove(xhash xh, void* key) {
     return XSUCCESS;
   } else {
     // head is not target
-    q = p->next;
     for (;;) {
       // q is the item to be checked
       q = p->next;
