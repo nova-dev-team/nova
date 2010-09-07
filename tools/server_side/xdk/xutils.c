@@ -310,6 +310,23 @@ xsuccess xfilesystem_path_cdup(xstr norm_path) {
   return XSUCCESS;
 }
 
+static void xfilesystem_normalize_abs_path_helper(xstr seg, xstr norm_path) {
+  const char sep = xsys_fs_sep_char; // filesystem path seperator
+  if (strcmp(xstr_get_cstr(seg), ".") == 0) {
+    // do nothing
+  } else if (strcmp(xstr_get_cstr(seg), "..") == 0) {
+    // cd up
+    xfilesystem_path_cdup(norm_path);
+  } else {
+    // append '/' & 'seg'
+    if (xstr_last_char(norm_path) != sep) {
+      xstr_append_char(norm_path, sep);
+    }
+    xstr_append_cstr(norm_path, xstr_get_cstr(seg));
+  }
+  xstr_set_cstr(seg, "");
+}
+
 xsuccess xfilesystem_normalize_abs_path(const char* abs_path, xstr norm_path) {
   xsuccess ret = XSUCCESS;
   const char sep = xsys_fs_sep_char; // filesystem path seperator
@@ -327,19 +344,7 @@ xsuccess xfilesystem_normalize_abs_path(const char* abs_path, xstr norm_path) {
       if (abs_path[i] == sep) {
         if (xstr_len(seg) != 0) {
           // got a new segment
-          if (strcmp(xstr_get_cstr(seg), ".") == 0) {
-            // do nothing
-          } else if (strcmp(xstr_get_cstr(seg), "..") == 0) {
-            // cd up
-            xfilesystem_path_cdup(norm_path);
-          } else {
-            // append '/' & 'seg'
-            if (xstr_last_char(norm_path) != sep) {
-              xstr_append_char(norm_path, sep);
-            }
-            xstr_append_cstr(norm_path, xstr_get_cstr(seg));
-          }
-          xstr_set_cstr(seg, "");
+          xfilesystem_normalize_abs_path_helper(seg, norm_path);
         }
       } else {
         xstr_append_char(seg, abs_path[i]);
@@ -347,22 +352,9 @@ xsuccess xfilesystem_normalize_abs_path(const char* abs_path, xstr norm_path) {
     }
     if (xstr_len(seg) != 0) {
       // got a new segment
-      if (strcmp(xstr_get_cstr(seg), ".") == 0) {
-        // do nothing
-      } else if (strcmp(xstr_get_cstr(seg), "..") == 0) {
-        // cd up
-        xfilesystem_path_cdup(norm_path);
-      } else {
-        // append '/' & 'seg'
-        if (xstr_last_char(norm_path) != sep) {
-          xstr_append_char(norm_path, sep);
-        }
-        xstr_append_cstr(norm_path, xstr_get_cstr(seg));
-      }
-      xstr_set_cstr(seg, "");
+      xfilesystem_normalize_abs_path_helper(seg, norm_path);
     }
   }
-
   xstr_delete(seg);
   return ret;
 }
