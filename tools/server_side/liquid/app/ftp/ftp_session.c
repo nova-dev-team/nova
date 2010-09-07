@@ -127,19 +127,22 @@ void ftp_session_set_trans_type(ftp_session session, char type) {
   session->trans_type = type;
 }
 
-void ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data_acceptor) {
+xsuccess ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data_acceptor) {
+  xsuccess ret = XSUCCESS;
   int data_port_min = 20000;
   int data_port_max = 56000;
   int backlog = 1;
   int serv_count = 1;
-  char serv_mode = 'p';
+  char serv_mode = 'b';
   int max_try = 10;
   int try_count;
   if (session->rand_data_port < 0) {
     session->rand_data_port = data_port_min + rand() % (data_port_max - data_port_min + 1);
   }
-  xstr host = xstr_copy(session->host_addr);  // will be managed by xserver (destroyed automatically after service)
   for (try_count = 0; try_count < max_try; try_count++) {
+    // we must create a new "host" var each round, since it will be automatically
+    // destroyed if bind failed
+    xstr host = xstr_copy(session->host_addr);  // will be managed by xserver (destroyed automatically after service)
     // TODO probably port confliction here
     // TODO when creating a server with serv_count = 1, add a timeout. when time is out, kill the server
     session->data_server = xserver_new(host, session->rand_data_port, backlog, data_acceptor, serv_count, serv_mode, (void *) session);
@@ -153,6 +156,10 @@ void ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data
       session->rand_data_port = data_port_min + rand() % (data_port_max - data_port_min + 1);
     }
   }
+  if (try_count >= max_try) {
+    ret = XFAILURE;
+  }
+  return ret;
 }
 
 xbool ftp_session_is_data_service_ready(ftp_session session) {
