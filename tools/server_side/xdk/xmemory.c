@@ -2,26 +2,20 @@
 #define XMEM_DEBUG 0
 #endif  // XMEM_DEBUG
 
-#ifndef __APPLE__
-#include <malloc.h>
-#else
 #include <stdlib.h>
-#endif // __APPLE__
-
 #include <string.h>
 #include <stdarg.h>
-
-#ifdef HAVE_LIBPTHREAD
 #include <pthread.h>
-#endif  // HAVE_LIBPTHREAD
+
+#ifndef __APPLE__
+#include <malloc.h>
+#endif // __APPLE__
 
 #include "xdef.h"
 #include "xmemory.h"
 
 static int xmalloc_counter = 0;
-#ifdef HAVE_LIBPTHREAD
 pthread_mutex_t xmem_mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif  // HAVE_LIBPTHREAD
 
 #if XMEM_DEBUG == 1
 // memory alloction logging utility
@@ -96,7 +90,7 @@ static int xmem_log_table_slot_id(xmem_log_table* xl, void* key) {
     // already extended part
     return hcode % (xl->base_size << (1 + xl->extend_level));
   } else {
-    // no the yet-not-extended part
+    // no the not-extended-yet part
     return hcode % (xl->base_size << xl->extend_level);
   }
 }
@@ -134,50 +128,39 @@ static void xmem_log_table_try_extend(xmem_log_table* xl) {
 
 void xmem_log_table_put(xmem_log_table* xl, void* ptr, const char* file, int line) {
   int slot_id;
-  xmem_log_table_entry* entry = (xmem_log_table_entry *) malloc(sizeof(xmem_log_table_entry));
-
   // first of all, test if need to expand
   xmem_log_table_try_extend(xl);
-
   slot_id = xmem_log_table_slot_id(xl, ptr);
 
-  entry->next = xl->slot[slot_id];
+  xmem_log_table_entry* entry = (xmem_log_table_entry *) malloc(sizeof(xmem_log_table_entry));
   entry->ptr = ptr;
   entry->file = file;
   entry->line = line;
+  entry->next = xl->slot[slot_id];
   xl->slot[slot_id] = entry;
-
   xl->entry_count++;
 }
 
 const char* xmem_log_table_get_file(xmem_log_table* xl, void* ptr) {
   int slot_id = xmem_log_table_slot_id(xl, ptr);
-
   xmem_log_table_entry* p;
-  xmem_log_table_entry* q;
-
   p = xl->slot[slot_id];
   while (p != NULL) {
-    q = p->next;
     if (ptr == p->ptr)
       return p->file;
-    p = q;
+    p = p->next;
   }
   return "(unknown)";
 }
 
 int xmem_log_table_get_line(xmem_log_table* xl, void* ptr) {
   int slot_id = xmem_log_table_slot_id(xl, ptr);
-
   xmem_log_table_entry* p;
-  xmem_log_table_entry* q;
-
   p = xl->slot[slot_id];
   while (p != NULL) {
-    q = p->next;
     if (ptr == p->ptr)
       return p->line;
-    p = q;
+    p = p->next;
   }
   return -1;
 }
@@ -231,7 +214,6 @@ int xmem_log_table_remove(xmem_log_table* xl, void* ptr) {
     return XSUCCESS;
   } else {
     // head is not target
-    q = p->next;
     for (;;) {
       // q is the item to be checked
       q = p->next;
@@ -282,10 +264,7 @@ void* xmalloc(int size, ...) {
   void* ret = NULL;
   if (size > 0) {
     void* ptr;
-#ifdef HAVE_LIBPTHREAD
     pthread_mutex_lock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
-
     ptr = malloc(size);
     xmalloc_counter++;
 
@@ -308,19 +287,14 @@ void* xmalloc(int size, ...) {
     }
 #endif  // XMEM_DEBUG == 1
 
-#ifdef HAVE_LIBPTHREAD
     pthread_mutex_unlock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
     ret = ptr;
   }
   return ret;
 }
 
 void xfree(void* ptr) {
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
-
   xmalloc_counter--;
   free(ptr);
 
@@ -330,17 +304,12 @@ void xfree(void* ptr) {
   }
 #endif  // XMEM_DEBUG == 1
 
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
 }
 
 void* xrealloc(void* ptr, int new_size) {
   void* new_ptr;
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
-
   new_ptr = realloc(ptr, new_size);
 
 #if XMEM_DEBUG == 1
@@ -352,18 +321,13 @@ void* xrealloc(void* ptr, int new_size) {
   }
 #endif  // XMEM_DEBUG == 1
 
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
   return new_ptr;
 }
 
 int xmem_usage(FILE* fp) {
   int ret;
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
-
   ret = xmalloc_counter;
   if (fp != NULL) {
     fprintf(fp, "[xdk-xmemory] memory usage: allocation count = %d\n", xmalloc_counter);
@@ -372,17 +336,12 @@ int xmem_usage(FILE* fp) {
 #endif  // XMEM_DEBUG == 1
   }
 
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
   return ret;
 }
 
 void xmem_reset_counter() {
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_lock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
-
   xmalloc_counter = 0;
 
 #if XMEM_DEBUG == 1
@@ -392,8 +351,6 @@ void xmem_reset_counter() {
   }
 #endif  // XMEM_DEBUG == 1
 
-#ifdef HAVE_LIBPTHREAD
   pthread_mutex_unlock(&xmem_mutex);
-#endif  // HAVE_LIBPTHREAD
 }
 
