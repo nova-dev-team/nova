@@ -266,8 +266,11 @@ void ftp_session_set_trans_type(ftp_session session, char type);
     User's connection session.
   @param data_acceptor
     The data service acceptor to be bound to data xserver.
+
+  @return
+    Whether the data port is successfully opened.
 */
-void ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data_acceptor);
+xsuccess ftp_session_prepare_data_service(ftp_session session, xserver_acceptor data_acceptor);
 
 
 /**
