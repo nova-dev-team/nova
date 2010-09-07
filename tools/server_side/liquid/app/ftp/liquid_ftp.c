@@ -256,10 +256,13 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
 
     } else if (xcstr_startwith_cstr(inbuf, "PASV")) {
       xstr rep = xstr_new();
-      xstr_set_cstr(rep, "227 entering passive mode ");
       ftp_session_set_start_offset(session, 0);
-      ftp_session_prepare_data_service(session, data_acceptor);
-      add_comma_separated_data_server_addr(rep, session);
+      if (ftp_session_prepare_data_service(session, data_acceptor) == XSUCCESS) {
+        xstr_set_cstr(rep, "227 entering passive mode ");
+        add_comma_separated_data_server_addr(rep, session);
+      } else {
+        xstr_set_cstr(rep, "500 failed to open data socket\r\n");
+      }
       reply(session, xstr_get_cstr(rep));
       xstr_delete(rep);
     } else if (xcstr_startwith_cstr(inbuf, "LIST")) {
@@ -452,10 +455,10 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
 static xsuccess liquid_ftp_service(xstr host, int port, xstr root_jail) {
   xsuccess ret;
   int backlog = 10; // TODO move this into config file
-  void** args = xmalloc_ty(2, void *); // it will be free'ed after the call of xserver_serv
+  void* args[2];
   args[0] = host;
   args[1] = root_jail;
-  char serv_mode = 'p'; // serv in new process
+  char serv_mode = 't'; // serv in new thread
   xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, serv_mode, args);
   if (xs == NULL) {
     xlog_fatal("[ftp] in liquid_ftp_service(): failed to init xserver!\n");
@@ -464,8 +467,7 @@ static xsuccess liquid_ftp_service(xstr host, int port, xstr root_jail) {
     xlog_info("[ftp] ftp server started on %s:%d, root is '%s'\n", xstr_get_cstr(host), port, xstr_get_cstr(root_jail));
     ret = xserver_serve(xs);  // xserver is self destrying, after service, it will destroy it self
   }
-  xfree(args);
-  xstr_delete(host);
+  // don't need to release "host", since it is managed by xserver
   xstr_delete(root_jail);
   return ret;
 }
