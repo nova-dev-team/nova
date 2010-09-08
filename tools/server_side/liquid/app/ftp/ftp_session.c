@@ -139,11 +139,11 @@ xsuccess ftp_session_prepare_data_service(ftp_session session, xserver_acceptor 
   if (session->rand_data_port < 0) {
     session->rand_data_port = data_port_min + rand() % (data_port_max - data_port_min + 1);
   }
+  // deal with port confliction here, try to get a new socket for a few times
   for (try_count = 0; try_count < max_try; try_count++) {
     // we must create a new "host" var each round, since it will be automatically
     // destroyed if bind failed
     xstr host = xstr_copy(session->host_addr);  // will be managed by xserver (destroyed automatically after service)
-    // TODO probably port confliction here
     // TODO when creating a server with serv_count = 1, add a timeout. when time is out, kill the server
     session->data_server = xserver_new(host, session->rand_data_port, backlog, data_acceptor, serv_count, serv_mode, (void *) session);
     session->rand_data_port++;
