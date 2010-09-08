@@ -4,6 +4,7 @@
 #include <time.h>
 #include <inttypes.h>
 #include <sys/time.h>
+#include <signal.h>
 
 #include "xdef.h"
 #include "xnet.h"
@@ -108,6 +109,12 @@ static void data_acceptor(xsocket data_xsock, void* args) {
   gettimeofday(&time_now, NULL);
   xlog_debug("[prof] ftp-data_acceptor running at %d, %d (sec, usec)\n", (int) time_now.tv_sec, (int) time_now.tv_usec);
 #endif  // #if PROFILE_FPT == 1
+
+  // XXX ignore sigpipe, we encountered problems when there is conflicts
+  // in ftp data random port
+  // NOTE SIGPIPE is per-thread option, so set it in every thread!
+  signal(SIGPIPE, SIG_IGN);
+
   if (xcstr_startwith_cstr(data_cmd, "LIST")) {
     xstr ls_data = xstr_new();
     xstr error_msg = xstr_new();
@@ -157,6 +164,11 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
   char* inbuf = xmalloc_ty(buf_size, char);
   char* outbuf = xmalloc_ty(buf_size, char);
   xbool stop_service = XFALSE;
+
+  // XXX ignore sigpipe, we encountered problems when there is conflicts
+  // in ftp data random port
+  // NOTE SIGPIPE is per-thread option, so set it in every thread!
+  signal(SIGPIPE, SIG_IGN);
 
   xlog_info("[ftp] ftp root jail is '%s'\n", xstr_get_cstr(root_jail));
 
@@ -433,11 +445,9 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
             reply(session, "500 need RNTO\r\n");
           }
         }
-
         xstr_delete(rnfr);
         xstr_delete(error_msg);
       }
-
     } else {
       xstr rep = xstr_new();
       xstr_printf(rep, "500 unknown command '%s'\r\n", inbuf);
@@ -445,7 +455,6 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       xstr_delete(rep);
     }
   }
-
   ftp_session_delete(session);
   xfree(inbuf);
   xfree(outbuf);
@@ -460,6 +469,12 @@ static xsuccess liquid_ftp_service(xstr host, int port, xstr root_jail) {
   args[1] = root_jail;
   char serv_mode = 't'; // serv in new thread
   xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, serv_mode, args);
+
+  // XXX ignore sigpipe, we encountered problems when there is conflicts
+  // in ftp data random port
+  // NOTE SIGPIPE is per-thread option, so set it in every thread!
+  signal(SIGPIPE, SIG_IGN);
+
   if (xs == NULL) {
     xlog_fatal("[ftp] in liquid_ftp_service(): failed to init xserver!\n");
     ret = XFAILURE;
