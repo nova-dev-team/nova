@@ -47,6 +47,14 @@ struct xserver_impl {
   int serv_count; ///< @brief How many rounds of service will be given.
   char serv_mode; ///< @brief Service mode: 'b' blocking, 'p' new process, 't' new thread
   void* args; ///< @brief Additional arguments for acceptor function.
+
+  /**
+    @brief
+      Reference counter for xserver. In threaded service mode, it will be used to
+      determine when should the xserver be really destroyed.
+  */
+  int ref_counter;
+  pthread_mutex_t ref_counter_mutex; ///< @brief The mutex which protectes ref_counter.
 };
 
 // host will be deleted when deleting xsocked
@@ -215,7 +223,6 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
       }
     }
   }
-
   return ret;
 }
 
@@ -314,8 +321,25 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2) {
 }
 
 static void xserver_delete(xserver xs) {
-  xsocket_delete(xs->sock);
-  xfree(xs);
+  int should_delete = 0;
+  pthread_mutex_lock(&(xs->ref_counter_mutex));
+  // check the reference counter to see if we really need to delete the xserver
+  xs->ref_counter--;
+  if (xs->ref_counter == 0) {
+    should_delete = 1;
+  }
+  pthread_mutex_unlock(&(xs->ref_counter_mutex));
+  if (should_delete) {
+    pthread_mutex_destroy(&(xs->ref_counter_mutex));
+    xsocket_delete(xs->sock);
+    xfree(xs);
+  }
+}
+
+static void xserver_incr_ref_count(xserver xs) {
+  pthread_mutex_lock(&(xs->ref_counter_mutex));
+  xs->ref_counter++;
+  pthread_mutex_unlock(&(xs->ref_counter_mutex));
 }
 
 xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor, int serv_count, char serv_mode, void* args) {
@@ -325,6 +349,10 @@ xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor,
   struct timeval start_time, end_time;
   gettimeofday(&start_time, NULL);
 #endif  // PROFILE_XSERVER
+
+  // set the reference counter & mutex
+  xs->ref_counter = 1;
+  pthread_mutex_init(&(xs->ref_counter_mutex), NULL);
 
   xs->backlog = backlog;
   xs->acceptor = acceptor;
@@ -360,6 +388,7 @@ static void* acceptor_wrapper(void* pthread_arg) {
   void* args = arglist[2];
   xfree(pthread_arg); // need to free this as soon as possible
   xserver->acceptor(client_xs, args);
+  xserver_delete(xserver);  // try to delete the xserver (it is ref counted)
   xsocket_delete(client_xs);
   xmem_usage(stdout);
   pthread_exit(NULL);
@@ -400,7 +429,6 @@ xsuccess xserver_serve(xserver xs) {
     xstr_set_cstr(client_xs->host, inet_ntoa(client_addr.sin_addr));
 
     serv_count++;
-
     if (xs->serv_mode == 't' || xs->serv_mode == 'T') {
       // serve in new thread
       pthread_t tid;
@@ -408,6 +436,8 @@ xsuccess xserver_serve(xserver xs) {
       arglist[0] = xs;
       arglist[1] = client_xs;
       arglist[2] = xs->args;
+      // increase the ref counter for xserver
+      xserver_incr_ref_count(xs);
       if (pthread_create(&tid, NULL, acceptor_wrapper, (void *) arglist) < 0) {
         perror("error in pthread_create()");
         // TODO handle error creating new thread
@@ -422,7 +452,6 @@ xsuccess xserver_serve(xserver xs) {
         break;
       } else if (pid == 0) {
         // child process
-
         // begin monitoring mem usage in service process
         xmem_reset_counter();
 
@@ -432,20 +461,16 @@ xsuccess xserver_serve(xserver xs) {
 #endif  // #if PROFILE_XSERVER == 1
 
         xs->acceptor(client_xs, xs->args);
-
         if (xmem_usage(stdout) != 0) {
           xlog_warning("[xdk] possible memory leak in xserver's service process!\n");
         }
         xsocket_delete(client_xs);
-        // exit child process
+        // exit child process, do not try to destroy xserver in child process
         exit(0);
-
       } else {
         // parent process
-
         // tricky here, reset rand seed, prevent sub process from rand value collisions
         srand(pid);
-
         // release client handle in this process
         // also release allocated memory resource, make xmem monitor happy
         xsocket_delete(client_xs);
@@ -456,14 +481,13 @@ xsuccess xserver_serve(xserver xs) {
       xsocket_delete(client_xs);
     }
   }
-  xserver_delete(xs); // self destroy
+  xserver_delete(xs); // self destroy (xserver is ref counted)
   return ret;
 }
 
 int xserver_get_port(xserver xs) {
   return xs->sock->port;
 }
-
 
 const char* xserver_get_ip_cstr(xserver xs) {
   return inet_ntoa(xs->sock->addr.sin_addr);
