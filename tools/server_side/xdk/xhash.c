@@ -43,7 +43,7 @@ struct xhash_impl {
   xhash_free free_func; ///< @brief Hash entry destructor.
 };
 
-#define ALLOC(ty, n) ((ty *) xmalloc(sizeof(ty) * (n)))
+#define ALLOC(ty, n) ((ty *) xmalloc_ty(n, ty))
 #define REALLOC(ty, ptr, n) (ty *) xrealloc(ptr, sizeof(ty) * (n))
 
 xhash xhash_new(xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free) {
