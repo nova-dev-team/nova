@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <pthread.h>
+#include <assert.h>
 
 #ifndef __APPLE__
 #include <malloc.h>
@@ -131,6 +132,8 @@ void xmem_log_table_put(xmem_log_table* xl, void* ptr, const char* file, int lin
   // first of all, test if need to expand
   xmem_log_table_try_extend(xl);
   slot_id = xmem_log_table_slot_id(xl, ptr);
+
+  assert(file != NULL);
 
   xmem_log_table_entry* entry = (xmem_log_table_entry *) malloc(sizeof(xmem_log_table_entry));
   entry->ptr = ptr;
