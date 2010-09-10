@@ -8,6 +8,7 @@
 
 #include "ftp_session.h"
 #include "ftp_fs.h"
+#include "ftp_acl.h"
 
 /**
   @brief
@@ -32,7 +33,7 @@ struct ftp_session_impl {
   off_t start_offset; ///< @brief Starting offset for RETR and STOR command.
 };
 
-ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr, xstr root_jail) {
+ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr) {
   ftp_session session = xmalloc_ty(1, struct ftp_session_impl);
   session->host_addr = host_addr;
   session->cmd_sock = cmd_sock;
@@ -42,7 +43,8 @@ ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr, xstr root_jail) {
   session->data_cmd = xstr_new();
   session->cwd = xstr_new();
   xstr_set_cstr(session->cwd, "/");
-  session->root_jail = xstr_copy(root_jail);  // NOTE the arg root_jail will not be managed by ftp_session
+  session->root_jail = xstr_new();
+  xstr_set_cstr(session->root_jail, "/");
   session->user_identifier = xstr_new();
   xstr_printf(session->user_identifier, "%s:%d", xsocket_get_host_cstr(session->cmd_sock), xsocket_get_port(session->cmd_sock));
   session->user_aborted = XFALSE;
@@ -76,6 +78,10 @@ const xstr ftp_session_get_root_jail(ftp_session session) {
   return session->root_jail;
 }
 
+void ftp_session_set_root_jail(ftp_session session, const char* root_jail_cstr) {
+  xstr_set_cstr(session->root_jail, root_jail_cstr);
+}
+
 xbool ftp_session_is_logged_in(ftp_session session) {
   return session->logged_in;
 }
@@ -101,14 +107,14 @@ const char* ftp_session_get_user_identifier_cstr(ftp_session session) {
 }
 
 xbool ftp_session_auth_cstr(ftp_session session, char* password) {
+  xbool ret = XFALSE;
   if (session->username_given) {
-    // TODO add authentication
-    if (strcmp(password, "santa") == 0) {
+    if (ftp_auth_user(xstr_get_cstr(session->username), password) == XSUCCESS) {
+      ret = XTRUE;
       session->logged_in = XTRUE;
-      return XTRUE;
     }
   }
-  return XFALSE;
+  return ret;
 }
 
 const char* ftp_session_get_cwd_cstr(ftp_session session) {
@@ -173,6 +179,13 @@ xbool ftp_session_is_data_service_ready(ftp_session session) {
 void ftp_session_trigger_data_service(ftp_session session) {
   if (session->data_server != NULL) {
     xserver_serve(session->data_server);
+    session->data_server = NULL;
+  }
+}
+
+void ftp_session_discard_data_service(ftp_session session) {
+  if (session->data_server != NULL) {
+    xserver_delete(session->data_server);
     session->data_server = NULL;
   }
 }
