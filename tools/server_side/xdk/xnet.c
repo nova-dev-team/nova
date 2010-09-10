@@ -320,7 +320,7 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2) {
   xfree(buf);
 }
 
-static void xserver_delete(xserver xs) {
+void xserver_delete(xserver xs) {
   int should_delete = 0;
   pthread_mutex_lock(&(xs->ref_counter_mutex));
   // check the reference counter to see if we really need to delete the xserver
