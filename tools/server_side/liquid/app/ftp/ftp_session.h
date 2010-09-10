@@ -32,13 +32,11 @@ typedef struct ftp_session_impl* ftp_session;
     User's command connection xsocket object. It will NOT be destroyed when deleting the FTP session object.
   @param host_addr
     The host address of FTP server.
-  @param root_jail
-    The root jail in which the ftp service is running. Every action must be locked inside this jail.
 
   @return
     A newly created FTP session object.
 */
-ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr, xstr root_jail);
+ftp_session ftp_session_new(xsocket cmd_sock, xstr host_addr);
 
 /**
   @brief
@@ -96,6 +94,16 @@ int ftp_session_cmd_read(ftp_session session, void* buf, int max_len);
 */
 const xstr ftp_session_get_root_jail(ftp_session session);
 
+/**
+ * @brief
+ *  Set the root jail of an ftp session.
+ *
+ * @param session
+ *  The ftp session.
+ * @param root_jail_cstr
+ *  The new root jail.
+ */
+void ftp_session_set_root_jail(ftp_session session, const char* root_jail_cstr);
 
 /**
   @brief
@@ -294,6 +302,16 @@ xbool ftp_session_is_data_service_ready(ftp_session session);
     User's connection session.
 */
 void ftp_session_trigger_data_service(ftp_session session);
+
+
+/**
+ * @brief
+ *  Stop the data service of the FTP session.
+ *
+ * @param session
+ *  User's connection session.
+ */
+void ftp_session_discard_data_service(ftp_session session);
 
 /**
   @brief
