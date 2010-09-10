@@ -56,6 +56,7 @@ namespace :nova do
       else
         rails_env = "development"
       end
+      FileUtils.mkdir_p "#{conf["storage_root"]}/ftp_users"
 
       # boot the daemons
       all_daemons "start", rails_env

@@ -9,7 +9,23 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100318080649) do
+ActiveRecord::Schema.define(:version => 20100910063517) do
+
+  create_table "group_rules", :force => true do |t|
+    t.integer  "group_id",   :null => false
+    t.string   "path",       :null => false
+    t.boolean  "readable"
+    t.boolean  "writable",   :null => false
+    t.boolean  "deletable",  :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "groups", :force => true do |t|
+    t.string   "name",       :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "pmachines", :force => true do |t|
     t.string   "ip",           :limit => 20,                :null => false
@@ -24,6 +40,25 @@ ActiveRecord::Schema.define(:version => 20100318080649) do
     t.string   "key",        :limit => 40,                   :null => false
     t.string   "value",                                      :null => false
     t.boolean  "editable",                 :default => true, :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "user_rules", :force => true do |t|
+    t.integer  "user_id",    :null => false
+    t.string   "path",       :null => false
+    t.boolean  "readable"
+    t.boolean  "writable",   :null => false
+    t.boolean  "deletable",  :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "users", :force => true do |t|
+    t.string   "name",                       :null => false
+    t.string   "passwd",                     :null => false
+    t.string   "root_jail",                  :null => false
+    t.integer  "group_id",   :default => -1
     t.datetime "created_at"
     t.datetime "updated_at"
   end

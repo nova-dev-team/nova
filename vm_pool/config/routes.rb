@@ -47,6 +47,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'release/:name.:format', :controller => "misc", :action => "release"
   map.connect 'release.:format', :controller => "misc", :action => "release"
   map.connect 'list_vm.:format', :controller => "misc", :action => "list_vm"
+  map.connect 'register_user.:format', :controller => "misc", :action => "register_ftp_user"
+  map.connect 'list_users.:format', :controller => "misc", :action => "list_ftp_users"
 
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action.:format'

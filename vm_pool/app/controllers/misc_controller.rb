@@ -192,6 +192,37 @@ class MiscController < ApplicationController
     reply_success "VM '#{vm.name}' released, current use_count = #{vm.use_count}"
   end
 
+  # Register ftp user.
+  #
+  # Since::     0.3.4
+  def register_ftp_user
+    unless (valid_param? params[:name]) and (valid_param? params[:passwd])
+      reply_failure "Please provide the user's 'name' & 'passwd' parameter!"
+      return
+    end
+    if (User.find_by_name params[:name]) != nil
+      reply_failure "User '#{params[:name]}' already registered!"
+      return
+    end
+    u = User.new
+    u.name = params[:name]
+    u.passwd = params[:passwd]
+    u.root_jail = "#{common_conf["storage_root"]}/ftp_users/#{u.name}"
+    if u.save
+      FileUtils.mkdir_p u.root_jail
+      reply_success "Successfully registered user '#{u.name}'."
+    else
+      reply_failure "Failed to save '#{u.name}' into database!"
+    end
+  end
+
+  # List all registered ftp users.
+  #
+  # Since::     0.3.4
+  def list_ftp_users
+    reply_model User, :items => ["name", "root_jail"]
+  end
+
   # Destroy vmachine.
   #
   # Since::     0.3

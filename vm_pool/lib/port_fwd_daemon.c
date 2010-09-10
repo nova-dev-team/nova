@@ -8,11 +8,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
+
+#ifndef __APPLE__
+#include <malloc.h>
+#endif  // __APPLE__
 
 void print_help() {
   printf("Usage: port_fwd_daemon <timeout_minutes> <local_port> <remote_ip[:remote_port]> <log_folder> <path_to_port_mapper>\n");
