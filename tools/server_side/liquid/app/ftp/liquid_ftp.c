@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <sys/time.h>
 #include <signal.h>
+#include <sys/stat.h>
 
 #include "xdef.h"
 #include "xnet.h"
@@ -69,6 +70,7 @@ static void reply(ftp_session session, const char* text) {
 
 static xsuccess get_request(ftp_session session, char* inbuf, int buf_size) {
   int cnt;
+  // TODO ignore NOOP request
 
 #if PROFILE_FTP == 1
   struct timeval time_now;
@@ -99,6 +101,66 @@ static xsuccess get_request(ftp_session session, char* inbuf, int buf_size) {
   xlog_info("[req %s] %s\n", ftp_session_get_user_identifier_cstr(session), inbuf);
 
   return XSUCCESS;
+}
+
+static xbool can_read(ftp_session session, const char* path) {
+  int priv_flag;
+  xbool ret = XFALSE;
+  if (ftp_path_privilege(ftp_session_get_username_cstr(session), path, &priv_flag) == XSUCCESS) {
+    if (FTP_ACL_CAN_READ(priv_flag)) {
+      ret = XTRUE;
+    }
+  }
+  return ret;
+}
+
+static xbool can_read2(ftp_session session, const char* path, const char* sub_path) {
+  xbool ret;
+  xstr join_path = xstr_new();
+  xjoin_path_cstr(join_path, path, sub_path);
+  ret = can_read(session, xstr_get_cstr(join_path));
+  xstr_delete(join_path);
+  return ret;
+}
+
+static xbool can_write(ftp_session session, const char* path) {
+  int priv_flag;
+  xbool ret = XFALSE;
+  if (ftp_path_privilege(ftp_session_get_username_cstr(session), path, &priv_flag) == XSUCCESS) {
+    if (FTP_ACL_CAN_WRITE(priv_flag)) {
+      ret = XTRUE;
+    }
+  }
+  return ret;
+}
+
+static xbool can_write2(ftp_session session, const char* path, const char* sub_path) {
+  xbool ret;
+  xstr join_path = xstr_new();
+  xjoin_path_cstr(join_path, path, sub_path);
+  ret = can_write(session, xstr_get_cstr(join_path));
+  xstr_delete(join_path);
+  return ret;
+}
+
+static xbool can_del(ftp_session session, const char* path) {
+  int priv_flag;
+  xbool ret = XFALSE;
+  if (ftp_path_privilege(ftp_session_get_username_cstr(session), path, &priv_flag) == XSUCCESS) {
+    if (FTP_ACL_CAN_DEL(priv_flag)) {
+      ret = XTRUE;
+    }
+  }
+  return ret;
+}
+
+static xbool can_del2(ftp_session session, const char* path, const char* sub_path) {
+  xbool ret;
+  xstr join_path = xstr_new();
+  xjoin_path_cstr(join_path, path, sub_path);
+  ret = can_del(session, xstr_get_cstr(join_path));
+  xstr_delete(join_path);
+  return ret;
 }
 
 static void data_acceptor(xsocket data_xsock, void* args) {
@@ -158,9 +220,8 @@ static void data_acceptor(xsocket data_xsock, void* args) {
 
 static void cmd_acceptor(xsocket client_xs, void* args) {
   int buf_size = 8192;
-  void** args_list = (void **) args;
-  xstr host_addr = (xstr) args_list[0];
-  xstr root_jail = (xstr) args_list[1]; // NOTE root_jail will not be managed by this function. It should be managed by liquid_ftp_service
+  xstr host_addr = (xstr) args;
+  xstr root_jail = xstr_new();
   char* inbuf = xmalloc_ty(buf_size, char);
   char* outbuf = xmalloc_ty(buf_size, char);
   xbool stop_service = XFALSE;
@@ -170,12 +231,9 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
   // NOTE SIGPIPE is per-thread option, so set it in every thread!
   signal(SIGPIPE, SIG_IGN);
 
-  xlog_info("[ftp] ftp root jail is '%s'\n", xstr_get_cstr(root_jail));
-
   // client_xs will NOT be deleted by ftp_session, but will be deleted by xserver
   // host_addr will NOT be deleted by ftp_session, but will be deleted by ftp entry (liquid_ftp_service)
-  // root_jail will NOT be deleted by ftp_session, but it will be managed by liquid_ftp_service
-  ftp_session session = ftp_session_new(client_xs, host_addr, root_jail);
+  ftp_session session = ftp_session_new(client_xs, host_addr);
   reply(session, "220 liquid ftp\r\n");
 
   // pre-login
@@ -223,6 +281,13 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       reply(session, xstr_get_cstr(rep));
       xstr_delete(rep);
     }
+  }
+
+  // load the root_jail
+  if (stop_service == XFALSE) {
+    ftp_get_root_jail(ftp_session_get_username_cstr(session), root_jail);
+    ftp_session_set_root_jail(session, xstr_get_cstr(root_jail));
+    xlog_info("[ftp] root jail is %s\n", xstr_get_cstr(root_jail));
   }
 
   // post-login
@@ -279,9 +344,14 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       xstr_delete(rep);
     } else if (xcstr_startwith_cstr(inbuf, "LIST")) {
       if (ftp_session_is_data_service_ready(session)) {
-        reply(session, "150 here comes the listing\r\n");
-        ftp_session_set_data_cmd_cstr(session, inbuf);
-        ftp_session_trigger_data_service(session);
+        if (can_read(session, ftp_session_get_cwd_cstr(session))) {
+          reply(session, "150 here comes the listing\r\n");
+          ftp_session_set_data_cmd_cstr(session, inbuf);
+          ftp_session_trigger_data_service(session);
+        } else {
+          reply(session, "550 permission denied\r\n");
+          ftp_session_discard_data_service(session);
+        }
       } else {
         reply(session, "425 use PASV first\r\n");
       }
@@ -291,9 +361,14 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
         if (strlen(inbuf) < 6) {
           reply(session, "501 please provide filename\r\n");
         } else {
-          reply(session, "150 sending file\r\n");
-          ftp_session_set_data_cmd_cstr(session, inbuf);
-          ftp_session_trigger_data_service(session);
+          if (can_read2(session, ftp_session_get_cwd_cstr(session), inbuf + 5)) {
+            reply(session, "150 sending file\r\n");
+            ftp_session_set_data_cmd_cstr(session, inbuf);
+            ftp_session_trigger_data_service(session);
+          } else {
+            reply(session, "550 permission denied\r\n");
+            ftp_session_discard_data_service(session);
+          }
         }
       } else {
         reply(session, "425 use PASV first\r\n");
@@ -303,8 +378,34 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
         if (strlen(inbuf) < 6) {
           reply(session, "501 please provide filename\r\n");
         } else {
-          ftp_session_set_data_cmd_cstr(session, inbuf);
-          ftp_session_trigger_data_service(session);
+          xbool file_exists = XFALSE;
+          xbool perm_denied = XFALSE;
+          xstr file_fullpath = xstr_new();
+          struct stat st;
+          xjoin_path_cstr(file_fullpath, ftp_session_get_cwd_cstr(session), inbuf + 5);
+          if (lstat(xstr_get_cstr(file_fullpath), &st) == 0) {
+            file_exists = XTRUE;
+          }
+          if (file_exists == XTRUE) {
+            // appending to file
+            if (can_write2(session, ftp_session_get_cwd_cstr(session), inbuf + 5) == XFALSE) {
+              perm_denied = XTRUE;
+            }
+          } else {
+            // creating new file
+            if (can_write(session, ftp_session_get_cwd_cstr(session)) == XFALSE) {
+              perm_denied = XTRUE;
+            }
+          }
+          if (perm_denied == XTRUE) {
+            reply(session, "550 permission denied\r\n");
+            ftp_session_discard_data_service(session);
+          } else { 
+            // ok to write file
+            ftp_session_set_data_cmd_cstr(session, inbuf);
+            ftp_session_trigger_data_service(session);
+          }
+          xstr_delete(file_fullpath);
         }
       } else {
         reply(session, "425 use PASV first\r\n");
@@ -314,13 +415,17 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       if (strlen(inbuf) < 5) {
         reply(session, "501 invalid CWD command\r\n");
       } else {
-        xstr error_msg = xstr_new();
-        if (ftp_session_try_cwd_cstr(session, inbuf + 4, error_msg) == XSUCCESS) {
-          reply(session, "250 CWD command successful\r\n");
+        if (can_read2(session, ftp_session_get_cwd_cstr(session), inbuf + 4) == XTRUE) {
+          xstr error_msg = xstr_new();
+          if (ftp_session_try_cwd_cstr(session, inbuf + 4, error_msg) == XSUCCESS) {
+            reply(session, "250 CWD command successful\r\n");
+          } else {
+            reply(session, xstr_get_cstr(error_msg));
+          }
+          xstr_delete(error_msg);
         } else {
-          reply(session, xstr_get_cstr(error_msg));
+          reply(session, "550 permission denied\r\n");
         }
-        xstr_delete(error_msg);
       }
     } else if (xcstr_startwith_cstr(inbuf, "CDUP")) {
       ftp_session_cdup(session);
@@ -329,30 +434,38 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       if (strlen(inbuf) < 6) {
         reply(session, "501 invalid MDTM command\r\n");
       } else {
-        xstr error_msg = xstr_new();
-        xstr mdtm_str = xstr_new();
-        if (ftp_fs_mdtm(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 5, mdtm_str, error_msg) == XSUCCESS) {
-          reply(session, xstr_get_cstr(mdtm_str));
+        if (can_read2(session, ftp_session_get_cwd_cstr(session), inbuf + 5) == XTRUE) {
+          xstr error_msg = xstr_new();
+          xstr mdtm_str = xstr_new();
+          if (ftp_fs_mdtm(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 5, mdtm_str, error_msg) == XSUCCESS) {
+            reply(session, xstr_get_cstr(mdtm_str));
+          } else {
+            reply(session, xstr_get_cstr(error_msg));
+          }
+          xstr_delete(mdtm_str);
+          xstr_delete(error_msg);
         } else {
-          reply(session, xstr_get_cstr(error_msg));
+          reply(session, "550 permission denied\r\n");
         }
-        xstr_delete(mdtm_str);
-        xstr_delete(error_msg);
       }
 
     } else if (xcstr_startwith_cstr(inbuf, "SIZE")) {
       if (strlen(inbuf) < 6) {
         reply(session, "501 invalid SIZE command\r\n");
       } else {
-        xstr error_msg = xstr_new();
-        xstr size_str = xstr_new();
-        if (ftp_fs_size(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 5, size_str, error_msg) == XSUCCESS) {
-          reply(session, xstr_get_cstr(size_str));
+        if (can_read2(session, ftp_session_get_cwd_cstr(session), inbuf + 5) == XTRUE) {
+          xstr error_msg = xstr_new();
+          xstr size_str = xstr_new();
+          if (ftp_fs_size(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 5, size_str, error_msg) == XSUCCESS) {
+            reply(session, xstr_get_cstr(size_str));
+          } else {
+            reply(session, xstr_get_cstr(error_msg));
+          }
+          xstr_delete(size_str);
+          xstr_delete(error_msg);
         } else {
-          reply(session, xstr_get_cstr(error_msg));
+          reply(session, "550 permission denied\r\n");
         }
-        xstr_delete(size_str);
-        xstr_delete(error_msg);
       }
 
     } else if (xcstr_startwith_cstr(inbuf, "REST")) {
@@ -371,25 +484,33 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       if (strlen(inbuf) < 5) {
         reply(session, "501 invalid MKD command\r\n");
       } else {
-        xstr error_msg = xstr_new();
-        if (ftp_fs_mkdir(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 4, error_msg) == XSUCCESS) {
-          reply(session, "257 mkdir success\r\n");
+        if (can_write(session, ftp_session_get_cwd_cstr(session)) == XTRUE) {
+          xstr error_msg = xstr_new();
+          if (ftp_fs_mkdir(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 4, error_msg) == XSUCCESS) {
+            reply(session, "257 mkdir success\r\n");
+          } else {
+            reply(session, xstr_get_cstr(error_msg));
+          }
+          xstr_delete(error_msg);
         } else {
-          reply(session, xstr_get_cstr(error_msg));
+          reply(session, "550 permission denied\r\n");
         }
-        xstr_delete(error_msg);
       }
     } else if (xcstr_startwith_cstr(inbuf, "DELE")) {
       if (strlen(inbuf) < 6) {
         reply(session, "501 invalid DELE command\r\n");
       } else {
-        xstr error_msg = xstr_new();
-        if (ftp_fs_dele(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 5, error_msg) == XSUCCESS) {
-          reply(session, "250 delete done\r\n");
+        if (can_del2(session, ftp_session_get_cwd_cstr(session), inbuf + 5)) {
+          xstr error_msg = xstr_new();
+          if (ftp_fs_dele(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 5, error_msg) == XSUCCESS) {
+            reply(session, "250 delete done\r\n");
+          } else {
+            reply(session, xstr_get_cstr(error_msg));
+          }
+          xstr_delete(error_msg);
         } else {
-          reply(session, xstr_get_cstr(error_msg));
+          reply(session, "550 permission denied\r\n");
         }
-        xstr_delete(error_msg);
       }
     } else if (xcstr_startwith_cstr(inbuf, "ALLO")) {
       reply(session, "202 ALLO command ignored\r\n");
@@ -398,6 +519,7 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       if (strlen(inbuf) < 6) {
         reply(session, "501 invalid SITE command\r\n");
       } else {
+        // TODO acl on site command
         xstr error_msg = xstr_new();
         if (ftp_fs_site_cmd(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 5, error_msg) == XSUCCESS) {
           reply(session, "200 SITE command succeeded\r\n");
@@ -411,42 +533,50 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       if (strlen(inbuf) < 5) {
         reply(session, "501 invalid RMD command!\r\n");
       } else {
-        xstr error_msg = xstr_new();
-        if (ftp_fs_dele(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 4, error_msg) == XSUCCESS) {
-          reply(session, "250 RMD done\r\n");
+        if (can_del2(session, ftp_session_get_cwd_cstr(session), inbuf + 4) == XTRUE) {
+          xstr error_msg = xstr_new();
+          if (ftp_fs_dele(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), inbuf + 4, error_msg) == XSUCCESS) {
+            reply(session, "250 RMD done\r\n");
+          } else {
+            reply(session, xstr_get_cstr(error_msg));
+          }
+          xstr_delete(error_msg);
         } else {
-          reply(session, xstr_get_cstr(error_msg));
+          reply(session, "550 permission denied\r\n");
         }
-        xstr_delete(error_msg);
       }
     } else if (xcstr_startwith_cstr(inbuf, "RNFR")) {
       if (strlen(inbuf) < 6) {
         reply(session, "501 invalid RNFR command\r\n");
       } else {
-        xstr error_msg = xstr_new();
-        xstr rnfr = xstr_new();
-        xstr_set_cstr(rnfr, inbuf + 5);
-        reply(session, "350 RNFR ok\r\n");
-
-        if (get_request(session, inbuf, buf_size) != XSUCCESS) {
-          stop_service = XTRUE;
-        } else {
-          if (xcstr_startwith_cstr(inbuf, "RNTO")) {
-            if (strlen(inbuf) < 6) {
-              reply(session, "501 invalid RNTO command!\r\n");
-            } else {
-              if (ftp_fs_rename(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), xstr_get_cstr(rnfr), inbuf + 5, error_msg) != XSUCCESS) {
-                reply(session, xstr_get_cstr(error_msg));
-              } else {
-                reply(session, "250 rename ok\r\n");
-              }
-            }
+        if (can_del2(session, ftp_session_get_cwd_cstr(session), inbuf + 5) == XTRUE) {
+          xstr error_msg = xstr_new();
+          xstr rnfr = xstr_new();
+          xstr_set_cstr(rnfr, inbuf + 5);
+          reply(session, "350 RNFR ok\r\n");
+          if (get_request(session, inbuf, buf_size) != XSUCCESS) {
+            stop_service = XTRUE;
           } else {
-            reply(session, "500 need RNTO\r\n");
+            if (xcstr_startwith_cstr(inbuf, "RNTO")) {
+              // TODO acl on RNTO
+              if (strlen(inbuf) < 6) {
+                reply(session, "501 invalid RNTO command!\r\n");
+              } else {
+                if (ftp_fs_rename(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), xstr_get_cstr(rnfr), inbuf + 5, error_msg) != XSUCCESS) {
+                  reply(session, xstr_get_cstr(error_msg));
+                } else {
+                  reply(session, "250 rename ok\r\n");
+                }
+              }
+            } else {
+              reply(session, "500 need RNTO\r\n");
+            }
           }
+          xstr_delete(rnfr);
+          xstr_delete(error_msg);
+        } else {
+          reply(session, "550 permission denied\r\n");
         }
-        xstr_delete(rnfr);
-        xstr_delete(error_msg);
       }
     } else {
       xstr rep = xstr_new();
@@ -458,15 +588,13 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
   ftp_session_delete(session);
   xfree(inbuf);
   xfree(outbuf);
+  xstr_delete(root_jail);
 }
 
 
-static xsuccess liquid_ftp_service(xstr host, int port, xstr root_jail) {
+static xsuccess liquid_ftp_service(xstr host, int port, int backlog) {
   xsuccess ret;
-  int backlog = 10; // TODO move this into config file
-  void* args[2];
-  args[0] = host;
-  args[1] = root_jail;
+  void* args = host;
   char serv_mode = 't'; // serv in new thread
   xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, serv_mode, args);
 
@@ -479,18 +607,21 @@ static xsuccess liquid_ftp_service(xstr host, int port, xstr root_jail) {
     xlog_fatal("[ftp] in liquid_ftp_service(): failed to init xserver!\n");
     ret = XFAILURE;
   } else {
-    xlog_info("[ftp] ftp server started on %s:%d, root is '%s'\n", xstr_get_cstr(host), port, xstr_get_cstr(root_jail));
+    xlog_info("[ftp] ftp server started on %s:%d\n", xstr_get_cstr(host), port);
     ret = xserver_serve(xs);  // xserver is self destrying, after service, it will destroy it self
   }
   // don't need to release "host", since it is managed by xserver
-  xstr_delete(root_jail);
   return ret;
 }
 
 int liquid_ftp_real(int argc, char* argv[]) {
   int port = 8021;
   xstr bind_addr = xstr_new();  // will be sent into liquid_ftp_service(), and work as a component of xserver. will be destroyed when xserver is deleted
-  xstr root_jail = xstr_new();  // will be sent into liquid_ftp_service(), and will be deleted there
+  int back_log = 10;
+  const char* single_user = "";
+  const char* single_pwd = "";
+  const char* single_root = "/";
+  xsuccess ret = XFAILURE;
 
   xoption xopt = xoption_new();
   xoption_parse_with_xconf(xopt, argc, argv);
@@ -499,9 +630,7 @@ int liquid_ftp_real(int argc, char* argv[]) {
 
   // set the root jail, where action will be locked inside
   if (strlen(getenv("HOME")) > 0) {
-    xstr_set_cstr(root_jail, getenv("HOME"));
-  } else {
-    xstr_set_cstr(root_jail, "/");
+    single_root = getenv("HOME");
   }
 
   if (xoption_has(xopt, "p")) {
@@ -524,12 +653,42 @@ int liquid_ftp_real(int argc, char* argv[]) {
   if (xoption_has(xopt, "bind")) {
     xstr_set_cstr(bind_addr, xoption_get(xopt, "bind"));
   }
-  if (xoption_has(xopt, "root")) {
-    xstr_set_cstr(root_jail, xoption_get(xopt, "root"));
+  if (xoption_has(xopt, "backlog")) {
+    back_log = atoi(xoption_get(xopt, "backlog"));
+  }
+
+  if (xoption_has(xopt, "simple")) {
+    // single user mode
+    xbool readonly = XFALSE;
+    if (xoption_has(xopt, "user")) {
+      single_user = xoption_get(xopt, "user");
+    }
+    if (xoption_has(xopt, "passwd")) {
+      single_pwd = xoption_get(xopt, "passwd");
+    }
+    if (xoption_has(xopt, "root")) {
+      single_root = xoption_get(xopt, "root");
+    }
+    if (xoption_has(xopt, "readonly")) {
+      if (xoption_get(xopt, "readonly") == NULL
+          || xoption_get(xopt, "readonly")[0] == '1'
+          || xoption_get(xopt, "readonly")[0] == 't'
+          || xoption_get(xopt, "readonly")[0] == 'T') {
+        readonly = XTRUE;
+      }
+    }
+    ftp_acl_single_user_mode(single_user, single_pwd, single_root, readonly);
+    xlog_info("[ftp] running in simple mode\n");
+  } else {
+    // multi user mode
+    ftp_acl_multi_user_mode("liquid_ftp.sqlite3");
+    xlog_info("[ftp] running in advanced mode\n");
   }
 
   xoption_delete(xopt);
-  return liquid_ftp_service(bind_addr, port, root_jail);
+  ret = liquid_ftp_service(bind_addr, port, back_log);
+  ftp_acl_finalize();
+  return ret;
 }
 
 xsuccess liquid_ftp(int argc, char* argv[]) {
