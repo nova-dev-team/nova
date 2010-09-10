@@ -235,6 +235,18 @@ xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor,
 xsuccess xserver_serve(xserver xs);
 
 /**
+ * @brief
+ *  Destroy an xserver.
+ *
+ * It could only be used when xserver_serve() is not called.
+ * When xserver_server() finished, it will automatically call xserver_delete().
+ *
+ * @param xs
+ *  The xserver to be destroyed.
+ */
+void xserver_delete(xserver xs);
+
+/**
   @brief
     Get the port on which xserver is serving.
 
