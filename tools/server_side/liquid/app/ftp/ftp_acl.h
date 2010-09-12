@@ -37,19 +37,19 @@
  * @brief
  *  Check if the path entry is readable.
  */
-#define FTP_ACL_CAN_READ(priv)  ((priv) & FTP_ACL_READ_FLAG)
+#define FTP_ACL_CAN_READ(priv)  (((priv) & FTP_ACL_READ_FLAG) != 0)
 
 /**
  * @brief
  *  Check if the path entry is writable.
  */
-#define FTP_ACL_CAN_WRITE(priv) ((priv) & FTP_ACL_WRITE_FLAG)
+#define FTP_ACL_CAN_WRITE(priv) (((priv) & FTP_ACL_WRITE_FLAG) != 0)
 
 /**
  * @brief
  *  Check if the path entry is deletable.
  */
-#define FTP_ACL_CAN_DEL(priv)   ((priv) & FTP_ACL_DEL_FLAG)
+#define FTP_ACL_CAN_DEL(priv)   (((priv) & FTP_ACL_DEL_FLAG) != 0)
 
 /**
  * @brief
