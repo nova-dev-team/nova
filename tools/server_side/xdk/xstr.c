@@ -218,7 +218,6 @@ xbool xstr_eql(xstr xstr1, xstr xstr2) {
   }
 }
 
-
 void xstr_strip(xstr xs, char* strip_set) {
   int new_begin = 0;
   int new_end = xs->len;  // exclusive end point
@@ -261,6 +260,8 @@ void xstr_strip(xstr xs, char* strip_set) {
   stripped_cstr[new_end - new_begin] = '\0';
   xstr_set_cstr(xs, stripped_cstr);
   xfree(stripped_cstr);
-
 }
 
+int xstr_compare(xstr xs1, xstr xs2) {
+  return strcmp(xstr_get_cstr(xs1), xstr_get_cstr(xs2));
+}
