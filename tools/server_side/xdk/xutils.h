@@ -292,6 +292,31 @@ int xhash_hash_xstr(void* key);
 */
 xbool xhash_eql_xstr(void* key1, void* key2);
 
+/**
+ * @brief
+ *  Get hash value of int.
+ *
+ * @param key
+ *  Pointer to the int.
+ *
+ * @return
+ *  The hash value of the int.
+ */
+int xhash_hash_int(void* key);
+
+/**
+ * @brief
+ *  Check if 2 int values are equal.
+ *
+ * @param key1
+ *  Pointer to the first int.
+ * @param key2
+ *  Pointer to the second int.
+ *
+ * @return
+ *  Whether the 2 int values are equal.
+ */
+xbool xhash_eql_int(void* key1, void* key2);
 
 /**
   @brief
