@@ -417,6 +417,21 @@ xbool xhash_eql_xstr(void* key1, void* key2) {
   return xstr_eql((xstr) key1, (xstr) key2);
 }
 
+int xhash_hash_int(void* key) {
+  int* int_key = (int *) key;
+  return *int_key;
+}
+
+xbool xhash_eql_int(void* key1, void* key2) {
+  int* int_key1 = (int *) key1;
+  int* int_key2 = (int *) key2;
+  if (*int_key1 == *int_key2) {
+    return XTRUE;
+  } else {
+    return XFALSE;
+  }
+}
+
 xsuccess xgetline_fp(FILE* fp, xstr line) {
   xsuccess ret = XSUCCESS;
   xstr_set_cstr(line, "");
