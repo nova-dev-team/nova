@@ -4,7 +4,6 @@
 #include <time.h>
 #include <inttypes.h>
 #include <sys/time.h>
-#include <signal.h>
 #include <sys/stat.h>
 
 #include "xdef.h"
@@ -24,7 +23,17 @@
 #define PROFILE_FTP 0
 
 void liquid_ftp_help() {
-  printf("usage: liquid ftp [-p port|--port=port] [-b bind_addr|--bind=bind_addr] [--root=<root_folder>] [--keepalive]\n");
+  printf("Usage: liquid ftp [-p port|--port=port] [-b bind_addr|--bind=bind_addr] [--keepalive]\n");
+  printf("\n");
+  printf("Simple mode args: [--user=username] [--passwd=passwd] [--root=root_jail]\n");
+  printf("Advanced mode args: [--dbfile=dbfile]\n");
+  printf("\n");
+  printf("Liquid FTP could serve in simple mode and advanced mode.\n");
+  printf("By default, it works in advanced mode with dbfile 'liquid_ftp.sqlite3'\n");
+  printf("\n");
+  printf("For simple mode, if user name is not provided, any username could be used.\n");
+  printf("And if password is not provided, andy password could be used.\n");
+  printf("If root jail is not provided, $HOME will be used.\n");
 }
 
 static void strip_trailing_crlf(char* str) {
@@ -172,11 +181,6 @@ static void data_acceptor(xsocket data_xsock, void* args) {
   xlog_debug("[prof] ftp-data_acceptor running at %d, %d (sec, usec)\n", (int) time_now.tv_sec, (int) time_now.tv_usec);
 #endif  // #if PROFILE_FPT == 1
 
-  // XXX ignore sigpipe, we encountered problems when there is conflicts
-  // in ftp data random port
-  // NOTE SIGPIPE is per-thread option, so set it in every thread!
-  signal(SIGPIPE, SIG_IGN);
-
   if (xcstr_startwith_cstr(data_cmd, "LIST")) {
     xstr ls_data = xstr_new();
     xstr error_msg = xstr_new();
@@ -225,11 +229,6 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
   char* inbuf = xmalloc_ty(buf_size, char);
   char* outbuf = xmalloc_ty(buf_size, char);
   xbool stop_service = XFALSE;
-
-  // XXX ignore sigpipe, we encountered problems when there is conflicts
-  // in ftp data random port
-  // NOTE SIGPIPE is per-thread option, so set it in every thread!
-  signal(SIGPIPE, SIG_IGN);
 
   // client_xs will NOT be deleted by ftp_session, but will be deleted by xserver
   // host_addr will NOT be deleted by ftp_session, but will be deleted by ftp entry (liquid_ftp_service)
@@ -400,7 +399,7 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
           if (perm_denied == XTRUE) {
             reply(session, "550 permission denied\r\n");
             ftp_session_discard_data_service(session);
-          } else { 
+          } else {
             // ok to write file
             ftp_session_set_data_cmd_cstr(session, inbuf);
             ftp_session_trigger_data_service(session);
@@ -598,11 +597,6 @@ static xsuccess liquid_ftp_service(xstr host, int port, int backlog) {
   char serv_mode = 't'; // serv in new thread
   xserver xs = xserver_new(host, port, backlog, cmd_acceptor, XUNLIMITED, serv_mode, args);
 
-  // XXX ignore sigpipe, we encountered problems when there is conflicts
-  // in ftp data random port
-  // NOTE SIGPIPE is per-thread option, so set it in every thread!
-  signal(SIGPIPE, SIG_IGN);
-
   if (xs == NULL) {
     xlog_fatal("[ftp] in liquid_ftp_service(): failed to init xserver!\n");
     ret = XFAILURE;
@@ -681,7 +675,11 @@ int liquid_ftp_real(int argc, char* argv[]) {
     xlog_info("[ftp] running in simple mode\n");
   } else {
     // multi user mode
-    ftp_acl_multi_user_mode("liquid_ftp.sqlite3");
+    const char* db_fname = "liquid_ftp.sqlite3";
+    if (xoption_has(xopt, "dbfile")) {
+      db_fname = xoption_get(xopt, "dbfile");
+    }
+    ftp_acl_multi_user_mode(db_fname);
     xlog_info("[ftp] running in advanced mode\n");
   }
 
