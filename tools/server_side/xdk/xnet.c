@@ -386,6 +386,10 @@ static void* acceptor_wrapper(void* pthread_arg) {
   xserver xserver = arglist[0];
   xsocket client_xs = arglist[1];
   void* args = arglist[2];
+
+  // ignore sigpipe, it is triggered when client socket crashed. it is per-thread option
+  signal(SIGPIPE, SIG_IGN);
+
   xfree(pthread_arg); // need to free this as soon as possible
   xserver->acceptor(client_xs, args);
   xserver_delete(xserver);  // try to delete the xserver (it is ref counted)
@@ -404,6 +408,9 @@ xsuccess xserver_serve(xserver xs) {
   if (xs->serv_mode == 'p' || xs->serv_mode == 'P') {
     signal(SIGCHLD, SIG_IGN);
   }
+
+  // ignore sigpipe, it is triggered when client socket crashed
+  signal(SIGPIPE, SIG_IGN);
 
   while (xs->serv_count == XUNLIMITED || serv_count < xs->serv_count) {
     struct sockaddr_in client_addr;
