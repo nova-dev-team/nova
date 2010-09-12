@@ -61,4 +61,20 @@ typedef unsigned char xbyte;
  */
 #define XINOUT
 
+/**
+ * @brief
+ *  Function for comparing 2 x-objects.
+ *
+ * @param obj1
+ *  x-object 1
+ * @param obj2
+ *  x-object 2
+ *
+ * @return
+ *  If obj1 > obj2, return 1;
+ *  If obj1 == obj2, return 0;
+ *  If obj1 < obj2, return -1.
+ */
+typedef int (*xcompare_f)(void* obj1, void* obj2);
+
 #endif  // XDK_XDEF_H_
