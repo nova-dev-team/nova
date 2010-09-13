@@ -36,6 +36,16 @@ class VmachinesController < ApplicationController
     end
   end
 
+  # Displays detailed info about the virtual machine
+  #
+  # Since::   0.3.3
+  def show_info
+    vm = load_vm
+    return if vm == nil
+    return unless check_privilege vm
+    reply_success "Query successful", :data => vm
+  end
+
   # Change a VM's status from 'shut-off' to 'start-pending'.
   #
   # Since::   0.3
