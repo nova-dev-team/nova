@@ -580,6 +580,25 @@ xsuccess ftp_get_root_jail(const char* user, xstr root_jail) {
   return ret;
 }
 
+xsuccess static do_match_acl(ftp_rule* rule, const char* path_cstr, int* priv_flag) {
+  xsuccess ret = XFAILURE;
+  if (xcstr_startwith_cstr(path_cstr, xstr_get_cstr(rule->ftp_path)) == XTRUE) {
+    xlog_debug("[ftp acl] matched acl: %s -> %s\n", path_cstr, xstr_get_cstr(rule->ftp_path));
+    *priv_flag = 0;
+    if (rule->read == XTRUE) {
+      *priv_flag |= FTP_ACL_READ_FLAG;
+    }
+    if (rule->write == XTRUE) {
+      *priv_flag |= FTP_ACL_WRITE_FLAG;
+    }
+    if (rule->del == XTRUE) {
+      *priv_flag |= FTP_ACL_DEL_FLAG;
+    }
+    ret = XSUCCESS;
+  }
+  return ret;
+}
+
 xsuccess ftp_path_privilege(const char* user, const char* path, int* priv_flag) {
   xsuccess ret = XFAILURE;
   if (single_user_mode == 1) {
@@ -590,13 +609,44 @@ xsuccess ftp_path_privilege(const char* user, const char* path, int* priv_flag) 
       *priv_flag = FTP_ACL_READ_FLAG | FTP_ACL_WRITE_FLAG | FTP_ACL_DEL_FLAG;
     }
   } else {
+    xbool matched = XFALSE;
+    ftp_user* u;
+    xstr user_xs = xstr_new();
+    xstr_set_cstr(user_xs, user);
     assert(multi_user_mode == 1);
     try_update_data();
 
     pthread_mutex_lock(&cache_mutex);
-    // TODO
-    *priv_flag = FTP_ACL_READ_FLAG | FTP_ACL_WRITE_FLAG | FTP_ACL_DEL_FLAG;
+    // match ACL in databse
+    u = xhash_get(users_map, user_xs);
+    if (u != NULL) {
+      // first match the user's rules
+      int i;
+      for (i = 0; i < xvec_size(u->rules); i++) {
+        ftp_rule* rule = xvec_get(u->rules, i);
+        if (do_match_acl(rule, path, priv_flag) == XSUCCESS) {
+          matched = XTRUE;
+          break;
+        }
+      }
+      // if user's rules not matched, go on with group's rules
+      if (matched == XFALSE && u->group != NULL) {
+        ftp_group* g = u->group;
+        for (i = 0; i < xvec_size(g->rules); i++) {
+          ftp_rule* rule = xvec_get(g->rules, i);
+          if (do_match_acl(rule, path, priv_flag) == XSUCCESS) {
+            matched = XTRUE;
+            break;
+          }
+        }
+      }
+    }
     pthread_mutex_unlock(&cache_mutex);
+    xstr_delete(user_xs);
+
+    if (matched == XFALSE) {
+      *priv_flag = FTP_ACL_READ_FLAG | FTP_ACL_WRITE_FLAG | FTP_ACL_DEL_FLAG;
+    }
     ret = XSUCCESS;
   }
   xlog_info("[ftp acl] (user=%s) privilege of %s, R=%d, W=%d, D=%d\n",
