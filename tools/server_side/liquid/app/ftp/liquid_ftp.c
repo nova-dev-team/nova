@@ -343,7 +343,10 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       xstr_delete(rep);
     } else if (xcstr_startwith_cstr(inbuf, "LIST")) {
       if (ftp_session_is_data_service_ready(session)) {
-        if (can_read(session, ftp_session_get_cwd_cstr(session))) {
+        // ACL checking, if could delete/write entries in this folder, so could it be listed
+        if (can_read(session, ftp_session_get_cwd_cstr(session))
+            || can_write(session, ftp_session_get_cwd_cstr(session))
+            || can_del(session, ftp_session_get_cwd_cstr(session))) {
           reply(session, "150 here comes the listing\r\n");
           ftp_session_set_data_cmd_cstr(session, inbuf);
           ftp_session_trigger_data_service(session);
@@ -414,7 +417,10 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
       if (strlen(inbuf) < 5) {
         reply(session, "501 invalid CWD command\r\n");
       } else {
-        if (can_read2(session, ftp_session_get_cwd_cstr(session), inbuf + 4) == XTRUE) {
+        // checking ACL on the folder, if its entries are writable/deletable, we surely could cd into this folder
+        if (can_read2(session, ftp_session_get_cwd_cstr(session), inbuf + 4) == XTRUE
+            || can_write2(session, ftp_session_get_cwd_cstr(session), inbuf + 4) == XTRUE
+            || can_del2(session, ftp_session_get_cwd_cstr(session), inbuf + 4)) {
           xstr error_msg = xstr_new();
           if (ftp_session_try_cwd_cstr(session, inbuf + 4, error_msg) == XSUCCESS) {
             reply(session, "250 CWD command successful\r\n");
@@ -557,14 +563,39 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
             stop_service = XTRUE;
           } else {
             if (xcstr_startwith_cstr(inbuf, "RNTO")) {
-              // TODO acl on RNTO
               if (strlen(inbuf) < 6) {
                 reply(session, "501 invalid RNTO command!\r\n");
               } else {
-                if (ftp_fs_rename(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), xstr_get_cstr(rnfr), inbuf + 5, error_msg) != XSUCCESS) {
-                  reply(session, xstr_get_cstr(error_msg));
+                // check acl on RNTO
+                xbool file_exists = XFALSE;
+                xbool perm_denied = XFALSE;
+                xstr file_fullpath = xstr_new();
+                struct stat st;
+                xjoin_path_cstr(file_fullpath, ftp_session_get_cwd_cstr(session), inbuf + 5);
+                if (lstat(xstr_get_cstr(file_fullpath), &st) == 0) {
+                  file_exists = XTRUE;
+                }
+                if (file_exists == XTRUE) {
+                  // need to delete file, then create new file
+                  if (can_del2(session, ftp_session_get_cwd_cstr(session), inbuf + 5) == XFALSE
+                      || can_write2(session, ftp_session_get_cwd_cstr(session), inbuf + 5) == XFALSE) {
+                    perm_denied = XTRUE;
+                  }
                 } else {
-                  reply(session, "250 rename ok\r\n");
+                  // create new file
+                  if (can_write2(session, ftp_session_get_cwd_cstr(session), inbuf + 5) == XFALSE) {
+                    perm_denied = XTRUE;
+                  }
+                }
+                xstr_delete(file_fullpath);
+                if (perm_denied == XTRUE) {
+                  reply(session, "550 permission denied\r\n");
+                } else {
+                  if (ftp_fs_rename(ftp_session_get_root_jail(session), ftp_session_get_cwd_cstr(session), xstr_get_cstr(rnfr), inbuf + 5, error_msg) != XSUCCESS) {
+                    reply(session, xstr_get_cstr(error_msg));
+                  } else {
+                    reply(session, "250 rename ok\r\n");
+                  }
                 }
               }
             } else {
