@@ -43,6 +43,33 @@ class PmachinesController < ApplicationController
     reply_success "query successful!", :data => list_data
   end
 
+  # Show detail info of a pmachine
+  # Param:
+  #   ip: The ip address of pmachine.
+  #
+  # Since::     0.3.3
+  def show_info
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+    
+    if pm != nil
+      pm_data = {
+        :id => pm.id,
+        :ip => pm.ip,
+        :hostname => pm.hostname,
+        :status => pm.status,
+        :vm_capacity => pm.vm_capacity,
+        :vm_list => []
+      }
+      pm.vmachines.each do |vm|
+        pm_data[:vm_list] << vm
+      end
+      reply_success "Query successful!", :data => pm_data
+    else
+      reply_failure "Pmachine with ip=#{params[ip]} not found!"
+    end
+  end
+
   # Add a new pmachine entry.
   #
   # Since::     0.3

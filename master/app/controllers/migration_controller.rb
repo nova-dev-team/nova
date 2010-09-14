@@ -36,6 +36,12 @@ class MigrationController < ApplicationController
     reply_success "Query successful!", :data => reply_data
   end
 
+  # Live migrate VM to another host
+  # Params:
+  #     vm_uuid: The UUID of VM
+  #     dest_ip: Destination node ip
+  #
+  # Since::     0.3.2
   def live_migrate
     unless valid_param? params["vm_uuid"]
       reply_failure "Please provide the 'vm_uuid' parameter!"
