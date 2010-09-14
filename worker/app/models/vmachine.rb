@@ -271,7 +271,13 @@ end
 <devices>
   #{
     if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
-      "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
+      if File.exists? "/usr/lib/xen/bin/qemu-dm"
+        "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
+      elsif File.exists? "/usr/lib64/xen/bin/qemu-dm"
+        "<emulator>/usr/lib64/xen/bin/qemu-dm</emulator>\n"
+      else
+        raise "qemu-dm not found!"
+      end
     end
   }
   <disk type='file' device='disk'>
@@ -364,7 +370,13 @@ XML_DESC
 <devices>
 #{
   if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
-    "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
+    if File.exists? "/usr/lib/xen/bin/qemu-dm"
+      "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
+    elsif File.exists? "/usr/lib64/xen/bin/qemu-dm"
+      "<emulator>/usr/lib64/xen/bin/qemu-dm</emulator>\n"
+    else
+      raise "qemu-dm not found!"
+    end
   end
 }
   <disk type='file' device='disk'>
@@ -427,9 +439,9 @@ XML_DESC
     when "kvm"
       xml_desc = Vmachine.emit_domain_xml_kvm params
     when "xen"
-      if params[:hda_image] =~ "img$"
+      if params[:hda_image] =~ /img$/
         xml_desc = Vmachine.emit_domain_xml_xen_img params
-      elsif params[:hda_image] =~ "qcow$"
+      elsif params[:hda_image] =~ /qcow$/
         xml_desc = Vmachine.emit_domain_xml_xen_qcow params        
       else
         raise "disk image #{params[:hda_image]} not supported!"
