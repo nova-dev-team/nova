@@ -245,7 +245,7 @@ xsuccess ftp_fs_retr_file(xsocket xsock, const xstr root_jail, const xstr curren
       const int send_limit = 1 * 1024 * 1024 * 1024;  // 1 GB
       int limited_send_count;
 
-      stat(xstr_get_cstr(jailed_fullpath), &st);
+      lstat(xstr_get_cstr(jailed_fullpath), &st);
       while (send_count > 0) {
         int cnt;
 
@@ -417,9 +417,9 @@ xsuccess ftp_fs_rename(const xstr root_jail, const char* current_dir, const char
   xsuccess ret = XSUCCESS;
   xstr unjailed_from_path = xstr_new();
   xstr unjailed_to_path = xstr_new();
-
   xstr jailed_from_path = xstr_new();
   xstr jailed_to_path = xstr_new();
+  struct stat st;
 
 #if PROFILE_FTP_FS == 1
   struct timeval begin_time, end_time;
@@ -430,6 +430,17 @@ xsuccess ftp_fs_rename(const xstr root_jail, const char* current_dir, const char
   xjoin_path_cstr(unjailed_to_path, current_dir, to_name);
   jail_path(jailed_from_path, root_jail, unjailed_from_path);
   jail_path(jailed_to_path, root_jail, unjailed_to_path);
+  
+  // if destination is a dir, append the original fname
+  if (lstat(xstr_get_cstr(jailed_to_path), &st) == 0 && S_ISDIR(st.st_mode)) {
+    xstr new_jailed_to_path = xstr_new();
+    xstr base_fn = xstr_new();
+    xfilesystem_basename(jailed_from_path, base_fn);
+    xjoin_path_cstr(new_jailed_to_path, xstr_get_cstr(jailed_to_path), xstr_get_cstr(base_fn));
+    xstr_set_cstr(jailed_to_path, xstr_get_cstr(new_jailed_to_path));
+    xstr_delete(base_fn);
+    xstr_delete(new_jailed_to_path);
+  }
 
   if (rename(xstr_get_cstr(jailed_from_path), xstr_get_cstr(jailed_to_path)) != 0) {
     xstr_set_cstr(error_msg, "550 rename failed\r\n");
