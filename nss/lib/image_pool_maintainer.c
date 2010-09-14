@@ -368,7 +368,8 @@ void maintain_pool_size() {
         continue;
       }
       if (text_ends_with(p_dirent->d_name, ".qcow2") ||
-          text_ends_with(p_dirent->d_name, ".img")) {
+          text_ends_with(p_dirent->d_name, ".img") ||
+          text_ends_with(p_dirent->d_name, ".qcow")) {
         char* buf = (char *) malloc(sizeof(char) * (strlen(p_dirent->d_name) + 32));
         printf("found image: %s\n", p_dirent->d_name);
         printf("checking if %s has .copying lock\n", p_dirent->d_name);
