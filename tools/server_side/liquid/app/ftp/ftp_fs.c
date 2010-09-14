@@ -239,13 +239,15 @@ xsuccess ftp_fs_retr_file(xsocket xsock, const xstr root_jail, const xstr curren
       int out_fd = xsocket_get_socket_fd(xsock);
       off_t off_value = start_pos;
       struct stat st;
-      off_t send_count = st.st_size - off_value;
+      off_t send_count;
 
       // note that sendfile() has a limit of 2GB, so if the file is larger than 1G (a smaller value than 2G, just to avoid margin values), we send 1G at a time
       const int send_limit = 1 * 1024 * 1024 * 1024;  // 1 GB
       int limited_send_count;
 
       lstat(xstr_get_cstr(jailed_fullpath), &st);
+      send_count = st.st_size - off_value;
+
       while (send_count > 0) {
         int cnt;
 
