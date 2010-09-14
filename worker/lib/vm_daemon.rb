@@ -385,6 +385,9 @@ def do_prepare rails_root, storage_server, vm_dir
         if img.end_with? ".qcow2"
           write_log "preparing qcow2 image '#{img}'"
           prepare_hda_image storage_server, image_pool_dir, vm_dir, img
+        if img.end_with? ".qcow"
+          write_log "preparing qcow image '#{img}'"
+          prepare_hda_image storage_server, image_pool_dir, vm_dir, img
         elsif img.end_with? ".iso"
           write_log "preparing iso image '#{img}'"
           prepare_iso_image storage_server, image_pool_dir, vm_dir, img
