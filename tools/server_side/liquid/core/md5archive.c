@@ -33,7 +33,7 @@ xsuccess md5archive_path(const char* basefolder, unsigned char* md5, xstr path) 
     sprintf(buf, "%02x", md5[i]);
     xstr_printf(path, "%s", buf);
   }
-  if (stat(xstr_get_cstr(path), &st) != 0) {
+  if (lstat(xstr_get_cstr(path), &st) != 0) {
     ret = XFAILURE;
   }
   return ret;
