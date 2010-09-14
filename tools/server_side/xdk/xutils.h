@@ -212,6 +212,23 @@ xbool xfilesystem_is_file(const char* path, xsuccess* optional_succ);
 xbool xfilesystem_is_dir(const char* path, xsuccess* optional_succ);
 
 /**
+ * @brief
+ *  Get the name of last entry in a normalized path.
+ *
+ * A few examples:
+ * 1. / -> / ;
+ * 2. /abs/nice/ -> nice ;
+ * 3. /abs -> abs ;
+ * 4. /abs/last -> last .
+ *
+ * @param norm_path
+ *  [IN] Normalized path.
+ * @param basename
+ *  [OUT] Will be set to the basename.
+ */
+void xfilesystem_basename(XIN xstr norm_path, XOUT xstr basename);
+
+/**
   @brief
     Cdup for an normalized path.
 
