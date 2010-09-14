@@ -317,6 +317,16 @@ end
     <script path='/etc/xen/scripts/vif-bridge'/>
     <target dev='vif-1.0'/>
   </interface>
+  <serial type='pty'>
+    <source path='/dev/pts/1'/>
+    <target port='0'/>
+  </serial>
+  <console type='pty' tty='/dev/pts/1'>
+    <source path='/dev/pts/1'/>
+    <target port='0'/>
+  </console>
+  <input type='tablet' bus='usb'/>
+  <input type='mouse' bus='ps2'/>
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
 </devices>
 </domain>
