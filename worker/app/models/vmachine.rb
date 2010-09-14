@@ -158,6 +158,262 @@ class Vmachine < ActiveRecord::Base
     end
 
   end
+  
+  # Helper function that emits corresponding XML for kvm
+  #
+  # Since::     0.3.3
+  def Vmachine.emit_domain_xml_kvm params
+    nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+    return <<XML_DESC
+<domain type='#{params[:hypervisor]}'>
+<name>#{params[:name]}</name>
+<uuid>#{params[:uuid]}</uuid>
+<memory>#{params[:mem_size].to_i * 1024}</memory>
+<vcpu>#{params[:cpu_count]}</vcpu>
+<os>
+  <type arch='#{params[:arch]}' machine='pc'>hvm</type>
+  <boot dev='#{
+# if used user's custom cd image, we boot from cdrom
+if params[:cd_image] != nil and params[:cd_image] != ""
+"cdrom"
+else
+"hd"
+end
+}'/>
+</os>
+<features>
+  <pae/>
+  <acpi/>
+</features>
+<devices>
+  <emulator>/usr/bin/kvm</emulator>
+  <disk type='file' device='disk'>
+    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
+    <target dev='hda'/>
+  </disk>
+#{
+# determine cdrom
+if params[:run_agent].to_s == "true"
+"    <disk type='file' device='cdrom'>
+    <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
+    <target dev='hdc'/>
+  </disk>
+"
+elsif params[:cd_image] != nil and params[:cd_image] != ""
+"    <disk type='file' device='cdrom'>
+    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
+    <target dev='hdc'/>
+    <readonly/>
+  </disk>
+"
+end
+}    <interface type='bridge'>
+    <source bridge='#{nova_conf["vm_network_bridge"]}'/>
+    <mac address='54:7E:#{
+# generate random mac address
+# note that mac address has some format requirements
+((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
+}'/>
+  </interface>
+  <graphics type='vnc' port='-1' listen='0.0.0.0'/>
+  <input type='tablet' bus='usb'/>
+</devices>
+</domain>
+XML_DESC
+  end
+  
+  # Helper function that emits corresponding XML for xen+img image
+  #
+  # Since::     0.3.3
+  def Vmachine.emit_domain_xml_xen_img params
+    return <<XML_DESC
+<domain type='#{params[:hypervisor]}'>
+<name>#{params[:name]}</name>
+<uuid>#{params[:uuid]}</uuid>
+<memory>#{params[:mem_size].to_i * 1024}</memory>
+<vcpu>#{params[:cpu_count]}</vcpu>
+<os>
+  #{
+    if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+      "<type arch='#{params[:arch]}' machine='pc'>hvm</type>\n\
+      <loader>/usr/lib/xen/boot/hvmloader</loader>\n"
+    else
+      "<type arch='#{params[:arch]}' machine='pc'>linux</type>"
+    end
+  }
+  #{if valid(params[:kernel]) and valid(params[:initrd])
+ "<kernel>#{params[:kernel]}</kernel>\n\
+  <initrd>#{params[:initrd]}</initrd>\n"
+    end
+   }
+  #{if valid(params[:hda_dev])
+      "<cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
+    end
+   }
+  <boot dev='#{
+# if used user's custom cd image, we boot from cdrom
+if params[:cd_image] != nil and params[:cd_image] != ""
+"cdrom"
+else
+"hd"
+end
+}'/>
+</os>
+<features>
+  <pae/>
+  <acpi/>
+  #{
+    if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+      "<apic/>\n"
+    end
+  }
+</features>
+<devices>
+  #{
+    if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+      "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
+    end
+  }
+  <disk type='file' device='disk'>
+    <driver name='file'/>
+    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
+    #{
+      if valid(params[:hda_dev])
+        "<target dev='#{params[:hda_dev]}' bus='scsi'/>"
+      else
+        "<target dev='xvda' bus='xen'/>"
+      end
+     }
+  </disk>
+#{
+# determine cdrom
+if params[:run_agent].to_s == "true"
+"    <disk type='file' device='cdrom'>
+    <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
+    <target dev='hdc'/>
+  </disk>
+"
+elsif params[:cd_image] != nil and params[:cd_image] != ""
+"    <disk type='file' device='cdrom'>
+    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
+    <target dev='hdc'/>
+    <readonly/>
+  </disk>
+"
+end
+}    <interface type='bridge'>
+    <source bridge='xenbr0'/>
+    <mac address='54:7E:#{
+# generate random mac address
+# note that mac address has some format requirements
+((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
+}'/>
+    <script path='/etc/xen/scripts/vif-bridge'/>
+    <target dev='vif-1.0'/>
+  </interface>
+  <graphics type='vnc' port='-1' listen='0.0.0.0'/>
+</devices>
+</domain>
+XML_DESC
+  end
+
+  # Helper function that emits corresponding XML for xen+qcow image
+  #
+  # Since::     0.3.3
+  def Vmachine.emit_domain_xml_xen_qcow params
+    nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
+    return <<XML_DESC
+<domain type='xen'>
+<name>#{params[:name]}</name>
+<uuid>#{params[:uuid]}</uuid>
+<memory>#{params[:mem_size].to_i * 1024}</memory>
+<vcpu>#{params[:cpu_count]}</vcpu>
+<os>
+ #{
+   if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+     "<type>hvm</type>\n\
+     <loader>/usr/lib/xen/boot/hvmloader</loader>\n
+     <boot dev='hd'/>"
+   else
+     "<type arch='#{params[:arch]}' machine='pc'>linux</type>"
+   end
+ }
+ #{if valid(params[:kernel]) and valid(params[:initrd])
+"<kernel>#{params[:kernel]}</kernel>\n\
+ <initrd>#{params[:initrd]}</initrd>\n"
+   end
+  }
+ #{if valid(params[:hda_dev])
+     "<cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
+   end
+  }
+</os>
+<features>
+  <acpi/>
+  #{
+    if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+      "<apic/>\n"
+    end
+  }
+  <pae/>
+</features>
+<clock offset='utc'/>
+<on_poweroff>destroy</on_poweroff>
+<on_reboot>restart</on_reboot>
+<on_crash>restart</on_crash>
+<devices>
+#{
+  if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
+    "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
+  end
+}
+  <disk type='file' device='disk'>
+    <driver name='tap' type='qcow'/>
+    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
+    <target dev='hda' bus='ide'/>
+  </disk>
+#{
+  # determine cdrom
+if params[:run_agent].to_s == "true"
+"    <disk type='file' device='cdrom'>
+    <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
+    <target dev='hdc'/>
+  </disk>
+"
+elsif params[:cd_image] != nil and params[:cd_image] != ""
+"    <disk type='file' device='cdrom'>
+    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
+    <target dev='hdc'/>
+    <readonly/>
+  </disk>
+"
+end
+}
+  <interface type='bridge'>
+    <mac address='54:7E:#{
+  # generate random mac address
+  # note that mac address has some format requirements
+  ((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
+  }'/>
+    <source bridge='xenbr0'/>
+    <script path='/etc/xen/scripts/vif-bridge'/>
+    <target dev='vif4.0'/>
+  </interface>
+  <serial type='pty'>
+    <source path='/dev/pts/1'/>
+    <target port='0'/>
+  </serial>
+  <console type='pty' tty='/dev/pts/1'>
+    <source path='/dev/pts/1'/>
+    <target port='0'/>
+  </console>
+  <input type='tablet' bus='usb'/>
+  <input type='mouse' bus='ps2'/>
+  <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'/>
+</devices>
+</domain>
+XML_DESC
+  end
 
   # Generate XML definition on VM params. It will be used by libvirt.
   # * Note on generated XML:
@@ -166,157 +422,18 @@ class Vmachine < ActiveRecord::Base
   #
   # Since::     0.3
   def Vmachine.emit_domain_xml params
-    nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
-
     xml_desc = ""
     case params[:hypervisor]
     when "kvm"
-      xml_desc = <<XML_DESC
-<domain type='#{params[:hypervisor]}'>
-  <name>#{params[:name]}</name>
-  <uuid>#{params[:uuid]}</uuid>
-  <memory>#{params[:mem_size].to_i * 1024}</memory>
-  <vcpu>#{params[:cpu_count]}</vcpu>
-  <os>
-    <type arch='#{params[:arch]}' machine='pc'>hvm</type>
-    <boot dev='#{
-# if used user's custom cd image, we boot from cdrom
-if params[:cd_image] != nil and params[:cd_image] != ""
-  "cdrom"
-else
-  "hd"
-end
-}'/>
-  </os>
-  <features>
-    <pae/>
-    <acpi/>
-  </features>
-  <devices>
-    <emulator>/usr/bin/kvm</emulator>
-    <disk type='file' device='disk'>
-      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
-      <target dev='hda'/>
-    </disk>
-#{
-# determine cdrom
-if params[:run_agent].to_s == "true"
-"    <disk type='file' device='cdrom'>
-      <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
-      <target dev='hdc'/>
-    </disk>
-"
-elsif params[:cd_image] != nil and params[:cd_image] != ""
-"    <disk type='file' device='cdrom'>
-      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
-      <target dev='hdc'/>
-      <readonly/>
-    </disk>
-"
-end
-}    <interface type='bridge'>
-      <source bridge='#{nova_conf["vm_network_bridge"]}'/>
-      <mac address='54:7E:#{
-# generate random mac address
-# note that mac address has some format requirements
-((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
-}'/>
-    </interface>
-    <graphics type='vnc' port='-1' listen='0.0.0.0'/>
-    <input type='tablet' bus='usb'/>
-  </devices>
-</domain>
-XML_DESC
+      xml_desc = Vmachine.emit_domain_xml_kvm params
     when "xen"
-      xml_desc = <<XML_DESC
-<domain type='#{params[:hypervisor]}'>
-  <name>#{params[:name]}</name>
-  <uuid>#{params[:uuid]}</uuid>
-  <memory>#{params[:mem_size].to_i * 1024}</memory>
-  <vcpu>#{params[:cpu_count]}</vcpu>
-  <os>
-    #{
-      if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
-        "<type arch='#{params[:arch]}' machine='pc'>hvm</type>\n\
-        <loader>/usr/lib/xen/boot/hvmloader</loader>\n"
+      if params[:hda_image] =~ "img$"
+        xml_desc = Vmachine.emit_domain_xml_xen_img params
+      elsif params[:hda_image] =~ "qcow$"
+        xml_desc = Vmachine.emit_domain_xml_xen_qcow params        
       else
-        "<type arch='#{params[:arch]}' machine='pc'>linux</type>"
+        raise "disk image #{params[:hda_image]} not supported!"
       end
-    }
-    #{if valid(params[:kernel]) and valid(params[:initrd])
-   "<kernel>#{params[:kernel]}</kernel>\n\
-    <initrd>#{params[:initrd]}</initrd>\n"
-      end
-     }
-    #{if valid(params[:hda_dev])
-        "<cmdline>root=/dev/#{params[:hda_dev]} ro </cmdline>"
-      end
-     }
-    <boot dev='#{
-# if used user's custom cd image, we boot from cdrom
-if params[:cd_image] != nil and params[:cd_image] != ""
-  "cdrom"
-else
-  "hd"
-end
-}'/>
-  </os>
-  <features>
-    <pae/>
-    <acpi/>
-    #{
-      if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
-        "<apic/>\n"
-      end
-    }
-  </features>
-  <devices>
-    #{
-      if valid(params[:use_hvm]) and params[:use_hvm].to_s == "true"
-        "<emulator>/usr/lib/xen/bin/qemu-dm</emulator>\n"
-      end
-    }
-    <disk type='file' device='disk'>
-      <driver name='file'/>
-      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
-      #{
-        if valid(params[:hda_dev])
-          "<target dev='#{params[:hda_dev]}' bus='scsi'/>"
-        else
-          "<target dev='xvda' bus='xen'/>"
-        end
-       }
-    </disk>
-#{
-# determine cdrom
-if params[:run_agent].to_s == "true"
-"    <disk type='file' device='cdrom'>
-      <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
-      <target dev='hdc'/>
-    </disk>
-"
-elsif params[:cd_image] != nil and params[:cd_image] != ""
-"    <disk type='file' device='cdrom'>
-      <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
-      <target dev='hdc'/>
-      <readonly/>
-    </disk>
-"
-end
-}    <interface type='bridge'>
-      <source bridge='xenbr0'/>
-      <mac address='54:7E:#{
-# generate random mac address
-# note that mac address has some format requirements
-((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
-}'/>
-      <script path='/etc/xen/scripts/vif-bridge'/>
-      <target dev='vif-1.0'/>
-    </interface>
-    <graphics type='vnc' port='-1' listen='0.0.0.0'/>
-  </devices>
-</domain>
-XML_DESC
     else
       raise "hypervisor #{params[:hypervisor]} not supported!"
     end
