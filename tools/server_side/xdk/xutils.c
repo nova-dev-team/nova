@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include "xmemory.h"
 #include "xutils.h"
@@ -281,6 +282,40 @@ xsuccess xfilesystem_rmrf(const char* path) {
     ret = XFAILURE;
   }
   return ret;
+}
+
+
+// requirement: norm_path is normalized
+// result: basename will be the last entry's name in norm_path.
+//         if norm_path == /, then basename will be /
+//
+// eg: /abs -> abs
+//     / -> /
+//     /abs/nice/ -> nice
+//     /abs/last -> last
+void xfilesystem_basename(XIN xstr norm_path, XOUT xstr basename) {
+  xstr_set_cstr(basename, "");
+  assert(xstr_len(norm_path) > 0);
+  if (strcmp(xstr_get_cstr(norm_path), xsys_fs_sep_cstr) == 0) {
+    // special case, / -> /
+    xstr_set_cstr(basename, xsys_fs_sep_cstr);
+  } else {
+    int end = xstr_len(norm_path) - 1;
+    int begin = -1;
+    int i;
+    const char* norm_path_cstr = xstr_get_cstr(norm_path);
+    while (end >= 0 && norm_path_cstr[end] == xsys_fs_sep_char) {
+      // skip the trailing '/'
+      end--;
+    }
+    begin = end;
+    while (begin >= 0 && norm_path_cstr[begin] != xsys_fs_sep_char) {
+      begin--;
+    }
+    for (i = begin + 1; i <= end; i++) {
+      xstr_append_char(basename, norm_path_cstr[i]);
+    }
+  }
 }
 
 
