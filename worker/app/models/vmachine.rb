@@ -223,7 +223,8 @@ if nova_conf["vm_network_interface"] != nil and nova_conf["vm_network_bridge"] !
 else
   # use NAT
 "
-  <interface type='default'>
+  <interface type='network'>
+    <source network='default'/>
 "
 end
 }
