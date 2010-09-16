@@ -225,6 +225,7 @@ else
 "
   <interface type='default'>
 "
+end
 }
   </interface>
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
