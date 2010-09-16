@@ -207,13 +207,25 @@ elsif params[:cd_image] != nil and params[:cd_image] != ""
   </disk>
 "
 end
-}    <interface type='bridge'>
+}
+#{
+if nova_conf["vm_network_interface"] != nil and nova_conf["vm_network_bridge"] != nil
+  # use bridge
+"
+  <interface type='bridge'>
     <source bridge='#{nova_conf["vm_network_bridge"]}'/>
     <mac address='54:7E:#{
 # generate random mac address
 # note that mac address has some format requirements
 ((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
 }'/>
+"
+else
+  # use NAT
+"
+  <interface type='default'>
+"
+}
   </interface>
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
   <input type='tablet' bus='usb'/>

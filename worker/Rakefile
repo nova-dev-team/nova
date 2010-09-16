@@ -85,9 +85,13 @@ namespace :nova do
       my_exec "service libvirt-bin start"
 
       if conf["hypervisor"] == "kvm"
-        # if using kvm, we need to create the network bridge
-        # make sure there is network bridge
-        my_exec "./lib/create_br.rb"
+        if conf["vm_network_interface"] != nil and conf["vm_network_bridge"] != nil
+          # if using kvm, we need to create the network bridge
+          # make sure there is network bridge
+          my_exec "./lib/create_br.rb"
+        else
+          puts "use NAT for vm network"
+        end
       else
         # in CentOS5.4 Xen, peth0 is the bridge
         # xen will create bridge for us, so we just do nothing

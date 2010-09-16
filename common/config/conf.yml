@@ -41,12 +41,14 @@ storage_root:                   /nova/storage
 
 # the network interface that will be utilized by virtual machines
 # this option only used by kvm
-vm_network_interface:           eth0
+# if it is not set (empty), then NAT will be used instead
+vm_network_interface:           
 
 # the network bridge used by virtual machines
 # it will be created on installation
 # this option only used by kvm
-vm_network_bridge:              br0
+# if it is not set (empty), then NAT will be used instead
+vm_network_bridge:              
 
 # whether enables VM migration, currently only works for XEN+NFS
 vm_enable_migration:            true
