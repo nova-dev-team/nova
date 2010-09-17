@@ -153,8 +153,8 @@ class MiscController < ApplicationController
         reply_success "successfully acquired VM", :name => vm.name
       end
     else
-      # name not given, select a vm from pool
-      Vmachine.all.each do |vm|
+      # name not given, select a vm from pool, randomly
+      Vmachine.all.shuffle.each do |vm|
         if vm.using == false and vm.status.downcase == "running"
           vm.using = true
           vm.save
