@@ -26,7 +26,7 @@ class MiscController < ApplicationController
   end
 
   # return worker's uuid
-  # Since::   0.31
+  # Since::   0.3.1
   def uuid
     if File.exists? "#{RAILS_ROOT}/config/worker.uuid"
       uuid = File.read("#{RAILS_ROOT}/config/worker.uuid").strip
@@ -35,10 +35,10 @@ class MiscController < ApplicationController
       reply_failure "UUID is not specified!"
     end
   end
+  
   # Reply the current version of Nova platform.
   #
   # Since::   0.3
-
   def version
     if File.exists? "#{RAILS_ROOT}/../VERSION"
       ver = File.read("#{RAILS_ROOT}/../VERSION").strip
