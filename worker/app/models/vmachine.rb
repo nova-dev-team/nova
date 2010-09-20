@@ -925,6 +925,18 @@ private
     end
   end
 
+
+  def Vmachine.add_package vm_name, app_list
+    pkg_list_fn = File.join Setting.vm_root, vm_name, "pkg_list"
+    File.open(pkg_list_fn, "w") do |f|
+      f.write app_list
+    end
+    Vmachine.send_instruction vm_name, "add_pkg"
+    pkg_count = app_list.split.length
+    Vmachine.log vm_name, "#{pkg_count} packages added to VM '#{vm_name}'"
+    return {:success => true, :message => "#{pkg_count} packages added to Vmachine '#{vm_name}'"}
+  end
+
   def Vmachine.live_migrate_to vm_name, migrate_dest, migrate_src
     migrate_to_fn = File.join Setting.vm_root, vm_name, "migrate_to"
     File.open(migrate_to_fn, "w") do |f|
