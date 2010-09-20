@@ -417,6 +417,35 @@ function change_hda_save_to(vm_name, old_value) {
   });
 }
 
+function add_package(vm_name) {
+  pkg_list = prompt("Input software package list(separated by space)", "");
+  if (pkg_list == null) {
+    return;
+  }
+  $.ajax({
+    url: "/vmachines/add_package.json",
+    type: "POST",
+    dataType: "json",
+    data: {
+      name: vm_name,
+      pkg_list: pkg_list
+    },
+    success: function(result) {
+      $("#sys_settings_panel").unblock();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert("Error message: " + result.message);
+      }
+    },
+    error: function() {
+      $("#sys_settings_panel").unblock();
+      alert("Request failed!");
+    }
+  });
+
+}
+
 function live_migrate_to(vm_name) {
   target_addr = prompt("Input destination worker's addr", "destintaion");
   if (target_addr == null) {

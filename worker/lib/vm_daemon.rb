@@ -768,6 +768,69 @@ def do_poll storage_server, vm_dir
 =end
 end
 
+
+def do_add_pkg vm_dir
+  #1.get vm's ip address
+  agent_ip = nil
+  File.read("agent_hint").each_line do |line|
+    line = line.strip
+    if line.start_with? "ip="
+      agent_ip = line[3..-1]
+    end
+  end
+  if agent_ip == nil
+    write_log "[add_pkg]cannot get vm's ip_addr!"
+    return
+  end
+
+  #2.get ceil password
+  agent_password = nil
+  begin
+    agent_password = File.read("ceil_password")
+  rescue
+  end
+
+  if agent_password == nil
+    write_log "[add_pkg]dont know vm's ceil_password!"
+    return
+  end
+  
+  #3.get pkg_list
+  pkg_list = nil
+  begin
+    pkg_list = File.read("pkg_list")
+  rescue
+  end
+  if pkg_list == nil
+    write_log "[add_pkg]cannot get vm's package_list"
+    return
+  end
+  
+  #4.get package server addr
+  pkg_server_addr = nil
+  begin
+    pkg_server_addr = File.read("pkg_server")
+  rescue
+  end
+  if pkg_server_addr == nil
+    write_log "[add_pkg]dont know package_server's url"
+    return
+  end
+
+  #4.connect-> send password, send "addjob", send ftp://server/pkg_list
+  require 'ceil_caller'
+  caller = CeilCaller.new(agent_ip, agent_password, pkg_server_addr)
+
+  for pkg_list.each_line do |app_name|
+    result = caller.add_job(app_name)    
+    if result == nil
+      write_log "[add_pkg]cannot connect to ceil_agent on #{agent_ip}!"
+    end
+  end
+  #5.ok!
+end
+
+
 def do_resume vm_dir
   #suspend the vm running in vm_dir
   Dir.chdir vm_dir
@@ -908,6 +971,9 @@ def do_action action
     when "resume"
       write_log "vm_daemon action: resume"
       do_resume vm_dir
+    when "add_pkg" #this is for realtime on demand software deployment
+      write_log "vm_daemon action: add_pkg"
+      do_add_pkg vm_dir
     else
       write_log "error: action '#{action}' not understood!"
     end

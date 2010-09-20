@@ -177,6 +177,11 @@ end
 }
 <button type='button' class='btn' onclick="live_migrate_to('#{dom.name}')"><span><span>Migrate</span></span></button>
 <button type='button' class='btn' onclick="destroy_vmachine('#{dom.name}')"><span><span><font color='red'><b>Destroy</b></font></span></span></button>
+#{
+if dom.info.state == Vmachine::LIBVIRT_RUNNING || dom.info.state == Vmachine::LIBVIRT_BLOCK
+  "<button type='button' class='btn' onclick=\"add_package('#{dom.name}')\"><span><span>Add Software</span></span></button>\n"
+end
+}
 </td>
 </tr>
 <tr><td colspan=5>

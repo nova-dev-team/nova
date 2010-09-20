@@ -114,6 +114,23 @@ public
     end
   end
 
+  # realtime software deployment
+  def add_package
+    if valid_param? params[:name] and valid_param? params[:pkg_list]
+      result = Vmachine.add_package params[:name], params[:pkg_list]
+      if result == nil
+        reply_failure "call to Vmachine.add_package failed"
+      elsif result[:success]
+        reply_success result[:message]
+      else
+        reply_failure result[:message]
+      end
+    else
+      reply_failure "add_package: invalid params"
+    end
+ 
+  end
+
   # Tell vm_daemon to prepare migrate
 
   def live_migrate_to
