@@ -794,7 +794,7 @@ def do_add_pkg vm_dir
     write_log "[add_pkg]dont know vm's ceil_password!"
     return
   end
-  
+
   #3.get pkg_list
   pkg_list = nil
   begin
@@ -805,7 +805,7 @@ def do_add_pkg vm_dir
     write_log "[add_pkg]cannot get vm's package_list"
     return
   end
-  
+
   #4.get package server addr
   pkg_server_addr = nil
   begin
@@ -822,7 +822,7 @@ def do_add_pkg vm_dir
   caller = CeilCaller.new(agent_ip, agent_password, pkg_server_addr)
 
   for pkg_list.each_line do |app_name|
-    result = caller.add_job(app_name)    
+    result = caller.add_job(app_name)
     if result == nil
       write_log "[add_pkg]cannot connect to ceil_agent on #{agent_ip}!"
     end

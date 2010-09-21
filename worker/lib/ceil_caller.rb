@@ -10,7 +10,7 @@ class CeilPorter
 
   def add_pkg pkg_name
     vm_conn = TCPSocket::new(agent_ip, 32167)
-    
+
   end
 
   def status
