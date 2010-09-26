@@ -35,7 +35,7 @@ class MiscController < ApplicationController
       reply_failure "UUID is not specified!"
     end
   end
-  
+
   # Reply the current version of Nova platform.
   #
   # Since::   0.3

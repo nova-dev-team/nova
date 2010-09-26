@@ -158,7 +158,7 @@ class Vmachine < ActiveRecord::Base
     end
 
   end
-  
+
   # Helper function that emits corresponding XML for kvm
   #
   # Since::     0.3.3
@@ -235,7 +235,7 @@ end
 </domain>
 XML_DESC
   end
-  
+
   # Helper function that emits corresponding XML for xen+img image
   #
   # Since::     0.3.3
@@ -466,7 +466,7 @@ XML_DESC
       if params[:hda_image] =~ /img$/
         xml_desc = Vmachine.emit_domain_xml_xen_img params
       elsif params[:hda_image] =~ /qcow$/
-        xml_desc = Vmachine.emit_domain_xml_xen_qcow params        
+        xml_desc = Vmachine.emit_domain_xml_xen_qcow params
       else
         raise "disk image #{params[:hda_image]} not supported!"
       end

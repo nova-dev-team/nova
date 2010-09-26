@@ -128,7 +128,7 @@ public
     else
       reply_failure "add_package: invalid params"
     end
- 
+
   end
 
   # Tell vm_daemon to prepare migrate

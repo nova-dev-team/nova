@@ -432,7 +432,7 @@ xsuccess ftp_fs_rename(const xstr root_jail, const char* current_dir, const char
   xjoin_path_cstr(unjailed_to_path, current_dir, to_name);
   jail_path(jailed_from_path, root_jail, unjailed_from_path);
   jail_path(jailed_to_path, root_jail, unjailed_to_path);
-  
+
   // if destination is a dir, append the original fname
   if (lstat(xstr_get_cstr(jailed_to_path), &st) == 0 && S_ISDIR(st.st_mode)) {
     xstr new_jailed_to_path = xstr_new();

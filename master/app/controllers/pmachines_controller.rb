@@ -51,7 +51,7 @@ class PmachinesController < ApplicationController
   def show_info
     return unless valid_ip?
     pm = Pmachine.find_by_ip params[:ip]
-    
+
     if pm != nil
       pm_data = {
         :id => pm.id,
