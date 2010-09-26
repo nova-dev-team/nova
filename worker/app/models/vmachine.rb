@@ -506,6 +506,24 @@ XML_DESC
         f.write "#{key}=#{value}\n"
       end
     end
+
+    #generate a password for ceil_agent's verification
+    ceil_password = ""
+    8.times do |i|
+      chr = (65 + rand(52)).chr
+      ceil_password = ceil_password + chr 
+    end
+
+    package_server = params[:pkg_server]
+    if package_server
+      Vmachine.open_vm_file(params[:name], "package_server") do |f|
+        f.write package_server
+      end
+      Vmachine.open_vm_file(params[:name], "ceil_password") do |f|
+        f.write ceil_password
+      end
+    end
+
     Vmachine.log params[:name], "virtual machine defined"
   end
 
