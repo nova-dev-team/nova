@@ -1,3 +1,11 @@
+v0.3.4:
++ added ftp client registration api in vm_pool module
+* implemented acl in liquid ftp
+
+v0.3.3:
++ added a few helper scripts for developers
+* a few bug fixes in xdk toolkit
+
 v0.3.2:
 + added web UI for NSS module
 + added start/stop all link in master web UI
