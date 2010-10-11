@@ -824,7 +824,6 @@ private
 
     # write instruction file, so vm_daemon_helper will do preparing
     Vmachine.send_instruction params[:name], "prepare"
-
   end
 
   def Vmachine.start_vm_daemon vm_name
@@ -943,6 +942,8 @@ private
     end
   end
 
+  #realtime package install
+  #only works as ceil_agent is running in vm
 
   def Vmachine.add_package vm_name, app_list
     pkg_list_fn = File.join Setting.vm_root, vm_name, "pkg_list"
