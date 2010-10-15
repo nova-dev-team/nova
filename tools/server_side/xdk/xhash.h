@@ -73,7 +73,7 @@ typedef xbool (*xhash_visitor)(void* key, void* value, void* args);
   @brief
     Interface of xhash which is exposed to users.
 */
-typedef struct xhash_impl* xhash;
+typedef struct xhash_impl* xhash; 
 
 /**
   @brief
