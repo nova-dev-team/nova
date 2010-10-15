@@ -99,7 +99,7 @@ static void monitor_server_real(keep_alive_info* info) {
 
 static void* monitor_server_wrapper(void* args) {
   monitor_server_real((keep_alive_info *) args);
-  return NULL;
+  return NULL; 
 }
 
 static void run_monitor_server(keep_alive_info* info) {
@@ -157,7 +157,7 @@ static void check_is_target_alive(keep_alive_info* info) {
   if (kill(info->target_pid, 0) < 0) {
     int new_target_pid;
     xlog_warning("[xkeepalive] oops, target process %d is dead!\n", info->target_pid);
-
+    
     new_target_pid = my_fork();
     if (new_target_pid != 0) {
       // parent process, still work as monitor
@@ -215,7 +215,7 @@ int xkeep_alive(keep_alive_func func, int argc, char* argv[]) {
   int pid;
 
   // prevent zombie processes
-  signal(SIGCHLD, SIG_IGN);
+  signal(SIGCHLD, SIG_IGN); 
 
   pid = my_fork();
   if (pid != 0) {
