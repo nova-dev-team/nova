@@ -185,26 +185,12 @@ xbool xstr_eql(xstr xstr1, xstr xstr2);
 /**
   @brief
     Strip an xstr.
-
+  
   @param xs
     The xstr object to be stripped.
   @param strip_set
     A c-string containing all the chars to be stripped.
 */
 void xstr_strip(xstr xs, char* strip_set);
-
-/**
- * @brief
- *  Compare 2 xstr object.
- *
- * @param xs1
- *  The xstr 1 to be compared.
- * @param xs2
- *  The xstr 2 to be compared.
- *
- * @return
- *  Return value is like strcmp().
- */
-int xstr_compare(xstr xs1, xstr xs2);
 
 #endif  // XSTR_H_
