@@ -12,7 +12,6 @@
     Simple vector implementation.
 */
 
-#include "xdef.h"
 
 /**
   @brief
@@ -161,19 +160,6 @@ int xvec_push_back(xvec xv, void* data);
     The size of xvec object.
 */
 int xvec_size(xvec xv);
-
-/**
- * @brief
- *  Sort an xvec.
- *
- * Sorting is done by exchanging the void* pointers inside xvec.
- *
- * @param xv
- *  The xvec to be sorted.
- * @param cmp
- *  The compare function.
- */
-void xvec_sort(xvec xv, xcompare_f cmp);
 
 #endif  // XVEC_H_
 
