@@ -186,7 +186,7 @@ RB_ENTRY(search)(const RB_ENTRY(data_t) *key, struct RB_ENTRY(tree) *rbinfo)
 #endif /* no_search */
 
 #ifndef no_find
-RB_STATIC const RB_ENTRY(data_t) *
+RB_STATIC const RB_ENTRY(data_t) * 
 RB_ENTRY(find)(const RB_ENTRY(data_t) *key, struct RB_ENTRY(tree) *rbinfo)
 {
 	struct RB_ENTRY(node) *x;
@@ -205,7 +205,7 @@ RB_ENTRY(find)(const RB_ENTRY(data_t) *key, struct RB_ENTRY(tree) *rbinfo)
 #endif /* no_find */
 
 #ifndef no_delete
-RB_STATIC const RB_ENTRY(data_t) *
+RB_STATIC const RB_ENTRY(data_t) * 
 RB_ENTRY(delete)(const RB_ENTRY(data_t) *key, struct RB_ENTRY(tree) *rbinfo)
 {
 	struct RB_ENTRY(node) *x;
@@ -251,7 +251,7 @@ RB_ENTRY(openlist)(const struct RB_ENTRY(tree) *rbinfo)
 	return(RB_ENTRY(_openlist)(rbinfo->rb_root));
 }
 
-RB_STATIC const RB_ENTRY(data_t) *
+RB_STATIC const RB_ENTRY(data_t) * 
 RB_ENTRY(readlist)(RBLIST *rblistp)
 {
 	if (rblistp==NULL)
@@ -271,7 +271,7 @@ RB_ENTRY(closelist)(RBLIST *rblistp)
 #endif /* no_readlist */
 
 #ifndef no_lookup
-RB_STATIC const RB_ENTRY(data_t) *
+RB_STATIC const RB_ENTRY(data_t) * 
 RB_ENTRY(lookup)(int mode, const RB_ENTRY(data_t) *key, struct RB_ENTRY(tree) *rbinfo)
 {
 	struct RB_ENTRY(node) *x;
@@ -887,7 +887,7 @@ RB_ENTRY(_openlist)(const struct RB_ENTRY(node) *rootp)
 	return(rblistp);
 }
 
-static const RB_ENTRY(data_t) *
+static const RB_ENTRY(data_t) * 
 RB_ENTRY(_readlist)(RBLIST *rblistp)
 {
 	const RB_ENTRY(data_t) *key=NULL;
