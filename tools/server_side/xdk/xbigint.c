@@ -133,7 +133,7 @@ xsuccess xbigint_div_int(xbigint xbi, int value) {
 }
 
 xsuccess xbigint_mod_int(xbigint xbi, int value, int* result) {
-  if (bigint_mod_int((bigint *) xbi, value, result) != -BIGINT_NOERR) {
+  if (bigint_mod_by_int((bigint *) xbi, value, result) != -BIGINT_NOERR) {
     return XFAILURE;
   } else {
     return XSUCCESS;
