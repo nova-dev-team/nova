@@ -45,10 +45,10 @@ const char* xstr_get_cstr(xstr xs) {
 static void ensure_mem_size(xstr xs, int mem_size) {
   if (mem_size > xs->mem_size) {
 
-    // Note that we allocated mem_size * 2, which will reduce
+    // Note that we allocated mem_size * 2 + 2, which will reduce
     // calls to this function.
     // Think about the case where many chars are appended to an xstr.
-    xs->mem_size = mem_size * 2;
+    xs->mem_size = mem_size * 2 + 2;
     xs->str = xrealloc(xs->str, xs->mem_size);
   }
 }
@@ -68,7 +68,8 @@ int xstr_len(xstr xs) {
 
 void xstr_append_char(xstr xs, char ch) {
   if (ch != '\0') {
-    ensure_mem_size(xs, xs->len + 1);
+    // +2 because of the trailing '\0' and the new char
+    ensure_mem_size(xs, xs->len + 2);
     xs->str[xs->len] = ch;
     xs->len++;
     xs->str[xs->len] = '\0';
@@ -79,9 +80,7 @@ void xstr_append_char(xstr xs, char ch) {
 // prevent calling strlen(cs) more than once
 static void xstr_append_cstr_len_precalculated(xstr xs, const char* cs, int cs_len) {
   if (cs_len > 0) {
-
-    // *** do not modify "+16"! make sure there is *enough* memory
-    ensure_mem_size(xs, xs->len + cs_len + 16);
+    ensure_mem_size(xs, xs->len + cs_len + 1);  // +1 because of the trailing '\0'
 
     // Note: we did not use strcat(xs->str, ...), but used strcpy(xs->str + xs->len),
     // because we know exactly where new string should be appended, rather than scanning xs->str
@@ -103,9 +102,11 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
   int cnt = 0;
   long long ldval;
   int ival;
+  float float_val;
+  double double_val;
   char* sval;
   char cval;
-  char buf[32]; // for xitoa & xltoa
+  char buf[350]; // for xitoa & xltoa & double/float convertion
   int str_len;
 
   va_start(argp, fmt);
@@ -136,6 +137,20 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
         str_len = strlen(buf);
         cnt += str_len;
         xstr_append_cstr_len_precalculated(xs, buf, str_len);
+      } else if (*p == 'f') {
+        // %lf
+        double_val = va_arg(argp, double);
+        sprintf(buf, "%lf", double_val);
+        str_len = strlen(buf);
+        cnt += str_len;
+        xstr_append_cstr_len_precalculated(xs, buf, str_len);
+      } else if (*p == 'g') {
+        // %lf
+        double_val = va_arg(argp, double);
+        sprintf(buf, "%lg", double_val);
+        str_len = strlen(buf);
+        cnt += str_len;
+        xstr_append_cstr_len_precalculated(xs, buf, str_len);
       } else {
         xstr_append_cstr(xs, "** FORMAT ERROR ***");
         cnt = -1;
@@ -150,6 +165,24 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
       xstr_append_cstr_len_precalculated(xs, buf, str_len);
       break;
 
+    case 'f':
+      // float is converted to double when passing with ...
+      float_val = (float) va_arg(argp, double);
+      sprintf(buf, "%f", float_val);
+      str_len = strlen(buf);
+      cnt += str_len;
+      xstr_append_cstr_len_precalculated(xs, buf, str_len);
+      break;
+
+    case 'g':
+      // float is converted to double when passing with ...
+      float_val = (float) va_arg(argp, double);
+      sprintf(buf, "%g", float_val);
+      str_len = strlen(buf);
+      cnt += str_len;
+      xstr_append_cstr_len_precalculated(xs, buf, str_len);
+      break;
+
     case 's':
       sval = va_arg(argp, char *);
       str_len = strlen(sval);
@@ -159,6 +192,7 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
 
     case '%':
       cnt++;
+      xstr_append_char(xs, '%');
       break;
 
     default:
@@ -218,7 +252,6 @@ xbool xstr_eql(xstr xstr1, xstr xstr2) {
   }
 }
 
-
 void xstr_strip(xstr xs, char* strip_set) {
   int new_begin = 0;
   int new_end = xs->len;  // exclusive end point
@@ -255,12 +288,14 @@ void xstr_strip(xstr xs, char* strip_set) {
       break;
     }
   }
-  
+
   stripped_cstr = xmalloc_ty(new_end - new_begin + 1, char);
   memcpy(stripped_cstr, xs->str + new_begin, new_end - new_begin);
   stripped_cstr[new_end - new_begin] = '\0';
   xstr_set_cstr(xs, stripped_cstr);
   xfree(stripped_cstr);
-
 }
 
+int xstr_compare(xstr xs1, xstr xs2) {
+  return strcmp(xstr_get_cstr(xs1), xstr_get_cstr(xs2));
+}
