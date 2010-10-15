@@ -94,7 +94,7 @@ char* xcstr_strip(char* str);
   @param str
     The string that will contain text representation of the IP value.
     It must have enough size (>= 16).
-
+  
   @return
     -1 if convert failure, otherwise 0.
 
@@ -212,23 +212,6 @@ xbool xfilesystem_is_file(const char* path, xsuccess* optional_succ);
 xbool xfilesystem_is_dir(const char* path, xsuccess* optional_succ);
 
 /**
- * @brief
- *  Get the name of last entry in a normalized path.
- *
- * A few examples:
- * 1. / -> / ;
- * 2. /abs/nice/ -> nice ;
- * 3. /abs -> abs ;
- * 4. /abs/last -> last .
- *
- * @param norm_path
- *  [IN] Normalized path.
- * @param basename
- *  [OUT] Will be set to the basename.
- */
-void xfilesystem_basename(XIN xstr norm_path, XOUT xstr basename);
-
-/**
   @brief
     Cdup for an normalized path.
 
@@ -305,35 +288,10 @@ int xhash_hash_xstr(void* key);
     A key to be compared.
 
   @return
-    Whether the 2 xstr is equal.
+    Whether the 2 xstr is equal. 
 */
 xbool xhash_eql_xstr(void* key1, void* key2);
 
-/**
- * @brief
- *  Get hash value of int.
- *
- * @param key
- *  Pointer to the int.
- *
- * @return
- *  The hash value of the int.
- */
-int xhash_hash_int(void* key);
-
-/**
- * @brief
- *  Check if 2 int values are equal.
- *
- * @param key1
- *  Pointer to the first int.
- * @param key2
- *  Pointer to the second int.
- *
- * @return
- *  Whether the 2 int values are equal.
- */
-xbool xhash_eql_int(void* key1, void* key2);
 
 /**
   @brief
