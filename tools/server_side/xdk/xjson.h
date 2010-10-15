@@ -43,6 +43,17 @@ void xjson_delete(xjson xj);
 
 /**
  * @brief
+ *  Set an json object to c-string value.
+ *
+ * @param xj
+ *  The json object.
+ * @param cs
+ *  The c-string value.
+ */
+void xjson_set_cstr(xjson xj, const char* cs);
+
+/**
+ * @brief
  *  Set an json object to string value.
  *
  * @param xj
@@ -118,6 +129,36 @@ void xjson_set_object(xjson xj);
  *  The json object.
  */
 void xjson_set_array(xjson xj);
+
+/**
+ * @brief
+ *  Add a new element into the array.
+ *
+ * @param xj_array
+ *  The array.
+ * @param xj_elem
+ *  The new element.
+ *
+ * @return 
+ *  XSUCCESS if successful. If xj_obj is not set to array, then XFAILURE will be returned.
+ */
+xsuccess xjson_array_append(xjson xj_array, xjson xj_elem);
+
+/**
+ * @brief
+ *  Add a new attribute into the object.
+ *
+ * @param xj_obj
+ *  The object.
+ * @param key
+ *  The key of attribute. It will be copied for internal memory management.
+ * @param xj_elem
+ *  The attribute.
+ *
+ * @return
+ *  XSUCCESS if successful. If xj_obj is not set to object, then XFAILURE will be returned.
+ */
+xsuccess xjson_object_put(xjson xj_obj, const char* key, xjson xj_attr);
 
 /**
  * @brief
