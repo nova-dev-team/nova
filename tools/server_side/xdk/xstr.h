@@ -33,6 +33,18 @@ typedef struct xstr_impl* xstr;
 xstr xstr_new();
 
 /**
+ * @brief
+ *  Create a new xstr object from a c-string.
+ *
+ * @param cs
+ *  The c-string.
+ *
+ * @return
+ *  The new xstr object, already set to the c-string.
+ */
+xstr xstr_new_from_cstr(const char* cs);
+
+/**
   @brief
     Destroy an xstr object.
 
