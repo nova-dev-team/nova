@@ -82,7 +82,7 @@ void xfree(void* ptr);
     Pointer to current memory chunk.
   @param new_size
     New memory chunk size.
-
+  
   @return
     Pointer to new memory chunk.
 */
