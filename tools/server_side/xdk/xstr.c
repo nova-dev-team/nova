@@ -24,6 +24,15 @@ xstr xstr_new() {
   return xs;
 }
 
+xstr xstr_new_from_cstr(const char* cs) {
+  xstr xs = xmalloc_ty(1, struct xstr_impl);
+  xs->len = strlen(cs);
+  xs->mem_size = xs->len + 4;
+  xs->str = xmalloc_ty(xs->mem_size, char);
+  strcpy(xs->str, cs);
+  return xs;
+}
+
 void xstr_delete(xstr xs) {
   xfree(xs->str);
   xfree(xs);
