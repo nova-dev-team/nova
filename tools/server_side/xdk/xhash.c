@@ -43,7 +43,7 @@ struct xhash_impl {
   xhash_free free_func; ///< @brief Hash entry destructor.
 };
 
-#define ALLOC(ty, n) ((ty *) xmalloc(sizeof(ty) * (n)))
+#define ALLOC(ty, n) ((ty *) xmalloc_ty(n, ty))
 #define REALLOC(ty, ptr, n) (ty *) xrealloc(ptr, sizeof(ty) * (n))
 
 xhash xhash_new(xhash_hash arg_hash, xhash_eql arg_eql, xhash_free arg_free) {
@@ -73,7 +73,7 @@ void xhash_delete(xhash xh) {
   int actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
   xhash_entry* p;
   xhash_entry* q;
-  
+
   for (i = 0; i < actual_size; i++) {
     p = xh->slot[i];
     while (p != NULL) {
@@ -221,13 +221,12 @@ int xhash_remove(xhash xh, void* key) {
     return XSUCCESS;
   } else {
     // head is not target
-    q = p->next;
     for (;;) {
       // q is the item to be checked
       q = p->next;
       if (q == NULL)
         return XFAILURE;
-      
+
       if (xh->eql_func(key, q->key)) {
         // q is target
         p->next = q->next;
@@ -251,7 +250,7 @@ void xhash_visit(xhash xh, xhash_visitor visitor, void* args) {
   int actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
   xbool should_continue = XTRUE;
   xhash_entry* p;
-  
+
   for (i = 0; i < actual_size && should_continue == XTRUE; i++) {
     p = xh->slot[i];
     while (p != NULL && should_continue == XTRUE) {
