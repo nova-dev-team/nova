@@ -12,8 +12,6 @@
  * @link todo.html TODO list.@endlink
  */
 
-#ifdef __linux__
-
 #define _GNU_SOURCE 1
 #define __USE_LARGEFILE64
 #define _LARGEFILE_SOURCE
@@ -2065,6 +2063,3 @@ struct rbtree *inotifytools_wd_sorted_by_event(int sort_event)
 	rbcloselist(all);
 	return ret;
 }
-
-#endif  // #ifdef __linux__
-
