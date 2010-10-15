@@ -69,7 +69,7 @@ const char* xsocket_get_host_cstr(xsocket xs);
 /**
   @brief
     Get host machine's service port.
-  
+
   @param xs
     The xsocket object containing the port number.
 
@@ -170,10 +170,8 @@ void xsocket_delete(xsocket xs);
     One of the xsockets.
   @param xs2
     One of the xsockets.
-  @param sleep_usec
-    The sleeping interval, in useconds (10e-6 second).
 */
-void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec);
+void xsocket_shortcut(xsocket xs1, xsocket xs2);
 
 struct xserver_impl;
 
@@ -235,6 +233,18 @@ xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor,
     Remember, xserver will be self-destroyed after this call!
 */
 xsuccess xserver_serve(xserver xs);
+
+/**
+ * @brief
+ *  Destroy an xserver.
+ *
+ * It could only be used when xserver_serve() is not called.
+ * When xserver_server() finished, it will automatically call xserver_delete().
+ *
+ * @param xs
+ *  The xserver to be destroyed.
+ */
+void xserver_delete(xserver xs);
 
 /**
   @brief
