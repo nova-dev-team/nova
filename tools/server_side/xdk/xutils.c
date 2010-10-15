@@ -8,7 +8,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <assert.h>
 
 #include "xmemory.h"
 #include "xutils.h"
@@ -36,7 +35,7 @@ char* xitoa(int value, char* buf, int base) {
 
   if (v < 0)
     *ptr++ = '-';
-
+  
   *ptr-- = '\0';
   while (ptr1 < ptr) {
     ch = *ptr;
@@ -68,7 +67,7 @@ char* xltoa(long long value, char* buf, int base) {
 
   if (v < 0)
     *ptr++ = '-';
-
+  
   *ptr-- = '\0';
   while (ptr1 < ptr) {
     ch = *ptr;
@@ -112,7 +111,7 @@ char* xcstr_strip(char* str) {
     str[i] = str[begin + i];
   }
   str[i] = '\0';
-
+  
   return str;
 }
 
@@ -136,9 +135,6 @@ xsuccess xinet_ip2str(int ip, char* str) {
 
 xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr) {
   in_addr_t a;
-  if (host == NULL) {
-    return XFAILURE;
-  }
   bzero(addr, sizeof(*addr));
   addr->sin_family = AF_INET;
   a = inet_addr(host);
@@ -246,7 +242,7 @@ xbool xfilesystem_is_dir(const char* path, xsuccess* optional_succ) {
 xsuccess xfilesystem_rmrf(const char* path) {
   xsuccess ret = XSUCCESS;
   if (xfilesystem_is_dir(path, NULL) == XTRUE) {
-    // TODO detect loops incurred by soft links (or just ignore folder link?)
+    // TODO detect loops incurred by soft links (or just ignore folder link?)    
     xstr subpath = xstr_new();
     DIR* p_dir = opendir(path);
 
@@ -286,40 +282,6 @@ xsuccess xfilesystem_rmrf(const char* path) {
 
 
 // requirement: norm_path is normalized
-// result: basename will be the last entry's name in norm_path.
-//         if norm_path == /, then basename will be /
-//
-// eg: /abs -> abs
-//     / -> /
-//     /abs/nice/ -> nice
-//     /abs/last -> last
-void xfilesystem_basename(XIN xstr norm_path, XOUT xstr basename) {
-  xstr_set_cstr(basename, "");
-  assert(xstr_len(norm_path) > 0);
-  if (strcmp(xstr_get_cstr(norm_path), xsys_fs_sep_cstr) == 0) {
-    // special case, / -> /
-    xstr_set_cstr(basename, xsys_fs_sep_cstr);
-  } else {
-    int end = xstr_len(norm_path) - 1;
-    int begin = -1;
-    int i;
-    const char* norm_path_cstr = xstr_get_cstr(norm_path);
-    while (end >= 0 && norm_path_cstr[end] == xsys_fs_sep_char) {
-      // skip the trailing '/'
-      end--;
-    }
-    begin = end;
-    while (begin >= 0 && norm_path_cstr[begin] != xsys_fs_sep_char) {
-      begin--;
-    }
-    for (i = begin + 1; i <= end; i++) {
-      xstr_append_char(basename, norm_path_cstr[i]);
-    }
-  }
-}
-
-
-// requirement: norm_path is normalized
 // result: norm_path is changed, if necessary
 // when norm_path is '/', we cannot cdup
 // the result will have an '/' at the end
@@ -332,7 +294,7 @@ xsuccess xfilesystem_path_cdup(xstr norm_path) {
     char sep = xsys_fs_sep_char; // filesystem separator
     char* new_cstr_path = xmalloc_ty(new_len + 1, char);
     strcpy(new_cstr_path, xstr_get_cstr(norm_path));
-
+    
     // skip the trailing '/'
     if (new_cstr_path[index] == sep) {
       index--;
@@ -346,23 +308,6 @@ xsuccess xfilesystem_path_cdup(xstr norm_path) {
     xfree(new_cstr_path);
   }
   return XSUCCESS;
-}
-
-static void xfilesystem_normalize_abs_path_helper(xstr seg, xstr norm_path) {
-  const char sep = xsys_fs_sep_char; // filesystem path seperator
-  if (strcmp(xstr_get_cstr(seg), ".") == 0) {
-    // do nothing
-  } else if (strcmp(xstr_get_cstr(seg), "..") == 0) {
-    // cd up
-    xfilesystem_path_cdup(norm_path);
-  } else {
-    // append '/' & 'seg'
-    if (xstr_last_char(norm_path) != sep) {
-      xstr_append_char(norm_path, sep);
-    }
-    xstr_append_cstr(norm_path, xstr_get_cstr(seg));
-  }
-  xstr_set_cstr(seg, "");
 }
 
 xsuccess xfilesystem_normalize_abs_path(const char* abs_path, xstr norm_path) {
@@ -382,7 +327,19 @@ xsuccess xfilesystem_normalize_abs_path(const char* abs_path, xstr norm_path) {
       if (abs_path[i] == sep) {
         if (xstr_len(seg) != 0) {
           // got a new segment
-          xfilesystem_normalize_abs_path_helper(seg, norm_path);
+          if (strcmp(xstr_get_cstr(seg), ".") == 0) {
+            // do nothing
+          } else if (strcmp(xstr_get_cstr(seg), "..") == 0) {
+            // cd up
+            xfilesystem_path_cdup(norm_path);
+          } else {
+            // append '/' & 'seg'
+            if (xstr_last_char(norm_path) != sep) {
+              xstr_append_char(norm_path, sep);
+            }
+            xstr_append_cstr(norm_path, xstr_get_cstr(seg));
+          }
+          xstr_set_cstr(seg, "");
         }
       } else {
         xstr_append_char(seg, abs_path[i]);
@@ -390,9 +347,22 @@ xsuccess xfilesystem_normalize_abs_path(const char* abs_path, xstr norm_path) {
     }
     if (xstr_len(seg) != 0) {
       // got a new segment
-      xfilesystem_normalize_abs_path_helper(seg, norm_path);
+      if (strcmp(xstr_get_cstr(seg), ".") == 0) {
+        // do nothing
+      } else if (strcmp(xstr_get_cstr(seg), "..") == 0) {
+        // cd up
+        xfilesystem_path_cdup(norm_path);
+      } else {
+        // append '/' & 'seg'
+        if (xstr_last_char(norm_path) != sep) {
+          xstr_append_char(norm_path, sep);
+        }
+        xstr_append_cstr(norm_path, xstr_get_cstr(seg));
+      }
+      xstr_set_cstr(seg, "");
     }
   }
+
   xstr_delete(seg);
   return ret;
 }
@@ -450,21 +420,6 @@ int xhash_hash_xstr(void* key) {
 
 xbool xhash_eql_xstr(void* key1, void* key2) {
   return xstr_eql((xstr) key1, (xstr) key2);
-}
-
-int xhash_hash_int(void* key) {
-  int* int_key = (int *) key;
-  return *int_key;
-}
-
-xbool xhash_eql_int(void* key1, void* key2) {
-  int* int_key1 = (int *) key1;
-  int* int_key2 = (int *) key2;
-  if (*int_key1 == *int_key2) {
-    return XTRUE;
-  } else {
-    return XFALSE;
-  }
 }
 
 xsuccess xgetline_fp(FILE* fp, xstr line) {
