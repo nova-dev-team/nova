@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "xvec.h"
 #include "xmemory.h"
@@ -53,7 +54,7 @@ static void ensure_max_size(xvec xv, int max_size) {
 int xvec_put(xvec xv, int index, void* data) {
   if (index < 0 || index > xv->size)
     return -1;
-  
+
   ensure_max_size(xv, index + 1);
   if (index == xv->size) {
     xv->size++; // append new data
@@ -93,12 +94,81 @@ int xvec_remove(xvec xv, int index) {
   int i;
   if (index < 0 || index >= xv->size)
     return -1;
-  
+
   xv->xvfree(xv->data[index]);
   for (i = index; i < xv->size - 1; i++) {
     xv->data[i] = xv->data[i + 1];
   }
   xv->size--;
   return index;
+}
+
+static void xvec_sort_sel(void* arr[], int len, xcompare_f cmp) {
+  int i, j, min_index;
+  void* tmp;
+  for (i = 0; i < len; i++) {
+    min_index = i;
+    for (j = i + 1; j < len; j++) {
+      if (cmp(arr[j], arr[min_index]) < 0) {
+        min_index = j;
+      }
+    }
+    if (min_index != i) {
+      tmp = arr[i];
+      arr[i] = arr[min_index];
+      arr[min_index] = tmp;
+    }
+  }
+}
+
+static void xvec_sort_q(void* arr[], int len, xcompare_f cmp) {
+  const int qsort_threshold = 10;
+  if (len <= 1) {
+    // no need to sort
+    return;
+  }
+  if (len < qsort_threshold) {
+    xvec_sort_sel(arr, len, cmp);
+    return;
+  } else {
+    int i, j, k;
+    void* tmp;
+    int key_index = rand() % len;
+    void* key = arr[key_index];
+
+    // 1st phase, push all elements smaller than 'key' to front
+    j = 0;
+    for (i = 0; i < len; i++) {
+      if (cmp(arr[i], key) < 0) {
+        tmp = arr[j];
+        arr[j] = arr[i];
+        arr[i] = tmp;
+        j++;
+      }
+    }
+
+    // 2nd phase, push all elements equal to 'key' to middle
+    k = j;
+    for (i = j; i < len; i++) {
+      if (cmp(arr[i], key) == 0) {
+        tmp = arr[i];
+        arr[i] = arr[k];
+        arr[k] = tmp;
+        k++;
+      }
+    }
+
+    // recursively call qsort
+    if (j > 1) {
+      xvec_sort_q(arr, j, cmp);
+    }
+    if (len - k > 1) {
+      xvec_sort_q(arr + k, len - k, cmp);
+    }
+  }
+}
+
+void xvec_sort(xvec xv, xcompare_f cmp) {
+  xvec_sort_q(xv->data, xv->size, cmp);
 }
 
