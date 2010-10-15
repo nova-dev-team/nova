@@ -45,10 +45,10 @@ const char* xstr_get_cstr(xstr xs) {
 static void ensure_mem_size(xstr xs, int mem_size) {
   if (mem_size > xs->mem_size) {
 
-    // Note that we allocated mem_size * 2 + 2, which will reduce
+    // Note that we allocated mem_size * 2, which will reduce
     // calls to this function.
     // Think about the case where many chars are appended to an xstr.
-    xs->mem_size = mem_size * 2 + 2;
+    xs->mem_size = mem_size * 2;
     xs->str = xrealloc(xs->str, xs->mem_size);
   }
 }
@@ -68,8 +68,7 @@ int xstr_len(xstr xs) {
 
 void xstr_append_char(xstr xs, char ch) {
   if (ch != '\0') {
-    // +2 because of the trailing '\0' and the new char
-    ensure_mem_size(xs, xs->len + 2);
+    ensure_mem_size(xs, xs->len + 1);
     xs->str[xs->len] = ch;
     xs->len++;
     xs->str[xs->len] = '\0';
@@ -80,7 +79,9 @@ void xstr_append_char(xstr xs, char ch) {
 // prevent calling strlen(cs) more than once
 static void xstr_append_cstr_len_precalculated(xstr xs, const char* cs, int cs_len) {
   if (cs_len > 0) {
-    ensure_mem_size(xs, xs->len + cs_len + 1);  // +1 because of the trailing '\0'
+
+    // *** do not modify "+16"! make sure there is *enough* memory
+    ensure_mem_size(xs, xs->len + cs_len + 16);
 
     // Note: we did not use strcat(xs->str, ...), but used strcpy(xs->str + xs->len),
     // because we know exactly where new string should be appended, rather than scanning xs->str
@@ -158,7 +159,6 @@ int xstr_printf(xstr xs, const char* fmt, ...) {
 
     case '%':
       cnt++;
-      xstr_append_char(xs, '%');
       break;
 
     default:
@@ -218,6 +218,7 @@ xbool xstr_eql(xstr xstr1, xstr xstr2) {
   }
 }
 
+
 void xstr_strip(xstr xs, char* strip_set) {
   int new_begin = 0;
   int new_end = xs->len;  // exclusive end point
@@ -254,14 +255,12 @@ void xstr_strip(xstr xs, char* strip_set) {
       break;
     }
   }
-
+  
   stripped_cstr = xmalloc_ty(new_end - new_begin + 1, char);
   memcpy(stripped_cstr, xs->str + new_begin, new_end - new_begin);
   stripped_cstr[new_end - new_begin] = '\0';
   xstr_set_cstr(xs, stripped_cstr);
   xfree(stripped_cstr);
+
 }
 
-int xstr_compare(xstr xs1, xstr xs2) {
-  return strcmp(xstr_get_cstr(xs1), xstr_get_cstr(xs2));
-}
