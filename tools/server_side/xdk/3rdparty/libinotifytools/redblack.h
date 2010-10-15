@@ -21,10 +21,10 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* Header file for redblack.c, should be included by any code that
-** uses redblack.c since it defines the functions
-*/
-
+/* Header file for redblack.c, should be included by any code that 
+** uses redblack.c since it defines the functions 
+*/ 
+ 
 /* Stop multiple includes */
 #ifndef _REDBLACK_H
 
@@ -71,12 +71,12 @@ typedef enum
 }
 VISIT;
 
-struct RB_ENTRY(lists) {
-const struct RB_ENTRY(node) *rootp;
-const struct RB_ENTRY(node) *nextp;
-};
-
-#define RBLIST struct RB_ENTRY(lists)
+struct RB_ENTRY(lists) { 
+const struct RB_ENTRY(node) *rootp; 
+const struct RB_ENTRY(node) *nextp; 
+}; 
+ 
+#define RBLIST struct RB_ENTRY(lists) 
 
 struct RB_ENTRY(tree) {
 #ifndef RB_CUSTOMIZE
@@ -119,13 +119,13 @@ RB_STATIC void RB_ENTRY(destroy)(struct RB_ENTRY(tree) *);
 #ifndef no_walk
 RB_STATIC void RB_ENTRY(walk)(const struct RB_ENTRY(tree) *,
 		void (*)(const RB_ENTRY(data_t) *, const VISIT, const int, void *),
-		void *);
+		void *); 
 #endif
 
 #ifndef no_readlist
-RB_STATIC RBLIST *RB_ENTRY(openlist)(const struct RB_ENTRY(tree) *);
-RB_STATIC const RB_ENTRY(data_t) *RB_ENTRY(readlist)(RBLIST *);
-RB_STATIC void RB_ENTRY(closelist)(RBLIST *);
+RB_STATIC RBLIST *RB_ENTRY(openlist)(const struct RB_ENTRY(tree) *); 
+RB_STATIC const RB_ENTRY(data_t) *RB_ENTRY(readlist)(RBLIST *); 
+RB_STATIC void RB_ENTRY(closelist)(RBLIST *); 
 #endif
 
 /* Some useful macros */
