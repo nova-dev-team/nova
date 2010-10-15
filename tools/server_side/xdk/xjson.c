@@ -96,6 +96,61 @@ void xjson_set_double(xjson xj, double val) {
   xj->double_value = val;
 }
 
+void xjson_set_xstr(xjson xj, xstr xs) {
+  xjson_set_cstr(xj, xstr_get_cstr(xs));
+}
+
+void xjson_set_cstr(xjson xj, const char* cstr) {
+  xjson_delete_content(xj);
+  xj->type = XJSON_STRING;
+  xj->xstr_value = xstr_new_from_cstr(cstr);
+}
+
+void xjson_array_vec_free_func(void* ptr) {
+  xjson_delete((xjson) ptr);
+}
+
+void xjson_set_array(xjson xj) {
+  xjson_delete_content(xj);
+  xj->type = XJSON_ARRAY;
+  xj->array_vec = xvec_new(xjson_array_vec_free_func);
+}
+
+static void escape_json_string(xstr json_xs, xstr holder) {
+  const char* p = xstr_get_cstr(json_xs);
+  xstr_set_cstr(holder, "");
+  xstr_append_char(holder, '"');
+  while (*p != '\0') {
+    switch (*p) {
+    case '\b':
+      xstr_append_cstr(holder, "\\b");
+      break;
+    case '\n':
+      xstr_append_cstr(holder, "\\n");
+      break;
+    case '\r':
+      xstr_append_cstr(holder, "\\r");
+      break;
+    case '\'':
+      xstr_append_cstr(holder, "\\\'");
+      break;
+    case '\"':
+      xstr_append_cstr(holder, "\\\"");
+      break;
+    case '/':
+      xstr_append_cstr(holder, "\\/");
+      break;
+    case '\\':
+      xstr_append_cstr(holder, "\\\\");
+      break;
+    default:
+      xstr_append_char(holder, *p);
+    }
+    p++;
+  }
+  xstr_append_char(holder, '"');
+}
+
 void xjson_to_xstr(xjson xj, xstr xs) {
   xstr_set_cstr(xs, "");
   switch (xj->type) {
@@ -106,7 +161,7 @@ void xjson_to_xstr(xjson xj, xstr xs) {
     // TODO
     break;
   case XJSON_STRING:
-    // TODO
+    escape_json_string(xj->xstr_value, xs);
     break;
   case XJSON_INT:
     xstr_printf(xs, "%d", xj->int_value);
