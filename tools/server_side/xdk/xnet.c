@@ -47,6 +47,14 @@ struct xserver_impl {
   int serv_count; ///< @brief How many rounds of service will be given.
   char serv_mode; ///< @brief Service mode: 'b' blocking, 'p' new process, 't' new thread
   void* args; ///< @brief Additional arguments for acceptor function.
+
+  /**
+    @brief
+      Reference counter for xserver. In threaded service mode, it will be used to
+      determine when should the xserver be really destroyed.
+  */
+  int ref_counter;
+  pthread_mutex_t ref_counter_mutex; ///< @brief The mutex which protectes ref_counter.
 };
 
 // host will be deleted when deleting xsocked
@@ -153,7 +161,7 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
 
     // NOTE We don't use xmalloc here, because this will trigger a false warning on "memeory leak"
     // Because when forking the service process, we set the mem counter to 0, after the creation of the xsocket.
-    // So everything inside the client_xsocket should not be counted. However, if we use xmalloc here, 
+    // So everything inside the client_xsocket should not be counted. However, if we use xmalloc here,
     // the readline_buf will be counted, which is not what we wanted.
     xs->readline_buf = (char *) malloc(xs->readline_buf_size);
     xs->readline_buf_start = 0;
@@ -161,7 +169,7 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
   }
 
   xstr_set_cstr(line, "");
-  // fetch data from buffer into the req_xstr 
+  // fetch data from buffer into the req_xstr
   for (;;) {
     if (xs->readline_buf_start == xs->readline_buf_end) {
       // no data in buffer
@@ -172,7 +180,7 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
         xs->readline_buf_end = 0;
       } else {
         // could read data into the buffer
-        // TODO use select(), add time out 
+        // TODO use select(), add time out
         int cnt = read(xs->sockfd, xs->readline_buf + xs->readline_buf_start, xs->readline_buf_size - xs->readline_buf_start);
         //printf("cnt = %d\n", cnt);
         if (cnt <= 0) {
@@ -215,7 +223,6 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
       }
     }
   }
-
   return ret;
 }
 
@@ -240,7 +247,7 @@ void xsocket_delete(xsocket xs) {
   xfree(xs);
 }
 
-void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
+void xsocket_shortcut(xsocket xs1, xsocket xs2) {
   fd_set r_set;
   fd_set w_set;
   fd_set ex_set;
@@ -249,11 +256,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
   const int buf_len = 8192;
   char* buf = xmalloc_ty(buf_len, char);
   int cnt;
-
-  // make sure the sleeping time is valid (positive)
-  if (sleep_usec < 1) {
-    sleep_usec = 1;
-  }
 
   if (xs1->sockfd + 1 > maxfdp1) {
     maxfdp1 = xs1->sockfd + 1;
@@ -266,7 +268,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
   time_out.tv_usec = 50 * 1000; // 50msec time out
 
   for (;;) {
-    xbool has_activity = XFALSE;  // whether some data was sent in this round
     FD_ZERO(&r_set);
     FD_ZERO(&w_set);
     FD_ZERO(&ex_set);
@@ -277,7 +278,7 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
     FD_SET(xs2->sockfd, &r_set);
     FD_SET(xs1->sockfd, &ex_set);
 
-    if (select(maxfdp1, &r_set, &w_set, &ex_set, &time_out) == -1) {
+    if (select(maxfdp1, &r_set, &w_set, &ex_set, NULL) < 0) {
       xlog_debug("[info] select < 0\n");
       break;
     }
@@ -289,7 +290,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
           // TODO is "<=" correct?
           break;
         }
-        has_activity = XTRUE;
       } else if (cnt == 0) {
         break;  // is this correct?
       } else if (cnt < 0) {
@@ -304,7 +304,6 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
           // TODO is "<=" correct?
           break;
         }
-        has_activity = XTRUE;
       } else if (cnt == 0) {
         break;
       } else if (cnt < 0) {
@@ -317,18 +316,30 @@ void xsocket_shortcut(xsocket xs1, xsocket xs2, int sleep_usec) {
       xlog_debug("[info] sock exception encountered!\n");
       break;
     }
-
-    if (has_activity == XFALSE) {
-      // if no data was sent, sleep for a very short time, prevent high CPU usage
-      usleep(sleep_usec);
-    }
   }
   xfree(buf);
 }
 
-static void xserver_delete(xserver xs) {
-  xsocket_delete(xs->sock);
-  xfree(xs);
+void xserver_delete(xserver xs) {
+  int should_delete = 0;
+  pthread_mutex_lock(&(xs->ref_counter_mutex));
+  // check the reference counter to see if we really need to delete the xserver
+  xs->ref_counter--;
+  if (xs->ref_counter == 0) {
+    should_delete = 1;
+  }
+  pthread_mutex_unlock(&(xs->ref_counter_mutex));
+  if (should_delete) {
+    pthread_mutex_destroy(&(xs->ref_counter_mutex));
+    xsocket_delete(xs->sock);
+    xfree(xs);
+  }
+}
+
+static void xserver_incr_ref_count(xserver xs) {
+  pthread_mutex_lock(&(xs->ref_counter_mutex));
+  xs->ref_counter++;
+  pthread_mutex_unlock(&(xs->ref_counter_mutex));
 }
 
 xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor, int serv_count, char serv_mode, void* args) {
@@ -339,13 +350,21 @@ xserver xserver_new(xstr host, int port, int backlog, xserver_acceptor acceptor,
   gettimeofday(&start_time, NULL);
 #endif  // PROFILE_XSERVER
 
-  xs->sock = xsocket_new(host, port);
+  // set the reference counter & mutex
+  xs->ref_counter = 1;
+  pthread_mutex_init(&(xs->ref_counter_mutex), NULL);
+
   xs->backlog = backlog;
   xs->acceptor = acceptor;
   xs->serv_count = serv_count;
   xs->serv_mode = serv_mode;
   xs->args = args;
-  if (bind(xs->sock->sockfd, (struct sockaddr *) &(xs->sock->addr), sizeof(struct sockaddr)) < 0) {
+  xs->sock = xsocket_new(host, port);
+  if (xs->sock == NULL) {
+    xserver_delete(xs);
+    xs = NULL;
+  }
+  if (xs != NULL && bind(xs->sock->sockfd, (struct sockaddr *) &(xs->sock->addr), sizeof(struct sockaddr)) < 0) {
     perror("error in bind()");
     xserver_delete(xs);
     xs = NULL;
@@ -368,11 +387,13 @@ static void* acceptor_wrapper(void* pthread_arg) {
   xsocket client_xs = arglist[1];
   void* args = arglist[2];
 
+  // ignore sigpipe, it is triggered when client socket crashed. it is per-thread option
+  signal(SIGPIPE, SIG_IGN);
+
+  xfree(pthread_arg); // need to free this as soon as possible
   xserver->acceptor(client_xs, args);
-
-  xfree(pthread_arg);
+  xserver_delete(xserver);  // try to delete the xserver (it is ref counted)
   xsocket_delete(client_xs);
-
   xmem_usage(stdout);
   pthread_exit(NULL);
   return NULL;
@@ -387,6 +408,9 @@ xsuccess xserver_serve(xserver xs) {
   if (xs->serv_mode == 'p' || xs->serv_mode == 'P') {
     signal(SIGCHLD, SIG_IGN);
   }
+
+  // ignore sigpipe, it is triggered when client socket crashed
+  signal(SIGPIPE, SIG_IGN);
 
   while (xs->serv_count == XUNLIMITED || serv_count < xs->serv_count) {
     struct sockaddr_in client_addr;
@@ -412,7 +436,6 @@ xsuccess xserver_serve(xserver xs) {
     xstr_set_cstr(client_xs->host, inet_ntoa(client_addr.sin_addr));
 
     serv_count++;
-
     if (xs->serv_mode == 't' || xs->serv_mode == 'T') {
       // serve in new thread
       pthread_t tid;
@@ -420,6 +443,8 @@ xsuccess xserver_serve(xserver xs) {
       arglist[0] = xs;
       arglist[1] = client_xs;
       arglist[2] = xs->args;
+      // increase the ref counter for xserver
+      xserver_incr_ref_count(xs);
       if (pthread_create(&tid, NULL, acceptor_wrapper, (void *) arglist) < 0) {
         perror("error in pthread_create()");
         // TODO handle error creating new thread
@@ -434,7 +459,6 @@ xsuccess xserver_serve(xserver xs) {
         break;
       } else if (pid == 0) {
         // child process
-
         // begin monitoring mem usage in service process
         xmem_reset_counter();
 
@@ -444,20 +468,16 @@ xsuccess xserver_serve(xserver xs) {
 #endif  // #if PROFILE_XSERVER == 1
 
         xs->acceptor(client_xs, xs->args);
-        
         if (xmem_usage(stdout) != 0) {
           xlog_warning("[xdk] possible memory leak in xserver's service process!\n");
         }
         xsocket_delete(client_xs);
-        // exit child process
+        // exit child process, do not try to destroy xserver in child process
         exit(0);
-
       } else {
         // parent process
-        
         // tricky here, reset rand seed, prevent sub process from rand value collisions
         srand(pid);
-
         // release client handle in this process
         // also release allocated memory resource, make xmem monitor happy
         xsocket_delete(client_xs);
@@ -468,14 +488,13 @@ xsuccess xserver_serve(xserver xs) {
       xsocket_delete(client_xs);
     }
   }
-  xserver_delete(xs); // self destroy
+  xserver_delete(xs); // self destroy (xserver is ref counted)
   return ret;
 }
 
 int xserver_get_port(xserver xs) {
   return xs->sock->port;
 }
-
 
 const char* xserver_get_ip_cstr(xserver xs) {
   return inet_ntoa(xs->sock->addr.sin_addr);
