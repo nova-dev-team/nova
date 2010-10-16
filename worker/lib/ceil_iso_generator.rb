@@ -10,7 +10,9 @@ igen.config_package_server('10.0.1.223', '8000', 'ftp')
 igen.config_key_server('10.0.1.211', '21', 'ftp')
 igen.config_nodelist("10.0.1.200 node1\n10.0.1.211 node2")
 igen.config_softlist("common ssh-nopass hadoop")
+igen.config_agent("ftp://xen:xen@192.168.0.223/software_pkgs", "12345678")
 igen.generate('/var/vm1', '/home/rei/test.iso')
+
 =end
 
 require "../../common/lib/ceil/server/ceil_iso_generator.rb"

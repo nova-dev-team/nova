@@ -436,6 +436,17 @@ def do_prepare rails_root, storage_server, vm_dir
       cluster_name = ""
       id_rsa = nil
       id_rsa_pub = nil
+      
+      begin
+		    if File.exists?('ceil_password') and File.exists?('pkg_server')
+		      agent_password = File.read('ceil_password')
+		      agent_pkg_server = File.read('pkg_server')
+		      igen.config_agent(agent_pkg_server, agent_password)
+          write_log "ceil_agent configured"
+		    end
+			rescue
+  			wirte_log "failed to configure ceil_agent!"
+      end
 
       File.read("agent_hint").each_line do |line|
         line = line.strip
