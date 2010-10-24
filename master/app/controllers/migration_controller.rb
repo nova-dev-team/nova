@@ -8,6 +8,7 @@ class MigrationController < ApplicationController
   before_filter :root_or_admin_required
 
   # List all the pmachines, and their vmachines.
+  # No param required.
   #
   # Since::   0.3
   def overview

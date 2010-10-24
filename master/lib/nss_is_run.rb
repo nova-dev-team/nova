@@ -31,12 +31,21 @@ NSS_ADDR = "127.0.0.1:#{common_conf["nss_port"]}"
 fspath = File.join common_conf["run_root"], "nss_is_run_updater_script"
 fpath = File.join common_conf["run_root"], "nss_is_run"
 
+#rectified by frankvictor@qq.com
 fork do
+  # if it's a parent process, then exit
+  exit if fork
+  Process.setsid
   # write a pid file
   File.open(File.dirname(__FILE__) + "/../tmp/pids/nss_is_run.pid", "w") do |f|
     f.write Process.pid
   write_nss_log "Open and write process id file!"
   end
+  Dir.chdir File.expand_path(File.dirname(__FILE__))
+  File.umask 0000
+  STDIN.reopen "/dev/null"
+  STDOUT.reopen "/dev/null", "a"
+  STDERR.reopen STDOUT
   while 1 do
     fp = File.new(fpath, "w+")
 

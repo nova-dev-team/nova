@@ -71,6 +71,9 @@ class PmachinesController < ApplicationController
   end
 
   # Add a new pmachine entry.
+  # Params:
+  #   ip: the ip address of the new pmachine
+  #   vm_capacity: a suggested limit on number of vmachines
   #
   # Since::     0.3
   def add

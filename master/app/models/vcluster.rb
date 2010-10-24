@@ -14,6 +14,11 @@ class Vcluster < ActiveRecord::Base
   # Try to allocate a cluster.
   # Returns {success, message} pair.
   #
+  # Params:
+  #   name: the name of the vcluster
+  #   size: the size of the vcluster
+  #   owner: the owner of the vcluster (a User model)
+  #
   # Since::   0.3
   def Vcluster.alloc_cluster name, size, owner
     if Vcluster.find_by_cluster_name name

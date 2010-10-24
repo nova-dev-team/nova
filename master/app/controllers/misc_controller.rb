@@ -12,6 +12,7 @@ class MiscController < ApplicationController
   include StorageManagementHelper
 
   # Reply the role of this node.
+  # Possible roles: master, worker, vm_pool, nss
   #
   # Since::   0.3
   def role
@@ -171,6 +172,11 @@ class MiscController < ApplicationController
   end
 
   # Handles requests for storage server.
+  # param: req
+  #   req could be 'try_update': try to update the stroage server info
+  #   'server_down': check if storage server is down
+  #   'vdisk_list': show a list of all vdisks
+  #   'soft_list': show a list of all software
   #
   # Since::   0.3
   def storage_server
@@ -241,67 +247,6 @@ class MiscController < ApplicationController
     end
   end
 
-=begin
-  def sstest
-   # return unless root_required
-    unless valid_param? params[:req]
-      reply_failure "Please provide the 'req' parameter! Could be 'try_update', 'server_down', 'vdisk_list' or 'soft_list'."
-      return
-    end
-    conf = common_conf
-    case params[:req]
-    when "try_update"
-       if conf["storage_type"] == "ftp"||"nfs"
-        storage_server_try_update
-      else
-        reply_failure "Server config error: Unknown storage type '#{conf["storage_type"]}'"
-        return
-      end
-      reply_success "Tried to update server files list."
-    when "server_down"
-      is_server_down = nil
-      if conf["storage_type"] == "ftp" || "nfs"
-        is_server_down = storage_server_down?
-      else
-        reply_failure "Server config error: Unknown storage type '#{conf["storage_type"]}'"
-        return
-      end
-      if is_server_down
-        reply_success "Storage server is down!", :server_down => true
-      else
-        reply_success "Storage server is up and running!", :server_down => false
-      end
-    when "vdisk_list"
-      vdisk_list = nil
-      if conf["storage_type"] == "ftp"||"nfs"
-        vdisk_list = storage_server_vdisks_list
-      else
-        reply_failure "Server config error: Unknown storage type '#{conf["storage_type"]}'"
-        return
-      end
-      if vdisk_list == nil
-        reply_failure "Storage server is down! Cannot retrieve list!"
-      else
-        reply_success "List of vdisks successfully retrieved!", :data => vdisk_list
-      end
-    when "soft_list"
-      soft_list = nil
-      if conf["storage_type"] == "ftp"||"nfs"
-        soft_list = storage_server_soft_list
-      else
-        reply_failure "Server config error: Unknown storage type '#{conf["storage_type"]}'"
-        return
-      end
-      if soft_list == nil
-        reply_failure "Storage server is down! Cannot retrieve list!"
-      else
-        reply_success "List of soft successfully retrieved!", :data => soft_list
-      end
-    else
-      reply_failure "Unknown request '#{params[:req]}'"
-    end
-  end
-=end
 
   # Handles requests for overview info:
   # * users (root, admin, normal_user, not_activated)

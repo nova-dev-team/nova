@@ -8,6 +8,10 @@ class VmachinesController < ApplicationController
   before_filter :login_required
 
   # Change settings of the VM.
+  # Params:
+  #   uuid: the UUID of the VM
+  #   item: the property to be changed: 'name', 'cpu_count' or 'mem_size'
+  #   value: the new value
   #
   # Since::   0.3
   def edit
@@ -37,6 +41,8 @@ class VmachinesController < ApplicationController
   end
 
   # Displays detailed info about the virtual machine
+  # Param:
+  #   uuid: UUID of the vm
   #
   # Since::   0.3.3
   def show_info
@@ -47,6 +53,8 @@ class VmachinesController < ApplicationController
   end
 
   # Change a VM's status from 'shut-off' to 'start-pending'.
+  # Param:
+  #   uuid: UUID of the vm
   #
   # Since::   0.3
   def start
@@ -65,6 +73,9 @@ class VmachinesController < ApplicationController
 
   # Force the VM to be in 'shut-off' status.
   # Could be used in those status: start-pending, start-preparing, running, suspended, connect-failure.
+  #
+  # Param:
+  #   uuid: the UUID of the VM
   #
   # Since::   0.3
   def shut_off
@@ -86,6 +97,10 @@ class VmachinesController < ApplicationController
   end
 
   # Suspend the VM, this is a blocking call
+  # Param:
+  #   uuid: the UUID of the VM
+  #
+  # TODO make this function async (non-blocking)?
   #
   # Since::   0.3
   def suspend
@@ -105,6 +120,10 @@ class VmachinesController < ApplicationController
   end
 
   # Resume the suspended VMs, this is a blocking call
+  # Param:
+  #   uuid: the UUID of the VM
+  #
+  # TODO make this function async (non-blocking)?
   #
   # Since::   0.3
   def resume
@@ -124,6 +143,8 @@ class VmachinesController < ApplicationController
   end
 
   # remove the error messages for the VM.
+  # Param:
+  #   uuid: the UUID of the VM
   #
   # Since::   0.3
   def reset_error

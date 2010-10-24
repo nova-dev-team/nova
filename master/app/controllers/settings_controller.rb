@@ -15,7 +15,9 @@ class SettingsController < ApplicationController
   #
   # * params[:items]: a comma separated list of items to be shown, eg:
   #     /settings/index?items=id,key,value
-  #   if params[:items] not given (nil), by default, 'key' and 'value' are given
+  #   if params[:items] not given (nil), by default, 'key', 'value' and 'for_worker' are given
+  #
+  # for the valid 'items', check the definition for Setting in 'db/migrate' folder
   #
   # Since::   0.3
   def index
@@ -29,6 +31,10 @@ class SettingsController < ApplicationController
 
   # Change system setting.
   # If the setting is also for worker machines, they will be updated, too.
+  #
+  # params:
+  #   key: the key of a Setting
+  #   value: the value of a Setting
   #
   # Since::   0.3
   def edit

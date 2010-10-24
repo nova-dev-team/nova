@@ -33,6 +33,8 @@ class VclustersController < ApplicationController
   # Create a new virtual cluster with given cluster size.
   # Will reply failure if cannot create such a big cluster.
   #
+  # TODO provide more detailed error info
+  #
   # Since::     0.3
   def create
     unless valid_param? params[:name] and valid_param? params[:size] and params[:size].to_i.to_s == params[:size] and params[:size].to_i > 0 and valid_param? params[:machines]

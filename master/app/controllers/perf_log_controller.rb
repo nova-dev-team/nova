@@ -8,7 +8,8 @@ class PerfLogController < ApplicationController
   before_filter :root_or_admin_required
 
   # List all the pmachines.
-  # We provide this api for admin access. The Pmachine.list function is only available for root.
+  # We provide this api for admin access.
+  # This api is not like the Pmachine.list function (in pmachines_controller.rb), which is only available for root.
   #
   # Since::   0.3
   def list_pm

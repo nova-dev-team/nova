@@ -54,6 +54,8 @@ class SoftwaresController < ApplicationController
   end
 
   # Remove a registered vdisk.
+  # param:
+  #   file_name: the file name of the vdisk
   #
   # Since::     0.3
   def remove

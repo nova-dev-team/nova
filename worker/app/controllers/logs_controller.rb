@@ -2,6 +2,7 @@ class LogsController < ApplicationController
 
   LogFilePath = "#{RAILS_ROOT}/log/pm_top.log"
 
+  # TODO by frankvictor: add comments
   def show
     if File.exists?(LogFilePath)
       logs = []

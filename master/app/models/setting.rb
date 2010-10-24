@@ -101,7 +101,9 @@ LFTP_SCRIPT
     (Setting.find_by_key "vm_subnet_mask").value
   end
 
-
+  # Get the DNS server for the VMs.
+  #
+  # Since::   0.3
   def Setting.vm_dns_server
     (Setting.find_by_key "vm_dns_server").value
   end
