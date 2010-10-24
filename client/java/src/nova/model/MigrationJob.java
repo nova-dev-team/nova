@@ -1,4 +1,4 @@
-package nova.client.java.model;
+package nova.model;
 
 public class MigrationJob {
 

@@ -1,4 +1,4 @@
-package nova.client.java.model;
+package nova.model;
 
 public enum VmachineStatus {
 	NOT_RUNNING,
@@ -7,6 +7,7 @@ public enum VmachineStatus {
 	SUSPENDED,
 	RUNNING,
 	SHUTDOWN_PENDING,
+	SHUT_OFF,
 	
 	BOOT_FAILURE,
 	CONNECT_FAILURE
