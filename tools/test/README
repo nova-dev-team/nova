@@ -1,5 +1,0 @@
-This folder contains scripts for testing.
-
-torture_worker.rb
-  This script tests if the worker module is stable. It will create and destroy VM for many times.
-
