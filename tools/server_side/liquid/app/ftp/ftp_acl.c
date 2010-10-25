@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "3rdparty/sqlite3.h"
+#include "3rdparty/sqlite3/sqlite3.h"
 
 #include "xmemory.h"
 #include "xlog.h"
