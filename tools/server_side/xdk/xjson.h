@@ -139,7 +139,7 @@ void xjson_set_array(xjson xj);
  * @param xj_elem
  *  The new element.
  *
- * @return 
+ * @return
  *  XSUCCESS if successful. If xj_obj is not set to array, then XFAILURE will be returned.
  */
 xsuccess xjson_array_append(xjson xj_array, xjson xj_elem);
