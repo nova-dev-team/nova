@@ -1,3 +1,9 @@
+v0.3.5:
++ added Java client library
++ added advanced features for XEN: live migration, hot backup
++ user ACL is made optional
++ better VM image management for NFS mode (added "power off" option)
+
 v0.3.4:
 + added ftp client registration api in vm_pool module
 * implemented acl in liquid ftp
