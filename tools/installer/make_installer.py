@@ -131,9 +131,9 @@ def rubygems_infer_dependency(ver_info, mode = "development", visited_list = [])
         return True
     return False
 
-  print gem_name, gem_version
   visited_list += "%s %s %s" % (gem_name, dep_op, gem_version),
   info = parse_rubygems_org_page(gem_name, gem_version, mode)
+  print gem_name, gem_version, info["gem_url"]
 #  print "runtime dependency:",
 #  for dep in info["runtime_dependency"]:
 #    print dep,
@@ -151,5 +151,17 @@ def rubygems_infer_dependency(ver_info, mode = "development", visited_list = [])
         rubygems_infer_dependency(dep, mode, visited_list)
 
 if __name__ == "__main__":
-  rubygems_infer_dependency("rails >= 3.0.0")
+  mode = "runtime"
+  visited_list = []
+  rubygems_infer_dependency("rails = 3.0.1", mode, visited_list)
+  rubygems_infer_dependency("mongrel >= 0", mode, visited_list)
+  rubygems_infer_dependency("devise >= 0", mode, visited_list)
+  rubygems_infer_dependency("rack >= 0", mode, visited_list)
+  rubygems_infer_dependency("uuidtools >= 0", mode, visited_list)
+  rubygems_infer_dependency("xml-simple >= 0", mode, visited_list)
+  rubygems_infer_dependency("sqlite3-ruby >= 0", mode, visited_list)
+  rubygems_infer_dependency("rest-client >= 0", mode, visited_list)
+  rubygems_infer_dependency("daemons >= 0", mode, visited_list)
+  rubygems_infer_dependency("ruby-libvirt >= 0", mode, visited_list)
+  rubygems_infer_dependency("posixlock >= 0", mode, visited_list)
 
