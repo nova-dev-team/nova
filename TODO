@@ -8,7 +8,7 @@ those features is being developed for version 0.3.5:
 + better install script
 
 those features are proposed for version 0.4:
-+ re-implemented master in C, better concurrency
-+ lightweight and faster worker, asset node
++ update master to use Rails 3
++ lightweight and faster worker, asset node (probably using sinatra)
 + client libraries (Java, Python, Ruby) and command line tools (Python)
 
