@@ -565,6 +565,7 @@ BUILD_MODES.collect do |build_mode, settings|
     "#{build_mode}: #{my_join '-', ['bin', build_mode]} #{my_join '-', ['obj', build_mode]} #{DEFAULT_BUILD_MODULES.collect {|mod| (my_join '-', [mod, build_mode]) + ' '}}\n\n"
   else
     mf_targets << "all"
+    "" # don't write any thing to Makefile
   end
 end
 }
