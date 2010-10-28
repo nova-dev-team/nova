@@ -300,15 +300,17 @@ function load_overview_info() {
     success: function(result) {
       if (result.success) {
         var html = "";
-        html += "The following overview info is generated for '<font color='blue'>" + result.data.privilege + "</font>' user";
+        html += "The following overview info is generated for users with '<font color='blue'>" + result.data.privilege + "</font>' privilege.";
 
-        // users info
-        html += "<h3>Users:</h3>";
-        html += "<font color='blue'>" + result.data.users_total + "</font> in total, ";
-        html += "<font color='blue'>" + result.data.users_root + "</font> root user, ";
-        html += "<font color='" + (result.data.users_admin == 0 ? "red" : "blue") + "'>" + result.data.users_admin + "</font> admin user, ";
-        html += "<font color='" + (result.data.users_normal == 0 ? "red" : "blue") + "'>" + result.data.users_normal + "</font> normal user, ";
-        html += "<font color='" + (result.data.users_not_activated != 0 ? "red" : "blue") + "'>" + result.data.users_not_activated + "</font> not activated.<p/><p/>";
+        if (result.data.enable_user_acl) {
+          // users info
+          html += "<h3>Users:</h3>";
+          html += "<font color='blue'>" + result.data.users_total + "</font> in total, ";
+          html += "<font color='blue'>" + result.data.users_root + "</font> root user, ";
+          html += "<font color='" + (result.data.users_admin == 0 ? "red" : "blue") + "'>" + result.data.users_admin + "</font> admin user, ";
+          html += "<font color='" + (result.data.users_normal == 0 ? "red" : "blue") + "'>" + result.data.users_normal + "</font> normal user, ";
+          html += "<font color='" + (result.data.users_not_activated != 0 ? "red" : "blue") + "'>" + result.data.users_not_activated + "</font> not activated.<p/><p/>";
+        }
 
         if (result.data.privilege == "root") {
           // pmachine detail info, if current user is root

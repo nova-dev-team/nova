@@ -1,5 +1,7 @@
 <%
 
+require "utils"
+
 def spacing size = 8
   "&nbsp;" * size
 end
@@ -27,8 +29,12 @@ var g_current_user = "<%= @current_user.login %>";
 <body>
 <table width="100%"><tr><td>
 <h1>Nova master</h1></td><td align='right' valign="top">
+<% if common_conf["enable_user_acl"] == nil or common_conf["enable_user_acl"] == true %>
 <%= "user: <b>#{@current_user.login}</b>, privilege: <b>#{@current_user.privilege}</b>" %><br/>
 <a href="/logout">Logout</a>
+<% else %>
+<font color='gray'>User ACL disabled, working as 'root' user</font>
+<% end %>
 </td></tr></table>
 <table width="100%"><tr><td>
 <%=
@@ -43,18 +49,23 @@ var g_current_user = "<%= @current_user.login %>";
 <%=
 html = ""
 
+links_only_working_with_user_acl = ["user", "account"]
+
 [
   # privilege,      link,           title
   ["admin",         "overview",     "Overview"],
   ["admin",         "user",         "Users"],
   ["root",          "system",       "System"],
   ["admin",         "monitor",      "Monitor"],
-  ["admin",         "migrate",      "Advanced"],
+  ["admin",         "advanced",      "Advanced"],
   ["normal_user",   "workspace",    "Workspace"],
   ["normal_user",   "wizard",       "Wizard"],
   ["normal_user",   "account",      "My Account"],
 ].each do |item|
   priv, link, title = item
+  if links_only_working_with_user_acl.include? link
+    next unless common_conf["enable_user_acl"] == nil or common_conf["enable_user_acl"] == true
+  end
   if link == "migrate" and common_conf["vm_enable_migration"] == false
     next
   end

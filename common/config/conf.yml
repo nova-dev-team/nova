@@ -62,4 +62,6 @@ storage_type:                   nfs
 # enable user ACL or not
 enable_user_acl:                false
 
+# use Xen+Remus for hot backup
+enable_xen_hotbackup:           true
 

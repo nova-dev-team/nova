@@ -256,7 +256,9 @@ class MiscController < ApplicationController
   def overview
     return unless root_or_admin_required
     users_total = User.count
+    enable_user_acl = (common_conf["enable_user_acl"] != false)
     reply_data = {
+      :enable_user_acl => enable_user_acl,
       :privilege => @current_user.privilege,
       :users_total => users_total,
       :users_root => 1,

@@ -1,0 +1,31 @@
+<% content_for :page do %>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  load_migration_view();
+});
+</script>
+
+<h2>Live migration</h2>
+<div id="migration_view"></div>
+<p/>
+<a href='#' onclick="load_migration_view()">Refresh</a>
+
+
+<% if common_conf["enable_xen_hotbackup"] == true %>
+<hr/>
+<h2>Xen hot backup</h2>
+<div id="xen_hotbackup_view"></div>
+<p/>
+<a href='#' onclick="alert('TODO')">Refresh</a>
+<% end %>
+
+<hr/>
+
+<h2>Unmanaged VMs</h2>
+Virtual machines not started by Nova platform.
+<div id="unmanaged_vms_view"></div>
+<p/>
+<a href='#' onclick="alert('TODO')">Refresh</a>
+
+<% end %>
