@@ -11,4 +11,5 @@ those features are proposed for version 0.4:
 + update master to use Rails 3
 + lightweight and faster worker, asset node (probably using sinatra)
 + client libraries (Java, Python, Ruby) and command line tools (Python)
-
++ command line utility
++ merge vm_pool into master
