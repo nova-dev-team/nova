@@ -504,6 +504,7 @@ task :gen => :check do
   end
 
   mf_targets = ["clean", "targets"]
+  mf_targets += BUILD_MODULES
   mf_default_targets = []
   
   mf_header = <<MF_EOF
