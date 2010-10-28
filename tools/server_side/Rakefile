@@ -678,12 +678,12 @@ end
 MF_EOF
 
   File.open("Makefile", "w") do |mf|
-    mf.write (mf_header + mf_content_linux + mf_content + mf_tail_linux)
+    mf.write(mf_header + mf_content_linux + mf_content + mf_tail_linux)
   end
 
   if defined? GEN_MINGW32_MAKEFILE and GEN_MINGW32_MAKEFILE == true
     File.open("Makefile.mingw32", "w") do |mf|
-      mf.write (mf_header + mf_content_mingw32 + mf_content + mf_tail_mingw32)
+      mf.write(mf_header + mf_content_mingw32 + mf_content + mf_tail_mingw32)
     end
   end
 end
