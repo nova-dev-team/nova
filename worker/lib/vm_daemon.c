@@ -143,53 +143,5 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-/*
-    //old routing
-    if (mode == 0) {
-      sprintf(cmd, "./vm_daemon_helper.rb %s %s %s prepare 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
-      printf("[cmd] %s\n", cmd);
-      system(cmd);
-    // after vm booted, we don't do anything for 30 seconds
-    // this is necessary, because libvirt takes some time do boot the vm
-      sleep(30);
-    }
-
-    if (mode == 2) {
-      sprintf(cmd, "./vm_daemon_helper.rb %s %s %s receive 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
-      printf("[cmd] %s\n", cmd);
-      system(cmd);
-    }
-
-    sprintf(status_fn, "%s/status", vm_dir);
-    for (;;) {
-      FILE* status_fp = NULL;
-      sprintf(cmd, "./vm_daemon_helper.rb %s %s %s poll 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
-      printf("[cmd] %s\n", cmd);
-      system(cmd);
-
-      // check if to be destroyed (read 'status' file)
-      status_fp = fopen(status_fn, "r");
-      if (status_fp != NULL) {
-        fscanf(status_fp, "%s", status_info);
-        if (strcmp(status_info, "destroyed") == 0) {
-          printf("vm destroyed detected!\n");
-          break;
-        }
-        fclose(status_fp);
-      } else {
-        // cannot read file, print warning, remove the vm
-        printf("warning: cannot read 'status' file, consider vm as destroyed!\n");
-        break;
-      }
-      sleep(1); // sleep 1 sec between each polling round
-    }
-
-    // clean up resource
-    sprintf(cmd, "./vm_daemon_helper.rb %s %s %s cleanup 2>&1 >> %s/raw_exec_output.log", rails_root, storage_server, vm_dir, vm_dir);
-    printf("[cmd] %s\n", cmd);
-    system(cmd);
-    return 0;
-  }
-  */
 }
 
