@@ -59,3 +59,7 @@ hypervisor:                     xen
 # storage server type, could be ftp or nfs
 storage_type:                   nfs
 
+# enable user ACL or not
+enable_user_acl:                false
+
+

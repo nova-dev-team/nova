@@ -1,3 +1,5 @@
+require 'utils'
+
 module AuthenticatedSystem
   protected
     # Returns true or false if the user is logged in.
@@ -9,7 +11,13 @@ module AuthenticatedSystem
     # Accesses the current user from the session.
     # Future calls avoid the database because nil is not equal to false.
     def current_user
-      @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie) unless @current_user == false
+      # hacked by Santa Zhang:
+      # disable user ACL (treat as root)
+      if common_conf["enable_user_acl"] == nil or common_conf["enable_user_acl"] == true
+        @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie) unless @current_user == false
+      else
+        @current_user ||= User.find_by_login("root") unless @current_user == false
+      end
     end
 
     # Store the given user id in the session.
