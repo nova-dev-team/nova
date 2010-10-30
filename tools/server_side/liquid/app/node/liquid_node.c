@@ -5,8 +5,10 @@
 #include "xkeepalive.h"
 #include "xoption.h"
 #include "xlog.h"
+#include "xstr.h"
 
-#include "server.h"
+#include "lqd_server.h"
+
 #include "liquid_node.h"
 
 static void parse_peer_servers(xvec vec, const char* peer_cstr) {
@@ -85,11 +87,10 @@ static xsuccess liquid_node_real(int argc, char* argv[]) {
 
   xoption_delete(xopt);
 
-
   conf.bind_addr = bind_addr;
   conf.bind_port = port;
   conf.basefolder = basefolder;
-  conf.backlog = 10;  // TODO move these things into config file
+  conf.backlog = 10;  // TOOD move these things into config file
   return start_server(&conf);
 }
 
