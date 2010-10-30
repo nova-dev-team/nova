@@ -625,7 +625,7 @@ if defined? DEFAULT_BUILD_MODE
 end
 if defined? TEST_MODULES and default_build_mode != ""
   TEST_MODULES.collect do |mod|
-    "run-#{mod}: #{my_join "-", ["run#{mod}", default_build_mode]}\n\n"
+    "run-#{mod}: #{my_join "-", ["run-#{mod}", default_build_mode]}\n\n"
   end
 end
 }
