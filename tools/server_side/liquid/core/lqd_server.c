@@ -11,11 +11,10 @@
 #include "xsys.h"
 #include "xutils.h"
 
-#include "core_defs.h"
-#include "server.h"
-#include "token.h"
+#include "lqd_defs.h"
+#include "lqd_server.h"
 
-#include "data_archive.h"
+#include "lqd_archive.h"
 
 /**
   @brief
@@ -23,7 +22,6 @@
 */
 typedef struct {
   const server_config* conf;  ///< @brief The basic server config.
-  token_set tkn_set;  ///< @brief The set of tokens.
 } server_instance;
 
 static void server_config_peers_servers_free(void* ptr) {
@@ -127,19 +125,15 @@ xsuccess start_server(const server_config* conf) {
   int i;
 
   serv_inst.conf = conf;
-  serv_inst.tkn_set = NULL;
 
   // prepare folders
-  if (mkdir_helper(conf->basefolder, "data") != XSUCCESS) {
+  if (mkdir_helper(conf->basefolder, "small") != XSUCCESS) {
     has_error = XTRUE;
   }
-  if (mkdir_helper(conf->basefolder, "info") != XSUCCESS) {
+  if (mkdir_helper(conf->basefolder, "readonly") != XSUCCESS) {
     has_error = XTRUE;
   }
-  if (mkdir_helper(conf->basefolder, "tmp") != XSUCCESS) {
-    has_error = XTRUE;
-  }
-  if (mkdir_helper(conf->basefolder, "log") != XSUCCESS) {
+  if (mkdir_helper(conf->basefolder, "appendable") != XSUCCESS) {
     has_error = XTRUE;
   }
 
@@ -158,15 +152,7 @@ xsuccess start_server(const server_config* conf) {
           connected_to_peer = XTRUE;
 
           // exchange token info
-          serv_inst.tkn_set = create_token_set_from_peer(xsock);
           xsocket_delete(xsock);
-          if (serv_inst.tkn_set != NULL) {
-            break;
-          } else {
-            // don't use peer_host here, because it is already destroyed before
-            xlog_info("failed to get proper token set from peer server");
-            // if failed to get token set from peer, try next peer
-          }
         } else {
           // don't use peer_host here, because it is already destroyed on failure
           xlog_error("error connecting to peer server");
@@ -179,9 +165,8 @@ xsuccess start_server(const server_config* conf) {
       }
     }
 
-    if (connected_to_peer == XFALSE || serv_inst.tkn_set == NULL) {
+    if (connected_to_peer == XFALSE) {
       xlog_info("not connectted to peer servers, generating tokens myself");
-      serv_inst.tkn_set = create_token_set();
     }
 
     xserver xs = xserver_new(conf->bind_addr, conf->bind_port, conf->backlog, node_server_acceptor, XUNLIMITED, serv_mode, (void *) conf);

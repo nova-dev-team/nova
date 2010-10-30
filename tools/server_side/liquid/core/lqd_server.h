@@ -13,7 +13,7 @@
     Santa Zhang
 
   @file
-    server.h
+    lqd_server.h
 */
 
 /**
