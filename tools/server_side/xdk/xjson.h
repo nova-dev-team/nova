@@ -152,7 +152,7 @@ xsuccess xjson_array_append(xjson xj_array, xjson xj_elem);
  *  The object.
  * @param key
  *  The key of attribute. It will be copied for internal memory management.
- * @param xj_elem
+ * @param xj_attr
  *  The attribute.
  *
  * @return
