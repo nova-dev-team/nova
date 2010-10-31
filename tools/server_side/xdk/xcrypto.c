@@ -69,7 +69,7 @@ xsuccess xsha1_result(XIN xsha1 xsh, XOUT xbyte* result) {
     int i, j;
     for (i = 0; i < 5; i++) {
       for (j = 0; j < 4; j++) {
-        result[i * 4 + j] = (xsh->message_digest[i] >> (j * 8)) & 0xf;
+        result[i * 4 + j] = (xsh->message_digest[i] >> (24 - j * 8)) & 0xff;
       }
     }
     return XSUCCESS;
