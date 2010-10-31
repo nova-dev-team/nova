@@ -190,8 +190,8 @@ def all_targets_in_module mod, build_mode
   end
 
   if defined? TEST_MODULES and TEST_MODULES.include? mod
-    # add a run#{mod} target
-    run_mod = my_join "-", ["run-#{mod}", build_mode]
+    # add a run-#{mod}-verbose target
+    run_mod = my_join "-", ["run-#{mod}-verbose", build_mode]
     depend[run_mod] = [] if depend[run_mod] == nil
     depend[run_mod] << (my_join "-", [mod, build_mode])
 
@@ -213,6 +213,28 @@ def all_targets_in_module mod, build_mode
       action[run_mod] << "@echo"
       test_case_counter += 1
     end
+
+    all_xxx = my_join "_", ["all", build_mode]
+    $g_targets[all_xxx] = [] if $g_targets[all_xxx] == nil
+    $g_targets[all_xxx] += all_bin_list
+
+    # add a silent run-#{mode} target
+    run_mod = my_join "-", ["run-#{mod}", build_mode]
+    depend[run_mod] = [] if depend[run_mod] == nil
+    depend[run_mod] << (my_join "-", [mod, build_mode])
+
+    action[run_mod] = [] if action[run_mod] == nil
+
+    echo_info = "Running test module \\'#{mod}\\'"
+    action[run_mod] << "@echo #{echo_info}"
+    action[run_mod] << "@echo #{"=" * (echo_info.length - 2)}"
+
+    all_bin_list = all_bin_list.sort
+    all_bin_list.each do |e|
+      e_main_fn = File.basename e
+      action[run_mod] << "@((#{e} > /dev/null 2>&1) && echo [pass] #{e_main_fn}) || echo [fail] #{e_main_fn}"
+    end
+    action[run_mod] << "@echo"
 
     all_xxx = my_join "_", ["all", build_mode]
     $g_targets[all_xxx] = [] if $g_targets[all_xxx] == nil
@@ -505,6 +527,7 @@ task :gen => :check do
 
   mf_targets = ["clean", "targets"]
   mf_targets += BUILD_MODULES
+  mf_targets += TEST_MODULES.collect {|mod| "run-#{mod}-verbose"}
   mf_targets += TEST_MODULES.collect {|mod| "run-#{mod}"}
   mf_default_targets = []
 
@@ -625,7 +648,10 @@ if defined? DEFAULT_BUILD_MODE
 end
 if defined? TEST_MODULES and default_build_mode != ""
   TEST_MODULES.collect do |mod|
-    "run-#{mod}: #{my_join "-", ["run-#{mod}", default_build_mode]}\n\n"
+    <<RUN_MODULE_CMD
+run-#{mod}-verbose: #{my_join "-", ["run-#{mod}-verbose", default_build_mode]}
+run-#{mod}: #{my_join "-", ["run-#{mod}", default_build_mode]}
+RUN_MODULE_CMD
   end
 end
 }
