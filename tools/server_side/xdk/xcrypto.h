@@ -62,7 +62,7 @@ void xmd5_feed(xmd5 xm, const void* data, int size);
   @warning
     Make sure result has got enough memory size!
 */
-void xmd5_result(xmd5 xm, unsigned char* result);
+void xmd5_result(XIN xmd5 xm, XOUT xbyte* result);
 
 /**
   @brief
@@ -85,7 +85,7 @@ void xmd5_delete(xmd5 xm);
   @warning
     Make sure md5_cstr has got enough size (at least 33 bytes)!
 */
-void xcrypto_md5_cstr(const unsigned char* md5, char* md5_cstr);
+void xcrypto_md5_cstr(XIN const xbyte* md5, XOUT char* md5_cstr);
 
 
 /**
@@ -129,7 +129,7 @@ void xsha1_feed(xsha1 xsh, void* data, int size);
   @param xsh
     The SHA1 calculator.
   @param result
-    Pointer to output array. It is an unsigned int array with 5 elements.
+    Pointer to output array. It is an xbyte array with length of 20.
 
   @return
     XSUCCESS if calculation was succesfull. XFAILURE if failed to calculate SHA1 value (possible data corruption).
@@ -137,7 +137,7 @@ void xsha1_feed(xsha1 xsh, void* data, int size);
   @warning
     Make sure result has got enough memory size!
 */
-xsuccess xsha1_result(xsha1 xsh, unsigned int* result);
+xsuccess xsha1_result(XIN xsha1 xsh, XOUT xbyte* result);
 
 /**
   @brief
