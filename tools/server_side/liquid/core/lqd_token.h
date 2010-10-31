@@ -14,29 +14,41 @@
 
 #include "xdef.h"
 
- /**
-  * @brief
-  *  Check if a char is lowercase hex.
-  *
-  * @param ch
-  *  The char to be checked.
-  *
-  * @return
-  *  If the char is lowercase hex.
-  */
- #define IS_LOWERCASE_HEX_CHAR(ch) (('0' <= (ch) && (ch) <= '9') || ('a' <= (ch) && (ch) <= 'f'))
+/**
+* @brief
+*  Check if a char is lowercase hex.
+*
+* @param ch
+*  The char to be checked.
+*
+* @return
+*  If the char is lowercase hex.
+*/
+#define IS_LOWERCASE_HEX_CHAR(ch) (('0' <= (ch) && (ch) <= '9') || ('a' <= (ch) && (ch) <= 'f'))
 
- /**
-  * @brief
-  *  Convert a hex char to an dec value. The hex char should be in '0' ~ '9' or 'a' ~ 'f'.
-  *
-  * @param ch
-  *  The hex char to be checked.
-  *
-  * @return
-  *  The dec value.
-  */
- #define HEX_CHAR_TO_DEC(ch)  ((ch) >= 'a' ? (((ch) - 'a') + 10) : ((ch) - '0'))
+/**
+* @brief
+*  Convert a hex char to an dec value. The hex char should be in '0' ~ '9' or 'a' ~ 'f'.
+*
+* @param ch
+*  The hex char to be checked.
+*
+* @return
+*  The dec value.
+*/
+#define HEX_CHAR_TO_DEC(ch)  ((ch) >= 'a' ? (((ch) - 'a') + 10) : ((ch) - '0'))
+
+/**
+ * @brief
+ *  Convert a decimal value (0~15) to corresponding hex char.
+ *
+ * @param val
+ *  The decimal value to be checked.
+ *
+ * @return
+ *  The hex char.
+ */
+#define DEC_TO_HEX_CHAR(val) ((char)((val) >= 10 ? (((val) - 10) + 'a') : ((val) + '0')))
 
 
 // hidden implementation
@@ -81,7 +93,7 @@ token token_new(XIN const char* start, XIN const char* stop);
  * @warning
  *  Note that the splitted tokens should not be initialized!
  */
-xsuccess token_new_by_split(XIN token tkn, XOUT token splt1, XOUT token splt2);
+xsuccess token_new_by_split(XIN token tkn, XOUT token* splt1, XOUT token* splt2);
 
 /**
  * @brief
