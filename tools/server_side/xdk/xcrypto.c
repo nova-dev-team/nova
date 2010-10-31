@@ -64,11 +64,13 @@ void xsha1_feed(xsha1 xsh, void* data, int size) {
   SHA1Input((SHA1Context *) xsh, data, size);
 }
 
-xsuccess xsha1_result(xsha1 xsh, unsigned int* result) {
+xsuccess xsha1_result(XIN xsha1 xsh, XOUT xbyte* result) {
   if (SHA1Result((SHA1Context *) xsh)) {
-    int i;
+    int i, j;
     for (i = 0; i < 5; i++) {
-      result[i] = xsh->message_digest[i];
+      for (j = 0; j < 4; j++) {
+        result[i * 4 + j] = (xsh->message_digest[i] >> (j * 8)) & 0xf;
+      }
     }
     return XSUCCESS;
   } else {
