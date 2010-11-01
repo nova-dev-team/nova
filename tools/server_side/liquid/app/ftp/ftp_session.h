@@ -92,7 +92,7 @@ int ftp_session_cmd_read(ftp_session session, void* buf, int max_len);
   @return
     The root jail of the given ftp session.
 */
-const xstr ftp_session_get_root_jail(ftp_session session);
+xstr ftp_session_get_root_jail(ftp_session session);
 
 /**
  * @brief
