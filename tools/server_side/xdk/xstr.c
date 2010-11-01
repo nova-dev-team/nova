@@ -33,6 +33,14 @@ xstr xstr_new_from_cstr(const char* cs) {
   return xs;
 }
 
+xstr xstr_substr(xstr xs, int start) {
+  if (start >= xstr_len(xs)) {
+    return xstr_new();
+  } else {
+    return xstr_new_from_cstr(xs->str + start);
+  }
+}
+
 void xstr_delete(xstr xs) {
   xfree(xs->str);
   xfree(xs);
