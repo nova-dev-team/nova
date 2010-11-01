@@ -46,6 +46,20 @@ xstr xstr_new_from_cstr(const char* cs);
 
 /**
   @brief
+    Get a substring in an xstr.
+  
+  @param xs
+    The xstr including the substring.
+  @param start
+    The start index of the substring. If it is larger than the xstr length, an empty xstr will be returned.
+  
+  @return
+    A new xstr object, as a substring.
+*/
+xstr xstr_substr(xstr xs, int start);
+
+/**
+  @brief
     Destroy an xstr object.
 
   @param xs
