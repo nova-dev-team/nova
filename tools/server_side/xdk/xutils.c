@@ -154,15 +154,52 @@ xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr
   return XSUCCESS;
 }
 
-xsuccess xinet_split_host_port(const char* host_port, xstr host, int* port) {
+static xsuccess xinet_split_host_port_ipv4(XIN const char* host_port, XOUT xstr host, XOUT int* port) {
   xsuccess ret = XSUCCESS;
-  int i;
+  int i, j, seg_count = 0;
+  char seg_text[4];
   xstr_set_cstr(host, "");
+  j = 0;
   for (i = 0; host_port[i] != '\0' && host_port[i] != ':'; i++) {
-    xstr_append_char(host, host_port[i]);
+    if (host_port[i] == '.') {
+      if (i >= 1 && host_port[i - 1] == '.') {
+        // should not have 2 '.' consecutively
+        ret = XFAILURE;
+        break;
+      }
+      seg_count++;
+      if (atoi(seg_text) > 255) {
+        // for ipv4, no seg could be > 255
+        ret = XFAILURE;
+        break;
+      }
+      j = 0;  // start a new seg
+      xstr_append_char(host, host_port[i]);
+    } else if (host_port[i] == ':') {
+      seg_count++;
+      break;
+    } else if ('0' <= host_port[i] && host_port[i] <= '9') {
+      seg_text[j] = host_port[i];
+      j++;
+      seg_text[j] = '\0';
+      if (j > 3) {
+        // for ipv4, no seg could have length > 3
+        ret = XFAILURE;
+        break;
+      }
+      xstr_append_char(host, host_port[i]);
+    } else {
+      ret = XFAILURE;
+      break;
+    }
   }
-  if (host_port[i] == ':') {
-    int j;
+  seg_count++;
+  if (atoi(seg_text) > 255 || seg_count != 4) {
+    // check last segmnt, for ipv4, no seg could be > 255
+    // check if host ip has 4 parts
+    ret = XFAILURE;
+  }
+  if (ret == XSUCCESS && host_port[i] == ':') {
     // check if there is only '0-9' after the ':'
     for (j = i + 1; '0' <= host_port[j] && host_port[j] <= '9'; j++) {
     }
@@ -172,10 +209,19 @@ xsuccess xinet_split_host_port(const char* host_port, xstr host, int* port) {
       *port = atoi(host_port + i + 1);
     }
   }
+  if (ret == XFAILURE) {
+    // revert changes to 'host' variable
+    xstr_set_cstr(host, "");
+  }
   return ret;
 }
 
-void xjoin_path_cstr(xstr fullpath, const char* current_dir, const char* append_dir) {
+xsuccess xinet_split_host_port(const char* host_port, xstr host, int* port) {
+  // currently only check for ipv4
+  return xinet_split_host_port_ipv4(host_port, host, port);
+}
+
+void xjoin_path_cstr(XOUT xstr fullpath, XIN const char* current_dir, XIN const char* append_dir) {
   const char sep = xsys_fs_sep_char; // filesystem path seperator
   const char* sep_str = xsys_fs_sep_cstr;
   if (append_dir[0] == sep) {
@@ -424,6 +470,52 @@ long xfilesystem_parse_filesize(const char* size_cstr) {
   return size;
 }
 
+// helper function to do real work for mkdir_p operation
+static xsuccess xfilesystem_mkdir_p_helper(xstr path, int mode) {
+  xsuccess ret = XFAILURE;
+  struct stat st;
+  if (lstat(xstr_get_cstr(path), &st) == 0) {
+    // file exists, only need to check if it is a folder
+    if (S_ISDIR(st.st_mode)) {
+      ret = XSUCCESS;
+    } else {
+      ret = XFAILURE;
+    }
+  } else {
+    // file does not exist, need to mkdir on parent
+    xstr parent_path = xstr_copy(path);
+    xfilesystem_path_cdup(parent_path);
+    if (xstr_eql(parent_path, path)) {
+      // cannot cdup!
+      ret = XFAILURE;
+    } else {
+      // recursive call, make parent folders
+      ret = xfilesystem_mkdir_p_helper(parent_path, mode);
+      if (ret == XSUCCESS) {
+        if (mkdir(xstr_get_cstr(path), mode) == 0) {
+          ret = XSUCCESS;
+        } else {
+          ret = XFAILURE;
+        }
+      }
+    }
+    xstr_delete(parent_path);
+  }
+  return ret;
+}
+
+xsuccess xfilesystem_mkdir_p(const char* path, int mode) {
+  xsuccess ret = XFAILURE;
+  xstr path_xstr = xstr_new_from_cstr(path);
+  const int cwd_buf_len = 256;
+  char* cwd_cstr = xmalloc_ty(cwd_buf_len, char);
+  getcwd(cwd_cstr, cwd_buf_len);
+  xjoin_path_cstr(path_xstr, cwd_cstr, path);
+  ret = xfilesystem_mkdir_p_helper(path_xstr, mode);
+  xfree(cwd_cstr);
+  xstr_delete(path_xstr);
+  return ret;
+}
 
 int xhash_hash_cstr(void* key) {
   int hv = 0;
