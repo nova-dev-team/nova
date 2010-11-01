@@ -651,6 +651,7 @@ int liquid_ftp_real(int argc, char* argv[]) {
   xoption xopt = xoption_new();
   xoption_parse_with_xconf(xopt, argc, argv);
 
+  xlog_init(argc, argv);
   xstr_set_cstr(bind_addr, "0.0.0.0");
 
   // set the root jail, where action will be locked inside
