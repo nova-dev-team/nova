@@ -3,6 +3,7 @@
 #include <fcntl.h>
 
 #include "xsys.h"
+#include "xutils.h"
 #include "lqd_defs.h"
 #include "lqd_archive.h"
 
@@ -47,12 +48,12 @@ FILE* archive_open_fp(const char* basefolder, xbyte* key, const char* modes) {
 
   // make folders
   xstr_set_cstr(folder_path, basefolder);
-  mkdir(xstr_get_cstr(folder_path), 0755);
   for (i = 0; i < FOLDER_LEVELS; i++) {
     sprintf(buf, "%02x", key[i]);
     xstr_printf(folder_path, "%c%s", xsys_fs_sep_char, buf);
-    mkdir(xstr_get_cstr(folder_path), 0755);
   }
+  xfilesystem_mkdir_p(xstr_get_cstr(folder_path), 0755);
+  
   archive_path(basefolder, key, path);
   fp = fopen(xstr_get_cstr(path), modes);
   xstr_delete(folder_path);
