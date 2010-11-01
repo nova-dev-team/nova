@@ -1450,7 +1450,7 @@ bigint_errno bigint_square_root_floor(bigint* p_bigint) {
 // b should be positive
 static void bigint_approx_root_n(bigint* b, bigint* root, int n) {
   double base, base_r;
-  int expo, expo_r, i;
+  int expo, expo_r;
   bigint_to_scientific(b, &base, &expo);
   expo_r = expo / n;
   base_r = pow(10, log10(base) / n + (expo % n) / ((double) n));
