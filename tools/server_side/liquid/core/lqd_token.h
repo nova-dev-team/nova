@@ -31,7 +31,7 @@
 *  Convert a hex char to an dec value. The hex char should be in '0' ~ '9' or 'a' ~ 'f'.
 *
 * @param ch
-*  The hex char to be checked.
+*  The hex char to be converted.
 *
 * @return
 *  The dec value.
@@ -43,7 +43,7 @@
  *  Convert a decimal value (0~15) to corresponding hex char.
  *
  * @param val
- *  The decimal value to be checked.
+ *  The decimal value to be converted.
  *
  * @return
  *  The hex char.
