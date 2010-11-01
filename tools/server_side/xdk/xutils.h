@@ -133,7 +133,7 @@ xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr
   @return
     Whether the host_port is successfully splitted, i.e, if the host_port has correct grammar.
 */
-xsuccess xinet_split_host_port(const char* host_port, xstr host, int* port);
+xsuccess xinet_split_host_port(XIN const char* host_port, XOUT xstr host, XOUT int* port);
 
 /**
   @brief
@@ -147,7 +147,7 @@ xsuccess xinet_split_host_port(const char* host_port, xstr host, int* port);
     The path that will be appended to current_dir. If it starts with '/',
     things gets a little different: the append_dir will be considered as new fullpath.
 */
-void xjoin_path_cstr(xstr fullpath, const char* current_dir, const char* append_dir);
+void xjoin_path_cstr(XOUT xstr fullpath, XIN const char* current_dir, XIN const char* append_dir);
 
 /**
   @brief
@@ -268,6 +268,21 @@ xsuccess xfilesystem_normalize_abs_path(const char* abs_path, xstr norm_path);
     File size on succcess, or -1 will be returned if failed.
 */
 long xfilesystem_parse_filesize(const char* size_cstr);
+
+/**
+  @brief
+    Create folders recursively, with the given mode.
+  
+  @param path
+    The full folder path, could be relative path.
+  @param mode
+    The permission mode for all new folders.
+  
+  @return
+    XSUCCESS if all folders are created.
+    XFAILURE if failed to create the folders.
+*/
+xsuccess xfilesystem_mkdir_p(const char* path, int mode);
 
 /**
   @brief
