@@ -74,7 +74,7 @@ int ftp_session_cmd_read(ftp_session session, void* buf,  int max_len) {
   return xsocket_read(session->cmd_sock, buf, max_len - 1);
 }
 
-const xstr ftp_session_get_root_jail(ftp_session session) {
+xstr ftp_session_get_root_jail(ftp_session session) {
   return session->root_jail;
 }
 
