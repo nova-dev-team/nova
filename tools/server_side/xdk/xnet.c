@@ -34,6 +34,8 @@ struct xsocket_impl {
   int readline_buf_end; ///< @brief Fetch end position (exclusive) in the readline buffer.
   int readline_buf_size;  ///< @brief Size of the readline buffer.
   char* readline_buf; ///< @brief The readline buffer.
+  pthread_mutex_t sock_write_mutex; ///< @brief Protect the xsock write operations.
+  pthread_mutex_t sock_read_mutex;  ///< @brief Protect the xsock read operations.
 };
 
 /**
@@ -68,6 +70,9 @@ xsocket xsocket_new(xstr host, int port) {
   xsock->readline_buf_start = 0;
   xsock->readline_buf_end = 0;
 
+  pthread_mutex_init(&(xsock->sock_write_mutex), NULL);
+  pthread_mutex_init(&(xsock->sock_read_mutex), NULL);
+
   if (xinet_get_sockaddr(xstr_get_cstr(host), port, &(xsock->addr)) != XSUCCESS) {
     xsocket_delete(xsock);
     xsock = NULL;
@@ -91,7 +96,11 @@ int xsocket_get_port(xsocket xs) {
 
 int xsocket_write(xsocket xs, const void* data, int len) {
   if (len != 0) {
-    return write(xs->sockfd, data, len);
+    int ret;
+    pthread_mutex_lock(&(xs->sock_write_mutex));
+    ret = write(xs->sockfd, data, len);
+    pthread_mutex_unlock(&(xs->sock_write_mutex));
+    return ret;
   } else {
     return 0;
   }
@@ -116,7 +125,9 @@ int xsocket_read(xsocket xs, void* buf, int max_len) {
         real_cnt += bytes_in_readline_buf;
 
         // read from net
+        pthread_mutex_lock(&(xs->sock_read_mutex));
         cnt = read(xs->sockfd, buf + bytes_in_readline_buf, max_len - bytes_in_readline_buf);
+        pthread_mutex_unlock(&(xs->sock_read_mutex));
         if (cnt < 0) {
           return cnt;
         } else {
@@ -125,7 +136,11 @@ int xsocket_read(xsocket xs, void* buf, int max_len) {
         }
       }
     } else {
-      return read(xs->sockfd, buf, max_len);
+      int ret;
+      pthread_mutex_lock(&(xs->sock_read_mutex));
+      ret = read(xs->sockfd, buf, max_len);
+      pthread_mutex_unlock(&(xs->sock_read_mutex));
+      return ret;
     }
   } else {
     return 0;
@@ -153,7 +168,7 @@ xsuccess xsocket_write_line(xsocket xs, const char* line) {
 }
 
 xsuccess xsocket_read_line(xsocket xs, xstr line) {
-  static const int readline_buf_default_size = 8192;
+  const int readline_buf_default_size = 8192;
   xsuccess ret = XSUCCESS;
   if (xs->readline_buf == NULL) {
     // first time calling this function, prepare buffers
@@ -181,7 +196,10 @@ xsuccess xsocket_read_line(xsocket xs, xstr line) {
       } else {
         // could read data into the buffer
         // TODO use select(), add time out
-        int cnt = read(xs->sockfd, xs->readline_buf + xs->readline_buf_start, xs->readline_buf_size - xs->readline_buf_start);
+        int cnt;
+        pthread_mutex_lock(&(xs->sock_read_mutex));
+        cnt = read(xs->sockfd, xs->readline_buf + xs->readline_buf_start, xs->readline_buf_size - xs->readline_buf_start);
+        pthread_mutex_unlock(&(xs->sock_read_mutex));
         //printf("cnt = %d\n", cnt);
         if (cnt <= 0) {
           // XXX the case cnt == 0 is also considered "failure", I'm not sure if this is good
@@ -240,6 +258,8 @@ void xsocket_delete(xsocket xs) {
   // close it in child process (when serving in multi-process)
   close(xs->sockfd);
   xstr_delete(xs->host);
+  pthread_mutex_destroy(&(xs->sock_write_mutex));
+  pthread_mutex_destroy(&(xs->sock_read_mutex));
   if (xs->readline_buf != NULL) {
     // NOTE use free instead of xfree here, because it is not allocated with xmalloc
     free(xs->readline_buf);
