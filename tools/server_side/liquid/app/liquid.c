@@ -25,6 +25,9 @@
 #include "dfs/liquid_dfs.h"
 #include "dftp/liquid_dftp.h"
 #include "node/liquid_node.h"
+#include "imgstore/imgstore.h"
+#include "imgdir/imgdir_server.h"
+#include "imgmount/imgmount.h"
 
 typedef xsuccess (*liquid_action)(int argc, char* argv[]);
 typedef void (*liquid_action_help)();
@@ -47,6 +50,12 @@ void* g_actions[] = {
   "help", "Display help message", print_help, help_on_help,
 
   "node", "Serve as a storage node", liquid_node, liquid_node_help,
+
+  "imgstore", "Serve as a virtual machine disk image storage node", liquid_imgstore, liquid_imgstore_help,
+
+  "imgmount", "Mount a VM disk filesystem", imgmount_main, imgmount_print_help,
+
+  "imgdir", "Serve as a VM disk info directroy", imgdir_server_main, imgdir_print_help,
 
   // terminated by NULL
   NULL
