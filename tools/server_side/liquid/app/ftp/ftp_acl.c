@@ -453,38 +453,38 @@ xsuccess ftp_acl_multi_user_mode(const char* db_fname) {
   multi_user_mode = 1;
   if (sqlite3_open(db_fname, &conn) == SQLITE_OK) {
     ret = XSUCCESS;
+    exec_sql_or_die(
+    "create table if not exists users("
+      "id integer primary key autoincrement not null,"
+      "name varchar(255) not null,"
+      "passwd varchar(255) not null,"
+      "root_jail varchar(255) not null,"
+      "group_id integer default -1"
+    ")");
+    exec_sql_or_die(
+    "create table if not exists user_rules("
+      "user_id integer not null,"
+      "path varchar(255) not null,"
+      "readable boolean,"
+      "writable boolean not null,"
+      "deletable boolean not null"
+    ")");
+    exec_sql_or_die(
+    "create table if not exists groups("
+      "id integer primary key autoincrement not null,"
+      "name varchar(255) not null"
+    ")");
+    exec_sql_or_die(
+    "create table if not exists group_rules("
+      "group_id integer not null,"
+      "path varchar(255) not null,"
+      "readable boolean,"
+      "writable boolean not null,"
+      "deletable boolean not null"
+    ")");
+    // load data for the first time
+    try_update_data();
   }
-  exec_sql_or_die(
-  "create table if not exists users("
-    "id integer primary key autoincrement not null,"
-    "name varchar(255) not null,"
-    "passwd varchar(255) not null,"
-    "root_jail varchar(255) not null,"
-    "group_id integer default -1"
-  ")");
-  exec_sql_or_die(
-  "create table if not exists user_rules("
-    "user_id integer not null,"
-    "path varchar(255) not null,"
-    "readable boolean,"
-    "writable boolean not null,"
-    "deletable boolean not null"
-  ")");
-  exec_sql_or_die(
-  "create table if not exists groups("
-    "id integer primary key autoincrement not null,"
-    "name varchar(255) not null"
-  ")");
-  exec_sql_or_die(
-  "create table if not exists group_rules("
-    "group_id integer not null,"
-    "path varchar(255) not null,"
-    "readable boolean,"
-    "writable boolean not null,"
-    "deletable boolean not null"
-  ")");
-  // load data for the first time
-  try_update_data();
   return ret;
 }
 
