@@ -14,6 +14,24 @@
 
 #include "xdef.h"
 
+#include "imgsvr/imgdir_fsdb.h"
+
+/**
+  @brief
+    Implementation of imgdir_server model.
+*/
+struct imgdir_server_impl {
+  fsdb fs;  ///< @brief Filesystem database handle.
+  fs_cache root;  ///< @brief Root of the filesystem.
+};
+
+
+/**
+  @brief
+    Defines handler of imgdir_server model.
+*/
+typedef struct imgdir_server_impl* imgdir_server;
+
 /**
  * @brief
  *  Entry of the imgdir utility.
