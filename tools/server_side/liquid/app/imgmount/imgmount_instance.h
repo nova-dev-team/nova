@@ -13,7 +13,10 @@
 */
 
 #include "xdef.h"
+#include "xnet.h"
 #include "xstr.h"
+
+#include "imgmount_fs_cache.h"
 
 // hidden implementation
 struct imgmount_instance_impl;
@@ -26,43 +29,54 @@ typedef struct imgmount_instance_impl* imgmount_instance;
 
 /**
   @brief
-    Create a new 'imgmount' instance.
-
-  @param server_ip
-    The ip address of 'imgdir' server.
-    This variable is managed by imgmount_instance, and will be deleted when imgmount_instance is deleted.
-  @param server_port
-    The service port of 'imgdir' server.
-  @param mount_home
-    The mount home directory of 'imgdir' server.
-    This variable is managed by imgmount_instance, and will be deleted when imgmount_instance is deleted.
-
-  @return
-    Will return NULL on failure (eg. mount_home not found, sub-folder cannot be created, etc).
-    'mount_home' and 'server_ip' will be deleted on failure, so don't worry about memory leak.
-*/
-imgmount_instance imgmount_instance_new(xstr server_ip, int server_port, xstr mount_home);
-
-/**
-  @brief
     Start a imgmount instance's work.
 
-  @param inst
-    The imgmount_instance to serve.
+  @param argc
+    The number of args passed to imgmount.
+  @param argv
+    The array of args passed to imgmount.
 
   @return
     XSUCCESS if every thing runs ok.
-    XFAILURE if failed to start.
+    XFAILURE if failed to run the imgmount instance.
 */
-xsuccess imgmount_instance_run(imgmount_instance inst);
+xsuccess imgmount_instance_run(int argc, char* argv[]);
 
 /**
   @brief
-    Destroy a 'imgmount_instance'. All connections will be closed, and mount_home will be unmounted.
+    Get the mount home of a imgmount instance.
 
   @param inst
-    The imgmount_instance to be destroyed.
+    The imgmount instance.
+
+  @return
+    The mount home as an x-string.
 */
-void imgmount_instance_delete(imgmount_instance inst);
+xstr get_mount_home(imgmount_instance inst);
+
+/**
+  @brief
+    Get the x-socket connecting to imgdir server.
+
+  @param inst
+    The imgmount instance.
+
+  @return
+    The x-socket to imgdir server.
+*/
+xsocket get_imgdir_sock(imgmount_instance inst);
+
+/**
+  @brief
+    Get the cached root.
+
+  @param inst
+    The imgmount instance.
+
+  @return
+    The cached root.
+*/
+fs_cache get_root(imgmount_instance inst);
 
 #endif  // IMGMOUNT_INSTANCE_H_
+
