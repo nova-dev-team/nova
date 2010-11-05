@@ -35,14 +35,15 @@ static xbool hash_str_eql(void* key1, void* key2) {
 static void opt_free(void* key, void* value) {
   // key is copy of char* need to be free'd, but they are left to be free'd in opt_free (same copy of pointer)
 
-  // NOTE The xfree job is left to optlen_free, instead of this function.
+  // NOTE The xfree job of key is left to optlen_free, instead of this function.
   // This is caused by short options like "-h", which have key 'h', but don't have value.
   // In this case, xopt->opt hash table does not have an entry for 'h',
   // but xopt->optlen hash table entry ("h", 0). This means we can always xfree
   // the pointer to "h", from xopt->optlen hash table. So the key is left to be xfree'd in xoptlen_free.
   // See add_short_option for details.
 
-  // value is pointer to const c-string, so they don't need to be free'd
+  // value is copied from c-string, so we need to free them
+  xfree(value);
 }
 
 static void optlen_free(void* key, void* value) {
@@ -92,8 +93,10 @@ static void add_short_option(xoption xopt, char key_ch, char* value) {
   key[0] = key_ch;
   key[1] = '\0';
   if (value != NULL) {
+    char* cvalue = xmalloc_ty(strlen(value) + 1, char);
+    strcpy(cvalue, value);
     *len = 1;
-    xhash_put(xopt->opt, key, value);
+    xhash_put(xopt->opt, key, cvalue);
   } else {
     *len = 0;
     // NOTE (key,value) pair is not put in xopt->opt in this case,
@@ -182,13 +185,6 @@ xsuccess xoption_parse_with_xconf(xoption xopt, int argc, char* argv[]) {
         ret = load_xconf_into_xoption(xopt, opt_name + 1);
       }
     }
-    /*
-    // show debug info
-    for (i = 0; i < xvec_size(xopt->leftover); i++) {
-      const char* opt_name = (const char *) xvec_get(xopt->leftover, i);
-      printf("%s\n", opt_name);
-    }
-    */
   }
   return ret;
 }
