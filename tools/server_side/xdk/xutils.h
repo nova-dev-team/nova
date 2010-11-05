@@ -87,6 +87,18 @@ char* xcstr_strip(char* str);
 
 /**
   @brief
+    Strips trailing crlf chars from a c-string.
+
+  @param cstr
+    The c-string to be stripped.
+
+  @return
+    The original c-string, stripped.
+*/
+char* xcstr_strip_trailing_crlf(char* cstr);
+
+/**
+  @brief
     Convert an IP value into string.
 
   @param ip
@@ -272,12 +284,12 @@ long xfilesystem_parse_filesize(const char* size_cstr);
 /**
   @brief
     Create folders recursively, with the given mode.
-  
+
   @param path
     The full folder path, could be relative path.
   @param mode
     The permission mode for all new folders.
-  
+
   @return
     XSUCCESS if all folders are created.
     XFAILURE if failed to create the folders.
