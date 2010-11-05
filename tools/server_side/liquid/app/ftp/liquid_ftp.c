@@ -36,15 +36,6 @@ void liquid_ftp_help() {
   printf("If root jail is not provided, $HOME will be used.\n");
 }
 
-static void strip_trailing_crlf(char* str) {
-  // abc\r\n -> abc
-  int pos = strlen(str) - 1;
-  while (pos >= 0 && (str[pos] == '\r' || str[pos] == '\n')) {
-    str[pos] = '\0';
-    pos--;
-  }
-}
-
 static void add_comma_separated_data_server_addr(xstr rep, ftp_session session) {
   int data_server_port = ftp_session_get_data_server_port(session);
   char data_server_ip[16];
@@ -106,7 +97,7 @@ static xsuccess get_request(ftp_session session, char* inbuf, int buf_size) {
     return XFAILURE;
   }
   inbuf[cnt] = '\0';
-  strip_trailing_crlf(inbuf);
+  xcstr_strip_trailing_crlf(inbuf);
   xlog_info("[req %s] %s\n", ftp_session_get_user_identifier_cstr(session), inbuf);
 
   return XSUCCESS;
@@ -683,6 +674,7 @@ int liquid_ftp_real(int argc, char* argv[]) {
     back_log = atoi(xoption_get(xopt, "backlog"));
   }
 
+  // initialize ACL
   if (xoption_has(xopt, "simple")) {
     // single user mode
     xbool readonly = XFALSE;
@@ -703,20 +695,32 @@ int liquid_ftp_real(int argc, char* argv[]) {
         readonly = XTRUE;
       }
     }
-    ftp_acl_single_user_mode(single_user, single_pwd, single_root, readonly);
-    xlog_info("[ftp] running in simple mode\n");
+    ret = ftp_acl_single_user_mode(single_user, single_pwd, single_root, readonly);
+    if (ret == XSUCCESS) {
+      xlog_info("[ftp] running in simple mode\n");
+    } else {
+      xlog_fatal("[ftp] failed to initialize ACL!\n");
+    }
   } else {
     // multi user mode
     const char* db_fname = "liquid_ftp.sqlite3";
     if (xoption_has(xopt, "dbfile")) {
       db_fname = xoption_get(xopt, "dbfile");
     }
-    ftp_acl_multi_user_mode(db_fname);
-    xlog_info("[ftp] running in advanced mode\n");
+    ret = ftp_acl_multi_user_mode(db_fname);
+    if (ret == XSUCCESS) {
+      xlog_info("[ftp] running in advanced mode\n");
+    } else {
+      xlog_fatal("[ftp] failed to initialize ACL!\n");
+    }
   }
 
   xoption_delete(xopt);
-  ret = liquid_ftp_service(bind_addr, port, back_log);
+  if (ret == XSUCCESS) {
+    ret = liquid_ftp_service(bind_addr, port, back_log);
+  } else {
+    xstr_delete(bind_addr); // will have to release bind_addr by hand if it is not managed by liquid_ftp_service()
+  }
   ftp_acl_finalize();
   return ret;
 }
