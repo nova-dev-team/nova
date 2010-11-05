@@ -116,6 +116,16 @@ char* xcstr_strip(char* str) {
   return str;
 }
 
+char* xcstr_strip_trailing_crlf(char* str) {
+  // abc\r\n -> abc
+  int pos = strlen(str) - 1;
+  while (pos >= 0 && (str[pos] == '\r' || str[pos] == '\n')) {
+    str[pos] = '\0';
+    pos--;
+  }
+  return str;
+}
+
 xsuccess xinet_ip2str(int ip, char* str) {
   unsigned char* p = (unsigned char *) &ip;
   int i;
@@ -154,7 +164,8 @@ xsuccess xinet_get_sockaddr(const char* host, int port, struct sockaddr_in* addr
   return XSUCCESS;
 }
 
-static xsuccess xinet_split_host_port_ipv4(XIN const char* host_port, XOUT xstr host, XOUT int* port) {
+// helper function, split ipv4 and port
+static xsuccess xinet_split_ipv4_port(XIN const char* host_port, XOUT xstr host, XOUT int* port) {
   xsuccess ret = XSUCCESS;
   int i, j, seg_count = 0;
   char seg_text[4];
@@ -203,10 +214,16 @@ static xsuccess xinet_split_host_port_ipv4(XIN const char* host_port, XOUT xstr 
     // check if there is only '0-9' after the ':'
     for (j = i + 1; '0' <= host_port[j] && host_port[j] <= '9'; j++) {
     }
-    if (host_port[j] != '\0') {
+    if (host_port[j] != '\0' || j == i + 1) {
       ret = XFAILURE;
     } else {
-      *port = atoi(host_port + i + 1);
+      int prt = atoi(host_port + i + 1);
+      if (prt < 65536) {
+        *port = atoi(host_port + i + 1);
+        ret = XSUCCESS;
+      } else {
+        ret = XFAILURE;
+      }
     }
   }
   if (ret == XFAILURE) {
@@ -216,9 +233,59 @@ static xsuccess xinet_split_host_port_ipv4(XIN const char* host_port, XOUT xstr 
   return ret;
 }
 
+static xsuccess xinet_split_host_port_helper(XIN const char* host_port, XOUT xstr host, XOUT int* port) {
+  xbool has_dot = XFALSE;
+  int i;
+  for (i = 0; host_port[i] != '\0'; i++) {
+    if (host_port[i] == '.') {
+      has_dot = XTRUE;
+    }
+  }
+  if (has_dot == XTRUE) {
+    // split as ipv4 + port
+    // currently only check for ipv4
+    return xinet_split_ipv4_port(host_port, host, port);
+  } else {
+    xstr_set_cstr(host, "");
+    for (i = 0; host_port[i] != '\0' && host_port[i] != ':'; i++) {
+      xstr_append_char(host, host_port[i]);
+    }
+    if (host_port[i] == ':') {
+      // check if length > 0 and only has 0~9 on port value
+      int prt = 0, prt_len = 0;
+      for (;;) {
+        char ch = host_port[i + 1 + prt_len];
+        if (ch == '\0') {
+          break;
+        } else if ('0' <= ch && ch <= '9') {
+          prt_len++;
+        } else {
+          // illegal chars on port
+          xstr_set_cstr(host, "");
+          return XFAILURE;
+        }
+      }
+      if (prt_len == 0) {
+        xstr_set_cstr(host, "");
+        return XFAILURE;
+      }
+      prt = atoi(host_port + i + 1);
+      if (prt < 65536) {
+        *port = prt;
+        return XSUCCESS;
+      } else {
+        xstr_set_cstr(host, "");
+        return XFAILURE;
+      }
+    } else {
+      // no port, don't touch the 'port' variable
+      return XSUCCESS;
+    }
+  }
+}
+
 xsuccess xinet_split_host_port(const char* host_port, xstr host, int* port) {
-  // currently only check for ipv4
-  return xinet_split_host_port_ipv4(host_port, host, port);
+  return xinet_split_host_port_helper(host_port, host, port);
 }
 
 void xjoin_path_cstr(XOUT xstr fullpath, XIN const char* current_dir, XIN const char* append_dir) {
