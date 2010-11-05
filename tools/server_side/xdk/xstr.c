@@ -41,6 +41,24 @@ xstr xstr_substr(xstr xs, int start) {
   }
 }
 
+xstr xstr_substr2(xstr xs, int start, int len) {
+  int orig_len = xstr_len(xs);
+  xstr subxs;
+  if (start >= orig_len) {
+    subxs = xstr_new();
+  } else if (start + len >= orig_len) {
+    subxs = xstr_new_from_cstr(xs->str + start);
+  } else {
+    int i;
+    subxs = xstr_new();
+    const char* orig_cstr = xstr_get_cstr(xs);
+    for (i = 0; i < len; i++) {
+      xstr_append_char(subxs, orig_cstr[start + i]);
+    }
+  }
+  return subxs;
+}
+
 void xstr_delete(xstr xs) {
   xfree(xs->str);
   xfree(xs);
@@ -81,6 +99,16 @@ void xstr_set_cstr(xstr xs, const char* cs) {
 
 int xstr_len(xstr xs) {
   return xs->len;
+}
+
+void xstr_add_prefix_cstr(xstr xs, const char* prefix) {
+  int prefix_len = strlen(prefix);
+  // note the "+1", because of the trailing '\0'
+  ensure_mem_size(xs, xs->len + prefix_len + 1);
+  // note the "+1", because we also copy the '\0'
+  memmove(xs->str + prefix_len, xs->str, xs->len + 1);
+  memcpy(xs->str, prefix, prefix_len);
+  xs->len += prefix_len;
 }
 
 void xstr_append_char(xstr xs, char ch) {
@@ -258,6 +286,14 @@ char xstr_last_char(xstr xs) {
     return '\0';
   } else {
     return xs->str[xs->len - 1];
+  }
+}
+
+xbool xstr_eql_cstr(xstr xs, const char* cstr) {
+  if (strcmp(xstr_get_cstr(xs), cstr) == 0) {
+    return XTRUE;
+  } else {
+    return XFALSE;
   }
 }
 
