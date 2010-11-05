@@ -47,16 +47,32 @@ xstr xstr_new_from_cstr(const char* cs);
 /**
   @brief
     Get a substring in an xstr.
-  
+
   @param xs
     The xstr including the substring.
   @param start
     The start index of the substring. If it is larger than the xstr length, an empty xstr will be returned.
-  
+
   @return
     A new xstr object, as a substring.
 */
 xstr xstr_substr(xstr xs, int start);
+
+/**
+  @brief
+    Get a substring in an xstr.
+
+  @param xs
+    The xstr including the substring.
+  @param start
+    The start index of the substring. If it is larger than the xstr length, an empty xstr will be returned.
+  @param len
+    Length of the substring.
+
+  @return
+    A new xstr object, as a substring.
+*/
+xstr xstr_substr2(xstr xs, int start, int len);
 
 /**
   @brief
@@ -119,6 +135,18 @@ int xstr_len(xstr xs);
     Otherwise the number of chars appended to xs.
 */
 int xstr_printf(xstr xs, const char* fmt, ...);
+
+
+/**
+  @brief
+    Add a c-string as prefix.
+
+  @param xs
+    The xstr where the new c-string will be added as prefix.
+  @param prefix
+    The prefix to be added.
+*/
+void xstr_add_prefix_cstr(xstr xs, const char* prefix);
 
 /**
   @brief
@@ -207,6 +235,20 @@ char xstr_last_char(xstr xs);
     Whether the 2 xstr is equal.
 */
 xbool xstr_eql(xstr xstr1, xstr xstr2);
+
+/**
+  @brief
+    Test if an x-string is equal to a c-string.
+
+  @param xs
+    The x-string.
+  @param cstr
+    The c-string.
+
+  @return
+    Whether the 2 strings are equal.
+*/
+xbool xstr_eql_cstr(xstr xs, const char* cstr);
 
 /**
   @brief
