@@ -121,13 +121,14 @@ static void move_current_log_into_history() {
   xstr_delete(current_log_fn);
 }
 
-static void prepare_fp() {
+static void prepare_fp(int level) {
   if (log_fp != NULL) {
     if (ftello(log_fp) >= log_max_size) {
       fclose(log_fp);
       move_current_log_into_history();
       log_fp = NULL;
-      prepare_fp(); // retry, again
+      if (level < 3)
+        prepare_fp(level + 1); // retry, and avoid too deep recursive call
     }
   } else if (log_name != NULL) {
     // only prepare fp if log_name is given, that means the logging system is initialized
@@ -142,7 +143,7 @@ static void prepare_fp() {
 void xlog_start_record(int level) {
   // prevent 2 thread from logging concurrently, which will mess up the log file
   pthread_mutex_lock(&logging_lock);
-  prepare_fp();
+  prepare_fp(0);
   if (level <= log_level) {
     char timestr_buf[32];
     struct tm* tm_struct;
