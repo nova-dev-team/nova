@@ -14,7 +14,7 @@
 
 #include "xdef.h"
 
-#include "imgsvr/imgdir_fsdb.h"
+#include "imgdir_fsdb.h"
 
 /**
   @brief
