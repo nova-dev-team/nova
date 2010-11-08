@@ -43,10 +43,9 @@ static void cmd_acceptor(xsocket client_xs, void* args) {
   imgdir_session_serve(session);
 }
 
-static xsuccess imgdir_service(xstr host, int port, int backlog) {
+static xsuccess imgdir_service(xstr host, int port, int backlog, const char* fsdb_fn) {
   xsuccess ret;
   char serv_mode = 't'; // serv in new thread
-  char* fsdb_fn = "fsdb.sqlite3"; // TODO parse from command line
   imgdir_server svr = imgdir_server_new(fsdb_fn);
   if (svr == NULL) {
     ret = XFAILURE;
@@ -73,6 +72,7 @@ static xsuccess imgdir_server_real(int argc, char* argv[]) {
   int port = 2010;
   xstr bind_addr = xstr_new();  // will be send into imgstore_service(), and work as a component of xserver. will be destroyed when xserver is deleted
   int back_log = 10;
+  const char* fsdb_fn = "liquid_imgdir.sqlite3";
   xoption xopt = xoption_new();
   xoption_parse_with_xconf(xopt, argc, argv);
   xlog_init(argc, argv);
@@ -102,8 +102,11 @@ static xsuccess imgdir_server_real(int argc, char* argv[]) {
   if (xoption_has(xopt, "backlog")) {
     back_log = atoi(xoption_get(xopt, "backlog"));
   }
+  if (xoption_has(xopt, "dbfile")) {
+    fsdb_fn = xoption_get(xopt, "dbfile");
+  }
+  ret = imgdir_service(bind_addr, port, back_log, fsdb_fn);
   xoption_delete(xopt);
-  ret = imgdir_service(bind_addr, port, back_log);
   return ret;
 }
 
