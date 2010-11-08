@@ -43,19 +43,19 @@ void* g_actions[] = {
   // NOTE: sort these functions alphabetically
   "dfs", "Run as an distributed filesystem server", liquid_dfs, liquid_dfs_help,
 
-  "dftp", "Run as an distributed ftp server", liquid_dftp, liquid_dftp_help,
+  "dftp", "Run as an distributed FTP server", liquid_dftp, liquid_dftp_help,
 
-  "ftp", "Run as an local ftp server", liquid_ftp, liquid_ftp_help,
+  "ftp", "Run as an local FTP server", liquid_ftp, liquid_ftp_help,
 
   "help", "Display help message", print_help, help_on_help,
 
-  "node", "Serve as a storage node", liquid_node, liquid_node_help,
-
-  "imgstore", "Serve as a virtual machine disk image storage node", liquid_imgstore, liquid_imgstore_help,
+  "imgdir", "Serve as a VM disk info directroy", imgdir_server_main, imgdir_print_help,
 
   "imgmount", "Mount a VM disk filesystem", imgmount_main, imgmount_print_help,
 
-  "imgdir", "Serve as a VM disk info directroy", imgdir_server_main, imgdir_print_help,
+  "imgstore", "Serve as a VM disk image storage node", liquid_imgstore, liquid_imgstore_help,
+
+  "node", "Serve as a liquid DHT storage node", liquid_node, liquid_node_help,
 
   // terminated by NULL
   NULL
