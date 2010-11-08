@@ -572,15 +572,47 @@ static xsuccess xfilesystem_mkdir_p_helper(xstr path, int mode) {
 }
 
 xsuccess xfilesystem_mkdir_p(const char* path, int mode) {
-  xsuccess ret = XFAILURE;
+  xsuccess ret = XSUCCESS;
   xstr path_xstr = xstr_new_from_cstr(path);
-  const int cwd_buf_len = 256;
+  const int cwd_buf_len_max = 16 * 1024;
+  int cwd_buf_len = 256;
   char* cwd_cstr = xmalloc_ty(cwd_buf_len, char);
-  getcwd(cwd_cstr, cwd_buf_len);
-  xjoin_path_cstr(path_xstr, cwd_cstr, path);
-  ret = xfilesystem_mkdir_p_helper(path_xstr, mode);
+  while (getcwd(cwd_cstr, cwd_buf_len) == NULL) {
+    // expand the buffer if necessary
+    cwd_buf_len *= 2;
+    // stop allocation if too much memory is required
+    if (cwd_buf_len > cwd_buf_len_max) {
+      ret = XFAILURE;
+      break;
+    }
+    cwd_cstr = xrealloc(cwd_cstr, cwd_buf_len);
+  }
+  if (ret != XFAILURE) {
+    xjoin_path_cstr(path_xstr, cwd_cstr, path);
+    ret = xfilesystem_mkdir_p_helper(path_xstr, mode);
+  }
   xfree(cwd_cstr);
   xstr_delete(path_xstr);
+  return ret;
+}
+
+
+xsuccess xfilesystem_split_path(XIN xstr path, XOUT xstr parent, XOUT xstr child) {
+  xsuccess ret = XSUCCESS;
+  const char* cpath = xstr_get_cstr(path);
+  int i;
+  xstr_set_cstr(parent, "");
+  xstr_set_cstr(child, "");
+  for (i = 0; cpath[i] != '\0'; i++) {
+    char ch = cpath[i];
+    if (ch == xsys_fs_sep_char) {
+      xstr_append_cstr(parent, xstr_get_cstr(child));
+      xstr_append_char(parent, ch);
+      xstr_set_cstr(child, "");
+    } else {
+      xstr_append_char(child, ch);
+    }
+  }
   return ret;
 }
 
