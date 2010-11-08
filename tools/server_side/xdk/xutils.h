@@ -97,6 +97,7 @@ char* xcstr_strip(char* str);
 */
 char* xcstr_strip_trailing_crlf(char* cstr);
 
+
 /**
   @brief
     Convert an IP value into string.
@@ -295,6 +296,24 @@ long xfilesystem_parse_filesize(const char* size_cstr);
     XFAILURE if failed to create the folders.
 */
 xsuccess xfilesystem_mkdir_p(const char* path, int mode);
+
+
+/**
+  @brief
+    Split a file path into parent and child parts.
+    The result is same as Python's os.path.split()
+
+  @param path
+    The path to be splitted.
+  @param parent
+    Where the parent path will be returned.
+  @param child
+    Where the child name will be returned.
+
+  @return
+    Whether successfully splitted the path.
+*/
+xsuccess xfilesystem_split_path(XIN xstr path, XOUT xstr parent, XOUT xstr child);
 
 /**
   @brief
