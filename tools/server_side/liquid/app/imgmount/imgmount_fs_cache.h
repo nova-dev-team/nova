@@ -19,6 +19,17 @@
 #include "xstr.h"
 #include "xhash.h"
 
+/**
+  @brief
+    The uid of root node in fsdb.
+*/
+#define FS_CACHE_ROOT_UID 1
+
+/**
+  @brief
+    A special mark for invalid uid.
+*/
+#define FS_CACHE_INVALID_UID -1
 
 /**
   @brief
@@ -43,11 +54,10 @@ struct fs_cache_impl {
   int mtime;  ///< @brief Last modification time of the entry.
   off_t size; ///< @brief The size of the entry. (only for normal files)
   pthread_mutex_t mutex;  ///< @brief Mutex to protect the node in multi-thread app.
-
+  int uid;  ///< @brief Unique id for this fs node. For 'not-in-fsdb' node (like in imgdir), this will be -1.
+  int parent_uid; ///< @brief Parent's uid. Only used by imgdir.
   struct timeval sync_time;  ///< @brief The time that this info is updated. When fs_cache is newly created, this is set to an "invalid" value.
   struct timeval sync_expire;  ///< @brief The maximum expire interval for a node. It is by default set to 1 sec.
-
-  int db_id;  ///< @brief Id in database. This is only used by imgdir service, when saving data in fsdb models. For imgmount, it is ignored.
 };
 
 
@@ -56,6 +66,19 @@ struct fs_cache_impl {
     Cached imgdir filesystem structure.
 */
 typedef struct fs_cache_impl* fs_cache;
+
+
+/**
+  @brief
+    Create a new raw fs_cache node.
+
+  @warning
+    Don't use this function unless you clearly know what you are doing.
+
+  @return
+    A new raw fs_cache node, most fields are not set.
+*/
+fs_cache fs_cache_new_raw();
 
 /**
   @brief
@@ -146,6 +169,18 @@ xbool fs_cache_is_synced(fs_cache entry);
     XSUCCESS if nothing goes wrong.
 */
 xsuccess fs_cache_get_fullpath(XIN fs_cache entry, XOUT xstr fullpath);
+
+/**
+  @brief
+    Count all nodes in a subtree.
+
+  @param root
+    The root of the subtree.
+
+  @return
+    The number of nodes in the subtree.
+*/
+int fs_cache_tree_count(XIN fs_cache root);
 
 #endif  // IMGMOUNT_FS_CACHE_H_
 
