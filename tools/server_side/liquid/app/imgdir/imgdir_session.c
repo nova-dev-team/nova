@@ -1,13 +1,14 @@
 #include "xnet.h"
 #include "xmemory.h"
 #include "xstr.h"
+#include "xlog.h"
 
 #include "imgdir_session.h"
 #include "imgdir_handlers.h"
 
 // this macro is for imgdir_session_serve() function
-#define REPLY_OR_DIE(text) \
-  if (xsocket_write_line(session->clnt_sock, (text)) == XFALSE) {  \
+#define REPLY_OR_DIE(text)  \
+  if (xsocket_write_line(session->clnt_sock, (text)) == XFAILURE) { \
     stop_service = XTRUE; \
   }
 
@@ -19,6 +20,7 @@ struct imgdir_session_impl {
   xsocket clnt_sock;  ///< @brief Connection to client.
   imgdir_server svr;  ///< @brief Pointer to server model, contains global info.
 };
+
 
 imgdir_session imgdir_session_new(xsocket client_sock, imgdir_server svr) {
   imgdir_session session = xmalloc_ty(1, struct imgdir_session_impl);
@@ -41,7 +43,6 @@ void imgdir_session_serve(imgdir_session session) {
 
   // start handshake
   if (xsocket_read_line(session->clnt_sock, req_head) == XFAILURE || xstr_eql_cstr(req_head, "accept_me") == XFALSE) {
-    printf("line: %s\n", xstr_get_cstr(req_head));
     stop_service = XTRUE;
   } else {
     // accept client
@@ -59,13 +60,26 @@ void imgdir_session_serve(imgdir_session session) {
     if (xstr_startwith_cstr(req_head, "list ")) {
       imgdir_handle_ls(session, req_head);
     } else if (xstr_startwith_cstr(req_head, "mkdir ")) {
-      // TODO handle mkdir
-      REPLY_OR_DIE("ok\r\n");
+      imgdir_handle_mkdir(session, req_head);
     } else {
       REPLY_OR_DIE("confused\r\n");
     }
   }
 
+  xlog_info("[imgdir] stop service for client");
+
   xstr_delete(req_head);
   imgdir_sessoin_delete(session);
+}
+
+xsocket get_session_socket(imgdir_session session) {
+  return session->clnt_sock;
+}
+
+fs_cache get_fs_root(imgdir_session session) {
+  return session->svr->root;
+}
+
+fsdb get_fsdb(imgdir_session session) {
+  return session->svr->fs;
 }
