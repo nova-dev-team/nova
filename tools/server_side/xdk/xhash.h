@@ -64,6 +64,9 @@ typedef void (*xhash_free)(void* key, void* value);
   @param args
     Additional helper arguments.
 
+  @warning
+    Do not change hash table structure (add/remove elements) when visiting the hash table.
+
   @return
     Whether we should go on visiting other elements. If XFALSE is returned, no more element will be visited.
 */
@@ -136,7 +139,7 @@ void* xhash_get(xhash xh, void* key);
     Pointer to the key which will be removed.
 
   @return
-    0 if successful, -1 if failed.
+    Whether the remove action is successful.
 */
 xsuccess xhash_remove(xhash xh, void* key);
 
@@ -150,6 +153,10 @@ xsuccess xhash_remove(xhash xh, void* key);
     The visitor function.
   @param args
     Additional arguments to the visitor.
+
+  @warning
+    Do not change hash table structure (add/remove elements) when visiting the hash table.
+
 */
 void xhash_visit(xhash xh, xhash_visitor visitor, void* args);
 
