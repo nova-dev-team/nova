@@ -12,14 +12,24 @@
     Implementation of a 'imgmount' instance. It represents and handles all operations for a mount point.
 */
 
+#include <pthread.h>
+
 #include "xdef.h"
 #include "xnet.h"
 #include "xstr.h"
 
 #include "imgmount_fs_cache.h"
 
-// hidden implementation
-struct imgmount_instance_impl;
+/**
+  @brief
+    The imgmount instance.
+*/
+struct imgmount_instance_impl {
+  xsocket imgdir_sock;  ///<  @brief Connection to imgdir.
+  pthread_mutex_t imgdir_sock_lock;  ///< @brief Protect imgdir_sock in multi-thread communication.
+  xstr mount_home;  ///<  @brief The mount home, where the imgmount filesystem is organized.
+  fs_cache fs_root;  ///<  @brief The cached root of imgdir filesystem.
+};
 
 /**
   @brief
@@ -42,41 +52,6 @@ typedef struct imgmount_instance_impl* imgmount_instance;
 */
 xsuccess imgmount_instance_run(int argc, char* argv[]);
 
-/**
-  @brief
-    Get the mount home of a imgmount instance.
-
-  @param inst
-    The imgmount instance.
-
-  @return
-    The mount home as an x-string.
-*/
-xstr get_mount_home(imgmount_instance inst);
-
-/**
-  @brief
-    Get the x-socket connecting to imgdir server.
-
-  @param inst
-    The imgmount instance.
-
-  @return
-    The x-socket to imgdir server.
-*/
-xsocket get_imgdir_sock(imgmount_instance inst);
-
-/**
-  @brief
-    Get the cached root.
-
-  @param inst
-    The imgmount instance.
-
-  @return
-    The cached root.
-*/
-fs_cache get_root(imgmount_instance inst);
 
 #endif  // IMGMOUNT_INSTANCE_H_
 
