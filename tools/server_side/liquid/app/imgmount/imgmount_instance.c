@@ -7,29 +7,6 @@
 #include "imgmount_fuse.h"
 #include "imgmount_fs_cache.h"
 
-/**
-  @brief
-    The imgmount instance.
-*/
-struct imgmount_instance_impl {
-  xsocket imgdir_sock;  ///<  @brief Connection to imgdir.
-  xstr mount_home;  ///<  @brief The mount home, where the imgmount filesystem is organized.
-  fs_cache fs_root;  ///<  @brief The cached root of imgdir filesystem.
-};
-
-xstr get_mount_home(imgmount_instance inst) {
-  return inst->mount_home;
-}
-
-xsocket get_imgdir_sock(imgmount_instance inst) {
-  return inst->imgdir_sock;
-}
-
-fs_cache get_root(imgmount_instance inst) {
-  return inst->fs_root;
-}
-
-
 // check existance of the mount_home, and add contents to it
 static xsuccess prepare_mount_home(const char* mount_home_cstr) {
   xsuccess ret = XSUCCESS;
@@ -48,6 +25,7 @@ static xsuccess prepare_mount_home(const char* mount_home_cstr) {
 
 static void imgmount_instance_delete(imgmount_instance inst) {
   xsocket_delete(inst->imgdir_sock);
+  pthread_mutex_destroy(&(inst->imgdir_sock_lock));
   xstr_delete(inst->mount_home);
   fs_cache_delete(inst->fs_root);
   xfree(inst);
@@ -57,6 +35,7 @@ static void imgmount_instance_delete(imgmount_instance inst) {
 static imgmount_instance imgmount_instance_new(xstr server_ip, int server_port, xstr mount_home) {
   imgmount_instance inst = xmalloc_ty(1, struct imgmount_instance_impl);
   inst->imgdir_sock = xsocket_new(server_ip, server_port);
+  pthread_mutex_init(&(inst->imgdir_sock_lock), NULL);
   inst->mount_home = mount_home;
   inst->fs_root = fs_cache_new_root();
   if (prepare_mount_home(xstr_get_cstr(mount_home)) == XFAILURE) {
@@ -88,10 +67,13 @@ static xsuccess imgmount_instance_connect_imgdir(imgmount_instance inst) {
 }
 
 static struct fuse_operations imgmount_filesystem_operations = {
-  .getattr = imgmount_getattr,
-  .open    = imgmount_open,
-  .read    = imgmount_read,
-  .readdir = imgmount_readdir,
+  .access   = imgmount_access,
+  .getattr  = imgmount_getattr,
+  .mkdir    = imgmount_mkdir,
+  .open     = imgmount_open,
+  .read     = imgmount_read,
+  .readdir  = imgmount_readdir,
+  .statfs   = imgmount_statfs,
 };
 
 // helper function for handling real running routine in imgmount_instance_run()
