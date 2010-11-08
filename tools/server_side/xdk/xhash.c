@@ -249,13 +249,15 @@ void xhash_visit(xhash xh, xhash_visitor visitor, void* args) {
   int i;
   int actual_size = (xh->base_size << xh->extend_level) + xh->extend_ptr;
   xbool should_continue = XTRUE;
-  xhash_entry* p;
+  xhash_entry *p, *q;
 
   for (i = 0; i < actual_size && should_continue == XTRUE; i++) {
     p = xh->slot[i];
     while (p != NULL && should_continue == XTRUE) {
+      // store p->next in q, in case if p was deleted in visitor
+      q = p->next;
       should_continue = visitor(p->key, p->value, args);
-      p = p->next;
+      p = q;
     }
   }
 }
