@@ -144,6 +144,7 @@ def loop_body
 
     ##############################get workers' log and write these logs to database#############################################
 
+=begin
     begin
       #write_log "Fetching perflogs from #{pm.ip}"
 
@@ -169,7 +170,7 @@ def loop_body
     rescue Exception => e
       write_log "Exception happend when fetching perflogs from #{pm.ip}. Exception: #{e.to_s}"
     end
-
+=end
     ##############################end of get workers' log and write these logs to database#####################################
 
     # sync info on vm

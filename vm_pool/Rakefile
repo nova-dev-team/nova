@@ -84,6 +84,8 @@ namespace :nova do
         my_exec "RAILS_ENV=#{rails_env} #{RAILS_ROOT}/script/server -d -p #{conf["master_port"]} &"
       end
 
+      my_exec "#{RAILS_ROOT}/lib/log_cleaner.rb &"
+
       # start vnc_proxy
       my_exec "#{RAILS_ROOT}/../tools/server_side/bin/vnc_proxy -p #{conf["vm_vnc_port"]} -s #{RAILS_ROOT}/tmp/sockets/vnc_proxy.sock -pf #{RAILS_ROOT}/log/vnc_proxy.pid"
     end

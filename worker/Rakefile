@@ -141,6 +141,8 @@ LFTP_SCRIPT
         puts "[WARNING]unknown storage type :#{conf["storage_type"]}"
       end
 
+      my_exec "#{RAILS_ROOT}/lib/log_cleaner.rb &"
+
       log_interval = 5 # read performance meters every 5 seconds
       log_max_count = 720 # the limit on log counts. 720 * 5 sec = 1 hour
       my_exec "#{RAILS_ROOT}/lib/pm_top #{RAILS_ROOT}/tmp/pids/pm_top.pid #{RAILS_ROOT}/log/pm_top.log #{log_interval} #{log_max_count}"
