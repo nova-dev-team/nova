@@ -30,7 +30,7 @@ while true
   log_folder = "#{File.dirname __FILE__}/../log"
   Dir.foreach(log_folder) do |entry|
     next if entry.start_with? "."
-    next unless entry.end_with? ".log"
+    next unless (entry.end_with? ".log" or entry.end_with? "_log")
     fullpath = File.join log_folder, entry
     puts "checking log file: #{fullpath}"
     if (File.size fullpath) > log_max_size
