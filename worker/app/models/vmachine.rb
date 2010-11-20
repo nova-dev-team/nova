@@ -339,7 +339,7 @@ end
     <source path='/dev/pts/1'/>
     <target port='0'/>
   </console>
-  <input type='tablet' bus='usb'/>
+  <!--input type='tablet' bus='usb'/-->
   <input type='mouse' bus='ps2'/>
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
 </devices>
@@ -443,7 +443,7 @@ end
     <source path='/dev/pts/1'/>
     <target port='0'/>
   </console>
-  <input type='tablet' bus='usb'/>
+  <!--input type='tablet' bus='usb'/-->
   <input type='mouse' bus='ps2'/>
   <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'/>
 </devices>
@@ -475,10 +475,6 @@ XML_DESC
     end
     File.open("/var/xml_desc.log", "w") do |f|
       f.puts xml_desc
-    end
-    puts xml_desc
-    File.open("/var/xml_desc.log", "w") do |f|
-        f.puts xml_desc
     end
     return xml_desc
   end
@@ -955,6 +951,24 @@ private
     Vmachine.log vm_name, "#{pkg_count} packages added to VM '#{vm_name}'"
     return {:success => true, :message => "#{pkg_count} packages added to Vmachine '#{vm_name}'"}
   end
+
+  def Vmachine.hotbackup_to vm_name, hotbackup_dest, hotbackup_src
+    hotbackup_to_fn = File.join Setting.vm_root, vm_name, "hotbackup_to"
+    File.open(hotbackup_to_fn, "w") do |f|
+      f.write hotbackup_dest
+    end
+    hotbackup_from_fn = File.join Setting.vm_root, vm_name, "hotbackup_from"
+    if hotbackup_src
+      File.open(hotbackup_from_fn, "a") do |f|
+        f.write hotbackup_src
+      end
+    end
+    Vmachine.send_instruction vm_name, "hotbackup"
+
+    Vmachine.log vm_name, "prepare hotbackup to #{hotbackup_dest}"
+    return {:success => true, :message => "Vmachine '#{vm_name}' is preparing hotbackup to worker '#{hotbackup_dest}'"}
+  end
+
 
   def Vmachine.live_migrate_to vm_name, migrate_dest, migrate_src
     migrate_to_fn = File.join Setting.vm_root, vm_name, "migrate_to"

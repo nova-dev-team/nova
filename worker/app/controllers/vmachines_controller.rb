@@ -131,6 +131,23 @@ public
 
   end
 
+  def hotbackup_to
+    if valid_param? params[:name] and valid_param? params[:hotbackup_dest]
+      result = Vmachine.hotbackup_to params[:name], params[:hotbackup_dest], params[:hotbackup_src]
+      if result == nil
+        reply_failure "call to Vmachine.hotbackup_to failed"
+      elsif result[:success]
+        reply_success result[:message]
+      else
+        reply_failure result[:message]
+      end
+
+    else
+      reply_failure "hotbackup_to: invalid params"
+    end
+ 
+  end
+
   # Tell vm_daemon to prepare migrate
 
   def live_migrate_to

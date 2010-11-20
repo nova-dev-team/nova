@@ -85,7 +85,15 @@ html = ""
 
 row_counter = 0
 Vmachine.all_domains.each do |dom|
-  xml_desc = XmlSimple.xml_in dom.xml_desc
+  
+  xml_desc = nil
+  hotbackup_fn = File.join Setting.vm_root, dom.name, "hotbackup"
+  vm_hotbackup = false
+  if File.exists? hotbackup_fn
+    vm_hotbackup = true
+    xml_desc = XmlSimple.xml_in dom.xml_desc
+  else
+  end
 
   hda_save_to_fn = File.join Setting.vm_root, dom.name, "hda_save_to"
   if File.exists? hda_save_to_fn
@@ -110,28 +118,39 @@ end
 <td>
 #{
   vm_daemon_status = ""
-  begin
-    vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
-  rescue
-  end
+  vm_hotbackup_status = ""
+  
+  vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status" rescue nil
+  vm_hotbackup_status = File.read "#{Setting.vm_root}/#{dom.name}/hotbackup" rescue nil
+ 
 
   case dom.info.state
   when Vmachine::LIBVIRT_RUNNING
-    if vm_daemon_status == "migrating"
+    if vm_hotbackup
+      "<font color='red'><b>Hotbackuping</b></font>"
+    elsif vm_daemon_status == "migrating"
       "<font color='red'><b>Migrating</b></font>"
     else
       "Running"
     end
   when Vmachine::LIBVIRT_BLOCK
-    if vm_daemon_status == "migrating"
+    if vm_hotbackup
+      "<font color='red'><b>Hotbackuping</b></font>"
+    elsif vm_daemon_status == "migrating"
       "<font color='red'><b>Migrating</b></font>"
     else
       "Running"
     end
   when Vmachine::LIBVIRT_SUSPENDED
-    "<b>Suspended</b>"
+    if vm_hotbackup
+      "<font color='red'><b>Hotbackuping</b></font>"
+    else
+      "<b>Suspended</b>"
+    end
   when Vmachine::LIBVIRT_NOT_RUNNING
-    if vm_daemon_status == "preparing"
+    if vm_hotbackup
+      "<font color='red'><b>Hotbackuping</b></font>"
+    elsif vm_daemon_status == "preparing"
       "Preparing"
     elsif vm_daemon_status == "saving"
       "Saving"
@@ -176,6 +195,7 @@ elsif dom.info.state == Vmachine::LIBVIRT_NOT_RUNNING
 end
 }
 <button type='button' class='btn' onclick="live_migrate_to('#{dom.name}')"><span><span>Migrate</span></span></button>
+<button type='button' class='btn' onclick="hotbackup_to('#{dom.name}')"><span><span>Hotbackup</span></span></button>
 <button type='button' class='btn' onclick="destroy_vmachine('#{dom.name}')"><span><span><font color='red'><b>Destroy</b></font></span></span></button>
 #{
 if dom.info.state == Vmachine::LIBVIRT_RUNNING || dom.info.state == Vmachine::LIBVIRT_BLOCK
