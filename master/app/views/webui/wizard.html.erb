@@ -105,9 +105,11 @@ $(document).ready(function() {
 function on_change_cluster_size() {
   $("#create_cluster_container").html("");
   var cluster_size = parseInt($("#new_cluster_size").val());
-  var html = "<table width='100%'>";
+  var html = "<br/><font color='red'>* NOTE: Manually assigning IP address is not suggested!</red><br/><br/>";
+  html += "<table width='100%'>";
   for (var machine_id = 1; machine_id <= cluster_size; machine_id ++) {
     html += "<tr class='row_type_" + ((machine_id + 1) % 2) + "'><td><h2>" + machine_id + "</h2></td><td>";
+    html += "&nbsp;<br/>";
 
     html += "Machine image: <select id='cluster_machine_vdisk-" + machine_id + "'>";
     <% Vdisk.all.each do |vdisk| %>
@@ -120,10 +122,14 @@ function on_change_cluster_size() {
     html += "CPU count: <select id='cluster_cpu_count-" + machine_id + "'>";
     html += "<option>1</option><option>2</option><option>4</option></select>";
     html += "<%= spacing 4%>";
-    html += "Memory size: <input type='text' id='cluster_mem_size-" + machine_id + "' value='256' /> MB<br/>";
+    html += "Memory size: <input type='text' id='cluster_mem_size-" + machine_id + "' value='256' /> MB";
+    html += "<%= spacing 4%>";
+    html += "<font color='blue'>IP address (optional): </font><input type='text' id='cluster_ip_addr-" + machine_id + "'/>";
+    html += "<br/>";
     html += "Software (package file name, separate with comma): <input type='text' size=120 id='cluster_soft_list-" + machine_id + "'>";
     html += "<%= spacing 4%>";
     html += "<button type='button' class='btn' onclick='cluster_setting_apply_down(" + machine_id + ", " + cluster_size + ")'><span><span>Apply down</span></span></button>";
+    html += "<br/>&nbsp;<br/>";
     html += "</td></tr>";
 
   }
