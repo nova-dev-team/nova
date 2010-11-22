@@ -36,7 +36,7 @@ function load_all_monitor() {
             html += dat.status + " ";
           }
           html += "capacity:" + dat.vm_capacity;
-          html += " <a href='#' onclick='load_monitor(\"" + dat.ip + "\", " + dat.id + ")'>Refresh</a>";
+          html += " <a href='#' onclick='load_monitor(\"" + dat.ip + "\", " + dat.id + ", false)'>Refresh</a>";
           html += "</td></tr>";
 
           html += "<tr class='row_type_1'><td>";
@@ -47,10 +47,9 @@ function load_all_monitor() {
         html += "</table>"
         $("#all_monitor_holder").html(html);
 
-        for (i = 0; i < result.data.length; i++) {
-          var pm = result.data[i];
-          load_monitor(pm.ip, pm.id);
-        }
+
+        g_curr_loading_monitor_id = 0;
+        load_monitor(null, null, true);
       } else {
         do_message("failure", "Error occurred", result.message);
       }
@@ -63,7 +62,11 @@ function load_all_monitor() {
   });
 }
 
-function load_monitor(ip, pm_id) {
+function load_monitor(ip, pm_id, serialized_call) {
+  if (serialized_call == true) {
+    ip = g_all_pm_info[g_curr_loading_monitor_id][0];
+    pm_id = g_all_pm_info[g_curr_loading_monitor_id][1];
+  }
   $("#monitor_holder_" + pm_id).block();
   $.ajax({
     url: "/perf_log/show",
@@ -187,6 +190,15 @@ function load_monitor(ip, pm_id) {
             }
           }
         );
+
+        if (serialized_call == true) {
+          g_curr_loading_monitor_id += 1;
+          if (g_curr_loading_monitor_id < g_all_pm_info.length) {
+            load_monitor(null, null, true);
+          } else {
+            g_curr_loading_monitor_id = 0;
+          }
+        }
 
       } else {
         do_message("failure", "Error occurred", result.message);
