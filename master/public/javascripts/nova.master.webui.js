@@ -1387,6 +1387,7 @@ function load_cluster_content(cluster_name) {
           m_info = result.machines[j];
           html += "<tr class='row_type_" + (j % 2) + "'><td>";
           html += "<td><h2>" + (j + 1) + "</h2></td><td>";
+          html += "&nbsp;<br/>";
           html += "Machine name: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"name\", \"" + m_info["name"] + "\")'>" + m_info["name"] + "</a></b>" + tmp_spacing;
           html += "CPU Count: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"cpu_count\", \"" + m_info["cpu_count"] + "\")'>" + m_info["cpu_count"] + "</a></b>" + tmp_spacing;
           html += "Memory size: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"mem_size\", \"" + m_info["mem_size"] + "\")'>" + m_info["mem_size"] + " MB</a></b>" + tmp_spacing;
@@ -1433,6 +1434,7 @@ function load_cluster_content(cluster_name) {
           }
           html += white_spacing(4);
           html += "<button type='button' class='btn' onclick='show_vm_log(\"" + m_info["uuid"] + "\")'><span><span><font color='blue'>Show Log</font></span></span></button>";
+          html += "<br/>&nbsp;";
           html += "</td></tr>";
         }
         html += "</table>";
