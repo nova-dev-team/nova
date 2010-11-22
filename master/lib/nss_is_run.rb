@@ -39,7 +39,7 @@ fork do
   # write a pid file
   File.open(File.dirname(__FILE__) + "/../tmp/pids/nss_is_run.pid", "w") do |f|
     f.write Process.pid
-  write_nss_log "Open and write process id file!"
+    write_nss_log "Open and write process id file!"
   end
   Dir.chdir File.expand_path(File.dirname(__FILE__))
   File.umask 0000
