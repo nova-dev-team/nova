@@ -1363,6 +1363,7 @@ function load_cluster_content(cluster_name) {
         } else {
           html += "<b>IP range:</b> " + result.first_ip + " ~ " + result.last_ip + "</br>";
         }
+        html += "<a href='#' onclick='load_cluster_content(\"" + cluster_name + "\")'>Refresh</a>" + white_spacing(12);
         html += "<a href='#' onclick='start_cluster_vm(\"" + result.name + "\")'>Start all VM</a>" + white_spacing(4);
         html += "<a href='#' onclick='stop_cluster_vm(\"" + result.name + "\")'>Stop all VM</a>" + white_spacing(4);
         html += "<a href='#' onclick='destroy_cluster(\"" + result.name + "\")'><font color='red'>Destroy cluster!</font></a></br>";
@@ -1380,6 +1381,23 @@ function load_cluster_content(cluster_name) {
           html += "Machine image: <b>" + m_info["disk_image"] + "</b><br/>";
           html += "UUID: <b>" + m_info["uuid"] + "</b></br>";
           html += "Software list: <b>" + m_info["soft_list"] + "</b><br/>";
+
+          if (m_info["status"] == "shut-off") {
+            // manual scheduling
+            html += "Schedule to: ";
+            html += "<select id='sched_to_opt_" + m_info["name"] + "'>";
+            html += "<option value='auto'>(Automatic)</option>";
+            // add pmachines as option, see the def of 'g_working_pmachines' in app/view/webui
+            for (var k = 0; k < g_working_pmachines.length; k++) {
+              var opt_ip = g_working_pmachines[k][0];
+              var opt_host = g_working_pmachines[k][1];
+              html += "<option value='" + opt_ip + "'>" + opt_host + "(" + opt_ip + ")</option>";
+            }
+            html += ""
+            html += "</select>";
+            html += "</br>";
+          }
+
           html += "Status: <b>" + m_info["status"] + "</b>" + tmp_spacing + "Actions: ";
 
           if (m_info["status"] == "shut-off") {
