@@ -204,12 +204,111 @@ function load_monitor(ip, pm_id) {
 //
 // "Migration" page
 //
+function toggle_auto_balance() {
+  var cur_status = $("#auto_balance_link").html();
+  if (cur_status == "ON" || cur_status == "OFF") {
+    $("#load_balance_logs_pane").block();
+    var should_on = false;
+    if (cur_status == "OFF") {
+      should_on = true;
+    }
+    $.ajax({
+      url: "/misc/auto_load_balance",
+      type: "GET",
+      dataType: "json",
+      data: {
+        on: should_on
+      },
+      async: false,
+      success: function(result) {
+        if (result.success) {
+          if (result.on == true || result.on == "true") {
+            $("#auto_balance_link").html("ON");
+          } else {
+            // result.on == false
+            $("#auto_balance_link").html("OFF");
+          }
+        } else {
+          do_message("failure", "Error occurred", result.message);
+        }
+        $("#load_balance_logs_pane").unblock();
+      },
+      error: function() {
+        $("#load_balance_logs_pane").unblock();
+        do_message("failure", "Request failed", "Please check your network connection!");
+      }
+    });
+  } else {
+    load_auto_balance_status();
+  }
+}
+
+function load_auto_balance_status() {
+  $("#load_balance_logs_pane").block();
+  $.ajax({
+    url: "/misc/auto_load_balance",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        if (result.on == true) {
+          $("#auto_balance_link").html("ON");
+        } else {
+          // result.on == false
+          $("#auto_balance_link").html("OFF");
+        }
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#load_balance_logs_pane").unblock();
+    },
+    error: function() {
+      $("#load_balance_logs_pane").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function load_auto_balance_logs() {
+  $("#load_balance_logs_pane").block();
+  $.ajax({
+    url: "/misc/auto_load_balance_logs",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        var html = "<pre>";
+        for (i = 0; i < result.data.length; i++) {
+          html += result.data[i] + "\n";
+        }
+        html += "</pre>";
+        $("#load_balance_logs_holder").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#load_balance_logs_pane").unblock();
+    },
+    error: function() {
+      $("#load_balance_logs_pane").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function load_auto_balance_view() {
+  load_auto_balance_status();
+  load_auto_balance_logs();
+}
+
 function load_migration_view() {
   $("#migration_view").block();
   $.ajax({
     url: "/migration/overview",
     type: "GET",
     dataType: "json",
+    async: false,
     success: function(result) {
       if (result.success) {
         var html = "";
