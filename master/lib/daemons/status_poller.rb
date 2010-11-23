@@ -81,6 +81,13 @@ def loop_body
               if reply["success"] == true
                 pm.hostname = reply["hostname"]
               end
+
+              # update uuid
+              raw_reply = rep_body(RestClient.get "#{pm.root_url}/misc/uuid.json")
+              reply = JSON.parse raw_reply
+              if reply["success"] == true
+                pm.uuid = reply["uuid"]
+              end
               pm.save
               write_log "Successfully connected to #{pm.ip}, raw reply is '#{raw_reply}'"
             end
@@ -103,31 +110,36 @@ def loop_body
 
     # test if worker is still running
     retry_count = 0
-    begin
-      #write_log "Testing if worker #{pm.ip} is still running"
-      wp = pm.worker_proxy
-      if wp.status == "failure"
-        if retry_count > 3
-          write_log "Worker #{pm.ip} is down"
-          pm.status = "failure"
-          pm.save
+    loop do
+      should_retry = false
+      begin
+        #write_log "Testing if worker #{pm.ip} is still running"
+        wp = pm.worker_proxy
+        if wp.status == "failure"
+          if retry_count > 3
+            write_log "Worker #{pm.ip} is down"
+            pm.status = "failure"
+            pm.save
+          else
+            retry_count += 1
+            should_retry = true
+          end
         else
-          retry_count += 1
-          retry
-        end
-      else
 #        write_log "Worker #{pm.ip} still running"
+        end
+      rescue => e
+        write_log "Exception occured when testing liveness of #{pm.ip}: #{e.to_s}"
+        unless retry_count > 3
+          retry_count += 1
+          should_retry = true
+        end
       end
-    rescue => e
-      write_log "Exception occured when testing liveness of #{pm.ip}: #{e.to_s}"
-      unless retry_count > 3
-        retry_count += 1
-        retry
-      end
+      break if should_retry == false
     end
 
     if pm.status != "working"
       # the pm status could be changed by the testing code above
+      sleep 1
       next # go on with next pmachine
     end
 
@@ -214,12 +226,29 @@ def loop_body
           end
         end
 
+        should_destroy = true
+        Vmachine.all.each do |vm|
+          if vm.name == real_vm["name"]
+            should_destroy = false
+            break
+          end
+        end
+
         if vm_already_in_db
           #write_log "VM '#{real_vm["name"]}' already in DB"
           if vm.status == "shutdown-pending"
-            # destroy VM if it is pending shut-off
+            # power_off VM if it is pending shut-off
             write_log "VM '#{real_vm["name"]}' is to be shut off"
             vm.log "info", "VM '#{real_vm["name"]}' is to be shut off"
+            pm.worker_proxy.power_off_vm vm.name
+
+            vm.status = "shut-off"
+            vm.pmachine.vmachines.delete vm
+            vm.pmachine = nil
+            vm.save
+          elsif vm.status == "destroy-pending"
+            write_log "VM '#{real_vm["name"]}' is to be destroyed"
+            vm.log "info", "VM '#{real_vm["name"]}' is to be destroyed"
             pm.worker_proxy.destroy_vm vm.name
 
             vm.status = "shut-off"
@@ -247,7 +276,7 @@ def loop_body
             end
             vm.save
           end
-        elsif real_vm["status"] == "running"
+        elsif should_destroy == true
           write_log "VM '#{real_vm["name"]}' not in DB, destroying!"
           begin
             pm.worker_proxy.destroy_vm real_vm["name"]
@@ -294,6 +323,27 @@ def loop_body
     vm.log "info", "Shutting down vm '#{vm.name}'"
     if vm.pmachine != nil
       wp = vm.pmachine.worker_proxy
+      wp.power_off_vm vm.name if wp != nil
+      vm.status = "shut-off"
+      vm.pmachine.vmachines.delete vm
+      vm.pmachine.save
+      vm.pmachine = nil
+      vm.save
+    else
+      # pmachine is null, which is very unlikely
+      write_log "Warning: vm '#{vm.name}' does not have a pmachine!"
+      vm.log "warning", "Vmachine '#{vm.name}' does not have a pmachine!"
+      vm.status = "shut-off"
+      vm.save
+    end
+  end
+
+  # destroy VMs.
+  Vmachine.find(:all, :conditions =>'status = "destroy-pending"').each do |vm|
+    write_log "Destroying vm '#{vm.name}'"
+    vm.log "info", "Destroy vm '#{vm.name}'"
+    if vm.pmachine != nil
+      wp = vm.pmachine.worker_proxy
       wp.destroy_vm vm.name if wp != nil
       vm.status = "shut-off"
       vm.pmachine.vmachines.delete vm
@@ -308,6 +358,7 @@ def loop_body
       vm.save
     end
   end
+
 
   # live migrations
   Vmachine.all.each do |vm|
@@ -363,5 +414,6 @@ while($running) do
     e.backtrace.each_line do |line|
       write_log "Backtrace: #{line}"
     end
+    sleep 1
   end
 end

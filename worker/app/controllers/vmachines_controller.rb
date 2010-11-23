@@ -82,6 +82,13 @@ public
     action_request "destroy", params
   end
 
+  # Shutdown a domain.
+  #
+  # Since::     0.3.5
+  def power_off
+    action_request "power_off", params
+  end
+
   # Suspend a domain.
   #
   # Since::     0.3

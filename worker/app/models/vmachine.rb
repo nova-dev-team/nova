@@ -586,15 +586,6 @@ XML_DESC
     else
       raise "Please provide a name!"
     end
-=begin
-    if params[:uuid] != nil and params[:uuid] != ""
-      Vmachine.libvirt_call_by_uuid "suspend", params[:uuid]
-    elsif params[:name] != nil and params[:name] != ""
-      Vmachine.libvirt_call_by_name "suspend", params[:name]
-    else
-      raise "Please provide either uuid or name!"
-    end
-=end
   end
 
   # Resume a vmachine. This is a blocking call, but won't take a long time.
@@ -611,15 +602,6 @@ XML_DESC
     else
       raise "Please provide a name!"
     end
-=begin
-    if params[:uuid] != nil and params[:uuid] != ""
-      Vmachine.libvirt_call_by_uuid "resume", params[:uuid]
-    elsif params[:name] != nil and params[:name] != ""
-      Vmachine.libvirt_call_by_name "resume", params[:name]
-    else
-      raise "Please provide either uuid or name!"
-    end
-=end
   end
 
   # Destroy a VM domain, either by name or by uuid. Its hda image will not be saved.
@@ -630,9 +612,7 @@ XML_DESC
   # * When both name & uuid is given, we work according to "uuid" value.
   #
   # Since::     0.3
-
-  # non-blocking Since 0.31
-
+  # Non-blocking Since 0.3.1
   def Vmachine.destroy params
     vm_name = params[:name]
     if vm_name and vm_name != ""
@@ -642,38 +622,17 @@ XML_DESC
     else
       raise "Please provide a name!"
     end
+  end
 
-=begin
-    if params[:uuid] != nil and params[:uuid].is_uuid?
-      begin
-        # "destroy" must be performed on running vm, so when vm is not running,
-        # this will trigger an exception. we have to catch it by "rescue"
-        Vmachine.libvirt_call_by_uuid "destroy", params[:uuid]
-      rescue
-      end
-      begin
-        Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
-      rescue
-      end
-      return {:success => true, :message => "destroyed vm with uuid #{params[:uuid]}."}
-
-    elsif params[:name] != nil and params[:name] != ""
-      begin
-        # "destroy" must be performed on running vm, so when vm is not running,
-        # this will trigger an exception. we have to catch it by "rescue"
-        Vmachine.libvirt_call_by_name "destroy", params[:name]
-      rescue
-      end
-      begin
-        Vmachine.libvirt_call_by_name "undefine", params[:name]
-      rescue
-      end
-      return {:success => true, :message => "destroyed vm named '#{params[:name]}'."}
-
+  def Vmachine.power_off params
+    vm_name = params[:name]
+    if vm_name and vm_name != ""
+      Vmachine.kill_vm_daemon vm_name
+      sleep 1
+      Vmachine.send_instruction vm_name, "power_off"
     else
-      raise "you must provide either 'name' or 'uuid'!"
+      raise "Please provide a name!"
     end
-=end
   end
 
 private

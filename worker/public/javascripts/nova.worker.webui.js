@@ -311,6 +311,10 @@ function suspend_vmachine(name) {
   vm_ajax2("/vmachines/suspend.json", name);
 }
 
+function power_off_vmachine(name) {
+  vm_ajax2("/vmachines/power_off.json", name);
+}
+
 function change_system_setting(key) {
   old_value = $("#sys_setting_holder_" + key).html();
   new_value = prompt("Input the new value for key '" + key + "'.", old_value);

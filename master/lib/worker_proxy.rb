@@ -186,6 +186,13 @@ AGENT_HINT
     post_request "vmachines/destroy.json", :name => name
   end
 
+  # Power off a running vm.
+  #
+  # Since::   0.3.5
+  def power_off_vm name
+    post_request "vmachines/power_off.json", :name => name
+  end
+
   # Live migration.
   #
   # Since::   0.3

@@ -105,7 +105,7 @@ $(document).ready(function() {
 function on_change_cluster_size() {
   $("#create_cluster_container").html("");
   var cluster_size = parseInt($("#new_cluster_size").val());
-  var html = "<br/><font color='red'>* NOTE: Manually assigning IP address is not suggested!</red><br/><br/>";
+  var html = "";
   html += "<table width='100%'>";
   for (var machine_id = 1; machine_id <= cluster_size; machine_id ++) {
     html += "<tr class='row_type_" + ((machine_id + 1) % 2) + "'><td><h2>" + machine_id + "</h2></td><td>";
@@ -124,7 +124,6 @@ function on_change_cluster_size() {
     html += "<%= spacing 4%>";
     html += "Memory size: <input type='text' id='cluster_mem_size-" + machine_id + "' value='256' /> MB";
     html += "<%= spacing 4%>";
-    html += "<font color='blue'>IP address (optional): </font><input type='text' id='cluster_ip_addr-" + machine_id + "'/>";
     html += "<br/>";
     html += "Software (package file name, separate with comma): <input type='text' size=120 id='cluster_soft_list-" + machine_id + "'>";
     html += "<%= spacing 4%>";

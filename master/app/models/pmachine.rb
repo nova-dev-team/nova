@@ -133,12 +133,11 @@ class Pmachine < ActiveRecord::Base
       ret = wp.start_vm start_vm_params
 
       if ret == nil
-        logger.error "[pm.error] failed to start vm"
+        vm.log "error", "failed to start vm"
       else
-        logger.info "[pm.info] started vm! raw reply is: #{ret}"
+        vm.log "info", "started vm! raw reply is: #{ret}"
       end
 
-      logger.info "[pm.info] safe round"
     end
     return sched_pm
   end

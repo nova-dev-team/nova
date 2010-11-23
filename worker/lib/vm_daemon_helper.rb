@@ -339,6 +339,11 @@ def do_prepare rails_root, storage_server, vm_dir
   File.open "required_images" do |f|
     f.each_line do |line|
       img = line.strip
+      img_fn = File.join vm_dir, img
+      if File.exists? img_fn
+        write_log "image file #{img} already exists"
+        next
+      end
       if img.end_with? ".qcow2"
         write_log "preparing qcow2 image '#{img}'"
         prepare_hda_image storage_server, image_pool_dir, vm_dir, img
@@ -730,6 +735,18 @@ def do_cleanup storage_server, vm_dir
 
 end
 
+def do_power_off storage_server, vm_dir
+  write_log "doing power off work"
+  if File.exists? "xml_desc.xml"
+    xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+    uuid = xml_desc["uuid"][0]
+    name = xml_desc["name"][0]
+    virt_conn = libvirt_connect_local
+    dom = virt_conn.lookup_domain_by_uuid(uuid) rescue nil
+    dom.destroy rescue nil
+    write_log "power off done"
+  end
+end
 
 ###############################################################################################
 #                                                                                             #
@@ -783,6 +800,9 @@ def do_action action
   when "save"
     write_log "vm_daemon_helper action: save"
     do_save storage_server, vm_dir
+  when "power_off"
+    write_log "vm_daemon_helper action: power_off"
+    do_power_off storage_server, vm_dir
   when "cleanup", "destroy"
     write_log "vm_daemon_helper action: #{action}"
     do_cleanup storage_server, vm_dir

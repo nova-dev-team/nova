@@ -30,7 +30,7 @@ class MiscController < ApplicationController
   def uuid
     if File.exists? "#{RAILS_ROOT}/config/worker.uuid"
       uuid = File.read("#{RAILS_ROOT}/config/worker.uuid").strip
-      reply_success "Worker UUID is '#{ver}'", :uuid => uuid
+      reply_success "Worker UUID is '#{uuid}'", :uuid => uuid
     else
       reply_failure "UUID is not specified!"
     end

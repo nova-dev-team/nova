@@ -379,6 +379,10 @@ def do_prepare rails_root, storage_server, vm_dir
     f.each_line do |line|
       img = line.strip
       img_fn = File.join vm_dir, img
+      if File.exists? img_fn
+        write_log "Image file '#{img}' already exists"
+        next
+      end
       retry_count = 5
 
       while retry_count > 0
@@ -920,6 +924,20 @@ def do_resume vm_dir
   end
 end
 
+def do_power_off vm_dir
+  Dir.chdir vm_dir
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  uuid = xml_desc["uuid"][0]
+
+  virt_conn = libvirt_connect_local
+  begin
+    dom = virt_conn.lookup_domain_by_uuid(uuid)
+    dom.destroy
+  rescue => e
+    write_log "error while resuming vmachine #{uuid}, message: #{e.to_s}"
+  end
+end
+
 
 def do_suspend vm_dir
   #suspend the vm running in vm_dir
@@ -1047,6 +1065,9 @@ def do_action action
     when "resume"
       write_log "vm_daemon action: resume"
       do_resume vm_dir
+    when "power_off"
+      write_log "vm_daemon action: power_off"
+      do_power_off vm_dir
     when "add_pkg" #this is for realtime on demand software deployment
       write_log "vm_daemon action: add_pkg"
       do_add_pkg vm_dir

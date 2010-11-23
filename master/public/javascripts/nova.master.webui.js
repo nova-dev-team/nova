@@ -1430,11 +1430,11 @@ function load_cluster_content(cluster_name) {
             html += white_spacing(4);
             html += "<button type='button' class='btn' onclick='suspend_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"" + m_info["name"] + "\")'><span><span>Suspend</span></span></button>";
             html += white_spacing(4);
-            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Power off</font></span></span></button>";
           } else if (m_info["status"] == "suspended") {
             html += "<button type='button' class='btn' onclick='resume_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"" + m_info["name"] + "\")'><span><span>Resume</span></span></button>";
             html += white_spacing(4);
-            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Power off</font></span></span></button>";
           } else if (m_info["status"] == "boot-failure") {
             html += "<button type='button' class='btn' onclick='clear_error_of_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Clear error</span></span></button>";
           }
