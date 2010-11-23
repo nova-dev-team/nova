@@ -122,7 +122,8 @@ class VclustersController < ApplicationController
           :mem_size => vm.memory_size,
           :disk_image => (Vdisk.find_by_file_name vm.hda).display_name,
           :soft_list => vm.soft_list,
-          :status => vm.status
+          :status => vm.status,
+          :sched_to => vm.sched_to
         }
       end
 
@@ -146,6 +147,14 @@ class VclustersController < ApplicationController
       reply_failure "Please provide valid 'name' parameter!"
       return
     end
+    sched_map = {}
+    if valid_param? params[:sched_to_info]
+      params[:sched_to_info].each_line do |line|
+        line = line.strip
+        splt = line.split "="
+        sched_map[splt[0]] = splt[1]
+      end
+    end
     vc = Vcluster.find_by_cluster_name params[:name]
     if vc
       if @current_user.privilege != "root" and (@current_user.vclusters.include? vc) == false
@@ -153,6 +162,9 @@ class VclustersController < ApplicationController
         return
       end
       vc.vmachines.each do |vm|
+        if sched_map.has_key? vm.uuid
+          vm.sched_to = sched_map[vm.uuid]
+        end
         if vm.status == "shut-off" or vm.status == "boot-failure"
           vm.status = "start-pending"
           vm.save

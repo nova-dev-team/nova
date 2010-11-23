@@ -65,6 +65,10 @@ class VmachinesController < ApplicationController
       reply_failure "The VM with UUID='#{params[:uuid]}' is not in 'shut-off' status!"
       return false
     else
+      # check if need to do manual scheduling
+      if params[:sched_to] != nil
+        vm.sched_to = params[:sched_to]
+      end
       vm.status = "start-pending"
       vm.save
       reply_success "The VM with UUID='#{params[:uuid]}' is now pending start."

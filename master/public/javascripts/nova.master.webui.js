@@ -1398,17 +1398,23 @@ function load_cluster_content(cluster_name) {
           if (m_info["status"] == "shut-off") {
             // manual scheduling
             html += "Schedule to: ";
-            html += "<select id='sched_to_opt_" + m_info["name"] + "'>";
+            html += "<select class='sched_to_opt' id='sched_to_opt_" + m_info["uuid"] + "'>";
             html += "<option value='auto'>(Automatic)</option>";
             // add pmachines as option, see the def of 'g_working_pmachines' in app/view/webui
             for (var k = 0; k < g_working_pmachines.length; k++) {
               var opt_ip = g_working_pmachines[k][0];
               var opt_host = g_working_pmachines[k][1];
-              html += "<option value='" + opt_ip + "'>" + opt_host + "(" + opt_ip + ")</option>";
+              if (opt_ip != m_info["sched_to"]) {
+                html += "<option value='" + opt_ip + "'>" + opt_host + "(" + opt_ip + ")</option>";
+              } else {
+                html += "<option value='" + opt_ip + "' selected>" + opt_host + "(" + opt_ip + ")</option>";
+              }
             }
             html += ""
             html += "</select>";
             html += "</br>";
+          } else {
+            html += "Schedule target: <b>" + m_info["sched_to"] + "</b></br>";
           }
 
           html += "Status: <b>" + m_info["status"] + "</b>" + tmp_spacing + "Actions: ";
@@ -1486,7 +1492,8 @@ function shut_off_vm(cluster_name, uuid) {
 }
 
 function start_vm(cluster_name, uuid) {
-  vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid});
+  var sched_to_val = $("#sched_to_opt_" + uuid).val();
+  vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid, sched_to: sched_to_val});
 }
 
 function suspend_vm(cluster_name, uuid, vm_name) {
@@ -1512,12 +1519,20 @@ function edit_vm_setting(cluster_name, uuid, item, old_value) {
 }
 
 function start_cluster_vm(cluster_name) {
+  var sched_to_txt = "";
+  $(".sched_to_opt").each(function(idx, obj) {
+    console.log(obj.id);
+    var vm_uuid = obj.id.substring(13);
+    var sched_val = $("#sched_to_opt_" + vm_uuid).val();
+    sched_to_txt += vm_uuid + "=" + sched_val + "\n";
+  });
   $.ajax({
     url: "/vclusters/start_all_vm.json",
     type: "POST",
     dataType: "json",
     data: {
-      name: cluster_name
+      name: cluster_name,
+      sched_to_info: sched_to_txt
     },
     success: function(result) {
       if (result.success) {
