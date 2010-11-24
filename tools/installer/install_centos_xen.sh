@@ -39,61 +39,39 @@ if grep -q "CentOS" "/etc/issue" ; then
   all_yum=( $( cat $YUM_LIST ) )
   yum install -y ${all_yum[@]} || exit 1
 
-  echo =============================
-  echo Phase 2: download source code
-  echo =============================
-  cd $SCRIPT_ROOT/data/src
-  if [ -e "xen-3.3.1.tar.gz" ]
-  then
-    echo "Xen 3.3.1 already exists, skip downloading."
-  else
-    wget http://bits.xensource.com/oss-xen/release/3.3.1/xen-3.3.1.tar.gz
-  fi
-  if [ -e "kernel-2.6.18-164.15.1.el5.src.rpm" ]
-  then
-    echo "Kernel 2.6.18 for CentOS already exists, skip downloading."
-  else
-    wget http://mirror.centos.org/centos/5.4/updates/SRPMS/kernel-2.6.18-164.15.1.el5.src.rpm
-  fi
+
   # get back to where I were
   cd $RUNNING_ROOT
 
   echo ===========================
-  echo Phase 3: Unpack source code
+  echo Phase 2: Unpack source code
   echo ===========================
   mkdir -p /tmp/nova_build
   cd $SCRIPT_ROOT/data/src
-  cp xen-3.3.1.tar.gz /tmp/nova_build
+  cp xen_hotbackup.tar.bz2 /tmp/nova_build
   cd /tmp/nova_build
-  tar xzf xen-3.3.1.tar.gz
-
-  # get back to where I were
-  cd $RUNNING_ROOT
-
-  cd $SCRIPT_ROOT/data/src
-  rpm -i kernel-2.6.18-164.15.1.el5.src.rpm
-  cd /usr/src/redhat
-  rpmbuild -bp --with xenonly SPECS/kernel-2.6.spec
-  cp -r BUILD/kernel-2.6.18/linux-2.6.18.x86_64 /tmp/nova_build
+  tar xzf xen_hotbackup.tar.bz2
 
   echo ================
-  echo Phase 4: Compile
+  echo Phase 3: Install
   echo ================
-  
-  cd /tmp/nova_build/xen-3.3.1
-  make xen tools
-  cd /tmp/nova_build/linux-2.6.18.x86_64
-  cp configs/kernel-2.6.18-x86_64-xen.config .config
+  cd /tmp/nova_build/xen_hotbackup
+  yes "" | make install
+  cd /tmp/nova_build/xen_hotbackup/tools
+  make clean
   make
-
-  echo ================
-  echo Phase 5: Install
-  echo ================
-  cd /tmp/nova_build/xen-3.3.1
-  make install-xen install-tools
-  cd /tmp/nova_build/linux-2.6.18.x86_64
-  make modules_install install
-  mkinitrd /boot/initrd-2.6.18-prep.img 2.6.18-prep
+  make install
+  cd /tmp/nova_build/xen_hotbackup/build-linux-2.6.18-xen_x86_64
+  make modules_install
+  make install
+  mkinitrd /boot/initrd-2.6.18.8-xen.img 2.6.18.8-xen
+  yun install libvirt
+  cd /tmp/nova_build/xen_hotbackup
+  yes "" | make install
+  cd /tmp/nova_build/xen_hotbackup/tools
+  make clean
+  make
+  make install
 
   echo ====================================================================
   echo
@@ -106,9 +84,9 @@ if grep -q "CentOS" "/etc/issue" ; then
   echo 
   echo title Xen
   echo "        root(hd0,0)"
-  echo "        kernel /xen-3.3.1.gz"
-  echo "        module /vmlinuz-2.5.18-prep ro root=/dev/sda2"
-  echo "        module /initrd-2.6.18-prep.img"
+  echo "        kernel /boot/xen.gz"
+  echo "        module /boot/vmlinuz-2.6.18.8-xen ro root=LABEL=/1 rhgh quiet"
+  echo "        module /boot/initrd-2.6.18.8-xen.img"
   echo 
   echo ====================================================================
 
