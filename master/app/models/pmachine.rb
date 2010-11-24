@@ -39,18 +39,38 @@ class Pmachine < ActiveRecord::Base
   # Since::   0.3
   def Pmachine.start_vm vm
     logger.info "[pm.sched] starting sched"
-    all_not_retired = Pmachine.all.select {|pm| pm.status == "working"}
-    logger.info "[pm.sched] machines not retired: count=#{all_not_retired.size}"
-    sorted_pm = all_not_retired.sort {|pm1, pm2| pm1.vmachines.length <=> pm2.vmachines.length}
-    logger.info "[pm.sched] sorting done"
+    vm.log "sched", "vm is being scheduled"
     sched_pm = nil
-    sorted_pm.each do |pm|
-      if pm.vmachines.length < pm.vm_capacity
-        sched_pm = pm
-        break
+    if vm.sched_to != nil
+      vm.log "sched", "vm has manual schedule target: #{vm.sched_to}"
+      manual_sched_pm = Pmachine.find_by_ip vm.sched_to
+      if manual_sched_pm != nil and manual_sched_pm.status == "working"
+        sched_pm = manual_sched_pm
+        logger.info "[pm.sched] manually sched vm #{vm.name} to pm #{sched_pm.ip}"
+        vm.log "sched", "manually scheduled to taget: #{vm.sched_to}"
+      else
+        vm.log "sched", "manual sched target not found, or is not working"
       end
     end
-    logger.info "[pm.sched] target found"
+    if sched_pm == nil
+      # not manually schedule
+      all_not_retired = Pmachine.all.select {|pm| pm.status == "working"}
+      logger.info "[pm.sched] machines not retired: count=#{all_not_retired.size}"
+      sorted_pm = all_not_retired.sort {|pm1, pm2| pm1.vmachines.length <=> pm2.vmachines.length}
+      logger.info "[pm.sched] sorting done"
+      sorted_pm.each do |pm|
+        if pm.vmachines.length < pm.vm_capacity
+          sched_pm = pm
+          break
+        end
+      end
+      if sched_pm == nil
+        vm.log "sched", "failed to schedule the vm, not enough resource!"
+      else
+        logger.info "[pm.sched] automatically sched vm #{vm.name} to pm #{sched_pm.ip}"
+        vm.log "sched", "auto matically sched to #{sched_pm.ip}"
+      end
+    end
     if sched_pm != nil
       conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
       wp = WorkerProxy.new "#{sched_pm.ip}:#{conf["worker_port"]}"
@@ -113,12 +133,11 @@ class Pmachine < ActiveRecord::Base
       ret = wp.start_vm start_vm_params
 
       if ret == nil
-        logger.error "[pm.error] failed to start vm"
+        vm.log "error", "failed to start vm"
       else
-        logger.info "[pm.info] started vm! raw reply is: #{ret}"
+        vm.log "info", "started vm! raw reply is: #{ret}"
       end
 
-      logger.info "[pm.info] safe round"
     end
     return sched_pm
   end

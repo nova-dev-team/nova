@@ -379,6 +379,10 @@ def do_prepare rails_root, storage_server, vm_dir
     f.each_line do |line|
       img = line.strip
       img_fn = File.join vm_dir, img
+      if File.exists? img_fn
+        write_log "Image file '#{img}' already exists"
+        next
+      end
       retry_count = 5
 
       while retry_count > 0
@@ -639,6 +643,10 @@ end
 # 3. remove 'migrate_request' and 'migrate_accept'
 #      migration complete
 
+
+
+
+### this function is USELESS!
 def do_receive storage_server, vm_dir
   #1.handshake
   #waiting for migrate_request
@@ -679,6 +687,67 @@ def do_receive storage_server, vm_dir
   FileUtils.rm_f "migrate_accept"
   FileUtils.rm_f "migrate_request"
   return true
+end
+
+
+def do_hotbackup_cancel
+  
+end
+
+def do_hotbackup
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  vm_uuid = xml_desc["uuid"][0]
+  
+  virt_conn = libvirt_connect_local
+  dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
+
+  if dom.info.state == LIBVIRT_NOT_RUNNING
+    write_log "vm #{vm_uuid} not running! cannot hotbackup!"
+    return -1
+  end
+  
+  hotbackup_dest = nil
+  begin
+    hotbackup_dest = File.read "hotbackup_to"
+  rescue
+  end
+  
+  if hotbackup_dest and (hotbackup_dest.length > 0)
+    write_log "now hotbackup vm<#{vm_uuid}> to slave worker '#{hotbackup_dest}'"
+    old_status = File.read "status"
+    File.open("status", "w") do |f|
+      f.write "hotbackup"
+    end
+
+    write_log "changed VM status to 'hotbackup'"
+    begin
+      pid = fork do
+       cmd = "xm hotbackup " + VM_NAME + " " + hotbackup_dest + " 2>&1 >> hotbackup.log"
+       write_log "[cmd]" + cmd
+       system cmd    
+      end
+
+      Process.detach pid
+
+      File.open("hotbackup", "w") do |f| #special tag file
+        f.write pid
+      end
+
+      begin
+        if Process.kill 0, pid == 1
+         write_log "success!"
+        end
+      rescue
+        write_log "hotbackup maybe failed!"
+      end 
+    end
+  else
+    write_log "invalid params, hotbackup failed"
+
+    FileUtils.rm_f "hotbackup_to"
+    FileUtils.rm_f "hotbackup_from"
+    #invalid params
+  end
 end
 
 
@@ -779,7 +848,6 @@ def do_poll storage_server, vm_dir
 =end
 end
 
-
 def do_add_pkg vm_dir
   #1.get vm's ip address
   agent_ip = nil
@@ -832,7 +900,7 @@ def do_add_pkg vm_dir
   require 'ceil_caller'
   caller = CeilCaller.new(agent_ip, agent_password, pkg_server_addr)
 
-  for pkg_list.each_line do |app_name|
+  pkg_list.each_line do |app_name|
     result = caller.add_job(app_name)
     if result == nil
       write_log "[add_pkg]cannot connect to ceil_agent on #{agent_ip}!"
@@ -840,7 +908,6 @@ def do_add_pkg vm_dir
   end
   #5.ok!
 end
-
 
 def do_resume vm_dir
   #suspend the vm running in vm_dir
@@ -852,6 +919,20 @@ def do_resume vm_dir
   begin
     dom = virt_conn.lookup_domain_by_uuid(uuid)
     dom.resume
+  rescue => e
+    write_log "error while resuming vmachine #{uuid}, message: #{e.to_s}"
+  end
+end
+
+def do_power_off vm_dir
+  Dir.chdir vm_dir
+  xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
+  uuid = xml_desc["uuid"][0]
+
+  virt_conn = libvirt_connect_local
+  begin
+    dom = virt_conn.lookup_domain_by_uuid(uuid)
+    dom.destroy
   rescue => e
     write_log "error while resuming vmachine #{uuid}, message: #{e.to_s}"
   end
@@ -940,7 +1021,7 @@ def get_action
       #cannot remove instruction file, for safety, we do nothing
       return "poll"
     end
-    return action
+    return action.chomp
   else
     return "poll"
   end
@@ -951,7 +1032,6 @@ def do_action action
   rails_root = RAILS_ROOT
   storage_server = STORAGE_SERVER
   vm_dir = VM_DIR
-
 
   begin
     case action
@@ -964,6 +1044,9 @@ def do_action action
     when "migrate"
       write_log "vm_daemon action: migrate"
       do_migrate
+    when "hotbackup"
+      write_log "vm_daemon action: hotbackup"
+      do_hotbackup
     when "poll"
       #write_log "vm_daemon_helper action: poll"
       do_poll storage_server, vm_dir
@@ -982,6 +1065,9 @@ def do_action action
     when "resume"
       write_log "vm_daemon action: resume"
       do_resume vm_dir
+    when "power_off"
+      write_log "vm_daemon action: power_off"
+      do_power_off vm_dir
     when "add_pkg" #this is for realtime on demand software deployment
       write_log "vm_daemon action: add_pkg"
       do_add_pkg vm_dir
@@ -1077,4 +1163,5 @@ while true
   end
   sleep 3
 end
+
 

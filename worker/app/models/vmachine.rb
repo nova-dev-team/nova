@@ -339,7 +339,7 @@ end
     <source path='/dev/pts/1'/>
     <target port='0'/>
   </console>
-  <input type='tablet' bus='usb'/>
+  <!--input type='tablet' bus='usb'/-->
   <input type='mouse' bus='ps2'/>
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
 </devices>
@@ -443,7 +443,7 @@ end
     <source path='/dev/pts/1'/>
     <target port='0'/>
   </console>
-  <input type='tablet' bus='usb'/>
+  <!--input type='tablet' bus='usb'/-->
   <input type='mouse' bus='ps2'/>
   <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'/>
 </devices>
@@ -475,10 +475,6 @@ XML_DESC
     end
     File.open("/var/xml_desc.log", "w") do |f|
       f.puts xml_desc
-    end
-    puts xml_desc
-    File.open("/var/xml_desc.log", "w") do |f|
-        f.puts xml_desc
     end
     return xml_desc
   end
@@ -590,15 +586,6 @@ XML_DESC
     else
       raise "Please provide a name!"
     end
-=begin
-    if params[:uuid] != nil and params[:uuid] != ""
-      Vmachine.libvirt_call_by_uuid "suspend", params[:uuid]
-    elsif params[:name] != nil and params[:name] != ""
-      Vmachine.libvirt_call_by_name "suspend", params[:name]
-    else
-      raise "Please provide either uuid or name!"
-    end
-=end
   end
 
   # Resume a vmachine. This is a blocking call, but won't take a long time.
@@ -615,15 +602,6 @@ XML_DESC
     else
       raise "Please provide a name!"
     end
-=begin
-    if params[:uuid] != nil and params[:uuid] != ""
-      Vmachine.libvirt_call_by_uuid "resume", params[:uuid]
-    elsif params[:name] != nil and params[:name] != ""
-      Vmachine.libvirt_call_by_name "resume", params[:name]
-    else
-      raise "Please provide either uuid or name!"
-    end
-=end
   end
 
   # Destroy a VM domain, either by name or by uuid. Its hda image will not be saved.
@@ -634,9 +612,7 @@ XML_DESC
   # * When both name & uuid is given, we work according to "uuid" value.
   #
   # Since::     0.3
-
-  # non-blocking Since 0.31
-
+  # Non-blocking Since 0.3.1
   def Vmachine.destroy params
     vm_name = params[:name]
     if vm_name and vm_name != ""
@@ -646,38 +622,15 @@ XML_DESC
     else
       raise "Please provide a name!"
     end
+  end
 
-=begin
-    if params[:uuid] != nil and params[:uuid].is_uuid?
-      begin
-        # "destroy" must be performed on running vm, so when vm is not running,
-        # this will trigger an exception. we have to catch it by "rescue"
-        Vmachine.libvirt_call_by_uuid "destroy", params[:uuid]
-      rescue
-      end
-      begin
-        Vmachine.libvirt_call_by_uuid "undefine", params[:uuid]
-      rescue
-      end
-      return {:success => true, :message => "destroyed vm with uuid #{params[:uuid]}."}
-
-    elsif params[:name] != nil and params[:name] != ""
-      begin
-        # "destroy" must be performed on running vm, so when vm is not running,
-        # this will trigger an exception. we have to catch it by "rescue"
-        Vmachine.libvirt_call_by_name "destroy", params[:name]
-      rescue
-      end
-      begin
-        Vmachine.libvirt_call_by_name "undefine", params[:name]
-      rescue
-      end
-      return {:success => true, :message => "destroyed vm named '#{params[:name]}'."}
-
+  def Vmachine.power_off params
+    vm_name = params[:name]
+    if vm_name and vm_name != ""
+      Vmachine.send_instruction vm_name, "power_off"
     else
-      raise "you must provide either 'name' or 'uuid'!"
+      raise "Please provide a name!"
     end
-=end
   end
 
 private
@@ -955,6 +908,24 @@ private
     Vmachine.log vm_name, "#{pkg_count} packages added to VM '#{vm_name}'"
     return {:success => true, :message => "#{pkg_count} packages added to Vmachine '#{vm_name}'"}
   end
+
+  def Vmachine.hotbackup_to vm_name, hotbackup_dest, hotbackup_src
+    hotbackup_to_fn = File.join Setting.vm_root, vm_name, "hotbackup_to"
+    File.open(hotbackup_to_fn, "w") do |f|
+      f.write hotbackup_dest
+    end
+    hotbackup_from_fn = File.join Setting.vm_root, vm_name, "hotbackup_from"
+    if hotbackup_src
+      File.open(hotbackup_from_fn, "a") do |f|
+        f.write hotbackup_src
+      end
+    end
+    Vmachine.send_instruction vm_name, "hotbackup"
+
+    Vmachine.log vm_name, "prepare hotbackup to #{hotbackup_dest}"
+    return {:success => true, :message => "Vmachine '#{vm_name}' is preparing hotbackup to worker '#{hotbackup_dest}'"}
+  end
+
 
   def Vmachine.live_migrate_to vm_name, migrate_dest, migrate_src
     migrate_to_fn = File.join Setting.vm_root, vm_name, "migrate_to"

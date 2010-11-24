@@ -336,21 +336,63 @@ void cleanup_vm_dir() {
   delete [] vm_dir;
 }
 
+void cleanup_logs(char* log_folder) {
+  printf("Debug!\n");
+
+  const int log_max_size = 1024 * 1024 * 16;  // 16M max!
+  struct dirent* p_dirent;
+  DIR* p_dir = opendir(log_folder);
+  if (p_dir == NULL) {
+    printf("Failed to open log dir: '%s'\n", log_folder);
+  } else {
+    while ((p_dirent = readdir(p_dir)) != NULL) {
+      struct stat st;
+      if (text_starts_with(p_dirent->d_name, (char *) ".")) {
+        // skip files starting with "."
+        continue;
+      }
+      if (text_ends_with(p_dirent->d_name, ".log")) {
+        struct stat st;
+        string fullpath;
+        fullpath += log_folder;
+        fullpath += "/";
+        fullpath += p_dirent->d_name;
+        if (lstat(fullpath.c_str(), &st) == 0) {
+          printf("checking log file: '%s'\n", fullpath.c_str());
+          if (st.st_size > log_max_size) {
+            printf("log too big, truncating: '%s'\n", fullpath.c_str());
+            FILE *fp;
+            if (fp = fopen(fullpath.c_str(), "w")) {
+              printf("truncated: '%s'\n", fullpath.c_str());
+              fclose(fp);
+            } else {
+              printf("failed to truncate: '%s'\n", fullpath.c_str());
+            }
+          }
+        }
+      }
+    }
+    closedir(p_dir);
+  }
+}
+
 int main(int argc, char* argv[]) {
   printf("This is trash_cleaner!\n");
+
   if (argc < 3) {
     printf("Usage: trash_cleaner <log_folder> <run_root> <hypervisor>\n");
     exit(0);
   }
 
   if (fork() == 0) {
-    char* pid_fn = new char[strlen(argv[1]) + 40];
-    strcpy(pid_fn, argv[1]);
+    char* log_folder = argv[1];
+    char* pid_fn = new char[strlen(log_folder) + 40];
+    strcpy(pid_fn, log_folder);
     strcat(pid_fn, "/");
     strcat(pid_fn, "trash_cleaner.pid");
 
-    char* log_fn = new char[strlen(argv[1]) + 40];
-    strcpy(log_fn, argv[1]);
+    char* log_fn = new char[strlen(log_folder) + 40];
+    strcpy(log_fn, log_folder);
     strcat(log_fn, "/");
     strcat(log_fn, "trash_cleaner.log");
     g_log_fp = fopen(log_fn, "a");
@@ -375,6 +417,9 @@ int main(int argc, char* argv[]) {
 
       // first of all, cleanup image pool directory
       cleanup_image_pool_dir();
+
+      // cleanup logs folder, prevent huge logs
+      cleanup_logs(log_folder);
 
       // cleanup the running VMs
       // temperarily disabled..

@@ -45,71 +45,84 @@ def cleanup vm_dir, reason
   FileUtils.rm_rf vm_dir
 end
 
+# add by santa zhang: the following code ensures this process could successfully run as a daemon process
+# if this process is started with SSH, when the session closed, STDIN/STDOUT/STDERR could not be used,
+# so we have to redirect them
+fork do
+  # exit if is parent process
+  exit if fork
+  Process.setsid
+  Dir.chdir File.expand_path(File.dirname(__FILE__))
+  File.umask 0000
+  STDIN.reopen "/dev/null"
+  STDOUT.reopen "/dev/null", "a"
+  STDERR.reopen STDOUT
+  # the code below is not modified by santa zhang
 
-begin
-  File.open(PIDFILE, "w") do |f|
-    f.write Process.pid
-  end
-rescue
-  puts "cannot write pid file #{PIDFILE}!"
-  exit 1
-end
-
-while true
-  Dir.foreach(VM_ROOT) do |vm_entry|
-    begin
-      vm_dir_path = File.join VM_ROOT, vm_entry
-      vm_xml_fn = File.join vm_dir_path, "xml_desc.xml"
-      host_uuid_fn = File.join vm_dir_path, "host.uuid"
-      next if vm_entry.start_with? "."
-      next unless File.directory? vm_dir_path
-
-      host_uuid = nil
-      sleep 1
-      begin
-        host_uuid = File.read(host_uuid_fn)
-      rescue
-        host_uuid = nil
-      end
-
-      if host_uuid
-        if host_uuid == WORKER_UUID
-          uuid = nil
-          begin
-            xml_desc = XmlSimple.xml_in(File.read(vm_xml_fn))
-            uuid = xml_desc["uuid"][0]
-          rescue
-            uuid = nil
-          end
-
-          if uuid
-            conn = Libvirt::open("xen:///") #only for xen+nfs
-            dom = nil
-            begin
-              dom = conn.lookup_domain_by_uuid(uuid)
-            rescue
-              dom = nil
-            end
-
-            if dom == nil
-              #cleanup(vm_dir_path, "vmachine not defined")
-            end
-            conn.close
-          else
-            cleanup(vm_dir_path, "xml_desc.xml is broken")
-          end
-
-        end
-      else
-        cleanup(vm_dir_path, "host.uuid not found")
-      end
-
-    rescue
+  begin
+    File.open(PIDFILE, "w") do |f|
+      f.write Process.pid
     end
+  rescue
+    puts "cannot write pid file #{PIDFILE}!"
+    exit 1
   end
 
-  sleep 60 * SCAN_INTERVAL
-end
+  while true
+    Dir.foreach(VM_ROOT) do |vm_entry|
+      begin
+        vm_dir_path = File.join VM_ROOT, vm_entry
+        vm_xml_fn = File.join vm_dir_path, "xml_desc.xml"
+        host_uuid_fn = File.join vm_dir_path, "host.uuid"
+        next if vm_entry.start_with? "."
+        next unless File.directory? vm_dir_path
 
+        host_uuid = nil
+        sleep 1
+        begin
+          host_uuid = File.read(host_uuid_fn)
+        rescue
+          host_uuid = nil
+        end
 
+        if host_uuid
+          if host_uuid == WORKER_UUID
+            uuid = nil
+            begin
+              xml_desc = XmlSimple.xml_in(File.read(vm_xml_fn))
+              uuid = xml_desc["uuid"][0]
+            rescue
+              uuid = nil
+            end
+
+            if uuid
+              conn = Libvirt::open("xen:///") #only for xen+nfs
+              dom = nil
+              begin
+                dom = conn.lookup_domain_by_uuid(uuid)
+              rescue
+                dom = nil
+              end
+
+              if dom == nil
+                #cleanup(vm_dir_path, "vmachine not defined")
+              end
+              conn.close
+            else
+              cleanup(vm_dir_path, "xml_desc.xml is broken")
+            end
+
+          end
+        else
+          cleanup(vm_dir_path, "host.uuid not found")
+        end
+
+      rescue
+      end
+    end
+
+    sleep 60 * SCAN_INTERVAL
+  end
+
+end # fork
 

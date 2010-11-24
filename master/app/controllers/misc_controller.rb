@@ -4,6 +4,7 @@
 # Since::       0.3
 
 require 'utils'
+require 'fileutils'
 
 class MiscController < ApplicationController
 
@@ -289,6 +290,50 @@ class MiscController < ApplicationController
       # do nothing more
     end
     reply_success "Query successful!", :data => reply_data
+  end
+
+  # Enable or disable auto load balance.
+  # * querying: /misc/auto_load_balance.json
+  #   return: :on => true/false
+  # * setting: /misc/auto_load_balance.json?on=true/false
+  #   return: {success,message}
+  #
+  # Since::   0.3.5
+  def auto_load_balance
+    return unless root_required
+    if params[:on] != nil
+      if params[:on] == "true"
+        FileUtils.touch "#{RAILS_ROOT}/log/load_balance.on"
+        reply_success "Enabled auto balancing.", :on => params[:on]
+      elsif params[:on] == "false"
+        FileUtils.rm_f "#{RAILS_ROOT}/log/load_balance.on"
+        reply_success "Disabled auto balancing.", :on => params[:on]
+      else
+        reply_failure "Param not understood!"
+      end
+    else
+      # just querying
+      if File.exists? "#{RAILS_ROOT}/log/load_balance.on"
+        reply_success "Auto load balance is ON.", :on => true
+      else
+        reply_success "Auto load balance is OFF.", :on => false
+      end
+    end
+  end
+
+  def auto_load_balance_logs
+    return unless root_required
+    recent_logs = []
+    log_fn = "#{RAILS_ROOT}/log/load_balance.log"
+    if File.exists? log_fn
+      # use tail
+      IO.popen("tail -n 25 #{log_fn}", "r") do |pipe|
+        pipe.each_line do |line|
+          recent_logs << line.chomp
+        end
+      end
+    end
+    reply_success "Query successful!", :data => recent_logs
   end
 
 private

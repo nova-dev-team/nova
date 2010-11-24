@@ -12,6 +12,9 @@ class CreatePmachines < ActiveRecord::Migration
       # The host name of physical machine.
       t.column :hostname,       :string
 
+      # The uuid of the worker machine
+      t.column :uuid,           :string
+
       # The limit of running VMs on this machine.
       # It is not a hard limit, but creating VMs more than this limit will result in low performance.
       t.column :vm_capacity,    :integer, :default => 2

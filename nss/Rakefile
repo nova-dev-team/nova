@@ -60,6 +60,9 @@ namespace :nova do
       # start image pool helper
       my_exec "cd #{RAILS_ROOT}/lib && ./image_pool_maintainer ../tmp/pids/image_pool_maintainer.pid image_pool_maintainer.conf #{conf["storage_root"]}/vdisks"
 
+      # start log cleaner
+      my_exec "#{File.dirname __FILE__}/lib/log_cleaner.rb &"
+
       # start the NSS module server
       my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["nss_port"]} &"
     end
@@ -71,6 +74,14 @@ namespace :nova do
       Dir.foreach("#{File.dirname __FILE__}/tmp/pids") do |entry|
         if entry.end_with? ".pid"
           fpath = "#{File.dirname __FILE__}/tmp/pids/#{entry}"
+          puts (File.read fpath)
+          kill_by_pid_file fpath
+        end
+      end
+
+      Dir.foreach("#{File.dirname __FILE__}/log") do |entry|
+        if entry.end_with? ".pid"
+          fpath = "#{File.dirname __FILE__}/log/#{entry}"
           puts (File.read fpath)
           kill_by_pid_file fpath
         end

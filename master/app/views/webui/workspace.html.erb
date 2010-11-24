@@ -1,6 +1,17 @@
 <% content_for :page do %>
 
 <script type='text/javascript'>
+
+var g_working_pmachines = [
+  // [ip, hostname]
+<%=
+  working_pm = Pmachine.all.select {|pm| pm.status == "working"}
+  data = working_pm.collect {|pm| ["#{pm.ip}", "#{pm.hostname}"].to_json}
+  js_code = data.join ","
+  js_code
+%>
+];
+
 $(document).ready(function() {
   load_workspace_clusters_list();
   <% if params[:vcluster_name] != nil and params[:vcluster_name] != "" %>

@@ -36,7 +36,7 @@ function load_all_monitor() {
             html += dat.status + " ";
           }
           html += "capacity:" + dat.vm_capacity;
-          html += " <a href='#' onclick='load_monitor(\"" + dat.ip + "\", " + dat.id + ")'>Refresh</a>";
+          html += " <a href='#' onclick='load_monitor(\"" + dat.ip + "\", " + dat.id + ", false)'>Refresh</a>";
           html += "</td></tr>";
 
           html += "<tr class='row_type_1'><td>";
@@ -47,10 +47,9 @@ function load_all_monitor() {
         html += "</table>"
         $("#all_monitor_holder").html(html);
 
-        for (i = 0; i < result.data.length; i++) {
-          var pm = result.data[i];
-          load_monitor(pm.ip, pm.id);
-        }
+
+        g_curr_loading_monitor_id = 0;
+        load_monitor(null, null, true);
       } else {
         do_message("failure", "Error occurred", result.message);
       }
@@ -63,7 +62,11 @@ function load_all_monitor() {
   });
 }
 
-function load_monitor(ip, pm_id) {
+function load_monitor(ip, pm_id, serialized_call) {
+  if (serialized_call == true) {
+    ip = g_all_pm_info[g_curr_loading_monitor_id][0];
+    pm_id = g_all_pm_info[g_curr_loading_monitor_id][1];
+  }
   $("#monitor_holder_" + pm_id).block();
   $.ajax({
     url: "/perf_log/show",
@@ -188,6 +191,15 @@ function load_monitor(ip, pm_id) {
           }
         );
 
+        if (serialized_call == true) {
+          g_curr_loading_monitor_id += 1;
+          if (g_curr_loading_monitor_id < g_all_pm_info.length) {
+            load_monitor(null, null, true);
+          } else {
+            g_curr_loading_monitor_id = 0;
+          }
+        }
+
       } else {
         do_message("failure", "Error occurred", result.message);
       }
@@ -204,12 +216,111 @@ function load_monitor(ip, pm_id) {
 //
 // "Migration" page
 //
+function toggle_auto_balance() {
+  var cur_status = $("#auto_balance_link").html();
+  if (cur_status == "ON" || cur_status == "OFF") {
+    $("#load_balance_logs_pane").block();
+    var should_on = false;
+    if (cur_status == "OFF") {
+      should_on = true;
+    }
+    $.ajax({
+      url: "/misc/auto_load_balance",
+      type: "GET",
+      dataType: "json",
+      data: {
+        on: should_on
+      },
+      async: false,
+      success: function(result) {
+        if (result.success) {
+          if (result.on == true || result.on == "true") {
+            $("#auto_balance_link").html("ON");
+          } else {
+            // result.on == false
+            $("#auto_balance_link").html("OFF");
+          }
+        } else {
+          do_message("failure", "Error occurred", result.message);
+        }
+        $("#load_balance_logs_pane").unblock();
+      },
+      error: function() {
+        $("#load_balance_logs_pane").unblock();
+        do_message("failure", "Request failed", "Please check your network connection!");
+      }
+    });
+  } else {
+    load_auto_balance_status();
+  }
+}
+
+function load_auto_balance_status() {
+  $("#load_balance_logs_pane").block();
+  $.ajax({
+    url: "/misc/auto_load_balance",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        if (result.on == true) {
+          $("#auto_balance_link").html("ON");
+        } else {
+          // result.on == false
+          $("#auto_balance_link").html("OFF");
+        }
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#load_balance_logs_pane").unblock();
+    },
+    error: function() {
+      $("#load_balance_logs_pane").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function load_auto_balance_logs() {
+  $("#load_balance_logs_pane").block();
+  $.ajax({
+    url: "/misc/auto_load_balance_logs",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        var html = "<pre>";
+        for (i = 0; i < result.data.length; i++) {
+          html += result.data[i] + "\n";
+        }
+        html += "</pre>";
+        $("#load_balance_logs_holder").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#load_balance_logs_pane").unblock();
+    },
+    error: function() {
+      $("#load_balance_logs_pane").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function load_auto_balance_view() {
+  load_auto_balance_status();
+  load_auto_balance_logs();
+}
+
 function load_migration_view() {
   $("#migration_view").block();
   $.ajax({
     url: "/migration/overview",
     type: "GET",
     dataType: "json",
+    async: false,
     success: function(result) {
       if (result.success) {
         var html = "";
@@ -1264,6 +1375,7 @@ function load_cluster_content(cluster_name) {
         } else {
           html += "<b>IP range:</b> " + result.first_ip + " ~ " + result.last_ip + "</br>";
         }
+        html += "<a href='#' onclick='load_cluster_content(\"" + cluster_name + "\")'>Refresh</a>" + white_spacing(12);
         html += "<a href='#' onclick='start_cluster_vm(\"" + result.name + "\")'>Start all VM</a>" + white_spacing(4);
         html += "<a href='#' onclick='stop_cluster_vm(\"" + result.name + "\")'>Stop all VM</a>" + white_spacing(4);
         html += "<a href='#' onclick='destroy_cluster(\"" + result.name + "\")'><font color='red'>Destroy cluster!</font></a></br>";
@@ -1275,12 +1387,36 @@ function load_cluster_content(cluster_name) {
           m_info = result.machines[j];
           html += "<tr class='row_type_" + (j % 2) + "'><td>";
           html += "<td><h2>" + (j + 1) + "</h2></td><td>";
+          html += "&nbsp;<br/>";
           html += "Machine name: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"name\", \"" + m_info["name"] + "\")'>" + m_info["name"] + "</a></b>" + tmp_spacing;
           html += "CPU Count: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"cpu_count\", \"" + m_info["cpu_count"] + "\")'>" + m_info["cpu_count"] + "</a></b>" + tmp_spacing;
           html += "Memory size: <b><a href='#' onclick='edit_vm_setting(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"mem_size\", \"" + m_info["mem_size"] + "\")'>" + m_info["mem_size"] + " MB</a></b>" + tmp_spacing;
           html += "Machine image: <b>" + m_info["disk_image"] + "</b><br/>";
           html += "UUID: <b>" + m_info["uuid"] + "</b></br>";
           html += "Software list: <b>" + m_info["soft_list"] + "</b><br/>";
+
+          if (m_info["status"] == "shut-off") {
+            // manual scheduling
+            html += "Schedule to: ";
+            html += "<select class='sched_to_opt' id='sched_to_opt_" + m_info["uuid"] + "'>";
+            html += "<option value='auto'>(Automatic)</option>";
+            // add pmachines as option, see the def of 'g_working_pmachines' in app/view/webui
+            for (var k = 0; k < g_working_pmachines.length; k++) {
+              var opt_ip = g_working_pmachines[k][0];
+              var opt_host = g_working_pmachines[k][1];
+              if (opt_ip != m_info["sched_to"]) {
+                html += "<option value='" + opt_ip + "'>" + opt_host + "(" + opt_ip + ")</option>";
+              } else {
+                html += "<option value='" + opt_ip + "' selected>" + opt_host + "(" + opt_ip + ")</option>";
+              }
+            }
+            html += ""
+            html += "</select>";
+            html += "</br>";
+          } else {
+            html += "Schedule target: <b>" + m_info["sched_to"] + "</b></br>";
+          }
+
           html += "Status: <b>" + m_info["status"] + "</b>" + tmp_spacing + "Actions: ";
 
           if (m_info["status"] == "shut-off") {
@@ -1294,16 +1430,17 @@ function load_cluster_content(cluster_name) {
             html += white_spacing(4);
             html += "<button type='button' class='btn' onclick='suspend_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"" + m_info["name"] + "\")'><span><span>Suspend</span></span></button>";
             html += white_spacing(4);
-            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Power off</font></span></span></button>";
           } else if (m_info["status"] == "suspended") {
             html += "<button type='button' class='btn' onclick='resume_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\", \"" + m_info["name"] + "\")'><span><span>Resume</span></span></button>";
             html += white_spacing(4);
-            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Destroy!!!</font></span></span></button>";
+            html += "<button type='button' class='btn' onclick='shut_off_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span><font color='red'>Power off</font></span></span></button>";
           } else if (m_info["status"] == "boot-failure") {
             html += "<button type='button' class='btn' onclick='clear_error_of_vm(\"" + cluster_name + "\", \"" + m_info["uuid"] + "\")'><span><span>Clear error</span></span></button>";
           }
           html += white_spacing(4);
           html += "<button type='button' class='btn' onclick='show_vm_log(\"" + m_info["uuid"] + "\")'><span><span><font color='blue'>Show Log</font></span></span></button>";
+          html += "<br/>&nbsp;";
           html += "</td></tr>";
         }
         html += "</table>";
@@ -1355,7 +1492,8 @@ function shut_off_vm(cluster_name, uuid) {
 }
 
 function start_vm(cluster_name, uuid) {
-  vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid});
+  var sched_to_val = $("#sched_to_opt_" + uuid).val();
+  vm_ajax(cluster_name, "/vmachines/start.json", {uuid: uuid, sched_to: sched_to_val});
 }
 
 function suspend_vm(cluster_name, uuid, vm_name) {
@@ -1381,12 +1519,20 @@ function edit_vm_setting(cluster_name, uuid, item, old_value) {
 }
 
 function start_cluster_vm(cluster_name) {
+  var sched_to_txt = "";
+  $(".sched_to_opt").each(function(idx, obj) {
+    console.log(obj.id);
+    var vm_uuid = obj.id.substring(13);
+    var sched_val = $("#sched_to_opt_" + vm_uuid).val();
+    sched_to_txt += vm_uuid + "=" + sched_val + "\n";
+  });
   $.ajax({
     url: "/vclusters/start_all_vm.json",
     type: "POST",
     dataType: "json",
     data: {
-      name: cluster_name
+      name: cluster_name,
+      sched_to_info: sched_to_txt
     },
     success: function(result) {
       if (result.success) {

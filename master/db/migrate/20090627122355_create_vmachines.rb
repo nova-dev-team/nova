@@ -57,6 +57,11 @@ class CreateVmachines < ActiveRecord::Migration
       t.column :migrate_from,       :string
       t.column :migrate_to,         :string
 
+      # Schedule info: on which pmachine should the VM run
+      #
+      # Since::     0.3.5
+      t.column :sched_to,           :string
+
       t.timestamps
     end
   end
