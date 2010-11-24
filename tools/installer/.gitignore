@@ -2,3 +2,5 @@ data/debs.list.full
 data/debs/
 data/all-in-one/
 data/src/xen-3.3.1.tar.gz
+data/xen-3.3.1.tar.gz
+data/src/xen_hotbackup.tar.bz2

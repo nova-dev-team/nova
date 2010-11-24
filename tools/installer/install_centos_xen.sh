@@ -50,11 +50,13 @@ if grep -q "CentOS" "/etc/issue" ; then
   cd $SCRIPT_ROOT/data/src
   cp xen_hotbackup.tar.bz2 /tmp/nova_build
   cd /tmp/nova_build
-  tar xzf xen_hotbackup.tar.bz2
+  tar xvf xen_hotbackup.tar.bz2
 
   echo ================
   echo Phase 3: Install
   echo ================
+  cd $SCRIPT_ROOT/data/src
+  rpm -i dmraid-devel-1.0.0.rc13-63.e15.x86_64.rpm
   cd /tmp/nova_build/xen_hotbackup
   yes "" | make install
   cd /tmp/nova_build/xen_hotbackup/tools
