@@ -70,6 +70,26 @@ class PmachinesController < ApplicationController
     end
   end
 
+  # Power off a pmachine.
+  # Params:
+  #   ip: The ip address of the machine
+  #
+  # Since::     0.3.5
+  def power_off
+    # TODO shut off pmachine
+    reply_success "The pmachine will shutdown soon."
+  end
+
+  # Power on a pmachine
+  # Params:
+  #   ip: The ip address of the pmachine.
+  #
+  # Since::     0.3.5
+  def power_on
+    # TODO power on pmachine
+    reply_success "The pmachine will start soon."
+  end
+
   # Add a new pmachine entry.
   # Params:
   #   ip: the ip address of the new pmachine

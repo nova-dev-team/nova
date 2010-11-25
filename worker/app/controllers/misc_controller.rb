@@ -67,6 +67,30 @@ class MiscController < ApplicationController
     end
   end
 
+  # Get the mac address of the machine.
+  #
+  # Since::   0.3.5
+  def mac_addr
+    IO.popen("ifconfig | grep eth") do |pipe|
+      pipe.each_line do |line|
+        line = line.strip
+        splt = line.split
+        mac = splt[-1]
+        reply_success "Mac address is '#{mac}'", :mac_addr => mac
+        return
+      end
+    end
+    reply_failure "Failed to retrieve MAC address!"
+  end
+
+  # Power off the pmachine
+  #
+  # Since::   0.3.5
+  def power_off
+    reply_success "Executing power off request!"
+    `shutdown -h 0`
+  end
+
 
   # Removes deprecated VM image.
   #
