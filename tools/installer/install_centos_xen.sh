@@ -67,12 +67,11 @@ if grep -q "CentOS" "/etc/issue" ; then
   make modules_install
   make install
   mkinitrd /boot/initrd-2.6.18.8-xen.img 2.6.18.8-xen
-  yun install libvirt
+  yum remove libvirt
+  yum install libvirt
+  yum install virt-manager
+  yum install libvirt-devel
   cd /tmp/nova_build/xen_hotbackup
-  yes "" | make install
-  cd /tmp/nova_build/xen_hotbackup/tools
-  make clean
-  make
   make install
 
   echo ====================================================================
@@ -90,6 +89,8 @@ if grep -q "CentOS" "/etc/issue" ; then
   echo "        module /boot/vmlinuz-2.6.18.8-xen ro root=LABEL=/1 rhgh quiet"
   echo "        module /boot/initrd-2.6.18.8-xen.img"
   echo 
+  echo "You need to config xen in /etc/xen/xend-config.sxp"
+  echo "remove '#' before (xend-http-server yes), (xend-port 8000)"
   echo ====================================================================
 
   # get back to where I were
