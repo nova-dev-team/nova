@@ -50,7 +50,11 @@ end
 # Since::   0.3
 def rep_body rep
   begin
-    return rep.body
+    if rep.methods.include? "body"
+      return rep.body
+    else
+      return rep
+    end
   rescue
     return rep
   end
@@ -80,6 +84,13 @@ def loop_body
               reply = JSON.parse raw_reply
               if reply["success"] == true
                 pm.hostname = reply["hostname"]
+              end
+
+              # update mac_addr
+              raw_reply = rep_body(RestClient.get "#{pm.root_url}/misc/mac_addr.json")
+              reply = JSON.parse raw_reply
+              if reply["success"] == true
+                pm.mac_address = reply["mac_addr"]
               end
 
               # update uuid

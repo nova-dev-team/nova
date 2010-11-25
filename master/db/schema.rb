@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(:version => 20100715134626) do
     t.string   "status",                                   :null => false
     t.string   "hostname"
     t.string   "uuid"
+    t.string   "mac_address"
     t.integer  "vm_capacity",               :default => 2
     t.datetime "created_at"
     t.datetime "updated_at"

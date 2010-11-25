@@ -5,6 +5,7 @@
 # Since::     0.3
 
 require "utils.rb"
+require "timeout"
 
 class PmachinesController < ApplicationController
 
@@ -20,6 +21,7 @@ class PmachinesController < ApplicationController
         :id => pm.id,
         :ip => pm.ip,
         :hostname => pm.hostname,
+        :mac_addr => pm.mac_address,
         :status => pm.status,
         :vm_capacity => pm.vm_capacity
       }
@@ -76,18 +78,39 @@ class PmachinesController < ApplicationController
   #
   # Since::     0.3.5
   def power_off
-    # TODO shut off pmachine
-    reply_success "The pmachine will shutdown soon."
+    if params[:ip]
+      fork do
+        timeout(10) do
+          `ssh #{params[:ip]} "shutdown -h 0"`
+        end
+        exit
+      end
+      reply_success "The pmachine will shutdown soon."
+    else
+      reply_failure "Please check your params!"
+    end
   end
 
   # Power on a pmachine
   # Params:
   #   ip: The ip address of the pmachine.
+  #   mac_addr: (optional) The mac address of the pmachine.
   #
   # Since::     0.3.5
   def power_on
-    # TODO power on pmachine
-    reply_success "The pmachine will start soon."
+    mac_addr = nil
+    if params[:mac_addr]
+      mac_addr = params[:mac_addr]
+    elsif params[:ip]
+      pm = Pmachine.find_by_ip params[:ip]
+      mac_addr = pm.mac_address
+    end
+    if mac_addr != nil
+      `ether-wake #{mac_addr}`
+      reply_success "The pmachine will start soon."
+    else
+      reply_failure "Please check your params!"
+    end
   end
 
   # Add a new pmachine entry.
