@@ -48,7 +48,7 @@ class VclustersController < ApplicationController
       # create vmachines
       vm_counter = 0
       begin
-        vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil}
+        vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil, :sched_to => nil}
         params[:machines].each_line do |line|
           line = line.strip
           if line == "" and vm_info[:name] != nil
@@ -58,6 +58,9 @@ class VclustersController < ApplicationController
             vm.cpu_count = vm_info[:cpu_count].to_i
             vm.memory_size = vm_info[:mem_size].to_i
             vm.soft_list = vm_info[:soft_list]
+            if vm_info[:sched_to] != nil
+              vm.sched_to = vm_info[:sched_to]
+            end
             vm.hda = vm_info[:vdisk_fname]
             vm.ip = IpTools.i_to_ipv4(IpTools.ipv4_to_i(vc.first_ip) + vm_counter)
 
@@ -67,7 +70,7 @@ class VclustersController < ApplicationController
             raise "Failed to create vmachine!" unless vm.save
             vm_counter += 1
 
-            vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil}
+            vm_info = {:name => nil, :vdisk_fname => nil, :cpu_count => nil, :mem_size => nil, :soft_list => nil, :sched_to => nil}
           else
             case line
             when /^vdisk_fname=/
@@ -80,6 +83,8 @@ class VclustersController < ApplicationController
               vm_info[:mem_size] = line[9..-1]
             when /^soft_list=/
               vm_info[:soft_list] = line[10..-1]
+            when /^sched_to=/
+              vm_info[:sched_to] = line[9..-1]
             else
               raise "Wrong parameter for 'machines'!"
             end
