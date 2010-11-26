@@ -63,6 +63,9 @@ namespace :nova do
       # start log cleaner
       my_exec "#{File.dirname __FILE__}/lib/log_cleaner.rb &"
 
+      # start trash cleaner
+      my_exec "#{File.dirname __FILE__}/lib/trash_cleaner &"
+
       # start the NSS module server
       my_exec "#{File.dirname __FILE__}/script/server -d -p #{conf["nss_port"]} &"
     end

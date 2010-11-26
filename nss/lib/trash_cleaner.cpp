@@ -10,9 +10,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <libvirt/libvirt.h>
-#include <libvirt/virterror.h>
-
 using namespace std;
 
 // struct used to present image pool item info
@@ -43,9 +40,6 @@ map<string, ImagePoolItemInfo> g_image_pool_dir;
 // Map which stores VM's last ack time.
 // If we lose contact to a VM for a long time, remove its resource.
 map<string, int> g_vm_alive_time;
-
-// connection to libvirt
-virConnectPtr g_virt_conn = NULL;
 
 FILE* g_log_fp = NULL;
 
@@ -116,6 +110,9 @@ bool is_vm_disk_image(const char* filename) {
   if (text_ends_with(filename, (char *) ".qcow2")) {
     return true;
   }
+  if (text_ends_with(filename, (char *) ".qcow")) {
+    return true;
+  }
   if (text_ends_with(filename, (char *) ".img")) {
     return true;
   }
@@ -136,6 +133,9 @@ bool is_vm_disk_image(const char* filename) {
   }
   fname_copy[idx] = '\0';
   if (text_ends_with(fname_copy, (char *) ".qcow2.pool")) {
+    return true;
+  }
+  if (text_ends_with(fname_copy, (char *) ".qcow.pool")) {
     return true;
   }
   if (text_ends_with(fname_copy, (char *) ".img.pool")) {
@@ -270,76 +270,11 @@ void cleanup_image_pool_dir() {
   return;
 }
 
-void cleanup_vm_dir() {
-  string connStr = "";
-  if (hypervisor == NULL) connStr = "qemu:///system";
-  if (strcmp(hypervisor, "xen") == 0) connStr = "xen:///";
-  if (strcmp(hypervisor, "kvm") == 0) connStr = "qemu:///system";
-
-  const char *conn = connStr.c_str();
-  g_virt_conn = virConnectOpen(conn);
-  if (g_virt_conn == NULL) {
-    do_log("error: cannot open connection to '%s'", conn);
-    return;
-  }
-
-  time_t now = time(NULL);
-  char* vm_dir = new char[strlen(g_run_root) + 10];
-  strcpy(vm_dir, g_run_root);
-  strcat(vm_dir, "/");
-  strcat(vm_dir, "vm");
-
-  DIR* p_dir = opendir(vm_dir);
-  if (p_dir != NULL) {
-    struct dirent* p_dirent;
-    while ((p_dirent = readdir(p_dir)) != NULL) {
-      if (text_starts_with(p_dirent->d_name, ".")) {
-        continue; // skip .* files
-      }
-      char* fpath = new char[(strlen(vm_dir) + strlen(p_dirent->d_name)) * 2 + 10];
-      strcpy(fpath, vm_dir);
-      strcat(fpath, "/");
-      strcat(fpath, p_dirent->d_name);
-      struct stat st;
-      if (lstat(fpath, &st) != 0) {
-        do_log("failed to stat on '%s'", fpath);
-      }
-      if (S_ISDIR(st.st_mode)) {
-        do_log("Checking if VM '%s' exists", p_dirent->d_name);
-        if (virDomainLookupByName(g_virt_conn, p_dirent->d_name) != NULL) {
-          do_log("Domain '%s' is running", p_dirent->d_name);
-          g_vm_alive_time[p_dirent->d_name] = now;
-        } else {
-          do_log("Domain '%s' is NOT running", p_dirent->d_name);
-          if (g_vm_alive_time.find(p_dirent->d_name) == g_vm_alive_time.end()) {
-            g_vm_alive_time[p_dirent->d_name] = now;
-          }
-          if (now - g_vm_alive_time[p_dirent->d_name] > 60 * 60) {
-            // remove the vm if it is not detected for 1 hour
-            do_log("Consider VM '%s' trashed since it is not detected for a long time", p_dirent->d_name);
-            do_log("Remove all data of '%s' since it is trashed", p_dirent->d_name);
-            char* rm_cmd = new char[strlen(fpath) + 40];
-            sprintf(rm_cmd, "rm %s -rf", fpath);
-            do_log("[cmd] %s", rm_cmd);
-            system(rm_cmd);
-            delete [] rm_cmd;
-          }
-        }
-      }
-      delete [] fpath;
-    }
-    closedir(p_dir);
-  } else {
-    do_log("failed to open dir '%s'\n", vm_dir);
-  }
-
-  delete [] vm_dir;
-}
 
 int main(int argc, char* argv[]) {
   printf("This is trash_cleaner!\n");
-  if (argc < 3) {
-    printf("Usage: trash_cleaner <log_folder> <run_root> <hypervisor>\n");
+  if (argc < 2) {
+    printf("Usage: trash_cleaner <log_folder> <run_root>\n");
     exit(0);
   }
 
@@ -368,17 +303,12 @@ int main(int argc, char* argv[]) {
     fprintf(p_pidf, "%d", getpid());
     fclose(p_pidf);
     g_run_root = argv[2];
-    hypervisor = argv[3];
     // ok, start to do cleanup work
     for (;;) {
       do_log("Doing cleanup work...\n");
 
       // first of all, cleanup image pool directory
       cleanup_image_pool_dir();
-
-      // cleanup the running VMs
-      // temperarily disabled..
-      // cleanup_vm_dir();
 
       // do cleanup every 3 minutes
       sleep(3 * 60);
