@@ -3,6 +3,8 @@ v0.3.5:
 + added advanced features for XEN: live migration, hot backup
 + user ACL is made optional
 + better VM image management for NFS mode (added "power off" option)
++ host machine power management
++ command line utility
 
 v0.3.4:
 + added ftp client registration api in vm_pool module
