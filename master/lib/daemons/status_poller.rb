@@ -60,6 +60,55 @@ def rep_body rep
   end
 end
 
+# log for load balance
+def lb_log message
+  puts message
+  File.open("#{File.dirname __FILE__}/../log/load_balance.log", "a") do |f|
+    message.each_line do |line|
+      if line.end_with? "\n"
+        f.write "[#{Time.now}] #{line}"
+      else
+        f.write "[#{Time.now}] #{line}\n"
+      end
+    end
+  end
+end
+
+# params for load balance
+$lb_was_on = false
+$lb_was_off = false
+$lb_last_time = nil
+
+
+def real_load_balance
+  lb_log "TODO: load balancer"
+end
+
+def do_load_balance
+  should_do_load_balance = false
+  if File.exists? "#{File.dirname __FILE__}/../log/load_balance.on"
+    should_do_load_balance = true
+  end
+  if should_do_load_balance == false
+    if $lb_was_off == false
+      lb_log "Load balance is OFF"
+      $lb_was_off = true
+    end
+    $lb_was_on = false
+    return
+  end
+  
+  if $lb_was_on == false
+    lb_log "Load balance is ON"
+    $lb_was_on = true
+  end
+
+  # do real work, load balancing
+  # migrate one vm per round
+  real_load_balance
+  $lb_was_off = false
+end
+
 def loop_body
   #write_log "daemon woke up"
   # connect pending pmachines
@@ -369,7 +418,9 @@ def loop_body
       vm.save
     end
   end
-
+  
+  # auto balance
+  do_load_balance
 
   # live migrations
   Vmachine.all.each do |vm|

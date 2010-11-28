@@ -83,8 +83,6 @@ LFTP_SCRIPT
         # boot the NSS monitor
         my_exec "#{RAILS_ROOT}/lib/nss_is_run.rb"
 
-        # boot the auto balancer
-        my_exec "#{RAILS_ROOT}/lib/load_balance.rb"
       else
         # storage type not known!
         puts "!!!"
