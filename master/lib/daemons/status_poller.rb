@@ -63,7 +63,7 @@ end
 # log for load balance
 def lb_log message
   puts message
-  File.open("#{File.dirname __FILE__}/../log/load_balance.log", "a") do |f|
+  File.open("#{File.dirname __FILE__}/../../log/load_balance.log", "a") do |f|
     message.each_line do |line|
       if line.end_with? "\n"
         f.write "[#{Time.now}] #{line}"
@@ -81,12 +81,29 @@ $lb_last_time = nil
 
 
 def real_load_balance
-  lb_log "TODO: load balancer"
+  ret = nil
+  lb_log "Running load balancer"
+  all_working_pm = Pmachine.all.select {|pm| pm.status == "working"}
+  sorted_pms = all_working_pm.sort {|p1, p2| p1.vmachines.count <=> p2.vmachines.count}
+  low_load_pm = sorted_pms.first
+  high_load_pm = sorted_pms.last
+  if high_load_pm.vmachines.count >= low_load_pm.vmachines.count * 2 + 2
+    lb_log "high load: #{high_load_pm.ip} (#{high_load_pm.vmachines.count} VM), low load: #{low_load_pm.ip} (#{low_load_pm.vmachines.count} VM)"
+    vm_migr = high_load_pm.vmachines[rand(high_load_pm.vmachines.count)]
+    vm_migr.migrate_to = low_load_pm.ip
+    vm_migr.save
+    ret = vm_migr
+    lb_log "migrate #{vm_migr.name} from #{high_load_pm.ip} to #{low_load_pm.ip}"
+  else
+    lb_log "Load balance not necessary"
+  end
+  lb_log "Load balancer finished"
+  return ret
 end
 
 def do_load_balance
   should_do_load_balance = false
-  if File.exists? "#{File.dirname __FILE__}/../log/load_balance.on"
+  if File.exists? "#{File.dirname __FILE__}/../../log/load_balance.on"
     should_do_load_balance = true
   end
   if should_do_load_balance == false
@@ -103,9 +120,14 @@ def do_load_balance
     $lb_was_on = true
   end
 
-  # do real work, load balancing
-  # migrate one vm per round
-  real_load_balance
+  if ($lb_last_time == nil) or (Time.now - $lb_last_time > 5 * 60)
+    # do real work, load balancing
+    # migrate one vm per round
+    ret = real_load_balance
+    if ret != nil
+      $lb_last_time = Time.now
+    end
+  end
   $lb_was_off = false
 end
 
