@@ -82,7 +82,6 @@ $lb_last_time = nil
 
 def real_load_balance
   ret = nil
-  lb_log "Running load balancer"
   all_working_pm = Pmachine.all.select {|pm| pm.status == "working"}
   sorted_pms = all_working_pm.sort {|p1, p2| p1.vmachines.count <=> p2.vmachines.count}
   low_load_pm = sorted_pms.first
@@ -94,10 +93,7 @@ def real_load_balance
     vm_migr.save
     ret = vm_migr
     lb_log "migrate #{vm_migr.name} from #{high_load_pm.ip} to #{low_load_pm.ip}"
-  else
-    lb_log "Load balance not necessary"
   end
-  lb_log "Load balancer finished"
   return ret
 end
 
