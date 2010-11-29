@@ -25,6 +25,9 @@ ActiveRecord::Schema.define(:version => 20100715134626) do
     t.datetime "updated_at"
   end
 
+  add_index "perf_logs", ["pmachine_id"], :name => "index_perf_logs_on_pmachine_id"
+  add_index "perf_logs", ["time"], :name => "index_perf_logs_on_time"
+
   create_table "pmachines", :force => true do |t|
     t.string   "ip",          :limit => 20,                :null => false
     t.string   "status",                                   :null => false

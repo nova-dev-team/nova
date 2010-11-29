@@ -234,13 +234,18 @@ def loop_body
 
     ##############################get workers' log and write these logs to database#############################################
 
-=begin
+#=begin
     begin
       #write_log "Fetching perflogs from #{pm.ip}"
+      log_time = Time.now.to_i - 60
+      last_log = PerfLog.find(:first, :conditions => {:pmachine_id => pm.id}, :order => "time DESC")
+      if last_log != nil
+        log_time = last_log.time
+      end
 
-      logs = JSON.parse rep_body(RestClient.post "#{pm.root_url}/logs/show.json", :time => (Time.now.to_i - 60))
+      logs = JSON.parse rep_body(RestClient.post "#{pm.root_url}/logs/show.json", :time => log_time)
       logs["data"].each do |log|
-        next if PerfLog.find(:first, :conditions => {:pmachine_id => pm.id, :time => log["Time"]}) != nil # prevent duplicate entries
+        #next if PerfLog.find(:first, :conditions => {:pmachine_id => pm.id, :time => log["Time"]}) != nil # prevent duplicate entries
         plog = PerfLog.new
         plog.memFree = log["memFree"]
         plog.pmachine_id = pm.id
@@ -260,7 +265,7 @@ def loop_body
     rescue Exception => e
       write_log "Exception happend when fetching perflogs from #{pm.ip}. Exception: #{e.to_s}"
     end
-=end
+#=end
     ##############################end of get workers' log and write these logs to database#####################################
 
     # sync info on vm

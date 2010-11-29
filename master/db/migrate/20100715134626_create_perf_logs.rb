@@ -12,6 +12,8 @@ class CreatePerfLogs < ActiveRecord::Migration
       t.column :dAvail,       :string,   :limit => 20
       t.timestamps
     end
+    add_index :perf_logs, :time
+    add_index :perf_logs, :pmachine_id
   end
 
   def self.down
