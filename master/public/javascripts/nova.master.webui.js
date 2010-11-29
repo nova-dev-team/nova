@@ -216,6 +216,118 @@ function load_monitor(ip, pm_id, serialized_call) {
 //
 // "Migration" page
 //
+function load_all_pmachine_info() {
+  $("#pm_info_view").block();
+  $.ajax({
+    url: "/pmachines/show_all_info",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        var html = "";
+        html += "<table width='100%'><tr class='row_type_0'><td>Pmachine</td><td>Status</td><td>Running VM</td><td>Suspended VM</td><td>Preparing VM</td><td>Actions</td></tr>";
+        for (var i = 0; i < result.data.length; i++) {
+          var pm_data = result.data[i];
+          html += "<tr class='row_type_" + ((i + 1) % 2) + "'><td>";
+          html += pm_data.ip;
+          html += "<font color='gray'> (" + pm_data.hostname + ")</font>"
+          html += "</td><td>";
+          if (pm_data.status == "failure") {
+            html += "<font color='red'>failure</font>";
+          } else {
+            html += pm_data.status;
+          }
+          html += "</td><td>";
+          var could_power_off_all = true;
+          var could_suspend_all = true;
+          var could_resume_all = true;
+          for (var j = 0; j < pm_data.vm_list.length; j++) {
+            if (pm_data.vm_list[j].status == "running") {
+              could_power_off_all = true;
+              html += pm_data.vm_list[j].name + white_spacing(4);
+            }
+          }
+          html += "</td><td>";
+          for (var j = 0; j < pm_data.vm_list.length; j++) {
+            if (pm_data.vm_list[j].status == "suspended") {
+              could_resume_all = true;
+              html += pm_data.vm_list[j].name + white_spacing(4);
+            }
+          }
+          html += "</td><td>";
+          for (var j = 0; j < pm_data.vm_list.length; j++) {
+            if (pm_data.vm_list[j].status == "start-preparing") {
+              could_suspend_all = true;
+              html += pm_data.vm_list[j].name + white_spacing(4);
+            }
+          }
+          html += "</td><td>";
+          var ip = pm_data.ip;
+          if (could_suspend_all) {
+            html += "<button type='button' class='btn' onclick='pm_suspend_all_vm(\"" + ip + "\")'><span><span>Suspend all</span></span></button>";
+            html += "&nbsp;&nbsp;";
+          }
+          if (could_resume_all) {
+            html += "<button type='button' class='btn' onclick='pm_resume_all_vm(\"" + ip + "\")'><span><span>Resume all</span></span></button>";
+            html += "&nbsp;&nbsp;";
+          }
+          if (could_power_off_all) {
+            html += "<button type='button' class='btn' onclick='pm_power_off_all_vm(\"" + ip + "\")'><span><span><font color='red'>Power off all</font></span></span></button>";
+            html += "&nbsp;&nbsp;";
+          }
+          html += "</td></tr>";
+        }
+
+        html += "</table>";
+        $("#pm_info_view").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+      $("#pm_info_view").unblock();
+    },
+    error: function() {
+      $("#pm_info_view").unblock();
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function pm_operate_all_vm(action, ip) {
+  var req_url = "/pmachines/" + action;
+  $.ajax({
+    url: req_url,
+    type: "GET",
+    dataType: "json",
+    async: false,
+    data: {
+      ip: ip
+    },
+    success: function(result) {
+      if (result.success) {
+        do_message("success", "Success", result.message);
+      } else {
+        do_message("failure", "Failure", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function pm_suspend_all_vm(ip) {
+  pm_operate_all_vm("suspend_all_vm", ip);
+}
+
+function pm_resume_all_vm(ip) {
+  pm_operate_all_vm("resume_all_vm", ip);
+}
+
+function pm_power_off_all_vm(ip) {
+  pm_operate_all_vm("power_off_all_vm", ip);
+}
+
 function toggle_auto_balance() {
   var cur_status = $("#auto_balance_link").html();
   if (cur_status == "ON" || cur_status == "OFF") {

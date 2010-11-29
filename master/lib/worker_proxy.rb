@@ -285,6 +285,18 @@ AGENT_HINT
     return {:success => false, :message => "Request to worker module failed!"}
   end
 
+  def suspend_all
+    ret = get_request "vmachines/suspend_all.json"
+    return ret if ret != nil
+    return {:success => false, :message => "Request to worker module failed!"}
+  end
+
+  def resume_all
+    ret = get_request "vmachines/resume_all.json"
+    return ret if ret != nil
+    return {:success => false, :message => "Request to worker module failed!"}
+  end
+
 private
 
   # Send a POST request.

@@ -70,6 +70,10 @@ class PerfLogController < ApplicationController
       perf_data = PerfLog.find(:all, :order => "time DESC")
     end
 
+    if start_time == nil and perf_data.size > 0
+      start_time = perf_data.first[:time]
+    end
+
     reply_data = []
     perf_data.each do |perf|
       reply_data << {

@@ -237,7 +237,7 @@ def loop_body
 #=begin
     begin
       #write_log "Fetching perflogs from #{pm.ip}"
-      log_time = Time.now.to_i - 60
+      log_time = (Time.now - 60).strftime("%Y%m%d%H%M%S")
       last_log = PerfLog.find(:first, :conditions => {:pmachine_id => pm.id}, :order => "time DESC")
       if last_log != nil
         log_time = last_log.time
@@ -245,7 +245,7 @@ def loop_body
 
       logs = JSON.parse rep_body(RestClient.post "#{pm.root_url}/logs/show.json", :time => log_time)
       logs["data"].each do |log|
-        #next if PerfLog.find(:first, :conditions => {:pmachine_id => pm.id, :time => log["Time"]}) != nil # prevent duplicate entries
+        next if PerfLog.find(:first, :conditions => {:pmachine_id => pm.id, :time => log["Time"]}) != nil # prevent duplicate entries
         plog = PerfLog.new
         plog.memFree = log["memFree"]
         plog.pmachine_id = pm.id

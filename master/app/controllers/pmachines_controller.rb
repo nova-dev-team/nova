@@ -45,6 +45,101 @@ class PmachinesController < ApplicationController
     reply_success "query successful!", :data => list_data
   end
 
+  # Shut down all vm on a pmachine
+  #
+  # Since::     0.3.6
+  def power_off_all_vm
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+
+    if pm == nil
+      reply_failure "No pmachine with ip=#{params[:ip]} was found!"
+    elsif pm.status != "working"
+      reply_failure "Pmachine with ip=#{params[:ip]} is not working!"
+    else
+      pm.vmachines.each do |vm|
+        case vm.status.downcase
+        when "start-preparing", "suspended", "running"
+          vm.status = "shutdown-pending"
+          vm.save
+        end
+      end
+      reply_success "All VM on ip=#{params[:ip]} was marked as shutdown-pending."
+    end
+  end
+
+  # Resume all vm on a pmachine
+  #
+  # Since::     0.3.6
+  def resume_all_vm
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+
+    if pm == nil
+      reply_failure "No pmachine with ip=#{params[:ip]} was found!"
+    elsif pm.status != "working"
+      reply_failure "Pmachine with ip=#{params[:ip]} is not working!"
+    else
+      begin
+        rep = pm.worker_proxy.resume_all
+        if rep["success"].to_s == "true"
+          reply_success "All VM on ip=#{params[:ip]} was being resumed."
+        else
+          reply_failure "Operation failed: #{rep["message"]}"
+        end
+      rescue Exception => e
+        reply_failure "Exception: #{e.to_s}"
+      end
+    end
+  end
+
+  # Suspend all vm on a pmachine
+  #
+  # Since::     0.3.6
+  def suspend_all_vm
+    return unless valid_ip?
+    pm = Pmachine.find_by_ip params[:ip]
+
+    if pm == nil
+      reply_failure "No pmachine with ip=#{params[:ip]} was found!"
+    elsif pm.status != "working"
+      reply_failure "Pmachine with ip=#{params[:ip]} is not working!"
+    else
+      begin
+        rep = pm.worker_proxy.suspend_all
+        if rep["success"].to_s == "true"
+          reply_success "All VM on ip=#{params[:ip]} was being suspended."
+        else
+          reply_failure "Operation failed: #{rep["message"]}"
+        end
+      rescue Exception => e
+        reply_failure "Exception: #{e.to_s}"
+      end
+    end
+  end
+
+  # Show all info of every pmachine
+  #
+  # Since::     0.3.6
+  def show_all_info
+    all_data = []
+    Pmachine.all.each do |pm|
+      pm_data = {
+        :id => pm.id,
+        :ip => pm.ip,
+        :hostname => pm.hostname,
+        :status => pm.status,
+        :vm_capacity => pm.vm_capacity,
+        :vm_list => []
+      }
+      pm.vmachines.each do |vm|
+        pm_data[:vm_list] << vm
+      end
+      all_data << pm_data
+    end
+    reply_success "Query successful!", :data => all_data
+  end
+
   # Show detail info of a pmachine
   # Param:
   #   ip: The ip address of pmachine.

@@ -173,6 +173,26 @@ public
     end
   end
 
+  def suspend_all
+    Vmachine.all_domains.each do |dom|
+      vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+      if dom.info.state == Vmachine::LIBVIRT_RUNNING
+        action_request "suspend", :name => dom.name
+      end
+    end
+    reply_success "Request sent"
+  end
+
+  def resume_all
+    Vmachine.all_domains.each do |dom|
+      vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
+      if dom.info.state == Vmachine::LIBVIRT_RUNNING
+        action_request "resume", :name => dom.name
+      end
+    end
+    reply_success "Request sent"
+  end
+
 private
 
   # This is a helper, it triggers Vmachine's action, and replies result to user.
