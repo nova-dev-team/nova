@@ -5,25 +5,15 @@ class Log < ActiveRecord::Base
   # params[:path] is the log file path
   # use binary serach to seach the first log to show
   def Log.get_tail params
-    i = 0
-    file = File.new(params[:path])
-    strs = file.readlines[i]
     ori_logs = []
-    while strs
-      ori_logs[i] = strs
-      i += 1
-      file = File.new(params[:path])
-      strs = file.readlines[i]
+    tail_counter = 10
+    IO.popen("tail -n #{tail_counter} #{params[:path]}") do |pipe|
+      pipe.each_line do |line|
+        ori_logs << line.strip
+      end
     end
     index = 0
-    if params[:time] != nil
-      head = 0
-      tail = ori_logs.size
-      middle = (head + tail) / 2
-      index = binary_search({:head => head, :middle => middle, :tail => tail, :array => ori_logs, :time => params[:time]})
-    end
     logs = []
-    i = 0
     while index < ori_logs.size
 
       time_value = ori_logs[index].slice(6, 15)
@@ -37,36 +27,12 @@ class Log < ActiveRecord::Base
       rece_value = get_value({:log => ori_logs[index], :key => "Rece", :offset => 6})
       tran_value = get_value({:log => ori_logs[index], :key => "Tran", :offset => 6})
 
-      logs[i] = { :Time => time_value, :CPU => cpu_value, :memTotal => memTotal_value, \
+      logs << { :Time => time_value, :CPU => cpu_value, :memTotal => memTotal_value, \
         :memFree => memFree_value, :dSize => dSize_value, :dAvail => dAvail_value, :Rece => rece_value, :Tran => tran_value}
 
-      i +=1
       index += 1
     end
     logs
-  end
-
-  def Log.binary_search params
-    time = params[:time]
-    time.insert(8, "-")
-    head = params[:head]
-    tail = params[:tail]
-    middle = params[:middle]
-    array = params[:array]
-    while(head < tail - 1)
-      temp_time = array[middle].slice(6, 15)
-      if temp_time < time
-        head = middle
-      else
-        tail = middle
-      end
-      middle = (head + tail) / 2
-    end
-    if array[head].slice(6, 15) == time
-      return head
-    else
-      return tail
-    end
   end
 
   def Log.get_value params
