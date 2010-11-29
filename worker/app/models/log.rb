@@ -19,6 +19,17 @@ class Log < ActiveRecord::Base
       time_value = ori_logs[index].slice(6, 15)
       time_value = time_value.delete("-")
 
+      if params[:time] != nil and params[:time] != ""
+        begin
+          if Time.parse(time_value) < Time.parse(params[:time])
+            index += 1
+            next
+          end
+        rescue
+          break
+        end
+      end
+
       cpu_value = get_value({:log => ori_logs[index], :key => "CPU", :offset => 5})
       memTotal_value = get_value({:log => ori_logs[index], :key => "memTotal", :offset => 10})
       memFree_value = get_value({:log => ori_logs[index], :key => "memFree", :offset => 9})
