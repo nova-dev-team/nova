@@ -3,8 +3,22 @@
 #	This Program operate nova from the command line
 # Author: frankvictor-frankvictor@qq.com 
 
+#set the dir of config files
+if [ ! $NOVASHELL_CONF_DIR ]; then
+	NOVASHELL_CONF_DIR=$PWD/../conf/
+fi
+
+if [ "$1" == "list-clusters" ]; then
+  java -Xbootclasspath/a:../lib/jdom.jar:../lib/httpclient-4.0.2.jar:../lib/commons-logging-1.1.1.jar:../lib/gson-1.5.jar:../lib/httpcore-4.0.1.jar:../lib/httpcore-nio-4.0.1.jar:../lib/httpmime-4.0.2.jar -jar ../nova-client.jar $NOVASHELL_CONF_DIR $1
+  exit 0
+elif [ "$1" == "start-vmachines" ] ||
+       	[ "$1" == "destroy-vmachines" ] || [ "$1" == "suspend-vmachines" ] || [ "$1" == "resume-vmachines" ] || [ "$1" == "create-cluster" ] || [ "$1" == "list-vmachines" ] || [ "$1" == "list-vmachineinfo" ]; then
+  java -Xbootclasspath/a:../lib/jdom.jar:../lib/httpclient-4.0.2.jar:../lib/commons-logging-1.1.1.jar:../lib/gson-1.5.jar:../lib/httpcore-4.0.1.jar:../lib/httpcore-nio-4.0.1.jar:../lib/httpmime-4.0.2.jar -jar ../nova-client.jar $NOVASHELL_CONF_DIR $1 $2 $3
+  exit 0
+fi
+
 #if no args or help specified, show usage
-if [ $1 == "help" ] || [ $# == 0 ]; then
+if [ "$1" ] || [ "$#" == 0 ]; then
 	echo "Usage: nova COMMAND"
 	echo "where COMMAND is one of:"
 	echo "  list-clusters"
@@ -16,17 +30,6 @@ if [ $1 == "help" ] || [ $# == 0 ]; then
 	echo "  resume-vmachines  vmachinename"
 	echo "  create-cluster    filePath"
 	exit 1
-fi
-	
-#set the dir of config files
-if [ ! $NOVASHELL_CONF_DIR ]; then
-	NOVASHELL_CONF_DIR=$PWD/../conf/
-fi
-
-if [ $1 == "list-clusters" ]; then
-  java -Xbootclasspath/a:../lib/jdom.jar:../lib/httpclient-4.0.2.jar:../lib/commons-logging-1.1.1.jar:../lib/gson-1.5.jar:../lib/httpcore-4.0.1.jar:../lib/httpcore-nio-4.0.1.jar:../lib/httpmime-4.0.2.jar -jar ../nova-client.jar $NOVASHELL_CONF_DIR $1
-elif [ $1 == "start-vmachines" ] || [ $1 == "destroy-vmachines" ] || [ $1 == "suspend-vmachines" ] || [ $1 == "resume-vmachines" ] || [ $1 == "create-cluster" ] || [ $1 == "list-vmachines" ] || [ $1 == "list-vmachineinfo" ]; then
-  java -Xbootclasspath/a:../lib/jdom.jar:../lib/httpclient-4.0.2.jar:../lib/commons-logging-1.1.1.jar:../lib/gson-1.5.jar:../lib/httpcore-4.0.1.jar:../lib/httpcore-nio-4.0.1.jar:../lib/httpmime-4.0.2.jar -jar ../nova-client.jar $NOVASHELL_CONF_DIR $1 $2 $3
 fi
 
 exit 0
