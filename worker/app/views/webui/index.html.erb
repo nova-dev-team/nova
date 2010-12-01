@@ -91,7 +91,10 @@ Vmachine.all_domains.each do |dom|
   vm_hotbackup = false
   if File.exists? hotbackup_fn
     vm_hotbackup = true
-    xml_desc = XmlSimple.xml_in dom.xml_desc
+    begin
+      xml_desc = XmlSimple.xml_in dom.xml_desc
+    rescue
+    end
   else
   end
 
@@ -212,7 +215,13 @@ end
 <tr><td colspan=5>
 <div style="display:none;" id='xml-def-#{dom.uuid}'>
 <pre class='xml' name='xml_code' cols='160'>
-#{CGI.escapeHTML dom.xml_desc}
+#{
+begin
+  CGI.escapeHTML dom.xml_desc
+rescue
+  (not available)
+end
+}
 </pre>
 </div>
 </td></tr>
