@@ -345,7 +345,7 @@ def loop_body
             case real_vm["status"].downcase
             when "preparing"
               vm.status = "start-preparing"
-            when "running"
+            when "running", "hotbackup"
               vm.status = "running"
             when "suspended"
               vm.status = "suspended"

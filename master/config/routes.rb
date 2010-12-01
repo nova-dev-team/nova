@@ -49,4 +49,6 @@ ActionController::Routing::Routes.draw do |map|
   map.connect ':controller/:action.:format'
   map.connect ':controller/:action/:id.:format'
 
+  map.connnect 'hotbackup/:action', :controller => "hotbackup"
+
 end
