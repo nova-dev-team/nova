@@ -133,7 +133,7 @@ class PmachinesController < ApplicationController
         :vm_list => []
       }
       pm.vmachines.each do |vm|
-        pm_data[:vm_list] << vm
+        pm_data[:vm_list] << {:name => vm.name, :status => vm.status}
       end
       all_data << pm_data
     end

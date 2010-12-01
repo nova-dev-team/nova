@@ -174,23 +174,25 @@ public
   end
 
   def suspend_all
+    doms = []
     Vmachine.all_domains.each do |dom|
-      vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
-      if dom.info.state == Vmachine::LIBVIRT_RUNNING
-        action_request "suspend", :name => dom.name
+      if [Vmachine::LIBVIRT_RUNNING, Vmachine::LIBVIRT_BLOCK].include? dom.info.state
+        result = Vmachine.suspend :name => dom.name
+        doms << dom.name
       end
     end
-    reply_success "Request sent"
+    reply_success "Request sent, domains: [#{doms.join ","}]"
   end
 
   def resume_all
+    doms = []
     Vmachine.all_domains.each do |dom|
-      vm_daemon_status = File.read "#{Setting.vm_root}/#{dom.name}/status"
-      if dom.info.state == Vmachine::LIBVIRT_RUNNING
-        action_request "resume", :name => dom.name
+      if dom.info.state == Vmachine::LIBVIRT_SUSPENDED
+        result = Vmachine.resume :name => dom.name
+        doms << dom.name
       end
     end
-    reply_success "Request sent"
+    reply_success "Request sent, domains: [#{doms.join ","}]"
   end
 
 private
