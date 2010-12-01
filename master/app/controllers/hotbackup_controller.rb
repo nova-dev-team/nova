@@ -49,7 +49,7 @@ class HotbackupController < ApplicationController
       hb.from_ip = vm.pmachine.ip
       hb.to_ip = params[:slave_ip]
       hb.save
-      vm.pmachine.worker_proxy.hotbackup_to vm.name, hb.to_ip
+      vm.pmachine.worker_proxy.hotbackup_to(vm.name, hb.to_ip)
       reply_success "Done!"
     end
   end
