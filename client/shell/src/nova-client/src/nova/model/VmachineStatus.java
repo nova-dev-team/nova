@@ -1,0 +1,14 @@
+package nova.model;
+
+public enum VmachineStatus {
+	NOT_RUNNING,
+	START_PENDING,
+	START_PREPARING,
+	SUSPENDED,
+	RUNNING,
+	SHUTDOWN_PENDING,
+	SHUT_OFF,
+	
+	BOOT_FAILURE,
+	CONNECT_FAILURE
+}
