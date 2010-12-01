@@ -26,7 +26,7 @@ public class ExeShellCMD {
 		Configuration conf = new Configuration(args[0]);
 		VMMControl vmmc = new VMMControl(conf.getMaster_ip(),conf.getUsername(),conf.getPasswd());
 		
-		if(args[1].equals("list-clusters")) {
+		if(args[1].equals("list-clusters") || args[1].equals("lcs")) {
 			Client c = new Client(conf.getMaster_ip(),conf.getUsername(),conf.getPasswd());
 			List<Vmachine> list = c.listVclusters();
 			Iterator<Vmachine> it = list.iterator();
@@ -34,7 +34,7 @@ public class ExeShellCMD {
 				Vmachine vm = it.next();
 				System.out.println(vm.getName());
 			}
-		} else if(args[1].equals("list-vmachines")) {
+		} else if(args[1].equals("list-vmachines") || args[1].equals("lvs")) {
 			List<IVM_INFO> list = vmmc.getVirtualClusterInfo(new VM_HANDLE(args[2]));
 			Iterator<IVM_INFO> it = list.iterator();
 			if( DebugEnv.print_debug_info ) System.out.println(list.size());
@@ -43,7 +43,7 @@ public class ExeShellCMD {
 				System.out.println(VM_INFO.VM_NAME + ": " +vm_info.getInfo(VM_INFO.VM_NAME) + " " + 
 						VM_INFO.VM_UUID + ": " + vm_info.getInfo(VM_INFO.VM_UUID));
 			}
-		} else if(args[1].equals("list-vmachineinfo")) {
+		} else if(args[1].equals("list-vmachineinfo") || args[1].equals("lvi")) {
 			VM_INFO mf = (VM_INFO) vmmc.getVirtualMachineInfo(new VM_HANDLE(args[2]));
 			System.out.println(VM_INFO.VM_CPU_COUNT + ": " + mf.getInfo(VM_INFO.VM_CPU_COUNT));
 			System.out.println(VM_INFO.VM_DISK_IMAGE + ": " + mf.getInfo(VM_INFO.VM_DISK_IMAGE));
@@ -53,23 +53,23 @@ public class ExeShellCMD {
 			System.out.println(VM_INFO.VM_SOFT_LIST + ": " + mf.getInfo(VM_INFO.VM_SOFT_LIST));
 			System.out.println(VM_INFO.VM_STAUTS + ": " + mf.getInfo(VM_INFO.VM_STAUTS));
 			System.out.println(VM_INFO.VM_UUID + ": " + mf.getInfo(VM_INFO.VM_UUID));
-		} else if(args[1].equals("start-vmachines")) {
+		} else if(args[1].equals("start-vmachines") || args[1].equals("sv")) {
 			callback = new VMPowerCallback();
 			if(args.length < 4) {
 				vmmc.startVirtualMachine(new VM_HANDLE(args[2]), callback);
 			} else {
 				vmmc.startVirtualMachine(new VM_HANDLE(args[2]), args[3], callback);
 			}
-		} else if(args[1].equals("destroy-vmachines")) {
+		} else if(args[1].equals("destroy-vmachines") || args[1].equals("dv")) {
 			callback = new VMPowerCallback();
 			vmmc.powerdownVirtualMachine(new VM_HANDLE(args[2]), callback);
-		} else if(args[1].equals("suspend-vmachines")) {
+		} else if(args[1].equals("suspend-vmachines") || args[1].equals("ssv")) {
 			callback = new VMPowerCallback();
 			vmmc.suspendVirtualMachine(new VM_HANDLE(args[2]), callback);
-		} else if(args[1].equals("resume-vmachines")) {
+		} else if(args[1].equals("resume-vmachines") || args[1].equals("rv")) {
 			callback = new VMPowerCallback();
 			vmmc.startVirtualMachine(new VM_HANDLE(args[2]), callback);
-		} else if(args[1].equals("create-cluster")) {
+		} else if(args[1].equals("create-cluster") || args[1].equals("cc")) {
 			VMCreateFile vmcf = new VMCreateFile(args[2]);
 			vmcf.creatCluster(conf.getMaster_ip(), conf.getUsername(), conf.getPasswd());
 		}

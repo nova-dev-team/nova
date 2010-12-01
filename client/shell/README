@@ -9,6 +9,8 @@ Point $NOVASHELL_CONF_DIR to the directory that contains the nova-conf.xml file.
 
 TODO
 1.remove the use passwd authen
-2.add uuid info to the list-vmachines command
+DONE2.add uuid info to the list-vmachines command
 3.add the src to git
 4.use git to config the server(hp01-hp04) to update automatically
+DONE5.support breif command
+DONE6.if the command is wrong(lack of para), then report the error instead of run error in java app
