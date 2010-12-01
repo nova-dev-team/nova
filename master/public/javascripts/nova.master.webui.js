@@ -216,6 +216,132 @@ function load_monitor(ip, pm_id, serialized_call) {
 //
 // "Migration" page
 //
+function list_xen_hotbackup() {
+  $.ajax({
+    url: "/hotbackup/index",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        var html = "";
+        html += "<table width='100%'><tr class='row_type_0'><td>Vmachine</td><td>Master Pmachine</td><td>Slave Pmachine</td><td>Actions</td></tr>";
+        for (var i = 0; i < result.data.length; i++) {
+          var hb_data = result.data[i];
+          html += "<tr class='row_type_" + ((i + 1) % 2) + "'><td>";
+          html += hb_data.vm_name;
+          html += "</td><td>";
+          html += hb_data.from_ip;
+          html += "</td><td>";
+          html += hb_data.to_ip;
+          html += "</td><td>";
+          html += "<button type='button' class='btn' onclick='del_hotbackup(" + hb_data.id + ")'><span><span><font color='red'>Stop hot backup!</font></span></span></button>";
+          html += "</td></tr>";
+        }
+        html += "</table>";
+        $("#xen_hotbackup_view").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+
+  $.ajax({
+    url: "/hotbackup/suggest",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    success: function(result) {
+      if (result.success) {
+        var html = "";
+        html += "Running VMs: ";
+        html += "<select id='hb-vm-sel'>";
+        html += "<option value=''>(none)</option>";
+        for (i = 0; i < result.vmachines.length; i++) {
+          var vm = result.vmachines[i];
+          html += "<option value='" + vm.uuid + "'>" + vm.name + "</option>";
+        }
+        html += "</select>";
+
+        html += white_spacing(4);
+        html += "Target Pmachine: ";
+        html += "<select id='hb-pm-sel'>";
+        html += "<option value=''>(none)</option>";
+        for (i = 0; i < result.pmachines.length; i++) {
+          var pm = result.pmachines[i];
+          html += "<option value='" + pm.ip + "'>" + pm.hostname + "(" + pm.ip + ")</option>";
+        }
+        html += "</select>";
+        html += white_spacing(4);
+        
+        html += "<button type='button' class='btn' onclick='do_hotbackup()'><span><span><font color='red'>Hot backup!</font></span></span></button>";
+        $("#xen_hotbackup_add_panel").html(html);
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function del_hotbackup(id) {
+  $.ajax({
+    url: "/hotbackup/remove",
+    type: "GET",
+    dataType: "json",
+    async: false,
+    data: {
+      id: id
+    },
+    success: function(result) {
+      if (result.success) {
+        list_xen_hotbackup();
+      } else {
+        do_message("failure", "Error occurred", result.message);
+      }
+    },
+    error: function() {
+      do_message("failure", "Request failed", "Please check your network connection!");
+    }
+  });
+}
+
+function do_hotbackup() {
+  var vm_uuid = $("#hb-vm-sel").val();
+  var slave_pm_ip = $("#hb-pm-sel").val();
+  if (vm_uuid != "" && slave_pm_ip != "") {
+
+    $.ajax({
+      url: "/hotbackup/add",
+      type: "GET",
+      dataType: "json",
+      async: false,
+      data: {
+        uuid: vm_uuid,
+        slave_ip: slave_pm_ip
+      },
+      success: function(result) {
+        if (result.success) {
+          list_xen_hotbackup();
+        } else {
+          do_message("failure", "Error occurred", result.message);
+        }
+      },
+      error: function() {
+        do_message("failure", "Request failed", "Please check your network connection!");
+      }
+    });
+  } else {
+    alert("Please select Vmachine and Pmachine for hot backup!");
+  }
+}
+
+
 function load_all_pmachine_info() {
   $("#pm_info_view").block();
   $.ajax({

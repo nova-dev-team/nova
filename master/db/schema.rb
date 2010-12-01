@@ -9,7 +9,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100715134626) do
+ActiveRecord::Schema.define(:version => 20101201085817) do
+
+  create_table "hotbackups", :force => true do |t|
+    t.integer  "vmachine_id"
+    t.string   "from_ip"
+    t.string   "to_ip"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "perf_logs", :force => true do |t|
     t.integer  "pmachine_id"
@@ -24,9 +32,6 @@ ActiveRecord::Schema.define(:version => 20100715134626) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  add_index "perf_logs", ["pmachine_id"], :name => "index_perf_logs_on_pmachine_id"
-  add_index "perf_logs", ["time"], :name => "index_perf_logs_on_time"
 
   create_table "pmachines", :force => true do |t|
     t.string   "ip",          :limit => 20,                :null => false
