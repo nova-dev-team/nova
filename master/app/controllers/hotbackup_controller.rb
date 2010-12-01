@@ -3,7 +3,18 @@ class HotbackupController < ApplicationController
   before_filter :root_required
 
   def index
-   reply_model Hotbackup
+   data = []
+   Hotbackup.all.each do |hb|
+    vm = hb.vmachine
+    data << {
+      :id => hb.id,
+      :to_ip => hb.to_ip,
+      :from_ip => hb.from_ip,
+      :vm_uuid => vm.uuid,
+      :vm_name => vm.name
+    }
+   end
+   reply_success "Query successful!", :data => data
   end
 
   def suggest
@@ -12,14 +23,15 @@ class HotbackupController < ApplicationController
     available_pms = []
     Pmachine.all.each do |pm|
       next if pm.status != "working"
-      available_pms << pm.ip
+      available_pms << {:ip => pm.ip, :hostname => pm.hostname}
     end
 
     Vmachine.all.each do |vm|
-      next if backuped_vms.include? vm
+      next if backuped_vms.include? vm.uuid
       next if vm.status != "running"
       vm_uuid = vm.uuid
       vm_pm_ip = vm.pmachine.ip
+      available_vms << {:name => vm.name, :uuid => vm.uuid, :pm_ip => vm_pm_ip}
     end
     reply_success "Query successful!", :vmachines => available_vms, :pmachines => available_pms
   end
@@ -37,6 +49,7 @@ class HotbackupController < ApplicationController
       hb.from_ip = vm.pmachine.ip
       hb.to_ip = params[:slave_ip]
       hb.save
+      vm.pmachine.worker_proxy.hotbackup_to vm.name, hb.to_ip
       reply_success "Done!"
     end
   end

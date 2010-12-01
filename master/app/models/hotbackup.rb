@@ -1,5 +1,5 @@
 class Hotbackup < ActiveRecord::Base
 
-  has_one :vmachine
+  belongs_to :vmachine
 
 end

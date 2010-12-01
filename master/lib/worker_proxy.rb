@@ -297,6 +297,12 @@ AGENT_HINT
     return {:success => false, :message => "Request to worker module failed!"}
   end
 
+  def hotbackup_to vm_name, slave_ip
+    ret = post_request "vmachines/hotbackup_to.json", :name => vm_name, :hotbackup_dest => slave_ip
+    return ret if ret != nil
+    return {:success => false, :message => "Request to worker module failed!"}
+  end
+
 private
 
   # Send a POST request.
