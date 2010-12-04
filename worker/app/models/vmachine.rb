@@ -230,7 +230,11 @@ end
 }
   </interface>
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
-  <input type='tablet' bus='usb'/>
+#{
+  if nova_conf["fix_vnc_mouse_pointer"] == true
+    "<input type='tablet' bus='usb'/>"
+  end
+}
 </devices>
 </domain>
 XML_DESC
@@ -448,7 +452,11 @@ end
     <source path='/dev/pts/1'/>
     <target port='0'/>
   </console>
-  <!--input type='tablet' bus='usb'/-->
+#{
+  if nova_conf["fix_vnc_mouse_pointer"] == true
+    "<input type='tablet' bus='usb'/>"
+  end
+}
   <input type='mouse' bus='ps2'/>
   <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0'/>
 </devices>
