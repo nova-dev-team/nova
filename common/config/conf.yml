@@ -65,3 +65,6 @@ enable_user_acl:                false
 # use Xen+Remus for hot backup
 enable_xen_hotbackup:           true
 
+# whether we should actively fix the VNC mouse pointer bug
+fix_vnc_mouse_pointer:          true
+

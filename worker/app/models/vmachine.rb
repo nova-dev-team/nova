@@ -240,6 +240,7 @@ XML_DESC
   #
   # Since::     0.3.3
   def Vmachine.emit_domain_xml_xen_img params
+    nova_conf = YAML::load File.read "#{RAILS_ROOT}/../common/config/conf.yml"
     return <<XML_DESC
 <domain type='#{params[:hypervisor]}'>
 <name>#{params[:name]}</name>
@@ -339,7 +340,11 @@ end
     <source path='/dev/pts/1'/>
     <target port='0'/>
   </console>
-  <!--input type='tablet' bus='usb'/-->
+#{
+  if nova_conf["fix_vnc_mouse_pointer"] == true
+    "<input type='tablet' bus='usb'/>"
+  end
+}
   <input type='mouse' bus='ps2'/>
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
 </devices>
