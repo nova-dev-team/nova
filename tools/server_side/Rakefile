@@ -743,6 +743,11 @@ task :tar do
   my_exec <<CMD
 git clone #{source_root} #{clone_folder}
 rm -Rf #{clone_folder}/.git
+#{
+  if defined? IGNORE_IN_TAR
+    (IGNORE_IN_TAR.collect {|e| "rm -Rf #{clone_folder}/#{e}"}).join "\n"
+  end
+}
 rm -f #{tar_fn}
 cd #{clone_folder}/.. && tar pczf #{tar_fn} #{project_name}
 rm -Rf #{clone_folder_parent}
