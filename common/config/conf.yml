@@ -66,5 +66,5 @@ enable_user_acl:                false
 enable_xen_hotbackup:           true
 
 # whether we should actively fix the VNC mouse pointer bug
-fix_vnc_mouse_pointer:          true
+fix_vnc_mouse_pointer:          false
 
