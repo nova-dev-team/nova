@@ -1,14 +1,7 @@
-those features are developed for version 0.3.5:
-+ add Java client library
-+ add advanced features for Xen: live migration, hot backup
-+ user ACL made optional
-+ better VM image management for NFS mode (add "power off" option)
-+ host machine power management
-+ better install script
-+ command line utility
-
 those features are proposed for version 0.4:
-+ update master to use Rails 3
++ update master to use Rails 3, jQuery 1.4.2
++ user interface in Flex
 + lightweight and faster worker, asset node (probably using sinatra)
 + client libraries (Java, Python, Ruby) and command line tools (Python)
 + merge vm_pool into master
+
