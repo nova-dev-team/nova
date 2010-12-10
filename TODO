@@ -4,4 +4,5 @@ those features are proposed for version 0.4:
 + lightweight and faster worker, asset node (probably using sinatra)
 + client libraries (Java, Python, Ruby) and command line tools (Python)
 + merge vm_pool into master
-
++ change project layout, organize into system/ run/ storage/ folders, like the /nova folder
++ update installer
