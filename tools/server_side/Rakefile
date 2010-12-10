@@ -60,7 +60,9 @@ def source_file_of f
       src_fn = drop_ext(f) + ext
       return src_fn if File.exists? src_fn
     end
-    puts "[error] cannot find corresponding source file for '#{f}'"
+    unless defined? CONFIGURE_H and File.basename(CONFIGURE_H) == File.basename(f)
+      puts "[error] cannot find corresponding source file for '#{f}'"
+    end
   else
     return f
   end
@@ -74,8 +76,11 @@ def depended_obj file, build_mode
   loop do
     break if not_visited.length == 0
     header = not_visited[0]
-    depended_header(source_file_of header).each do |h|
-      (not_visited << h) if not (not_visited.include? h or visited.include? h)
+    src_file = source_file_of header
+    if src_file != nil
+      depended_header(src_file).each do |h|
+        (not_visited << h) if not (not_visited.include? h or visited.include? h)
+      end
     end
     not_visited.delete header
     visited << header
@@ -126,6 +131,9 @@ def all_targets_in_module mod, build_mode
   all_bin_list = [] # all the executable file list
 
   Find.find(mod) do |path|
+    if defined? CONFIGURE_H
+      next if File.basename(path) == File.basename(CONFIGURE_H)
+    end
     next if FileTest.directory? path
     cc_or_cxx = nil
     cc_or_cxx_flags = nil
@@ -294,7 +302,9 @@ def all_src_files
       if FileTest.directory? path
         # do nothing
       elsif File.extname(path) == ".h" or $source_ext.include? File.extname(path)
-        $g_all_src_files << path
+        unless defined? CONFIGURE_H and File.basename(CONFIGURE_H) == File.basename(path)
+          $g_all_src_files << path
+        end
       end
     end
   end
@@ -374,6 +384,10 @@ def warn_bad_style
         end
       end
       next if should_skip
+    end
+
+    if defined? CONFIGURE_H
+      next if File.basename(path) == File.basename(CONFIGURE_H)
     end
 
     # check if used tabs in spacing
@@ -509,7 +523,14 @@ end
 
 desc "Generate Makefile"
 task :gen => :check do
-  puts "Generating Makefile"
+  if defined? GEN_MINGW32_MAKEFILE and GEN_MINGW32_MAKEFILE == true and defined? GEN_CONFIGURE_SCRIPT and GEN_CONFIGURE_SCRIPT == true
+    raise "GEN_MINGW32_MAKEFILE and GEN_CONFIGURE_SCRIPT cannot both be true"
+  end
+  if defined? GEN_CONFIGURE_SCRIPT and GEN_CONFIGURE_SCRIPT == true
+    puts "Generating Makefile.in"
+  else
+    puts "Generating Makefile"
+  end
 
   # Default build mode
   unless defined? BUILD_MODES
@@ -669,11 +690,16 @@ end
 }
 
 #{
-"include Makefile.in" if File.exists? "#{File.dirname __FILE__}/Makefile.in"
+if !(defined? GEN_CONFIGURE_SCRIPT) or GEN_CONFIGURE_SCRIPT == false
+  "include Makefile.in" if File.exists? "#{File.dirname __FILE__}/Makefile.in"
+end
 }
 
 MF_EOF
 
+  if defined? INSTALL_DEPENDS or defined? INSTALL_ACTIONS
+    mf_targets << "install"
+  end
   mf_targets.sort!
   mf_targets.uniq!
 
@@ -703,8 +729,16 @@ end
 }
 MF_EOF
 
-  File.open("Makefile", "w") do |mf|
-    mf.write(mf_header + mf_content_linux + mf_content + mf_tail_linux)
+  if defined? GEN_CONFIGURE_SCRIPT and GEN_CONFIGURE_SCRIPT == true
+    File.open("Makefile.in", "w") do |mf|
+      mf.write(mf_header + mf_content_linux + mf_content + mf_tail_linux)
+    end
+    puts "Generating configure script"
+    gen_configure_script
+  else
+    File.open("Makefile", "w") do |mf|
+      mf.write(mf_header + mf_content_linux + mf_content + mf_tail_linux)
+    end
   end
 
   if defined? GEN_MINGW32_MAKEFILE and GEN_MINGW32_MAKEFILE == true
@@ -712,6 +746,122 @@ MF_EOF
       mf.write(mf_header + mf_content_mingw32 + mf_content + mf_tail_mingw32)
     end
   end
+end
+
+def gen_configure_script
+  cfg = <<CFG_FILE
+#!/bin/sh
+
+#{
+  if defined? CONFIGURE_BINARIES
+    "echo \"Checking binaries\""
+  end
+}
+#{
+  if defined? CONFIGURE_BINARIES
+    all_binaries = CONFIGURE_BINARIES.collect do |bin_file|
+      "which #{bin_file}\n" +
+      "if [ \"$?\" -ne \"0\" ] ; then\n" +
+      "  echo \"Binary not found: #{bin_file}\"\n" +
+      "  exit 1\n" +
+      "fi"
+    end
+    all_binaries.join "\n"
+  end
+}
+
+test_c_file="int main(){return 0;}"
+
+#{
+  if defined? CONFIGURE_LIBS
+    "echo \"Checking libraries\""
+  end
+}
+#{
+  if defined? CONFIGURE_LIBS
+    all_libs = CONFIGURE_LIBS.collect do |lib_fn, err_msg|
+      "echo ${test_c_file} > configure.check.c\n" +
+      "gcc configure.check.c -l#{lib_fn[3..-1]} -o configure.check.out\n" +
+      "if [ \"$?\" -ne \"0\" ] ; then\n" +
+      "  echo \"#{err_msg}\"\n" +
+      "  rm -rf configure.check.c configure.check.out\n" + 
+      "  exit 1\n" +
+      "else\n" +
+      "  rm -rf configure.check.c configure.check.out\n" + 
+      "fi"
+    end
+    all_libs.join "\n"
+  end
+}
+
+#{
+  if defined? CONFIGURE_H and defined? CONFIGURE_HEADERS
+    "echo \"Generating config.h\"\n" +
+    "rm -rf #{CONFIGURE_H}\n" +
+    "echo \"#ifndef CONFIGURE_H\" >> #{CONFIGURE_H}\n" +
+    "echo \"#define CONFIGURE_H\" >> #{CONFIGURE_H}"
+  end
+}
+#{
+  if defined? CONFIGURE_H and defined? CONFIGURE_HEADERS
+    all_headers = CONFIGURE_HEADERS.collect do |header_fn|
+      "echo \"#include \\\"#{header_fn}\\\"\" > configure.check.c\n" +
+      "echo ${test_c_file} >> configure.check.c\n" +
+      "gcc configure.check.c -o configure.check.out\n" +
+      "if [ \"$?\" -ne \"0\" ] ; then\n" +
+      "  echo \"#{header_fn}: no\"\n" +
+      "else\n" +
+      "  echo \"#{header_fn}: yes\"\n" +
+      "  echo \"\" >> #{CONFIGURE_H}\n" +
+      "  echo \"#define HAVE_#{header_fn.upcase.gsub(".", "_")}\" >> #{CONFIGURE_H}\n" +
+      "  echo \"\" >> #{CONFIGURE_H}\n" +
+      "fi\n" +
+      "rm -rf configure.check.c configure.check.out\n" 
+    end
+    all_headers.join "\n"
+  end
+}
+#{
+  if defined? CONFIGURE_H and defined? CONFIGURE_HEADERS
+    "echo \"#endif // CONFIGURE_H\" >> #{CONFIGURE_H}"
+  end
+}
+
+
+echo "Generating Makefile"
+rm -f Makefile
+touch Makefile
+echo "# WARNING! This file is automatically generated by './configure'." >> Makefile
+echo "# WARNING! Any modifications to it will be lost after another './configure' operation!" >> Makefile
+echo "" >> Makefile
+echo "# Automatically generated at `date`" >> Makefile
+echo "" >> Makefile
+echo "include Makefile.in" >> Makefile
+echo "" >> Makefile
+#{
+  if defined? DEFAULT_CONFIGURE_OPTIONS
+    all_params = DEFAULT_CONFIGURE_OPTIONS.collect do |param, value|
+      "#{param}=#{value}"
+    end
+    all_params.join "\n"
+  end
+}
+echo "" >> Makefile
+echo "install: #{INSTALL_DEPENDS.join " " if defined? INSTALL_DEPENDS}" >> Makefile 
+#{
+  if defined? INSTALL_ACTIONS
+    all_actions = INSTALL_ACTIONS.collect do |action|
+      "echo \"\t#{action}\" >> Makefile"
+    end
+    all_actions.join "\n"
+  end
+}
+
+CFG_FILE
+  File.open("configure", "w") do |cf|
+    cf.write(cfg)
+  end
+  `chmod a+x configure`
 end
 
 desc "Show all notes like TODO, ENHANCE, etc"
