@@ -216,6 +216,10 @@ def loop_body
     end
 
     if pm.status != "working"
+      pm.vmachines.each do |vm|
+        vm.status = "boot-failure"
+        vm.save
+      end
       # the pm status could be changed by the testing code above
       sleep 1
       next # go on with next pmachine

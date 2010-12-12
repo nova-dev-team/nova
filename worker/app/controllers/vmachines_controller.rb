@@ -46,6 +46,8 @@ public
           dom_info["status"] = "Saving"
         elsif vm_daemon_status == "migrating"
           dom_info["status"] = "Migrating"
+        elsif vm_daemon_status == "hotbackup"
+          dom_info["status"] = "Hotbackup"
         else
           dom_info["status"] = "Not running"
         end
