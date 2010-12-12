@@ -1,4 +1,7 @@
-v0.3.5:
+v0.3.6, 2010-12-01:
++ added simple load balancing
+
+v0.3.5, 2010-11-25:
 + added Java client library
 + added advanced features for XEN: live migration, hot backup
 + user ACL is made optional
@@ -6,21 +9,21 @@ v0.3.5:
 + host machine power management
 + command line utility
 
-v0.3.4:
+v0.3.4, 2010-09-16:
 + added ftp client registration api in vm_pool module
 * implemented acl in liquid ftp
 
-v0.3.3:
+v0.3.3, 2010-09-01:
 + added a few helper scripts for developers
 * a few bug fixes in xdk toolkit
 
-v0.3.2:
+v0.3.2, 2010-08-26:
 + added web UI for NSS module
 + added start/stop all link in master web UI
 + support Xen kernel/initrd/hda_dev options
 * a few bug fixes in image_pool_maintainer of NSS module
 
-v0.3.1:
+v0.3.1, 2010-08-09:
 First public release.
 + Xen support (with live-migration)
 + added NSS module
