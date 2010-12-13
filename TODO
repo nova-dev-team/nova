@@ -6,3 +6,6 @@ those features are proposed for version 0.4:
 + merge vm_pool into master
 + change project layout, organize into system/ run/ storage/ folders, like the /nova folder
 + update installer
+
+bugs:
+* port_mapper sometimes uses 100% cpu (possibly caused by buggy select())
