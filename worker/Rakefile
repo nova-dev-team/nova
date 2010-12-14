@@ -141,6 +141,10 @@ LFTP_SCRIPT
         puts "[WARNING]unknown storage type :#{conf["storage_type"]}"
       end
 
+      if conf["enable_skewness_sched"] == true
+        my_exec "#{RAILS_ROOT}/lib/vm_monitor/boot.rb &"
+      end
+
       my_exec "#{RAILS_ROOT}/lib/log_cleaner.rb &"
 
       log_interval = 5 # read performance meters every 5 seconds

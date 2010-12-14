@@ -115,6 +115,8 @@ end
 # Kill a process by pid file.
 # This function is intended to be used in Rakefile.
 #
+# return: whether found pid file and killed it
+#
 # Since::     0.3
 def kill_by_pid_file file_path
   if File.exists? file_path
@@ -124,6 +126,9 @@ def kill_by_pid_file file_path
     puts "Terminating..."
     my_exec "kill -9 #{pid}"
     File.delete file_path
+    true
+  else
+    false
   end
 end
 

@@ -1,0 +1,31 @@
+# this is actually a ruby file
+
+pm_capacity = {
+  ["10.0.1.206", "femi"] => {
+    "hw_cpu_MHz" => 4000,
+    "hw_ram_MB" => 8000,
+    "hw_link_Mbps" => 1000,
+    "hw_num_nics" => 1,
+    "hw_num_cpus" => 1
+  },
+  "femi3" => {
+    "hw_cpu_MHz" => 4000,
+    "hw_ram_MB" => 8000,
+    "hw_link_Mbps" => 1000,
+    "hw_num_nics" => 1,
+    "hw_num_cpus" => 1
+  },
+# default capacity
+  ".default" => {
+    "hw_cpu_MHz" => 4000,
+    "hw_ram_MB" => 8000,
+    "hw_link_Mbps" => 1000,
+    "hw_num_nics" => 1,
+    "hw_num_cpus" => 1
+  }
+}
+
+script_body =<<EOF
+# This is the body of the config.py
+EOF
+
