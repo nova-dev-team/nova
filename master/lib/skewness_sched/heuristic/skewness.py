@@ -1,5 +1,5 @@
-from usher.utils import notify, plugin
-lg = notify.get_notify()
+#from usher.utils import notify, plugin
+#lg = notify.get_notify()
 import copy
 import math
 import plugin
@@ -106,7 +106,7 @@ class Algorithm(object):
             if bDoneNum == hotspotnumber:
                 break
 
-        lg.notify(notify.DEBUG, "csw hot migration_list: %s" % migration_list)
+        #lg.notify(notify.DEBUG, "csw hot migration_list: %s" % migration_list)
         #generate the active pm list (the pm which has at least one vm running on)
         self.active_pms = self.generate_apmlist(pmdict)
 
