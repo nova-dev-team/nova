@@ -68,3 +68,6 @@ enable_xen_hotbackup:           true
 # whether we should actively fix the VNC mouse pointer bug
 fix_vnc_mouse_pointer:          false
 
+# use skewness scheduler (provided by PKU)
+enable_skewness_sched:          true
+
