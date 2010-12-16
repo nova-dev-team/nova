@@ -86,7 +86,7 @@ def real_load_balance
   sorted_pms = all_working_pm.sort {|p1, p2| p1.vmachines.count <=> p2.vmachines.count}
   low_load_pm = sorted_pms.first
   high_load_pm = sorted_pms.last
-  if high_load_pm.vmachines.count >= low_load_pm.vmachines.count * 2 + 2
+  if high_load_pm.vmachines.count >= low_load_pm.vmachines.count + 2
     lb_log "high load: #{high_load_pm.ip} (#{high_load_pm.vmachines.count} VM), low load: #{low_load_pm.ip} (#{low_load_pm.vmachines.count} VM)"
     vm_migr = high_load_pm.vmachines[rand(high_load_pm.vmachines.count)]
     vm_migr.migrate_to = low_load_pm.ip
