@@ -123,19 +123,19 @@ typedef enum {
 
   @return
     Whether the logging system was correctly started.
-    
+
 */
 xsuccess xlog_init(int argc, char* argv[]);
 
 /**
   @brief
     General interface to control the logging system.
-  
+
   @param logger_name
     The logger that we are dealing with.
   @param action
     The control action we gonna take.
-  
+
   @return
     If the control action is successful.
 */
@@ -144,9 +144,9 @@ xsuccess xlog_ctl(const char* logger_name, xlog_ctl_action action, ...);
 /**
   @brief
     Create a new logger.
-  
+
   This is actually a macro around xlog_ctl(), using the @c XLOG_CTL_ADD action.
-  
+
   @param logger_name
     Name of the new logger.
 
@@ -159,9 +159,9 @@ xsuccess xlog_ctl(const char* logger_name, xlog_ctl_action action, ...);
 /**
   @brief
     Remove an existing logger.
-  
+
   This is actually a macro around xlog_ctl(), using the @c XLOG_CTL_REMOVE action.
-  
+
   @param logger_name
     Name of the new logger.
 
@@ -183,10 +183,10 @@ xsuccess xlog_ctl(const char* logger_name, xlog_ctl_action action, ...);
     The code file name containing logging code.
   @param code_ln
     The line number of logging code.
-  
+
   @warning
     This function is not intended to be used directly. Use xlog() instead.
-  
+
   @return
     Whether the log was written successfully.
 */
@@ -195,33 +195,16 @@ xsuccess xlog_real(int level, const char* code_fn, int code_ln, const char* fmt,
 /**
   @brief
     Write logs of a certain logging level.
-  
+
   @param level
     The logging level, could be 0 (fatal), 1 (error), 2 (warning), 3 (info), 4 (debug), 5~7 (user defined).
   @param fmt
     The formatting string.
-    
+
   @return
     Whether the log was written successfully.
 */
 #define xlog(level, fmt, ...) xlog_real(level, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
-
-/*
-#define xlog(level, fmt, ...) { \
-  if (level == XLOG_DISABLED) { \
-     \
-  } else if (level <= XLOG_LEVEL7) { \
-    xlog_start_record(level); \
-    printf(fmt, ## __VA_ARGS__); \
-    if (xlog_is_screen_only() == XFALSE && xlog_get_log_fp() != NULL) {  \
-      fprintf(xlog_get_log_fp(), fmt, ## __VA_ARGS__); \
-    } \
-    xlog_end_record(fmt); \
-  } else {  \
-    fprintf(stderr, "[error] no such log level: %d\n", level);  \
-  } \
-};
-*/
 
 /**
   @brief
@@ -270,60 +253,6 @@ xsuccess xlog_real(int level, const char* code_fn, int code_ln, const char* fmt,
     Helper macro, make you type less.
 */
 #define xlog_level7(fmt, ...)   xlog(XLOG_LEVEL7, fmt, ## __VA_ARGS__)
-
-/**
-  @brief
-    Start writing a log record.
-
-  @param level
-    The logging level, could be 0 (fatal), 1 (error), 2 (warning), 3 (info), 4 (debug), 5~7 (user defined).
-
-  @return
-    Whether the log was correctly written.
-
-  @warning
-    This function is not intended to be used by users!
-*/
-void xlog_start_record(int level);
-
-/**
-  @brief
-    Stop writing a log record.
-
-  @param fmt
-    The formatting string.
-
-  @return
-    Whether the log was correctly written.
-
-  @warning
-    This function is not intended to be used by users!
-*/
-void xlog_end_record(const char* fmt);
-
-/**
-  @brief
-    Get the file pointer of log file.
-
-  @return
-    The file pointer.
-
-  @warning
-    This function is not intended to be used by users!
-*/
-FILE* xlog_get_log_fp();
-
-/**
-  @brief
-    Check if the logging system only writes to stdout.
-
-  @return
-    XTRUE if logs are written to stdout only.
-
-  @warning
-    This function is not intended to be used by users!
-*/
-xbool xlog_is_screen_only();
 
 #endif  // XLOG_H_
 
