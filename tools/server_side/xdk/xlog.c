@@ -24,7 +24,7 @@ static pthread_mutex_t logging_lock = PTHREAD_MUTEX_INITIALIZER;
 // logger model
 typedef struct {
   char* name;  // name of the logger (need to be free'd)
-  
+
   char* pattern; // the logger pattern (need to be free'd)
   // available patterns:
   //
@@ -40,18 +40,18 @@ typedef struct {
   //
   // other char will be outputed as given
   // an end-of-line will be attached to each line
-  
+
   char* fn; // file name for the logger file
   // a series of files fn.1, fn.2, .. etc will be created, when the base log file is too big
-  
+
   FILE* fp; // pointer to the log file pointer, by default, XLOG_DEFAULT_FILE
-  
+
   xbool enabled;  // whether the logger is enabled
   int levels; // a flag indicating which levels should the logger run, by default, fatal~info
   // use "enabled == XTRUE && ((log_levels >> level) & 0x1) == 1" to check if need to print log
-  
+
   xbool special; // if it is a special logger (stdout, stderr, etc)
-  
+
   long max_size;  // size threshold of a log file (not used for special loggers)
   int history;  // max history count of a log (not used for special loggers)
 } xlogger_ty;
@@ -80,11 +80,11 @@ xsuccess xlog_init(int argc, char* argv[]) {
   xsuccess ret = XSUCCESS;
   xoption xopt = xoption_new();
   xstr log_fn = xstr_new();
-  
+
   xoption_parse(xopt, argc, argv);
 
   // by default, create a console logging, and a file logging
-  xlog_add("default-console");  
+  xlog_add("default-console");
   xlog_add("default-file");
 
   if (xoption_has(xopt, "log-level")) {
@@ -105,7 +105,7 @@ xsuccess xlog_init(int argc, char* argv[]) {
     const int cwd_buf_size = 256;
     char cwd_buffer[cwd_buf_size];
     char* log_dir = (char *) xoption_get(xopt, "log-dir");
-    
+
     getcwd(cwd_buffer, cwd_buf_size);
     xjoin_path_cstr(log_folder, cwd_buffer, log_dir);
     xstr_printf(log_fn_abs, "%s%c%s.log", xstr_get_cstr(log_folder), xsys_fs_sep_char, log_basename);
@@ -207,7 +207,7 @@ static xsuccess xlog_ctl_enable(const char* logger_name) {
     if (lg != NULL) {
       lg->enabled = XTRUE;
     } else {
-      ret = XFAILURE;      
+      ret = XFAILURE;
     }
   }
   return ret;
@@ -222,7 +222,7 @@ static xsuccess xlog_ctl_disable(const char* logger_name) {
     if (lg != NULL) {
       lg->enabled = XFALSE;
     } else {
-      ret = XFAILURE;      
+      ret = XFAILURE;
     }
   }
   return ret;
@@ -244,7 +244,7 @@ static xsuccess xlog_ctl_set_file(const char* logger_name, const char* fn) {
       lg->fp = fp;
       lg->special = XFALSE;
     } else {
-      ret = XFAILURE;      
+      ret = XFAILURE;
     }
   }
   return ret;
@@ -259,7 +259,7 @@ static xsuccess xlog_ctl_set_levels(const char* logger_name, int levels) {
     if (lg != NULL) {
       lg->levels = levels;
     } else {
-      ret = XFAILURE;      
+      ret = XFAILURE;
     }
   }
   return ret;
@@ -274,7 +274,7 @@ static xsuccess xlog_ctl_set_history(const char* logger_name, int history) {
     if (lg != NULL) {
       lg->history = history;
     } else {
-      ret = XFAILURE;      
+      ret = XFAILURE;
     }
   }
   return ret;
@@ -289,7 +289,7 @@ static xsuccess xlog_ctl_set_size(const char* logger_name, int max_size) {
     if (lg != NULL) {
       lg->max_size = max_size;
     } else {
-      ret = XFAILURE;      
+      ret = XFAILURE;
     }
   }
   return ret;
@@ -300,10 +300,10 @@ xsuccess xlog_ctl(const char* logger_name, xlog_ctl_action action, ...) {
   xsuccess ret = XSUCCESS;
   char* sval = NULL;
   int ival = 0;
-  
+
   va_start(argp, action);
   pthread_mutex_lock(&logging_lock);
-  
+
   switch(action) {
   case XLOG_CTL_ADD:
     ret = xlog_ctl_add(logger_name);
@@ -339,10 +339,10 @@ xsuccess xlog_ctl(const char* logger_name, xlog_ctl_action action, ...) {
     ret = XFAILURE;
     break;
   }
-  
+
   pthread_mutex_unlock(&logging_lock);
   va_end(argp);
-  return ret;  
+  return ret;
 }
 
 // this is a container for passing multiple params into do_log_visitor() function
@@ -361,7 +361,7 @@ static xsuccess rotate_log(xlogger_ty* lg) {
   int i;
   fclose(lg->fp);
   lg->fp = NULL;
-  
+
   //xstr_append_cstr(current_log_fn, ".log");
 
   for (i = 1; i <= lg->history; i++) {
@@ -397,7 +397,7 @@ static xsuccess rotate_log(xlogger_ty* lg) {
     xstr_delete(history_log_fn);
   }
   xstr_delete(current_log_fn);
-  
+
   lg->fp = fopen(lg->fn, "a");
   return ret;
 }
@@ -414,7 +414,7 @@ static xbool do_log_visitor(const void* key, void* value, void* args) {
     struct tm* tm_struct;
     time_t tm_val = time(NULL);
     tm_struct = localtime(&tm_val);
-    
+
     assert(p != NULL);
     while (*p != '\0') {
       if (*p == '%') {
