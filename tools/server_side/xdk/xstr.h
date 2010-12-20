@@ -1,7 +1,10 @@
 #ifndef XSTR_H_
 #define XSTR_H_
 
+#include <stdarg.h>
+
 #include "xdef.h"
+#include "xvec.h"
 
 /**
   @author
@@ -81,7 +84,7 @@ xstr xstr_substr2(xstr xs, int start, int len);
   @param xs
     The xstr to be destroyed.
 */
-void xstr_delete(xstr xs);
+void xstr_delete(void* xs);
 
 /**
   @brief
@@ -96,7 +99,7 @@ void xstr_delete(xstr xs);
   @warning
     Do not modify the content of returned c-string!
 */
-const char* xstr_get_cstr(xstr xs);
+const char* xstr_get_cstr(const xstr xs);
 
 /**
   @brief
@@ -123,7 +126,7 @@ int xstr_len(xstr xs);
 
 /**
   @brief
-    This is printf like function, except that it prints into an xstr. It only supports some basic formats.
+    This is printf like function, except that it prints into an xstr.
 
   @param xs
     The xstr that will be printed into. New data will be appended to the end of xs.
@@ -136,6 +139,22 @@ int xstr_len(xstr xs);
 */
 int xstr_printf(xstr xs, const char* fmt, ...);
 
+/**
+  @brief
+    This is vprintf like function, except that it prints into an xstr.
+
+  @param xs
+    The xstr that will be printed into. New data will be appended to the end of xs.
+  @param fmt
+    The format string like in printf. Only support \%d, \%c, \%s.
+  @param va
+    The variable arg list to be printed.
+
+  @return
+    On error (format error, etc.) return -1.
+    Otherwise the number of chars appended to xs.
+*/
+int xstr_vprintf(xstr xs, const char* fmt, va_list va);
 
 /**
   @brief
@@ -274,5 +293,20 @@ void xstr_strip(xstr xs, char* strip_set);
  *  Return value is like strcmp().
  */
 int xstr_compare(xstr xs1, xstr xs2);
+
+/**
+  @brief
+    Split an xstring.
+  
+  @param xs
+    The xstring to be splitted.
+  @param sep
+    Separators for the xstring.
+    If "" is given, the original string will be separated into characters.
+  
+  @return
+    An xvec object, containing all the segments.
+*/
+xvec xstr_split_xvec(xstr xs, const char* sep);
 
 #endif  // XSTR_H_
