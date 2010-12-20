@@ -1,5 +1,7 @@
 #include <string.h>
 #include <stdarg.h>
+#include <assert.h>
+#include <stdlib.h>
 
 #include "xstr.h"
 #include "xmemory.h"
@@ -59,12 +61,12 @@ xstr xstr_substr2(xstr xs, int start, int len) {
   return subxs;
 }
 
-void xstr_delete(xstr xs) {
-  xfree(xs->str);
+void xstr_delete(void* xs) {
+  xfree(((xstr) xs)->str);
   xfree(xs);
 }
 
-const char* xstr_get_cstr(xstr xs) {
+const char* xstr_get_cstr(const xstr xs) {
   return xs->str;
 }
 
@@ -143,110 +145,20 @@ void xstr_append_cstr(xstr xs, const char* cs) {
 
 int xstr_printf(xstr xs, const char* fmt, ...) {
   va_list argp;
-  const char* p;
-  int cnt = 0;
-  long long ldval;
-  int ival;
-  float float_val;
-  double double_val;
-  char* sval;
-  char cval;
-  char buf[350]; // for xitoa & xltoa & double/float convertion
-  int str_len;
-
+  int cnt;
   va_start(argp, fmt);
-
-  for (p = fmt; *p != '\0' && cnt >= 0; p++) {
-    if (*p != '%') {
-      cnt++;
-      xstr_append_char(xs, *p);
-      continue;
-    }
-
-    // otherwise, found an '%', go to next char
-    p++;
-    switch(*p) {
-    case 'c':
-      // Note, we use 'int' here instead of 'char', because 'char' type uses same number of bytes as 'int' on stack
-      cval = va_arg(argp, int);
-      xstr_append_char(xs, cval);
-      cnt++;
-      break;
-
-    case 'l':
-      p++;
-      if (*p == 'd') {
-        // %ld
-        ldval = va_arg(argp, long long);
-        xltoa(ldval, buf, 10);
-        str_len = strlen(buf);
-        cnt += str_len;
-        xstr_append_cstr_len_precalculated(xs, buf, str_len);
-      } else if (*p == 'f') {
-        // %lf
-        double_val = va_arg(argp, double);
-        sprintf(buf, "%lf", double_val);
-        str_len = strlen(buf);
-        cnt += str_len;
-        xstr_append_cstr_len_precalculated(xs, buf, str_len);
-      } else if (*p == 'g') {
-        // %lf
-        double_val = va_arg(argp, double);
-        sprintf(buf, "%lg", double_val);
-        str_len = strlen(buf);
-        cnt += str_len;
-        xstr_append_cstr_len_precalculated(xs, buf, str_len);
-      } else {
-        xstr_append_cstr(xs, "** FORMAT ERROR ***");
-        cnt = -1;
-      }
-      break;
-
-    case 'd':
-      ival = va_arg(argp, int);
-      xitoa(ival, buf, 10);
-      str_len = strlen(buf);
-      cnt += str_len;
-      xstr_append_cstr_len_precalculated(xs, buf, str_len);
-      break;
-
-    case 'f':
-      // float is converted to double when passing with ...
-      float_val = (float) va_arg(argp, double);
-      sprintf(buf, "%f", float_val);
-      str_len = strlen(buf);
-      cnt += str_len;
-      xstr_append_cstr_len_precalculated(xs, buf, str_len);
-      break;
-
-    case 'g':
-      // float is converted to double when passing with ...
-      float_val = (float) va_arg(argp, double);
-      sprintf(buf, "%g", float_val);
-      str_len = strlen(buf);
-      cnt += str_len;
-      xstr_append_cstr_len_precalculated(xs, buf, str_len);
-      break;
-
-    case 's':
-      sval = va_arg(argp, char *);
-      str_len = strlen(sval);
-      cnt += str_len;
-      xstr_append_cstr_len_precalculated(xs, sval, str_len);
-      break;
-
-    case '%':
-      cnt++;
-      xstr_append_char(xs, '%');
-      break;
-
-    default:
-      xstr_append_cstr(xs, "** FORMAT ERROR ***");
-      cnt = -1;
-      break;
-    }
-  }
+  cnt = xstr_vprintf(xs, fmt, argp);
   va_end(argp);
+  return cnt;
+}
+
+int xstr_vprintf(xstr append_to, const char* fmt, va_list va) {
+  char* ret;
+  int cnt = vasprintf(&ret, fmt, va);
+  if (cnt >= 0) {
+    xstr_append_cstr(append_to, ret);
+  }
+  free(ret);
   return cnt;
 }
 
@@ -351,4 +263,45 @@ void xstr_strip(xstr xs, char* strip_set) {
 
 int xstr_compare(xstr xs1, xstr xs2) {
   return strcmp(xstr_get_cstr(xs1), xstr_get_cstr(xs2));
+}
+
+
+xvec xstr_split_xvec(xstr xs, const char* sep) {
+  xvec xv = xvec_new(xstr_delete);
+  xstr seg = xstr_new();
+  int i, j;
+  if (sep[0] == '\0') {
+    for (i = 0; i < xs->len; i++) {
+      xstr_append_char(seg, xs->str[i]);
+      xvec_push_back(xv, xstr_copy(seg));
+      xstr_set_cstr(seg, "");
+    }
+  } else {
+    for (i = 0; i < xs->len; i++) {
+      // ENHANCE: use KMP here (conditionally, if sep is long enough)
+      xbool is_sep = XTRUE;
+      for (j = 0; sep[j] != '\0' && xs->str[i + j] != '\0'; j++) {
+        if (sep[j] != xs->str[i + j]) {
+          is_sep = XFALSE;
+          break;
+        }
+      }
+      if (is_sep == XTRUE) {
+        if (seg->len > 0) {
+          xvec_push_back(xv, xstr_copy(seg));
+          xstr_set_cstr(seg, "");
+        }
+        assert(j > 0);
+        i += j - 1; // i will still be added 1 by the for loop, so actually we have increased i by j, in this loop, discarding the separator
+      } else {
+        xstr_append_char(seg, xs->str[i]);
+      }
+    }
+    if (seg->len > 0) {
+      xvec_push_back(xv, xstr_copy(seg));
+      xstr_set_cstr(seg, "");
+    }
+  }
+  xstr_delete(seg);
+  return xv;
 }
