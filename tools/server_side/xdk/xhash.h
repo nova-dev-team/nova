@@ -26,7 +26,7 @@
   @return
     The hash value of key. Could be negative.
 */
-typedef int (*xhash_hash)(void* key);
+typedef int (*xhash_hash)(const void* key);
 
 /**
   @brief
@@ -40,7 +40,7 @@ typedef int (*xhash_hash)(void* key);
   @return
     XTRUE if the keys are equal, otherwise XFALSE.
 */
-typedef xbool (*xhash_eql)(void* key1, void* key2);
+typedef xbool (*xhash_eql)(const void* key1, const void* key2);
 
 /**
   @brief
@@ -70,7 +70,7 @@ typedef void (*xhash_free)(void* key, void* value);
   @return
     Whether we should go on visiting other elements. If XFALSE is returned, no more element will be visited.
 */
-typedef xbool (*xhash_visitor)(void* key, void* value, void* args);
+typedef xbool (*xhash_visitor)(const void* key, void* value, void* args);
 
 /**
   @brief
@@ -127,7 +127,7 @@ void xhash_put(xhash xh, void* key, void* value);
   @return
     NULL if not found, otherwise corresponding *value will be returned.
 */
-void* xhash_get(xhash xh, void* key);
+void* xhash_get(xhash xh, const void* key);
 
 /**
   @brief
@@ -141,7 +141,7 @@ void* xhash_get(xhash xh, void* key);
   @return
     Whether the remove action is successful.
 */
-xsuccess xhash_remove(xhash xh, void* key);
+xsuccess xhash_remove(xhash xh, const void* key);
 
 /**
   @brief
