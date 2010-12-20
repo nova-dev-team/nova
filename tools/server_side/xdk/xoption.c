@@ -24,14 +24,6 @@ static void leftover_free(void* ptr) {
   // do nothing, since values are given from argv, which is const
 }
 
-static xbool hash_str_eql(void* key1, void* key2) {
-  if (strcmp((char *) key1, (char *) key2) == 0) {
-    return XTRUE;
-  } else {
-    return XFALSE;
-  }
-}
-
 static void opt_free(void* key, void* value) {
   // key is copy of char* need to be free'd, but they are left to be free'd in opt_free (same copy of pointer)
 
@@ -54,8 +46,8 @@ static void optlen_free(void* key, void* value) {
 xoption xoption_new() {
   xoption xopt = xmalloc_ty(1, struct xoption_impl);
   xopt->leftover = xvec_new(leftover_free);
-  xopt->opt = xhash_new(xhash_hash_cstr, hash_str_eql, opt_free);
-  xopt->optlen = xhash_new(xhash_hash_cstr, hash_str_eql, optlen_free);
+  xopt->opt = xhash_new(xhash_hash_cstr, xhash_eql_cstr, opt_free);
+  xopt->optlen = xhash_new(xhash_hash_cstr, xhash_eql_cstr, optlen_free);
   return xopt;
 }
 
@@ -138,13 +130,13 @@ xsuccess xoption_parse(xoption xopt, int argc, char* argv[]) {
 }
 
 // helper for converting xconf to xoption
-static xbool xconf_section_visitor(void* key, void* value, void* args) {
+static xbool xconf_section_visitor(const void* key, void* value, void* args) {
   xoption xopt = (xoption) args;
-  xstr xkey = (xstr) key;
+  const xstr xkey = (const xstr) key;
   xstr xvalue = (xstr) value;
-  if (xoption_get(xopt, xstr_get_cstr(key))) {
+  if (xoption_get(xopt, xstr_get_cstr(xkey))) {
     // duplicate key, use command line args
-    xlog_warning("configuration '%s' already provided on command line, the value provided in configuration file will be ignored!\n", xstr_get_cstr(key));
+    xlog_warning("configuration '%s' already provided on command line, the value provided in configuration file will be ignored!\n", xstr_get_cstr(xkey));
   } else {
     // adapted from "add_long_option"
     int* len = xmalloc_ty(1, int);
