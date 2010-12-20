@@ -315,7 +315,7 @@ void xsleep_msec(int msec) {
 
 xbool xfilesystem_exists(const char* path) {
   struct stat st;
-  if (lstat(path, &st) != 0) {
+  if (stat(path, &st) != 0) {
     return XFALSE;
   } else {
     return XTRUE;
@@ -324,7 +324,7 @@ xbool xfilesystem_exists(const char* path) {
 
 xbool xfilesystem_is_file(const char* path, xsuccess* optional_succ) {
   struct stat st;
-  if (lstat(path, &st) == 0) {
+  if (stat(path, &st) == 0) {
     if (optional_succ != NULL) {
       *optional_succ = XSUCCESS;
     }
@@ -341,7 +341,7 @@ xbool xfilesystem_is_file(const char* path, xsuccess* optional_succ) {
 
 xbool xfilesystem_is_dir(const char* path, xsuccess* optional_succ) {
   struct stat st;
-  if (lstat(path, &st) == 0) {
+  if (stat(path, &st) == 0) {
     if (optional_succ != NULL) {
       *optional_succ = XSUCCESS;
     }
@@ -541,7 +541,7 @@ long xfilesystem_parse_filesize(const char* size_cstr) {
 static xsuccess xfilesystem_mkdir_p_helper(xstr path, int mode) {
   xsuccess ret = XFAILURE;
   struct stat st;
-  if (lstat(xstr_get_cstr(path), &st) == 0) {
+  if (stat(xstr_get_cstr(path), &st) == 0) {
     // file exists, only need to check if it is a folder
     if (S_ISDIR(st.st_mode)) {
       ret = XSUCCESS;
@@ -616,11 +616,11 @@ xsuccess xfilesystem_split_path(XIN xstr path, XOUT xstr parent, XOUT xstr child
   return ret;
 }
 
-int xhash_hash_cstr(void* key) {
+int xhash_hash_cstr(const void* key) {
   int hv = 0;
   unsigned char digest[16];
   int i;
-  char* cstr = (char *) key;
+  const char* cstr = (const char *) key;
   xmd5 xm = xmd5_new();
   xmd5_feed(xm, cstr, strlen(cstr));
   xmd5_result(xm, digest);
@@ -634,23 +634,31 @@ int xhash_hash_cstr(void* key) {
   return hv;
 }
 
-int xhash_hash_xstr(void* key) {
-  xstr xs = (xstr) key;
-  return xhash_hash_cstr((void *) xstr_get_cstr(xs));
+xbool xhash_eql_cstr(const void* key1, const void* key2) {
+  if (strcmp((const char *) key1, (const char *) key2) == 0) {
+    return XTRUE;
+  } else {
+    return XFALSE;
+  }
 }
 
-xbool xhash_eql_xstr(void* key1, void* key2) {
+int xhash_hash_xstr(const void* key) {
+  const xstr xs = (const xstr) key;
+  return xhash_hash_cstr((const void *) xstr_get_cstr(xs));
+}
+
+xbool xhash_eql_xstr(const void* key1, const void* key2) {
   return xstr_eql((xstr) key1, (xstr) key2);
 }
 
-int xhash_hash_int(void* key) {
-  int* int_key = (int *) key;
+int xhash_hash_int(const void* key) {
+  const int* int_key = (const int *) key;
   return *int_key;
 }
 
-xbool xhash_eql_int(void* key1, void* key2) {
-  int* int_key1 = (int *) key1;
-  int* int_key2 = (int *) key2;
+xbool xhash_eql_int(const void* key1, const void* key2) {
+  const int* int_key1 = (const int *) key1;
+  const int* int_key2 = (const int *) key2;
   if (*int_key1 == *int_key2) {
     return XTRUE;
   } else {
