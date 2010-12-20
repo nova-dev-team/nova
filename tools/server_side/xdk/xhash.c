@@ -88,7 +88,7 @@ void xhash_delete(xhash xh) {
 }
 
 // calculates the actuall slot id of a key
-static int xhash_slot_id(xhash xh, void* key) {
+static int xhash_slot_id(xhash xh, const void* key) {
   int hcode = xh->hash_func(key);
   if (hcode < 0) {
     hcode = -hcode;
@@ -154,7 +154,7 @@ void xhash_put(xhash xh, void* key, void* value) {
   xh->entry_count++;
 }
 
-void* xhash_get(xhash xh, void* key) {
+void* xhash_get(xhash xh, const void* key) {
   int slot_id = xhash_slot_id(xh, key);
 
   xhash_entry* p;
@@ -201,7 +201,7 @@ static void xhash_try_shrink(xhash xh) {
   }
 }
 
-int xhash_remove(xhash xh, void* key) {
+xsuccess xhash_remove(xhash xh, const void* key) {
   int slot_id;
   xhash_entry* p;
   xhash_entry* q;
