@@ -325,8 +325,21 @@ xsuccess xfilesystem_split_path(XIN xstr path, XOUT xstr parent, XOUT xstr child
   @return
     The hash value of the c-string.
 */
-int xhash_hash_cstr(void* key);
+int xhash_hash_cstr(const void* key);
 
+/**
+  @brief
+    A wrapper around strcmp(), make things handy.
+
+  @param key1
+    A key to be compared.
+  @param key2
+    A key to be compared.
+
+  @return
+    Whether the 2 cstr is equal.
+*/
+xbool xhash_eql_cstr(const void* key1, const void* key2);
 
 /**
   @brief
@@ -338,7 +351,7 @@ int xhash_hash_cstr(void* key);
   @return
     The hash value of the x-string.
 */
-int xhash_hash_xstr(void* key);
+int xhash_hash_xstr(const void* key);
 
 
 /**
@@ -353,7 +366,7 @@ int xhash_hash_xstr(void* key);
   @return
     Whether the 2 xstr is equal.
 */
-xbool xhash_eql_xstr(void* key1, void* key2);
+xbool xhash_eql_xstr(const void* key1, const void* key2);
 
 /**
  * @brief
@@ -365,7 +378,7 @@ xbool xhash_eql_xstr(void* key1, void* key2);
  * @return
  *  The hash value of the int.
  */
-int xhash_hash_int(void* key);
+int xhash_hash_int(const void* key);
 
 /**
  * @brief
@@ -379,7 +392,7 @@ int xhash_hash_int(void* key);
  * @return
  *  Whether the 2 int values are equal.
  */
-xbool xhash_eql_int(void* key1, void* key2);
+xbool xhash_eql_int(const void* key1, const void* key2);
 
 /**
   @brief
