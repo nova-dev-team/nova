@@ -76,13 +76,13 @@ xsuccess xconf_load(xconf xcf, const char* fname) {
   return ret;
 }
 
-static xbool write_item_visitor(void* key, void* value, void* args) {
+static xbool write_item_visitor(const void* key, void* value, void* args) {
   FILE* fp = (FILE *) args;
   fprintf(fp, "%s=%s\n", xstr_get_cstr((xstr) key), xstr_get_cstr((xstr) value));
   return XTRUE;
 }
 
-static xbool write_section_visitor(void* key, void* value, void* args) {
+static xbool write_section_visitor(const void* key, void* value, void* args) {
   FILE* fp = (FILE *) args;
   fprintf(fp, "[%s]\n", xstr_get_cstr((xstr) key));
   xhash_visit((xhash) value, write_item_visitor, fp);
