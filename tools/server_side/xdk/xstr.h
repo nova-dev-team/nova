@@ -297,13 +297,13 @@ int xstr_compare(xstr xs1, xstr xs2);
 /**
   @brief
     Split an xstring.
-  
+
   @param xs
     The xstring to be splitted.
   @param sep
     Separators for the xstring.
     If "" is given, the original string will be separated into characters.
-  
+
   @return
     An xvec object, containing all the segments.
 */
