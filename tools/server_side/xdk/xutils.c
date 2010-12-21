@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <signal.h>
 #include <assert.h>
 
 #include "xmemory.h"
@@ -304,6 +305,23 @@ void xjoin_path_cstr(XOUT xstr fullpath, XIN const char* current_dir, XIN const 
   }
 }
 
+void xgetcwd_xstr(xstr xcwd) {
+  const int cwd_buf_len_max = 16 * 1024;
+  int cwd_buf_len = 256;
+  char* cwd_cstr = xmalloc_ty(cwd_buf_len, char);
+  while (getcwd(cwd_cstr, cwd_buf_len) == NULL) {
+    // expand the buffer if necessary
+    cwd_buf_len *= 2;
+    // stop allocation if too much memory is required
+    if (cwd_buf_len > cwd_buf_len_max) {
+      break;
+    }
+    cwd_cstr = xrealloc(cwd_cstr, cwd_buf_len);
+  }
+  xstr_set_cstr(xcwd, cwd_cstr);
+  xfree(cwd_cstr);
+}
+
 void xsleep_msec(int msec) {
   struct timespec req = {0};
   time_t sec = msec / 1000;
@@ -574,24 +592,11 @@ static xsuccess xfilesystem_mkdir_p_helper(xstr path, int mode) {
 xsuccess xfilesystem_mkdir_p(const char* path, int mode) {
   xsuccess ret = XSUCCESS;
   xstr path_xstr = xstr_new_from_cstr(path);
-  const int cwd_buf_len_max = 16 * 1024;
-  int cwd_buf_len = 256;
-  char* cwd_cstr = xmalloc_ty(cwd_buf_len, char);
-  while (getcwd(cwd_cstr, cwd_buf_len) == NULL) {
-    // expand the buffer if necessary
-    cwd_buf_len *= 2;
-    // stop allocation if too much memory is required
-    if (cwd_buf_len > cwd_buf_len_max) {
-      ret = XFAILURE;
-      break;
-    }
-    cwd_cstr = xrealloc(cwd_cstr, cwd_buf_len);
-  }
-  if (ret != XFAILURE) {
-    xjoin_path_cstr(path_xstr, cwd_cstr, path);
-    ret = xfilesystem_mkdir_p_helper(path_xstr, mode);
-  }
-  xfree(cwd_cstr);
+  xstr xcwd = xstr_new();
+  xgetcwd_xstr(xcwd);
+  xjoin_path_cstr(path_xstr, xstr_get_cstr(xcwd), path);
+  ret = xfilesystem_mkdir_p_helper(path_xstr, mode);
+  xstr_delete(xcwd);
   xstr_delete(path_xstr);
   return ret;
 }
@@ -695,3 +700,68 @@ xsuccess xgetline_fp(FILE* fp, xstr line) {
   return ret;
 }
 
+xsuccess xdaemonize_me(const char* pid_fn, int argc, char* argv[]) {
+  FILE* fp = fopen(pid_fn, "w");
+  int i;
+  pid_t pid;
+
+  pid = fork();
+  if (pid < 0) {
+    return XFAILURE;
+  } else if (pid > 0) {
+    // exit parent process
+    exit(0);
+  } else {
+    // double forking
+    pid = fork();
+    if (pid < 0) {
+      return XFAILURE;
+    } else if (pid > 0) {
+      // exit parent process
+      exit(0);
+    } else {
+      // pass to the code below
+    }
+  }
+
+  umask(0);
+  setsid();
+  chdir("/");
+
+  freopen("/dev/null", "r", stdin);
+  freopen("/dev/null", "w", stdout);
+  freopen("/dev/null", "r", stderr);
+
+  fprintf(fp, "%d\n", getpid());
+  for (i = 0; i < argc; i++) {
+    if (i != 0) {
+      fprintf(fp, " ");
+    }
+    fprintf(fp, "%s", argv[i]);
+  }
+  fprintf(fp, "\n");
+  fclose(fp);
+
+  return XSUCCESS;
+}
+
+xsuccess xkill_by_pid_file(const char* pid_fn) {
+  xsuccess ret = XSUCCESS;
+
+  FILE* fp = fopen(pid_fn, "r");
+  int pid_to_kill = 0;
+  fscanf(fp, "%d", &pid_to_kill);
+  fclose(fp);
+  if (kill(pid_to_kill, 0) == 0) {
+    // process exists, kill it
+    kill(pid_to_kill, SIGKILL);
+  }
+  xsleep_msec(1000);  // wait 1 sec for killing it
+  if (kill(pid_to_kill, 0) != 0) {
+    // the process no longer exists
+    remove(pid_fn);
+  } else {
+    ret = XFAILURE;
+  }
+  return ret;
+}
