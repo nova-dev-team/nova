@@ -240,7 +240,7 @@ static xsuccess xlog_ctl_set_file(const char* logger_name, const char* fn) {
     // check if name already used
     lg = xhash_get(g_xloggers, logger_name);
     if (lg != NULL) {
-      lg->fn = fn;
+      lg->fn = strdup(fn);
       lg->fp = fp;
       lg->special = XFALSE;
     } else {
