@@ -164,6 +164,15 @@ void xjoin_path_cstr(XOUT xstr fullpath, XIN const char* current_dir, XIN const 
 
 /**
   @brief
+    Get the current working directory.
+
+  @param xcwd
+    The parameter that will hold current working directory.
+*/
+void xgetcwd_xstr(XOUT xstr xcwd);
+
+/**
+  @brief
     Sleep in milliseconds.
 
   @param msec
@@ -407,6 +416,34 @@ xbool xhash_eql_int(const void* key1, const void* key2);
     If new lines are read, XSUCCESS will be returned. Other wise (including EOF) XFAILURE is returned.
 */
 xsuccess xgetline_fp(FILE* fp, xstr line);
+
+/**
+  @brief
+    Daemonize current process.
+
+  @param pid_fn
+    Filename (actually, full path) of the pid file containing the running info of current process.
+  @param argc
+    Number of command line args.
+  @param argv
+    Command line args array.
+
+  @return
+    If successfully daemonized current process.
+*/
+xsuccess xdaemonize_me(const char* pid_fn, int argc, char* argv[]);
+
+/**
+  @brief
+    Kill a process by its pid file. The pid file will be removed if the process does not exist, or is killed successfully.
+
+  @param pid_fn
+    Filename (actually, full path) of the pid file containing the running info of target process.
+
+  @return
+    If killing is successful.
+*/
+xsuccess xkill_by_pid_file(const char* pid_fn);
 
 #endif  // XUTILS_H_
 
