@@ -15,13 +15,8 @@
 
   @brief
     Provide logging utility.
+    Special loggers: stderr, stdout.
 */
-
-/**
-  @brief
-    The default logging file.
-*/
-#define XLOG_DEFAULT_FILE stderr
 
 /**
   @brief
@@ -127,6 +122,14 @@ typedef enum {
 */
 xsuccess xlog_init(int argc, char* argv[]);
 
+
+/**
+  @brief
+    Shutdown the logging utility.
+    You can easily restart it by adding new loggers.
+*/
+void xlog_finalize();
+
 /**
   @brief
     General interface to control the logging system.
@@ -149,11 +152,13 @@ xsuccess xlog_ctl(const char* logger_name, xlog_ctl_action action, ...);
 
   @param logger_name
     Name of the new logger.
+  @param log_fn
+    The log file name
 
   @return
     Whether the logger is successfully created.
 */
-#define xlog_add(logger_name) xlog_ctl(logger_name, XLOG_CTL_ADD)
+#define xlog_add(logger_name, log_fn) xlog_ctl(logger_name, XLOG_CTL_ADD, log_fn)
 
 
 /**
