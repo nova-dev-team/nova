@@ -443,25 +443,18 @@ def warn_bad_style
       end
     end
 
-    # check if .h files have got @author, @file tags
+    # check if .h files have got @author
     if path.end_with? ".h"
       has_author_tag = false
-      has_file_tag = false
       File.open(path) do |f|
         f.each_line do |line|
           if line =~ /@author/
             has_author_tag = true
           end
-          if line =~ /@file/
-            has_file_tag = true
-          end
         end
       end
       if has_author_tag == false
         puts "style warning: #{path}, does not have @author tag!"
-      end
-      if has_file_tag == false
-        puts "style warning: #{path}, does not have @file tag"
       end
     end
 
@@ -700,6 +693,9 @@ MF_EOF
 
   if defined? INSTALL_DEPENDS or defined? INSTALL_ACTIONS
     mf_targets << "install"
+  end
+  if defined? UNINSTALL_ACTIONS
+    mf_targets << "uninstall"
   end
   mf_targets.sort!
   mf_targets.uniq!
@@ -1025,6 +1021,15 @@ if defined? INSTALL_ACTIONS
 end
 }
 
+#{
+if defined? UNINSTALL_ACTIONS
+  all_actions = UNINSTALL_ACTIONS.collect do |action|
+    "echo \"\t#{action}\" >> Makefile"
+  end
+  "echo \"\" >> Makefile\necho \"uninstall:\" >> Makefile\n" + (all_actions.join "\n")
+end
+}
+
 CFG_FILE
   File.open("configure", "w") do |cf|
     cf.write(cfg)
@@ -1035,7 +1040,13 @@ end
 desc "Show all notes like TODO, ENHANCE, etc"
 task :notes do
   ["TODO", "NOTE", "ENHANCE", "XXX", "FIXME"].each do |note|
-    system "grep #{note} * -r -n --color"
+    if defined? SHOW_NOTES
+      SHOW_NOTES.each do |entry|
+        system "grep #{note} #{entry} -r -n --color"
+      end
+    else
+      system "grep #{note} * -r -n --color"
+    end
     puts
   end
 end
