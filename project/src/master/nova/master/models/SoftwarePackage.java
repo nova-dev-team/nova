@@ -1,4 +1,4 @@
-package nova.master.model;
+package nova.master.models;
 
 public class SoftwarePackage {
 

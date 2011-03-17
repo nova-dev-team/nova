@@ -1,4 +1,4 @@
-package nova.agent.core.model;
+package nova.agent.core.models;
 
 public class SoftwarePackage {
 
