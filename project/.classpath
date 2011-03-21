@@ -12,5 +12,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/netty-3.2.4.Final.jar" sourcepath="lib/netty-3.2.4.Final-sources.jar"/>
 	<classpathentry kind="lib" path="lib/gson-1.6.jar" sourcepath="lib/gson-1.6-sources.jar"/>
+	<classpathentry kind="lib" path="lib/json_simple-1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

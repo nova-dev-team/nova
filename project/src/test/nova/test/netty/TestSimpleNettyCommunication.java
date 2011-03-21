@@ -33,7 +33,7 @@ public class TestSimpleNettyCommunication {
 	static final ChannelGroup allDiscardChannels = new DefaultChannelGroup(
 			"discard-server");
 
-	static final int MAX_CONNECTIONS = 1000;
+	static final int MAX_CONNECTIONS = 100;
 	private static int nConnections = 0;
 	static final int BIND_PORT = 9876;
 
