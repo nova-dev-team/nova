@@ -70,6 +70,7 @@ public class TestSimpleNettyCommunication {
 		ChannelFuture f = bootstrap.connect(new InetSocketAddress("localhost",
 				BIND_PORT));
 		f.awaitUninterruptibly();
+		factory.releaseExternalResources();
 		bootstrap.releaseExternalResources();
 	}
 
@@ -104,6 +105,7 @@ public class TestSimpleNettyCommunication {
 		waitForDiscardServerShutdown();
 		ChannelGroupFuture future = allDiscardChannels.close();
 		future.awaitUninterruptibly();
+		bootstrap.releaseExternalResources();
 		factory.releaseExternalResources();
 		synchronized (this) {
 			this.notify();

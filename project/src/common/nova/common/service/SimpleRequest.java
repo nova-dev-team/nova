@@ -1,5 +1,5 @@
 package nova.common.service;
 
-public class SimpleMessage {
+public class SimpleRequest {
 
 }
