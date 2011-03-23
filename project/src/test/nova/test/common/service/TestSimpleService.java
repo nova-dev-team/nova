@@ -1,18 +1,15 @@
 package nova.test.common.service;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleProxy;
-import nova.common.service.SimpleRequest;
 import nova.common.service.SimpleServer;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.junit.Test;
-
-import com.google.gson.Gson;
 
 public class TestSimpleService {
 
@@ -21,18 +18,28 @@ public class TestSimpleService {
 	Object sem = new Object();
 
 	@Test
-	public void test() {
-
-	}
-
-	@Test
 	public void testHeartbeat() {
-		new Thread(new Runnable() {
+		Thread t = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-				HeartbeatServer svr = new HeartbeatServer();
+				SimpleServer svr = new SimpleServer();
+				svr.registerHandler(HeartbeatMessage.class,
+						new SimpleHandler<HeartbeatMessage>() {
+
+							AtomicLong counter = new AtomicLong();
+
+							@Override
+							public void handleMessage(HeartbeatMessage msg,
+									ChannelHandlerContext ctx, MessageEvent e) {
+								System.out.println(counter.incrementAndGet());
+								System.out.println("Got a heartbeat request!");
+								System.out.println(msg);
+							}
+
+						});
+
 				svr.bind(new InetSocketAddress(BIND_PORT));
 
 				synchronized (sem) {
@@ -41,95 +48,53 @@ public class TestSimpleService {
 
 			}
 
-		}).start();
+		});
+
+		t.start();
 
 		try {
 			synchronized (sem) {
 				sem.wait();
 			}
-
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 
-		ArrayList<Thread> tList = new ArrayList<Thread>();
-
-		for (int k = 0; k < 10; k++) {
-			Thread t = new Thread() {
-
-				@Override
-				public void run() {
-					for (int i = 0; i < 20; i++) {
-						HeartbeatProxy hp = new HeartbeatProxy();
-						hp.connect(new InetSocketAddress("localhost", BIND_PORT));
-						for (int j = 0; j < 500; j++) {
-							hp.getHeartbeat(j);
-						}
-
-						hp.close();
-					}
-				}
-
-			};
-			t.start();
-			tList.add(t);
-
+		HeartbeatProxy hp = new HeartbeatProxy();
+		hp.connect(new InetSocketAddress("localhost", BIND_PORT));
+		for (int j = 0; j < 1000; j++) {
+			hp.sendHeartbeat();
 		}
+		hp.close();
 
-		for (Thread t : tList) {
-			try {
-				t.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			// wait a few milliseconds for packets to be handled
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-
 	}
-}
-
-class HeartbeatServer extends SimpleServer {
-
-	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-		Gson gson = new Gson();
-		HeartbeatRequest req = gson.fromJson((String) e.getMessage(),
-				HeartbeatRequest.class);
-		System.out.println(gson.toJson(req));
-	}
-
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-		e.getCause().printStackTrace();
-		e.getChannel().close();
-	}
-
 }
 
 class HeartbeatProxy extends SimpleProxy {
 
-	public void getHeartbeat() {
-		this.sendRequest(new HeartbeatRequest());
-	}
-
-	public void getHeartbeat(int id) {
-		this.sendRequest(new HeartbeatRequest(id));
+	public void sendHeartbeat() {
+		this.sendRequest(new HeartbeatMessage());
 	}
 
 }
 
-class HeartbeatRequest extends SimpleRequest {
-	public String xcall = "getHeartbeat";
-	public int xid = xidCounter++;
-	public int id = 0;
+class HeartbeatMessage {
+	// dummy request
 
-	private static int xidCounter = 0;
+	Integer id = counter++;
 
-	public HeartbeatRequest() {
-		this(0);
+	static int counter = 0;
+
+	String xtype = "dummy!";
+
+	@Override
+	public String toString() {
+		return "heartbeat id: " + id + " ~ " + xtype;
 	}
-
-	public HeartbeatRequest(int id) {
-		this.id = id;
-	}
-
 }

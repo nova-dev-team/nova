@@ -7,9 +7,11 @@ import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.ChannelGroupFuture;
@@ -77,14 +79,20 @@ public class SimpleProxy extends SimpleChannelHandler {
 	public void close() {
 		ChannelGroupFuture future = this.allChannels.close();
 		future.awaitUninterruptibly();
-		this.factory.releaseExternalResources();
 		this.bootstrap.releaseExternalResources();
 	}
 
 	protected final void sendRequest(Object req) {
-		String message = gson.toJson(req) + "\r\n";
+		Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req);
+		String message = gson.toJson(packet) + "\r\n";
 		ChannelFuture future = this.channel.write(message);
 		future.awaitUninterruptibly();
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+		e.getCause().printStackTrace();
+		e.getChannel().close();
 	}
 
 }

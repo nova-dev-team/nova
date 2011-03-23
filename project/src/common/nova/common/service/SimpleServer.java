@@ -1,6 +1,8 @@
 package nova.common.service;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -11,6 +13,8 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.ChannelGroupFuture;
@@ -20,12 +24,19 @@ import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
+import org.json.simple.JSONValue;
+
+import com.google.gson.Gson;
 
 public class SimpleServer extends SimpleChannelHandler {
 
 	ChannelGroup allChannels = null;
 	ChannelFactory factory = null;
 	ServerBootstrap bootstrap = null;
+	Gson gson = new Gson();
+
+	@SuppressWarnings("rawtypes")
+	Map<Class, SimpleHandler> handlers = new HashMap<Class, SimpleHandler>();
 
 	public SimpleServer() {
 		this.allChannels = new DefaultChannelGroup();
@@ -43,7 +54,7 @@ public class SimpleServer extends SimpleChannelHandler {
 				ChannelPipeline pipeline = Channels.pipeline();
 				pipeline.addLast(
 						"frameDecoder",
-						new DelimiterBasedFrameDecoder(8192, Delimiters
+						new DelimiterBasedFrameDecoder(8192 * 16, Delimiters
 								.lineDelimiter()));
 				pipeline.addLast("stringDecoder", new StringDecoder());
 				pipeline.addLast("stringEncoder", new StringEncoder());
@@ -63,6 +74,41 @@ public class SimpleServer extends SimpleChannelHandler {
 
 		bootstrap.setOption("child.tcpNoDelay", true);
 		bootstrap.setOption("child.keepAlive", true);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void registerHandler(Class klass, SimpleHandler handler) {
+		handlers.put(klass, handler);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+		String msg = (String) e.getMessage();
+		Map jsonMsg = (Map) JSONValue.parse(msg);
+		String xtype = (String) jsonMsg.get("xtype");
+		try {
+			Class klass = Class.forName(xtype);
+			SimpleHandler handler = this.handlers.get(klass);
+			if (handler == null) {
+				throw new HandlerNotFoundException(xtype);
+			}
+			synchronized (gson) {
+				this.handlers.get(klass)
+						.handleMessage(
+								gson.fromJson(
+										gson.toJson(jsonMsg.get("xvalue")),
+										klass), ctx, e);
+			}
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+		e.getCause().printStackTrace();
+		e.getChannel().close();
 	}
 
 	public Channel bind(InetSocketAddress addr) {
