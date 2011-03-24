@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Mar 24, 2011 9:31:31 PM                                                        
+
+     Nova
+     Virtualization management system
+                   
+     Santa Zhang (santa1987@gmail.com)
+     ====================================================================== -->
+<project name="Nova" default="build">
+	<description>
+    	Virtualization management system
+    </description>
+
+
+	<target name="check-env" description="check build environment">
+		<mkdir dir="bin"/>
+	</target>
+
+
+	<target name="build" depends="check-env" description="build project">
+		<javac srcdir="src" destdir="bin" includeantruntime="false">
+			<classpath>
+				<fileset dir="lib">
+					<include name="**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+		<copy file="conf/log4j.properties" todir="bin/" />
+	</target>
+
+
+	<target name="test" depends="build" description="run junit4 tests">
+		<junit printsummary="false">
+			<classpath>
+				<fileset dir="lib">
+					<include name="**/*.jar"/>
+				</fileset>
+				<fileset dir="conf"/>
+			</classpath>
+			<batchtest>
+				<fileset dir="bin/nova/test"/>
+			</batchtest>
+		</junit>
+	</target>
+
+
+	<target name="clean" description="clean build files">
+		<delete>
+			<fileset dir="bin">
+				<include name="**/*.class"/>
+			</fileset>
+		</delete>
+	</target>
+
+</project>
