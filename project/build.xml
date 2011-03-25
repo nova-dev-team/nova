@@ -29,28 +29,31 @@
 		<copy file="conf/log4j.properties" todir="bin/" />
 	</target>
 
+  <target name="pre-test" depends="build" description="prepare test environment">
+    <mkdir dir="bin/junit-temp"/>
+    <mkdir dir="bin/junit-report"/>
+  </target>
 
-	<target name="test" depends="build" description="run junit4 tests">
-		<junit printsummary="false">
+	<target name="test" depends="pre-test" description="run junit4 tests">
+    <junit printsummary="false" filtertrace="true" haltonfailure="true" tempdir="bin/junit-temp">
+      <formatter type="xml"/>
 			<classpath>
 				<fileset dir="lib">
 					<include name="**/*.jar"/>
 				</fileset>
 				<fileset dir="conf"/>
 			</classpath>
-			<batchtest>
-				<fileset dir="bin/nova/test"/>
+      <batchtest todir="bin/junit-report">
+        <fileset dir="bin/">
+          <include name="nova/test/**/*.class" />
+        </fileset>
 			</batchtest>
 		</junit>
 	</target>
 
 
 	<target name="clean" description="clean build files">
-		<delete>
-			<fileset dir="bin">
-				<include name="**/*.class"/>
-			</fileset>
-		</delete>
+    <delete dir="bin/" />
 	</target>
 
 </project>
