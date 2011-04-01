@@ -13,13 +13,13 @@ public class SystemInfo {
 	private NetInfo net;
 
 	public SystemInfo() throws SigarException {
-		this.cpu = new CpuInfo();
+		this.cpu = CpuInfo.get();
 		this.mem = new MemoryInfo();
 		this.net = new NetInfo();
 	}
 
 	/**
-	 * Ê±¼ä±ê×¼ÏÔÊ¾
+	 * Ê±ï¿½ï¿½ï¿½×¼ï¿½ï¿½Ê¾
 	 */
 	public static String formatUptime(double uptime) {
 		String retval = "";
@@ -58,12 +58,12 @@ public class SystemInfo {
 
 	// Cpu Model
 	public String getCpuModel() {
-		return this.cpu.getCpuModel();
+		return this.cpu.model;
 	}
 
 	// Cpu number
 	public int getCpuNum() throws SigarException {
-		return this.cpu.getCpuNum();
+		return this.cpu.nCpu;
 	}
 
 	// Memory Size

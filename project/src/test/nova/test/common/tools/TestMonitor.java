@@ -7,7 +7,6 @@ import nova.common.tools.perf.NetInfo;
 import nova.common.tools.perf.ProcInfo;
 import nova.common.tools.perf.SystemInfo;
 
-import org.hyperic.sigar.CpuPerc;
 import org.hyperic.sigar.FileSystem;
 import org.hyperic.sigar.SigarException;
 import org.junit.Test;
@@ -15,20 +14,8 @@ import org.junit.Test;
 public class TestMonitor {
 	@Test
 	public void TestCpuInfo() throws SigarException {
-		CpuInfo ci = new CpuInfo();
-		CpuPerc[] cpus = ci.getCpus();
-		for (int i = 0; i < cpus.length; i++) {
-			ci.setCpu(cpus[i]);
-			System.out.println(i);
-			System.out.println("User Time....."
-					+ CpuPerc.format(ci.getCpuUserTime()));
-			System.out.println("Sys Time......"
-					+ CpuPerc.format(ci.getCpuSystemTime()));
-			System.out.println("Combined......"
-					+ CpuPerc.format(ci.getCpuCombinedTime()));
-			System.out.println("Mzh......" + ci.getCpuMhz());
-			System.out.println("Model......" + ci.getCpuModel());
-		}
+		CpuInfo ci = CpuInfo.get();
+		System.out.println(ci);
 	}
 
 	@Test

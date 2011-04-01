@@ -1,55 +1,40 @@
 package nova.common.tools.perf;
 
-import org.hyperic.sigar.CpuPerc;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
+import com.google.gson.Gson;
+
 public class CpuInfo {
 
-	private CpuPerc cpu;
-	private Sigar sigar = new Sigar();
-	private org.hyperic.sigar.CpuInfo info;
+	public final double combinedTime;
+	public final int mhz;
+	public final int nCpu;
+	public final String model;
 
-	public CpuInfo() throws SigarException {
-		org.hyperic.sigar.CpuInfo[] infos = this.sigar.getCpuInfoList();
-		this.info = infos[0];
+	private static Sigar sigar = new Sigar();
+
+	public static CpuInfo get() {
+		CpuInfo info = null;
+		try {
+			info = new CpuInfo();
+		} catch (SigarException e) {
+			e.printStackTrace();
+		}
+		return info;
 	}
 
-	public CpuPerc[] getCpus() throws SigarException {
-		return this.sigar.getCpuPercList();
+	private CpuInfo() throws SigarException {
+		this.combinedTime = sigar.getCpuPerc().getCombined();
+		org.hyperic.sigar.CpuInfo[] infoList = sigar.getCpuInfoList();
+		this.mhz = infoList[0].getMhz();
+		this.nCpu = infoList.length;
+		this.model = infoList[0].getModel();
 	}
 
-	// cpu numbers
-	public int getCpuNum() throws SigarException {
-		return this.sigar.getCpuPercList().length;
-	}
-
-	public void setCpu(CpuPerc cpuChosed) {
-		cpu = cpuChosed;
-	}
-
-	// user time
-	public Double getCpuUserTime() {
-		return cpu.getUser();
-	}
-
-	// system time
-	public Double getCpuSystemTime() {
-		return cpu.getSys();
-	}
-
-	// total time
-	public Double getCpuCombinedTime() {
-		return cpu.getCombined();
-	}
-
-	// Cpu Mhz
-	public int getCpuMhz() {
-		return this.info.getMhz();
-	}
-
-	// Cpu Model
-	public String getCpuModel() {
-		return this.info.getModel();
+	@Override
+	public String toString() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
 	}
 }
