@@ -1,23 +1,29 @@
 package nova.common.service;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class Xpacket {
 
-	private Xpacket() {
+	protected Xpacket() {
 
 	}
 
-	Integer xid;
+	protected String xfrom;
 
-	String xtype;
+	protected Integer xid;
 
-	Object xvalue;
+	protected String xtype;
 
-	private static AtomicInteger xidCounter = new AtomicInteger();
+	protected Object xvalue;
 
-	public static Xpacket createPacket(String name, Object obj) {
+	protected static AtomicInteger xidCounter = new AtomicInteger();
+
+	public static Xpacket createPacket(String name, Object obj)
+			throws UnknownHostException {
 		Xpacket packet = new Xpacket();
+		packet.xfrom = InetAddress.getLocalHost().toString();
 		packet.xid = xidCounter.incrementAndGet();
 		packet.xtype = name;
 		packet.xvalue = obj;

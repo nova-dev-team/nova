@@ -1,10 +1,10 @@
 package nova.common.service;
 
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -14,7 +14,6 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.ChannelGroupFuture;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
@@ -30,7 +29,7 @@ public class SimpleProxy extends SimpleChannelHandler {
 	ChannelGroup allChannels = null;
 	ChannelFactory factory = null;
 	ClientBootstrap bootstrap = null;
-	Channel channel = null;
+	ChannelFuture channel = null;
 	Gson gson = new GsonBuilder().serializeNulls().create();
 
 	public SimpleProxy() {
@@ -64,28 +63,25 @@ public class SimpleProxy extends SimpleChannelHandler {
 		bootstrap.setOption("keepAlive", true);
 	}
 
-	public Channel connect(InetSocketAddress addr) {
-		ChannelFuture future = bootstrap.connect(addr);
-		this.channel = future.awaitUninterruptibly().getChannel();
-		if (!future.isSuccess()) {
-			future.getCause().printStackTrace();
-			this.close();
-			return null;
-		}
-		this.allChannels.add(this.channel);
+	public ChannelFuture connect(InetSocketAddress addr) {
+		this.channel = bootstrap.connect(addr);
+
 		return this.channel;
 	}
 
 	public void close() {
-		ChannelGroupFuture future = this.allChannels.close();
-		future.awaitUninterruptibly();
-		this.bootstrap.releaseExternalResources();
+		this.channel.awaitUninterruptibly();
+		if (!this.channel.isSuccess()) {
+			this.channel.getCause().printStackTrace();
+		}
+		this.channel.getChannel().getCloseFuture().awaitUninterruptibly();
+		this.factory.releaseExternalResources();
 	}
 
-	protected final void sendRequest(Object req) {
+	protected final void sendRequest(Object req) throws UnknownHostException {
 		Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req);
 		String message = gson.toJson(packet) + "\r\n";
-		ChannelFuture future = this.channel.write(message);
+		ChannelFuture future = this.channel.getChannel().write(message);
 		future.awaitUninterruptibly();
 	}
 

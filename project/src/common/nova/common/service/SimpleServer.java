@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
+import nova.common.service.message.CloseChannelMessage;
+
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
@@ -36,7 +38,7 @@ public class SimpleServer extends SimpleChannelHandler {
 	Gson gson = new Gson();
 
 	@SuppressWarnings("rawtypes")
-	Map<Class, SimpleHandler> handlers = new HashMap<Class, SimpleHandler>();
+	Map<Class, ISimpleHandler> handlers = new HashMap<Class, ISimpleHandler>();
 
 	public SimpleServer() {
 		this.allChannels = new DefaultChannelGroup();
@@ -77,7 +79,7 @@ public class SimpleServer extends SimpleChannelHandler {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public void registerHandler(Class klass, SimpleHandler handler) {
+	public void registerHandler(Class klass, ISimpleHandler handler) {
 		handlers.put(klass, handler);
 	}
 
@@ -89,7 +91,7 @@ public class SimpleServer extends SimpleChannelHandler {
 		String xtype = (String) jsonMsg.get("xtype");
 		try {
 			Class klass = Class.forName(xtype);
-			SimpleHandler handler = this.handlers.get(klass);
+			ISimpleHandler handler = this.handlers.get(klass);
 			if (handler == null) {
 				throw new HandlerNotFoundException(xtype);
 			}
@@ -98,10 +100,16 @@ public class SimpleServer extends SimpleChannelHandler {
 						.handleMessage(
 								gson.fromJson(
 										gson.toJson(jsonMsg.get("xvalue")),
-										klass), ctx, e);
+										klass), ctx, e,
+								jsonMsg.get("xfrom").toString());
 			}
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
+		}
+
+		if (xtype.equals(CloseChannelMessage.class.getName().toString())) {
+			// System.out.println(xtype);
+			e.getChannel().close();
 		}
 	}
 
