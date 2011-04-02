@@ -84,18 +84,24 @@ public class TestMonitor {
 		for (int i = 0; i < pids.length; i++)
 			System.out.println(pids[i]);
 
-		pids = pi.getPidsThroughProcessName("QQ");
+		String interestedProcessName = "java";
+		pids = pi.getPidsThroughProcessName(interestedProcessName);
 		System.out.println("svchost pids:");
 		for (int i = 0; i < pids.length; i++)
 			System.out.println(pids[i]);
-		pi.setPid(pids[0]);
-		System.out.println("QQ start time: "
-				+ pi.changeTimeFormat(pi.getStartTime()));
-		System.out.println("Current Time: "
-				+ pi.changeTimeFormat(pi.getCurrenTime()));
-		System.out.println("QQ time last: " + pi.getLastTime());
-		System.out.println("QQ Rss: " + pi.getProcMemmoryRss());
-		System.out.println("QQ Vss: " + pi.getProcMemmoryVss());
-		System.out.println("Cpu Util: " + pi.getProcCpuPercent());
+		if (pids.length > 0) {
+			pi.setPid(pids[0]);
+			System.out.println(interestedProcessName + " start time: "
+					+ pi.changeTimeFormat(pi.getStartTime()));
+			System.out.println("Current Time: "
+					+ pi.changeTimeFormat(pi.getCurrenTime()));
+			System.out.println(interestedProcessName + " time last: "
+					+ pi.getLastTime());
+			System.out.println(interestedProcessName + " Rss: "
+					+ pi.getProcMemmoryRss());
+			System.out.println(interestedProcessName + " Vss: "
+					+ pi.getProcMemmoryVss());
+			System.out.println("Cpu Util: " + pi.getProcCpuPercent());
+		}
 	}
 }
