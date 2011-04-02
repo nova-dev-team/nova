@@ -53,7 +53,7 @@ class HotbackupController < ApplicationController
       reply_success "Done!"
     end
   end
-  
+
   def remove
     hb = Hotbackup.find_by_id params[:id]
     Hotbackup.delete hb

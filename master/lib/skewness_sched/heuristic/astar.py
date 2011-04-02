@@ -10,7 +10,7 @@ class Algorithm(object):
         self.hot_threshold = args["hot"]
 
     ###################################
-    # schedule to generate mig list 
+    # schedule to generate mig list
     ###################################
     def schedule(self, layout, predicted_vms, predicted_pms, predicted_sys):
         # reset

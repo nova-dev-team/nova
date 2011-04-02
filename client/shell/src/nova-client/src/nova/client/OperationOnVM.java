@@ -1,11 +1,11 @@
 /**
- * 
+ *
  */
 package nova.client;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class OperationOnVM {
 	public static String START = "start";

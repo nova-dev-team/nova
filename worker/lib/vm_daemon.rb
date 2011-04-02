@@ -440,15 +440,15 @@ def do_prepare rails_root, storage_server, vm_dir
       cluster_name = ""
       id_rsa = nil
       id_rsa_pub = nil
-      
+
       begin
-		    if File.exists?('ceil_password') and File.exists?('pkg_server')
-		      agent_password = File.read('ceil_password')
-		      agent_pkg_server = File.read('pkg_server')
-		      igen.config_agent(agent_pkg_server, agent_password)
+        if File.exists?('ceil_password') and File.exists?('pkg_server')
+          agent_password = File.read('ceil_password')
+          agent_pkg_server = File.read('pkg_server')
+          igen.config_agent(agent_pkg_server, agent_password)
           write_log "ceil_agent configured"
-		    end
-			rescue
+        end
+      rescue
   			wirte_log "failed to configure ceil_agent!"
       end
 
@@ -691,13 +691,13 @@ end
 
 
 def do_hotbackup_cancel
-  
+
 end
 
 def do_hotbackup
   xml_desc = XmlSimple.xml_in(File.read "xml_desc.xml")
   vm_uuid = xml_desc["uuid"][0]
-  
+
   virt_conn = libvirt_connect_local
   dom = virt_conn.lookup_domain_by_uuid(vm_uuid)
 
@@ -705,13 +705,13 @@ def do_hotbackup
     write_log "vm #{vm_uuid} not running! cannot hotbackup!"
     return -1
   end
-  
+
   hotbackup_dest = nil
   begin
     hotbackup_dest = File.read "hotbackup_to"
   rescue
   end
-  
+
   if hotbackup_dest and (hotbackup_dest.length > 0)
     write_log "now hotbackup vm<#{vm_uuid}> to slave worker '#{hotbackup_dest}'"
     old_status = File.read "status"
@@ -724,7 +724,7 @@ def do_hotbackup
       pid = fork do
        cmd = "xm hotbackup " + VM_NAME + " " + hotbackup_dest + " 2>&1 >> hotbackup.log"
        write_log "[cmd]" + cmd
-       system cmd    
+       system cmd
       end
 
       Process.detach pid
@@ -739,7 +739,7 @@ def do_hotbackup
         end
       rescue
         write_log "hotbackup maybe failed!"
-      end 
+      end
     end
   else
     write_log "invalid params, hotbackup failed"

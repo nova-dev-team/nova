@@ -25,11 +25,11 @@ class Predictor(object):
             self.lbbs = kw['lookbackbufsize'];
         else:
             self.lbbs = self.pspan;
-    
+
     def predict(self,sample):
         # to be override:
         raise Exception("predict is not implemented!");
-    
+
     def reset(self):
         # to be override:
         raise Exception("reset is no implemented!");
@@ -46,7 +46,7 @@ def get_sla_threshold(oarr, slath):
 
 # predict one: SINGLE EWMA Predictor
 class SingleEWMAPredictor(Predictor):
-    
+
     # initial parameters:
     # pspan - prediction span
     # alpha - alpha in [0,1] for EWMA algorithm, default to 0
@@ -66,7 +66,7 @@ class SingleEWMAPredictor(Predictor):
         # data structures
         self.sample_buffer = []
         self.first_try = 1
-        
+
     def predict(self,sample):
         self.sample_buffer.append(sample);
         # keep the size of the sample buffer
@@ -82,7 +82,7 @@ class SingleEWMAPredictor(Predictor):
         else:
             self.last_estimation = self.last_estimation*self.alpha + observation*(1-self.alpha)
         return self.pspan,self.last_estimation
-    
+
     def reset(self):
         self.sample_buffer = []
         self.first_try = 1
@@ -90,7 +90,7 @@ class SingleEWMAPredictor(Predictor):
 
 # predict two: FastUpSlowDownPredictor
 class FastUpSlowDownPredictor(SingleEWMAPredictor):
-    
+
     # initial parameters:
     # pspan - prediction span
     # alpha - alpha in [0,1] for EWMA algorithm, default to 0
@@ -99,7 +99,7 @@ class FastUpSlowDownPredictor(SingleEWMAPredictor):
         SingleEWMAPredictor.__init__(self,**kw);
         self.upalpha = kw["upalpha"]
         self.downalpha = kw["downalpha"]
-        
+
     def predict(self,sample):
         self.sample_buffer.append(sample);
         # keep the size of the sample buffer

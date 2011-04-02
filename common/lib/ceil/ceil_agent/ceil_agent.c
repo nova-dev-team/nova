@@ -14,9 +14,9 @@ void error(char *msg) {
 }
 
 void split_cmd(char *buffer, char *jobname) {
-  int i, sp; 
+  int i, sp;
   bzero(jobname, LENGTH_JOB);
-  for (sp = 0; sp < strlen(buffer); ++sp) 
+  for (sp = 0; sp < strlen(buffer); ++sp)
     if (buffer[sp] == ' ') break;
   strcpy(jobname, &buffer[sp + 1]);
 }
@@ -61,7 +61,7 @@ int find_max_dirname(char *path) {
 }
 
 int write_file(char *basepath, char *filename, char *content) {
-  char pbuf[LENGTH_PATH]; 
+  char pbuf[LENGTH_PATH];
   FILE *fp;
   bzero(pbuf, LENGTH_PATH);
   sprintf(pbuf, "%s/%s", basepath, filename);
@@ -73,12 +73,12 @@ int write_file(char *basepath, char *filename, char *content) {
 
 int addjob(char *basepath, char *jobname, char *command) {
   int max, ret;
-  char pbuf[LENGTH_PATH]; 
+  char pbuf[LENGTH_PATH];
   max = find_max_dirname(basepath);
   max = max + 1;
   bzero(pbuf, LENGTH_PATH);
   sprintf(pbuf, "%s/%d", basepath, max);
-  
+
   //mkdir pbuf
   ret = mkdir(pbuf, 0755);
   if (ret == 0) {
@@ -131,7 +131,7 @@ char *get_status(char *basepath) {
       fp = fopen(pbuf, "r");
       fscanf(fp, "%s", jobname);
       fclose(fp);
-      
+
       bzero(pbuf, LENGTH_PATH);
       bzero(status, LENGTH_LINE);
       sprintf(pbuf, "%s/%s/status", basepath, dirp->d_name);
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
   if (sockfd < 0)
     error("ERROR on opening socket");
   bzero((char *) &server_addr, sizeof(server_addr));
-  
+
   server_addr.sin_family = AF_INET;
   server_addr.sin_addr.s_addr = INADDR_ANY;
   server_addr.sin_port = htons(portno);
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
       } else {
         //new command
         printf("[MSG]%s\n", buffer);
-        if (strcmp(buffer, password) != 0) {  
+        if (strcmp(buffer, password) != 0) {
           perror("password not match");
           n = fd_send(clientfd, "access denied");
           close(clientfd);
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
           //doing things here
           if (strcmp(buffer, "status") == 0) {
             // TODO return working status
-          } else 
+          } else
           if (str_startwith(buffer, "addjob ") == 0) {
             // TODO
             split_cmd(buffer, jobname);

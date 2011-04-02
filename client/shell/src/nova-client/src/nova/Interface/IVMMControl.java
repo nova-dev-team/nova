@@ -20,7 +20,7 @@ public interface IVMMControl
 
     /**
      * 获取虚拟机信息
-     * 
+     *
      * @param machine 虚拟机句柄
      * @return 虚拟机的内存、CPU、网络信息
      */
@@ -42,15 +42,15 @@ public interface IVMMControl
      * @param callback 执行结果的回调接口
      */
     public void startVirtualMachine(VM_HANDLE machine, String sched_to, IVMPowerCallback callback);
-    
-    /** 
+
+    /**
      * 关闭虚拟机（相当于强制切断电源）
      * @param machine 虚拟机句柄
      * @param callback 执行结果的回调接口
      */
     //这个好像没有
-    public void powerdownVirtualMachine(VM_HANDLE machine, IVMPowerCallback callback); 
-    
+    public void powerdownVirtualMachine(VM_HANDLE machine, IVMPowerCallback callback);
+
     /**
      * 关闭虚拟机（相当于按下关机按钮）
      * @param machine 虚拟机句柄
@@ -73,7 +73,7 @@ public interface IVMMControl
     //这个好像没有
     public void pauseVirtualMachine(VM_HANDLE machine, IVMPowerCallback callback);
 
-    /** 
+    /**
      * 挂起虚拟机(类比于操作系统的休眠）
      * @param machine 虚拟机句柄
      * @param callback 执行结果的回调接口
@@ -96,7 +96,7 @@ public interface IVMMControl
      */
     public STATE_HANDLE[] getVirtualMachineStateList(VM_HANDLE machine);
 
-    /** 
+    /**
      * 获取状态信息
      * @param machine 虚拟机句柄
      * @param state 虚拟机状态句柄

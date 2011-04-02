@@ -110,7 +110,7 @@ def do_load_balance
     $lb_was_on = false
     return
   end
-  
+
   if $lb_was_on == false
     lb_log "Load balance is ON"
     $lb_was_on = true
@@ -445,7 +445,7 @@ def loop_body
       vm.save
     end
   end
-  
+
   # auto balance
   do_load_balance
 

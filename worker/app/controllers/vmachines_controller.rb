@@ -154,7 +154,7 @@ public
     else
       reply_failure "hotbackup_to: invalid params"
     end
- 
+
   end
 
   # Tell vm_daemon to prepare migrate

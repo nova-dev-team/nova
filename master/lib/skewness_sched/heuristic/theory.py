@@ -30,7 +30,7 @@ class Algorithm(object):
         self.changed_vm = []
         self.changed_pm = []
         self.shutdown_bin = []
-        
+
     def schedule(self, layout, predicted_vms, predicted_pms, predicted_sys):
         self.unwanted_pm_fqdn = ""
         self.unhandled = False
@@ -40,10 +40,10 @@ class Algorithm(object):
         self.predicted_vms = predicted_vms
         self.predicted_pms = predicted_pms
         self.predicted_sys = predicted_sys
-        
+
         for i in range(4, 13):
             self.bin_dict[i] = {}
-        
+
         if self.is_first:
             # first time
             # re-insert all vms
@@ -60,7 +60,7 @@ class Algorithm(object):
             self.setup()
             if self.judge() == False:
                 return {}
-            
+
             # not first time
             self.shutdown_bin = []
             for vm in self.vmdict.values():
@@ -77,7 +77,7 @@ class Algorithm(object):
                     vm.type = L_item
                 else:
                     vm.type = H_item
-                    
+
                 self.changed_pm = []
                 self.changed_vm = []
                 self.change(vm)
@@ -89,7 +89,7 @@ class Algorithm(object):
         #####################
         # output sth
         #typefile = file("output/theory_type.txt", "a")
-        
+
 #        for pmname, pm in self.pmdict.items():
 #            print >> typefile, pmname, checkdic[pm.type]
 #            for vm in pm.vms:
@@ -103,7 +103,7 @@ class Algorithm(object):
                 if layout[vm.fqdn] != vm.pm.fqdn:
                     self.migration_list[vm.fqdn] = vm.pm.fqdn
             print "migration number: ", len(self.migration_list)
-    
+
             #####################
             # record vm load and pm type
             for vm in self.vmdict.values():
@@ -156,7 +156,7 @@ class Algorithm(object):
         self.cal_vm_load()
         for pm in self.predicted_pms:
             pm.vms = []
-    
+
         ###############################
         # pm.type
         # And setup self.bin_dict (add all to Unused)
@@ -192,7 +192,7 @@ class Algorithm(object):
         # pm.vms
         self.generate_dicts_not_copy()
         ###############################
-        self.cal_vm_load()            
+        self.cal_vm_load()
         ###############################
         # pm.type
         # And setup self.bin_dict ()
@@ -244,7 +244,7 @@ class Algorithm(object):
                 vm.load.append(vm.net_tx / pm.total[3])
                 # max dim
                 vm.new_max_load = max(vm.load)
-               
+
                 for i in range(int(self.dispersedness)):
                     if vm.new_max_load <= (i + 1) / self.dispersedness:
                         vm.new_max_load = (i + 1) / self.dispersedness
@@ -271,7 +271,7 @@ class Algorithm(object):
             self.vmdict[vmf].pm = self.pmdict[pmf]
 
     ###################################
-    # insert a vm 
+    # insert a vm
     ###################################
     def insert(self, vm):
         if vm.type == H_item:
@@ -451,7 +451,7 @@ class Algorithm(object):
                 pm.type = unfilled_T_bin
 
     ###################################
-    # vm change 
+    # vm change
     ###################################
     def change(self, vm):
         old_pm = vm.pm
@@ -478,7 +478,7 @@ class Algorithm(object):
             if vm.type == H_item:
                 self.release(old_pm)
                 if self.unhandled == True:#unhandle case
-                    return 
+                    return
             elif vm.type == L_item:
                 self.adjust(old_pm)
                 if self.unhandled == True:#unhandle case
@@ -541,7 +541,7 @@ class Algorithm(object):
                     self.fill(new_bin)
                 self.release(old_pm)
                 if self.unhandled == True:
-                    return 
+                    return
             elif vm.type == L_item:
                 if old_pm.type == LT_bin or old_pm.type == unfilled_LT_bin:
                     new_bin = self.new([self.get_L_item(old_pm, vm)])
@@ -556,7 +556,7 @@ class Algorithm(object):
                     orig_bin = old_pm
                     self.insert_S_item(vm)
                     if self.unhandled == True:
-                        return 
+                        return
                     self.fill(orig_bin)
                 elif self.exist_z_bin(S_bin):
                     while self.exist_z_bin(unfilled_T_bin):
@@ -613,7 +613,7 @@ class Algorithm(object):
             del self.bin_dict[pm.type][pm.fqdn]
         except:
             print "Exception!"
-        
+
         type = pm.type
         self.get_bin_type(pm)
 #        if pm.type not in self.bin_dict:
@@ -624,19 +624,19 @@ class Algorithm(object):
             self.shutdown_bin.append(pm)
 
     ###################################
-    # remove all group in a pm 
+    # remove all group in a pm
     ###################################
     def release(self, pm):
         group = self.get_group(pm)
         while len(group) > 0:
             self.fill_with(group)
             if self.unhandled == True:
-                return 
+                return
             group = self.get_group(pm)
         return
 
     ###################################
-    # adjust a L_bin or a LT_bin 
+    # adjust a L_bin or a LT_bin
     ###################################
     def adjust(self, pm):
         while self.gap(pm) < 0:
@@ -648,7 +648,7 @@ class Algorithm(object):
             self.fill(pm)
 
     #########################################
-    # query: if there exists some kind of bin 
+    # query: if there exists some kind of bin
     #########################################
     def exist_z_bin(self, type):
         if len(self.bin_dict[type]) > 1:
@@ -662,7 +662,7 @@ class Algorithm(object):
             return False
 
     #########################################
-    # return a bin of some kind 
+    # return a bin of some kind
     #########################################
     def get_z_bin(self, type):
         if self.bin_dict[type].values()[0].fqdn == self.unwanted_pm_fqdn:
@@ -674,7 +674,7 @@ class Algorithm(object):
         self.generate_hotspots(self.hot_threshold)
         if len(self.hotspots) > 0:
             return True
-        
+
         #calculate the system capacity according to the active pm list
         sys_cap = plugin.SYS()
         apmlist = self.generate_apmlist()
@@ -683,9 +683,9 @@ class Algorithm(object):
             sys_cap.ram += pm.cap_ram
             sys_cap.net_rx += pm.cap_net
             sys_cap.net_tx += pm.cap_net
-        
+
         self.generate_coldspots(apmlist)
-        return self.check_green_compute(sys_cap) and len(self.coldspots) > 0 
+        return self.check_green_compute(sys_cap) and len(self.coldspots) > 0
 
     def generate_apmlist(self):
         apm = []
@@ -700,7 +700,7 @@ class Algorithm(object):
                          hot_pm.net_rx_rate > hot_threshold or
                          hot_pm.net_tx_rate > hot_threshold or
                          hot_pm.ram_rate > hot_threshold]
-        
+
     def generate_coldspots(self, apmlist):
         #if the system state is ready then try to find the cold spot(pm)
         self.coldspots = [cold_pm for cold_pm in apmlist
@@ -708,13 +708,13 @@ class Algorithm(object):
                           cold_pm.net_rx_rate < self.cold_threshold and
                           cold_pm.net_tx_rate < self.cold_threshold and
                           cold_pm.ram_rate < self.cold_threshold]
-        
+
     def check_green_compute(self, sys_cap):
         if self.predicted_sys.cpu / sys_cap.cpu < self.greencomputing_threshold and \
                 self.predicted_sys.ram / sys_cap.ram < self.greencomputing_threshold and \
                 self.predicted_sys.net_tx / sys_cap.net_tx < self.greencomputing_threshold and \
                 self.predicted_sys.net_rx / sys_cap.net_rx < self.greencomputing_threshold:
-            
+
             return True
         return False
 

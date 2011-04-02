@@ -5,7 +5,7 @@ from usher.utils import notify
 lg = notify.get_notify()
 
 class Algorithm(object):
-    
+
     def __init__(self,args):
         self.max_swap = args['max_swap']
         self.max_cpu = args['max_cpu']
@@ -27,7 +27,7 @@ class Algorithm(object):
         self.predicted_vms = predicted_vms
         self.predicted_pms = predicted_pms
         self.predicted_sys = predicted_sys
-        
+
         pmdict = {}
         vmdict = {}
         for vm in self.predicted_vms:
@@ -36,7 +36,7 @@ class Algorithm(object):
             pmdict[pm.fqdn] = pm
         for vmf, pmf in self.layout.items():
             pmdict[pmf].vms.append(vmdict[vmf])
-     
+
         self.moves = []
         # compute the result here
         self.make_moves()
@@ -49,7 +49,7 @@ class Algorithm(object):
         self.moves = self.moves_best_list()
         if not self.moves:
             return
- 
+
         self.layout[self.moves[0][0].fqdn] = self.moves[0][1].fqdn
 
     def calc_pm_cost(self,pm):
@@ -58,29 +58,29 @@ class Algorithm(object):
         if (1/(1-pm.cpu_rate))*(1/(1-pm.net_rx_rate))*(1/(1-pm.net_tx_rate))*(1/(1-pm.ram_rate)) < 0:
             return 1e100
         return (1/(1-pm.cpu_rate))*(1/(1-pm.net_rx_rate))*(1/(1-pm.net_tx_rate))*(1/(1-pm.ram_rate))
-   
+
     def calc_vm_cost(self, pm):
-        vmcostlist = []  
-  
-        for vm in pm.vms:  
+        vmcostlist = []
+
+        for vm in pm.vms:
             if vm.cpu/pm.cap_cpu == 1.0 or vm.net_tx/pm.cap_net == 1.0 or vm.net_rx/pm.cap_net == 1.0 or vm.ram/pm.cap_ram == 1.0:
-                cost = 1e100                
+                cost = 1e100
             elif (1/(1-vm.cpu/pm.cap_cpu))*(1/(1-vm.net_tx/pm.cap_net))*(1/(1-vm.net_rx/pm.cap_net))*(1/(1-vm.ram/pm.cap_ram)) < 0:
                 cost = 1e100
             else:
                 cost = (1/(1-vm.cpu/pm.cap_cpu))*(1/(1-vm.net_tx/pm.cap_net))*(1/(1-vm.net_rx/pm.cap_net))*(1/(1-vm.ram/pm.cap_ram))
-            
+
             if vm.ram == 0:
                 cost = 1e100
             else:
                 cost = cost/vm.ram
-                
+
             vmcostlist.append((cost,vm))
-        # sort and reverse    
+        # sort and reverse
         vmcostlist.sort()
         vmcostlist.reverse()
         return vmcostlist
-        
+
     def moves_best_list(self):
         moves = []
         hot_pms = []
@@ -137,9 +137,9 @@ class Algorithm(object):
                 if cpu >= self.max_cpu:
                     continue
                 # network not hot
-                elif net_tx >= self.max_net: 
+                elif net_tx >= self.max_net:
                     continue
-                elif net_rx >= self.max_net: 
+                elif net_rx >= self.max_net:
                     continue
                 else:
                     moves.append((vm,pm))

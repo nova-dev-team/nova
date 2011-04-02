@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nova.client;
 
@@ -10,7 +10,7 @@ import nova.Interface.Machine;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class VCControl implements IVCControl {
 

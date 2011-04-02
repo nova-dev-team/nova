@@ -9,11 +9,11 @@ public class Machine {
 	private static String SOFT_LIST = "soft_list";
 	
 	private String machinepara;
-//	private String vdisk_fname = null; 
-//	private String machine_name = null; 
-//	private String cpu_count = null; 
-//	private String mem_size = null; 
-//	private String soft_list = null; 
+//	private String vdisk_fname = null;
+//	private String machine_name = null;
+//	private String cpu_count = null;
+//	private String mem_size = null;
+//	private String soft_list = null;
 	
 	/**
 	 * 目前不支持soft_list,不论为何值均按空处理
