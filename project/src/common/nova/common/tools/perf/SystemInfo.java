@@ -18,9 +18,6 @@ public class SystemInfo {
 		this.net = new NetInfo();
 	}
 
-	/**
-	 * ʱ���׼��ʾ
-	 */
 	public static String formatUptime(double uptime) {
 		String retval = "";
 

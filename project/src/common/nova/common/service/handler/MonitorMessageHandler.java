@@ -16,7 +16,6 @@ public class MonitorMessageHandler implements ISimpleHandler<MonitorMessage> {
 			MessageEvent e, String xfrom) {
 		System.out.println(counter.incrementAndGet());
 		System.out.println(msg.getClass().getName());
-		System.out.println(msg.getFrom());
 		System.out.println(msg.getMonitorInfo());
 	}
 
