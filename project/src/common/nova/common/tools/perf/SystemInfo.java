@@ -13,7 +13,7 @@ public class SystemInfo {
 	private NetInfo net;
 
 	public SystemInfo() throws SigarException {
-		this.cpu = CpuInfo.get();
+		this.cpu = PerfMon.getCpuInfo();
 		this.mem = new MemoryInfo();
 		this.net = new NetInfo();
 	}

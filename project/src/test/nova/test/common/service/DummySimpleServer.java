@@ -10,7 +10,7 @@ import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.MonitorMessage;
 
-public class TestSimpleServer {
+public class DummySimpleServer {
 
 	static final int BIND_PORT = 9876;
 
@@ -55,7 +55,7 @@ public class TestSimpleServer {
 	}
 
 	public static void main(String[] args) {
-		TestSimpleServer server = new TestSimpleServer();
+		DummySimpleServer server = new DummySimpleServer();
 		server.testMessage();
 	}
 }

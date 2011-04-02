@@ -4,6 +4,7 @@ import nova.common.tools.perf.CpuInfo;
 import nova.common.tools.perf.DiskInfo;
 import nova.common.tools.perf.MemoryInfo;
 import nova.common.tools.perf.NetInfo;
+import nova.common.tools.perf.PerfMon;
 import nova.common.tools.perf.ProcInfo;
 import nova.common.tools.perf.SystemInfo;
 
@@ -14,7 +15,7 @@ import org.junit.Test;
 public class TestMonitor {
 	@Test
 	public void TestCpuInfo() throws SigarException {
-		CpuInfo ci = CpuInfo.get();
+		CpuInfo ci = PerfMon.getCpuInfo();
 		System.out.println(ci);
 	}
 

@@ -8,7 +8,7 @@ import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.MonitorMessage;
 
-public class TestSimpleProxy {
+public class DummySimpleProxy {
 	public void run() throws UnknownHostException {
 		MessageProxy hp = new MessageProxy();
 		hp.connect(new InetSocketAddress("localhost", 9876)); // Connect to
@@ -35,7 +35,7 @@ public class TestSimpleProxy {
 	}
 
 	public static void main(String[] args) throws UnknownHostException {
-		TestSimpleProxy proxy = new TestSimpleProxy();
+		DummySimpleProxy proxy = new DummySimpleProxy();
 		proxy.run();
 	}
 }
