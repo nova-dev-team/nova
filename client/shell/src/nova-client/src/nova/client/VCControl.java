@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nova.client;
 
@@ -11,7 +11,7 @@ import nova.shell.DebugEnv;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class VCControl implements IVCControl {
 

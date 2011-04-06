@@ -12,9 +12,9 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
 /**
- * 
+ *
  * @author frankvictor@qq.com JDOM JDOM 生成与解析XML文档
- * 
+ *
  */
 public class XMLParser {
 

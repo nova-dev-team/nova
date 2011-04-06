@@ -9,7 +9,7 @@ class Algorithm(object):
         self.warm_threshold = args["warm"]
 
     ###################################
-    # schedule to generate mig list 
+    # schedule to generate mig list
     ###################################
     def schedule(self, layout, predicted_vms, predicted_pms, predicted_sys):
         # reset
@@ -35,8 +35,8 @@ class Algorithm(object):
                 self.migration_list[move[0].fqdn] = move[1].fqdn
                 # not update the hotspot to prevent sth move back in
                 # update the dest info, vm would not be consider anyway
-                # because only vm on remaining hotspot or light pms 
-                # would be possible. remaining hotspot is clear, 
+                # because only vm on remaining hotspot or light pms
+                # would be possible. remaining hotspot is clear,
                 # and light pms require that no vm move in (so dest is safe)
                 for i in range(len(move[1].load)):
                     new_load = move[0].load[i] * move[0].pm.total[i]
@@ -184,7 +184,7 @@ class Algorithm(object):
             (vm_out_type, vm_out_penalty) = \
                 self.compute_penalty(load_after_out)
             if vm_out_type != HOT:
-                # no COOL or WARM for a PM who is hotspot 
+                # no COOL or WARM for a PM who is hotspot
                 vm_out_type = NOT_HOT
             for dest in self.predicted_pms:
                 # skip hot, not enough freeram and itself

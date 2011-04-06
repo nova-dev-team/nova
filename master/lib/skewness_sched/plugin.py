@@ -147,7 +147,7 @@ class Schedule(object):
 
         self.migrate()
 
-        
+
 
         self.hotspotnumafter = self.hotspot_count(config.algorithm_args["hot"])
 
@@ -187,7 +187,7 @@ class Schedule(object):
         for pm in self.predicted_pms:
             if pm.cpu_rate != 0.0 or pm.ram_rate != 0.0 or pm.net_rx_rate != 0.0  or pm.net_tx_rate != 0.0:
                 apm.append(pm)
-                
+
         tmp_coldspots = [cold_pm for cold_pm in apm\
                          if cold_pm.cpu_rate < cold_threshold and\
                          cold_pm.net_rx_rate < cold_threshold and\
@@ -195,7 +195,7 @@ class Schedule(object):
                          cold_pm.ram_rate < cold_threshold]
 
         return len(tmp_coldspots)
-    
+
     def preprocess(self, current_stats):
         self.vms = []
         # set VMS
@@ -316,24 +316,24 @@ class Schedule(object):
             pmdict[pmf].ram += vm.ram
             pmdict[pmf].net_tx += vm.net_tx
             pmdict[pmf].net_rx += vm.net_rx
-            
-        
+
+
         for pmf, pm in pmdict.items():
             p_pm = copy.deepcopy(self.pmdict[pmf])
             #the rate of each dimension is calculated
-           
+
             p_pm.cpu_rate = pm.cpu / self.pmdict[pmf].cap_cpu
             p_pm.ram_rate = pm.ram / self.pmdict[pmf].cap_ram
             p_pm.net_rx_rate = pm.net_rx / self.pmdict[pmf].cap_net
             p_pm.net_tx_rate = pm.net_tx / self.pmdict[pmf].cap_net
             #print p_pm.cpu_rate,p_pm.ram_rate
             if p_pm.cpu_rate > self.hot_threshold or p_pm.ram_rate > self.hot_threshold or p_pm.net_rx_rate > self.hot_threshold or p_pm.net_tx_rate > self.hot_threshold:
-                self.hotspotcount += 1            
+                self.hotspotcount += 1
             if p_pm.cpu_rate < self.cold_threshold and p_pm.ram_rate < self.cold_threshold and p_pm.net_rx_rate < self.cold_threshold and p_pm.net_tx_rate < self.cold_threshold:
                 if p_pm.cpu_rate != 0.0 or p_pm.ram_rate != 0.0 or p_pm.net_rx_rate != 0.0  or p_pm.net_tx_rate != 0.0:
                     self.coldspotcount += 1
-                
-                
+
+
             if self.pm_lps.get(pmf) is None:
                 self.pm_lps[pmf] = {}
 
@@ -364,7 +364,7 @@ class Schedule(object):
             p_pm.net_tx_rate = p_pm.net_tx / p_pm.cap_net
 
             self.predicted_pms.append(p_pm)
-            
+
         timeeval = file("output/%s_timeeval(vm%dpm%d).txt" % (config.heuristic_name , len(self.predicted_vms) , len(self.predicted_pms) ), "a")
         #timeeval = file("output/%s_timeeval(vm%dpm%d).txt" % (config.heuristic_name , 0, 0 ), "a")*change
         print >> timeeval,"hotspotcount_from_raw_data:",self.hotspotcount
@@ -411,7 +411,7 @@ class Schedule(object):
 
     def migrate(self):
         print self.migration_list
-        
+
         f_migrate = file("output/%s_migrate.out" % config.heuristic_name, "a")
         print >> f_migrate, "\nafter iteration: %d" % self.iteration
         print >> f_migrate, self.migration_list
@@ -428,7 +428,7 @@ class Schedule(object):
             self.pm_lps[des_pmf]["net_tx"].reset()
             self.pm_lps[des_pmf]["net_rx"].reset()
             self.layout[vmf] = des_pmf
-        
+
 
 
     def output_layout(self, iter):
@@ -442,7 +442,7 @@ class Schedule(object):
         f_sched.close()
 
     #function to calculate the overload value
-    #the "ol" is the summation of the variance of the actual and the threshold in each dimension    
+    #the "ol" is the summation of the variance of the actual and the threshold in each dimension
     def get_overload(self, pm, hot_threshold):
         ol = 0.0;
         #only the exceeding part will be added

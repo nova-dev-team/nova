@@ -16,5 +16,5 @@ public interface IVMPowerCallback
      * @param errno 错误代码
      */	
     public void onError(VM_HANDLE machine, int errno);
-    
+
 }

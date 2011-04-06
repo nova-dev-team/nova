@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nova.client;
 
@@ -9,7 +9,7 @@ import nova.Interface.IVM_INFO;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class VM_INFO implements IVM_INFO {
 

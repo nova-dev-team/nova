@@ -62,11 +62,11 @@ heuristic_args = {
         "hot": hot_threshold
     },
     "theory":{
-	"hot": hot_threshold,
-	"cold": 0.25,
-	"warm": 1.0,
-	"greencomputing_threshold": 0.45,
-	"dispersedness": 20.0,
+  "hot": hot_threshold,
+  "cold": 0.25,
+  "warm": 1.0,
+  "greencomputing_threshold": 0.45,
+  "dispersedness": 20.0,
     },
     "balance": {
         "hot": hot_threshold,

@@ -43,9 +43,38 @@ public class TestMonitor {
 	}
 
 	@Test
+<<<<<<< HEAD
 	public void TestCommonMonitorInfo() {
 		CommonMonitorInfo cmi = PerfMon.getCommonMonitorInfo();
 		System.out.println(cmi);
+=======
+	public void TestProcInfo() throws SigarException {
+		ProcInfo pi = new ProcInfo();
+		long[] pids = pi.getPidList();
+		System.out.println("Pids:");
+		for (int i = 0; i < pids.length; i++)
+			System.out.println(pids[i]);
+
+		String interestedProcessName = "java";
+		pids = pi.getPidsThroughProcessName(interestedProcessName);
+		System.out.println("svchost pids:");
+		for (int i = 0; i < pids.length; i++)
+			System.out.println(pids[i]);
+		if (pids.length > 0) {
+			pi.setPid(pids[0]);
+			System.out.println(interestedProcessName + " start time: "
+					+ pi.changeTimeFormat(pi.getStartTime()));
+			System.out.println("Current Time: "
+					+ pi.changeTimeFormat(pi.getCurrenTime()));
+			System.out.println(interestedProcessName + " time last: "
+					+ pi.getLastTime());
+			System.out.println(interestedProcessName + " Rss: "
+					+ pi.getProcMemmoryRss());
+			System.out.println(interestedProcessName + " Vss: "
+					+ pi.getProcMemmoryVss());
+			System.out.println("Cpu Util: " + pi.getProcCpuPercent());
+		}
+>>>>>>> 75f887c777d7071e29516b25477df5dfdaa3cdc2
 	}
 	// @Test
 	// public void TestMemoryInfo() throws SigarException {

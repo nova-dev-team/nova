@@ -48,7 +48,6 @@ end
 # report error, 'f' is file, 'msg' is error message
 def report_error f, msg
   puts "[error] #{f}: #{msg}"
-  exit 1
 end
 
 # check if a file contains trailing whitespace, and shows warning
@@ -131,10 +130,16 @@ def python_style_check f
   warn_tab_indents f
 end
 
+def general_style_check f
+  warn_trailing_whitespace f
+end
+
 Find.find(NOVA_SRC_ROOT) do |f|
   next if should_skip? f
   if f.end_with? ".c" or f.end_with? ".h" or CXX_EXT.include? File.extname(f)
     c_style_check f
+  elsif f.end_with? ".java" or f.end_with? ".conf"
+    general_style_check f
   elsif f.end_with? ".rb"
     ruby_style_check f
   elsif f.end_with? ".py"

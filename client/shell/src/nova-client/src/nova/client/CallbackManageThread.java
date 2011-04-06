@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nova.client;
 
@@ -16,7 +16,7 @@ import nova.shell.DebugEnv;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class CallbackManageThread extends Thread {
 
@@ -27,7 +27,7 @@ public class CallbackManageThread extends Thread {
 	private InetAddress desaddr = null;
 	private static Client cl = null;
 	/**
-	 * 
+	 *
 	 */
 	public CallbackManageThread(VM_HANDLE vh, IVMPowerCallback callback, VmachineStatus stopStatus) {
 //		this.cl = client;

@@ -26,6 +26,6 @@ public interface IVM_INFO
      * @param key 用来索引信息的关键字
      */
     public boolean hasInfo(String key);
-    
+
     public String toString();
 }

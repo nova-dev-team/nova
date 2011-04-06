@@ -44,19 +44,19 @@ int get_folder_name(char *ftp_address, char *buffer) {
   int i, j;
   len = strlen(ftp_address);
   printf("ftp address = %s, len = %d\n", ftp_address, len);
-   
-  for (i = len - 1; i > 0; --i) 
+
+  for (i = len - 1; i > 0; --i)
     if (ftp_address[i] == '/') {
       printf("find ! j = %d\n", i);
       for (j = i + 1; j < len; ++j) buffer[j - i - 1] = ftp_address[j];
-      buffer[j - i - 1] = '\0'; 
+      buffer[j - i - 1] = '\0';
       return 0;
     }
   return -1;
 }
 
 int main() {
-  while (1) { 
+  while (1) {
     unsigned int min;
     int ret;
     char src_path[LENGTH_PATH];
@@ -93,13 +93,13 @@ int main() {
 
     sprintf(command_file, "%s/command", dst_path);
     printf("opening %s\n", command_file);
-     
+
     fp = fopen(command_file, "r");
     if (fp == NULL) {
       perror("cannot open command file");
       continue;
     }
-    
+
     fscanf(fp, "%s", command);
     fclose(fp);
 
@@ -126,7 +126,7 @@ int main() {
     system(command_line);
     // mkdir dst_path/app_name/config
     // copy node.list to dir above
-    // 
+    //
     set_status(dst_path, "processing");
 
     bzero(command_line, LENGTH_LINE);
@@ -142,9 +142,9 @@ int main() {
     // 3.4 set status "processing"
     // 3.5 run entry.sh
     // 3.6 set status "finished"
-  
-    
+
+
   }
-  return 0; 
+  return 0;
 }
 

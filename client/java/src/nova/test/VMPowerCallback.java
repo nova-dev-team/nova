@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nova.test;
 
@@ -8,7 +8,7 @@ import nova.Interface.VM_HANDLE;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class VMPowerCallback implements IVMPowerCallback {
 

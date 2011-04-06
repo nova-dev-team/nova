@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nova.client;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class WebSessionPool extends Thread{
 
@@ -18,7 +18,7 @@ public class WebSessionPool extends Thread{
 //	//(第一行)0表示否，1表示被占用
 //	//(第二行)0表示已分配，1表示没有分配
 //	//(第三行)空闲时间
-//	static int[][] SESSIONTAG = new int[100][3]; 
+//	static int[][] SESSIONTAG = new int[100][3];
 //	public void run() {
 //		for(int i=0; i<100; i++){
 //			SESSIONTAG[i][0] = 0;

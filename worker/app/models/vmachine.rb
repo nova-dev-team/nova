@@ -520,7 +520,7 @@ XML_DESC
     ceil_password = ""
     8.times do |i|
       chr = (65 + rand(52)).chr
-      ceil_password = ceil_password + chr 
+      ceil_password = ceil_password + chr
     end
 
     package_server = params[:pkg_server]

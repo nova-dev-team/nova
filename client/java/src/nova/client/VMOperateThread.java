@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package nova.client;
 
@@ -12,7 +12,7 @@ import nova.model.VmachineStatus;
 
 /**
  * @author frankvictor mailto:frankvictor@qq.com
- * 
+ *
  */
 public class VMOperateThread extends Thread {
 	

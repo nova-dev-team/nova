@@ -40,7 +40,7 @@ public class ExeShellCMD {
 			if( DebugEnv.print_debug_info ) System.out.println(list.size());
 			while(it.hasNext()) {
 				IVM_INFO vm_info = it.next();
-				System.out.println(VM_INFO.VM_NAME + ": " +vm_info.getInfo(VM_INFO.VM_NAME) + " " + 
+				System.out.println(VM_INFO.VM_NAME + ": " +vm_info.getInfo(VM_INFO.VM_NAME) + " " +
 						VM_INFO.VM_UUID + ": " + vm_info.getInfo(VM_INFO.VM_UUID));
 			}
 		} else if(args[1].equals("list-vmachineinfo") || args[1].equals("lvi")) {
