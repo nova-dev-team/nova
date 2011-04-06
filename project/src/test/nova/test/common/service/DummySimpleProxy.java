@@ -5,12 +5,13 @@ import java.net.UnknownHostException;
 
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
+import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
-import nova.common.service.message.MonitorMessage;
 
 public class DummySimpleProxy {
 	public void run() throws UnknownHostException {
-		MessageProxy hp = new MessageProxy();
+		MessageProxy hp = new MessageProxy(new InetSocketAddress("10.0.1.224",
+				9876));
 		hp.connect(new InetSocketAddress("localhost", 9876)); // Connect to
 																// server and
 																// establish a
@@ -19,10 +20,7 @@ public class DummySimpleProxy {
 		for (int j = 0; j < 1000; j++) {
 			hp.sendHeartbeatMessage();
 		}
-		for (int j = 0; j < 1000; j++) {
-			hp.sendMonitorMessage();
-		}
-
+		hp.sendMonitorMessage();
 		hp.sendCloseChannelMessage(); // Close message
 		hp.close();
 
@@ -42,12 +40,16 @@ public class DummySimpleProxy {
 
 class MessageProxy extends SimpleProxy { // A client example
 
+	public MessageProxy(InetSocketAddress replyAddr) {
+		super(replyAddr);
+	}
+
 	public void sendHeartbeatMessage() throws UnknownHostException {
 		this.sendRequest(new HeartbeatMessage());
 	}
 
 	public void sendMonitorMessage() throws UnknownHostException {
-		this.sendRequest(new MonitorMessage());
+		this.sendRequest(new GeneralMonitorMessage());
 	}
 
 	public void sendCloseChannelMessage() throws UnknownHostException {

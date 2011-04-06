@@ -8,13 +8,13 @@ import com.google.gson.Gson;
  * @author gaotao1987@gmail.com
  * 
  */
-public class CommonMonitorInfo {
+public class GeneralMonitorInfo {
 	public CpuInfo cpuInfo = new CpuInfo();
 	public MemoryInfo memInfo = new MemoryInfo();
 	public DiskInfo diskInfo = new DiskInfo();
 	public NetInfo netInfo = new NetInfo();
 
-	public CommonMonitorInfo() {
+	public GeneralMonitorInfo() {
 
 	}
 

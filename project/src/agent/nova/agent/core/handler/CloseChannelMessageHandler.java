@@ -1,4 +1,4 @@
-package nova.common.service.handler;
+package nova.agent.core.handler;
 
 import nova.common.service.ISimpleHandler;
 import nova.common.service.message.CloseChannelMessage;

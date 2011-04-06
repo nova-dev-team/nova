@@ -148,14 +148,45 @@ public class PerfMon {
 	/**
 	 * Get common monitor information.
 	 * 
-	 * @return {@link CommonMonitorInfo}
+	 * @return {@link GeneralMonitorInfo}
 	 */
-	public static CommonMonitorInfo getCommonMonitorInfo() {
-		CommonMonitorInfo cMonitor = new CommonMonitorInfo();
-		cMonitor.cpuInfo = PerfMon.getCpuInfo();
-		cMonitor.memInfo = PerfMon.getMemoryInfo();
-		cMonitor.diskInfo = PerfMon.getDiskInfo();
-		cMonitor.netInfo = PerfMon.getNetInfo();
+	public static GeneralMonitorInfo getGeneralMonitorInfo() {
+		final GeneralMonitorInfo cMonitor = new GeneralMonitorInfo();
+		Thread t1 = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				cMonitor.diskInfo = PerfMon.getDiskInfo();
+			}
+		});
+		t1.start();
+
+		Thread t2 = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				cMonitor.netInfo = PerfMon.getNetInfo();
+			}
+		});
+		t2.start();
+
+		Thread t3 = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				cMonitor.cpuInfo = PerfMon.getCpuInfo();
+				cMonitor.memInfo = PerfMon.getMemoryInfo();
+			}
+		});
+		t3.start();
+
+		try {
+			t1.join();
+			t2.join();
+			t3.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return cMonitor;
 	}
 }

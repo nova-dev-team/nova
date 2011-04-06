@@ -31,8 +31,14 @@ public class SimpleProxy extends SimpleChannelHandler {
 	ClientBootstrap bootstrap = null;
 	ChannelFuture channel = null;
 	Gson gson = new GsonBuilder().serializeNulls().create();
+	InetSocketAddress replyAddr = null;
 
 	public SimpleProxy() {
+		this(null);
+	}
+
+	public SimpleProxy(InetSocketAddress replyAddr) {
+		this.replyAddr = replyAddr;
 		this.allChannels = new DefaultChannelGroup();
 		this.factory = new NioClientSocketChannelFactory(
 				Executors.newCachedThreadPool(),
@@ -79,8 +85,10 @@ public class SimpleProxy extends SimpleChannelHandler {
 	}
 
 	protected final void sendRequest(Object req) throws UnknownHostException {
-		Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req);
+		Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req,
+				replyAddr);
 		String message = gson.toJson(packet) + "\r\n";
+		// System.out.println(message);
 		ChannelFuture future = this.channel.getChannel().write(message);
 		future.awaitUninterruptibly();
 	}

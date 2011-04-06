@@ -96,12 +96,16 @@ public class SimpleServer extends SimpleChannelHandler {
 				throw new HandlerNotFoundException(xtype);
 			}
 			synchronized (gson) {
+				Object xfromObj = jsonMsg.get("xfrom");
+				String xfrom = null;
+				if (xfromObj != null) {
+					xfrom = xfromObj.toString();
+				}
 				this.handlers.get(klass)
 						.handleMessage(
 								gson.fromJson(
 										gson.toJson(jsonMsg.get("xvalue")),
-										klass), ctx, e,
-								jsonMsg.get("xfrom").toString());
+										klass), ctx, e, xfrom);
 			}
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
