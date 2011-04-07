@@ -7,25 +7,25 @@ public class UninstallProgress implements Cancelable, Progressable {
 
 	@Override
 	public int getProgress() {
-		// TODO Auto-generated method stub
+		// TODO @gaotao Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public boolean isDone() {
-		// TODO Auto-generated method stub
+		// TODO @gaotao Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void cancel() {
-		// TODO Auto-generated method stub
+		// TODO @gaotao Auto-generated method stub
 
 	}
 
 	@Override
 	public boolean isCanceled() {
-		// TODO Auto-generated method stub
+		// TODO @gaotao Auto-generated method stub
 		return false;
 	}
 
