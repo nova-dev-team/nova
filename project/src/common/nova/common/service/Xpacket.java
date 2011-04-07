@@ -22,13 +22,17 @@ class Xpacket {
 	protected static AtomicInteger xidCounter = new AtomicInteger();
 
 	public static Xpacket createPacket(String name, Object obj,
-			InetSocketAddress replyAddr) throws UnknownHostException {
+			InetSocketAddress replyAddr) {
 		Xpacket packet = new Xpacket();
 		if (replyAddr != null) {
 			packet.xfrom = replyAddr.getAddress().getHostAddress() + ":"
 					+ replyAddr.getPort();
 		} else {
-			packet.xfrom = InetAddress.getLocalHost().getHostAddress();
+			try {
+				packet.xfrom = InetAddress.getLocalHost().getHostAddress();
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
 		}
 		packet.xid = xidCounter.incrementAndGet();
 		packet.xtype = name;

@@ -38,7 +38,7 @@ public class TestMonitor {
 
 	@Test
 	public void TestProcInfo() {
-		ProcInfo pi = PerfMon.getProcInfo("QQ");
+		ProcInfo pi = PerfMon.getProcInfo("java");
 		System.out.println(pi);
 	}
 

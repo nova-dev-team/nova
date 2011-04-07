@@ -1,7 +1,9 @@
 package nova.master;
 
-public class NovaMaster {
-	
+import nova.common.service.SimpleServer;
+
+public class NovaMaster extends SimpleServer {
+
 	public static void main(String[] args) {
 		System.out.println("This shall be done!");
 	}

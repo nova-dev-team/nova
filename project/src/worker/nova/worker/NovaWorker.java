@@ -1,5 +1,7 @@
 package nova.worker;
 
-public class NovaWorker {
+import nova.common.service.SimpleServer;
+
+public class NovaWorker extends SimpleServer {
 
 }

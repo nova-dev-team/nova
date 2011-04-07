@@ -1,7 +1,6 @@
 package nova.common.service;
 
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.ClientBootstrap;
@@ -84,7 +83,7 @@ public class SimpleProxy extends SimpleChannelHandler {
 		this.factory.releaseExternalResources();
 	}
 
-	protected final void sendRequest(Object req) throws UnknownHostException {
+	protected final void sendRequest(Object req) {
 		Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req,
 				replyAddr);
 		String message = gson.toJson(packet) + "\r\n";

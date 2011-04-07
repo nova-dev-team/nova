@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src/master"/>
 	<classpathentry kind="src" path="src/worker"/>
+	<classpathentry kind="src" path="src/agent"/>
+	<classpathentry kind="src" path="src/common"/>
+	<classpathentry kind="src" path="src/test"/>
 	<classpathentry kind="src" path="src/storage"/>
 	<classpathentry kind="src" path="src/ui"/>
-	<classpathentry kind="src" path="src/test"/>
-	<classpathentry kind="src" path="src/common"/>
-	<classpathentry kind="src" path="src/agent"/>
 	<classpathentry kind="src" path="src/vncdispatch"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
