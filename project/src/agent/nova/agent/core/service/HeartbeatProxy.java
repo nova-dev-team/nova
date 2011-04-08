@@ -1,7 +1,6 @@
 package nova.agent.core.service;
 
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
@@ -20,18 +19,10 @@ public class HeartbeatProxy extends SimpleProxy {
 	}
 
 	public void sendHeartbeatMessage() {
-		try {
-			this.sendRequest(new HeartbeatMessage());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new HeartbeatMessage());
 	}
 
 	public void sendCloseChannelMessage() {
-		try {
-			this.sendRequest(new CloseChannelMessage());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new CloseChannelMessage());
 	}
 }

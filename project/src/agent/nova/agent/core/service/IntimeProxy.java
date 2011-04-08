@@ -1,7 +1,6 @@
 package nova.agent.core.service;
 
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 import nova.agent.core.handler.SoftwareInstallStatusMessageHandler;
 import nova.common.service.SimpleProxy;
@@ -22,42 +21,22 @@ public class IntimeProxy extends SimpleProxy {
 	}
 
 	public void sendHeartbeatMessage() {
-		try {
-			this.sendRequest(new HeartbeatMessage());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new HeartbeatMessage());
 	}
 
 	public void sendRequestHeartbeatMessage() {
-		try {
-			this.sendRequest(new RequestHeartbeatMessage());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new RequestHeartbeatMessage());
 	}
 
 	public void sendGeneralMonitorMessage() {
-		try {
-			this.sendRequest(new GeneralMonitorMessage());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new GeneralMonitorMessage());
 	}
 
 	public void sendSoftwareInstallStatusMessage() {
-		try {
-			this.sendRequest(new SoftwareInstallStatusMessageHandler());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new SoftwareInstallStatusMessageHandler());
 	}
 
 	public void sendCloseChannelMessage() {
-		try {
-			this.sendRequest(new CloseChannelMessage());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new CloseChannelMessage());
 	}
 }

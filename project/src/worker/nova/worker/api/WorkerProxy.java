@@ -1,5 +1,7 @@
 package nova.worker.api;
 
-public class WorkerProxy {
+import nova.common.service.SimpleProxy;
+
+public class WorkerProxy extends SimpleProxy {
 
 }
