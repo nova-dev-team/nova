@@ -72,14 +72,25 @@ public class SimpleProxy extends SimpleChannelHandler {
 	public ChannelFuture connect(InetSocketAddress addr) {
 		this.channel = bootstrap.connect(addr);
 
+		// Using addlistener instead of awaitUninterruptibly to avoid deadlock
+		ChannelFutureListener chfl = new ChannelFutureListener();
+		this.channel.addListener(chfl);
+		while (false == chfl.flag) {
+			synchronized (chfl.sem) {
+				try {
+					chfl.sem.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		if (!this.channel.isSuccess()) {
+			this.channel.getCause().printStackTrace();
+		}
 		return this.channel;
 	}
 
 	public void close() {
-		this.channel.awaitUninterruptibly();
-		if (!this.channel.isSuccess()) {
-			this.channel.getCause().printStackTrace();
-		}
 		this.channel.getChannel().getCloseFuture().awaitUninterruptibly();
 		this.factory.releaseExternalResources();
 	}
@@ -89,14 +100,32 @@ public class SimpleProxy extends SimpleChannelHandler {
 				replyAddr);
 		String message = gson.toJson(packet) + "\r\n";
 		// System.out.println(message);
-		ChannelFuture future = this.channel.getChannel().write(message);
-		future.awaitUninterruptibly();
+		this.channel.getChannel().write(message);
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
 		e.getCause().printStackTrace();
 		e.getChannel().close();
+	}
+}
+
+class ChannelFutureListener implements
+		org.jboss.netty.channel.ChannelFutureListener { // Using addlistener to
+														// avoid deadlock
+	public boolean flag = false;
+	public Object sem = new Object();
+
+	public ChannelFutureListener() {
+
+	}
+
+	@Override
+	public void operationComplete(ChannelFuture arg0) throws Exception {
+		this.flag = true;
+		synchronized (this.sem) {
+			this.sem.notifyAll();
+		}
 	}
 
 }

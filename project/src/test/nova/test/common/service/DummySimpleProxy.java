@@ -7,10 +7,12 @@ import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.message.RequestGeneralMonitorMessage;
+import nova.common.service.message.RequestHeartbeatMessage;
 
 public class DummySimpleProxy {
 	public void run() throws UnknownHostException {
-		MessageProxy hp = new MessageProxy(new InetSocketAddress("10.0.1.224",
+		MessageProxy hp = new MessageProxy(new InetSocketAddress("10.0.1.236",
 				9876));
 		hp.connect(new InetSocketAddress("localhost", 9876)); // Connect to
 																// server and
@@ -20,7 +22,7 @@ public class DummySimpleProxy {
 		for (int j = 0; j < 1000; j++) {
 			hp.sendHeartbeatMessage();
 		}
-		hp.sendMonitorMessage();
+		hp.sendGeneralMonitorMessage();
 		hp.sendCloseChannelMessage(); // Close message
 		hp.close();
 
@@ -48,12 +50,24 @@ class MessageProxy extends SimpleProxy { // A client example
 		this.sendRequest(new HeartbeatMessage());
 	}
 
-	public void sendMonitorMessage() throws UnknownHostException {
+	public void sendGeneralMonitorMessage() throws UnknownHostException {
 		this.sendRequest(new GeneralMonitorMessage());
+	}
+
+	public void sendRequestGeneralMonitorMessage() throws UnknownHostException {
+		this.sendRequest(new RequestGeneralMonitorMessage());
 	}
 
 	public void sendCloseChannelMessage() throws UnknownHostException {
 		this.sendRequest(new CloseChannelMessage());
+	}
+
+	public void sendRequestHeartBeatMessage() {
+		try {
+			this.sendRequest(new RequestHeartbeatMessage());
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

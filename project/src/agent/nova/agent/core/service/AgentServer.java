@@ -1,4 +1,4 @@
-package nova.agent.core.protocol;
+package nova.agent.core.service;
 
 import java.net.InetSocketAddress;
 
@@ -13,10 +13,9 @@ import nova.common.service.message.RequestGeneralMonitorMessage;
 import nova.common.service.message.RequestHeartbeatMessage;
 import nova.common.service.message.RequestSoftwareMessage;
 
-public class AgentProtocol {
-
+public class AgentServer {
 	/**
-	 * Start a server
+	 * Start a server and register some handler.
 	 */
 	public static void startServer() {
 		SimpleServer svr = new SimpleServer();
@@ -30,14 +29,5 @@ public class AgentProtocol {
 				new RequestSoftwareMessageHandler());
 
 		svr.bind(new InetSocketAddress(GlobalPara.BIND_PORT));
-	}
-
-	public static void startProxy(String hostAddress) {
-		GlobalPara.HEARTBEAT_PROXY.connect(new InetSocketAddress(hostAddress,
-				GlobalPara.BIND_PORT));
-		GlobalPara.GENERAL_MONITOR_PROXY.connect(new InetSocketAddress(
-				hostAddress, GlobalPara.BIND_PORT));
-		GlobalPara.INTIME_PROXY.connect(new InetSocketAddress(hostAddress,
-				GlobalPara.BIND_PORT));
 	}
 }

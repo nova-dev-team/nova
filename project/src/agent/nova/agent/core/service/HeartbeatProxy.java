@@ -1,4 +1,4 @@
-package nova.agent.core.models;
+package nova.agent.core.service;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;

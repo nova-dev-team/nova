@@ -1,11 +1,10 @@
 package nova.agent;
 
-import nova.agent.core.protocol.AgentProtocol;
+import nova.agent.core.service.AgentServer;
 
 public class NovaAgent {
 
 	public static void main(String[] args) {
-		AgentProtocol.startServer();
-		AgentProtocol.startProxy("localhost");
+		AgentServer.startServer();
 	}
 }

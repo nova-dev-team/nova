@@ -5,10 +5,12 @@ import java.net.InetSocketAddress;
 import nova.agent.core.handler.CloseChannelMessageHandler;
 import nova.agent.core.handler.GeneralMonitorMessageHandler;
 import nova.agent.core.handler.HeartbeatMessageHandler;
+import nova.agent.core.handler.RequestHeartbeatMessageHandler;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.message.RequestHeartbeatMessage;
 
 public class DummySimpleServer {
 
@@ -16,8 +18,6 @@ public class DummySimpleServer {
 
 	public void testMessage() {
 
-		// System.out.println(CloseChannelMessage.class.getName()
-		// .toString());
 		SimpleServer svr = new SimpleServer(); // Create a server
 
 		// Register 3 type of message handler to server
@@ -27,6 +27,8 @@ public class DummySimpleServer {
 				new HeartbeatMessageHandler());
 		svr.registerHandler(CloseChannelMessage.class,
 				new CloseChannelMessageHandler());
+		svr.registerHandler(RequestHeartbeatMessage.class,
+				new RequestHeartbeatMessageHandler());
 
 		svr.bind(new InetSocketAddress(BIND_PORT));
 
