@@ -12,12 +12,27 @@ import sun.net.TelnetInputStream;
 import sun.net.ftp.FtpClient;
 
 /**
- * Download software from ftp
+ * Download one selected software from ftp
  * 
  * @author gaotao1987@gmail.com
  * 
  */
 public class DownloadProgress implements Cancelable, Progressable, Runnable {
+
+	private String hostIp;
+	private String userName;
+	private String password;
+	private String softName; // Name of software
+	private String myPath; // Download to where
+
+	public DownloadProgress(String ftpAdress, String userName, String password,
+			String softNm) {
+		this.hostIp = ftpAdress;
+		this.userName = userName;
+		this.password = password;
+		this.softName = softNm;
+		this.myPath = GlobalPara.myPath;
+	}
 
 	@Override
 	public int getProgress() {
@@ -43,21 +58,6 @@ public class DownloadProgress implements Cancelable, Progressable, Runnable {
 		return false;
 	}
 
-	private String hostIp;
-	private String userName;
-	private String password;
-	private String softName;
-	private String myPath;
-
-	public DownloadProgress(String ftpAdress, String userName, String password,
-			String softNm) {
-		this.hostIp = ftpAdress;
-		this.userName = userName;
-		this.password = password;
-		this.softName = softNm;
-		this.myPath = GlobalPara.myPath;
-	}
-
 	/**
 	 * Connect to ftp
 	 * 
@@ -74,6 +74,14 @@ public class DownloadProgress implements Cancelable, Progressable, Runnable {
 		return fc;
 	}
 
+	/**
+	 * 
+	 * @param fClient
+	 *            {@link FtpClient}
+	 * @param softName
+	 *            {@link String}
+	 * @return {@link Boolean}
+	 */
 	public boolean downloadFromFtp(FtpClient fClient, String softName) {
 		GlobalPara.downProcess.setBorderPainted(true);
 		GlobalPara.downProcess.setBackground(Color.pink);
@@ -118,8 +126,10 @@ public class DownloadProgress implements Cancelable, Progressable, Runnable {
 	/**
 	 * Get the length of one file
 	 * 
-	 * @param FtpClient
+	 * @param client
+	 *            {@link FtpClient}
 	 * @param fileName
+	 *            {@link String}
 	 * @return {@link Integer}
 	 * @throws IOException
 	 */
