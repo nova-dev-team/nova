@@ -63,11 +63,7 @@ class MessageProxy extends SimpleProxy { // A client example
 	}
 
 	public void sendRequestHeartBeatMessage() {
-		try {
-			this.sendRequest(new RequestHeartbeatMessage());
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		this.sendRequest(new RequestHeartbeatMessage());
 	}
 
 }
