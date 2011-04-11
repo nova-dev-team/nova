@@ -14,28 +14,27 @@
 
 
 	<target name="check-env" description="check build environment">
-		<mkdir dir="bin"/>
+    <mkdir dir="bin/build"/>
 	</target>
 
 
 	<target name="build" depends="check-env" description="build project">
-		<javac srcdir="src" destdir="bin" includeantruntime="false">
+    <javac srcdir="src" destdir="bin/build" includeantruntime="false">
 			<classpath>
 				<fileset dir="lib">
 					<include name="**/*.jar"/>
 				</fileset>
 			</classpath>
 		</javac>
-		<copy file="conf/log4j.properties" todir="bin/" />
 	</target>
 
   <target name="pre-test" depends="build" description="prepare test environment">
-    <mkdir dir="bin/junit-temp"/>
-    <mkdir dir="bin/junit-report"/>
+    <mkdir dir="bin/build/junit-temp"/>
+    <mkdir dir="bin/build/junit-report"/>
   </target>
 
 	<target name="test" depends="pre-test" description="run junit4 tests">
-    <junit printsummary="false" filtertrace="true" haltonfailure="true" tempdir="bin/junit-temp">
+    <junit printsummary="false" filtertrace="true" haltonfailure="true" tempdir="bin/build/junit-temp">
       <formatter type="xml"/>
 			<classpath>
 				<fileset dir="lib">
@@ -43,8 +42,8 @@
 				</fileset>
 				<fileset dir="conf"/>
 			</classpath>
-      <batchtest todir="bin/junit-report">
-        <fileset dir="bin/">
+      <batchtest todir="bin/build/junit-report">
+        <fileset dir="bin/build/">
           <include name="nova/test/**/*.class" />
         </fileset>
 			</batchtest>
@@ -53,7 +52,7 @@
 
 
 	<target name="clean" description="clean build files">
-    <delete dir="bin/" />
+    <delete dir="bin/build/" />
 	</target>
 
 </project>
