@@ -3,9 +3,11 @@ package nova.master;
 import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleServer;
-import nova.master.daemons.MasterDaemon;
+import nova.common.service.message.HeartbeatMessage;
+import nova.common.util.SimpleDaemon;
 import nova.master.daemons.PnodeHealthCheckerDaemon;
 import nova.master.handler.AckStartVnodeHandler;
+import nova.master.handler.MasterHeartbeatHandler;
 import nova.master.models.MasterDB;
 
 import org.apache.log4j.Logger;
@@ -23,7 +25,7 @@ public class NovaMaster extends SimpleServer {
 	/**
 	 * All background working daemons for master node.
 	 */
-	MasterDaemon daemons[] = { new PnodeHealthCheckerDaemon() };
+	SimpleDaemon daemons[] = { new PnodeHealthCheckerDaemon() };
 
 	/**
 	 * Master's db.
@@ -39,6 +41,9 @@ public class NovaMaster extends SimpleServer {
 		this.registerHandler(AckStartVnodeHandler.Message.class,
 				new AckStartVnodeHandler());
 
+		this.registerHandler(HeartbeatMessage.class,
+				new MasterHeartbeatHandler());
+
 		// TODO @santa connect db
 	}
 
@@ -49,7 +54,7 @@ public class NovaMaster extends SimpleServer {
 	public Channel bind(InetSocketAddress bindAddr) {
 		Channel chnl = super.bind(bindAddr);
 		// start all daemons
-		for (MasterDaemon daemon : this.daemons) {
+		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
 		}
 		logger.info("All deamons started");
@@ -63,10 +68,10 @@ public class NovaMaster extends SimpleServer {
 	public void shutdown() {
 		logger.info("Shutting down NovaMaster");
 		// stop all daemons
-		for (MasterDaemon daemon : this.daemons) {
+		for (SimpleDaemon daemon : this.daemons) {
 			daemon.stopWork();
 		}
-		for (MasterDaemon daemon : this.daemons) {
+		for (SimpleDaemon daemon : this.daemons) {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
@@ -76,7 +81,7 @@ public class NovaMaster extends SimpleServer {
 		}
 		logger.info("All deamons stopped");
 		super.shutdown();
-		// TODO @santa more cleanup work
+		// TODO @zhaoxun more cleanup work
 
 		NovaMaster.instance = null;
 	}
@@ -119,7 +124,7 @@ public class NovaMaster extends SimpleServer {
 	 *            Environment variables.
 	 */
 	public static void main(String[] args) {
-		// TODO @santa Move bind addr into conf files.
+		// TODO @zhaoxun Move bind addr into conf files.
 		InetSocketAddress bindAddr = new InetSocketAddress("0.0.0.0", 3000);
 		logger.info("Nova master running @ " + bindAddr);
 		try {

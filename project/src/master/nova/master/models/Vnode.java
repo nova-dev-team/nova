@@ -8,7 +8,7 @@ import java.util.Date;
  * @author santa
  * 
  */
-public class Vnode {
+public class Vnode extends VnodeBasic {
 
 	/**
 	 * Status for the virtual node.
@@ -57,11 +57,6 @@ public class Vnode {
 	 * Id of the vnode.
 	 */
 	int id;
-
-	/**
-	 * Ip address of the vnode.
-	 */
-	String ip = null;
 
 	/**
 	 * Time of last message from the vnode. Used to detect vnode failure.

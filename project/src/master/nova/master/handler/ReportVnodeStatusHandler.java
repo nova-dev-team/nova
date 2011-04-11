@@ -5,17 +5,17 @@ import nova.common.service.ISimpleHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
-public class AckStartVnodeHandler implements
-		ISimpleHandler<AckStartVnodeHandler.Message> {
+public class ReportVnodeStatusHandler implements
+		ISimpleHandler<ReportVnodeStatusHandler.Message> {
 
 	public static class Message {
-		// TODO @santa populate the fields
+		// TODO @santa populate fields
 	}
 
 	@Override
 	public void handleMessage(Message msg, ChannelHandlerContext ctx,
 			MessageEvent e, String xfrom) {
-		// TODO @santa Auto-generated method stub
+		// TODO Auto-generated method stub
 
 	}
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/master"/>
-	<classpathentry kind="src" path="conf"/>
 	<classpathentry kind="src" path="src/worker"/>
 	<classpathentry kind="src" path="src/agent"/>
 	<classpathentry kind="src" path="src/common"/>
@@ -9,6 +8,7 @@
 	<classpathentry kind="src" path="src/storage"/>
 	<classpathentry kind="src" path="src/ui"/>
 	<classpathentry kind="src" path="src/vncdispatch"/>
+	<classpathentry kind="src" path="conf"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/netty-3.2.4.Final.jar" sourcepath="lib/netty-3.2.4.Final-sources.jar"/>

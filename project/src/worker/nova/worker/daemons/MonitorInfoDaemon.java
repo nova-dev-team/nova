@@ -1,26 +1,29 @@
 package nova.worker.daemons;
 
+import nova.common.tools.perf.GeneralMonitorInfo;
+import nova.common.tools.perf.PerfMon;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 import nova.worker.NovaWorker;
 
 /**
- * A daemons that sends hearbeat message to Master node.
+ * Deamon thread that sends monitor information to master.
  * 
  * @author santa
  * 
  */
-public class HeartbeatDaemon extends SimpleDaemon {
+public class MonitorInfoDaemon extends SimpleDaemon {
 
 	/**
-	 * send heart beat to master
+	 * Send monitor information.
 	 */
 	@Override
 	protected void workOneRound() {
 		if (this.isStopping() == false) {
 			MasterProxy master = NovaWorker.getInstance().getMaster();
 			if (master != null) {
-				master.sendHeartbeat();
+				GeneralMonitorInfo info = PerfMon.getGeneralMonitorInfo();
+				master.sendMonitorInfo(info);
 			}
 		}
 	}
