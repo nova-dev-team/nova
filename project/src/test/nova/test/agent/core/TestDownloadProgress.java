@@ -9,7 +9,7 @@ import nova.agent.core.DownloadProgress;
 public class TestDownloadProgress {
 	public static void main(String[] args) {
 		ExecutorService softPool = Executors.newFixedThreadPool(1);
-		GlobalPara globalPara = new GlobalPara();
+		new GlobalPara();
 		DownloadProgress dlp = new DownloadProgress(GlobalPara.hostIp,
 				GlobalPara.userName, GlobalPara.password, "test.exe");
 
