@@ -19,4 +19,7 @@ public class GlobalPara {
 	public static Map<String, HeartbeatProxy> heartbeatProxyMap = new HashMap<String, HeartbeatProxy>();
 	public static Map<String, GeneralMonitorProxy> generalMonitorProxyMap = new HashMap<String, GeneralMonitorProxy>();
 	public static Map<String, IntimeProxy> intimeProxyMap = new HashMap<String, IntimeProxy>();
+
+	public static Object heartbeatSem = new Object();
+	public static Object generalMonitorSem = new Object();
 }

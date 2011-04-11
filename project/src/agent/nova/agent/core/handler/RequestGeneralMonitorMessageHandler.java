@@ -41,6 +41,8 @@ public class RequestGeneralMonitorMessageHandler implements
 				gmp.connect(new InetSocketAddress(address, port));
 				gmp.sendGeneralMonitorMessage();
 
+				GlobalPara.generalMonitorSem.notifyAll();
+
 				GlobalPara.generalMonitorProxyMap.put(xfrom, gmp);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();

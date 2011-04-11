@@ -1,4 +1,4 @@
-package nova.test.common.service;
+package nova.test.agent.agent;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -9,8 +9,9 @@ import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.RequestGeneralMonitorMessage;
 import nova.common.service.message.RequestHeartbeatMessage;
+import nova.test.common.service.DummySimpleProxy;
 
-public class DummySimpleProxy {
+public class TestProxy {
 	public void run() throws UnknownHostException {
 		MessageProxy hp = new MessageProxy(new InetSocketAddress("10.0.1.236",
 				9876));
