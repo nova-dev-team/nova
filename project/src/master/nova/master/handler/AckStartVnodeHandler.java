@@ -9,7 +9,7 @@ public class AckStartVnodeHandler implements
 		ISimpleHandler<AckStartVnodeHandler.Message> {
 
 	public class Message {
-
+		// TODO @santa populate the fields
 	}
 
 	@Override

@@ -6,12 +6,11 @@ import nova.common.service.SimpleServer;
 import nova.master.daemons.MasterDaemon;
 import nova.master.daemons.PnodeHealthCheckerDaemon;
 import nova.master.handler.AckStartVnodeHandler;
+import nova.master.models.MasterDB;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
 
 /**
  * Master node of Nova system.
@@ -27,6 +26,11 @@ public class NovaMaster extends SimpleServer {
 	MasterDaemon daemons[] = { new PnodeHealthCheckerDaemon() };
 
 	/**
+	 * Master's db.
+	 */
+	MasterDB db = new MasterDB();
+
+	/**
 	 * Constructor made private for singleton pattern.
 	 */
 	private NovaMaster() {
@@ -34,55 +38,8 @@ public class NovaMaster extends SimpleServer {
 		// register handlers
 		this.registerHandler(AckStartVnodeHandler.Message.class,
 				new AckStartVnodeHandler());
-	}
 
-	/**
-	 * Master's messageReceived function is duplex'ed to handle HTTP requests.
-	 */
-	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
-		String msg = (String) e.getMessage();
-		if (isHTTPRequest(msg)) {
-			// if it is request from browers, handle the http request.
-			handleHTTPRequest(ctx, e, msg);
-		} else {
-			// otherwise, it is from nova components, handle it by simple
-			// server's logics
-			super.messageReceived(ctx, e);
-		}
-	}
-
-	/**
-	 * Check if a request looks like HTTP request.
-	 * 
-	 * @param req
-	 *            The request message
-	 * @return Whether the request is HTTP request.
-	 */
-	private boolean isHTTPRequest(String req) {
-		if (req.startsWith("GET ") || req.startsWith("POST ")
-				|| req.startsWith("PUT ") || req.startsWith("HEAD ")
-				|| req.startsWith("DELETE ")) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Handle a HTTP request from browsers.
-	 * 
-	 * @param ctx
-	 *            The ChannelHandlerContext.
-	 * @param e
-	 *            The MessageEvent.
-	 * @param req
-	 *            The request body.
-	 */
-	private void handleHTTPRequest(ChannelHandlerContext ctx, MessageEvent e,
-			String req) {
-		// TODO @santa handle http req
-		System.out.println(req);
+		// TODO @santa connect db
 	}
 
 	/**
@@ -120,6 +77,17 @@ public class NovaMaster extends SimpleServer {
 		logger.info("All deamons stopped");
 		super.shutdown();
 		// TODO @santa more cleanup work
+
+		NovaMaster.instance = null;
+	}
+
+	/**
+	 * Get master's database.
+	 * 
+	 * @return Master's database.
+	 */
+	public MasterDB getDB() {
+		return this.db;
 	}
 
 	/**
@@ -130,7 +98,7 @@ public class NovaMaster extends SimpleServer {
 	/**
 	 * Singleton instance of NovaMaster.
 	 */
-	private static NovaMaster instance = new NovaMaster();
+	private static NovaMaster instance = null;
 
 	/**
 	 * Get the singleton of NovaMaster.
@@ -138,6 +106,9 @@ public class NovaMaster extends SimpleServer {
 	 * @return NovaMaster instance, singleton.
 	 */
 	public static NovaMaster getInstance() {
+		if (NovaMaster.instance == null) {
+			NovaMaster.instance = new NovaMaster();
+		}
 		return NovaMaster.instance;
 	}
 
@@ -148,6 +119,7 @@ public class NovaMaster extends SimpleServer {
 	 *            Environment variables.
 	 */
 	public static void main(String[] args) {
+		// TODO @santa Move bind addr into conf files.
 		InetSocketAddress bindAddr = new InetSocketAddress("0.0.0.0", 3000);
 		logger.info("Nova master running @ " + bindAddr);
 		try {

@@ -53,6 +53,8 @@ public class SimpleServer extends SimpleChannelHandler {
 
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
+
+				// TODO @santa Make it HTTP friendly
 				ChannelPipeline pipeline = Channels.pipeline();
 				pipeline.addLast(
 						"frameDecoder",

@@ -1,5 +1,10 @@
 package nova.master.daemons;
 
+import java.util.ArrayList;
+
+import nova.master.NovaMaster;
+import nova.master.models.Pnode;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -31,7 +36,7 @@ public class PnodeHealthCheckerDaemon extends MasterDaemon {
 		while (this.stopFlag == false) {
 			logger.trace("PnodeHealthCheckerDaemon wake up");
 
-			poll();
+			pingAllPnodes();
 
 			try {
 				synchronized (this.stopFlagSem) {
@@ -50,9 +55,16 @@ public class PnodeHealthCheckerDaemon extends MasterDaemon {
 	/**
 	 * Do work, on round.
 	 */
-	private void poll() {
-		if (this.stopFlag == false) {
-			// TODO @santa work1
+	private void pingAllPnodes() {
+		ArrayList<Pnode> allPnodes = NovaMaster.getInstance().getDB()
+				.getAllPnodes();
+		for (Pnode pnode : allPnodes) {
+			if (this.stopFlag == true) {
+				// if should stop, cancel as soon as possible
+				return;
+			}
+			logger.trace("pinging pnode: " + pnode);
+			// TODO @santa ping pnode if necessary
 		}
 	}
 
