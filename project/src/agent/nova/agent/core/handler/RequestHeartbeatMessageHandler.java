@@ -39,8 +39,11 @@ public class RequestHeartbeatMessageHandler implements
 				int port = Integer.parseInt(xfrom.split(":")[1].toString()
 						.trim());
 				heartbeatProxy.connect(new InetSocketAddress(address, port));
-				GlobalPara.heartbeatProxyMap.put(xfrom, heartbeatProxy);
 				heartbeatProxy.sendHeartbeatMessage();
+
+				GlobalPara.heartbeatSem.notifyAll();
+
+				GlobalPara.heartbeatProxyMap.put(xfrom, heartbeatProxy);
 
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
