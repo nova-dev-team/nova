@@ -4,8 +4,13 @@ import nova.agent.common.util.GlobalPara;
 import nova.agent.core.service.AgentServer;
 import nova.agent.core.service.GeneralMonitorProxy;
 import nova.agent.core.service.HeartbeatProxy;
-import nova.common.service.message.HeartbeatMessage;
 
+/**
+ * Agent implementation
+ * 
+ * @author gaotao1987@gmail.com
+ * 
+ */
 public class NovaAgent {
 	public static void main(String[] args) {
 		AgentServer.startServer();
@@ -64,18 +69,5 @@ public class NovaAgent {
 			}
 		});
 		generalMonitorThread.start();
-	}
-}
-
-class SynchClass {
-	public Object heartbeatSem = new Object();
-	public Object generalMonitorSem = new Object();
-
-	public SynchClass(Object klass) {
-		if (klass.getClass().getName().equals(HeartbeatMessage.class.getName())) {
-			this.heartbeatSem.notifyAll();
-		} else {
-			this.generalMonitorSem.notifyAll();
-		}
 	}
 }

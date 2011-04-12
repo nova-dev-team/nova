@@ -11,6 +11,7 @@ import nova.agent.core.service.IntimeProxy;
 import nova.common.service.ISimpleHandler;
 import nova.common.service.message.RequestHeartbeatMessage;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
@@ -24,6 +25,8 @@ public class RequestHeartbeatMessageHandler implements
 		ISimpleHandler<RequestHeartbeatMessage> {
 
 	AtomicLong counter = new AtomicLong();
+	static Logger logger = Logger
+			.getLogger(RequestHeartbeatMessageHandler.class);
 
 	@Override
 	public void handleMessage(RequestHeartbeatMessage msg,
@@ -40,6 +43,10 @@ public class RequestHeartbeatMessageHandler implements
 						.trim());
 				heartbeatProxy.connect(new InetSocketAddress(address, port));
 				heartbeatProxy.sendHeartbeatMessage();
+
+				logger.info("General heartbeat proxy have connected to server "
+						+ xfrom);
+				// General heartbeat proxy can work
 				synchronized (GlobalPara.heartbeatSem) {
 					GlobalPara.heartbeatSem.notifyAll();
 				}
@@ -48,6 +55,7 @@ public class RequestHeartbeatMessageHandler implements
 
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
+				logger.error("Can't connect to host " + xfrom);
 			}
 			// Wake up intimeProxy when there are additional
 			// RequestHeartbeatMessages
@@ -63,9 +71,12 @@ public class RequestHeartbeatMessageHandler implements
 				intimeProxy.connect(new InetSocketAddress(address, port));
 				intimeProxy.sendHeartbeatMessage();
 
+				logger.info("Intime proxy have connected to server " + xfrom);
+
 				GlobalPara.intimeProxyMap.put(xfrom, intimeProxy);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
+				logger.error("Can't connect to host " + xfrom);
 			}
 			// use established channel to send HeartbeatMessage
 		} else {

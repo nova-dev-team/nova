@@ -32,7 +32,7 @@ public class RequestSoftwareMessageHandler implements
 			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
 		LinkedList<String> softList = msg.getInstallSoftList();
 
-		// add all downloading software task to download thread pool
+		// add all downloading softwares task to download thread pool
 		for (String softName : softList) {
 			DownloadProgress dlp = new DownloadProgress(GlobalPara.hostIp,
 					GlobalPara.userName, GlobalPara.password, softName);

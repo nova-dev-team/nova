@@ -3,6 +3,7 @@ package nova.agent.core.handler;
 import nova.common.service.ISimpleHandler;
 import nova.common.service.message.CloseChannelMessage;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
@@ -14,10 +15,11 @@ import org.jboss.netty.channel.MessageEvent;
  */
 public class CloseChannelMessageHandler implements
 		ISimpleHandler<CloseChannelMessage> {
+	static Logger logger = Logger.getLogger(CloseChannelMessageHandler.class);
 
 	@Override
 	public void handleMessage(CloseChannelMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
-		// System.out.println("Closed!");
+		logger.info(xfrom + " client channel closed");
 	}
 }
