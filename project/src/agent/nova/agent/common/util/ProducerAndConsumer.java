@@ -5,6 +5,12 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Producer and consumer used in download and install progress
+ * 
+ * @author gaotao1987@gmail.com
+ * 
+ */
 public class ProducerAndConsumer {
 	private static int CAPACITY = 100;
 	private LinkedList<String> queue = new LinkedList<String>();

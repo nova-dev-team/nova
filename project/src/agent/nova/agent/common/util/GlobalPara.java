@@ -15,6 +15,8 @@ import nova.agent.core.service.GeneralMonitorProxy;
 import nova.agent.core.service.HeartbeatProxy;
 import nova.agent.core.service.IntimeProxy;
 
+import org.apache.log4j.Logger;
+
 /**
  * Static variable used in agent
  * 
@@ -49,6 +51,8 @@ public class GlobalPara {
 	// Producer in DownloadProgress, consumer in RequestSoftwareMessageHandler
 	public static ProducerAndConsumer downloadedBuffer = new ProducerAndConsumer();
 
+	static Logger logger = Logger.getLogger(GlobalPara.class);
+
 	public GlobalPara() {
 		String s = null;
 		File f = new File("d://config.txt");
@@ -82,7 +86,7 @@ public class GlobalPara {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("文件不存在！");
+			logger.error("Can't find the configuration text!");
 		}
 
 		System.out.println("hostIp = " + hostIp);

@@ -11,6 +11,7 @@ import nova.agent.core.service.IntimeProxy;
 import nova.common.service.ISimpleHandler;
 import nova.common.service.message.RequestGeneralMonitorMessage;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
@@ -23,6 +24,8 @@ import org.jboss.netty.channel.MessageEvent;
 public class RequestGeneralMonitorMessageHandler implements
 		ISimpleHandler<RequestGeneralMonitorMessage> {
 	AtomicLong counter = new AtomicLong();
+	static Logger logger = Logger
+			.getLogger(RequestGeneralMonitorMessageHandler.class);
 
 	@Override
 	public void handleMessage(RequestGeneralMonitorMessage msg,
@@ -40,6 +43,11 @@ public class RequestGeneralMonitorMessageHandler implements
 						.trim());
 				gmp.connect(new InetSocketAddress(address, port));
 				gmp.sendGeneralMonitorMessage();
+
+				logger.info("General monitor proxy have connected to server "
+						+ xfrom);
+
+				// generalMonitorProxy can work
 				synchronized (GlobalPara.generalMonitorSem) {
 					GlobalPara.generalMonitorSem.notifyAll();
 				}
@@ -47,6 +55,7 @@ public class RequestGeneralMonitorMessageHandler implements
 				GlobalPara.generalMonitorProxyMap.put(xfrom, gmp);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
+				logger.error("Can't connect to host " + xfrom);
 			}
 			// Wake up intimeProxy when there are additional
 			// RequestGeneralMonitorMessages
@@ -62,9 +71,12 @@ public class RequestGeneralMonitorMessageHandler implements
 				ip.connect(new InetSocketAddress(address, port));
 				ip.sendGeneralMonitorMessage();
 
+				logger.info("Intime proxy have connected to server " + xfrom);
+
 				GlobalPara.intimeProxyMap.put(xfrom, ip);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
+				logger.error("Can't connect to host " + xfrom);
 			}
 			// use established channel to send GeneralMonitorMessage
 		} else {

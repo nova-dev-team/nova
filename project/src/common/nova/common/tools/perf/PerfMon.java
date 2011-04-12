@@ -1,5 +1,6 @@
 package nova.common.tools.perf;
 
+import org.apache.log4j.Logger;
 import org.hyperic.sigar.FileSystem;
 import org.hyperic.sigar.NetInterfaceConfig;
 import org.hyperic.sigar.NetInterfaceStat;
@@ -16,6 +17,7 @@ import org.hyperic.sigar.ptql.ProcessFinder;
  * 
  */
 public class PerfMon {
+	static Logger logger = Logger.getLogger(PerfMon.class);
 
 	private static Sigar sigar = new Sigar();
 	private static SigarProxy proxy = SigarProxyCache.newInstance(sigar);
@@ -36,6 +38,7 @@ public class PerfMon {
 			cpu.model = infoList[0].getModel();
 		} catch (SigarException e) {
 			e.printStackTrace();
+			logger.error("Can't get cpu information!");
 		}
 
 		return cpu;
@@ -56,6 +59,7 @@ public class PerfMon {
 			mem.ramSize = sigar.getMem().getRam();
 		} catch (SigarException e) {
 			e.printStackTrace();
+			logger.error("Can't get memory information!");
 		}
 
 		return mem;
@@ -80,6 +84,7 @@ public class PerfMon {
 			}
 		} catch (SigarException e) {
 			e.printStackTrace();
+			logger.error("Can't get disk information!");
 		}
 		return disk;
 	}
@@ -111,6 +116,7 @@ public class PerfMon {
 			net.upSpeed = netstat.getTxBytes() - net.upSpeed;
 		} catch (SigarException e) {
 			e.printStackTrace();
+			logger.error("Can't get net information!");
 		}
 
 		return net;
@@ -141,6 +147,7 @@ public class PerfMon {
 					.getProcTime(pidList[0]).getStartTime()) / 1000;
 		} catch (SigarException e) {
 			e.printStackTrace();
+			logger.error("Can't get process information!");
 		}
 		return process;
 	}
@@ -184,6 +191,7 @@ public class PerfMon {
 			t3.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			logger.error("Can't get general information!");
 		}
 		return cMonitor;
 	}
