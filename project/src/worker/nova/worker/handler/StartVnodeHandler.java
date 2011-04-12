@@ -1,7 +1,7 @@
 package nova.worker.handler;
 
 import nova.common.service.ISimpleHandler;
-import nova.master.models.VnodeBasic;
+import nova.master.models.Vnode;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -23,14 +23,14 @@ public class StartVnodeHandler implements
 	 */
 	public static class Message {
 
-		public Message(VnodeBasic vnodeInfo) {
-			this.vnodeInfo = vnodeInfo;
+		public Message(Vnode.Identity vIdent) {
+			this.vIdent = vIdent;
 		}
 
 		/**
 		 * Basic information required to start a new vnode.
 		 */
-		public VnodeBasic vnodeInfo;
+		public Vnode.Identity vIdent;
 
 	}
 

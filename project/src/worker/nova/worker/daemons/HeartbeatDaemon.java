@@ -12,6 +12,12 @@ import nova.worker.NovaWorker;
  */
 public class HeartbeatDaemon extends SimpleDaemon {
 
+	public static final long HEARTBEAT_INTERVAL = 1000;
+
+	public HeartbeatDaemon() {
+		super(HEARTBEAT_INTERVAL);
+	}
+
 	/**
 	 * send heart beat to master
 	 */

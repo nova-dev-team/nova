@@ -8,7 +8,7 @@ import java.util.Date;
  * @author santa
  * 
  */
-public class Vnode extends VnodeBasic {
+public class Vnode {
 
 	/**
 	 * Status for the virtual node.
@@ -16,7 +16,7 @@ public class Vnode extends VnodeBasic {
 	 * @author santa
 	 * 
 	 */
-	public enum Status {
+	public static enum Status {
 		/**
 		 * The vnode is shut off.
 		 */
@@ -52,6 +52,36 @@ public class Vnode extends VnodeBasic {
 		 */
 		CONNECT_FAILURE,
 	}
+
+	/**
+	 * Basic information needed to connect to a vnode.
+	 * 
+	 * @author santa
+	 * 
+	 */
+	public static class Identity {
+
+		/**
+		 * Ip address of the vnode.
+		 */
+		String ip = null;
+
+		/**
+		 * Port of the vnode.
+		 */
+		int port;
+
+	}
+
+	/**
+	 * Status of the vnode.
+	 */
+	Vnode.Status status;
+
+	/**
+	 * The vnode's identity
+	 */
+	Vnode.Identity ident;
 
 	/**
 	 * Id of the vnode.

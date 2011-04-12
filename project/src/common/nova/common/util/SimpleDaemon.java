@@ -13,7 +13,7 @@ public abstract class SimpleDaemon extends Thread {
 	/**
 	 * Sleep interval between each working round.
 	 */
-	private final int sleepMilli;
+	private final long sleepMilli;
 
 	/**
 	 * Whether current daemon should stop.
@@ -43,7 +43,7 @@ public abstract class SimpleDaemon extends Thread {
 	 * @param sleepMilli
 	 *            The sleep intervl between each working round.
 	 */
-	public SimpleDaemon(int sleepMilli) {
+	public SimpleDaemon(long sleepMilli) {
 		this.sleepMilli = sleepMilli;
 
 		// init worker using "this.getClass()" instead of "SimpleDaemon.class",

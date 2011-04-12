@@ -3,13 +3,15 @@ package nova.worker;
 import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleServer;
+import nova.common.service.message.RequestHeartbeatMessage;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 import nova.worker.daemons.HeartbeatDaemon;
 import nova.worker.daemons.MonitorInfoDaemon;
 import nova.worker.daemons.ReportVnodeStatusDeamon;
-import nova.worker.handler.WorkerHttpRequestHandler;
 import nova.worker.handler.StartVnodeHandler;
+import nova.worker.handler.WorkerHttpRequestHandler;
+import nova.worker.handler.WorkerRequestHeartbeatMessageHandler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
@@ -25,6 +27,8 @@ import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
  * 
  */
 public class NovaWorker extends SimpleServer {
+
+	InetSocketAddress bindAddr = null;
 
 	/**
 	 * All background working daemons for worker node.
@@ -44,10 +48,14 @@ public class NovaWorker extends SimpleServer {
 		// TODO @santa register handlers
 
 		// handle http requests
-		this.registerHandler(DefaultHttpRequest.class, new WorkerHttpRequestHandler());
+		this.registerHandler(DefaultHttpRequest.class,
+				new WorkerHttpRequestHandler());
 
 		this.registerHandler(StartVnodeHandler.Message.class,
 				new StartVnodeHandler());
+
+		this.registerHandler(RequestHeartbeatMessage.class,
+				new WorkerRequestHeartbeatMessageHandler());
 	}
 
 	/**
@@ -55,7 +63,8 @@ public class NovaWorker extends SimpleServer {
 	 */
 	@Override
 	public Channel bind(InetSocketAddress bindAddr) {
-		Channel chnl = super.bind(bindAddr);
+		this.bindAddr = bindAddr;
+		Channel chnl = super.bind(this.bindAddr);
 		// start all daemons
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
@@ -84,6 +93,7 @@ public class NovaWorker extends SimpleServer {
 		}
 		logger.info("All deamons stopped");
 		super.shutdown();
+		this.bindAddr = null;
 		// TODO @shayf more cleanup work
 
 		NovaWorker.instance = null;
@@ -97,6 +107,12 @@ public class NovaWorker extends SimpleServer {
 	 */
 	public MasterProxy getMaster() {
 		return this.master;
+	}
+
+	public void registerMaster(String xfrom) {
+		this.master = new MasterProxy(this.bindAddr);
+		String[] splt = xfrom.split(":");
+		master.connect(new InetSocketAddress(splt[0], Integer.parseInt(splt[1])));
 	}
 
 	/**
