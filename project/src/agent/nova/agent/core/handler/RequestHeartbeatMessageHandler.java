@@ -40,8 +40,9 @@ public class RequestHeartbeatMessageHandler implements
 						.trim());
 				heartbeatProxy.connect(new InetSocketAddress(address, port));
 				heartbeatProxy.sendHeartbeatMessage();
-
-				GlobalPara.heartbeatSem.notifyAll();
+				synchronized (GlobalPara.heartbeatSem) {
+					GlobalPara.heartbeatSem.notifyAll();
+				}
 
 				GlobalPara.heartbeatProxyMap.put(xfrom, heartbeatProxy);
 

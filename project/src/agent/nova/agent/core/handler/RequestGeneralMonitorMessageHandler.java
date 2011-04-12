@@ -40,8 +40,9 @@ public class RequestGeneralMonitorMessageHandler implements
 						.trim());
 				gmp.connect(new InetSocketAddress(address, port));
 				gmp.sendGeneralMonitorMessage();
-
-				GlobalPara.generalMonitorSem.notifyAll();
+				synchronized (GlobalPara.generalMonitorSem) {
+					GlobalPara.generalMonitorSem.notifyAll();
+				}
 
 				GlobalPara.generalMonitorProxyMap.put(xfrom, gmp);
 			} catch (UnknownHostException e1) {
