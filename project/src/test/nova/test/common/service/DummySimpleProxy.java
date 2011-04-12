@@ -2,6 +2,7 @@ package nova.test.common.service;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.LinkedList;
 
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
@@ -9,6 +10,7 @@ import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.RequestGeneralMonitorMessage;
 import nova.common.service.message.RequestHeartbeatMessage;
+import nova.common.service.message.RequestSoftwareMessage;
 
 public class DummySimpleProxy {
 	public void run() throws UnknownHostException {
@@ -18,11 +20,23 @@ public class DummySimpleProxy {
 																// server and
 																// establish a
 																// channel
+																// //
+																// TestRequestSoftwareMessage
+		// LinkedList<String> installSoftList = new LinkedList<String>();
+		// installSoftList.offer("test1.exe");
+		// installSoftList.offer("test2.exe");
+		// installSoftList.offer("test3.exe");
+		// installSoftList.offer("test4.exe");
+		// installSoftList.offer("test5.exe");
+		// installSoftList.offer("test6.exe");
+		// hp.sendRequestSoftwareMessage(installSoftList);
+
 		// Send many messages through this channel
 		for (int j = 0; j < 1000; j++) {
 			hp.sendHeartbeatMessage();
 		}
 		hp.sendGeneralMonitorMessage();
+
 		hp.sendCloseChannelMessage(); // Close message
 		hp.close();
 
@@ -64,6 +78,10 @@ class MessageProxy extends SimpleProxy { // A client example
 
 	public void sendRequestHeartBeatMessage() {
 		this.sendRequest(new RequestHeartbeatMessage());
+	}
+
+	public void sendRequestSoftwareMessage(LinkedList<String> installSoftList) {
+		this.sendRequest(new RequestSoftwareMessage(installSoftList));
 	}
 
 }

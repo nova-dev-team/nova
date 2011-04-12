@@ -46,6 +46,9 @@ public class GlobalPara {
 	public static JLabel statusInfo = new JLabel("Download process");
 	public static JProgressBar downProcess = new JProgressBar(); // 安装进度条
 
+	// Producer in DownloadProgress, consumer in RequestSoftwareMessageHandler
+	public static ProducerAndConsumer downloadedBuffer = new ProducerAndConsumer();
+
 	public GlobalPara() {
 		String s = null;
 		File f = new File("d://config.txt");

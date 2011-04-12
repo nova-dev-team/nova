@@ -171,6 +171,7 @@ public class DownloadProgress implements Cancelable, Progressable, Runnable {
 		FtpClient fc = connectToFtp();
 		downloadFromFtp(fc, this.softName);
 		GlobalPara.statusInfo.setText("Installing " + this.softName + "...");
+		GlobalPara.downloadedBuffer.write(this.softName);
 	}
 
 }

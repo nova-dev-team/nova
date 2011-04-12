@@ -6,11 +6,13 @@ import nova.agent.core.handler.CloseChannelMessageHandler;
 import nova.agent.core.handler.GeneralMonitorMessageHandler;
 import nova.agent.core.handler.HeartbeatMessageHandler;
 import nova.agent.core.handler.RequestHeartbeatMessageHandler;
+import nova.agent.core.handler.RequestSoftwareMessageHandler;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.RequestHeartbeatMessage;
+import nova.common.service.message.RequestSoftwareMessage;
 
 public class DummySimpleServer {
 
@@ -18,9 +20,11 @@ public class DummySimpleServer {
 
 	public void testMessage() {
 
+		// new GlobalPara(); // Test RequestSoftwareMessage
+
 		SimpleServer svr = new SimpleServer(); // Create a server
 
-		// Register 3 type of message handler to server
+		// Register 5 type of message handler to server
 		svr.registerHandler(GeneralMonitorMessage.class,
 				new GeneralMonitorMessageHandler());
 		svr.registerHandler(HeartbeatMessage.class,
@@ -29,6 +33,8 @@ public class DummySimpleServer {
 				new CloseChannelMessageHandler());
 		svr.registerHandler(RequestHeartbeatMessage.class,
 				new RequestHeartbeatMessageHandler());
+		svr.registerHandler(RequestSoftwareMessage.class,
+				new RequestSoftwareMessageHandler());
 
 		svr.bind(new InetSocketAddress(BIND_PORT));
 

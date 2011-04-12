@@ -1,21 +1,26 @@
 package nova.common.service.message;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
- * Request installation of softwares message
+ * Request installation of softwares message save softwares' names in LinkedList
+ * Using getInstallSoftList() to get will be installed softwares' names
  * 
  * @author gaotao1987@gmail.com
  * 
  */
 public class RequestSoftwareMessage {
-	private ArrayList<String> softList = new ArrayList<String>();
+	private LinkedList<String> softList = new LinkedList<String>();
 
-	public RequestSoftwareMessage(ArrayList<String> installSoftList) {
+	public RequestSoftwareMessage() {
+
+	}
+
+	public RequestSoftwareMessage(LinkedList<String> installSoftList) {
 		this.softList = installSoftList;
 	}
 
-	public ArrayList<String> getInstallSoftList() {
+	public LinkedList<String> getInstallSoftList() {
 		return this.softList;
 	}
 }
