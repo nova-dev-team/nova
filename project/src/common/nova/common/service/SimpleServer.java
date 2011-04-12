@@ -24,13 +24,20 @@ import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.json.simple.JSONValue;
 
 import com.google.gson.Gson;
 
+// TODO @santa Javadoc
 public class SimpleServer extends SimpleChannelHandler {
+
+	/**
+	 * Maximum packet size.
+	 */
+	public static final int MAX_PACKET_SIZE = 65536;
 
 	ChannelGroup allChannels = null;
 	ChannelFactory factory = null;
@@ -54,14 +61,24 @@ public class SimpleServer extends SimpleChannelHandler {
 			@Override
 			public ChannelPipeline getPipeline() throws Exception {
 
-				// TODO @santa Make it HTTP friendly
 				ChannelPipeline pipeline = Channels.pipeline();
-				pipeline.addLast(
-						"frameDecoder",
-						new DelimiterBasedFrameDecoder(8192 * 16, Delimiters
-								.lineDelimiter()));
-				pipeline.addLast("stringDecoder", new StringDecoder());
-				pipeline.addLast("stringEncoder", new StringEncoder());
+
+				// TODO @santa move this into config?
+				boolean usePortUnification = true;
+				if (usePortUnification) {
+					pipeline.addLast("portUnification",
+							new PortUnificationDecoder());
+				} else {
+					pipeline.addLast(
+							"frameDecoder",
+							new DelimiterBasedFrameDecoder(
+									SimpleServer.MAX_PACKET_SIZE, Delimiters
+											.lineDelimiter()));
+					pipeline.addLast("stringDecoder", new StringDecoder());
+					pipeline.addLast("stringEncoder", new StringEncoder());
+
+				}
+
 				pipeline.addLast("channelRecorder", new SimpleChannelHandler() {
 
 					@Override
@@ -71,6 +88,7 @@ public class SimpleServer extends SimpleChannelHandler {
 					}
 				});
 				pipeline.addLast("handler", thisSvr);
+
 				return pipeline;
 			}
 
@@ -85,9 +103,28 @@ public class SimpleServer extends SimpleChannelHandler {
 		handlers.put(klass, handler);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+		if (e.getMessage() instanceof DefaultHttpRequest) {
+			httpMessageReceived(ctx, e);
+		} else {
+			jsonMessageReceived(ctx, e);
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void httpMessageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+		DefaultHttpRequest req = (DefaultHttpRequest) e.getMessage();
+		ISimpleHandler handler = this.handlers.get(DefaultHttpRequest.class);
+		if (handler == null) {
+			throw new HandlerNotFoundException(
+					DefaultHttpRequest.class.getName());
+		}
+		handler.handleMessage(req, ctx, e, null);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void jsonMessageReceived(ChannelHandlerContext ctx, MessageEvent e) {
 		String msg = (String) e.getMessage();
 		Map jsonMsg = (Map) JSONValue.parse(msg);
 		String xtype = (String) jsonMsg.get("xtype");
@@ -103,14 +140,12 @@ public class SimpleServer extends SimpleChannelHandler {
 				if (xfromObj != null) {
 					xfrom = xfromObj.toString();
 				}
-				this.handlers.get(klass)
-						.handleMessage(
-								gson.fromJson(
-										gson.toJson(jsonMsg.get("xvalue")),
-										klass), ctx, e, xfrom);
+				handler.handleMessage(gson.fromJson(
+						gson.toJson(jsonMsg.get("xvalue")), klass), ctx, e,
+						xfrom);
 			}
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
+		} catch (ClassNotFoundException ex) {
+			ex.printStackTrace();
 		}
 
 		if (xtype.equals(CloseChannelMessage.class.getName().toString())) {

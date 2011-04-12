@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -23,6 +24,7 @@ import org.jboss.netty.handler.codec.string.StringEncoder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+// TODO @santa Javadoc
 public class SimpleProxy extends SimpleChannelHandler {
 
 	ChannelGroup allChannels = null;
@@ -54,8 +56,9 @@ public class SimpleProxy extends SimpleChannelHandler {
 				ChannelPipeline pipeline = Channels.pipeline();
 				pipeline.addLast(
 						"frameDecoder",
-						new DelimiterBasedFrameDecoder(8192, Delimiters
-								.lineDelimiter()));
+						new DelimiterBasedFrameDecoder(
+								SimpleServer.MAX_PACKET_SIZE, Delimiters
+										.lineDelimiter()));
 				pipeline.addLast("stringDecoder", new StringDecoder());
 				pipeline.addLast("stringEncoder", new StringEncoder());
 				pipeline.addLast("handler", thisProxy);
@@ -72,7 +75,7 @@ public class SimpleProxy extends SimpleChannelHandler {
 		this.channel = bootstrap.connect(addr);
 
 		// Using addlistener instead of awaitUninterruptibly to avoid deadlock
-		ChannelFutureListener chfl = new ChannelFutureListener();
+		ChannelConnectFutureListener chfl = new ChannelConnectFutureListener();
 		this.channel.addListener(chfl);
 		while (false == chfl.flag) {
 			synchronized (chfl.sem) {
@@ -98,6 +101,9 @@ public class SimpleProxy extends SimpleChannelHandler {
 		Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req,
 				replyAddr);
 		String message = gson.toJson(packet) + "\r\n";
+		if (message.length() > SimpleServer.MAX_PACKET_SIZE) {
+			throw new MessageTooLongException();
+		}
 		// System.out.println(message);
 		this.channel.getChannel().write(message);
 	}
@@ -109,13 +115,12 @@ public class SimpleProxy extends SimpleChannelHandler {
 	}
 }
 
-class ChannelFutureListener implements
-		org.jboss.netty.channel.ChannelFutureListener { // Using addlistener to
-														// avoid deadlock
+class ChannelConnectFutureListener implements ChannelFutureListener {
+	// Using addlistener to avoid deadlock
 	public boolean flag = false;
 	public Object sem = new Object();
 
-	public ChannelFutureListener() {
+	public ChannelConnectFutureListener() {
 
 	}
 

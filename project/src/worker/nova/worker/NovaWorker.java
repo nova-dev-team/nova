@@ -8,11 +8,15 @@ import nova.master.api.MasterProxy;
 import nova.worker.daemons.HeartbeatDaemon;
 import nova.worker.daemons.MonitorInfoDaemon;
 import nova.worker.daemons.ReportVnodeStatusDeamon;
+import nova.worker.handler.WorkerHttpRequestHandler;
 import nova.worker.handler.StartVnodeHandler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelException;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 
 /**
  * The worker module of Nova.
@@ -38,6 +42,9 @@ public class NovaWorker extends SimpleServer {
 	 */
 	private NovaWorker() {
 		// TODO @santa register handlers
+
+		// handle http requests
+		this.registerHandler(DefaultHttpRequest.class, new WorkerHttpRequestHandler());
 
 		this.registerHandler(StartVnodeHandler.Message.class,
 				new StartVnodeHandler());
@@ -90,6 +97,15 @@ public class NovaWorker extends SimpleServer {
 	 */
 	public MasterProxy getMaster() {
 		return this.master;
+	}
+
+	/**
+	 * Log exception.
+	 */
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+		logger.error(e.getCause());
+		super.exceptionCaught(ctx, e);
 	}
 
 	/**

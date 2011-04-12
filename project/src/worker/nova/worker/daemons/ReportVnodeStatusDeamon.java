@@ -12,9 +12,8 @@ public class ReportVnodeStatusDeamon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
-		// TODO Auto-generated method stub
 
-		// TODO shayf report actual vnodes status to master
+		// TODO @shayf report actual vnodes status to master
 	}
 
 }

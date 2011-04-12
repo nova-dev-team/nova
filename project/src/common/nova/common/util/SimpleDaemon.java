@@ -119,7 +119,7 @@ public abstract class SimpleDaemon extends Thread {
 	 *            InterruptedException, which is thrown by the sleep function
 	 *            between each workOneRound() call.
 	 */
-	public void exceptionCaught(Exception e) {
+	public void exceptionCaught(Throwable e) {
 		e.printStackTrace();
 		logger.error(this.getClass().getName() + " caught exception: " + e);
 	}

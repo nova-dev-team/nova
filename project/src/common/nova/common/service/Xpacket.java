@@ -5,6 +5,12 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Internal class to wrap messages to be sent. DO NOT USE IT DIRECTLY!
+ * 
+ * @author santa
+ * 
+ */
 class Xpacket {
 
 	protected Xpacket() {

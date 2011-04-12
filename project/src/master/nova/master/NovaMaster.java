@@ -8,11 +8,15 @@ import nova.common.util.SimpleDaemon;
 import nova.master.daemons.PnodeHealthCheckerDaemon;
 import nova.master.handler.AckStartVnodeHandler;
 import nova.master.handler.MasterHeartbeatHandler;
+import nova.master.handler.MasterHttpRequestHandler;
 import nova.master.models.MasterDB;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelException;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 
 /**
  * Master node of Nova system.
@@ -36,8 +40,12 @@ public class NovaMaster extends SimpleServer {
 	 * Constructor made private for singleton pattern.
 	 */
 	private NovaMaster() {
-
 		// register handlers
+
+		// handle http requests
+		this.registerHandler(DefaultHttpRequest.class,
+				new MasterHttpRequestHandler());
+
 		this.registerHandler(AckStartVnodeHandler.Message.class,
 				new AckStartVnodeHandler());
 
@@ -93,6 +101,15 @@ public class NovaMaster extends SimpleServer {
 	 */
 	public MasterDB getDB() {
 		return this.db;
+	}
+
+	/**
+	 * Log exception.
+	 */
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+		logger.error(e.getCause());
+		super.exceptionCaught(ctx, e);
 	}
 
 	/**
