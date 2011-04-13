@@ -39,8 +39,7 @@ public class RequestGeneralMonitorMessageHandler implements
 						new InetSocketAddress(InetAddress.getLocalHost()
 								.getHostAddress(), GlobalPara.BIND_PORT));
 
-				gmp.connect(new InetSocketAddress(xreply.getIp(), xreply
-						.getPort()));
+				gmp.connect(xreply.getInetSocketAddress());
 				gmp.sendGeneralMonitorMessage();
 
 				logger.info("General monitor proxy have connected to server "

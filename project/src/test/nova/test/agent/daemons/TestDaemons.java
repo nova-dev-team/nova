@@ -9,6 +9,7 @@ import nova.agent.core.service.GeneralMonitorProxy;
 import nova.agent.core.service.HeartbeatProxy;
 import nova.agent.daemons.GeneralMonitorDeamon;
 import nova.agent.daemons.HeartbeatDeamon;
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.GeneralMonitorMessage;
@@ -32,7 +33,8 @@ public class TestDaemons {
 						.getHostAddress(), GlobalPara.BIND_PORT));
 		gmp.connect(new InetSocketAddress("10.0.1.236", 9876));
 
-		GlobalPara.generalMonitorProxyMap.put("10.0.1.236:9876", gmp);
+		GlobalPara.generalMonitorProxyMap.put(new SimpleAddress("10.0.1.236",
+				9876), gmp);
 
 		HeartbeatProxy heartbeatProxy = new HeartbeatProxy(
 				new InetSocketAddress(InetAddress.getLocalHost()
@@ -40,7 +42,8 @@ public class TestDaemons {
 
 		heartbeatProxy.connect(new InetSocketAddress("10.0.1.236", 9876));
 
-		GlobalPara.heartbeatProxyMap.put("10.0.1.236:9876", heartbeatProxy);
+		GlobalPara.heartbeatProxyMap.put(new SimpleAddress("10.0.1.236", 9876),
+				heartbeatProxy);
 
 		SimpleDaemon[] simpleDaemons = { new HeartbeatDeamon(),
 				new GeneralMonitorDeamon() };

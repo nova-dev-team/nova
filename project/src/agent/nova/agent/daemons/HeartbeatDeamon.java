@@ -2,6 +2,7 @@ package nova.agent.daemons;
 
 import nova.agent.common.util.GlobalPara;
 import nova.agent.core.service.HeartbeatProxy;
+import nova.common.service.SimpleAddress;
 import nova.common.util.SimpleDaemon;
 
 /**
@@ -21,9 +22,9 @@ public class HeartbeatDeamon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		if (!GlobalPara.heartbeatProxyMap.isEmpty()) {
-			for (String xfrom : GlobalPara.heartbeatProxyMap.keySet()) {
+			for (SimpleAddress xreply : GlobalPara.heartbeatProxyMap.keySet()) {
 				HeartbeatProxy heartbeatProxy = GlobalPara.heartbeatProxyMap
-						.get(xfrom);
+						.get(xreply);
 				heartbeatProxy.sendHeartbeatMessage();
 			}
 		}
