@@ -13,46 +13,42 @@
     </description>
 
 
-	<target name="check-env" description="check build environment">
-    <mkdir dir="bin/build"/>
-	</target>
-
-
-	<target name="build" depends="check-env" description="build project">
-    <javac srcdir="src" destdir="bin/build" includeantruntime="false">
+	<target name="build" description="build project">
+		<mkdir dir="bin/build" />
+		<javac srcdir="src" destdir="bin/build" includeantruntime="false">
 			<classpath>
 				<fileset dir="lib">
-					<include name="**/*.jar"/>
+					<include name="**/*.jar" />
 				</fileset>
 			</classpath>
 		</javac>
 	</target>
 
-  <target name="pre-test" depends="build" description="prepare test environment">
-    <mkdir dir="bin/build/junit-temp"/>
-    <mkdir dir="bin/build/junit-report"/>
-  </target>
 
-	<target name="test" depends="pre-test" description="run junit4 tests">
-    <junit printsummary="false" filtertrace="true" haltonfailure="true" tempdir="bin/build/junit-temp">
-      <formatter type="xml"/>
+	<target name="test" description="run junit4 tests">
+		<mkdir dir="bin/build/junit-temp" />
+		<junit showoutput="false" printsummary="true" haltonfailure="false" fork="yes" forkmode="perTest" dir="bin/build" timeout="900000" errorProperty="tests.failed" failureProperty="tests.failed">
 			<classpath>
-				<fileset dir="lib">
-					<include name="**/*.jar"/>
-				</fileset>
-				<fileset dir="conf"/>
+				<path>
+					<pathelement location="conf/" />
+					<pathelement location="bin/build" />
+					<pathelement location="src/test" />
+					<fileset dir="lib/">
+						<include name="**/*.jar" />
+					</fileset>
+				</path>
 			</classpath>
-      <batchtest todir="bin/build/junit-report">
-        <fileset dir="bin/build/">
-          <include name="nova/test/**/*.class" />
-        </fileset>
+			<formatter type="xml" />
+			<batchtest todir="bin/build" unless="testcase">
+				<fileset dir="src/test" includes="**/*Test*.java" excludes="**/*Demo*.java">
+				</fileset>
 			</batchtest>
 		</junit>
 	</target>
 
 
 	<target name="clean" description="clean build files">
-    <delete dir="bin/build/" />
+		<delete dir="bin/build/" />
 	</target>
 
 </project>
