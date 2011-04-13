@@ -12,43 +12,57 @@
     	Virtualization management system
     </description>
 
+	
+	<property name="version" value="0.4-nightly" />
+	<property name="conf" value="conf/" />
+	<property name="bin" value="bin" />
+	<property name="build" value="${bin}/build" />
+	<property name="src" value="src" />
+	<property name="lib" value="lib" />
+	<property name="build.test" value="${build}/test" />
+	<property name="src.test" value="${src}/test" />
+
 
 	<target name="build" description="build project">
-		<mkdir dir="bin/build" />
-		<javac srcdir="src" destdir="bin/build" includeantruntime="false">
+		<mkdir dir="${build}" />
+		<javac srcdir="src" destdir="${build}" includeantruntime="false">
 			<classpath>
-				<fileset dir="lib">
+				<fileset dir="${lib}">
 					<include name="**/*.jar" />
 				</fileset>
 			</classpath>
 		</javac>
 	</target>
 
+	
+	<target name="pack" depends="build" description="make jar packages">
+		<jar destfile="${bin}/nova-${version}.jar" basedir="${build}" excludes="${build.test}/**" />
+	</target>
 
-	<target name="test" description="run junit4 tests">
-		<mkdir dir="bin/build/junit-temp" />
-		<junit showoutput="false" printsummary="true" haltonfailure="false" fork="yes" forkmode="perTest" dir="bin/build" timeout="900000" errorProperty="tests.failed" failureProperty="tests.failed">
+	
+	<target name="test" depends="build" description="run junit4 tests">
+		<junit showoutput="false" printsummary="true" haltonfailure="false" fork="no" forkmode="perTest" dir="${build}">
 			<classpath>
 				<path>
-					<pathelement location="conf/" />
-					<pathelement location="bin/build" />
-					<pathelement location="src/test" />
-					<fileset dir="lib/">
+					<pathelement location="${conf}" />
+					<pathelement location="${build}" />
+					<pathelement location="${src.test}" />
+					<fileset dir="${lib}">
 						<include name="**/*.jar" />
 					</fileset>
 				</path>
 			</classpath>
 			<formatter type="xml" />
-			<batchtest todir="bin/build" unless="testcase">
-				<fileset dir="src/test" includes="**/*Test*.java" excludes="**/*Demo*.java">
+			<batchtest todir="${build}" unless="testcase">
+				<fileset dir="${src.test}" includes="**/*Test*.java">
 				</fileset>
 			</batchtest>
 		</junit>
 	</target>
 
-
+	
 	<target name="clean" description="clean build files">
-		<delete dir="bin/build/" />
+		<delete dir="${build}" />
 	</target>
 
 </project>
