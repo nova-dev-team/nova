@@ -1,0 +1,84 @@
+package nova.test.agent.daemons;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+
+import nova.agent.common.util.GlobalPara;
+import nova.agent.core.service.GeneralMonitorProxy;
+import nova.agent.core.service.HeartbeatProxy;
+import nova.agent.daemons.GeneralMonitorDeamon;
+import nova.agent.daemons.HeartbeatDeamon;
+import nova.common.service.SimpleProxy;
+import nova.common.service.message.CloseChannelMessage;
+import nova.common.service.message.GeneralMonitorMessage;
+import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.message.RequestGeneralMonitorMessage;
+import nova.common.service.message.RequestHeartbeatMessage;
+import nova.common.util.SimpleDaemon;
+
+/**
+ * Test daemons used in agent. Use nova.test.common.service.DummySimpleServer as
+ * server
+ * 
+ * @author gaotao1987@gmail.com
+ * 
+ */
+public class TestDaemons {
+	public void run() throws UnknownHostException {
+		// Test daemons in agent
+		GeneralMonitorProxy gmp = new GeneralMonitorProxy(
+				new InetSocketAddress(InetAddress.getLocalHost()
+						.getHostAddress(), GlobalPara.BIND_PORT));
+		gmp.connect(new InetSocketAddress("10.0.1.236", 9876));
+
+		GlobalPara.generalMonitorProxyMap.put("10.0.1.236:9876", gmp);
+
+		HeartbeatProxy heartbeatProxy = new HeartbeatProxy(
+				new InetSocketAddress(InetAddress.getLocalHost()
+						.getHostAddress(), GlobalPara.BIND_PORT));
+
+		heartbeatProxy.connect(new InetSocketAddress("10.0.1.236", 9876));
+
+		GlobalPara.heartbeatProxyMap.put("10.0.1.236:9876", heartbeatProxy);
+
+		SimpleDaemon[] simpleDaemons = { new HeartbeatDeamon(),
+				new GeneralMonitorDeamon() };
+		for (SimpleDaemon daemon : simpleDaemons) {
+			daemon.start();
+		}
+	}
+
+	public static void main(String[] args) throws UnknownHostException {
+		TestDaemons proxy = new TestDaemons();
+		proxy.run();
+	}
+}
+
+class MessageProxy extends SimpleProxy { // A client example
+
+	public MessageProxy(InetSocketAddress replyAddr) {
+		super(replyAddr);
+	}
+
+	public void sendHeartbeatMessage() throws UnknownHostException {
+		this.sendRequest(new HeartbeatMessage());
+	}
+
+	public void sendGeneralMonitorMessage() throws UnknownHostException {
+		this.sendRequest(new GeneralMonitorMessage());
+	}
+
+	public void sendRequestGeneralMonitorMessage() throws UnknownHostException {
+		this.sendRequest(new RequestGeneralMonitorMessage());
+	}
+
+	public void sendCloseChannelMessage() throws UnknownHostException {
+		this.sendRequest(new CloseChannelMessage());
+	}
+
+	public void sendRequestHeartBeatMessage() {
+		this.sendRequest(new RequestHeartbeatMessage());
+	}
+
+}

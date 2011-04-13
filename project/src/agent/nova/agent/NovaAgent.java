@@ -15,6 +15,7 @@ import nova.common.service.SimpleAddress;
 public class NovaAgent {
 	public static void main(String[] args) {
 		AgentServer.startServer();
+
 		Thread heartbeatThread = new Thread(new Runnable() {
 			@Override
 			public void run() {

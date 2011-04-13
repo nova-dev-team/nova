@@ -14,14 +14,13 @@ import nova.common.service.message.RequestSoftwareMessage;
 
 public class DummySimpleProxy {
 	public void run() throws UnknownHostException {
+
 		MessageProxy hp = new MessageProxy(new InetSocketAddress("10.0.1.236",
 				9876));
-		hp.connect(new InetSocketAddress("localhost", 9876)); // Connect to
-																// server and
-																// establish a
-																// channel
-																// //
-																// TestRequestSoftwareMessage
+		// Connect to server and establish a channel
+		hp.connect(new InetSocketAddress("localhost", 9876));
+
+		// // TestRequestSoftwareMessage in agent
 		// LinkedList<String> installSoftList = new LinkedList<String>();
 		// installSoftList.offer("test1.exe");
 		// installSoftList.offer("test2.exe");
