@@ -7,8 +7,8 @@ import java.net.UnknownHostException;
 import nova.agent.common.util.GlobalPara;
 import nova.agent.core.service.GeneralMonitorProxy;
 import nova.agent.core.service.HeartbeatProxy;
-import nova.agent.daemons.GeneralMonitorDeamon;
-import nova.agent.daemons.HeartbeatDeamon;
+import nova.agent.daemons.GeneralMonitorDaemon;
+import nova.agent.daemons.HeartbeatDaemon;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
@@ -45,8 +45,8 @@ public class TestDaemons {
 		GlobalPara.heartbeatProxyMap.put(new SimpleAddress("10.0.1.236", 9876),
 				heartbeatProxy);
 
-		SimpleDaemon[] simpleDaemons = { new HeartbeatDeamon(),
-				new GeneralMonitorDeamon() };
+		SimpleDaemon[] simpleDaemons = { new HeartbeatDaemon(),
+				new GeneralMonitorDaemon() };
 		for (SimpleDaemon daemon : simpleDaemons) {
 			daemon.start();
 		}

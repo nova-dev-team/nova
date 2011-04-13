@@ -31,8 +31,11 @@ public class RequestGeneralMonitorMessageHandler implements
 	@Override
 	public void handleMessage(RequestGeneralMonitorMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-		// Wake up GeneralMonitorProxy when a server or a master discover this
-		// virtual machine
+		/**
+		 * Wake up GeneralMonitorProxy when a server or a master discover this
+		 * virtual machine
+		 */
+
 		if (!GlobalPara.generalMonitorProxyMap.containsKey(xreply)) {
 			try {
 				GeneralMonitorProxy gmp = new GeneralMonitorProxy(
@@ -46,8 +49,10 @@ public class RequestGeneralMonitorMessageHandler implements
 						+ xreply);
 
 				// generalMonitorProxy can work
-				synchronized (GlobalPara.generalMonitorSem) {
-					GlobalPara.generalMonitorSem.notifyAll();
+				if (GlobalPara.generalMonitorProxyMap.isEmpty()) {
+					synchronized (GlobalPara.generalMonitorSem) {
+						GlobalPara.generalMonitorSem.notifyAll();
+					}
 				}
 
 				GlobalPara.generalMonitorProxyMap.put(xreply, gmp);

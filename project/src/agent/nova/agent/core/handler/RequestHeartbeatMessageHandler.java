@@ -45,8 +45,10 @@ public class RequestHeartbeatMessageHandler implements
 				logger.info("General heartbeat proxy have connected to server "
 						+ xreply);
 				// General heartbeat proxy can work
-				synchronized (GlobalPara.heartbeatSem) {
-					GlobalPara.heartbeatSem.notifyAll();
+				if (GlobalPara.heartbeatProxyMap.isEmpty()) {
+					synchronized (GlobalPara.heartbeatSem) {
+						GlobalPara.heartbeatSem.notifyAll();
+					}
 				}
 
 				GlobalPara.heartbeatProxyMap.put(xreply, heartbeatProxy);
