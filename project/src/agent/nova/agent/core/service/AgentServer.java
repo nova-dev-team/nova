@@ -36,9 +36,6 @@ public class AgentServer extends SimpleServer {
 	 */
 	static Logger logger = Logger.getLogger(AgentServer.class);
 
-	private static boolean heartbeatSemFlag = false;
-	private static boolean generalMonitorSemFlag = false;
-
 	/**
 	 * Singleton instance of AgentServer.
 	 */
@@ -72,7 +69,7 @@ public class AgentServer extends SimpleServer {
 
 			@Override
 			public void run() {
-				while (false == heartbeatSemFlag)
+				while (true)
 					synchronized (GlobalPara.heartbeatSem) {
 						try {
 							GlobalPara.heartbeatSem.wait();
@@ -98,16 +95,15 @@ public class AgentServer extends SimpleServer {
 
 			@Override
 			public void run() {
-				while (false == generalMonitorSemFlag)
+				while (true)
 					synchronized (GlobalPara.generalMonitorSem) {
 						try {
 							GlobalPara.generalMonitorSem.wait();
-							heartbeatSemFlag = true;
+							break;
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
-				heartbeatSemFlag = false;
 
 				GeneralMonitorDaemon gmDaemon = new GeneralMonitorDaemon();
 				daemons.add(gmDaemon);
