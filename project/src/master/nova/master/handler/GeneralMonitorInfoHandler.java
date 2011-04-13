@@ -1,6 +1,7 @@
 package nova.master.handler;
 
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.tools.perf.GeneralMonitorInfo;
 
 import org.apache.log4j.Logger;
@@ -14,10 +15,10 @@ public class GeneralMonitorInfoHandler implements
 
 	@Override
 	public void handleMessage(GeneralMonitorInfo msg,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		// TODO Auto-generated method stub
 
-		logger.info("Got GeneralMonitorInfo from " + xfrom);
+		logger.info("Got GeneralMonitorInfo from " + xreply);
 	}
 
 }

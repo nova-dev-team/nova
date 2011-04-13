@@ -1,9 +1,10 @@
 package nova.master.api.messages;
 
+import nova.common.service.SimpleAddress;
 import nova.master.models.Pnode;
 
 /**
- * A wrapper for {@link Pnode.Identity} and {@link Pnode.Status}, so they could
+ * A wrapper for {@link SimpleAddress} and {@link Pnode.Status}, so they could
  * be send together.
  * 
  * @author santa
@@ -18,15 +19,15 @@ public class PnodeStatusMessage {
 
 	}
 
-	public PnodeStatusMessage(Pnode.Identity pIdent, Pnode.Status status) {
-		this.pIdent = pIdent;
+	public PnodeStatusMessage(SimpleAddress pAddr, Pnode.Status status) {
+		this.pAddr = pAddr;
 		this.status = status;
 	}
 
 	/**
-	 * The {@link Pnode.Identity}.
+	 * The {@link SimpleAddress}.
 	 */
-	public Pnode.Identity pIdent;
+	public SimpleAddress pAddr;
 
 	/**
 	 * The {@link Pnode.Status}.

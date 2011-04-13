@@ -3,6 +3,7 @@ package nova.common.service;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ClientBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
@@ -25,20 +26,26 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 // TODO @santa Javadoc
-public class SimpleProxy extends SimpleChannelHandler {
+public abstract class SimpleProxy extends SimpleChannelHandler {
 
 	ChannelGroup allChannels = null;
 	ChannelFactory factory = null;
 	ClientBootstrap bootstrap = null;
 	ChannelFuture channel = null;
 	Gson gson = new GsonBuilder().serializeNulls().create();
-	InetSocketAddress replyAddr = null;
+	SimpleAddress replyAddr;
+	Logger log = null;
 
 	public SimpleProxy() {
-		this(null);
+		this((SimpleAddress) null);
 	}
 
 	public SimpleProxy(InetSocketAddress replyAddr) {
+		this(new SimpleAddress(replyAddr));
+	}
+
+	public SimpleProxy(SimpleAddress replyAddr) {
+		this.log = Logger.getLogger(this.getClass());
 		this.replyAddr = replyAddr;
 		this.allChannels = new DefaultChannelGroup();
 		this.factory = new NioClientSocketChannelFactory(
@@ -106,10 +113,12 @@ public class SimpleProxy extends SimpleChannelHandler {
 		}
 		// System.out.println(message);
 		this.channel.getChannel().write(message);
+
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+		log.error(e.getCause());
 		e.getCause().printStackTrace();
 		e.getChannel().close();
 	}

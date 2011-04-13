@@ -1,6 +1,7 @@
 package nova.worker.handler;
 
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.service.message.RequestHeartbeatMessage;
 import nova.worker.NovaWorker;
 
@@ -12,12 +13,12 @@ public class WorkerRequestHeartbeatMessageHandler implements
 
 	@Override
 	public void handleMessage(RequestHeartbeatMessage msg,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
 		// TODO @shayf sendback heartbeat immediately
 
 		if (NovaWorker.getInstance().getMaster() == null) {
-			NovaWorker.getInstance().registerMaster(xfrom);
+			NovaWorker.getInstance().registerMaster(xreply);
 		}
 	}
 

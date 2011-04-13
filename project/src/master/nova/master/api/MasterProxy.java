@@ -2,6 +2,7 @@ package nova.master.api;
 
 import java.net.InetSocketAddress;
 
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.tools.perf.GeneralMonitorInfo;
@@ -41,8 +42,8 @@ public class MasterProxy extends SimpleProxy {
 		super.sendRequest(info);
 	}
 
-	public void sendPnodeStatus(Pnode.Identity pIdent, Pnode.Status status) {
-		super.sendRequest(new PnodeStatusMessage(pIdent, status));
+	public void sendPnodeStatus(SimpleAddress pAddr, Pnode.Status status) {
+		super.sendRequest(new PnodeStatusMessage(pAddr, status));
 	}
 
 }

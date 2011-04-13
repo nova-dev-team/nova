@@ -22,9 +22,9 @@ public interface ISimpleHandler<T> {
 	 *            The {@link ChannelHandlerContext}.
 	 * @param e
 	 *            The {@link MessageEvent}.
-	 * @param xfrom
-	 *            Where is the message sent from.
+	 * @param xreply
+	 *            Where you should reply the message to.
 	 */
 	public void handleMessage(T msg, ChannelHandlerContext ctx, MessageEvent e,
-			String xfrom);
+			SimpleAddress xreply);
 }

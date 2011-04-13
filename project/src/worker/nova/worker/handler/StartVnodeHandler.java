@@ -1,6 +1,7 @@
 package nova.worker.handler;
 
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.master.models.Vnode;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -39,7 +40,7 @@ public class StartVnodeHandler implements
 	 */
 	@Override
 	public void handleMessage(Message msg, ChannelHandlerContext ctx,
-			MessageEvent e, String xfrom) {
+			MessageEvent e, SimpleAddress xreply) {
 		// TODO @santa Add dummy example here
 
 		// TODO @shayf Add real handler for creating a new vnode

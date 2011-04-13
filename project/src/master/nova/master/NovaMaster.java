@@ -3,6 +3,7 @@ package nova.master;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.tools.perf.GeneralMonitorInfo;
@@ -46,7 +47,7 @@ public class NovaMaster extends SimpleServer {
 	 */
 	MasterDB db = new MasterDB();
 
-	HashMap<Pnode.Identity, WorkerProxy> workerProxyPool = new HashMap<Pnode.Identity, WorkerProxy>();
+	HashMap<SimpleAddress, WorkerProxy> workerProxyPool = new HashMap<SimpleAddress, WorkerProxy>();
 
 	/**
 	 * Constructor made private for singleton pattern.
@@ -123,13 +124,23 @@ public class NovaMaster extends SimpleServer {
 		return this.db;
 	}
 
-	public WorkerProxy getWorkerProxy(Pnode.Identity pIdent) {
-		if (workerProxyPool.get(pIdent) == null) {
-			WorkerProxy wp = new WorkerProxy(this.bindAddr);
-			wp.connect(new InetSocketAddress(pIdent.getIp(), pIdent.getPort()));
-			workerProxyPool.put(pIdent, wp);
+	public WorkerProxy getWorkerProxy(final SimpleAddress pAddr) {
+		if (workerProxyPool.get(pAddr) == null) {
+			WorkerProxy wp = new WorkerProxy(this.bindAddr) {
+
+				@Override
+				public void exceptionCaught(ChannelHandlerContext ctx,
+						ExceptionEvent e) {
+					getDB().updatePnodeStatus(pAddr,
+							Pnode.Status.CONNECT_FAILURE);
+					super.exceptionCaught(ctx, e);
+				}
+
+			};
+			wp.connect(new InetSocketAddress(pAddr.getIp(), pAddr.getPort()));
+			workerProxyPool.put(pAddr, wp);
 		}
-		return workerProxyPool.get(pIdent);
+		return workerProxyPool.get(pAddr);
 	}
 
 	/**
