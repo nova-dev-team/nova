@@ -9,8 +9,10 @@ import nova.agent.core.handler.HeartbeatMessageHandler;
 import nova.agent.core.handler.RequestGeneralMonitorMessageHandler;
 import nova.agent.core.handler.RequestHeartbeatMessageHandler;
 import nova.agent.core.handler.RequestSoftwareMessageHandler;
+import nova.agent.daemons.DownloadProgressDaemon;
 import nova.agent.daemons.GeneralMonitorDaemon;
 import nova.agent.daemons.HeartbeatDaemon;
+import nova.agent.daemons.InstallProgressDaemon;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.HeartbeatMessage;
@@ -61,6 +63,16 @@ public class AgentServer extends SimpleServer {
 				new RequestSoftwareMessageHandler());
 		registerHandler(CloseChannelMessage.class,
 				new CloseChannelMessageHandler());
+		/**
+		 * DownloadProgressDaemon and installProcessDaemon start
+		 */
+		DownloadProgressDaemon downloadProgressDaemon = new DownloadProgressDaemon();
+		downloadProgressDaemon.start();
+		daemons.add(downloadProgressDaemon);
+
+		InstallProgressDaemon installProgressDaemon = new InstallProgressDaemon();
+		installProgressDaemon.start();
+		daemons.add(installProgressDaemon);
 
 		/**
 		 * wait until request heartbeat message comes

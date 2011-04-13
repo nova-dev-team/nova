@@ -17,20 +17,17 @@ import sun.net.ftp.FtpClient;
  * @author gaotao1987@gmail.com
  * 
  */
-public class DownloadProgress implements Cancelable, Progressable, Runnable {
+public class DownloadProgress implements Cancelable, Progressable {
 
-	private String hostIp;
-	private String userName;
-	private String password;
-	private String softName; // Name of software
-	private String myPath; // Download to where
+	private String hostIp = GlobalPara.hostIp;
+	private String userName = GlobalPara.userName;
+	private String password = GlobalPara.password;
+	private String myPath = GlobalPara.myPath; // Download to where
 
-	public DownloadProgress(String ftpAdress, String userName, String password,
-			String softNm) {
-		this.hostIp = ftpAdress;
-		this.userName = userName;
-		this.password = password;
-		this.softName = softNm;
+	public DownloadProgress() {
+		this.hostIp = GlobalPara.hostIp;
+		this.userName = GlobalPara.userName;
+		this.password = GlobalPara.password;
 		this.myPath = GlobalPara.myPath;
 	}
 
@@ -166,12 +163,11 @@ public class DownloadProgress implements Cancelable, Progressable, Runnable {
 		return -1;
 	}
 
-	@Override
-	public void run() {
+	public void downLoad(String softName) {
 		FtpClient fc = connectToFtp();
-		downloadFromFtp(fc, this.softName);
-		GlobalPara.statusInfo.setText("Installing " + this.softName + "...");
-		GlobalPara.downloadedBuffer.write(this.softName);
+		downloadFromFtp(fc, softName);
+		GlobalPara.statusInfo.setText("Installing " + softName + "...");
+		// GlobalPara.downloadedBuffer.write(this.softName);
 	}
 
 }

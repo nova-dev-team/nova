@@ -11,9 +11,11 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
+import nova.agent.core.handler.RequestSoftwareMessageHandler;
 import nova.agent.core.service.GeneralMonitorProxy;
 import nova.agent.core.service.HeartbeatProxy;
 import nova.agent.core.service.IntimeProxy;
+import nova.agent.daemons.DownloadProgressDaemon;
 import nova.common.service.SimpleAddress;
 
 import org.apache.log4j.Logger;
@@ -25,7 +27,10 @@ import org.apache.log4j.Logger;
  * 
  */
 public class GlobalPara {
-	// Agent parameter
+
+	/**
+	 * Agent parameter
+	 */
 	public static int BIND_PORT = 9876;
 
 	public static Map<SimpleAddress, HeartbeatProxy> heartbeatProxyMap = new HashMap<SimpleAddress, HeartbeatProxy>();
@@ -35,7 +40,20 @@ public class GlobalPara {
 	public static Object heartbeatSem = new Object();
 	public static Object generalMonitorSem = new Object();
 
-	// Software parameter
+	/**
+	 * Producer in {@link RequestSoftwareMessageHandler}, consumer in
+	 * {@link DownloadProgressDaemon}
+	 */
+	public static ProducerAndConsumer downloadBuffer = new ProducerAndConsumer();
+
+	/**
+	 * Producer in DownloadProgressDaemon, consumer in InstallProgressDaemon
+	 */
+	public static ProducerAndConsumer downloadedBuffer = new ProducerAndConsumer();
+
+	/**
+	 * Software parameter
+	 */
 	public static String hostIp = null; // ftpadress
 	public static String userName = null; // ftp登陆用户名
 	public static String password = null; // ftp登陆密码
@@ -48,9 +66,6 @@ public class GlobalPara {
 
 	public static JLabel statusInfo = new JLabel("Download process");
 	public static JProgressBar downProcess = new JProgressBar(); // 安装进度条
-
-	// Producer in DownloadProgress, consumer in RequestSoftwareMessageHandler
-	public static ProducerAndConsumer downloadedBuffer = new ProducerAndConsumer();
 
 	static Logger logger = Logger.getLogger(GlobalPara.class);
 

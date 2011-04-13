@@ -25,7 +25,17 @@ public class DummySimpleProxy {
 		// installSoftList.offer("test1.exe");
 		// installSoftList.offer("test2.exe");
 		// installSoftList.offer("test3.exe");
+		// hp.sendRequestSoftwareMessage(installSoftList);
+		// try {
+		// Thread.sleep(1000);
+		// } catch (InterruptedException e1) {
+		// e1.printStackTrace();
+		// }
+		// installSoftList.clear();
 		// installSoftList.offer("test4.exe");
+		// hp.sendRequestSoftwareMessage(installSoftList);
+		//
+		// installSoftList.clear();
 		// installSoftList.offer("test5.exe");
 		// installSoftList.offer("test6.exe");
 		// hp.sendRequestSoftwareMessage(installSoftList);
