@@ -19,7 +19,6 @@ public class MasterHeartbeatHandler implements ISimpleHandler<HeartbeatMessage> 
 	@Override
 	public void handleMessage(HeartbeatMessage msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
-		// TODO @santa Auto-generated method stub
 
 		if (xreply == null) {
 			log.warn("Got a heartbeat message, but the reply address is null!");

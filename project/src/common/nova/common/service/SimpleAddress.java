@@ -33,7 +33,6 @@ public class SimpleAddress {
 	}
 
 	public SimpleAddress(InetSocketAddress addr) {
-		// TODO @santa check if return is really IP
 		this.ip = addr.getAddress().getHostAddress();
 		this.port = addr.getPort();
 	}

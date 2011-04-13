@@ -41,7 +41,6 @@ public class StartVnodeHandler implements
 	@Override
 	public void handleMessage(Message msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
-		// TODO @santa Add dummy example here
 
 		// TODO @shayf Add real handler for creating a new vnode
 

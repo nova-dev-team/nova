@@ -5,6 +5,9 @@ import java.util.concurrent.Executors;
 
 import nova.agent.core.InstallProgress;
 
+import org.junit.Ignore;
+
+@Ignore("class")
 public class TestInstallProgress {
 	public static void main(String[] args) {
 		ExecutorService softPool = Executors.newFixedThreadPool(1);

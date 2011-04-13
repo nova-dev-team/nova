@@ -19,6 +19,9 @@ import nova.common.service.message.RequestHeartbeatMessage;
 import nova.common.service.message.RequestSoftwareMessage;
 import nova.common.util.SimpleDaemon;
 
+import org.junit.Ignore;
+
+@Ignore("class")
 public class TestDownloadAndInstallDaemon {
 	static final int BIND_PORT = 9876;
 

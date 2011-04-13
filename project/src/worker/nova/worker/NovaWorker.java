@@ -46,7 +46,7 @@ public class NovaWorker extends SimpleServer {
 	 * Constructor made private for singleton pattern.
 	 */
 	private NovaWorker() {
-		// TODO @santa register handlers
+		// TODO @shayf register handlers
 
 		// handle http requests
 		this.registerHandler(DefaultHttpRequest.class,

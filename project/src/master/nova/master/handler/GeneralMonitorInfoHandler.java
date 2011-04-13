@@ -16,7 +16,7 @@ public class GeneralMonitorInfoHandler implements
 	@Override
 	public void handleMessage(GeneralMonitorInfo msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-		// TODO Auto-generated method stub
+		// TODO @zhaoxun Auto-generated method stub
 
 		logger.info("Got GeneralMonitorInfo from " + xreply);
 	}

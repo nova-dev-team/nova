@@ -21,7 +21,7 @@ public class PnodeStatusMessageHandler implements
 	public void handleMessage(PnodeStatusMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
-		// TODO @santa More verbose logging.
+		// TODO @zhaoxun More verbose logging.
 		log.info("update pnode status");
 		NovaMaster.getInstance().getDB()
 				.updatePnodeStatus(msg.pAddr, msg.status);

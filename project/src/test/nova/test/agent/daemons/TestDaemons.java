@@ -18,6 +18,8 @@ import nova.common.service.message.RequestGeneralMonitorMessage;
 import nova.common.service.message.RequestHeartbeatMessage;
 import nova.common.util.SimpleDaemon;
 
+import org.junit.Ignore;
+
 /**
  * Test daemons used in agent. Use nova.test.common.service.DummySimpleServer as
  * server
@@ -25,6 +27,7 @@ import nova.common.util.SimpleDaemon;
  * @author gaotao1987@gmail.com
  * 
  */
+@Ignore("class")
 public class TestDaemons {
 	public void run() throws UnknownHostException {
 		// Test daemons in agent

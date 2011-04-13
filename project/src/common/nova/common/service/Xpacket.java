@@ -1,6 +1,5 @@
 package nova.common.service;
 
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Internal class to wrap messages to be sent. DO NOT USE IT DIRECTLY!
@@ -22,7 +21,7 @@ class Xpacket {
 
 	protected Object xvalue;
 
-	protected static AtomicInteger xidCounter = new AtomicInteger();
+	// protected static AtomicInteger xidCounter = new AtomicInteger();
 
 	public static Xpacket createPacket(String name, Object obj,
 			SimpleAddress xreply) {

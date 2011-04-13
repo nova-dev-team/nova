@@ -36,7 +36,7 @@ public class MasterHttpRequestHandler extends SimpleHttpRequestHandler {
 	 */
 	@Override
 	public String renderResult(DefaultHttpRequest req) {
-		// TODO @santa render results
+		// TODO @zhaoxun render results
 		return "This shall be done!";
 	}
 }
