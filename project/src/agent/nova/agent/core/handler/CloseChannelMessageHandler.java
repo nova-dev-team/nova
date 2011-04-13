@@ -1,6 +1,7 @@
 package nova.agent.core.handler;
 
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.service.message.CloseChannelMessage;
 
 import org.apache.log4j.Logger;
@@ -19,7 +20,7 @@ public class CloseChannelMessageHandler implements
 
 	@Override
 	public void handleMessage(CloseChannelMessage msg,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
-		logger.info(xfrom + " client channel closed");
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
+		logger.info(xreply + " client channel closed");
 	}
 }

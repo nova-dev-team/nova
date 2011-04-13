@@ -2,6 +2,8 @@ package nova.master.models;
 
 import java.util.Date;
 
+import nova.common.service.SimpleAddress;
+
 /**
  * Model for a physical node.
  * 
@@ -39,82 +41,14 @@ public class Pnode {
 	}
 
 	/**
-	 * Basic information needed to connect to a pnode.
-	 * 
-	 * @author santa
-	 * 
-	 */
-	public static class Identity {
-
-		/**
-		 * Ip address of the vnode.
-		 */
-		String ip = null;
-
-		/**
-		 * Port of the vnode.
-		 */
-		int port;
-
-		/**
-		 * No-arg constructore for gson.
-		 */
-		public Identity() {
-
-		}
-
-		public Identity(String ip, int port) {
-			this.ip = ip;
-			this.port = port;
-		}
-
-		/**
-		 * Override string present.
-		 */
-		@Override
-		public String toString() {
-			return this.ip + ":" + this.port;
-		}
-
-		/**
-		 * Override equal checker.
-		 */
-		@Override
-		public boolean equals(Object o) {
-			if (o instanceof Pnode.Identity) {
-				Pnode.Identity other = (Pnode.Identity) o;
-				return this.ip.equals(other.ip) && this.port == other.port;
-			}
-			return false;
-		}
-
-		/**
-		 * Override hash function.
-		 */
-		@Override
-		public int hashCode() {
-			return ip.hashCode() ^ port;
-		}
-
-		public String getIp() {
-			return ip;
-		}
-
-		public int getPort() {
-			return port;
-		}
-
-	}
-
-	/**
 	 * Status of the pnode.
 	 */
 	Pnode.Status status;
 
 	/**
-	 * The pnode's identity
+	 * The pnode's address.
 	 */
-	Pnode.Identity ident;
+	SimpleAddress addr;
 
 	/**
 	 * Id of the pnode.
@@ -129,12 +63,16 @@ public class Pnode {
 
 	public static final long HEARTBEAT_TIMEOUT = 1000;
 
+	public Pnode() {
+		this.status = Pnode.Status.PENDING;
+	}
+
 	/**
 	 * Override string present.
 	 */
 	@Override
 	public String toString() {
-		return this.ident.toString();
+		return this.addr.toString();
 	}
 
 	public Status getStatus() {
@@ -143,10 +81,11 @@ public class Pnode {
 
 	public boolean isHeartbeatTimeout() {
 		Date now = new Date();
-		return now.getTime() - lastAliveTime.getTime() > Pnode.HEARTBEAT_TIMEOUT;
+		long timespan = now.getTime() - lastAliveTime.getTime();
+		return timespan > Pnode.HEARTBEAT_TIMEOUT;
 	}
 
-	public Identity getIdentity() {
-		return this.ident;
+	public SimpleAddress getAddress() {
+		return this.addr;
 	}
 }

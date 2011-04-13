@@ -2,6 +2,7 @@ package nova.worker;
 
 import java.net.InetSocketAddress;
 
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.RequestHeartbeatMessage;
 import nova.common.util.SimpleDaemon;
@@ -109,10 +110,9 @@ public class NovaWorker extends SimpleServer {
 		return this.master;
 	}
 
-	public void registerMaster(String xfrom) {
+	public void registerMaster(SimpleAddress xreply) {
 		this.master = new MasterProxy(this.bindAddr);
-		String[] splt = xfrom.split(":");
-		master.connect(new InetSocketAddress(splt[0], Integer.parseInt(splt[1])));
+		master.connect(xreply.getInetSocketAddress());
 	}
 
 	/**

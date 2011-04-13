@@ -1,5 +1,6 @@
 package nova.master.handler;
 
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpRequestHandler;
 
 import org.apache.log4j.Logger;
@@ -25,9 +26,9 @@ public class MasterHttpRequestHandler extends SimpleHttpRequestHandler {
 	 */
 	@Override
 	public void handleMessage(DefaultHttpRequest req,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		log.info("New HTTP request from " + e.getChannel().getRemoteAddress());
-		super.handleMessage(req, ctx, e, xfrom);
+		super.handleMessage(req, ctx, e, xreply);
 	}
 
 	/**

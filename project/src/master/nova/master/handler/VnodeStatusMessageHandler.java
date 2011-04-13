@@ -1,6 +1,7 @@
 package nova.master.handler;
 
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.master.api.messages.VnodeStatusMessage;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -11,7 +12,7 @@ public class VnodeStatusMessageHandler implements
 
 	@Override
 	public void handleMessage(VnodeStatusMessage msg,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		// TODO @zhaoxun Save update into database
 
 	}

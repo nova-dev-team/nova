@@ -9,6 +9,7 @@ import nova.agent.common.util.GlobalPara;
 import nova.agent.core.service.HeartbeatProxy;
 import nova.agent.core.service.IntimeProxy;
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.service.message.RequestHeartbeatMessage;
 
 import org.apache.log4j.Logger;
@@ -30,57 +31,52 @@ public class RequestHeartbeatMessageHandler implements
 
 	@Override
 	public void handleMessage(RequestHeartbeatMessage msg,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		// Wake up heartbeatProxy when a master or a server discover this
 		// virtual machine
-		if (!GlobalPara.heartbeatProxyMap.containsKey(xfrom)) {
+		if (!GlobalPara.heartbeatProxyMap.containsKey(xreply)) {
 			try {
 				HeartbeatProxy heartbeatProxy = new HeartbeatProxy(
 						new InetSocketAddress(InetAddress.getLocalHost()
 								.getHostAddress(), GlobalPara.BIND_PORT));
-				String address = xfrom.split(":")[0].toString().trim();
-				int port = Integer.parseInt(xfrom.split(":")[1].toString()
-						.trim());
-				heartbeatProxy.connect(new InetSocketAddress(address, port));
+				heartbeatProxy.connect(xreply.getInetSocketAddress());
 				heartbeatProxy.sendHeartbeatMessage();
 
 				logger.info("General heartbeat proxy have connected to server "
-						+ xfrom);
+						+ xreply);
 				// General heartbeat proxy can work
 				synchronized (GlobalPara.heartbeatSem) {
 					GlobalPara.heartbeatSem.notifyAll();
 				}
 
-				GlobalPara.heartbeatProxyMap.put(xfrom, heartbeatProxy);
+				GlobalPara.heartbeatProxyMap.put(xreply, heartbeatProxy);
 
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
-				logger.error("Can't connect to host " + xfrom);
+				logger.error("Can't connect to host " + xreply);
 			}
 			// Wake up intimeProxy when there are additional
 			// RequestHeartbeatMessages
-		} else if (!GlobalPara.intimeProxyMap.containsKey(xfrom)) {
+		} else if (!GlobalPara.intimeProxyMap.containsKey(xreply)) {
 			try {
 				IntimeProxy intimeProxy = new IntimeProxy(
 						new InetSocketAddress(InetAddress.getLocalHost()
 								.getHostAddress(), GlobalPara.BIND_PORT));
 
-				String address = xfrom.split(":")[0].toString().trim();
-				int port = Integer.parseInt(xfrom.split(":")[1].toString()
-						.trim());
-				intimeProxy.connect(new InetSocketAddress(address, port));
+				intimeProxy.connect(xreply.getInetSocketAddress());
 				intimeProxy.sendHeartbeatMessage();
 
-				logger.info("Intime proxy have connected to server " + xfrom);
+				logger.info("Intime proxy have connected to server " + xreply);
 
-				GlobalPara.intimeProxyMap.put(xfrom, intimeProxy);
+				GlobalPara.intimeProxyMap.put(xreply, intimeProxy);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
-				logger.error("Can't connect to host " + xfrom);
+				logger.error("Can't connect to host " + xreply);
 			}
 			// use established channel to send HeartbeatMessage
 		} else {
-			IntimeProxy ip = (IntimeProxy) GlobalPara.intimeProxyMap.get(xfrom);
+			IntimeProxy ip = (IntimeProxy) GlobalPara.intimeProxyMap
+					.get(xreply);
 			ip.sendHeartbeatMessage();
 		}
 	}

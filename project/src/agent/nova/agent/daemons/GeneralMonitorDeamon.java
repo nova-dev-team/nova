@@ -2,6 +2,7 @@ package nova.agent.daemons;
 
 import nova.agent.common.util.GlobalPara;
 import nova.agent.core.service.GeneralMonitorProxy;
+import nova.common.service.SimpleAddress;
 import nova.common.util.SimpleDaemon;
 
 /**
@@ -21,9 +22,10 @@ public class GeneralMonitorDeamon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		if (!GlobalPara.generalMonitorProxyMap.isEmpty()) {
-			for (String xfrom : GlobalPara.generalMonitorProxyMap.keySet()) {
+			for (SimpleAddress xreply : GlobalPara.generalMonitorProxyMap
+					.keySet()) {
 				GeneralMonitorProxy generalMonitorProxy = GlobalPara.generalMonitorProxyMap
-						.get(xfrom);
+						.get(xreply);
 				generalMonitorProxy.sendGeneralMonitorMessage();
 			}
 		}

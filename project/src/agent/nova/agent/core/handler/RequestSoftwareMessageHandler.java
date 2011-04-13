@@ -9,6 +9,7 @@ import nova.agent.common.util.GlobalPara;
 import nova.agent.core.DownloadProgress;
 import nova.agent.core.InstallProgress;
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.service.message.RequestSoftwareMessage;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -29,7 +30,7 @@ public class RequestSoftwareMessageHandler implements
 
 	@Override
 	public void handleMessage(RequestSoftwareMessage msg,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress reply) {
 		LinkedList<String> softList = msg.getInstallSoftList();
 
 		// add all downloading softwares task to download thread pool

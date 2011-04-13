@@ -3,6 +3,7 @@ package nova.agent.core.handler;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.service.message.HeartbeatMessage;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -20,9 +21,9 @@ public class HeartbeatMessageHandler implements
 
 	@Override
 	public void handleMessage(HeartbeatMessage msg, ChannelHandlerContext ctx,
-			MessageEvent e, String xfrom) {
+			MessageEvent e, SimpleAddress xreply) {
 		System.out.println(counter.incrementAndGet());
 		System.out.println(msg.getClass().getName());
-		System.out.println(xfrom + " is alive!");
+		System.out.println(xreply + " is alive!");
 	}
 }

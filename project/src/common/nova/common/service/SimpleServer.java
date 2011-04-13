@@ -135,14 +135,12 @@ public class SimpleServer extends SimpleChannelHandler {
 				throw new HandlerNotFoundException(xtype);
 			}
 			synchronized (gson) {
-				Object xfromObj = jsonMsg.get("xfrom");
-				String xfrom = null;
-				if (xfromObj != null) {
-					xfrom = xfromObj.toString();
-				}
+				SimpleAddress xreply = gson
+						.fromJson(gson.toJson(jsonMsg.get("xreply")),
+								SimpleAddress.class);
 				handler.handleMessage(gson.fromJson(
 						gson.toJson(jsonMsg.get("xvalue")), klass), ctx, e,
-						xfrom);
+						xreply);
 			}
 		} catch (ClassNotFoundException ex) {
 			ex.printStackTrace();

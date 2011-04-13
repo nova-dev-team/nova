@@ -37,6 +37,11 @@ public class PnodeHealthCheckerDaemon extends SimpleDaemon {
 					return;
 				}
 
+				if (pnode.getStatus() == Pnode.Status.CONNECT_FAILURE) {
+					// skip failed machines
+					continue;
+				}
+
 				// ping pnode if necessary
 				if (pnode.getStatus() == Pnode.Status.RUNNING
 						&& pnode.isHeartbeatTimeout() == false) {
@@ -44,9 +49,10 @@ public class PnodeHealthCheckerDaemon extends SimpleDaemon {
 					continue;
 				}
 
-				logger.debug("pinging pnode: " + pnode);
+				logger.debug("pinging pnode: " + pnode + ", its status="
+						+ pnode.getStatus());
 				WorkerProxy wp = NovaMaster.getInstance().getWorkerProxy(
-						pnode.getIdentity());
+						pnode.getAddress());
 
 				// TODO @santa how to detect connection failure here?
 				wp.sendRequestHeartbeat();

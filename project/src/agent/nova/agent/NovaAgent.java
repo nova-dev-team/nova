@@ -8,6 +8,7 @@ import nova.agent.common.util.GlobalPara;
 import nova.agent.core.service.AgentServer;
 import nova.agent.core.service.GeneralMonitorProxy;
 import nova.agent.core.service.HeartbeatProxy;
+import nova.common.service.SimpleAddress;
 
 import org.apache.log4j.Logger;
 
@@ -56,9 +57,10 @@ public class NovaAgent {
 						}
 					}
 				while (!GlobalPara.heartbeatProxyMap.isEmpty()) {
-					for (String xfrom : GlobalPara.heartbeatProxyMap.keySet()) {
+					for (SimpleAddress xreply : GlobalPara.heartbeatProxyMap
+							.keySet()) {
 						HeartbeatProxy heartbeatProxy = GlobalPara.heartbeatProxyMap
-								.get(xfrom);
+								.get(xreply);
 						heartbeatProxy.sendHeartbeatMessage();
 					}
 					try {
@@ -84,10 +86,10 @@ public class NovaAgent {
 						}
 					}
 				while (!GlobalPara.generalMonitorProxyMap.isEmpty()) {
-					for (String xfrom : GlobalPara.generalMonitorProxyMap
+					for (SimpleAddress xreply : GlobalPara.generalMonitorProxyMap
 							.keySet()) {
 						GeneralMonitorProxy generalMonitorProxy = GlobalPara.generalMonitorProxyMap
-								.get(xfrom);
+								.get(xreply);
 						generalMonitorProxy.sendGeneralMonitorMessage();
 					}
 					try {

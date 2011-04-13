@@ -3,6 +3,7 @@ package nova.agent.core.handler;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.service.message.GeneralMonitorMessage;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -14,7 +15,7 @@ public class GeneralMonitorMessageHandler implements
 
 	@Override
 	public void handleMessage(GeneralMonitorMessage msg,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		System.out.println(counter.incrementAndGet());
 		System.out.println(msg.getClass().getName());
 		System.out.println(msg.getGeneralMonitorInfo());

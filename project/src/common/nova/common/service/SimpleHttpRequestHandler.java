@@ -26,7 +26,7 @@ public abstract class SimpleHttpRequestHandler implements
 	 */
 	@Override
 	public void handleMessage(DefaultHttpRequest req,
-			ChannelHandlerContext ctx, MessageEvent e, String xfrom) {
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
 		String replyText = renderResult(req);
 		HttpResponse rep = new DefaultHttpResponse(req.getProtocolVersion(),
