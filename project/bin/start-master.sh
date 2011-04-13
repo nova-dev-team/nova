@@ -55,7 +55,7 @@ for f in $NOVA_HOME/lib/*.jar; do
 done
 
 export NOVA_LOG_DIR="$HADOOP_HOME/logs"
-export NOVA_LOGFILE='worker.log'
+export NOVA_LOGFILE='master.log'
 
 # restore ordinary behaviour
 unset IFS
