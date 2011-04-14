@@ -16,7 +16,7 @@
 	<property name="version" value="0.4-nightly" />
 	<property name="conf" value="conf/" />
 	<property name="bin" value="bin" />
-	<property name="build" value="${bin}/build" />
+	<property name="build" value="build" />
 	<property name="src" value="src" />
 	<property name="lib" value="lib" />
 	<property name="build.test" value="${build}/test" />

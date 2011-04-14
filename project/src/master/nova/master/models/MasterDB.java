@@ -1,7 +1,6 @@
 package nova.master.models;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 import nova.common.service.SimpleAddress;
@@ -70,7 +69,7 @@ public class MasterDB {
 					|| pnode.status == Pnode.Status.PENDING) {
 				pnode.status = Pnode.Status.RUNNING;
 			}
-			pnode.lastAliveTime = new Date();
+			pnode.gotAck();
 		}
 	}
 

@@ -59,9 +59,23 @@ public class Pnode {
 	 * Time of last message from the pnode. Used to detect pnode failure. Marked
 	 * "transient" because it does not need to be saved into database.
 	 */
-	transient Date lastAliveTime = new Date();
+	transient Date lastAckTime = new Date();
 
+	/**
+	 * Last time a ping message was sent to this node.
+	 */
+	transient Date lastPingTime = new Date();
+
+	/**
+	 * If lastAckTime is not updated in this interval, the node will be
+	 * considered as down.
+	 */
 	public static final long HEARTBEAT_TIMEOUT = 1000;
+
+	/**
+	 * Interval between each ping messages.
+	 */
+	public static final long PING_INTERVAL = 1000;
 
 	public Pnode() {
 		this.status = Pnode.Status.PENDING;
@@ -79,10 +93,24 @@ public class Pnode {
 		return this.status;
 	}
 
+	public void gotAck() {
+		this.lastAckTime = new Date();
+	}
+
 	public boolean isHeartbeatTimeout() {
 		Date now = new Date();
-		long timespan = now.getTime() - lastAliveTime.getTime();
+		long timespan = now.getTime() - lastAckTime.getTime();
 		return timespan > Pnode.HEARTBEAT_TIMEOUT;
+	}
+
+	public boolean needNewPingMessage() {
+		Date now = new Date();
+		long timespan = now.getTime() - this.lastPingTime.getTime();
+		return timespan > Pnode.PING_INTERVAL;
+	}
+
+	public void updateLastPingTime() {
+		this.lastPingTime = new Date();
 	}
 
 	public SimpleAddress getAddress() {

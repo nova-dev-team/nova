@@ -17,5 +17,5 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/sigar.jar"/>
 	<classpathentry kind="lib" path="lib/jrobin-1.5.11.jar"/>
-	<classpathentry kind="output" path="bin/build"/>
+	<classpathentry kind="output" path="build"/>
 </classpath>

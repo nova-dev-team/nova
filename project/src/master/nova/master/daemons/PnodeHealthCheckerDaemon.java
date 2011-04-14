@@ -49,12 +49,19 @@ public class PnodeHealthCheckerDaemon extends SimpleDaemon {
 					continue;
 				}
 
+				if (pnode.needNewPingMessage() == false) {
+					continue;
+				}
+
+				pnode.updateLastPingTime();
+
 				logger.debug("pinging pnode: " + pnode + ", its status="
 						+ pnode.getStatus());
 				WorkerProxy wp = NovaMaster.getInstance().getWorkerProxy(
 						pnode.getAddress());
 
-				// TODO @santa how to detect connection failure here?
+				// connection failure could not be detected here, but will be
+				// dected in worker proxy's exceptionCaught() handler.
 				wp.sendRequestHeartbeat();
 
 			} catch (Exception e) {
