@@ -12,7 +12,7 @@
     	Virtualization management system
     </description>
 
-	
+
 	<property name="version" value="0.4-nightly" />
 	<property name="conf" value="conf/" />
 	<property name="bin" value="bin" />
@@ -34,12 +34,12 @@
 		</javac>
 	</target>
 
-	
+
 	<target name="pack" depends="build" description="make jar packages">
 		<jar destfile="${bin}/nova-${version}.jar" basedir="${build}" excludes="${build.test}/**" />
 	</target>
 
-	
+
 	<target name="test" depends="build" description="run junit4 tests">
 		<junit showoutput="false" printsummary="true" haltonfailure="false" fork="no" forkmode="perTest" dir="${build}">
 			<classpath>
@@ -60,10 +60,10 @@
 		</junit>
 	</target>
 
-	
+
 	<target name="clean" description="clean build files">
-    <delete dir="${build}" />
-    <delete file="${bin}/nova-${version}.jar" />
+		<delete dir="${build}" />
+		<delete file="${bin}/nova-${version}.jar" />
 	</target>
 
 </project>
