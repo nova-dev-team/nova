@@ -62,7 +62,8 @@
 
 	
 	<target name="clean" description="clean build files">
-		<delete dir="${build}" />
+    <delete dir="${build}" />
+    <delete file="${bin}/nova-${version}.jar" />
 	</target>
 
 </project>
