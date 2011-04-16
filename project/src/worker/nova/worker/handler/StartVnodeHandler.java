@@ -2,7 +2,6 @@ package nova.worker.handler;
 
 import nova.common.service.ISimpleHandler;
 import nova.common.service.SimpleAddress;
-import nova.master.models.Vnode;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -24,14 +23,14 @@ public class StartVnodeHandler implements
 	 */
 	public static class Message {
 
-		public Message(Vnode.Identity vIdent) {
-			this.vIdent = vIdent;
+		public Message(SimpleAddress vAddr) {
+			this.vAddr = vAddr;
 		}
 
 		/**
 		 * Basic information required to start a new vnode.
 		 */
-		public Vnode.Identity vIdent;
+		public SimpleAddress vAddr;
 
 	}
 

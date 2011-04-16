@@ -92,7 +92,7 @@ public abstract class SimpleDaemon extends Thread {
 
 			try {
 				workOneRound();
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				// let exception handling routine do its work
 				exceptionCaught(e);
 			}
@@ -119,7 +119,7 @@ public abstract class SimpleDaemon extends Thread {
 	 *            InterruptedException, which is thrown by the sleep function
 	 *            between each workOneRound() call.
 	 */
-	public void exceptionCaught(Throwable e) {
+	protected void exceptionCaught(Throwable e) {
 		e.printStackTrace();
 		logger.error(this.getClass().getName() + " caught exception: " + e);
 	}

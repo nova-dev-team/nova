@@ -1,5 +1,6 @@
 package nova.master.api.messages;
 
+import nova.common.service.SimpleAddress;
 import nova.master.models.Vnode;
 
 /**
@@ -11,15 +12,15 @@ import nova.master.models.Vnode;
  */
 public class VnodeStatusMessage {
 
-	public VnodeStatusMessage(Vnode.Identity vIdent, Vnode.Status status) {
-		this.vIdent = vIdent;
+	public VnodeStatusMessage(SimpleAddress vAddr, Vnode.Status status) {
+		this.vAddr = vAddr;
 		this.status = status;
 	}
 
 	/**
 	 * The {@link Vnode.Identity}.
 	 */
-	public Vnode.Identity vIdent;
+	public SimpleAddress vAddr;
 
 	/**
 	 * The {@link Vnode.Status}.

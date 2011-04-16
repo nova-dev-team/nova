@@ -2,9 +2,9 @@ package nova.worker.api;
 
 import java.net.InetSocketAddress;
 
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.RequestHeartbeatMessage;
-import nova.master.models.Vnode;
 import nova.worker.handler.StartVnodeHandler;
 
 /**
@@ -23,8 +23,8 @@ public class WorkerProxy extends SimpleProxy {
 		super(bindAddr);
 	}
 
-	public void sendStartVnode(Vnode.Identity vIdent) {
-		StartVnodeHandler.Message msg = new StartVnodeHandler.Message(vIdent);
+	public void sendStartVnode(SimpleAddress vAddr) {
+		StartVnodeHandler.Message msg = new StartVnodeHandler.Message(vAddr);
 		super.sendRequest(msg);
 	}
 

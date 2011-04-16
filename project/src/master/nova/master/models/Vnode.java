@@ -2,6 +2,8 @@ package nova.master.models;
 
 import java.util.Date;
 
+import nova.common.service.SimpleAddress;
+
 /**
  * Model for a virtual node.
  * 
@@ -54,34 +56,14 @@ public class Vnode {
 	}
 
 	/**
-	 * Basic information needed to connect to a vnode.
-	 * 
-	 * @author santa
-	 * 
-	 */
-	public static class Identity {
-
-		/**
-		 * Ip address of the vnode.
-		 */
-		String ip = null;
-
-		/**
-		 * Port of the vnode.
-		 */
-		int port;
-
-	}
-
-	/**
 	 * Status of the vnode.
 	 */
 	Vnode.Status status;
 
 	/**
-	 * The vnode's identity
+	 * The vnode's address.
 	 */
-	Vnode.Identity ident;
+	SimpleAddress addr;
 
 	/**
 	 * Id of the vnode.
