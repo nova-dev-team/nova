@@ -25,7 +25,7 @@ public class HeartbeatDaemon extends SimpleDaemon {
 			for (SimpleAddress xreply : GlobalPara.heartbeatProxyMap.keySet()) {
 				HeartbeatProxy heartbeatProxy = GlobalPara.heartbeatProxyMap
 						.get(xreply);
-				heartbeatProxy.sendHeartbeatMessage();
+				heartbeatProxy.sendHeartbeat();
 			}
 		}
 	}

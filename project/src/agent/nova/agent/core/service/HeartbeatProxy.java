@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.protocol.HeartbeatProtocol;
 
 /**
  * The proxy that handles heartbeat message.
@@ -12,17 +13,20 @@ import nova.common.service.message.HeartbeatMessage;
  * @author gaotao1987@gmail.com
  * 
  */
-public class HeartbeatProxy extends SimpleProxy {
+// TODO @gaotao extract these proxies as protocols
+public class HeartbeatProxy extends SimpleProxy implements HeartbeatProtocol {
 
 	public HeartbeatProxy(InetSocketAddress replyAddr) {
 		super(replyAddr);
 	}
 
-	public void sendHeartbeatMessage() {
+	@Override
+	public void sendHeartbeat() {
 		this.sendRequest(new HeartbeatMessage());
 	}
 
 	public void sendCloseChannelMessage() {
 		this.sendRequest(new CloseChannelMessage());
 	}
+
 }

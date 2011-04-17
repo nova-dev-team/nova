@@ -5,6 +5,9 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.protocol.HeartbeatProtocol;
+import nova.common.service.protocol.MonitorProtocol;
+import nova.common.service.protocol.PnodeStatusProtocol;
 import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.models.Pnode;
@@ -15,7 +18,8 @@ import nova.master.models.Pnode;
  * @author santa
  * 
  */
-public class MasterProxy extends SimpleProxy {
+public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
+		MonitorProtocol, PnodeStatusProtocol {
 
 	public MasterProxy() {
 		super();

@@ -15,6 +15,7 @@ import nova.common.service.message.RequestHeartbeatMessage;
  * @author gaotao1987@gmail.com
  * 
  */
+// TODO @gaotao extract these proxies as protocols
 public class IntimeProxy extends SimpleProxy {
 	public IntimeProxy(InetSocketAddress replyAddr) {
 		super(replyAddr);

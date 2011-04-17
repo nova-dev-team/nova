@@ -40,7 +40,7 @@ public class RequestHeartbeatMessageHandler implements
 						new InetSocketAddress(InetAddress.getLocalHost()
 								.getHostAddress(), GlobalPara.BIND_PORT));
 				heartbeatProxy.connect(xreply.getInetSocketAddress());
-				heartbeatProxy.sendHeartbeatMessage();
+				heartbeatProxy.sendHeartbeat();
 
 				logger.info("General heartbeat proxy have connected to server "
 						+ xreply);

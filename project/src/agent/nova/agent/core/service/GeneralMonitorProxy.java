@@ -12,6 +12,7 @@ import nova.common.service.message.GeneralMonitorMessage;
  * @author gaotao1987@gmail.com
  * 
  */
+// TODO @gaotao extract these proxies as protocols
 public class GeneralMonitorProxy extends SimpleProxy {
 
 	public GeneralMonitorProxy(InetSocketAddress replyAddr) {
@@ -25,4 +26,5 @@ public class GeneralMonitorProxy extends SimpleProxy {
 	public void sendCloseChannelMessage() {
 		this.sendRequest(new CloseChannelMessage());
 	}
+
 }
