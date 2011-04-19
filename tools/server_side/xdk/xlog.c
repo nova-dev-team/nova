@@ -527,7 +527,7 @@ xsuccess xlog_real(int level, const char* code_fn, int code_ln, const char* fmt,
     param.level = level;
     param.code_fn = code_fn;
     param.code_ln = code_ln;
-    assert (xhash_size(g_xloggers) > 0);
+    //assert (xhash_size(g_xloggers) > 0);
     for (i = 0; i < xvec_size(lines); i++) {
       // call the function for each line
       param.log_line = xvec_get(lines, i);
