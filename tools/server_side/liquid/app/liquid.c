@@ -22,9 +22,9 @@
 #include "xlog.h"
 
 #include "ftp/liquid_ftp.h"
-#include "dfs/liquid_dfs.h"
-#include "dftp/liquid_dftp.h"
-#include "node/liquid_node.h"
+//#include "dfs/liquid_dfs.h"
+//#include "dftp/liquid_dftp.h"
+//#include "node/liquid_node.h"
 
 typedef xsuccess (*liquid_action)(int argc, char* argv[]);
 typedef void (*liquid_action_help)();
@@ -38,15 +38,15 @@ void* g_actions[] = {
 
   // action_name, action_info, action_function, action_print_help_function
   // NOTE: sort these functions alphabetically
-  "dfs", "Run as an distributed filesystem server", liquid_dfs, liquid_dfs_help,
+  /*"dfs", "Run as an distributed filesystem server", liquid_dfs, liquid_dfs_help,
 
   "dftp", "Run as an distributed ftp server", liquid_dftp, liquid_dftp_help,
-
+*/
   "ftp", "Run as an local ftp server", liquid_ftp, liquid_ftp_help,
 
   "help", "Display help message", print_help, help_on_help,
 
-  "node", "Serve as a storage node", liquid_node, liquid_node_help,
+  //"node", "Serve as a storage node", liquid_node, liquid_node_help,
 
   // terminated by NULL
   NULL
