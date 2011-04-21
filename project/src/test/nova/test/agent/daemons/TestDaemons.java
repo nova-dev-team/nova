@@ -4,9 +4,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
+import nova.agent.api.AgentProxy;
 import nova.agent.common.util.GlobalPara;
-import nova.agent.core.service.GeneralMonitorProxy;
-import nova.agent.core.service.HeartbeatProxy;
 import nova.agent.daemons.GeneralMonitorDaemon;
 import nova.agent.daemons.HeartbeatDaemon;
 import nova.common.service.SimpleAddress;
@@ -31,22 +30,13 @@ import org.junit.Ignore;
 public class TestDaemons {
 	public void run() throws UnknownHostException {
 		// Test daemons in agent
-		GeneralMonitorProxy gmp = new GeneralMonitorProxy(
-				new InetSocketAddress(InetAddress.getLocalHost()
-						.getHostAddress(), GlobalPara.BIND_PORT));
-		gmp.connect(new InetSocketAddress("10.0.1.236", 9876));
+		AgentProxy agentProxy = new AgentProxy(new InetSocketAddress(
+				InetAddress.getLocalHost().getHostAddress(),
+				GlobalPara.BIND_PORT));
+		agentProxy.connect(new InetSocketAddress("10.0.1.236", 9876));
 
-		GlobalPara.generalMonitorProxyMap.put(new SimpleAddress("10.0.1.236",
-				9876), gmp);
-
-		HeartbeatProxy heartbeatProxy = new HeartbeatProxy(
-				new InetSocketAddress(InetAddress.getLocalHost()
-						.getHostAddress(), GlobalPara.BIND_PORT));
-
-		heartbeatProxy.connect(new InetSocketAddress("10.0.1.236", 9876));
-
-		GlobalPara.heartbeatProxyMap.put(new SimpleAddress("10.0.1.236", 9876),
-				heartbeatProxy);
+		GlobalPara.agentProxyMap.put(new SimpleAddress("10.0.1.236", 9876),
+				agentProxy);
 
 		SimpleDaemon[] simpleDaemons = { new HeartbeatDaemon(),
 				new GeneralMonitorDaemon() };

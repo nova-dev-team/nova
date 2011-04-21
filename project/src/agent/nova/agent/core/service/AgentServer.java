@@ -3,7 +3,6 @@ package nova.agent.core.service;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
-import nova.agent.common.util.GlobalPara;
 import nova.agent.core.handler.CloseChannelMessageHandler;
 import nova.agent.core.handler.HeartbeatMessageHandler;
 import nova.agent.core.handler.RequestGeneralMonitorMessageHandler;
@@ -67,72 +66,25 @@ public class AgentServer extends SimpleServer {
 		 * DownloadProgressDaemon and installProcessDaemon start
 		 */
 		DownloadProgressDaemon downloadProgressDaemon = new DownloadProgressDaemon();
-		downloadProgressDaemon.start();
 		daemons.add(downloadProgressDaemon);
 
 		InstallProgressDaemon installProgressDaemon = new InstallProgressDaemon();
-		installProgressDaemon.start();
 		daemons.add(installProgressDaemon);
 
-		/**
-		 * wait until request heartbeat message comes
-		 */
-		Thread waitHeartbeatSem = new Thread(new Runnable() {
+		HeartbeatDaemon hbDaemon = new HeartbeatDaemon();
+		daemons.add(hbDaemon);
 
-			@Override
-			public void run() {
-				while (true)
-					synchronized (GlobalPara.heartbeatSem) {
-						try {
-							GlobalPara.heartbeatSem.wait();
-							break;
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-
-				HeartbeatDaemon hbDaemon = new HeartbeatDaemon();
-				hbDaemon.start();
-				daemons.add(hbDaemon);
-
-				logger.info("Heartbeat daemon starts!");
-			}
-		});
-		waitHeartbeatSem.start();
-
-		/**
-		 * wait until general monitor message comes
-		 */
-		Thread waitGeneralMonitorSem = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				while (true)
-					synchronized (GlobalPara.generalMonitorSem) {
-						try {
-							GlobalPara.generalMonitorSem.wait();
-							break;
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-
-				GeneralMonitorDaemon gmDaemon = new GeneralMonitorDaemon();
-				daemons.add(gmDaemon);
-				gmDaemon.start();
-
-				logger.info("General monitor daemon starts!");
-
-			}
-		});
-		waitGeneralMonitorSem.start();
+		GeneralMonitorDaemon gmDaemon = new GeneralMonitorDaemon();
+		gmDaemon.start();
 	}
 
 	@Override
 	public Channel bind(InetSocketAddress bindAddr) {
 		this.bindAddr = bindAddr;
 		Channel chnl = super.bind(this.bindAddr);
-
+		for(SimpleDaemon daemon:this.daemons){
+			daemon.start();
+		}
 		return chnl;
 	}
 
