@@ -5,11 +5,11 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import nova.agent.api.AgentProxy;
 import nova.agent.common.util.GlobalPara;
 import nova.common.service.ISimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.RequestHeartbeatMessage;
+import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -36,19 +36,19 @@ public class RequestHeartbeatMessageHandler implements
 		 * machine
 		 */
 
-		if (!GlobalPara.agentProxyMap.containsKey(xreply)) {
+		if (!GlobalPara.masterProxyMap.containsKey(xreply)) {
 			try {
-				AgentProxy agentProxy = new AgentProxy(new InetSocketAddress(
-						InetAddress.getLocalHost().getHostAddress(),
-						GlobalPara.BIND_PORT));
+				MasterProxy heartbeatProxy = new MasterProxy(
+						new InetSocketAddress(InetAddress.getLocalHost()
+								.getHostAddress(), GlobalPara.BIND_PORT));
 
-				agentProxy.connect(xreply.getInetSocketAddress());
-				agentProxy.sendHeartbeat();
+				heartbeatProxy.connect(xreply.getInetSocketAddress());
+				heartbeatProxy.sendHeartbeat();
 
 				logger.info("General monitor proxy have connected to server "
 						+ xreply);
 
-				GlobalPara.agentProxyMap.put(xreply, agentProxy);
+				GlobalPara.masterProxyMap.put(xreply, heartbeatProxy);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
 				logger.error("Can't connect to host " + xreply);
@@ -57,8 +57,8 @@ public class RequestHeartbeatMessageHandler implements
 			 * use established channel to send GeneralMonitorMessage
 			 */
 		} else {
-			AgentProxy agentProxy = GlobalPara.agentProxyMap.get(xreply);
-			agentProxy.sendHeartbeat();
+			MasterProxy heartbeatProxy = GlobalPara.masterProxyMap.get(xreply);
+			heartbeatProxy.sendHeartbeat();
 		}
 	}
 }
