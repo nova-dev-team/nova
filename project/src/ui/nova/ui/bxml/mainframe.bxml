@@ -1,0 +1,11 @@
+<Window title="Hello BXML!" maximized="true"
+	xmlns:bxml="http://pivot.apache.org/bxml" xmlns="org.apache.pivot.wtk">
+	<Label text="Hello Nova"
+		styles="{font:'Arial bold 24', color:'#ff0000',
+		horizontalAlignment:'center', verticalAlignment:'center'}" />
+	<!-- <Label xmlns="org.apache.pivot.wtk"> <text>Hello, World!</text> </Label> 
+		<ListView xmlns="org.apache.pivot.wtk" xmlns:collections="org.apache.pivot.collections" 
+		xmlns:content="org.apache.pivot.wtk.content"> <listData> <collections:ArrayList> 
+		<content:ListItem text="A" /> <content:ListItem text="B" /> <content:ListItem 
+		text="C" /> </collections:ArrayList> </listData> </ListView> -->
+</Window>

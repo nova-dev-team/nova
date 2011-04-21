@@ -17,5 +17,9 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/sigar.jar"/>
 	<classpathentry kind="lib" path="lib/jrobin-1.5.11.jar"/>
+	<classpathentry kind="lib" path="lib/pivot-charts-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/pivot-core-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/pivot-wtk-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/pivot-wtk-terra-2.0.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
