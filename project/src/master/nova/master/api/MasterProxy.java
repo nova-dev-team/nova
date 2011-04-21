@@ -23,12 +23,12 @@ import nova.master.models.Pnode;
 public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 		MonitorProtocol, PnodeStatusProtocol, SoftwareProtocol {
 
-	public MasterProxy() {
-		super();
-	}
-
 	public MasterProxy(InetSocketAddress bindAddr) {
 		super(bindAddr);
+	}
+
+	public MasterProxy(SimpleAddress replyAddr) {
+		super(replyAddr);
 	}
 
 	/**

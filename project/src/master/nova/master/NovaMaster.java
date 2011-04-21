@@ -5,13 +5,13 @@ import java.util.HashMap;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
+import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
-import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeHealthCheckerDaemon;
-import nova.master.handler.GeneralMonitorInfoHandler;
+import nova.master.handler.MasterGeneralMonitorMessageHandler;
 import nova.master.handler.MasterHeartbeatHandler;
 import nova.master.handler.MasterHttpRequestHandler;
 import nova.master.handler.PnodeStatusMessageHandler;
@@ -68,8 +68,8 @@ public class NovaMaster extends SimpleServer {
 		this.registerHandler(VnodeStatusMessage.class,
 				new VnodeStatusMessageHandler());
 
-		this.registerHandler(GeneralMonitorInfo.class,
-				new GeneralMonitorInfoHandler());
+		this.registerHandler(GeneralMonitorMessage.class,
+				new MasterGeneralMonitorMessageHandler());
 
 		// TODO @zhaoxun connect db
 	}

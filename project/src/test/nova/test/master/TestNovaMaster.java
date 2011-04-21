@@ -23,24 +23,6 @@ public class TestNovaMaster {
 	}
 
 	@Test
-	public void testHeartbeat() {
-		// test simple start/shutdown with connections
-		InetSocketAddress bindAddr = new InetSocketAddress("127.0.0.1", 9982);
-
-		NovaMaster.getInstance().bind(bindAddr);
-
-		MasterProxy mp = new MasterProxy();
-		mp.connect(bindAddr);
-		mp.sendHeartbeat();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		NovaMaster.getInstance().shutdown();
-	}
-
-	@Test
 	public void testAddWorker() {
 		// test simple start/shutdown with connections
 		InetSocketAddress masterAddr = new InetSocketAddress("127.0.0.1", 9281);
@@ -52,7 +34,7 @@ public class TestNovaMaster {
 		NovaMaster.getInstance().bind(masterAddr);
 		NovaWorker.getInstance().bind(workerAddr);
 
-		MasterProxy mp = new MasterProxy();
+		MasterProxy mp = new MasterProxy(workerAddr);
 		mp.connect(masterAddr);
 		mp.sendPnodeStatus(new SimpleAddress(workerHost, workerPort),
 				Pnode.Status.PENDING);
@@ -73,9 +55,8 @@ public class TestNovaMaster {
 		// master should detect worker stopped (heartbeat timeout)
 		Pnode pnode = NovaMaster.getInstance().getDB()
 				.getPnodeByAddress(new SimpleAddress(workerAddr));
-		if (pnode != null) {
-			Assert.assertTrue(pnode.getStatus() == Pnode.Status.CONNECT_FAILURE);
-		}
+		Assert.assertNotNull(pnode);
+		Assert.assertTrue(pnode.getStatus() == Pnode.Status.CONNECT_FAILURE);
 		NovaMaster.getInstance().shutdown();
 	}
 }
