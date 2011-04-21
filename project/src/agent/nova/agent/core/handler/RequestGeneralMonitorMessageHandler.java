@@ -60,8 +60,10 @@ public class RequestGeneralMonitorMessageHandler implements
 				e1.printStackTrace();
 				logger.error("Can't connect to host " + xreply);
 			}
-			// Wake up intimeProxy when there are additional
-			// RequestGeneralMonitorMessages
+			/**
+			 * Wake up intimeProxy when there are additional
+			 * RequestGeneralMonitorMessages
+			 */
 		} else if (!GlobalPara.intimeProxyMap.containsKey(xreply)) {
 			try {
 				IntimeProxy ip = new IntimeProxy(new InetSocketAddress(
@@ -78,7 +80,9 @@ public class RequestGeneralMonitorMessageHandler implements
 				e1.printStackTrace();
 				logger.error("Can't connect to host " + xreply);
 			}
-			// use established channel to send GeneralMonitorMessage
+			/**
+			 * use established channel to send GeneralMonitorMessage
+			 */
 		} else {
 			IntimeProxy ip = (IntimeProxy) GlobalPara.intimeProxyMap
 					.get(xreply);

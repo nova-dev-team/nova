@@ -12,7 +12,9 @@ import nova.common.util.SimpleDaemon;
  * 
  */
 public class HeartbeatDaemon extends SimpleDaemon {
-	// Heartbeat time interval
+	/**
+	 * Heartbeat time interval
+	 */
 	public static final long HEARTBEAT_INTERVAL = 2000;
 
 	public HeartbeatDaemon() {

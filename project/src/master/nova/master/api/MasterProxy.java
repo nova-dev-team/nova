@@ -4,11 +4,11 @@ import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
+import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.protocol.HeartbeatProtocol;
 import nova.common.service.protocol.MonitorProtocol;
 import nova.common.service.protocol.PnodeStatusProtocol;
-import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.models.Pnode;
 
@@ -42,8 +42,8 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 	 * @param info
 	 *            Monitor info.
 	 */
-	public void sendMonitorInfo(GeneralMonitorInfo info) {
-		super.sendRequest(info);
+	public void sendMonitorInfo() {
+		super.sendRequest(new GeneralMonitorMessage());
 	}
 
 	public void sendPnodeStatus(SimpleAddress pAddr, Pnode.Status status) {
