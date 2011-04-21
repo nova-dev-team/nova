@@ -2,6 +2,7 @@ package nova.agent.api;
 
 import java.net.InetSocketAddress;
 
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.GeneralMonitorMessage;
@@ -14,7 +15,12 @@ import nova.common.service.protocol.SoftwareProtocol;
 
 public class AgentProxy extends SimpleProxy implements HeartbeatProtocol,
 		MonitorProtocol, SoftwareProtocol, ClosableProtocol {
+
 	public AgentProxy(InetSocketAddress replyAddr) {
+		super(replyAddr);
+	}
+
+	public AgentProxy(SimpleAddress replyAddr) {
 		super(replyAddr);
 	}
 

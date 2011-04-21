@@ -15,12 +15,12 @@ import nova.worker.handler.StartVnodeHandler;
  */
 public class WorkerProxy extends SimpleProxy {
 
-	public WorkerProxy() {
-		super();
-	}
-
 	public WorkerProxy(InetSocketAddress bindAddr) {
 		super(bindAddr);
+	}
+
+	public WorkerProxy(SimpleAddress replyAddr) {
+		super(replyAddr);
 	}
 
 	public void sendStartVnode(SimpleAddress vAddr) {
