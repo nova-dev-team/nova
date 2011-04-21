@@ -1,9 +1,9 @@
 package nova.agent.daemons;
 
-import nova.agent.api.AgentProxy;
 import nova.agent.common.util.GlobalPara;
 import nova.common.service.SimpleAddress;
 import nova.common.util.SimpleDaemon;
+import nova.master.api.MasterProxy;
 
 /**
  * Heartbeat daemon used in agent
@@ -23,9 +23,9 @@ public class HeartbeatDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
-		if (!GlobalPara.agentProxyMap.isEmpty()) {
-			for (SimpleAddress xreply : GlobalPara.agentProxyMap.keySet()) {
-				AgentProxy heartbeatProxy = GlobalPara.agentProxyMap
+		if (!GlobalPara.masterProxyMap.isEmpty()) {
+			for (SimpleAddress xreply : GlobalPara.masterProxyMap.keySet()) {
+				MasterProxy heartbeatProxy = GlobalPara.masterProxyMap
 						.get(xreply);
 				heartbeatProxy.sendHeartbeat();
 			}
