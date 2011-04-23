@@ -12,6 +12,28 @@ def my_exec cmds
   end
 end
 
+
+# randomly generate a token with alphabets, like 'acd', 'zfc', etc.
+def random_token length = 5
+  token = ""
+  alphabets = "abcdefghijklmnopqrstuvwxyz"
+  1.upto(length) do |i|
+    idx = rand(alphabets.length)
+    token += alphabets[idx..idx]
+  end
+  return token
+end
+
+def nth_line text, nth
+  counter = 0
+  text.each_line do |line|
+    line = line.chomp
+    counter += 1
+    return line if counter == nth
+  end
+  return nil
+end
+
 desc "Make distribution tar package"
 task :dist do
   token = random_token
