@@ -43,7 +43,7 @@ task :dist do
   source_root = File.dirname __FILE__
   
   # check if clean (git status, line 2 not start with '#')
-  if nth_line(`git status`, 4).start_with? '#'
+  if nth_line(`git status`, 4) != nil and nth_line(`git status`, 4).start_with? '#'
     puts "*** not a clean workspace, please git commit & git push first!"
     exit
   end
