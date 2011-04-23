@@ -44,7 +44,7 @@ task :dist do
   
   # check if clean (git status, line 2 not start with '#')
   if nth_line(`git status`, 2).include? '#'
-    puts "*** not a clean workspace, please git commit first!"
+    puts "*** not a clean workspace, please git commit & git push first!"
     exit
   end
   
