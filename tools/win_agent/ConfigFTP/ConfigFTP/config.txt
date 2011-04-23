@@ -1,4 +1,0 @@
-installation path=default
-server name=166.111.131.100
-server host=166.111.131.100
-server port=8021
