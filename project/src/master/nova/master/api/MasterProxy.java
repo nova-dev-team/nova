@@ -34,6 +34,7 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 	/**
 	 * Report a heartbeat to Master node.
 	 */
+	@Override
 	public void sendHeartbeat() {
 		super.sendRequest(new HeartbeatMessage());
 	}
@@ -44,10 +45,12 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 	 * @param info
 	 *            Monitor info.
 	 */
+	@Override
 	public void sendMonitorInfo() {
 		super.sendRequest(new GeneralMonitorMessage());
 	}
 
+	@Override
 	public void sendPnodeStatus(SimpleAddress pAddr, Pnode.Status status) {
 		super.sendRequest(new PnodeStatusMessage(pAddr, status));
 	}

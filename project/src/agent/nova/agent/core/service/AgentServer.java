@@ -75,14 +75,14 @@ public class AgentServer extends SimpleServer {
 		daemons.add(hbDaemon);
 
 		GeneralMonitorDaemon gmDaemon = new GeneralMonitorDaemon();
-		gmDaemon.start();
+		daemons.add(gmDaemon);
 	}
 
 	@Override
 	public Channel bind(InetSocketAddress bindAddr) {
 		this.bindAddr = bindAddr;
 		Channel chnl = super.bind(this.bindAddr);
-		for(SimpleDaemon daemon:this.daemons){
+		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
 		}
 		return chnl;

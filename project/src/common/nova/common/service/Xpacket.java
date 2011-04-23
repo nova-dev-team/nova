@@ -1,6 +1,5 @@
 package nova.common.service;
 
-
 /**
  * Internal class to wrap messages to be sent. DO NOT USE IT DIRECTLY!
  * 
