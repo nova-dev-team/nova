@@ -16,7 +16,30 @@
 		</ListView>
 		<TextInput></TextInput>
 		<TextArea></TextArea>
-		<PushButton></PushButton>
+		<PushButton buttonData="push me" bxml:id="pushButton"></PushButton>
 		<Calendar></Calendar>
+		<BoxPane orientation="vertical" styles="{padding:4, spacing:6}">
+			<Checkbox bxml:id="sizeToSelectionCheckbox" buttonData="Size to selection" />
+			<Label text="Selection change effect:" />
+
+			<bxml:define>
+				<ButtonGroup bxml:id="selectionChangeEffect" />
+			</bxml:define>
+
+			<RadioButton bxml:id="crossfadeRadioButton" buttonData="Crossfade"
+				selected="true" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="horizontalSlideRadioButton"
+				buttonData="Horizontal Slide" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="verticalSlideRadioButton"
+				buttonData="Vertical Slide" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="horizontalFlipRadioButton"
+				buttonData="Horizontal Flip" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="verticalFlipRadioButton"
+				buttonData="Vertical Flip" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="zoomRadioButton" buttonData="Zoom"
+				buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="noneRadioButton" buttonData="None"
+				buttonGroup="$selectionChangeEffect" />
+		</BoxPane>
 	</Accordion>
 </Window>
