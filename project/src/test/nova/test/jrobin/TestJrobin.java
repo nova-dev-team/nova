@@ -12,10 +12,12 @@ public class TestJrobin {
 	@Test
 	public void testRRDTools() {
 		long startTime = System.currentTimeMillis();
-		long endTime = startTime + 60000;
+		long endTime = startTime + 100000;
 		String rootPath = "d://demo_flow.rrd";
 		int timeInterval = 10;
-		int rrdLength = 50;
+		int rrdLength = 8000;
+
+		String picPath = "d://demo_flow.png";
 
 		/**
 		 * 测试创建RrdDb
@@ -28,6 +30,14 @@ public class TestJrobin {
 		GeneralMonitorInfo msg = PerfMon.getGeneralMonitorInfo();
 		for (long t = startTime; t < endTime; t += 10)
 			RRDTools.addRRD(rrdDb, msg, t);
+
+		/**
+		 * 测试绘图
+		 */
+
+		long startTm = endTime - 86400;
+		String valueType = "freeMemorySize";
+		RRDTools.plotPicture(picPath, startTm, endTime, rootPath, valueType);
 
 		/**
 		 * 测试FetchData获取RRD
@@ -50,5 +60,6 @@ public class TestJrobin {
 		}
 
 		System.out.println(buffer);
+
 	}
 }

@@ -1,5 +1,7 @@
 package nova.common.tools.rrd;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.io.IOException;
 
 import nova.common.tools.perf.GeneralMonitorInfo;
@@ -12,6 +14,8 @@ import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
 import org.jrobin.core.Sample;
+import org.jrobin.graph.RrdGraph;
+import org.jrobin.graph.RrdGraphDef;
 
 /**
  * Utilization of Jrobin
@@ -187,6 +191,48 @@ public class RRDTools {
 			sample.update();
 
 			logger.info("Insert one General monitor information");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RrdException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 * @param picPath
+	 *            Where to store this picture
+	 * @param startTime
+	 *            start time
+	 * @param endTime
+	 *            wh
+	 * @param rrdFilePath
+	 * @param valueType
+	 */
+	public static void plotPicture(String picPath, long startTime,
+			long endTime, String rrdFilePath, String valueType) {
+		RrdGraphDef gDef = null;
+
+		// 生成最近一天的图形
+		gDef = new RrdGraphDef();
+		gDef.setFilename(picPath);
+		gDef.setWidth(450);
+		gDef.setHeight(250);
+		gDef.setImageFormat("png");
+		gDef.setTimeSpan(startTime, endTime);
+		gDef.setTitle(valueType + " Demo");
+
+		gDef.datasource("demo", rrdFilePath, valueType, "AVERAGE");
+
+		gDef.line("demo", Color.GREEN, valueType);
+		gDef.gprint("demo", "MIN", "%5.1lf Min");
+		gDef.gprint("demo", "AVERAGE", "%5.1lf Avg");
+		gDef.gprint("demo", "MAX", "%5.1lf Max");
+
+		gDef.setSmallFont(new Font("Monospaced", Font.PLAIN, 11));
+		gDef.setLargeFont(new Font("SansSerif", Font.BOLD, 14));
+		try {
+			new RrdGraph(gDef);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RrdException e) {
