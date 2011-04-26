@@ -16,9 +16,9 @@ public class TestJrobin {
 
 		String rootPath = "build/demo_flow.rrd";
 		int timeInterval = 10;
-		int rrdLength = 8000;
+		int rrdLength = 8640;
 
-		String picPath = "d://demo_flow.png";
+		String picPath = "build/demo_flow.png";
 
 		/**
 		 * 测试创建RrdDb
@@ -30,15 +30,19 @@ public class TestJrobin {
 		 */
 		GeneralMonitorInfo msg = PerfMon.getGeneralMonitorInfo();
 		for (long t = startTime; t < endTime; t += 10)
-			RRDTools.addRRD(rrdDb, msg, t);
+			RRDTools.addMonitorInfoInRRD(rrdDb, msg, t);
 
 		/**
 		 * 测试绘图
 		 */
 
 		long startTm = endTime - 86400;
-		String valueType = "freeMemorySize";
-		RRDTools.plotPicture(picPath, startTm, endTime, rootPath, valueType);
+		RRDTools.plotCpuGraph(picPath, startTm, endTime, rootPath);
+		/**
+		 * RRDTools.plotMemoryGraph(picPath, startTm, endTime, rootPath);
+		 * RRDTools.plotDiskGraph(picPath, startTm, endTime, rootPath);
+		 * RRDTools.plotNetGraph(picPath, startTm, endTime, rootPath);
+		 */
 
 		/**
 		 * 测试FetchData获取RRD

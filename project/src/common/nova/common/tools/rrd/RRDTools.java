@@ -18,7 +18,7 @@ import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
 /**
- * Utilization of Jrobin
+ * Utilization of jrobin
  * 
  * @author gaotao1987@gmail.com
  * 
@@ -166,7 +166,7 @@ public class RRDTools {
 	 *            {@link GeneralMonitorInfo}
 	 * @param timeStamp
 	 */
-	public static void addRRD(RrdDb rrdDb, GeneralMonitorInfo msg,
+	public static void addMonitorInfoInRRD(RrdDb rrdDb, GeneralMonitorInfo msg,
 			long timeStamp) {
 		Sample sample;
 		try {
@@ -199,38 +199,195 @@ public class RRDTools {
 	}
 
 	/**
+	 * Common definition of plot graph
 	 * 
 	 * @param picPath
 	 *            Where to store this picture
 	 * @param startTime
-	 *            start time
+	 *            Start time
 	 * @param endTime
-	 *            wh
+	 *            End time
 	 * @param rrdFilePath
-	 * @param valueType
+	 *            where to find the RRD file
+	 * @return gDef {@link RrdGraphDef}
 	 */
-	public static void plotPicture(String picPath, long startTime,
-			long endTime, String rrdFilePath, String valueType) {
+	private static RrdGraphDef plotGraph(String picPath, long startTime,
+			long endTime, String rrdFilePath) {
 		RrdGraphDef gDef = null;
-
-		// 生成最近一天的图形
 		gDef = new RrdGraphDef();
+
 		gDef.setFilename(picPath);
+
 		gDef.setWidth(450);
 		gDef.setHeight(250);
+
 		gDef.setImageFormat("png");
 		gDef.setTimeSpan(startTime, endTime);
-		gDef.setTitle(valueType + " Demo");
-
-		gDef.datasource("demo", rrdFilePath, valueType, "AVERAGE");
-
-		gDef.line("demo", Color.GREEN, valueType);
-		gDef.gprint("demo", "MIN", "%5.1lf Min");
-		gDef.gprint("demo", "AVERAGE", "%5.1lf Avg");
-		gDef.gprint("demo", "MAX", "%5.1lf Max");
+		gDef.setMinValue(0);
 
 		gDef.setSmallFont(new Font("Monospaced", Font.PLAIN, 11));
 		gDef.setLargeFont(new Font("SansSerif", Font.BOLD, 14));
+		return gDef;
+	}
+
+	/**
+	 * Plot CPU utilization graph
+	 * 
+	 * @param picPath
+	 *            where to store this picture
+	 * @param startTime
+	 *            start time
+	 * @param endTime
+	 *            end time
+	 * @param rrdFilePath
+	 *            where to find the RRD file
+	 */
+	public static void plotCpuGraph(String picPath, long startTime,
+			long endTime, String rrdFilePath) {
+		RrdGraphDef gDef = null;
+		String valueType = "combinedTime";
+
+		gDef = plotGraph(picPath, startTime, endTime, rrdFilePath);
+		gDef.setTitle("CPU Utilization");
+		gDef.setVerticalLabel("Utilization [%]");
+
+		gDef.datasource("CPU", rrdFilePath, valueType, "AVERAGE");
+
+		gDef.area("CPU", Color.GREEN, "CPU Utilization");
+		gDef.setMaxValue(100);
+
+		gDef.gprint("CPU", "MIN", "Min %5.1lf ");
+		gDef.gprint("CPU", "AVERAGE", " Avg %5.1lf ");
+		gDef.gprint("CPU", "MAX", "Max %5.1lf ");
+
+		try {
+			new RrdGraph(gDef);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RrdException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Plot memory utilization graph
+	 * 
+	 * @param picPath
+	 *            where to store this picture
+	 * @param startTime
+	 *            start time
+	 * @param endTime
+	 *            end time
+	 * @param rrdFilePath
+	 *            where to find the RRD file
+	 */
+	public static void plotMemoryGraph(String picPath, long startTime,
+			long endTime, String rrdFilePath) {
+		RrdGraphDef gDef = null;
+		String valueType = "usedMemorySize";
+		String totalSize = "totalMemorySize";
+
+		gDef = plotGraph(picPath, startTime, endTime, rrdFilePath);
+		gDef.setTitle("Memory Utilization");
+		gDef.setVerticalLabel("Utilization [GB]");
+		gDef.setBase(1024);
+
+		gDef.datasource("Memory", rrdFilePath, valueType, "AVERAGE");
+		gDef.datasource("totalMemory", rrdFilePath, totalSize, "AVERAGE");
+
+		gDef.line("totalMemory", Color.BLACK, "Total Memory");
+		gDef.area("Memory", Color.GREEN, "Memory Utilization");
+
+		gDef.gprint("Memory", "MIN", "Min %5.1lf B ");
+		gDef.gprint("Memory", "AVERAGE", " Avg %5.1lf B ");
+		gDef.gprint("Memory", "MAX", "Max %5.1lf B ");
+
+		try {
+			new RrdGraph(gDef);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RrdException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Plot disk utilization graph
+	 * 
+	 * @param picPath
+	 *            where to store this picture
+	 * @param startTime
+	 *            start time
+	 * @param endTime
+	 *            end time
+	 * @param rrdFilePath
+	 *            where to find the RRD file
+	 */
+	public static void plotDiskGraph(String picPath, long startTime,
+			long endTime, String rrdFilePath) {
+		RrdGraphDef gDef = null;
+		String valueType = "usedDiskSize";
+		String totalSize = "totalDiskSize";
+
+		gDef = plotGraph(picPath, startTime, endTime, rrdFilePath);
+		gDef.setTitle("Disk Utilization");
+		gDef.setVerticalLabel("Utilization [GB]");
+		gDef.setBase(1024);
+
+		gDef.datasource("Disk", rrdFilePath, valueType, "AVERAGE");
+		gDef.datasource("totalDisk", rrdFilePath, totalSize, "AVERAGE");
+
+		gDef.area("Disk", Color.GREEN, "Memory Utilization");
+		gDef.line("totalDisk", Color.BLACK, "Total Memory");
+
+		gDef.gprint("Disk", "MIN", "Min %5.1lf B ");
+		gDef.gprint("Disk", "AVERAGE", " Avg %5.1lf B ");
+		gDef.gprint("Disk", "MAX", "Max %5.1lf B ");
+
+		try {
+			new RrdGraph(gDef);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RrdException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Plot net utilization graph
+	 * 
+	 * @param picPath
+	 *            where to store this picture
+	 * @param startTime
+	 *            start time
+	 * @param endTime
+	 *            end time
+	 * @param rrdFilePath
+	 *            where to find the RRD file
+	 */
+	public static void plotNetGraph(String picPath, long startTime,
+			long endTime, String rrdFilePath) {
+		RrdGraphDef gDef = null;
+		String valueType1 = "upSpeed";
+		String valueType2 = "downSpeed";
+
+		gDef = plotGraph(picPath, startTime, endTime, rrdFilePath);
+		gDef.setTitle("Net Utilization");
+		gDef.setVerticalLabel("Utilization [B/s]");
+
+		gDef.datasource("upSpeed", rrdFilePath, valueType1, "AVERAGE");
+		gDef.datasource("downSpeed", rrdFilePath, valueType2, "AVERAGE");
+
+		gDef.area("downSpeed", new Color(0, 206, 0), "Down speed");
+		gDef.line("upSpeed", Color.BLUE, "Up speed");
+
+		gDef.gprint("upSpeed", "MIN", "Min up speed %5.1lf B/s ");
+		gDef.gprint("upSpeed", "AVERAGE", " Avg up speed %5.1lf B/s ");
+		gDef.gprint("upSpeed", "MAX", "Max up speed %5.1lf B/s ");
+		gDef.gprint("downSpeed", "MIN", "Min down speed %5.1lf B/s ");
+		gDef.gprint("downSpeed", "AVERAGE", " Avg down speed %5.1lf B/s ");
+		gDef.gprint("downSpeed", "MAX", "Max down speed %5.1lf B/s ");
+
 		try {
 			new RrdGraph(gDef);
 		} catch (IOException e) {
