@@ -14,6 +14,7 @@ import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
 import org.jrobin.core.Sample;
+import org.jrobin.core.Util;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
@@ -39,8 +40,8 @@ public class RRDTools {
 	 *            Start time stamp
 	 * @return {@link RrdDb}
 	 */
-	public static RrdDb CreateMonitorInfoRRD(String rootPath,
-			long timeInterval, int rrdLength, long startTime) {
+	public static void CreateMonitorInfoRRD(String rootPath, long timeInterval,
+			int rrdLength, long startTime) {
 		try {
 
 			/**
@@ -94,14 +95,11 @@ public class RRDTools {
 			/**
 			 * RRD file is on your disk
 			 */
-			RrdDb rrdDb = new RrdDb(rrdDef);
-
-			return rrdDb;
+			new RrdDb(rrdDef);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.equals("Create RRD failed!");
-			return null;
 		}
 	}
 
@@ -116,10 +114,10 @@ public class RRDTools {
 	 *            The length of RRD
 	 * @return rrdDb {@link RrdDb}
 	 */
-	public static RrdDb CreateMonitorInfoRRD(String rootPath,
-			long timeInterval, int rrdLength) {
-		return RRDTools.CreateMonitorInfoRRD(rootPath, timeInterval, rrdLength,
-				System.currentTimeMillis());
+	public static void CreateMonitorInfoRRD(String rootPath, long timeInterval,
+			int rrdLength) {
+		RRDTools.CreateMonitorInfoRRD(rootPath, timeInterval, rrdLength,
+				Util.getTime());
 	}
 
 	/**
@@ -170,6 +168,9 @@ public class RRDTools {
 			long timeStamp) {
 		Sample sample;
 		try {
+			// String rootPath = "build/demo_flow.rrd";
+			// rrdDb = new RrdDb(rootPath);
+
 			sample = rrdDb.createSample(timeStamp);
 			sample.setValue("combinedTime", msg.cpuInfo.combinedTime);
 			sample.setValue("mhz", msg.cpuInfo.mhz);
@@ -189,6 +190,8 @@ public class RRDTools {
 			sample.setValue("upSpeed", msg.netInfo.upSpeed);
 
 			sample.update();
+
+			// rrdDb.close();
 
 			logger.info("Insert one General monitor information");
 		} catch (IOException e) {

@@ -1,17 +1,20 @@
 package nova.test.jrobin;
 
+import java.io.IOException;
+
 import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.common.tools.perf.PerfMon;
 import nova.common.tools.rrd.RRDTools;
 
 import org.jrobin.core.RrdDb;
+import org.jrobin.core.RrdException;
 import org.jrobin.core.Util;
 import org.junit.Test;
 
 public class TestJrobin {
 	@Test
 	public void testRRDTools() {
-		long startTime = System.currentTimeMillis();
+		long startTime = Util.getTime();
 		long endTime = startTime + 100000;
 
 		String rootPath = "build/demo_flow.rrd";
@@ -23,14 +26,26 @@ public class TestJrobin {
 		/**
 		 * 测试创建RrdDb
 		 */
-		RrdDb rrdDb = RRDTools.CreateMonitorInfoRRD(rootPath, timeInterval,
-				rrdLength, startTime);
+		RRDTools.CreateMonitorInfoRRD(rootPath, timeInterval, rrdLength,
+				startTime);
 		/**
 		 * 测试添加 初始数据
 		 */
 		GeneralMonitorInfo msg = PerfMon.getGeneralMonitorInfo();
-		for (long t = startTime; t < endTime; t += 10)
-			RRDTools.addMonitorInfoInRRD(rrdDb, msg, t);
+		for (long t = startTime; t < endTime; t += 10) {
+			RrdDb rrd;
+			try {
+				rrd = new RrdDb(rootPath);
+				RRDTools.addMonitorInfoInRRD(rrd, msg, t);
+				rrd.close();
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			} catch (RrdException e) {
+				e.printStackTrace();
+			}
+
+		}
 
 		/**
 		 * 测试绘图
@@ -50,12 +65,16 @@ public class TestJrobin {
 		double[][] values = RRDTools.fetchRRDData(rootPath, startTime, endTime);
 		int rowCount = values[0].length;
 		int columnCount = values.length;
-
+		System.out.println(rowCount + " " + columnCount);
 		StringBuffer buffer = new StringBuffer("");
 		long timeCur = startTime;
 		for (int row = 0; row < rowCount; row++) {
+			for (int dsIndex = 0; dsIndex < columnCount; dsIndex++) {
+				buffer.append(Util.formatDouble(values[dsIndex][row]));
+				buffer.append("  ");
+			}
 			buffer.append(timeCur);
-			timeCur += 10;
+			timeCur += 5;
 			buffer.append(":  ");
 			for (int dsIndex = 0; dsIndex < columnCount; dsIndex++) {
 				buffer.append(Util.formatDouble(values[dsIndex][row]));
@@ -63,8 +82,6 @@ public class TestJrobin {
 			}
 			buffer.append("\n");
 		}
-
-		System.out.println(buffer);
 
 	}
 }
