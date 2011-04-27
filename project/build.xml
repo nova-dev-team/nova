@@ -12,8 +12,11 @@
     	Virtualization management system
     </description>
 
-
-	<property name="version" value="0.4-nightly" />
+	<loadfile property="version" srcFile="../VERSION">
+		<filterchain>
+			<striplinebreaks />
+		</filterchain>
+	</loadfile>
 	<property name="conf" value="conf/" />
 	<property name="bin" value="bin" />
 	<property name="build" value="build" />
