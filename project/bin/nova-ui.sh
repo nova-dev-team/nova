@@ -53,6 +53,7 @@ done
 # restore ordinary behaviour
 unset IFS
 
+cd $NOVA_HOME
 java -classpath "$CLASSPATH" org.apache.pivot.wtk.DesktopApplicationContext nova.ui.NovaUI
-
+cd -
 
