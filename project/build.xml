@@ -45,7 +45,7 @@
 				<exclude name="test/**" />
 			</fileset>
 			<bottom>
-				<![CDATA[Copyright &#169; 2000 Nova Development Team. All Rights Reserved.]]>
+				<![CDATA[Copyright &#169; 2011 Nova Development Team. All Rights Reserved.]]>
 			</bottom>
 			<group title="Master Packages" packages="nova.master*" />
 			<group title="Worker Packages" packages="nova.worker*" />
