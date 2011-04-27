@@ -34,6 +34,24 @@
 		</javac>
 	</target>
 
+	<target name="doc" description="generate javadoc">
+		<javadoc destdir="docs/api" author="true" version="true" use="true">
+			<fileset dir="src" defaultexcludes="yes">
+				<include name="**" />
+				<exclude name="**/*.bxml" />
+				<exclude name="test/**" />
+			</fileset>
+			<bottom>
+				<![CDATA[Copyright &#169; 2000 Nova Development Team. All Rights Reserved.]]>
+			</bottom>
+			<group title="Master Packages" packages="nova.master*" />
+			<group title="Worker Packages" packages="nova.worker*" />
+			<group title="Agent Packages" packages="nova.agent*" />
+			<group title="Storage Packages" packages="nova.storage*" />
+			<group title="Common Utilities" packages="nova.common*" />
+		</javadoc>
+	</target>
+
 
 	<target name="pack" depends="build" description="make jar packages">
 		<jar destfile="${bin}/nova-${version}.jar" basedir="${build}" excludes="${build.test}/**" />

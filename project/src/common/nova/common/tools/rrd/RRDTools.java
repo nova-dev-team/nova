@@ -38,7 +38,6 @@ public class RRDTools {
 	 *            The length of RRD
 	 * @param startTime
 	 *            Start time stamp
-	 * @return {@link RrdDb}
 	 */
 	public static void CreateMonitorInfoRRD(String rootPath, long timeInterval,
 			int rrdLength, long startTime) {
@@ -112,7 +111,6 @@ public class RRDTools {
 	 *            The insert time interval of RRD
 	 * @param rrdLength
 	 *            The length of RRD
-	 * @return rrdDb {@link RrdDb}
 	 */
 	public static void CreateMonitorInfoRRD(String rootPath, long timeInterval,
 			int rrdLength) {

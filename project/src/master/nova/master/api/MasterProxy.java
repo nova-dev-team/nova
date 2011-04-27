@@ -41,9 +41,6 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 
 	/**
 	 * Send a monitor info to master node.
-	 * 
-	 * @param info
-	 *            Monitor info.
 	 */
 	@Override
 	public void sendMonitorInfo() {

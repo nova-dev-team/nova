@@ -1,11 +1,17 @@
 package nova.storage;
 
+import java.io.File;
+import java.io.IOException;
+
 import nova.common.service.SimpleServer;
+import nova.common.util.Conf;
+import nova.common.util.Utils;
 
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.apache.ftpserver.listener.ListenerFactory;
+import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.log4j.Logger;
 
 public class NovaStorage extends SimpleServer {
@@ -15,23 +21,37 @@ public class NovaStorage extends SimpleServer {
 	public static void main(String[] args) {
 		// TODO @santa setup bind port, username, password, home folder, etc
 
+		Conf conf = null;
+		try {
+			conf = Utils.loadConf();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.fatal(e);
+			System.exit(1);
+		}
+
 		FtpServerFactory serverFactory = new FtpServerFactory();
 		ListenerFactory factory = new ListenerFactory();
 
-		// set the port of the listener
-		factory.setPort(2221);
+		// set users
+		String userAccountFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf",
+				"storage.ftp.users.properties");
+		logger.info("User account file: " + userAccountFpath);
+		PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
+		userManagerFactory.setFile(new File(userAccountFpath));
+		serverFactory.setUserManager(userManagerFactory.createUserManager());
+
+		// set listener address
+		logger.info("FTP server will be running @ "
+				+ conf.getString("storage.ftp.bind_host") + ":"
+				+ conf.getInteger("storage.ftp.bind_port"));
+
+		factory.setServerAddress(conf.getString("storage.ftp.bind_host"));
+		factory.setPort(conf.getInteger("storage.ftp.bind_port"));
 
 		// replace the default listener
 		serverFactory.addListener("default", factory.createListener());
 		final FtpServer server = serverFactory.createServer();
-
-		// start the server
-		try {
-			server.start();
-		} catch (FtpException e) {
-			logger.fatal(e);
-			e.printStackTrace();
-		}
 
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled
 		// gracefully
@@ -43,5 +63,15 @@ public class NovaStorage extends SimpleServer {
 				logger.info("FTP server stopped");
 			}
 		});
+
+		// start the server
+		try {
+			server.start();
+		} catch (FtpException e) {
+			logger.fatal(e);
+			e.printStackTrace();
+			System.exit(1);
+		}
+
 	}
 }

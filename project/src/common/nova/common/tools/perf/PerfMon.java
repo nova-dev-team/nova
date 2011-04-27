@@ -72,7 +72,7 @@ public class PerfMon {
 	/**
 	 * Disk information. Disk in B
 	 * 
-	 * @return
+	 * @return Return disk Info.
 	 */
 	public static DiskInfo getDiskInfo() {
 		DiskInfo disk = new DiskInfo();
