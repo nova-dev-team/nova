@@ -90,7 +90,7 @@ public class RRDTools {
 			/**
 			 * RRD file definition is completed
 			 */
-			logger.info("[One RRD is created! ]");
+			logger.info("One RRD is created!");
 
 			/**
 			 * RRD file is on your disk
