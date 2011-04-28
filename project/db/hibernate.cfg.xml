@@ -8,10 +8,14 @@
 		<property name="format_sql">true</property>
 		<property name="dialect">nova.common.db.SQLiteDialect</property>
 		<property name="connection.driver_class">org.sqlite.JDBC</property>
+<<<<<<< HEAD
 		<property name="connection.url">jdbc:sqlite:D:/nova.db</property>
+=======
+		<property name="connection.url">jdbc:sqlite:db/nova-master.sqlite3</property>
+		<property name="hibernate.hbm2ddl.auto">update</property>
+>>>>>>> ef653b14a26b5d86f5ab601813746aa7bf8a2025
 		<property name="connection.username"></property>
 		<property name="connection.password"></property>
-
-		<mapping resource="User.hbm.xml"/>
+		<mapping resource="schema/User.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

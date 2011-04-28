@@ -15,7 +15,7 @@ public class TestJrobin {
 	@Test
 	public void testRRDTools() {
 		long startTime = Util.getTime();
-		long endTime = startTime + 100000;
+		long endTime = startTime + 1000;
 
 		String rootPath = "build/demo_flow.rrd";
 		int timeInterval = 10;
@@ -23,12 +23,12 @@ public class TestJrobin {
 
 		String picPath = "build/demo_flow.png";
 
-		/**
+		/*
 		 * 测试创建RrdDb
 		 */
 		RRDTools.CreateMonitorInfoRRD(rootPath, timeInterval, rrdLength,
 				startTime);
-		/**
+		/*
 		 * 测试添加 初始数据
 		 */
 		GeneralMonitorInfo msg = PerfMon.getGeneralMonitorInfo();
@@ -47,19 +47,19 @@ public class TestJrobin {
 
 		}
 
-		/**
+		/*
 		 * 测试绘图
 		 */
 
 		long startTm = endTime - 86400;
 		RRDTools.plotCpuGraph(picPath, startTm, endTime, rootPath);
-		/**
+		/*
 		 * RRDTools.plotMemoryGraph(picPath, startTm, endTime, rootPath);
 		 * RRDTools.plotDiskGraph(picPath, startTm, endTime, rootPath);
 		 * RRDTools.plotNetGraph(picPath, startTm, endTime, rootPath);
 		 */
 
-		/**
+		/*
 		 * 测试FetchData获取RRD
 		 */
 		double[][] values = RRDTools.fetchRRDData(rootPath, startTime, endTime);
