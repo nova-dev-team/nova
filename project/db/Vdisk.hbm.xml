@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    
+<hibernate-mapping>
+<!-- 
+    Created by the Middlegen Hibernate plugin 2.1
+
+    http://boss.bekk.no/boss/middlegen/
+    http://www.hibernate.org/
+-->
+
+<class 
+    name="org.hibernate.sample.Vdisk" 
+    table="vdisk"
+>
+    <meta attribute="class-description" inherit="false">
+       @hibernate.class
+        table="vdisk"
+    </meta>
+
+    <composite-id>
+        <meta attribute="field-description" inherit="false">
+           @hibernate.id
+            generator-class="assigned"
+        </meta>
+        <key-property 
+            name="fileName" 
+            column="file_name" 
+            type="java.lang.String"
+            length="100"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="file_name"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="displayName" 
+            column="display_name" 
+            type="java.lang.String"
+            length="100"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="display_name"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="description" 
+            column="description" 
+            type="java.lang.String"
+            length="100"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="description"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="diskFormat" 
+            column="disk_format" 
+            type="java.lang.String"
+            length="100"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="disk_format"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="osFamily" 
+            column="os_family" 
+            type="java.lang.String"
+            length="100"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="os_family"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="osName" 
+            column="os_name" 
+            type="java.lang.String"
+            length="100"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="os_name"
+            </meta> 
+        </key-property>
+        <key-property 
+            name="softList" 
+            column="soft_list" 
+            type="java.lang.String"
+            length="100"
+        >
+            <meta attribute="field-description">
+               @hibernate.property
+                column="soft_list"
+            </meta> 
+        </key-property>
+    </composite-id>    
+
+
+    <!-- Associations -->
+    <!-- derived association(s) for compound key -->
+    <!-- end of derived association(s) -->
+  
+
+</class>
+</hibernate-mapping>
