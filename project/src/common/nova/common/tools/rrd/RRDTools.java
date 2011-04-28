@@ -25,6 +25,7 @@ import org.jrobin.graph.RrdGraphDef;
  * 
  */
 public class RRDTools {
+
 	public static Logger logger = Logger.getLogger(RRDTools.class);
 
 	/**
@@ -190,8 +191,6 @@ public class RRDTools {
 			sample.update();
 
 			// rrdDb.close();
-
-			logger.info("Insert one General monitor information");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RrdException e) {
