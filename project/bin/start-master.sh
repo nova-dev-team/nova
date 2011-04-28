@@ -66,5 +66,5 @@ export NOVA_OPTS="$NOVA_OPTS -Dnova.root.logger=${NOVA_ROOT_LOGGER:-INFO,console
 
 cd $NOVA_HOME
 java -server $NOVA_OPTS -classpath "$CLASSPATH" nova.master.NovaMaster "$@"
-cd -
+cd - > /dev/null
 
