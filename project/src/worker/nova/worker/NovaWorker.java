@@ -1,11 +1,14 @@
 package nova.worker;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.RequestHeartbeatMessage;
+import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 import nova.worker.daemons.HeartbeatDaemon;
 import nova.worker.daemons.MonitorInfoDaemon;
@@ -16,7 +19,6 @@ import nova.worker.handler.WorkerRequestHeartbeatMessageHandler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
@@ -28,6 +30,8 @@ import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
  * 
  */
 public class NovaWorker extends SimpleServer {
+
+	Conf conf = null;
 
 	InetSocketAddress bindAddr = null;
 
@@ -65,6 +69,7 @@ public class NovaWorker extends SimpleServer {
 	@Override
 	public Channel bind(InetSocketAddress bindAddr) {
 		this.bindAddr = bindAddr;
+		logger.info("Nova worker running @ " + this.bindAddr);
 		Channel chnl = super.bind(this.bindAddr);
 		// start all daemons
 		for (SimpleDaemon daemon : this.daemons) {
@@ -98,6 +103,25 @@ public class NovaWorker extends SimpleServer {
 		// TODO @shayf more cleanup work
 
 		NovaWorker.instance = null;
+	}
+
+	/**
+	 * Get config info.
+	 * 
+	 * @return The config info.
+	 */
+	public Conf getConf() {
+		return this.conf;
+	}
+
+	/**
+	 * Set config info.
+	 * 
+	 * @param conf
+	 *            The new config info.
+	 */
+	public void setConf(Conf conf) {
+		this.conf = conf;
 	}
 
 	/**
@@ -153,26 +177,32 @@ public class NovaWorker extends SimpleServer {
 	 *            Environment variables.
 	 */
 	public static void main(String[] args) {
-		// TODO @shayf Move bind addr into conf files.
-		InetSocketAddress bindAddr = new InetSocketAddress("0.0.0.0", 4000);
-		logger.info("Nova worker running @ " + bindAddr);
-		try {
-			NovaWorker.getInstance().bind(bindAddr);
-		} catch (ChannelException e) {
-			e.printStackTrace();
-			logger.fatal(e);
-		}
-
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled
 		// gracefully
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				// do cleanup work
+				this.setName("cleanup");
 				NovaWorker.getInstance().shutdown();
 				logger.info("Cleanup work done");
 			}
 		});
+
+		try {
+			Conf conf = Utils.loadConf();
+			NovaWorker.getInstance().setConf(conf);
+			String bindHost = conf.getString("worker.bind_host");
+			Integer bindPort = conf.getInteger("worker.bind_port");
+			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
+					bindPort);
+			NovaWorker.getInstance().bind(bindAddr);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.fatal(e);
+			System.exit(1);
+		}
+
 	}
 
 }

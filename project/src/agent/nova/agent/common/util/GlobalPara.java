@@ -12,11 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
 import nova.agent.core.handler.RequestSoftwareMessageHandler;
-import nova.agent.core.service.GeneralMonitorProxy;
-import nova.agent.core.service.HeartbeatProxy;
-import nova.agent.core.service.IntimeProxy;
 import nova.agent.daemons.DownloadProgressDaemon;
 import nova.common.service.SimpleAddress;
+import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 
@@ -33,9 +31,7 @@ public class GlobalPara {
 	 */
 	public static int BIND_PORT = 9876;
 
-	public static Map<SimpleAddress, HeartbeatProxy> heartbeatProxyMap = new HashMap<SimpleAddress, HeartbeatProxy>();
-	public static Map<SimpleAddress, GeneralMonitorProxy> generalMonitorProxyMap = new HashMap<SimpleAddress, GeneralMonitorProxy>();
-	public static Map<SimpleAddress, IntimeProxy> intimeProxyMap = new HashMap<SimpleAddress, IntimeProxy>();
+	public static Map<SimpleAddress, MasterProxy> masterProxyMap = new HashMap<SimpleAddress, MasterProxy>();
 
 	public static Object heartbeatSem = new Object();
 	public static Object generalMonitorSem = new Object();

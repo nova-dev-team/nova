@@ -12,8 +12,11 @@
     	Virtualization management system
     </description>
 
-
-	<property name="version" value="0.4-nightly" />
+	<loadfile property="version" srcFile="../VERSION">
+		<filterchain>
+			<striplinebreaks />
+		</filterchain>
+	</loadfile>
 	<property name="conf" value="conf/" />
 	<property name="bin" value="bin" />
 	<property name="build" value="build" />
@@ -32,11 +35,35 @@
 				</fileset>
 			</classpath>
 		</javac>
+		<copy todir="${build}">
+			<fileset dir="${src}/master" excludes="**/*.java" />
+			<fileset dir="${src}/worker" excludes="**/*.java" />
+			<fileset dir="${src}/agent" excludes="**/*.java" />
+			<fileset dir="${src}/common" excludes="**/*.java" />
+			<fileset dir="${src}/storage" excludes="**/*.java" />
+			<fileset dir="${src}/ui" excludes="**/*.java" />
+			<fileset dir="${src}/vncdispatch" excludes="**/*.java" />
+		</copy>
+		<jar destfile="${bin}/nova-${version}.jar" basedir="${build}" includes="nova/**" excludes="${build.test}/**" />
 	</target>
 
 
-	<target name="pack" depends="build" description="make jar packages">
-		<jar destfile="${bin}/nova-${version}.jar" basedir="${build}" excludes="${build.test}/**" />
+	<target name="doc" description="generate javadoc">
+		<javadoc destdir="docs/api" author="true" version="true" use="true">
+			<fileset dir="src" defaultexcludes="yes">
+				<include name="**" />
+				<exclude name="**/*.bxml" />
+				<exclude name="test/**" />
+			</fileset>
+			<bottom>
+				<![CDATA[Copyright &#169; 2011 Nova Development Team. All Rights Reserved.]]>
+			</bottom>
+			<group title="Master Packages" packages="nova.master*" />
+			<group title="Worker Packages" packages="nova.worker*" />
+			<group title="Agent Packages" packages="nova.agent*" />
+			<group title="Storage Packages" packages="nova.storage*" />
+			<group title="Common Utilities" packages="nova.common*" />
+		</javadoc>
 	</target>
 
 

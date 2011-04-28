@@ -11,7 +11,7 @@ import nova.common.interfaces.Progressable;
  * @author gaotao@gmail.com
  * 
  */
-public class InstallProgress implements Progressable, Cancelable, Runnable {
+public class InstallProgress implements Progressable, Cancelable {
 
 	private String softName; // The name of installing software
 	private String softPath;// The path of this installing software
@@ -45,8 +45,7 @@ public class InstallProgress implements Progressable, Cancelable, Runnable {
 		return false;
 	}
 
-	@Override
-	public void run() {
+	public void install() {
 		try {
 			Runtime.getRuntime().exec(this.softPath + "\\" + this.softName);
 		} catch (IOException e) {

@@ -4,7 +4,7 @@ import org.junit.Test;
 import junit.framework.Assert;
 
 public class ExampleTest {
-	
+
 	@Test
 	public void exampleTest() {
 		Assert.assertTrue(1 > 0);

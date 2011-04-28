@@ -4,7 +4,7 @@ import nova.common.service.SimpleAddress;
 import nova.master.models.Vnode;
 
 /**
- * A wrapper for {@link Vnode.Identity} and {@link Vnode.Status}, so they could
+ * A wrapper for {@link SimpleAddress} and {@link Vnode.Status}, so they could
  * be send together.
  * 
  * @author santa
@@ -18,7 +18,7 @@ public class VnodeStatusMessage {
 	}
 
 	/**
-	 * The {@link Vnode.Identity}.
+	 * The {@link SimpleAddress}.
 	 */
 	public SimpleAddress vAddr;
 

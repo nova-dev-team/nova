@@ -1,17 +1,20 @@
 package nova.master;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
+import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
-import nova.common.tools.perf.GeneralMonitorInfo;
+import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.common.util.Utils;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeHealthCheckerDaemon;
-import nova.master.handler.GeneralMonitorInfoHandler;
+import nova.master.handler.MasterGeneralMonitorMessageHandler;
 import nova.master.handler.MasterHeartbeatHandler;
 import nova.master.handler.MasterHttpRequestHandler;
 import nova.master.handler.PnodeStatusMessageHandler;
@@ -22,7 +25,6 @@ import nova.worker.api.WorkerProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelException;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
@@ -34,6 +36,8 @@ import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
  * 
  */
 public class NovaMaster extends SimpleServer {
+
+	Conf conf = null;
 
 	InetSocketAddress bindAddr = null;
 
@@ -68,8 +72,8 @@ public class NovaMaster extends SimpleServer {
 		this.registerHandler(VnodeStatusMessage.class,
 				new VnodeStatusMessageHandler());
 
-		this.registerHandler(GeneralMonitorInfo.class,
-				new GeneralMonitorInfoHandler());
+		this.registerHandler(GeneralMonitorMessage.class,
+				new MasterGeneralMonitorMessageHandler());
 
 		// TODO @zhaoxun connect db
 	}
@@ -80,6 +84,7 @@ public class NovaMaster extends SimpleServer {
 	@Override
 	public Channel bind(InetSocketAddress bindAddr) {
 		this.bindAddr = bindAddr;
+		logger.info("Nova master running @ " + this.bindAddr);
 		Channel chnl = super.bind(this.bindAddr);
 		// start all daemons
 		for (SimpleDaemon daemon : this.daemons) {
@@ -113,6 +118,25 @@ public class NovaMaster extends SimpleServer {
 		// TODO @zhaoxun more cleanup work
 
 		NovaMaster.instance = null;
+	}
+
+	/**
+	 * Get config info.
+	 * 
+	 * @return The config info.
+	 */
+	public Conf getConf() {
+		return this.conf;
+	}
+
+	/**
+	 * Set config info.
+	 * 
+	 * @param conf
+	 *            The new config info.
+	 */
+	public void setConf(Conf conf) {
+		this.conf = conf;
 	}
 
 	/**
@@ -181,25 +205,34 @@ public class NovaMaster extends SimpleServer {
 	 *            Environment variables.
 	 */
 	public static void main(String[] args) {
-		// TODO @zhaoxun Move bind addr into conf files.
-		InetSocketAddress bindAddr = new InetSocketAddress("0.0.0.0", 3000);
-		logger.info("Nova master running @ " + bindAddr);
-		try {
-			NovaMaster.getInstance().bind(bindAddr);
-		} catch (ChannelException e) {
-			e.printStackTrace();
-			logger.fatal(e);
-		}
 
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled
 		// gracefully
 		Runtime.getRuntime().addShutdownHook(new Thread() {
+
 			@Override
 			public void run() {
 				// do cleanup work
+				this.setName("cleanup");
 				NovaMaster.getInstance().shutdown();
 				logger.info("Cleanup work done");
 			}
+
 		});
+
+		try {
+			Conf conf = Utils.loadConf();
+			NovaMaster.getInstance().setConf(conf);
+			String bindHost = conf.getString("master.bind_host");
+			Integer bindPort = conf.getInteger("master.bind_port");
+			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
+					bindPort);
+			NovaMaster.getInstance().bind(bindAddr);
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.fatal(e);
+			System.exit(1);
+		}
+
 	}
 }

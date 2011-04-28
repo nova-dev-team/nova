@@ -1,9 +1,9 @@
 package nova.agent.daemons;
 
 import nova.agent.common.util.GlobalPara;
-import nova.agent.core.service.HeartbeatProxy;
 import nova.common.service.SimpleAddress;
 import nova.common.util.SimpleDaemon;
+import nova.master.api.MasterProxy;
 
 /**
  * Heartbeat daemon used in agent
@@ -12,7 +12,9 @@ import nova.common.util.SimpleDaemon;
  * 
  */
 public class HeartbeatDaemon extends SimpleDaemon {
-	// Heartbeat time interval
+	/**
+	 * Heartbeat time interval
+	 */
 	public static final long HEARTBEAT_INTERVAL = 2000;
 
 	public HeartbeatDaemon() {
@@ -21,9 +23,9 @@ public class HeartbeatDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
-		if (!GlobalPara.heartbeatProxyMap.isEmpty()) {
-			for (SimpleAddress xreply : GlobalPara.heartbeatProxyMap.keySet()) {
-				HeartbeatProxy heartbeatProxy = GlobalPara.heartbeatProxyMap
+		if (!GlobalPara.masterProxyMap.isEmpty()) {
+			for (SimpleAddress xreply : GlobalPara.masterProxyMap.keySet()) {
+				MasterProxy heartbeatProxy = GlobalPara.masterProxyMap
 						.get(xreply);
 				heartbeatProxy.sendHeartbeat();
 			}

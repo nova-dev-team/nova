@@ -23,7 +23,7 @@ public class PerfMon {
 	private static SigarProxy proxy = SigarProxyCache.newInstance(sigar);
 
 	/**
-	 * Utilization, frequency, quantity and model of cpu
+	 * Utilization, frequency, quantity and model of CPU
 	 * 
 	 * @return {@link CpuInfo}
 	 */
@@ -31,7 +31,11 @@ public class PerfMon {
 		CpuInfo cpu = new CpuInfo();
 
 		try {
-			cpu.combinedTime = sigar.getCpuPerc().getCombined();
+			/**
+			 * 100 as the standard
+			 */
+			cpu.combinedTime = sigar.getCpuPerc().getCombined() * 100;
+
 			org.hyperic.sigar.CpuInfo[] infoList = sigar.getCpuInfoList();
 			cpu.mhz = infoList[0].getMhz();
 			cpu.nCpu = infoList.length;
@@ -66,9 +70,9 @@ public class PerfMon {
 	}
 
 	/**
-	 * Disk information. Disk in KB
+	 * Disk information. Disk in B
 	 * 
-	 * @return
+	 * @return Return disk Info.
 	 */
 	public static DiskInfo getDiskInfo() {
 		DiskInfo disk = new DiskInfo();
@@ -82,6 +86,13 @@ public class PerfMon {
 				disk.freeDiskSize += sigar.getFileSystemUsage(
 						fs[i].getDirName()).getFree();
 			}
+			/**
+			 * Disk size in b
+			 */
+			disk.totalDiskSize *= 1000;
+			disk.usedDiskSize *= 1000;
+			disk.freeDiskSize *= 1000;
+
 		} catch (SigarException e) {
 			e.printStackTrace();
 			logger.error("Can't get disk information!");

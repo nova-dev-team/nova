@@ -1,3 +1,0 @@
-#!/bin/bash 
-#pack the nova-client to a jar file
-jar cvfm ../nova-client.jar MANIFEST.MF -C nova-client/bin/ .

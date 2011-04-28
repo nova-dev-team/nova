@@ -1,9 +1,9 @@
 package nova.agent.daemons;
 
 import nova.agent.common.util.GlobalPara;
-import nova.agent.core.service.GeneralMonitorProxy;
 import nova.common.service.SimpleAddress;
 import nova.common.util.SimpleDaemon;
+import nova.master.api.MasterProxy;
 
 /**
  * General monitor information daemon used in agent
@@ -12,7 +12,9 @@ import nova.common.util.SimpleDaemon;
  * 
  */
 public class GeneralMonitorDaemon extends SimpleDaemon {
-	// Monitor information interval
+	/**
+	 * Monitor information interval
+	 */
 	public static final long GENERAL_MONITOR_INTERVAL = 5000;
 
 	public GeneralMonitorDaemon() {
@@ -21,12 +23,11 @@ public class GeneralMonitorDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
-		if (!GlobalPara.generalMonitorProxyMap.isEmpty()) {
-			for (SimpleAddress xreply : GlobalPara.generalMonitorProxyMap
-					.keySet()) {
-				GeneralMonitorProxy generalMonitorProxy = GlobalPara.generalMonitorProxyMap
+		if (!GlobalPara.masterProxyMap.isEmpty()) {
+			for (SimpleAddress xreply : GlobalPara.masterProxyMap.keySet()) {
+				MasterProxy monitorProxy = GlobalPara.masterProxyMap
 						.get(xreply);
-				generalMonitorProxy.sendGeneralMonitorMessage();
+				monitorProxy.sendMonitorInfo();
 			}
 		}
 	}

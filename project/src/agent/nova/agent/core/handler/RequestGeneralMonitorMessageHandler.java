@@ -6,11 +6,10 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.agent.common.util.GlobalPara;
-import nova.agent.core.service.GeneralMonitorProxy;
-import nova.agent.core.service.IntimeProxy;
 import nova.common.service.ISimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.RequestGeneralMonitorMessage;
+import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -32,57 +31,33 @@ public class RequestGeneralMonitorMessageHandler implements
 	public void handleMessage(RequestGeneralMonitorMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		/**
-		 * Wake up GeneralMonitorProxy when a server or a master discover this
-		 * virtual machine
+		 * Wake up AgentProxy when a server or a master discover this virtual
+		 * machine
 		 */
 
-		if (!GlobalPara.generalMonitorProxyMap.containsKey(xreply)) {
+		if (!GlobalPara.masterProxyMap.containsKey(xreply)) {
 			try {
-				GeneralMonitorProxy gmp = new GeneralMonitorProxy(
+				MasterProxy monitorProxy = new MasterProxy(
 						new InetSocketAddress(InetAddress.getLocalHost()
 								.getHostAddress(), GlobalPara.BIND_PORT));
 
-				gmp.connect(xreply.getInetSocketAddress());
-				gmp.sendGeneralMonitorMessage();
+				monitorProxy.connect(xreply.getInetSocketAddress());
+				monitorProxy.sendMonitorInfo();
 
 				logger.info("General monitor proxy have connected to server "
 						+ xreply);
 
-				// generalMonitorProxy can work
-				if (GlobalPara.generalMonitorProxyMap.isEmpty()) {
-					synchronized (GlobalPara.generalMonitorSem) {
-						GlobalPara.generalMonitorSem.notifyAll();
-					}
-				}
-
-				GlobalPara.generalMonitorProxyMap.put(xreply, gmp);
+				GlobalPara.masterProxyMap.put(xreply, monitorProxy);
 			} catch (UnknownHostException e1) {
 				e1.printStackTrace();
 				logger.error("Can't connect to host " + xreply);
 			}
-			// Wake up intimeProxy when there are additional
-			// RequestGeneralMonitorMessages
-		} else if (!GlobalPara.intimeProxyMap.containsKey(xreply)) {
-			try {
-				IntimeProxy ip = new IntimeProxy(new InetSocketAddress(
-						InetAddress.getLocalHost().getHostAddress(),
-						GlobalPara.BIND_PORT));
-
-				ip.connect(xreply.getInetSocketAddress());
-				ip.sendGeneralMonitorMessage();
-
-				logger.info("Intime proxy have connected to server " + xreply);
-
-				GlobalPara.intimeProxyMap.put(xreply, ip);
-			} catch (UnknownHostException e1) {
-				e1.printStackTrace();
-				logger.error("Can't connect to host " + xreply);
-			}
-			// use established channel to send GeneralMonitorMessage
+			/**
+			 * use established channel to send GeneralMonitorMessage
+			 */
 		} else {
-			IntimeProxy ip = (IntimeProxy) GlobalPara.intimeProxyMap
-					.get(xreply);
-			ip.sendGeneralMonitorMessage();
+			MasterProxy monitorProxy = GlobalPara.masterProxyMap.get(xreply);
+			monitorProxy.sendMonitorInfo();
 		}
 	}
 }

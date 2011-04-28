@@ -1,7 +1,5 @@
 package nova.worker.daemons;
 
-import nova.common.tools.perf.GeneralMonitorInfo;
-import nova.common.tools.perf.PerfMon;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 import nova.worker.NovaWorker;
@@ -22,8 +20,7 @@ public class MonitorInfoDaemon extends SimpleDaemon {
 		if (this.isStopping() == false) {
 			MasterProxy master = NovaWorker.getInstance().getMaster();
 			if (master != null) {
-				GeneralMonitorInfo info = PerfMon.getGeneralMonitorInfo();
-				master.sendMonitorInfo(info);
+				master.sendMonitorInfo();
 			}
 		}
 	}

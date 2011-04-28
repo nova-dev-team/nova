@@ -11,6 +11,11 @@ import org.apache.log4j.Logger;
 public abstract class SimpleDaemon extends Thread {
 
 	/**
+	 * Private counter for daemons.
+	 */
+	private static int daemonCounter = 0;
+
+	/**
 	 * Sleep interval between each working round.
 	 */
 	private final long sleepMilli;
@@ -46,9 +51,13 @@ public abstract class SimpleDaemon extends Thread {
 	public SimpleDaemon(long sleepMilli) {
 		this.sleepMilli = sleepMilli;
 
+		SimpleDaemon.daemonCounter++;
+		this.setName("daemon-" + SimpleDaemon.daemonCounter);
+
 		// init worker using "this.getClass()" instead of "SimpleDaemon.class",
 		// so that we could know exactly what subclass is being logged.
 		logger = Logger.getLogger(this.getClass());
+
 	}
 
 	/**

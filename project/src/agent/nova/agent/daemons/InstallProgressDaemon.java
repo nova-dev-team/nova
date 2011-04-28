@@ -22,6 +22,6 @@ public class InstallProgressDaemon extends SimpleDaemon {
 		String downloadedSoftware = GlobalPara.downloadedBuffer.read();
 		InstallProgress insP = new InstallProgress(downloadedSoftware,
 				GlobalPara.myPath);
-		insP.run();
+		insP.install();
 	}
 }

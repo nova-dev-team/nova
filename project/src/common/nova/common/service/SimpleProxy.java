@@ -36,10 +36,6 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 	SimpleAddress replyAddr;
 	Logger log = null;
 
-	public SimpleProxy() {
-		this((SimpleAddress) null);
-	}
-
 	public SimpleProxy(InetSocketAddress replyAddr) {
 		this(new SimpleAddress(replyAddr));
 	}

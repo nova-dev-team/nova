@@ -1,0 +1,45 @@
+<Window title="Hello BXML!" maximized="true"
+	xmlns:bxml="http://pivot.apache.org/bxml" xmlns="org.apache.pivot.wtk">
+	<Accordion>
+		<Label text="Hello Nova"
+			styles="{font:'Arial bold 24', color:'#ff0000',
+		horizontalAlignment:'center', verticalAlignment:'center'}" />
+		<ListView xmlns="org.apache.pivot.wtk" xmlns:collections="org.apache.pivot.collections"
+			xmlns:content="org.apache.pivot.wtk.content">
+			<listData>
+				<collections:ArrayList>
+					<content:ListItem text="A" />
+					<content:ListItem text="B" />
+					<content:ListItem text="C" />
+				</collections:ArrayList>
+			</listData>
+		</ListView>
+		<TextInput></TextInput>
+		<TextArea></TextArea>
+		<PushButton buttonData="push me" bxml:id="pushButton"></PushButton>
+		<Calendar></Calendar>
+		<BoxPane orientation="vertical" styles="{padding:4, spacing:6}">
+			<Checkbox bxml:id="sizeToSelectionCheckbox" buttonData="Size to selection" />
+			<Label text="Selection change effect:" />
+
+			<bxml:define>
+				<ButtonGroup bxml:id="selectionChangeEffect" />
+			</bxml:define>
+
+			<RadioButton bxml:id="crossfadeRadioButton" buttonData="Crossfade"
+				selected="true" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="horizontalSlideRadioButton"
+				buttonData="Horizontal Slide" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="verticalSlideRadioButton"
+				buttonData="Vertical Slide" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="horizontalFlipRadioButton"
+				buttonData="Horizontal Flip" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="verticalFlipRadioButton"
+				buttonData="Vertical Flip" buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="zoomRadioButton" buttonData="Zoom"
+				buttonGroup="$selectionChangeEffect" />
+			<RadioButton bxml:id="noneRadioButton" buttonData="None"
+				buttonGroup="$selectionChangeEffect" />
+		</BoxPane>
+	</Accordion>
+</Window>
