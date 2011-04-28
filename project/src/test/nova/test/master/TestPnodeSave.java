@@ -7,7 +7,6 @@ import nova.master.models.Pnode1;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-
 public class TestPnodeSave extends TestCase {
 	public void testSave() {
 		Pnode1 pnode = new Pnode1();
