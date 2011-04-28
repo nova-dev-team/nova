@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
     "-//Hibernate/Hibernate Mapping DTD 2.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-2.0.dtd" >
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
 
 <hibernate-mapping>
 	<!-- Created by the Middlegen Hibernate plugin 2.1 http://boss.bekk.no/boss/middlegen/ 
 		http://www.hibernate.org/ -->
 
-	<class name="org.hibernate.sample.Vdisk" table="vdisk">
+	<class name="nova.master.models.Vdisk" table="vdisk">
 		<meta attribute="class-description" inherit="false">
 			@hibernate.class
 			table="vdisk"
