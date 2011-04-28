@@ -35,7 +35,18 @@
 				</fileset>
 			</classpath>
 		</javac>
+		<copy todir="${build}">
+			<fileset dir="${src}/master" excludes="**/*.java" />
+			<fileset dir="${src}/worker" excludes="**/*.java" />
+			<fileset dir="${src}/agent" excludes="**/*.java" />
+			<fileset dir="${src}/common" excludes="**/*.java" />
+			<fileset dir="${src}/storage" excludes="**/*.java" />
+			<fileset dir="${src}/ui" excludes="**/*.java" />
+			<fileset dir="${src}/vncdispatch" excludes="**/*.java" />
+		</copy>
+		<jar destfile="${bin}/nova-${version}.jar" basedir="${build}" includes="nova/**" excludes="${build.test}/**" />
 	</target>
+
 
 	<target name="doc" description="generate javadoc">
 		<javadoc destdir="docs/api" author="true" version="true" use="true">
@@ -53,11 +64,6 @@
 			<group title="Storage Packages" packages="nova.storage*" />
 			<group title="Common Utilities" packages="nova.common*" />
 		</javadoc>
-	</target>
-
-
-	<target name="pack" depends="build" description="make jar packages">
-		<jar destfile="${bin}/nova-${version}.jar" basedir="${build}" excludes="${build.test}/**" />
 	</target>
 
 
