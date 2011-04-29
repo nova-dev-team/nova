@@ -40,6 +40,6 @@
 	<classpathentry kind="lib" path="lib/antlr.jar"/>
 	<classpathentry kind="lib" path="lib/asm-attrs.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.0.jar"/>
-	<classpathentry kind="lib" path="D:/Program Files/msysgit/msysgit/system/project/lib/stringtree-2.0.9.jar"/>
+	<classpathentry kind="lib" path="lib/stringtree-2.0.9.jar"/>
 	<classpathentry kind="output" path="build"/>
 </classpath>
