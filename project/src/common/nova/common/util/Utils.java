@@ -3,8 +3,12 @@ package nova.common.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.stringtree.Fetcher;
+import org.stringtree.finder.StringFinder;
+import org.stringtree.template.InlineTemplater;
 
 /**
  * Provides handy utility functions.
@@ -113,5 +117,44 @@ public class Utils {
 			}
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * Generate string from a template.
+	 * 
+	 * @param template
+	 *            The template content, place holders are like "${key}".
+	 * @param values
+	 *            The template values in a map.
+	 * @return Generated content.
+	 */
+	public static String expandTemplate(String template,
+			final Map<String, Object> values) {
+
+		StringFinder finder = new StringFinder() {
+
+			@Override
+			public Object getObject(String key) {
+				return values.get(key);
+			}
+
+			@Override
+			public Fetcher getUnderlyingFetcher() {
+				return null;
+			}
+
+			@Override
+			public boolean contains(String key) {
+				return values.containsKey(key);
+			}
+
+			@Override
+			public String get(String key) {
+				return values.get(key).toString();
+			}
+		};
+
+		InlineTemplater templater = new InlineTemplater(finder);
+		return templater.expand(template);
 	}
 }

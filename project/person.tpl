@@ -1,1 +1,0 @@
-<person><name>${name}</name><phone>${phone}</phone></person>
