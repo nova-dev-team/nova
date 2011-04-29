@@ -1,6 +1,6 @@
 package nova.worker.handler;
 
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -13,7 +13,7 @@ import org.jboss.netty.channel.MessageEvent;
  * 
  */
 public class StartVnodeHandler implements
-		ISimpleHandler<StartVnodeHandler.Message> {
+		SimpleHandler<StartVnodeHandler.Message> {
 
 	/**
 	 * Message for "start new vnode" request.

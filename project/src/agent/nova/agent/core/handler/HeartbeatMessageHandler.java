@@ -2,7 +2,7 @@ package nova.agent.core.handler;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.HeartbeatMessage;
 
@@ -16,7 +16,7 @@ import org.jboss.netty.channel.MessageEvent;
  * 
  */
 public class HeartbeatMessageHandler implements
-		ISimpleHandler<HeartbeatMessage> {
+		SimpleHandler<HeartbeatMessage> {
 	AtomicLong counter = new AtomicLong();
 
 	@Override

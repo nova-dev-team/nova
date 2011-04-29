@@ -3,7 +3,7 @@ package nova.master.handler;
 import java.io.File;
 import java.io.IOException;
 
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.tools.perf.GeneralMonitorInfo;
@@ -23,7 +23,7 @@ import org.jrobin.core.Util;
  * 
  */
 public class MasterGeneralMonitorMessageHandler implements
-		ISimpleHandler<GeneralMonitorMessage> {
+		SimpleHandler<GeneralMonitorMessage> {
 
 	Logger logger = Logger.getLogger(GeneralMonitorInfo.class);
 

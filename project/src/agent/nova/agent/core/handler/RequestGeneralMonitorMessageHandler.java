@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.agent.common.util.GlobalPara;
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.RequestGeneralMonitorMessage;
 import nova.master.api.MasterProxy;
@@ -22,7 +22,7 @@ import org.jboss.netty.channel.MessageEvent;
  * 
  */
 public class RequestGeneralMonitorMessageHandler implements
-		ISimpleHandler<RequestGeneralMonitorMessage> {
+		SimpleHandler<RequestGeneralMonitorMessage> {
 	AtomicLong counter = new AtomicLong();
 	static Logger logger = Logger
 			.getLogger(RequestGeneralMonitorMessageHandler.class);

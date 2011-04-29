@@ -2,7 +2,7 @@ package nova.agent.core.handler;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.SoftwareInstallStatusMessage;
 
@@ -16,7 +16,7 @@ import org.jboss.netty.channel.MessageEvent;
  * 
  */
 public class SoftwareInstallStatusMessageHandler implements
-		ISimpleHandler<SoftwareInstallStatusMessage> {
+		SimpleHandler<SoftwareInstallStatusMessage> {
 	AtomicLong counter = new AtomicLong();
 
 	@Override

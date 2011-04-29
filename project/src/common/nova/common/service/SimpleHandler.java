@@ -11,7 +11,7 @@ import org.jboss.netty.channel.MessageEvent;
  * @param <T>
  *            Type of the message to be handled.
  */
-public interface ISimpleHandler<T> {
+public interface SimpleHandler<T> {
 
 	/**
 	 * Handle a certain message.

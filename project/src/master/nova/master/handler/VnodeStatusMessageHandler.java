@@ -1,6 +1,6 @@
 package nova.master.handler;
 
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.master.api.messages.VnodeStatusMessage;
 
@@ -9,7 +9,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 public class VnodeStatusMessageHandler implements
-		ISimpleHandler<VnodeStatusMessage> {
+		SimpleHandler<VnodeStatusMessage> {
 
 	/**
 	 * Log4j logger.

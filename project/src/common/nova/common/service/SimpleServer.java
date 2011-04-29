@@ -45,7 +45,7 @@ public class SimpleServer extends SimpleChannelHandler {
 	Gson gson = new Gson();
 
 	@SuppressWarnings("rawtypes")
-	Map<Class, ISimpleHandler> handlers = new HashMap<Class, ISimpleHandler>();
+	Map<Class, SimpleHandler> handlers = new HashMap<Class, SimpleHandler>();
 
 	public SimpleServer() {
 		this.allChannels = new DefaultChannelGroup();
@@ -99,7 +99,7 @@ public class SimpleServer extends SimpleChannelHandler {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public void registerHandler(Class klass, ISimpleHandler handler) {
+	public void registerHandler(Class klass, SimpleHandler handler) {
 		handlers.put(klass, handler);
 	}
 
@@ -115,7 +115,7 @@ public class SimpleServer extends SimpleChannelHandler {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void httpMessageReceived(ChannelHandlerContext ctx, MessageEvent e) {
 		DefaultHttpRequest req = (DefaultHttpRequest) e.getMessage();
-		ISimpleHandler handler = this.handlers.get(DefaultHttpRequest.class);
+		SimpleHandler handler = this.handlers.get(DefaultHttpRequest.class);
 		if (handler == null) {
 			throw new HandlerNotFoundException(
 					DefaultHttpRequest.class.getName());
@@ -130,7 +130,7 @@ public class SimpleServer extends SimpleChannelHandler {
 		String xtype = (String) jsonMsg.get("xtype");
 		try {
 			Class klass = Class.forName(xtype);
-			ISimpleHandler handler = this.handlers.get(klass);
+			SimpleHandler handler = this.handlers.get(klass);
 			if (handler == null) {
 				throw new HandlerNotFoundException(xtype);
 			}

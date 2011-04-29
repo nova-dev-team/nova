@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.tools.perf.GeneralMonitorInfo;
 
@@ -13,7 +13,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 public class GeneralMonitorInfoHandler implements
-		ISimpleHandler<GeneralMonitorInfo> {
+		SimpleHandler<GeneralMonitorInfo> {
 
 	Logger logger = Logger.getLogger(GeneralMonitorInfo.class);
 

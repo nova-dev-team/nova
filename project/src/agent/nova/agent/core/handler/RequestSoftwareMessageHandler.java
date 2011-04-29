@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.agent.common.util.GlobalPara;
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.RequestSoftwareMessage;
 
@@ -20,7 +20,7 @@ import org.jboss.netty.channel.MessageEvent;
  * 
  */
 public class RequestSoftwareMessageHandler implements
-		ISimpleHandler<RequestSoftwareMessage> {
+		SimpleHandler<RequestSoftwareMessage> {
 	public AtomicLong counter = new AtomicLong();
 
 	public ExecutorService softDownloadPool = Executors.newFixedThreadPool(1);

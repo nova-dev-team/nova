@@ -19,7 +19,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
  * 
  */
 public abstract class SimpleHttpRequestHandler implements
-		ISimpleHandler<DefaultHttpRequest> {
+		SimpleHandler<DefaultHttpRequest> {
 
 	/**
 	 * Handle an http request, send rendered page results.

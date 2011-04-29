@@ -1,6 +1,6 @@
 package nova.master.handler;
 
-import nova.common.service.ISimpleHandler;
+import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.HeartbeatMessage;
 import nova.master.NovaMaster;
@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
-public class MasterHeartbeatHandler implements ISimpleHandler<HeartbeatMessage> {
+public class MasterHeartbeatHandler implements SimpleHandler<HeartbeatMessage> {
 
 	/**
 	 * Log4j logger.
