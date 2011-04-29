@@ -12,6 +12,9 @@
 		<property name="hibernate.hbm2ddl.auto">update</property>
 		<property name="connection.username"></property>
 		<property name="connection.password"></property>
-		<mapping resource="schema/User.hbm.xml" />
+		
+		<mapping resource="schema/SoftwarePackage.hbm.xml"/>
+		<mapping resource="schema/Vdisk.hbm.xml"/>
+		<mapping resource="schema/Vcluster.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>
