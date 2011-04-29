@@ -22,6 +22,7 @@ this="$bin/$script"
 export NOVA_HOME=`dirname "$this"`/..
 
 export NOVA_CONF_DIR="$NOVA_HOME/conf"
+export NOVA_DB_DIR="$NOVA_HOME/db"
 
 # some Java parameters
 if [ "$JAVA_HOME" != "" ]; then
@@ -34,8 +35,8 @@ if [ "$JAVA_HOME" = "" ]; then
   #exit 1
 fi
 
-# CLASSPATH initially contains $NOVA_CONF_DIR
-export CLASSPATH="$NOVA_CONF_DIR"
+# CLASSPATH initially contains $NOVA_CONF_DIR and $NOVA_DB_DIR
+export CLASSPATH="$NOVA_CONF_DIR:$NOVA_DB_DIR"
 export CLASSPATH=${CLASSPATH}:$JAVA_HOME/lib/tools.jar
 
 # so that filenames w/ spaces are handled correctly in loops below
