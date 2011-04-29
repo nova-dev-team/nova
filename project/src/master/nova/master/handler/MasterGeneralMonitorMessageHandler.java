@@ -7,7 +7,7 @@ import nova.common.service.ISimpleHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.tools.perf.GeneralMonitorInfo;
-import nova.common.tools.rrd.RRDTools;
+import nova.common.util.RRDTools;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;

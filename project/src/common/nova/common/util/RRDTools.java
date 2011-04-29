@@ -1,4 +1,4 @@
-package nova.common.tools.rrd;
+package nova.common.util;
 
 import java.awt.Color;
 import java.awt.Font;

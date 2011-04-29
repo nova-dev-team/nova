@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.common.tools.perf.PerfMon;
-import nova.common.tools.rrd.RRDTools;
+import nova.common.util.RRDTools;
 
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdException;
