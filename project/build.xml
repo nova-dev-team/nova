@@ -18,6 +18,7 @@
 		</filterchain>
 	</loadfile>
 	<property name="conf" value="conf/" />
+	<property name="db" value="db/" />
 	<property name="bin" value="bin" />
 	<property name="build" value="build" />
 	<property name="src" value="src" />
@@ -71,6 +72,7 @@
 		<junit showoutput="false" printsummary="true" haltonfailure="false" fork="no" forkmode="perTest" dir="${build}">
 			<classpath>
 				<path>
+					<pathelement location="${db}" />
 					<pathelement location="${conf}" />
 					<pathelement location="${build}" />
 					<pathelement location="${src.test}" />

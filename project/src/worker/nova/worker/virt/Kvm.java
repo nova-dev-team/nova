@@ -9,11 +9,24 @@ import java.util.Map;
 
 import nova.common.util.Utils;
 
+/**
+ * Interfacing to the KVM hypervisor.
+ * 
+ * @author santa
+ * 
+ */
 public class Kvm {
 
+	/**
+	 * Emit libvirt domain definitions.
+	 * 
+	 * @param params
+	 *            VM parameters.
+	 * @return Emitted XML domain definition.
+	 */
 	public static String emitDomain(Map<String, Object> params) {
 		String template = null;
-		URL url = Kvm.class.getResource("kvm-domain-template.xml");
+		URL url = Kvm.class.getResource("resources/kvm-domain-template.xml");
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(
 					url.getFile())));
