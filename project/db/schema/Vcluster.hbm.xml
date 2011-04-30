@@ -11,12 +11,12 @@
 		</id>
 		<property name="clusterName" column="cluster_name" type="string"></property>
 		<property name="fristIp" column="frist_ip" type="string"></property>
-		<property name="clusterSize" column="cluster_size" type="integer"></property> 
+		<property name="clusterSize" column="cluster_size" type="integer"></property>
 		<property name="userId" column="user_id" type="integer"></property>
-		<property name="sshPublicKey" column="ssh_public_key" type="string"></property> 
-		<property name="sshPrivateKey" column="ssh_private_key" type="string"></property> 
+		<property name="sshPublicKey" column="ssh_public_key" type="string"></property>
+		<property name="sshPrivateKey" column="ssh_private_key" type="string"></property>
 		<property name="osUsername" column="os_username" type="string"></property>
 		<property name="osPassword" column="os_password" type="string"></property>
-		
+
 	</class>
 </hibernate-mapping>

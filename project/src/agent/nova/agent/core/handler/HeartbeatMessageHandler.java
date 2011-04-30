@@ -15,8 +15,7 @@ import org.jboss.netty.channel.MessageEvent;
  * @author gaotao1987@gmail.com
  * 
  */
-public class HeartbeatMessageHandler implements
-		SimpleHandler<HeartbeatMessage> {
+public class HeartbeatMessageHandler implements SimpleHandler<HeartbeatMessage> {
 	AtomicLong counter = new AtomicLong();
 
 	@Override

@@ -8,15 +8,15 @@
 	<class name="nova.master.models.Vdisk" table="vdisk">
 		<id name="id" column="id" type="long">
 			<generator class="native"></generator>
-		</id>		
+		</id>
 		<property name="fileName" column="file_name" type="string"></property>
-		<property name="displayName" column="display_name" type="string"></property> 
-		<property name="description" column="description" type="string"></property> 
-		<property name="diskFormat" column="disk_format" type="string"></property> 
+		<property name="displayName" column="display_name" type="string"></property>
+		<property name="description" column="description" type="string"></property>
+		<property name="diskFormat" column="disk_format" type="string"></property>
 		<property name="osFamily" column="os_family" type="string"></property>
 		<property name="osName" column="os_name" type="string"></property>
 		<property name="softList" column="soft_list" type="string"></property>
-		
+
 	</class>
 </hibernate-mapping>
 				

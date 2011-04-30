@@ -9,9 +9,9 @@
 		<id name="id" column="id" type="long">
 			<generator class="native"></generator>
 		</id>
-			<property name="fileName" column="file_name" type="string"></property>
-			<property name="displayName" column="display_name" type="string"></property>	
-			<property name="description" column="description" type="string"></property>
-			<property name="osFamily" column="os_family" type="string"></property>			
+		<property name="fileName" column="file_name" type="string"></property>
+		<property name="displayName" column="display_name" type="string"></property>
+		<property name="description" column="description" type="string"></property>
+		<property name="osFamily" column="os_family" type="string"></property>
 	</class>
 </hibernate-mapping>
