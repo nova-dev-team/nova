@@ -1,7 +1,10 @@
 package nova.master.handler;
 
+import java.util.HashMap;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpRequestHandler;
+import nova.common.util.Utils;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -37,6 +40,11 @@ public class MasterHttpRequestHandler extends SimpleHttpRequestHandler {
 	@Override
 	public String renderResult(DefaultHttpRequest req) {
 		// TODO @zhaoxun render results
-		return "This shall be done!";
+
+		String fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
+				"index.html");
+		HashMap<String, Object> values = new HashMap<String, Object>();
+		values.put("content", "hello, this is nova master!");
+		return Utils.expandTemplateFile(fpath, values);
 	}
 }

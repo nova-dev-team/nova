@@ -1,7 +1,9 @@
 package nova.common.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 
@@ -156,5 +158,34 @@ public class Utils {
 
 		InlineTemplater templater = new InlineTemplater(finder);
 		return templater.expand(template);
+	}
+
+	/**
+	 * Expand strings from a template file.
+	 * 
+	 * @param fpath
+	 *            Path to the template file.
+	 * @param values
+	 *            The template values in a map.
+	 * @return Generated content.
+	 */
+	public static String expandTemplateFile(String fpath,
+			Map<String, Object> values) {
+		String template = null;
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(
+					fpath)));
+			StringBuffer sb = new StringBuffer();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+				sb.append('\n');
+			}
+			template = sb.toString();
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return Utils.expandTemplate(template, values);
 	}
 }

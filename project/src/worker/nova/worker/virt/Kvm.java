@@ -1,13 +1,10 @@
 package nova.worker.virt;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
 
 import nova.common.util.Utils;
+
+import org.apache.log4j.Logger;
 
 /**
  * Interfacing to the KVM hypervisor.
@@ -18,6 +15,11 @@ import nova.common.util.Utils;
 public class Kvm {
 
 	/**
+	 * Log4j logger.
+	 */
+	Logger log = Logger.getLogger(Kvm.class);
+
+	/**
 	 * Emit libvirt domain definitions.
 	 * 
 	 * @param params
@@ -25,24 +27,9 @@ public class Kvm {
 	 * @return Emitted XML domain definition.
 	 */
 	public static String emitDomain(Map<String, Object> params) {
-		String template = null;
-		URL url = Kvm.class.getResource("resources/kvm-domain-template.xml");
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(new File(
-					url.getFile())));
-			StringBuffer sb = new StringBuffer();
-			String line;
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-				sb.append('\n');
-			}
-			template = sb.toString();
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return Utils.expandTemplate(template, params);
+		String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
+				"kvm-domain-template.xml");
+		return Utils.expandTemplateFile(templateFpath, params);
 	}
 
 }

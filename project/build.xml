@@ -25,6 +25,7 @@
 	<property name="lib" value="lib" />
 	<property name="build.test" value="${build}/test" />
 	<property name="src.test" value="${src}/test" />
+	<property name="javadoc" value="docs/api" />
 
 
 	<target name="build" description="build project">
@@ -50,7 +51,7 @@
 
 
 	<target name="doc" description="generate javadoc">
-		<javadoc destdir="docs/api" author="true" version="true" use="true">
+		<javadoc destdir="${javadoc}" author="true" version="true" use="true">
 			<fileset dir="src" defaultexcludes="yes">
 				<include name="**" />
 				<exclude name="**/*.bxml" />
@@ -92,6 +93,7 @@
 
 	<target name="clean" description="clean build files">
 		<delete dir="${build}" />
+		<delete dir="${javadoc}" />
 		<delete file="${bin}/nova-${version}.jar" />
 	</target>
 

@@ -1,7 +1,10 @@
 package nova.worker.handler;
 
+import java.util.HashMap;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpRequestHandler;
+import nova.common.util.Utils;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -37,6 +40,11 @@ public class WorkerHttpRequestHandler extends SimpleHttpRequestHandler {
 	@Override
 	public String renderResult(DefaultHttpRequest req) {
 		// TODO @shayf render results
-		return "This shall be done!";
+
+		String fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "worker",
+				"index.html");
+		HashMap<String, Object> values = new HashMap<String, Object>();
+		values.put("content", "hello, this is nova worker!");
+		return Utils.expandTemplateFile(fpath, values);
 	}
 }
