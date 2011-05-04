@@ -30,8 +30,8 @@ public class Utils {
 	 */
 	public static final String NOVA_HOME;
 
-	/**
-	 * Static constructor to determin NOVA_HOME.
+	/*
+	 * Static constructor to determine NOVA_HOME.
 	 */
 	static {
 		final String confName = Utils.pathJoin("conf", "nova.properties");
@@ -63,6 +63,11 @@ public class Utils {
 		}
 
 		NOVA_HOME = folderPath;
+		if (NOVA_HOME == null) {
+			System.err
+					.println("Fatal error: failed to locate conf/nova.properties!");
+			System.exit(1);
+		}
 	}
 
 	/**
