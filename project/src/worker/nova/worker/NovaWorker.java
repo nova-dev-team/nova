@@ -12,7 +12,7 @@ import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 import nova.worker.daemons.HeartbeatDaemon;
 import nova.worker.daemons.MonitorInfoDaemon;
-import nova.worker.daemons.ReportVnodeStatusDeamon;
+import nova.worker.daemons.ReportVnodeStatusDaemon;
 import nova.worker.handler.StartVnodeHandler;
 import nova.worker.handler.WorkerHttpRequestHandler;
 import nova.worker.handler.WorkerRequestHeartbeatMessageHandler;
@@ -39,7 +39,7 @@ public class NovaWorker extends SimpleServer {
 	 * All background working daemons for worker node.
 	 */
 	SimpleDaemon daemons[] = { new HeartbeatDaemon(), new MonitorInfoDaemon(),
-			new ReportVnodeStatusDeamon() };
+			new ReportVnodeStatusDaemon() };
 
 	/**
 	 * Connection to nova master.

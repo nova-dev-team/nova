@@ -1,10 +1,19 @@
 package nova.worker.handler;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Utils;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
+import org.libvirt.Connect;
+import org.libvirt.Domain;
+import org.libvirt.LibvirtException;
 
 /**
  * Handler for "start new vnode" request.
@@ -42,7 +51,45 @@ public class StartVnodeHandler implements
 			MessageEvent e, SimpleAddress xreply) {
 
 		// TODO @shayf Add real handler for creating a new vnode
+		Connect conn = null;
+		try {
+			conn = new Connect("qemu:///system", false);
+		} catch (LibvirtException e1) {
+			System.out.println("exception caught:" + e1);
+			System.out.println(e1.getError());
+		}
+
+		BufferedReader br;
+		String tmp = null;
+		try {
+			String filePath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
+					"test-domain-template.xml");
+			br = new BufferedReader(new FileReader(filePath));
+
+			StringBuffer sb = new StringBuffer();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+				sb.append('\n');
+			}
+			tmp = sb.toString();
+			br.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+
+		try {
+			Domain testDomain = conn.domainCreateLinux(tmp, 0);
+			System.out
+					.println("Domain:" + testDomain.getName() + " id "
+							+ testDomain.getID() + " running "
+							+ testDomain.getOSType());
+		} catch (LibvirtException e1) {
+			System.out.println("exception caught:" + e1);
+			System.out.println(e1.getError());
+		}
 
 	}
-
 }
