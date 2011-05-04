@@ -8,6 +8,13 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.junit.Test;
 
+/**
+ * test for add vnode, run in linux, qemu required, remember to kill the
+ * vmachine after running
+ * 
+ * @author shayf
+ * 
+ */
 public class TestStartVnode {
 	@Test
 	public void test() {

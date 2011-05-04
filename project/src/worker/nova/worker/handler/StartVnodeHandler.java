@@ -51,6 +51,7 @@ public class StartVnodeHandler implements
 			MessageEvent e, SimpleAddress xreply) {
 
 		// TODO @shayf Add real handler for creating a new vnode
+		// connect the qemu system
 		Connect conn = null;
 		try {
 			conn = new Connect("qemu:///system", false);
@@ -59,6 +60,7 @@ public class StartVnodeHandler implements
 			System.out.println(e1.getError());
 		}
 
+		// find conf file, currently using test-domain-template.xml
 		BufferedReader br;
 		String tmp = null;
 		try {
@@ -80,6 +82,7 @@ public class StartVnodeHandler implements
 			e2.printStackTrace();
 		}
 
+		// create domain and show some info
 		try {
 			Domain testDomain = conn.domainCreateLinux(tmp, 0);
 			System.out
