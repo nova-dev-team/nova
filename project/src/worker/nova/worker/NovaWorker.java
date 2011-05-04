@@ -163,7 +163,7 @@ public class NovaWorker extends SimpleServer {
 	 * 
 	 * @return NovaWorker instance, singleton.
 	 */
-	public static NovaWorker getInstance() {
+	public static synchronized NovaWorker getInstance() {
 		if (NovaWorker.instance == null) {
 			NovaWorker.instance = new NovaWorker();
 		}

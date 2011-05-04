@@ -127,7 +127,7 @@ public class AgentServer extends SimpleServer {
 	 * 
 	 * @return AgentServer instance, singleton.
 	 */
-	public static AgentServer getInstance() {
+	public static synchronized AgentServer getInstance() {
 		if (AgentServer.instance == null) {
 			AgentServer.instance = new AgentServer();
 		}

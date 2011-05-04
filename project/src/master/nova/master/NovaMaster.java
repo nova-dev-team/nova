@@ -191,7 +191,7 @@ public class NovaMaster extends SimpleServer {
 	 * 
 	 * @return NovaMaster instance, singleton.
 	 */
-	public static NovaMaster getInstance() {
+	public static synchronized NovaMaster getInstance() {
 		if (NovaMaster.instance == null) {
 			NovaMaster.instance = new NovaMaster();
 		}
