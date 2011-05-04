@@ -1,8 +1,9 @@
 package nova.worker.daemons;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-import nova.common.service.SimpleAddress;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 import nova.master.models.Vnode;
@@ -23,17 +24,16 @@ public class ReportVnodeStatusDaemon extends SimpleDaemon {
 	 */
 	Logger logger = Logger.getLogger(ReportVnodeStatusDaemon.class);
 
-	SimpleAddress vAddr;
-	ArrayList<Vnode.Status> vnodesStatus;
+	Map<UUID, Vnode.Status> allStatus = new HashMap<UUID, Vnode.Status>();
 
 	@Override
 	protected void workOneRound() {
-
-		// TODO @shayf report actual vnodes status to master
-		if (this.isStopping() == false) {
-			MasterProxy master = NovaWorker.getInstance().getMaster();
-			if (master != null) {
-				master.sendVnodeStatus(vAddr, vnodesStatus);
+		// report actual vnodes status to master
+		MasterProxy master = NovaWorker.getInstance().getMaster();
+		if (this.isStopping() == false && master != null) {
+			for (UUID uuid : allStatus.keySet()) {
+				Vnode.Status status = allStatus.get(uuid);
+				master.sendVnodeStatus(uuid, status);
 			}
 		}
 	}

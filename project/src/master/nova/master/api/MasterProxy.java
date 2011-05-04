@@ -1,7 +1,7 @@
 package nova.master.api;
 
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
+import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
@@ -12,10 +12,11 @@ import nova.common.service.protocol.HeartbeatProtocol;
 import nova.common.service.protocol.MonitorProtocol;
 import nova.common.service.protocol.PnodeStatusProtocol;
 import nova.common.service.protocol.SoftwareProtocol;
+import nova.common.service.protocol.VnodeStatusProtocol;
 import nova.master.api.messages.PnodeStatusMessage;
+import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Pnode;
-import nova.master.models.Vnode;
-import nova.worker.api.message.VnodesStatusMessage;
+import nova.master.models.Vnode.Status;
 
 /**
  * Proxy for Master node.
@@ -24,7 +25,8 @@ import nova.worker.api.message.VnodesStatusMessage;
  * 
  */
 public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
-		MonitorProtocol, PnodeStatusProtocol, SoftwareProtocol {
+		MonitorProtocol, PnodeStatusProtocol, SoftwareProtocol,
+		VnodeStatusProtocol {
 
 	public MasterProxy(InetSocketAddress bindAddr) {
 		super(bindAddr);
@@ -60,9 +62,9 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 		super.sendRequest(new SoftwareInstallStatusMessage());
 	}
 
-	public void sendVnodeStatus(SimpleAddress vAddr,
-			ArrayList<Vnode.Status> vnodesStatus) {
-		super.sendRequest(new VnodesStatusMessage(vAddr, vnodesStatus));
+	@Override
+	public void sendVnodeStatus(UUID uuid, Status status) {
+		super.sendRequest(new VnodeStatusMessage(uuid, status));
 	}
 
 }

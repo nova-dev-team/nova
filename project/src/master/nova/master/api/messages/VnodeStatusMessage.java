@@ -1,26 +1,27 @@
 package nova.master.api.messages;
 
-import nova.common.service.SimpleAddress;
+import java.util.UUID;
+
 import nova.master.models.Vnode;
 
 /**
- * A wrapper for {@link SimpleAddress} and {@link Vnode.Status}, so they could
- * be send together.
+ * A wrapper for {@link UUID} and {@link Vnode.Status}, so they could be send
+ * together.
  * 
  * @author santa
  * 
  */
 public class VnodeStatusMessage {
 
-	public VnodeStatusMessage(SimpleAddress vAddr, Vnode.Status status) {
-		this.vAddr = vAddr;
+	public VnodeStatusMessage(UUID uuid, Vnode.Status status) {
+		this.uuid = uuid;
 		this.status = status;
 	}
 
 	/**
-	 * The {@link SimpleAddress}.
+	 * The {@link UUID} for vnode.
 	 */
-	public SimpleAddress vAddr;
+	public UUID uuid;
 
 	/**
 	 * The {@link Vnode.Status}.

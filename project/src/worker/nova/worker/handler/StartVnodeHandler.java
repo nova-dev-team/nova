@@ -9,6 +9,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Utils;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.libvirt.Connect;
@@ -23,6 +24,11 @@ import org.libvirt.LibvirtException;
  */
 public class StartVnodeHandler implements
 		SimpleHandler<StartVnodeHandler.Message> {
+
+	/**
+	 * Log4j logger.
+	 */
+	Logger log = Logger.getLogger(StartVnodeHandler.class);
 
 	/**
 	 * Message for "start new vnode" request.
@@ -55,9 +61,8 @@ public class StartVnodeHandler implements
 		Connect conn = null;
 		try {
 			conn = new Connect("qemu:///system", false);
-		} catch (LibvirtException e1) {
-			System.out.println("exception caught:" + e1);
-			System.out.println(e1.getError());
+		} catch (LibvirtException ex) {
+			log.error(ex);
 		}
 
 		// find conf file, currently using test-domain-template.xml
@@ -76,10 +81,10 @@ public class StartVnodeHandler implements
 			}
 			tmp = sb.toString();
 			br.close();
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (IOException e2) {
-			e2.printStackTrace();
+		} catch (FileNotFoundException ex) {
+			log.error(ex);
+		} catch (IOException ex) {
+			log.error(ex);
 		}
 
 		// create domain and show some info
@@ -89,9 +94,8 @@ public class StartVnodeHandler implements
 					.println("Domain:" + testDomain.getName() + " id "
 							+ testDomain.getID() + " running "
 							+ testDomain.getOSType());
-		} catch (LibvirtException e1) {
-			System.out.println("exception caught:" + e1);
-			System.out.println(e1.getError());
+		} catch (LibvirtException ex) {
+			log.error(ex);
 		}
 
 	}
