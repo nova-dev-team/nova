@@ -41,8 +41,7 @@ public class PerfMon {
 			cpu.nCpu = infoList.length;
 			cpu.model = infoList[0].getModel();
 		} catch (SigarException e) {
-			e.printStackTrace();
-			logger.error("Can't get cpu information!");
+			logger.error("Can't get cpu information!", e);
 		}
 
 		return cpu;
@@ -62,8 +61,7 @@ public class PerfMon {
 			mem.totalMemorySize = sigar.getMem().getTotal();
 			mem.ramSize = sigar.getMem().getRam();
 		} catch (SigarException e) {
-			e.printStackTrace();
-			logger.error("Can't get memory information!");
+			logger.error("Can't get memory information!", e);
 		}
 
 		return mem;
@@ -94,8 +92,7 @@ public class PerfMon {
 			disk.freeDiskSize *= 1000;
 
 		} catch (SigarException e) {
-			e.printStackTrace();
-			logger.error("Can't get disk information!");
+			logger.error("Can't get disk information!", e);
 		}
 		return disk;
 	}
@@ -116,18 +113,18 @@ public class PerfMon {
 			net.bandWidth = netstat.getSpeed();
 			net.downSpeed = netstat.getRxBytes();
 			net.upSpeed = netstat.getTxBytes();
+
 			try {
 				Thread.sleep(1000);
-			} catch (InterruptedException ie) {
-				ie.printStackTrace();
+			} catch (InterruptedException e) {
+				logger.error("Thread interrupted", e);
 			}
 
 			netstat = sigar.getNetInterfaceStat(config.getName());
 			net.downSpeed = netstat.getRxBytes() - net.downSpeed;
 			net.upSpeed = netstat.getTxBytes() - net.upSpeed;
 		} catch (SigarException e) {
-			e.printStackTrace();
-			logger.error("Can't get net information!");
+			logger.error("Can't get net information!", e);
 		}
 
 		return net;
@@ -157,8 +154,7 @@ public class PerfMon {
 			process.lastTimeOfProc = (System.currentTimeMillis() - sigar
 					.getProcTime(pidList[0]).getStartTime()) / 1000;
 		} catch (SigarException e) {
-			e.printStackTrace();
-			logger.error("Can't get process information!");
+			logger.error("Can't get process information!", e);
 		}
 		return process;
 	}
@@ -201,8 +197,7 @@ public class PerfMon {
 			t2.join();
 			t3.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
-			logger.error("Can't get general information!");
+			logger.error("Can't get general information!", e);
 		}
 		return cMonitor;
 	}

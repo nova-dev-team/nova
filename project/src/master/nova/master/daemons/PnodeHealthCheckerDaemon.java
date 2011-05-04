@@ -65,8 +65,7 @@ public class PnodeHealthCheckerDaemon extends SimpleDaemon {
 				wp.sendRequestHeartbeat();
 
 			} catch (Exception e) {
-				e.printStackTrace();
-				logger.error(e);
+				logger.error("Error on pnode " + pnode, e);
 			}
 	}
 }

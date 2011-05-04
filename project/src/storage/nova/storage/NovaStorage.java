@@ -19,14 +19,11 @@ public class NovaStorage extends SimpleServer {
 	static Logger logger = Logger.getLogger(NovaStorage.class);
 
 	public static void main(String[] args) {
-		// TODO @santa setup bind port, username, password, home folder, etc
-
 		Conf conf = null;
 		try {
 			conf = Utils.loadConf();
 		} catch (IOException e) {
-			e.printStackTrace();
-			logger.fatal(e);
+			logger.fatal("Failed to load config file", e);
 			System.exit(1);
 		}
 
@@ -68,8 +65,7 @@ public class NovaStorage extends SimpleServer {
 		try {
 			server.start();
 		} catch (FtpException e) {
-			logger.fatal(e);
-			e.printStackTrace();
+			logger.fatal("Error starting FTP server", e);
 			System.exit(1);
 		}
 

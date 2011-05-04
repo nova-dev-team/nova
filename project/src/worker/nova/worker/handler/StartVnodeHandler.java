@@ -55,14 +55,16 @@ public class StartVnodeHandler implements
 	@Override
 	public void handleMessage(Message msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
-
-		// TODO @shayf Add real handler for creating a new vnode
-		// connect the qemu system
+		// TODO @shayf [future] support both xen and kvm.
+		final String virtService = "qemu:///system";
 		Connect conn = null;
 		try {
-			conn = new Connect("qemu:///system", false);
+			//
+			// connect the qemu system
+			conn = new Connect(virtService, false);
 		} catch (LibvirtException ex) {
-			log.error(ex);
+			// TODO @santa might need to restart libvirt deamon and retry
+			log.error("Error connecting " + virtService, ex);
 		}
 
 		// find conf file, currently using test-domain-template.xml
@@ -82,20 +84,21 @@ public class StartVnodeHandler implements
 			tmp = sb.toString();
 			br.close();
 		} catch (FileNotFoundException ex) {
-			log.error(ex);
+			log.error("Error loading vnode domain template file", ex);
 		} catch (IOException ex) {
-			log.error(ex);
+			log.error("Error loading vnode domain template file", ex);
 		}
 
 		// create domain and show some info
 		try {
+			// TODO @shayf support both windows and linux
 			Domain testDomain = conn.domainCreateLinux(tmp, 0);
 			System.out
 					.println("Domain:" + testDomain.getName() + " id "
 							+ testDomain.getID() + " running "
 							+ testDomain.getOSType());
 		} catch (LibvirtException ex) {
-			log.error(ex);
+			log.error("Create domain failed", ex);
 		}
 
 	}

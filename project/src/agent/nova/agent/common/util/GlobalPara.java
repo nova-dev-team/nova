@@ -67,6 +67,7 @@ public class GlobalPara {
 
 	public GlobalPara() {
 		String s = null;
+		// FIXME @gaotao hard code address is not allowed!
 		File f = new File("d://config.txt");
 		if (f.exists()) {
 			try {
@@ -95,7 +96,7 @@ public class GlobalPara {
 				}
 				br.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Error loading config info", e);
 			}
 		} else {
 			logger.error("Can't find the configuration text!");

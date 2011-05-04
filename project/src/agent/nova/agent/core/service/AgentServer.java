@@ -102,8 +102,8 @@ public class AgentServer extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-				logger.error(e);
+				logger.error("Error joining thread '" + daemon.getName() + "'",
+						e);
 			}
 		}
 		logger.info("All deamons stopped");

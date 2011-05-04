@@ -108,8 +108,8 @@ public class NovaMaster extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-				logger.error(e);
+				logger.error("Error joining thread '" + daemon.getName() + "'",
+						e);
 			}
 		}
 		logger.info("All deamons stopped");
@@ -229,8 +229,7 @@ public class NovaMaster extends SimpleServer {
 					bindPort);
 			NovaMaster.getInstance().bind(bindAddr);
 		} catch (IOException e) {
-			e.printStackTrace();
-			logger.fatal(e);
+			logger.fatal("Error booting master", e);
 			System.exit(1);
 		}
 

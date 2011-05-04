@@ -6,8 +6,8 @@ import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.agent.common.util.GlobalPara;
-import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
+import nova.common.service.SimpleHandler;
 import nova.common.service.message.RequestGeneralMonitorMessage;
 import nova.master.api.MasterProxy;
 
@@ -30,7 +30,7 @@ public class RequestGeneralMonitorMessageHandler implements
 	@Override
 	public void handleMessage(RequestGeneralMonitorMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-		/**
+		/*
 		 * Wake up AgentProxy when a server or a master discover this virtual
 		 * machine
 		 */
@@ -48,11 +48,10 @@ public class RequestGeneralMonitorMessageHandler implements
 						+ xreply);
 
 				GlobalPara.masterProxyMap.put(xreply, monitorProxy);
-			} catch (UnknownHostException e1) {
-				e1.printStackTrace();
-				logger.error("Can't connect to host " + xreply);
+			} catch (UnknownHostException ex) {
+				logger.error("Can't connect to host " + xreply, ex);
 			}
-			/**
+			/*
 			 * use established channel to send GeneralMonitorMessage
 			 */
 		} else {

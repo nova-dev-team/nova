@@ -3,8 +3,8 @@ package nova.master.handler;
 import java.io.File;
 import java.io.IOException;
 
-import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
+import nova.common.service.SimpleHandler;
 import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.common.util.RRDTools;
@@ -47,10 +47,10 @@ public class MasterGeneralMonitorMessageHandler implements
 			RRDTools.addMonitorInfoInRRD(rrdDb, msg.getGeneralMonitorInfo(),
 					Util.getTime());
 			rrdDb.close();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		} catch (RrdException e1) {
-			e1.printStackTrace();
+		} catch (IOException ex) {
+			logger.error("Error updating RRD", ex);
+		} catch (RrdException ex) {
+			logger.error("Error updating RRD", ex);
 		}
 
 		logger.info("Got GeneralMonitorInfo from " + xreply);

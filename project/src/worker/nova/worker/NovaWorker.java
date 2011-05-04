@@ -93,8 +93,8 @@ public class NovaWorker extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-				logger.error(e);
+				logger.error("Error joining thread '" + daemon.getName() + "'",
+						e);
 			}
 		}
 		logger.info("All deamons stopped");
@@ -198,11 +198,9 @@ public class NovaWorker extends SimpleServer {
 					bindPort);
 			NovaWorker.getInstance().bind(bindAddr);
 		} catch (IOException e) {
-			e.printStackTrace();
-			logger.fatal(e);
+			logger.fatal("Error booting worker", e);
 			System.exit(1);
 		}
 
 	}
-
 }

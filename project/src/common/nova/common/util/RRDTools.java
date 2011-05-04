@@ -98,8 +98,7 @@ public class RRDTools {
 			new RrdDb(rrdDef);
 
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.equals("Create RRD failed!");
+			logger.error("Error creating RRD file", e);
 		}
 	}
 
@@ -147,8 +146,7 @@ public class RRDTools {
 
 			return fetchData.getValues();
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.equals("Fetch RRD datas failed!");
+			logger.error("Failed to fetch data from RRD file", e);
 			return null;
 		}
 
@@ -192,9 +190,9 @@ public class RRDTools {
 
 			// rrdDb.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error inserting new value", e);
 		} catch (RrdException e) {
-			e.printStackTrace();
+			logger.error("Error inserting new value", e);
 		}
 	}
 
@@ -263,9 +261,9 @@ public class RRDTools {
 		try {
 			new RrdGraph(gDef);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		} catch (RrdException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		}
 	}
 
@@ -305,9 +303,9 @@ public class RRDTools {
 		try {
 			new RrdGraph(gDef);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		} catch (RrdException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		}
 	}
 
@@ -347,9 +345,9 @@ public class RRDTools {
 		try {
 			new RrdGraph(gDef);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		} catch (RrdException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		}
 	}
 
@@ -391,9 +389,9 @@ public class RRDTools {
 		try {
 			new RrdGraph(gDef);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		} catch (RrdException e) {
-			e.printStackTrace();
+			logger.error("Error plotting RRD graph", e);
 		}
 	}
 }

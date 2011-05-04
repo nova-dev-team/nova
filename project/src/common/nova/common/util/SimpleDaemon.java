@@ -129,7 +129,6 @@ public abstract class SimpleDaemon extends Thread {
 	 *            between each workOneRound() call.
 	 */
 	protected void exceptionCaught(Throwable e) {
-		e.printStackTrace();
-		logger.error(this.getClass().getName() + " caught exception: " + e);
+		logger.error("Exception caught", e.getCause());
 	}
 }

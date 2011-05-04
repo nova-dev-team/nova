@@ -23,12 +23,13 @@ public class NovaAgent {
 		try {
 			logger.info("Nova agent running @ "
 					+ InetAddress.getLocalHost().getHostAddress());
+
+			// santa: bind to 0.0.0.0, so master could always connect to agent
+			String bindAddr = "0.0.0.0";
 			AgentServer.getInstance().bind(
-					new InetSocketAddress(InetAddress.getLocalHost()
-							.getHostAddress(), GlobalPara.BIND_PORT));
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-			logger.fatal(e1);
+					new InetSocketAddress(bindAddr, GlobalPara.BIND_PORT));
+		} catch (UnknownHostException ex) {
+			logger.fatal("Error booting agent", ex);
 		}
 
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled

@@ -25,7 +25,12 @@ import org.jboss.netty.handler.codec.string.StringEncoder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-// TODO @santa Javadoc
+/**
+ * A simple netty powered client.
+ * 
+ * @author santa
+ * 
+ */
 public abstract class SimpleProxy extends SimpleChannelHandler {
 
 	ChannelGroup allChannels = null;
@@ -85,12 +90,12 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 				try {
 					chfl.sem.wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					log.error("Thread interrupted", e);
 				}
 			}
 		}
 		if (!this.channel.isSuccess()) {
-			this.channel.getCause().printStackTrace();
+			log.error("Channel connection failure", this.channel.getCause());
 		}
 		return this.channel;
 	}
@@ -114,8 +119,7 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-		log.error(e.getCause());
-		e.getCause().printStackTrace();
+		log.error("Exception caught", e.getCause());
 		e.getChannel().close();
 	}
 }

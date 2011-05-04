@@ -40,7 +40,7 @@ public class Utils {
 		try {
 			folderPath = cwd.getCanonicalPath();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Failed to determine current working directory", e);
 		}
 
 		// find conf file in folders
@@ -189,7 +189,7 @@ public class Utils {
 			template = sb.toString();
 			br.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Failed to read '" + fpath + "'", e);
 		}
 		return Utils.expandTemplate(template, values);
 	}

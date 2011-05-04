@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import nova.common.service.message.CloseChannelMessage;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
@@ -31,7 +32,12 @@ import org.json.simple.JSONValue;
 
 import com.google.gson.Gson;
 
-// TODO @santa Javadoc
+/**
+ * A simple netty powered server.
+ * 
+ * @author santa
+ * 
+ */
 public class SimpleServer extends SimpleChannelHandler {
 
 	/**
@@ -43,11 +49,13 @@ public class SimpleServer extends SimpleChannelHandler {
 	ChannelFactory factory = null;
 	ServerBootstrap bootstrap = null;
 	Gson gson = new Gson();
+	Logger log = null;
 
 	@SuppressWarnings("rawtypes")
 	Map<Class, SimpleHandler> handlers = new HashMap<Class, SimpleHandler>();
 
 	public SimpleServer() {
+		this.log = Logger.getLogger(this.getClass());
 		this.allChannels = new DefaultChannelGroup();
 		this.factory = new NioServerSocketChannelFactory(
 				Executors.newCachedThreadPool(),
@@ -63,7 +71,7 @@ public class SimpleServer extends SimpleChannelHandler {
 
 				ChannelPipeline pipeline = Channels.pipeline();
 
-				// TODO @santa move this into config?
+				// TODO @santa auto determine if need port unification
 				boolean usePortUnification = true;
 				if (usePortUnification) {
 					pipeline.addLast("portUnification",
@@ -143,7 +151,7 @@ public class SimpleServer extends SimpleChannelHandler {
 						xreply);
 			}
 		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
+			log.error("Error parsing json message", ex);
 		}
 
 		if (xtype.equals(CloseChannelMessage.class.getName().toString())) {
@@ -154,7 +162,7 @@ public class SimpleServer extends SimpleChannelHandler {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-		e.getCause().printStackTrace();
+		log.error("Exception caught", e.getCause());
 		e.getChannel().close();
 	}
 
