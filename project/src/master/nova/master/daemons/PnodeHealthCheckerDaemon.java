@@ -58,7 +58,7 @@ public class PnodeHealthCheckerDaemon extends SimpleDaemon {
 				logger.debug("pinging pnode: " + pnode + ", its status="
 						+ pnode.getStatus());
 				WorkerProxy wp = NovaMaster.getInstance().getWorkerProxy(
-						pnode.getAddress());
+						pnode.getAddr());
 
 				// connection failure could not be detected here, but will be
 				// dected in worker proxy's exceptionCaught() handler.

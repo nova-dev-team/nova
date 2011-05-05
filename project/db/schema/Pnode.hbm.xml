@@ -5,12 +5,23 @@
 <hibernate-mapping>
 
 
-	<class name="nova.master.models.Pnode1" table="pnode">
+	<class name="nova.master.models.Pnode" table="pnode">
 		<id name="id" column="id" type="long">
 			<generator class="native"></generator>
 		</id>
+		
+		<property name="status">
+		  <type name="org.hibernate.type.EnumType">
+		     <param name="enumClass">
+		         nova.master.models.Pnode.Status
+		     </param>
+		  </type>
+	 	</property>
+		
 		<property name="ip" column="ip" type="string"></property>
-		<property name="status" column="status" type="string"></property>
+		<property name="port" column="port" type="integer"></property>
+		<property name="pnodeid" column="pnodeid" type="integer"></property>
+				
 		<property name="hostname" column="hostname" type="string"></property>
 		<property name="uuid" column="uuid" type="string"></property>
 		<property name="macAddress" column="mac_address" type="string"></property>

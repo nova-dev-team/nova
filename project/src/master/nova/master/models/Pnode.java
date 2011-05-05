@@ -40,6 +40,9 @@ public class Pnode {
 		CONNECT_FAILURE,
 	}
 
+	/** for sqlite db */
+	private long id = 1L;
+
 	/**
 	 * Status of the pnode.
 	 */
@@ -49,11 +52,28 @@ public class Pnode {
 	 * The pnode's address.
 	 */
 	SimpleAddress addr;
+	private String ip;
+	private int port;
 
 	/**
 	 * Id of the pnode.
 	 */
-	int id;
+	private int pnodeid;
+
+	/** The host name of physical machine. */
+	private String hostname;
+
+	/** The uuid of the worker machine. */
+	private String uuid;
+
+	/** The MAC address of the worker machine, used for remote booting */
+	private String macAddress;
+
+	/**
+	 * The limit of running VMs on this machine. It is not a hard limit, but
+	 * creating VMs more than this limit will result in low performance.
+	 */
+	private int vmCapacity;
 
 	/**
 	 * Time of last message from the pnode. Used to detect pnode failure. Marked
@@ -81,12 +101,27 @@ public class Pnode {
 		this.status = Pnode.Status.PENDING;
 	}
 
+	public Pnode(Pnode.Status status, SimpleAddress addr, int pnodeid,
+			String hostname, String uuid, String macAddress, Integer vmCapacity) {
+		this.status = Pnode.Status.PENDING;
+		this.addr = addr;
+		this.pnodeid = pnodeid;
+		this.hostname = hostname;
+		this.uuid = uuid;
+		this.macAddress = macAddress;
+		this.vmCapacity = vmCapacity;
+	}
+
 	/**
 	 * Override string present.
 	 */
 	@Override
 	public String toString() {
 		return this.addr.toString();
+	}
+
+	public void setStatus(Pnode.Status status) {
+		this.status = status;
 	}
 
 	public Status getStatus() {
@@ -113,7 +148,79 @@ public class Pnode {
 		this.lastPingTime = new Date();
 	}
 
-	public SimpleAddress getAddress() {
+	public void setAddr(SimpleAddress addr) {
+		this.addr = addr;
+		this.ip = addr.ip;
+		this.port = addr.port;
+	}
+
+	public SimpleAddress getAddr() {
+		this.addr.ip = this.getIp();
+		this.addr.port = this.getPort();
 		return this.addr;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPnodeid(int pnodeid) {
+		this.pnodeid = pnodeid;
+	}
+
+	public int getPnodeid() {
+		return pnodeid;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
+	}
+
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	public void setVmCapacity(Integer vmCapacity) {
+		this.vmCapacity = vmCapacity;
+	}
+
+	public Integer getVmCapacity() {
+		return vmCapacity;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public long getId() {
+		return id;
 	}
 }
