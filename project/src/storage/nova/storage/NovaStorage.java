@@ -17,30 +17,42 @@ public class NovaStorage extends SimpleServer {
 
 	static Logger logger = Logger.getLogger(NovaStorage.class);
 
-	public static void main(String[] args) {
-		// TODO [future] support protocols other than ftp?
-		Conf conf = null;
-		try {
-			conf = Utils.loadConf();
+	/**
+	 * Config info for storage server.
+	 */
+	Conf conf = null;
 
-			conf.setDefaultValue("storage.engine", "ftp");
-			conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
-			conf.setDefaultValue("storage.ftp.bind_port", 8021);
-			conf.setDefaultValue("storage.ftp.home", "storage");
+	FtpServer ftpServer = null;
 
-		} catch (IOException e) {
-			logger.fatal("Failed to load config file", e);
-			System.exit(1);
-		}
+	/**
+	 * Constructor made private for singleton pattern.
+	 */
+	private NovaStorage() {
 
+	}
+
+	/**
+	 * Get config info.
+	 * 
+	 * @return The config info.
+	 */
+	public Conf getConf() {
+		return this.conf;
+	}
+
+	/**
+	 * Set config info.
+	 * 
+	 * @param conf
+	 *            The new config info.
+	 */
+	public void setConf(Conf conf) {
+		this.conf = conf;
+	}
+
+	public void startFtpServer() {
 		FtpServerFactory serverFactory = new FtpServerFactory();
 		ListenerFactory factory = new ListenerFactory();
-
-		// set users
-		String userAccountFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf",
-				"storage.ftp.users.properties");
-		logger.info("User account file: " + userAccountFpath);
-
 		serverFactory.setUserManager(new FtpUserManager());
 
 		// set listener address
@@ -53,7 +65,47 @@ public class NovaStorage extends SimpleServer {
 
 		// replace the default listener
 		serverFactory.addListener("default", factory.createListener());
-		final FtpServer server = serverFactory.createServer();
+		this.ftpServer = serverFactory.createServer();
+
+		// start the server
+		try {
+			this.ftpServer.start();
+		} catch (FtpException e) {
+			logger.fatal("Error starting FTP server", e);
+			System.exit(1);
+		}
+	}
+
+	/**
+	 * Override the shutdown() function, do a few housekeeping work.
+	 */
+	@Override
+	public void shutdown() {
+		logger.info("Shutting down NovaStorage");
+		super.shutdown();
+		this.ftpServer.stop();
+	}
+
+	/**
+	 * Singleton instance of NovaStorage.
+	 */
+	private static NovaStorage instance = null;
+
+	/**
+	 * Get the singleton of NovaStorage.
+	 * 
+	 * @return NovaStorage instance, singleton.
+	 */
+	public static synchronized NovaStorage getInstance() {
+		if (NovaStorage.instance == null) {
+			NovaStorage.instance = new NovaStorage();
+		}
+		return NovaStorage.instance;
+	}
+
+	public static void main(String[] args) {
+
+		// TODO [future] support protocols other than ftp?
 
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled
 		// gracefully
@@ -61,16 +113,25 @@ public class NovaStorage extends SimpleServer {
 			@Override
 			public void run() {
 				// do cleanup work
-				server.stop();
-				logger.info("FTP server stopped");
+				this.setName("cleanup");
+				NovaStorage.getInstance().shutdown();
+				logger.info("Cleanup work done");
 			}
 		});
 
-		// start the server
 		try {
-			server.start();
-		} catch (FtpException e) {
-			logger.fatal("Error starting FTP server", e);
+			Conf conf = Utils.loadConf();
+
+			conf.setDefaultValue("storage.engine", "ftp");
+			conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
+			conf.setDefaultValue("storage.ftp.bind_port", 8021);
+			conf.setDefaultValue("storage.ftp.home", "storage");
+
+			NovaStorage.getInstance().setConf(conf);
+			NovaStorage.getInstance().startFtpServer();
+
+		} catch (IOException e) {
+			logger.fatal("Failed to load config file", e);
 			System.exit(1);
 		}
 

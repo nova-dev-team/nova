@@ -66,7 +66,7 @@ public class NovaAgent extends SimpleServer {
 	/**
 	 * Start a server and register some handler.
 	 */
-	public NovaAgent() {
+	private NovaAgent() {
 		registerHandler(QueryHeartbeatMessage.class,
 				new AgentQueryHeartbeatHandler());
 		registerHandler(QueryPerfMessage.class, new AgentQueryPerfHandler());

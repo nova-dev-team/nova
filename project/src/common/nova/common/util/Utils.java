@@ -85,6 +85,7 @@ public class Utils {
 		for (File f : confDir.listFiles()) {
 			if (f.isFile() && f.getName().startsWith("nova.")
 					&& f.getName().endsWith(".properties")) {
+				logger.info("Loading config from " + f.getAbsolutePath());
 				Conf subConf = new Conf();
 				FileInputStream fis = new FileInputStream(f);
 				subConf.load(fis);
