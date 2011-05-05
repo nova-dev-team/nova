@@ -1,6 +1,6 @@
 package nova.worker.virt;
 
-import java.util.Map;
+import java.util.HashMap;
 
 import nova.common.util.Utils;
 
@@ -26,7 +26,7 @@ public class Kvm {
 	 *            VM parameters.
 	 * @return Emitted XML domain definition.
 	 */
-	public static String emitDomain(Map<String, Object> params) {
+	public static String emitDomain(HashMap<String, Object> params) {
 		String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
 				"kvm-domain-template.xml");
 		return Utils.expandTemplateFile(templateFpath, params);
