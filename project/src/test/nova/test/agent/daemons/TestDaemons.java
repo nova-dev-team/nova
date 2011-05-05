@@ -32,7 +32,7 @@ public class TestDaemons {
 		// Test daemons in agent
 		MasterProxy testProxy = new MasterProxy(new InetSocketAddress(
 				InetAddress.getLocalHost().getHostAddress(),
-				GlobalPara.BIND_PORT));
+				GlobalPara.AGENT_BIND_PORT));
 		testProxy.connect(new InetSocketAddress("10.0.1.236", 9876));
 
 		GlobalPara.masterProxyMap.put(new SimpleAddress("10.0.1.236", 9876),

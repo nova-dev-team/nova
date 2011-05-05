@@ -39,7 +39,7 @@ public class RequestGeneralMonitorMessageHandler implements
 			try {
 				MasterProxy monitorProxy = new MasterProxy(
 						new InetSocketAddress(InetAddress.getLocalHost()
-								.getHostAddress(), GlobalPara.BIND_PORT));
+								.getHostAddress(), GlobalPara.AGENT_BIND_PORT));
 
 				monitorProxy.connect(xreply.getInetSocketAddress());
 				monitorProxy.sendMonitorInfo();

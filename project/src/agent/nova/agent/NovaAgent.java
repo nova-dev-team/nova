@@ -25,9 +25,10 @@ public class NovaAgent {
 					+ InetAddress.getLocalHost().getHostAddress());
 
 			// santa: bind to 0.0.0.0, so master could always connect to agent
-			String bindAddr = "0.0.0.0";
+
 			AgentServer.getInstance().bind(
-					new InetSocketAddress(bindAddr, GlobalPara.BIND_PORT));
+					new InetSocketAddress(GlobalPara.AGENT_BIND_HOST,
+							GlobalPara.AGENT_BIND_PORT));
 		} catch (UnknownHostException ex) {
 			logger.fatal("Error booting agent", ex);
 		}

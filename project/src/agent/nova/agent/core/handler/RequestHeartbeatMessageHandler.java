@@ -40,7 +40,7 @@ public class RequestHeartbeatMessageHandler implements
 			try {
 				MasterProxy heartbeatProxy = new MasterProxy(
 						new InetSocketAddress(InetAddress.getLocalHost()
-								.getHostAddress(), GlobalPara.BIND_PORT));
+								.getHostAddress(), GlobalPara.AGENT_BIND_PORT));
 
 				heartbeatProxy.connect(xreply.getInetSocketAddress());
 				heartbeatProxy.sendHeartbeat();
