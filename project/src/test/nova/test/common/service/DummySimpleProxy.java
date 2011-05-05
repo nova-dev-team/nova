@@ -20,31 +20,31 @@ public class DummySimpleProxy {
 		// Connect to server and establish a channel
 		hp.connect(new InetSocketAddress("localhost", 9876));
 
-		// // TestRequestSoftwareMessage in agent
-		// LinkedList<String> installSoftList = new LinkedList<String>();
-		// installSoftList.offer("test1.exe");
-		// installSoftList.offer("test2.exe");
-		// installSoftList.offer("test3.exe");
-		// hp.sendRequestSoftwareMessage(installSoftList);
-		// try {
-		// Thread.sleep(1000);
-		// } catch (InterruptedException e1) {
-		// e1.printStackTrace();
-		// }
-		// installSoftList.clear();
-		// installSoftList.offer("test4.exe");
-		// hp.sendRequestSoftwareMessage(installSoftList);
-		//
-		// installSoftList.clear();
-		// installSoftList.offer("test5.exe");
-		// installSoftList.offer("test6.exe");
-		// hp.sendRequestSoftwareMessage(installSoftList);
+		// TestRequestSoftwareMessage in agent
+		LinkedList<String> installSoftList = new LinkedList<String>();
+		installSoftList.offer("test1.exe");
+		installSoftList.offer("test2.exe");
+		installSoftList.offer("test3.exe");
+		hp.sendRequestSoftwareMessage(installSoftList);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		installSoftList.clear();
+		installSoftList.offer("test4.exe");
+		hp.sendRequestSoftwareMessage(installSoftList);
+
+		installSoftList.clear();
+		installSoftList.offer("test5.exe");
+		installSoftList.offer("test6.exe");
+		hp.sendRequestSoftwareMessage(installSoftList);
 
 		// Send many messages through this channel
-		for (int j = 0; j < 1000; j++) {
-			hp.sendHeartbeatMessage();
-		}
-		hp.sendGeneralMonitorMessage();
+		// for (int j = 0; j < 1000; j++) {
+		// hp.sendHeartbeatMessage();
+		// }
+		// hp.sendGeneralMonitorMessage();
 
 		hp.sendCloseChannelMessage(); // Close message
 		hp.close();
