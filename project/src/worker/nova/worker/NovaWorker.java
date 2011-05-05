@@ -5,18 +5,18 @@ import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
-import nova.common.service.message.RequestHeartbeatMessage;
+import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 import nova.worker.api.messages.StartVnodeMessage;
-import nova.worker.daemons.HeartbeatDaemon;
-import nova.worker.daemons.MonitorInfoDaemon;
-import nova.worker.daemons.ReportVnodeStatusDaemon;
+import nova.worker.daemons.VnodeStatusDaemon;
+import nova.worker.daemons.WorkerHeartbeatDaemon;
+import nova.worker.daemons.WorkerPerfInfoDaemon;
 import nova.worker.handler.StartVnodeHandler;
-import nova.worker.handler.WorkerHttpRequestHandler;
-import nova.worker.handler.WorkerRequestHeartbeatMessageHandler;
+import nova.worker.handler.WorkerHttpHandler;
+import nova.worker.handler.WorkerQueryHeartbeatHandler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
@@ -39,8 +39,8 @@ public class NovaWorker extends SimpleServer {
 	/**
 	 * All background working daemons for worker node.
 	 */
-	SimpleDaemon daemons[] = { new HeartbeatDaemon(), new MonitorInfoDaemon(),
-			new ReportVnodeStatusDaemon() };
+	SimpleDaemon daemons[] = { new WorkerHeartbeatDaemon(),
+			new WorkerPerfInfoDaemon(), new VnodeStatusDaemon() };
 
 	/**
 	 * Connection to nova master.
@@ -54,13 +54,12 @@ public class NovaWorker extends SimpleServer {
 		// TODO @shayf register handlers
 
 		// handle http requests
-		this.registerHandler(DefaultHttpRequest.class,
-				new WorkerHttpRequestHandler());
+		this.registerHandler(DefaultHttpRequest.class, new WorkerHttpHandler());
 
 		this.registerHandler(StartVnodeMessage.class, new StartVnodeHandler());
 
-		this.registerHandler(RequestHeartbeatMessage.class,
-				new WorkerRequestHeartbeatMessageHandler());
+		this.registerHandler(QueryHeartbeatMessage.class,
+				new WorkerQueryHeartbeatHandler());
 	}
 
 	/**
@@ -93,8 +92,7 @@ public class NovaWorker extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				logger.error("Error joining thread '" + daemon.getName() + "'",
-						e);
+				logger.error("Error joining thread " + daemon.getName(), e);
 			}
 		}
 		logger.info("All deamons stopped");

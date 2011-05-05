@@ -4,13 +4,13 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
+import nova.agent.api.messages.QueryApplianceStatusMessage;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
-import nova.common.service.message.GeneralMonitorMessage;
+import nova.common.service.message.PerfMessage;
 import nova.common.service.message.HeartbeatMessage;
-import nova.common.service.message.RequestGeneralMonitorMessage;
-import nova.common.service.message.RequestHeartbeatMessage;
-import nova.common.service.message.RequestSoftwareMessage;
+import nova.common.service.message.QueryPerfMessage;
+import nova.common.service.message.QueryHeartbeatMessage;
 
 public class DummySimpleProxy {
 	public void run() throws UnknownHostException {
@@ -74,23 +74,23 @@ class MessageProxy extends SimpleProxy { // A client example
 	}
 
 	public void sendGeneralMonitorMessage() throws UnknownHostException {
-		this.sendRequest(new GeneralMonitorMessage());
+		this.sendRequest(new PerfMessage());
 	}
 
 	public void sendRequestGeneralMonitorMessage() throws UnknownHostException {
-		this.sendRequest(new RequestGeneralMonitorMessage());
+		this.sendRequest(new QueryPerfMessage());
 	}
 
 	public void sendCloseChannelMessage() throws UnknownHostException {
 		this.sendRequest(new CloseChannelMessage());
 	}
 
-	public void sendRequestHeartBeatMessage() {
-		this.sendRequest(new RequestHeartbeatMessage());
+	public void sendRequestHeartbeatMessage() {
+		this.sendRequest(new QueryHeartbeatMessage());
 	}
 
 	public void sendRequestSoftwareMessage(LinkedList<String> installSoftList) {
-		this.sendRequest(new RequestSoftwareMessage(installSoftList));
+		this.sendRequest(new QueryApplianceStatusMessage(installSoftList));
 	}
 
 }

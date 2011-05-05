@@ -1,6 +1,6 @@
 package nova.test.agent.core;
 
-import nova.agent.core.DownloadProgress;
+import nova.agent.DownloadProgress;
 
 import org.junit.Ignore;
 

@@ -15,10 +15,6 @@ public class CpuInfo {
 	public int nCpu = 0;
 	public String model = "";
 
-	public CpuInfo() {
-
-	}
-
 	@Override
 	public String toString() {
 		Gson gson = new Gson();

@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
-import nova.common.service.message.RequestHeartbeatMessage;
+import nova.common.service.message.QueryHeartbeatMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 
 /**
@@ -29,7 +29,7 @@ public class WorkerProxy extends SimpleProxy {
 	}
 
 	public void sendRequestHeartbeat() {
-		super.sendRequest(new RequestHeartbeatMessage());
+		super.sendRequest(new QueryHeartbeatMessage());
 	}
 
 }

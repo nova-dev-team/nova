@@ -6,19 +6,19 @@ import java.util.HashMap;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
-import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.message.PerfMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
-import nova.master.daemons.PnodeHealthCheckerDaemon;
-import nova.master.handler.MasterGeneralMonitorMessageHandler;
+import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.MasterHeartbeatHandler;
-import nova.master.handler.MasterHttpRequestHandler;
-import nova.master.handler.PnodeStatusMessageHandler;
-import nova.master.handler.VnodeStatusMessageHandler;
+import nova.master.handler.MasterHttpHandler;
+import nova.master.handler.MasterPerfHandler;
+import nova.master.handler.PnodeStatusHandler;
+import nova.master.handler.VnodeStatusHandler;
 import nova.master.models.MasterDB;
 import nova.master.models.Pnode;
 import nova.worker.api.WorkerProxy;
@@ -44,7 +44,7 @@ public class NovaMaster extends SimpleServer {
 	/**
 	 * All background working daemons for master node.
 	 */
-	SimpleDaemon daemons[] = { new PnodeHealthCheckerDaemon() };
+	SimpleDaemon daemons[] = { new PnodeCheckerDaemon() };
 
 	/**
 	 * Master's db.
@@ -60,20 +60,16 @@ public class NovaMaster extends SimpleServer {
 		// register handlers
 
 		// handle http requests
-		this.registerHandler(DefaultHttpRequest.class,
-				new MasterHttpRequestHandler());
+		this.registerHandler(DefaultHttpRequest.class, new MasterHttpHandler());
 
 		this.registerHandler(HeartbeatMessage.class,
 				new MasterHeartbeatHandler());
 
-		this.registerHandler(PnodeStatusMessage.class,
-				new PnodeStatusMessageHandler());
+		this.registerHandler(PnodeStatusMessage.class, new PnodeStatusHandler());
 
-		this.registerHandler(VnodeStatusMessage.class,
-				new VnodeStatusMessageHandler());
+		this.registerHandler(VnodeStatusMessage.class, new VnodeStatusHandler());
 
-		this.registerHandler(GeneralMonitorMessage.class,
-				new MasterGeneralMonitorMessageHandler());
+		this.registerHandler(PerfMessage.class, new MasterPerfHandler());
 
 		// TODO @zhaoxun connect db
 	}
@@ -108,8 +104,7 @@ public class NovaMaster extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				logger.error("Error joining thread '" + daemon.getName() + "'",
-						e);
+				logger.error("Error joining thread " + daemon.getName(), e);
 			}
 		}
 		logger.info("All deamons stopped");

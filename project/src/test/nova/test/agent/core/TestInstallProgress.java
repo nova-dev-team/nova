@@ -1,6 +1,6 @@
 package nova.test.agent.core;
 
-import nova.agent.core.InstallProgress;
+import nova.agent.InstallProgress;
 import nova.common.util.Utils;
 
 import org.junit.Ignore;

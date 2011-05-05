@@ -1,11 +1,11 @@
 package nova.common.service.message;
 
 /**
- * Close one channel message
+ * Request general monitor information message
  * 
  * @author gaotao1987@gmail.com
  * 
  */
-public class CloseChannelMessage {
+public class QueryPerfMessage {
 
 }

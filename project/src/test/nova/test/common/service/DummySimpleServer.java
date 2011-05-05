@@ -2,17 +2,11 @@ package nova.test.common.service;
 
 import java.net.InetSocketAddress;
 
-import nova.agent.core.handler.CloseChannelMessageHandler;
-import nova.agent.core.handler.GeneralMonitorMessageHandler;
-import nova.agent.core.handler.HeartbeatMessageHandler;
-import nova.agent.core.handler.RequestHeartbeatMessageHandler;
-import nova.agent.core.handler.RequestSoftwareMessageHandler;
+import nova.agent.api.messages.QueryApplianceStatusMessage;
+import nova.agent.handler.AgentQueryHeartbeatHandler;
+import nova.agent.handler.QueryApplianceStatusHandler;
 import nova.common.service.SimpleServer;
-import nova.common.service.message.CloseChannelMessage;
-import nova.common.service.message.GeneralMonitorMessage;
-import nova.common.service.message.HeartbeatMessage;
-import nova.common.service.message.RequestHeartbeatMessage;
-import nova.common.service.message.RequestSoftwareMessage;
+import nova.common.service.message.QueryHeartbeatMessage;
 
 public class DummySimpleServer {
 
@@ -24,17 +18,10 @@ public class DummySimpleServer {
 
 		SimpleServer svr = new SimpleServer(); // Create a server
 
-		// Register 5 type of message handler to server
-		svr.registerHandler(GeneralMonitorMessage.class,
-				new GeneralMonitorMessageHandler());
-		svr.registerHandler(HeartbeatMessage.class,
-				new HeartbeatMessageHandler());
-		svr.registerHandler(CloseChannelMessage.class,
-				new CloseChannelMessageHandler());
-		svr.registerHandler(RequestHeartbeatMessage.class,
-				new RequestHeartbeatMessageHandler());
-		svr.registerHandler(RequestSoftwareMessage.class,
-				new RequestSoftwareMessageHandler());
+		svr.registerHandler(QueryHeartbeatMessage.class,
+				new AgentQueryHeartbeatHandler());
+		svr.registerHandler(QueryApplianceStatusMessage.class,
+				new QueryApplianceStatusHandler());
 
 		svr.bind(new InetSocketAddress(BIND_PORT));
 

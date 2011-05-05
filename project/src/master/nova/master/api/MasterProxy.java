@@ -3,15 +3,15 @@ package nova.master.api;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 
+import nova.agent.api.messages.InstallApplianceMessage;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
-import nova.common.service.message.GeneralMonitorMessage;
+import nova.common.service.message.PerfMessage;
 import nova.common.service.message.HeartbeatMessage;
-import nova.common.service.message.SoftwareInstallStatusMessage;
 import nova.common.service.protocol.HeartbeatProtocol;
 import nova.common.service.protocol.MonitorProtocol;
 import nova.common.service.protocol.PnodeStatusProtocol;
-import nova.common.service.protocol.SoftwareProtocol;
+import nova.common.service.protocol.ApplianceProtocol;
 import nova.common.service.protocol.VnodeStatusProtocol;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
@@ -25,7 +25,7 @@ import nova.master.models.Vnode.Status;
  * 
  */
 public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
-		MonitorProtocol, PnodeStatusProtocol, SoftwareProtocol,
+		MonitorProtocol, PnodeStatusProtocol, ApplianceProtocol,
 		VnodeStatusProtocol {
 
 	public MasterProxy(InetSocketAddress bindAddr) {
@@ -49,7 +49,7 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 	 */
 	@Override
 	public void sendMonitorInfo() {
-		super.sendRequest(new GeneralMonitorMessage());
+		super.sendRequest(new PerfMessage());
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 
 	@Override
 	public void sendSoftwareStatus() {
-		super.sendRequest(new SoftwareInstallStatusMessage());
+		super.sendRequest(new InstallApplianceMessage());
 	}
 
 	@Override
