@@ -1,5 +1,9 @@
 package nova.agent.daemons;
 
+import nova.agent.NovaAgent;
+import nova.agent.daemons.helper.ApplianceFetcher;
+import nova.agent.daemons.helper.FtpApplianceFetcher;
+import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 
 /**
@@ -10,8 +14,14 @@ import nova.common.util.SimpleDaemon;
  */
 public class PackageInstallDaemon extends SimpleDaemon {
 
-	private PackageInstallDaemon() {
+	Conf conf = null;
+
+	ApplianceFetcher fetcher = null;
+
+	private PackageInstallDaemon(Conf conf) {
 		super(100);
+		this.conf = conf;
+		fetcher = new FtpApplianceFetcher(this.conf);
 	}
 
 	@Override
@@ -27,7 +37,8 @@ public class PackageInstallDaemon extends SimpleDaemon {
 
 	public static synchronized PackageInstallDaemon getInstance() {
 		if (PackageInstallDaemon.instance == null) {
-			PackageInstallDaemon.instance = new PackageInstallDaemon();
+			PackageInstallDaemon.instance = new PackageInstallDaemon(NovaAgent
+					.getInstance().getConf());
 		}
 		return PackageInstallDaemon.instance;
 	}

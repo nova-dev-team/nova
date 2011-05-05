@@ -1,6 +1,5 @@
 package nova.agent.daemons;
 
-import nova.agent.DownloadProgress;
 import nova.common.util.SimpleDaemon;
 
 /**
@@ -11,8 +10,6 @@ import nova.common.util.SimpleDaemon;
  */
 public class PackageDownloadDaemon extends SimpleDaemon {
 
-	public DownloadProgress dlp = new DownloadProgress();
-
 	public PackageDownloadDaemon() {
 		super(100);
 	}
@@ -21,4 +18,5 @@ public class PackageDownloadDaemon extends SimpleDaemon {
 	protected void workOneRound() {
 		// TODO @santa
 	}
+
 }

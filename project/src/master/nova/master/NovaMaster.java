@@ -217,6 +217,9 @@ public class NovaMaster extends SimpleServer {
 
 		try {
 			Conf conf = Utils.loadConf();
+			conf.setDefaultValue("master.bind_host", "0.0.0.0");
+			conf.setDefaultValue("master.bind_port", 3000);
+
 			NovaMaster.getInstance().setConf(conf);
 			String bindHost = conf.getString("master.bind_host");
 			Integer bindPort = conf.getInteger("master.bind_port");

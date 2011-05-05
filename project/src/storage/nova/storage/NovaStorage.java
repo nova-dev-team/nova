@@ -1,17 +1,16 @@
 package nova.storage;
 
-import java.io.File;
 import java.io.IOException;
 
 import nova.common.service.SimpleServer;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
+import nova.storage.ftp.FtpUserManager;
 
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.apache.ftpserver.listener.ListenerFactory;
-import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.log4j.Logger;
 
 public class NovaStorage extends SimpleServer {
@@ -19,9 +18,16 @@ public class NovaStorage extends SimpleServer {
 	static Logger logger = Logger.getLogger(NovaStorage.class);
 
 	public static void main(String[] args) {
+		// TODO [future] support protocols other than ftp?
 		Conf conf = null;
 		try {
 			conf = Utils.loadConf();
+
+			conf.setDefaultValue("storage.engine", "ftp");
+			conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
+			conf.setDefaultValue("storage.ftp.bind_port", 8021);
+			conf.setDefaultValue("storage.ftp.home", "storage");
+
 		} catch (IOException e) {
 			logger.fatal("Failed to load config file", e);
 			System.exit(1);
@@ -34,9 +40,8 @@ public class NovaStorage extends SimpleServer {
 		String userAccountFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf",
 				"storage.ftp.users.properties");
 		logger.info("User account file: " + userAccountFpath);
-		PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
-		userManagerFactory.setFile(new File(userAccountFpath));
-		serverFactory.setUserManager(userManagerFactory.createUserManager());
+
+		serverFactory.setUserManager(new FtpUserManager());
 
 		// set listener address
 		logger.info("FTP server will be running @ "

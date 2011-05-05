@@ -178,7 +178,7 @@ public class NovaAgent extends SimpleServer {
 		});
 
 		try {
-			Conf conf = Utils.loadAgentConf();
+			Conf conf = Utils.loadConf();
 			NovaAgent.getInstance().setConf(conf);
 			String bindHost = conf.getString("agent.bind_host");
 			Integer bindPort = conf.getInteger("agent.bind_port");

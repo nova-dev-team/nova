@@ -190,6 +190,9 @@ public class NovaWorker extends SimpleServer {
 
 		try {
 			Conf conf = Utils.loadConf();
+			conf.setDefaultValue("worker.bind_host", "0.0.0.0");
+			conf.setDefaultValue("worker.bind_port", 4000);
+
 			NovaWorker.getInstance().setConf(conf);
 			String bindHost = conf.getString("worker.bind_host");
 			Integer bindPort = conf.getInteger("worker.bind_port");
