@@ -1,11 +1,11 @@
 package nova.common.service.message;
 
 /**
- * Close one channel message
+ * Request heartbeat message
  * 
  * @author gaotao1987@gmail.com
  * 
  */
-public class CloseChannelMessage {
+public class QueryHeartbeatMessage {
 
 }

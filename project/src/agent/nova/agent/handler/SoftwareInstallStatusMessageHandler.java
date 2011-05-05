@@ -2,9 +2,9 @@ package nova.agent.handler;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+import nova.agent.api.messages.InstallApplianceMessage;
 import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
-import nova.common.service.message.SoftwareInstallStatusMessage;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -16,11 +16,11 @@ import org.jboss.netty.channel.MessageEvent;
  * 
  */
 public class SoftwareInstallStatusMessageHandler implements
-		SimpleHandler<SoftwareInstallStatusMessage> {
+		SimpleHandler<InstallApplianceMessage> {
 	AtomicLong counter = new AtomicLong();
 
 	@Override
-	public void handleMessage(SoftwareInstallStatusMessage msg,
+	public void handleMessage(InstallApplianceMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		System.out.println(counter.incrementAndGet());
 		System.out.println(msg.getClass().getName());

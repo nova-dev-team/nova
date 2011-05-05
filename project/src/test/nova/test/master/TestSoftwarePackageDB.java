@@ -2,14 +2,14 @@ package nova.test.master;
 
 import junit.framework.TestCase;
 import nova.common.db.HibernateUtil;
-import nova.master.models.SoftwarePackage;
+import nova.master.models.Appliance;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 public class TestSoftwarePackageDB extends TestCase {
 	public void testSave() {
-		SoftwarePackage soft = new SoftwarePackage();
+		Appliance soft = new Appliance();
 		soft.setFileName("blah");
 		soft.setDisplayName("haha");
 		soft.setDescription("blahlalalal");

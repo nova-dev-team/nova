@@ -19,10 +19,6 @@ public class MemoryInfo {
 	public long freeMemorySize = 0;
 	public long ramSize = 0;
 
-	public MemoryInfo() {
-
-	}
-
 	@Override
 	public String toString() {
 		Gson gson = new Gson();

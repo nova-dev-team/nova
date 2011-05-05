@@ -10,14 +10,11 @@ import com.google.gson.Gson;
  * 
  */
 public class ProcInfo {
+
 	public double cpuUtilization = 0;
 	public long residentSetSize = 0;
 	public long virtualSetSize = 0;
 	public long lastTimeOfProc = 0;
-
-	public ProcInfo() {
-
-	}
 
 	@Override
 	public String toString() {

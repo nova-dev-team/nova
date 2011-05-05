@@ -3,20 +3,130 @@ package nova.agent;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
-import nova.agent.common.util.GlobalPara;
-import nova.agent.core.service.AgentServer;
+import nova.agent.api.messages.QueryApplianceStatusMessage;
+import nova.agent.daemons.AgentHeartbeatDaemon;
+import nova.agent.daemons.AgentPerfInfoDaemon;
+import nova.agent.daemons.PackageDownloadDaemon;
+import nova.agent.daemons.PackageInstallDaemon;
+import nova.agent.handler.AgentRequestHeartbeatHandler;
+import nova.agent.handler.AgentRequestPerfHandler;
+import nova.agent.handler.RequestSoftwareMessageHandler;
+import nova.common.service.SimpleServer;
+import nova.common.service.message.QueryHeartbeatMessage;
+import nova.common.service.message.QueryPerfMessage;
+import nova.common.util.SimpleDaemon;
 
 import org.apache.log4j.Logger;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
 
 /**
- * Agent implementation
+ * The agent server model of nova
  * 
  * @author gaotao1987@gmail.com
  * 
  */
-public class NovaAgent {
+public class NovaAgent extends SimpleServer {
+	/**
+	 * Log4j logger.
+	 */
 	static Logger logger = Logger.getLogger(NovaAgent.class);
+
+	/**
+	 * Singleton instance of AgentServer.
+	 */
+	private static NovaAgent instance = null;
+
+	InetSocketAddress bindAddr = null;
+
+	/**
+	 * All background working daemons for agent node.
+	 */
+	public ArrayList<SimpleDaemon> daemons = new ArrayList<SimpleDaemon>();
+
+	/**
+	 * Start a server and register some handler.
+	 */
+	public NovaAgent() {
+		registerHandler(QueryHeartbeatMessage.class,
+				new AgentRequestHeartbeatHandler());
+		registerHandler(QueryPerfMessage.class, new AgentRequestPerfHandler());
+		registerHandler(QueryApplianceStatusMessage.class,
+				new RequestSoftwareMessageHandler());
+		/**
+		 * DownloadProgressDaemon and installProcessDaemon start
+		 */
+		PackageDownloadDaemon downloadProgressDaemon = new PackageDownloadDaemon();
+		daemons.add(downloadProgressDaemon);
+
+		PackageInstallDaemon installProgressDaemon = new PackageInstallDaemon();
+		daemons.add(installProgressDaemon);
+
+		AgentHeartbeatDaemon hbDaemon = new AgentHeartbeatDaemon();
+		daemons.add(hbDaemon);
+
+		AgentPerfInfoDaemon gmDaemon = new AgentPerfInfoDaemon();
+		daemons.add(gmDaemon);
+	}
+
+	@Override
+	public Channel bind(InetSocketAddress bindAddr) {
+		this.bindAddr = bindAddr;
+		Channel chnl = super.bind(this.bindAddr);
+		for (SimpleDaemon daemon : this.daemons) {
+			daemon.start();
+		}
+		return chnl;
+	}
+
+	/**
+	 * Override the shutdown() function, do a few housekeeping work.
+	 */
+	@Override
+	public void shutdown() {
+		logger.info("Shutting down AgentServer");
+		// stop all daemons
+		for (SimpleDaemon daemon : this.daemons) {
+			daemon.stopWork();
+		}
+		for (SimpleDaemon daemon : this.daemons) {
+			try {
+				daemon.join();
+			} catch (InterruptedException e) {
+				logger.error("Error joining thread '" + daemon.getName() + "'",
+						e);
+			}
+		}
+		logger.info("All deamons stopped");
+		super.shutdown();
+		this.bindAddr = null;
+
+		NovaAgent.instance = null;
+	}
+
+	/**
+	 * Log exception.
+	 */
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
+		logger.error(e.getCause());
+		super.exceptionCaught(ctx, e);
+	}
+
+	/**
+	 * Get the singleton of AgentServer.
+	 * 
+	 * @return AgentServer instance, singleton.
+	 */
+	public static synchronized NovaAgent getInstance() {
+		if (NovaAgent.instance == null) {
+			NovaAgent.instance = new NovaAgent();
+		}
+		return NovaAgent.instance;
+	}
 
 	public static void main(String[] args) {
 
@@ -26,7 +136,7 @@ public class NovaAgent {
 
 			// santa: bind to 0.0.0.0, so master could always connect to agent
 
-			AgentServer.getInstance().bind(
+			NovaAgent.getInstance().bind(
 					new InetSocketAddress(GlobalPara.AGENT_BIND_HOST,
 							GlobalPara.AGENT_BIND_PORT));
 		} catch (UnknownHostException ex) {
@@ -39,7 +149,7 @@ public class NovaAgent {
 			@Override
 			public void run() {
 				// do cleanup work
-				AgentServer.getInstance().shutdown();
+				NovaAgent.getInstance().shutdown();
 				logger.info("Cleanup agent done");
 			}
 		});

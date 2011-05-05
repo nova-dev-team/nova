@@ -4,16 +4,16 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-import nova.agent.common.util.GlobalPara;
-import nova.agent.daemons.GeneralMonitorDaemon;
-import nova.agent.daemons.HeartbeatDaemon;
+import nova.agent.GlobalPara;
+import nova.agent.daemons.AgentPerfInfoDaemon;
+import nova.agent.daemons.AgentHeartbeatDaemon;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
-import nova.common.service.message.GeneralMonitorMessage;
+import nova.common.service.message.PerfMessage;
 import nova.common.service.message.HeartbeatMessage;
-import nova.common.service.message.RequestGeneralMonitorMessage;
-import nova.common.service.message.RequestHeartbeatMessage;
+import nova.common.service.message.QueryPerfMessage;
+import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 
@@ -38,8 +38,8 @@ public class TestDaemons {
 		GlobalPara.masterProxyMap.put(new SimpleAddress("10.0.1.236", 9876),
 				testProxy);
 
-		SimpleDaemon[] simpleDaemons = { new HeartbeatDaemon(),
-				new GeneralMonitorDaemon() };
+		SimpleDaemon[] simpleDaemons = { new AgentHeartbeatDaemon(),
+				new AgentPerfInfoDaemon() };
 		for (SimpleDaemon daemon : simpleDaemons) {
 			daemon.start();
 		}
@@ -62,19 +62,19 @@ class MessageProxy extends SimpleProxy { // A client example
 	}
 
 	public void sendGeneralMonitorMessage() throws UnknownHostException {
-		this.sendRequest(new GeneralMonitorMessage());
+		this.sendRequest(new PerfMessage());
 	}
 
 	public void sendRequestGeneralMonitorMessage() throws UnknownHostException {
-		this.sendRequest(new RequestGeneralMonitorMessage());
+		this.sendRequest(new QueryPerfMessage());
 	}
 
 	public void sendCloseChannelMessage() throws UnknownHostException {
 		this.sendRequest(new CloseChannelMessage());
 	}
 
-	public void sendRequestHeartBeatMessage() {
-		this.sendRequest(new RequestHeartbeatMessage());
+	public void sendRequestHeartbeatMessage() {
+		this.sendRequest(new QueryHeartbeatMessage());
 	}
 
 }
