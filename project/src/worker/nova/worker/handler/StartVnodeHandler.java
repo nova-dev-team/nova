@@ -43,9 +43,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			log.error("Error connecting " + virtService, ex);
 		}
 
-		// TODO @shayf get real config value from files
-		msg.setHyperVisor("kvm");
-		msg.setName("vm1");
+		// TODO @shayf later generate a proper name and uuid and others
+		msg.setName("vm");
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
 		msg.setMemSize("524288");
 		msg.setCpuCount("1");
@@ -58,14 +57,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 		} else {
 			msg.setBootDevice("hd");
 		}
-		if (msg.getHyperVisor() == "kvm") {
-			msg.setEmulatorPath("/usr/bin/kvm");
-		} else if (msg.getHyperVisor() == "xen") {
-			// TODO @shayf update path
-			msg.setEmulatorPath("some other path");
-		} else {
-			msg.setEmulatorPath("some other path");
-		}
+		msg.setEmulatorPath("/usr/bin/kvm");
+
 		msg.setRunAgent("false");
 		if (msg.getRunAgent() == "true") {
 			msg.setCdromPath(Utils.pathJoin(Utils.NOVA_HOME, msg.getName(),
@@ -92,6 +85,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 		if ((vmNetworkInterface != "") && (vmNetworkBridge != "")) {
 			msg.setInterfaceType("bridge");
 			msg.setSourcebridge(vmNetworkBridge);
+			// generate a random macAddress
 			msg.setMacAddress(Integer.toHexString((int) (16 + Math.random() * 240))
 					+ ":"
 					+ Integer.toHexString((int) (16 + Math.random() * 240))

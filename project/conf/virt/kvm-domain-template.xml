@@ -1,10 +1,10 @@
-<domain type='${hyperVisor}'>
+<domain type='kvm'>
 <name>${name}</name>
 <uuid>${uuid}</uuid>
 <memory>${memSize}</memory>
 <vcpu>${cpuCount}</vcpu>
 <os>
-  <type arch='${arch}' machine='${machine}'>hvm</type>
+  <type arch='${arch}' machine='pc'>hvm</type>
   <boot dev='${bootDevice}'/>
 </os>
 <features>

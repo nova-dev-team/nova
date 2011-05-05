@@ -15,9 +15,7 @@ public class StartVnodeMessage {
 	/**
 	 * params for config
 	 */
-	String hyperVisor;
 	String name;
-	String machine;
 	String uuid;
 	String memSize;
 	String cpuCount;
@@ -127,22 +125,6 @@ public class StartVnodeMessage {
 		this.emulatorPath = emulatorPath;
 	}
 
-	public String getHyperVisor() {
-		return hyperVisor;
-	}
-
-	public void setHyperVisor(String hyperVisor) {
-		this.hyperVisor = hyperVisor;
-	}
-
-	public String getMachine() {
-		return machine;
-	}
-
-	public void setMachine(String machine) {
-		this.machine = machine;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -224,7 +206,6 @@ public class StartVnodeMessage {
 		values.put("determinCdrom", determinCdrom);
 		values.put("determinNetwork", determinNetwork);
 		values.put("determinVnc", determinVnc);
-		values.put("hyperVisor", hyperVisor);
 		values.put("name", name);
 		values.put("uuid", uuid);
 		values.put("memSize", memSize);
