@@ -1,10 +1,10 @@
-<domain type='${hyperVisor}'>
+<domain type='kvm'>
 <name>${name}</name>
 <uuid>${uuid}</uuid>
 <memory>${memSize}</memory>
 <vcpu>${cpuCount}</vcpu>
 <os>
-  <type arch='${arch}' machine='${machine}'>hvm</type>
+  <type arch='${arch}' machine='pc'>hvm</type>
   <boot dev='${bootDevice}'/>
 </os>
 <features>
@@ -17,16 +17,9 @@
     <source file='/var/lib/libvirt/images/linux.img'/>
     <target dev='hda'/>
   </disk>
-  <disk type='file' device='cdrom'>
-    <source file='${cdromPath}'/>
-    <target dev='hdc'/>
-  </disk>
-
-  <interface type='${interfaceType}'>
-    <source network='${sourceNetwork}'/>
-  </interface>
-  
+  ${determinCdrom}
+  ${determinNetwork}  
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
-    <input type='tablet' bus='usb'/>
+    ${determinVnc}
 </devices>
 </domain>
