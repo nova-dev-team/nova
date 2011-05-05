@@ -14,7 +14,7 @@
 		
 		<property name="ip" column="ip" type="string"></property>
 		<property name="port" column="port" type="integer"></property>
-		<property name="pnodeid" column="pnodeid" type="integer"></property>
+		<property name="pnodeId" column="pnode_id" type="integer"></property>
 				
 		<property name="hostname" column="hostname" type="string"></property>
 		<property name="uuid" column="uuid" type="string"></property>
