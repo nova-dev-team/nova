@@ -73,6 +73,7 @@ public class EnumUserType<E extends Enum<E>> implements UserType {
 		return result;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void nullSafeSet(PreparedStatement prepareStatement, Object value,
 			int index) throws HibernateException, SQLException {
 		// TODO Auto-generated method stub
