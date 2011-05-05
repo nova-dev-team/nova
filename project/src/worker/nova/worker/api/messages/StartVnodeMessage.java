@@ -33,6 +33,33 @@ public class StartVnodeMessage {
 	String macAddress;
 	String sourceNetwork;
 	String inputType;
+	String determinCdrom;
+	String determinNetwork;
+	String determinVnc;
+
+	public String getDeterminVnc() {
+		return determinVnc;
+	}
+
+	public void setDeterminVnc(String determinVnc) {
+		this.determinVnc = determinVnc;
+	}
+
+	public String getDeterminNetwork() {
+		return determinNetwork;
+	}
+
+	public void setDeterminNetwork(String determinNetwork) {
+		this.determinNetwork = determinNetwork;
+	}
+
+	public String getDeterminCdrom() {
+		return determinCdrom;
+	}
+
+	public void setDeterminCdrom(String determinCdrom) {
+		this.determinCdrom = determinCdrom;
+	}
 
 	public String getInputType() {
 		return inputType;
@@ -194,6 +221,9 @@ public class StartVnodeMessage {
 
 	public HashMap<String, Object> getHashMap() {
 		HashMap<String, Object> values = new HashMap<String, Object>();
+		values.put("determinCdrom", determinCdrom);
+		values.put("determinNetwork", determinNetwork);
+		values.put("determinVnc", determinVnc);
 		values.put("hyperVisor", hyperVisor);
 		values.put("name", name);
 		values.put("uuid", uuid);
