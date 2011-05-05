@@ -51,7 +51,7 @@ public class Pnode {
 	/**
 	 * Status of the pnode.
 	 */
-	transient Pnode.Status status;
+	Pnode.Status status;
 
 	/**
 	 * The pnode's address.
