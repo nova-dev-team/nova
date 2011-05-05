@@ -3,7 +3,6 @@ package nova.test.agent.daemons;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-import nova.agent.common.util.GlobalPara;
 import nova.agent.core.handler.CloseChannelMessageHandler;
 import nova.agent.core.handler.GeneralMonitorMessageHandler;
 import nova.agent.core.handler.HeartbeatMessageHandler;
@@ -28,8 +27,6 @@ public class TestDownloadAndInstallDaemon {
 	public void run() throws UnknownHostException {
 		// Test daemons in agent
 
-		new GlobalPara();
-
 		DownloadProgressDaemon downloadProgressDaemon = new DownloadProgressDaemon();
 		InstallProgressDaemon installProgressDaemon = new InstallProgressDaemon();
 		SimpleDaemon[] simpleDaemons = { downloadProgressDaemon,
@@ -53,6 +50,7 @@ public class TestDownloadAndInstallDaemon {
 				new RequestSoftwareMessageHandler());
 
 		svr.bind(new InetSocketAddress(BIND_PORT));
+
 	}
 
 	public static void main(String[] args) {

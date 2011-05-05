@@ -146,7 +146,7 @@ table.lined td, table.lined th {
 
 @page {
   margin: 27mm 16mm 27mm 16mm;
-  size: 7in 9.25in;
+  size: A4;
 
   @footnotes {
     border-top: thin solid black;
@@ -335,7 +335,7 @@ div.frontcover img {
 
 div.frontcover h1 {
   position: absolute;
-  left: 2.7cm; top: 5cm;
+  left: 4.5cm; top: 5cm;
   color: black;
   font-size: 44pt;
   font-weight: normal;

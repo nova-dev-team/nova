@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 import nova.agent.common.util.GlobalPara;
 import nova.common.interfaces.Cancelable;
 import nova.common.interfaces.Progressable;
+import nova.common.util.Utils;
 import sun.net.TelnetInputStream;
 import sun.net.ftp.FtpClient;
 
@@ -23,6 +24,29 @@ public class DownloadProgress implements Cancelable, Progressable {
 	private String userName = GlobalPara.userName;
 	private String password = GlobalPara.password;
 	private String myPath = GlobalPara.myPath; // Download to where
+
+	private FtpClient fc = connectToFtp();
+
+	public FtpClient getFtpClient() {
+		return this.fc;
+	}
+
+	public void closeFtpClient() {
+		try {
+			this.fc.closeServer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void stop() {
+		try {
+			this.fc.wait();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	public DownloadProgress() {
 		this.hostIp = GlobalPara.hostIp;
@@ -60,7 +84,7 @@ public class DownloadProgress implements Cancelable, Progressable {
 	 * 
 	 * @return {@link FtpClient}
 	 */
-	public FtpClient connectToFtp() {
+	private FtpClient connectToFtp() {
 		FtpClient fc = null;
 		try {
 			fc = new FtpClient(this.hostIp);
@@ -98,11 +122,11 @@ public class DownloadProgress implements Cancelable, Progressable {
 			int tb = getFileSize(fClient, softName);
 			GlobalPara.totalBytes = tb;
 			is = fClient.get(softName);
-			java.io.File outfile = new java.io.File(this.myPath + softName);
+			java.io.File outfile = new java.io.File(Utils.pathJoin(this.myPath,
+					softName));
 			os = new FileOutputStream(outfile);
 			byte[] bytes = new byte[1024];
 			int c = 0;
-
 			while ((c = is.read(bytes)) != -1) {
 
 				os.write(bytes, 0, c);
@@ -113,7 +137,6 @@ public class DownloadProgress implements Cancelable, Progressable {
 
 			is.close();
 			os.close();
-			fClient.closeServer();
 		} catch (IOException e) {
 			return false;
 		}
@@ -164,10 +187,8 @@ public class DownloadProgress implements Cancelable, Progressable {
 	}
 
 	public void downLoad(String softName) {
-		FtpClient fc = connectToFtp();
 		downloadFromFtp(fc, softName);
 		GlobalPara.statusInfo.setText("Installing " + softName + "...");
 		// GlobalPara.downloadedBuffer.write(this.softName);
 	}
-
 }

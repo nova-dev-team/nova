@@ -3,6 +3,7 @@ package nova.common.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -99,6 +100,27 @@ public class Utils {
 		conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
 		conf.setDefaultValue("storage.ftp.bind_port", 8021);
 		conf.setDefaultValue("storage.ftp.home", "storage");
+
+		return conf;
+	}
+
+	public static Conf loadAgentConf() {
+		Conf conf = new Conf();
+
+		final String confName = Utils.pathJoin(Utils.NOVA_HOME, "conf",
+				"nova.agent.properties");
+		logger.info("Loading config file: " + confName);
+		FileInputStream fis;
+		try {
+			fis = new FileInputStream(confName);
+
+			conf.load(fis);
+			fis.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		return conf;
 	}
