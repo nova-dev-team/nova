@@ -146,7 +146,7 @@ table.lined td, table.lined th {
 
 @page {
   margin: 27mm 16mm 27mm 16mm;
-  size: 7in 9.25in landscape;
+  size: A4;
 
   @footnotes {
     border-top: thin solid black;
@@ -162,7 +162,7 @@ table.lined td, table.lined th {
 @page :left {
   @top-left {
     font: 11pt "Gill Sans", serif;
-    content: "Git Community Book";
+    content: "The Nova Platform";
     vertical-align: bottom;
     padding-bottom: 2em;
   }
@@ -307,7 +307,7 @@ div.appendix, div.bibliography, div.glossary, div.index, div.colophon {
 div.backcover { 
 	page-break-before: left;
 	page: cover; 
-	background-image: url(../assets/images/b_cover.jpg);
+/*	background-image: url(../images/b_cover.png);*/
 	position: absolute;
 	width: 9.25in; height: 7in;
   left: 0; top: 0;
@@ -318,7 +318,7 @@ div.backcover {
 
 div.frontcover { 
 	page: cover; 
-	background-image: url(../assets/images/cover.jpg);
+/*	background-image: url(../images/cover.png);*/
 	position: absolute;
 	width: 9.25in; height: 7in;
   left: 0; top: 0;
@@ -335,8 +335,8 @@ div.frontcover img {
 
 div.frontcover h1 {
   position: absolute;
-  left: 2cm; top: 1cm;
-  color: white;
+  left: 4.5cm; top: 5cm;
+  color: black;
   font-size: 44pt;
   font-weight: normal;
 }

@@ -1,72 +1,32 @@
-<domain type='#{params[:hypervisor]}'>
-<name>#{params[:name]}</name>
-<uuid>#{params[:uuid]}</uuid>
-<memory>#{params[:mem_size].to_i * 1024}</memory>
-<vcpu>#{params[:cpu_count]}</vcpu>
+<domain type='${hyperVisor}'>
+<name>${name}</name>
+<uuid>${uuid}</uuid>
+<memory>${memSize}</memory>
+<vcpu>${cpuCount}</vcpu>
 <os>
-  <type arch='#{params[:arch]}' machine='pc'>hvm</type>
-  <boot dev='#{
-# if used user's custom cd image, we boot from cdrom
-if params[:cd_image] != nil and params[:cd_image] != ""
-"cdrom"
-else
-"hd"
-end
-}'/>
+  <type arch='${arch}' machine='${machine}'>hvm</type>
+  <boot dev='${bootDevice}'/>
 </os>
 <features>
   <pae/>
   <acpi/>
 </features>
 <devices>
-  <emulator>/usr/bin/kvm</emulator>
+  <emulator>${emulatorPath}</emulator>
   <disk type='file' device='disk'>
-    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:hda_image]}'/>
+    <source file='/var/lib/libvirt/images/linux.img'/>
     <target dev='hda'/>
   </disk>
-#{
-# determine cdrom
-if params[:run_agent].to_s == "true"
-"    <disk type='file' device='cdrom'>
-    <source file='#{Setting.vm_root}/#{params[:name]}/agent-cd.iso'/>
+  <disk type='file' device='cdrom'>
+    <source file='${cdromPath}'/>
     <target dev='hdc'/>
   </disk>
-"
-elsif params[:cd_image] != nil and params[:cd_image] != ""
-"    <disk type='file' device='cdrom'>
-    <source file='#{Setting.vm_root}/#{params[:name]}/#{params[:cd_image]}'/>
-    <target dev='hdc'/>
-    <readonly/>
-  </disk>
-"
-end
-}
-#{
-if nova_conf["vm_network_interface"] != nil and nova_conf["vm_network_bridge"] != nil
-  # use bridge
-"
-  <interface type='bridge'>
-    <source bridge='#{nova_conf["vm_network_bridge"]}'/>
-    <mac address='54:7E:#{
-# generate random mac address
-# note that mac address has some format requirements
-((1..4).collect {|n| "%02x" % (256 * rand)}).join ":"
-}'/>
-"
-else
-  # use NAT
-"
-  <interface type='network'>
-    <source network='default'/>
-"
-end
-}
+
+  <interface type='${interfaceType}'>
+    <source network='${sourceNetwork}'/>
   </interface>
+  
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
-#{
-  if nova_conf["fix_vnc_mouse_pointer"] == true
-    "<input type='tablet' bus='usb'/>"
-  end
-}
+    <input type='tablet' bus='usb'/>
 </devices>
 </domain>

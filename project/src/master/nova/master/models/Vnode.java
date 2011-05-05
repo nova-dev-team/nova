@@ -64,7 +64,7 @@ public class Vnode {
 	/**
 	 * Status of the vnode.
 	 */
-	transient Vnode.Status status;
+	Vnode.Status status;
 
 	/**
 	 * The vnode's address.
