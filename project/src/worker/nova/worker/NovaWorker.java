@@ -11,9 +11,9 @@ import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 import nova.worker.api.messages.StartVnodeMessage;
+import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.daemons.WorkerHeartbeatDaemon;
 import nova.worker.daemons.WorkerPerfInfoDaemon;
-import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.handler.StartVnodeHandler;
 import nova.worker.handler.WorkerHttpHandler;
 import nova.worker.handler.WorkerQueryHeartbeatHandler;
@@ -39,8 +39,8 @@ public class NovaWorker extends SimpleServer {
 	/**
 	 * All background working daemons for worker node.
 	 */
-	SimpleDaemon daemons[] = { new WorkerHeartbeatDaemon(), new WorkerPerfInfoDaemon(),
-			new VnodeStatusDaemon() };
+	SimpleDaemon daemons[] = { new WorkerHeartbeatDaemon(),
+			new WorkerPerfInfoDaemon(), new VnodeStatusDaemon() };
 
 	/**
 	 * Connection to nova master.
@@ -54,8 +54,7 @@ public class NovaWorker extends SimpleServer {
 		// TODO @shayf register handlers
 
 		// handle http requests
-		this.registerHandler(DefaultHttpRequest.class,
-				new WorkerHttpHandler());
+		this.registerHandler(DefaultHttpRequest.class, new WorkerHttpHandler());
 
 		this.registerHandler(StartVnodeMessage.class, new StartVnodeHandler());
 
@@ -93,8 +92,7 @@ public class NovaWorker extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				logger.error("Error joining thread '" + daemon.getName() + "'",
-						e);
+				logger.error("Error joining thread " + daemon.getName(), e);
 			}
 		}
 		logger.info("All deamons stopped");

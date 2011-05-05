@@ -98,15 +98,5 @@ public class GlobalPara {
 			logger.error("Can't find the configuration text!");
 		}
 
-		// System.out.println("hostIp = " + hostIp);
-		// System.out.println("username = " + userName);
-		// System.out.println("password = " + password);
-		// System.out.println("myPicPath = " + myPicPath);
-		// System.out.println("myPath = " + myPath);
-		// for (int i = 0; i < softList.size(); i++)
-		// System.out.println("soft: " + i + " " + softList.get(i)
-		// + " Description: " + softInfo.get(softList.get(i)).first
-		// + " Status: " + softInfo.get(softList.get(i)).second);
-
 	}
 }

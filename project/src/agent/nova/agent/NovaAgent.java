@@ -3,7 +3,6 @@ package nova.agent;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 
 import nova.agent.api.messages.QueryApplianceStatusMessage;
 import nova.agent.daemons.AgentHeartbeatDaemon;
@@ -45,7 +44,9 @@ public class NovaAgent extends SimpleServer {
 	/**
 	 * All background working daemons for agent node.
 	 */
-	public ArrayList<SimpleDaemon> daemons = new ArrayList<SimpleDaemon>();
+	public SimpleDaemon[] daemons = new SimpleDaemon[] {
+			new PackageDownloadDaemon(), new PackageInstallDaemon(),
+			new AgentHeartbeatDaemon(), new AgentPerfInfoDaemon() };
 
 	/**
 	 * Start a server and register some handler.
@@ -56,20 +57,6 @@ public class NovaAgent extends SimpleServer {
 		registerHandler(QueryPerfMessage.class, new AgentRequestPerfHandler());
 		registerHandler(QueryApplianceStatusMessage.class,
 				new RequestSoftwareMessageHandler());
-		/**
-		 * DownloadProgressDaemon and installProcessDaemon start
-		 */
-		PackageDownloadDaemon downloadProgressDaemon = new PackageDownloadDaemon();
-		daemons.add(downloadProgressDaemon);
-
-		PackageInstallDaemon installProgressDaemon = new PackageInstallDaemon();
-		daemons.add(installProgressDaemon);
-
-		AgentHeartbeatDaemon hbDaemon = new AgentHeartbeatDaemon();
-		daemons.add(hbDaemon);
-
-		AgentPerfInfoDaemon gmDaemon = new AgentPerfInfoDaemon();
-		daemons.add(gmDaemon);
 	}
 
 	@Override
@@ -96,14 +83,12 @@ public class NovaAgent extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				logger.error("Error joining thread '" + daemon.getName() + "'",
-						e);
+				logger.error("Error joining thread " + daemon.getName(), e);
 			}
 		}
 		logger.info("All deamons stopped");
 		super.shutdown();
 		this.bindAddr = null;
-
 		NovaAgent.instance = null;
 	}
 
@@ -135,6 +120,7 @@ public class NovaAgent extends SimpleServer {
 					+ InetAddress.getLocalHost().getHostAddress());
 
 			// santa: bind to 0.0.0.0, so master could always connect to agent
+			// TODO @gaotao load bind address from conf!
 
 			NovaAgent.getInstance().bind(
 					new InetSocketAddress(GlobalPara.AGENT_BIND_HOST,
