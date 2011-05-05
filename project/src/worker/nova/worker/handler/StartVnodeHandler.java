@@ -55,7 +55,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 		final String virtService = "qemu:///system";
 		Connect conn = null;
 		try {
-			//
 			// connect the qemu system
 			conn = new Connect(virtService, false);
 		} catch (LibvirtException ex) {
@@ -83,7 +82,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			// TODO @shayf update path
 			svm.setEmulatorPath("some other path");
 		} else {
-			// TODO @shayf update path
 			svm.setEmulatorPath("some other path");
 		}
 		svm.setRunAgent("false");

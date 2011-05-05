@@ -212,7 +212,6 @@ public class StartVnodeMessage {
 		values.put("sourceNetwork", sourceNetwork);
 		values.put("inputType", inputType);
 		return values;
-
 	}
 
 	/**
