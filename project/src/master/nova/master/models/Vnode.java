@@ -21,6 +21,11 @@ public class Vnode {
 	 */
 	public static enum Status {
 		/**
+		 * The vnode status is not known.
+		 */
+		UNKNOWN,
+
+		/**
 		 * The vnode is shut off.
 		 */
 		SHUT_OFF,
@@ -28,7 +33,7 @@ public class Vnode {
 		/**
 		 * The virtual node is being scheduled.
 		 */
-		PENDING,
+		SCHEDULING,
 
 		/**
 		 * The vnode is scheduled and it is being prepared on a pnode.

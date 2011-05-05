@@ -20,9 +20,14 @@ public class Pnode {
 	 */
 	public enum Status {
 		/**
+		 * The pnode status is not known.
+		 */
+		UNKNOWN,
+
+		/**
 		 * The pnode is being added.
 		 */
-		PENDING,
+		ADD_PENDING,
 
 		/**
 		 * The pnode is running and healthy.
@@ -98,12 +103,12 @@ public class Pnode {
 	public static final long PING_INTERVAL = 1000;
 
 	public Pnode() {
-		this.status = Pnode.Status.PENDING;
+		this.status = Pnode.Status.ADD_PENDING;
 	}
 
 	public Pnode(Pnode.Status status, SimpleAddress addr, int pnodeid,
 			String hostname, String uuid, String macAddress, Integer vmCapacity) {
-		this.status = Pnode.Status.PENDING;
+		this.status = Pnode.Status.ADD_PENDING;
 		this.addr = addr;
 		this.pnodeid = pnodeid;
 		this.hostname = hostname;

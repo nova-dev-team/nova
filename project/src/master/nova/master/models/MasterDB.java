@@ -66,7 +66,7 @@ public class MasterDB {
 		Pnode pnode = allPnodesByAddress.get(pAddr);
 		if (pnode != null) {
 			if (pnode.status == Pnode.Status.CONNECT_FAILURE
-					|| pnode.status == Pnode.Status.PENDING) {
+					|| pnode.status == Pnode.Status.ADD_PENDING) {
 				pnode.status = Pnode.Status.RUNNING;
 			}
 			pnode.gotAck();
