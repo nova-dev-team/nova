@@ -3,8 +3,8 @@ package nova.test.common.service;
 import java.net.InetSocketAddress;
 
 import nova.agent.api.messages.QueryApplianceStatusMessage;
-import nova.agent.handler.AgentRequestHeartbeatHandler;
-import nova.agent.handler.RequestSoftwareMessageHandler;
+import nova.agent.handler.AgentQueryHeartbeatHandler;
+import nova.agent.handler.QueryApplianceStatusHandler;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
 
@@ -19,9 +19,9 @@ public class DummySimpleServer {
 		SimpleServer svr = new SimpleServer(); // Create a server
 
 		svr.registerHandler(QueryHeartbeatMessage.class,
-				new AgentRequestHeartbeatHandler());
+				new AgentQueryHeartbeatHandler());
 		svr.registerHandler(QueryApplianceStatusMessage.class,
-				new RequestSoftwareMessageHandler());
+				new QueryApplianceStatusHandler());
 
 		svr.bind(new InetSocketAddress(BIND_PORT));
 

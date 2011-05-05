@@ -19,7 +19,7 @@ import org.jboss.netty.channel.MessageEvent;
  * @author gaotao1987@gmail.com
  * 
  */
-public class RequestSoftwareMessageHandler implements
+public class QueryApplianceStatusHandler implements
 		SimpleHandler<QueryApplianceStatusMessage> {
 	public AtomicLong counter = new AtomicLong();
 

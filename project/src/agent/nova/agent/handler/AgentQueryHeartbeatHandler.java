@@ -21,12 +21,12 @@ import org.jboss.netty.channel.MessageEvent;
  * @author gaotao1987@gmail.com
  * 
  */
-public class AgentRequestHeartbeatHandler implements
+public class AgentQueryHeartbeatHandler implements
 		SimpleHandler<QueryHeartbeatMessage> {
 
 	AtomicLong counter = new AtomicLong();
 	static Logger logger = Logger
-			.getLogger(AgentRequestHeartbeatHandler.class);
+			.getLogger(AgentQueryHeartbeatHandler.class);
 
 	@Override
 	public void handleMessage(QueryHeartbeatMessage msg,

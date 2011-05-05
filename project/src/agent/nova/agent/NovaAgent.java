@@ -9,9 +9,9 @@ import nova.agent.daemons.AgentHeartbeatDaemon;
 import nova.agent.daemons.AgentPerfInfoDaemon;
 import nova.agent.daemons.PackageDownloadDaemon;
 import nova.agent.daemons.PackageInstallDaemon;
-import nova.agent.handler.AgentRequestHeartbeatHandler;
-import nova.agent.handler.AgentRequestPerfHandler;
-import nova.agent.handler.RequestSoftwareMessageHandler;
+import nova.agent.handler.AgentQueryHeartbeatHandler;
+import nova.agent.handler.AgentQueryPerfHandler;
+import nova.agent.handler.QueryApplianceStatusHandler;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.service.message.QueryPerfMessage;
@@ -53,10 +53,10 @@ public class NovaAgent extends SimpleServer {
 	 */
 	public NovaAgent() {
 		registerHandler(QueryHeartbeatMessage.class,
-				new AgentRequestHeartbeatHandler());
-		registerHandler(QueryPerfMessage.class, new AgentRequestPerfHandler());
+				new AgentQueryHeartbeatHandler());
+		registerHandler(QueryPerfMessage.class, new AgentQueryPerfHandler());
 		registerHandler(QueryApplianceStatusMessage.class,
-				new RequestSoftwareMessageHandler());
+				new QueryApplianceStatusHandler());
 	}
 
 	@Override

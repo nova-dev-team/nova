@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
 import nova.agent.daemons.PackageDownloadDaemon;
-import nova.agent.handler.RequestSoftwareMessageHandler;
+import nova.agent.handler.QueryApplianceStatusHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.util.Conf;
 import nova.common.util.Pair;
@@ -42,7 +42,7 @@ public class GlobalPara {
 	public static Object generalMonitorSem = new Object();
 
 	/**
-	 * Producer in {@link RequestSoftwareMessageHandler}, consumer in
+	 * Producer in {@link QueryApplianceStatusHandler}, consumer in
 	 * {@link PackageDownloadDaemon}
 	 */
 	public static ProducerAndConsumer downloadBuffer = new ProducerAndConsumer();

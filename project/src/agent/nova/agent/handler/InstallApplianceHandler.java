@@ -15,7 +15,7 @@ import org.jboss.netty.channel.MessageEvent;
  * @author gaotao1987@gmail.com
  * 
  */
-public class SoftwareInstallStatusMessageHandler implements
+public class InstallApplianceHandler implements
 		SimpleHandler<InstallApplianceMessage> {
 	AtomicLong counter = new AtomicLong();
 

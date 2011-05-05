@@ -11,7 +11,7 @@ import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.protocol.HeartbeatProtocol;
 import nova.common.service.protocol.MonitorProtocol;
 import nova.common.service.protocol.PnodeStatusProtocol;
-import nova.common.service.protocol.SoftwareProtocol;
+import nova.common.service.protocol.ApplianceProtocol;
 import nova.common.service.protocol.VnodeStatusProtocol;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
@@ -25,7 +25,7 @@ import nova.master.models.Vnode.Status;
  * 
  */
 public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
-		MonitorProtocol, PnodeStatusProtocol, SoftwareProtocol,
+		MonitorProtocol, PnodeStatusProtocol, ApplianceProtocol,
 		VnodeStatusProtocol {
 
 	public MasterProxy(InetSocketAddress bindAddr) {

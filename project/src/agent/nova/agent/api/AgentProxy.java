@@ -12,9 +12,9 @@ import nova.common.service.message.QueryPerfMessage;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.service.protocol.ClosableProtocol;
 import nova.common.service.protocol.HeartbeatProtocol;
-import nova.common.service.protocol.RequestHeartbeatProtocol;
-import nova.common.service.protocol.RequestMonitorProtocol;
-import nova.common.service.protocol.RequestSoftwareProtocol;
+import nova.common.service.protocol.QueryHeartbeatProtocol;
+import nova.common.service.protocol.QueryMonitorProtocol;
+import nova.common.service.protocol.QueryApplianceStatusProtocol;
 
 /**
  * Proxy for Agent node.
@@ -23,8 +23,8 @@ import nova.common.service.protocol.RequestSoftwareProtocol;
  * 
  */
 public class AgentProxy extends SimpleProxy implements
-		RequestHeartbeatProtocol, RequestMonitorProtocol,
-		RequestSoftwareProtocol, HeartbeatProtocol, ClosableProtocol {
+		QueryHeartbeatProtocol, QueryMonitorProtocol,
+		QueryApplianceStatusProtocol, HeartbeatProtocol, ClosableProtocol {
 	public AgentProxy(InetSocketAddress replyAddr) {
 		super(replyAddr);
 	}

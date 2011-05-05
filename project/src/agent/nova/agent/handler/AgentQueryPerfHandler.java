@@ -21,11 +21,11 @@ import org.jboss.netty.channel.MessageEvent;
  * @author gaotao1987@gmail.com
  * 
  */
-public class AgentRequestPerfHandler implements
+public class AgentQueryPerfHandler implements
 		SimpleHandler<QueryPerfMessage> {
 	AtomicLong counter = new AtomicLong();
 	static Logger logger = Logger
-			.getLogger(AgentRequestPerfHandler.class);
+			.getLogger(AgentQueryPerfHandler.class);
 
 	@Override
 	public void handleMessage(QueryPerfMessage msg,

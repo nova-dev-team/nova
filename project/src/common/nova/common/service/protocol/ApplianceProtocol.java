@@ -1,5 +1,5 @@
 package nova.common.service.protocol;
 
-public interface SoftwareProtocol {
+public interface ApplianceProtocol {
 	public void sendSoftwareStatus();
 }

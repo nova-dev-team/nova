@@ -1,5 +1,5 @@
 package nova.common.service.protocol;
 
-public interface RequestHeartbeatProtocol {
+public interface QueryHeartbeatProtocol {
 	public void sendRequestHeartbeat();
 }
