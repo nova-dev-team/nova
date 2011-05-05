@@ -63,7 +63,7 @@ public class Pnode {
 	/**
 	 * Id of the pnode.
 	 */
-	private int pnodeid;
+	private int pnodeId;
 
 	/** The host name of physical machine. */
 	private String hostname;
@@ -106,11 +106,11 @@ public class Pnode {
 		this.status = Pnode.Status.ADD_PENDING;
 	}
 
-	public Pnode(Pnode.Status status, SimpleAddress addr, int pnodeid,
+	public Pnode(Pnode.Status status, SimpleAddress addr, int pnodeId,
 			String hostname, String uuid, String macAddress, Integer vmCapacity) {
 		this.status = Pnode.Status.ADD_PENDING;
 		this.addr = addr;
-		this.pnodeid = pnodeid;
+		this.pnodeId = pnodeId;
 		this.hostname = hostname;
 		this.uuid = uuid;
 		this.macAddress = macAddress;
@@ -181,12 +181,12 @@ public class Pnode {
 		return port;
 	}
 
-	public void setPnodeid(int pnodeid) {
-		this.pnodeid = pnodeid;
+	public void setPnodeId(int pnodeId) {
+		this.pnodeId = pnodeId;
 	}
 
-	public int getPnodeid() {
-		return pnodeid;
+	public int getPnodeId() {
+		return pnodeId;
 	}
 
 	public void setHostname(String hostname) {
