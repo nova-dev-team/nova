@@ -5,7 +5,7 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.RequestHeartbeatMessage;
-import nova.worker.handler.StartVnodeHandler;
+import nova.worker.api.messages.StartVnodeMessage;
 
 /**
  * Connection to worker module.
@@ -24,7 +24,7 @@ public class WorkerProxy extends SimpleProxy {
 	}
 
 	public void sendStartVnode(SimpleAddress vAddr) {
-		StartVnodeHandler.Message msg = new StartVnodeHandler.Message(vAddr);
+		StartVnodeMessage msg = new StartVnodeMessage(vAddr);
 		super.sendRequest(msg);
 	}
 

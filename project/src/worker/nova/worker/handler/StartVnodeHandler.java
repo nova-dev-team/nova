@@ -8,6 +8,7 @@ import java.io.IOException;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Utils;
+import nova.worker.api.messages.StartVnodeMessage;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -22,8 +23,7 @@ import org.libvirt.LibvirtException;
  * @author santa
  * 
  */
-public class StartVnodeHandler implements
-		SimpleHandler<StartVnodeHandler.Message> {
+public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
 	/**
 	 * Log4j logger.
@@ -31,29 +31,10 @@ public class StartVnodeHandler implements
 	Logger log = Logger.getLogger(StartVnodeHandler.class);
 
 	/**
-	 * Message for "start new vnode" request.
-	 * 
-	 * @author santa
-	 * 
-	 */
-	public static class Message {
-
-		public Message(SimpleAddress vAddr) {
-			this.vAddr = vAddr;
-		}
-
-		/**
-		 * Basic information required to start a new vnode.
-		 */
-		public SimpleAddress vAddr;
-
-	}
-
-	/**
 	 * Handle "start new vnode" request.
 	 */
 	@Override
-	public void handleMessage(Message msg, ChannelHandlerContext ctx,
+	public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
 		// TODO @shayf [future] support both xen and kvm.
 		final String virtService = "qemu:///system";

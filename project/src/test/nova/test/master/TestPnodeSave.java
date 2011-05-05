@@ -24,6 +24,9 @@ public class TestPnodeSave extends TestCase {
 		Transaction tx = session.beginTransaction();
 		session.save(pnode);
 		tx.commit();
+
+		// TODO @zhaoxun Load the saved pnode, check if all fields are correct
+
 		session.close();
 		HibernateUtil.shutdown();
 	}
