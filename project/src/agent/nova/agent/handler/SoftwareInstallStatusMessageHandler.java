@@ -1,28 +1,30 @@
-package nova.agent.core.handler;
+package nova.agent.handler;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
-import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.message.SoftwareInstallStatusMessage;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 /**
- * Ensure one master or worker is alive.
+ * Report to master or worker the status of softwares' installation.
  * 
  * @author gaotao1987@gmail.com
  * 
  */
-public class HeartbeatMessageHandler implements SimpleHandler<HeartbeatMessage> {
+public class SoftwareInstallStatusMessageHandler implements
+		SimpleHandler<SoftwareInstallStatusMessage> {
 	AtomicLong counter = new AtomicLong();
 
 	@Override
-	public void handleMessage(HeartbeatMessage msg, ChannelHandlerContext ctx,
-			MessageEvent e, SimpleAddress xreply) {
+	public void handleMessage(SoftwareInstallStatusMessage msg,
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		System.out.println(counter.incrementAndGet());
 		System.out.println(msg.getClass().getName());
-		System.out.println(xreply + " is alive!");
+		System.out.println(xreply);
 	}
+
 }

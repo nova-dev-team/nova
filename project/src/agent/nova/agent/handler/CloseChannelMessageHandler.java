@@ -1,4 +1,4 @@
-package nova.agent.core.handler;
+package nova.agent.handler;
 
 import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;

@@ -4,13 +4,13 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 import nova.agent.common.util.GlobalPara;
-import nova.agent.core.handler.CloseChannelMessageHandler;
-import nova.agent.core.handler.GeneralMonitorMessageHandler;
-import nova.agent.core.handler.HeartbeatMessageHandler;
-import nova.agent.core.handler.RequestHeartbeatMessageHandler;
-import nova.agent.core.handler.RequestSoftwareMessageHandler;
 import nova.agent.daemons.DownloadProgressDaemon;
 import nova.agent.daemons.InstallProgressDaemon;
+import nova.agent.handler.CloseChannelMessageHandler;
+import nova.agent.handler.GeneralMonitorMessageHandler;
+import nova.agent.handler.HeartbeatMessageHandler;
+import nova.agent.handler.RequestHeartbeatMessageHandler;
+import nova.agent.handler.RequestSoftwareMessageHandler;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.GeneralMonitorMessage;

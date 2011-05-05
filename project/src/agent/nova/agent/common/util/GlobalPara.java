@@ -11,8 +11,8 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 
-import nova.agent.core.handler.RequestSoftwareMessageHandler;
 import nova.agent.daemons.DownloadProgressDaemon;
+import nova.agent.handler.RequestSoftwareMessageHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.util.Conf;
 import nova.common.util.Pair;
