@@ -10,6 +10,7 @@ import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
+import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.daemons.HeartbeatDaemon;
 import nova.worker.daemons.MonitorInfoDaemon;
 import nova.worker.daemons.ReportVnodeStatusDaemon;
@@ -56,8 +57,7 @@ public class NovaWorker extends SimpleServer {
 		this.registerHandler(DefaultHttpRequest.class,
 				new WorkerHttpRequestHandler());
 
-		this.registerHandler(StartVnodeHandler.Message.class,
-				new StartVnodeHandler());
+		this.registerHandler(StartVnodeMessage.class, new StartVnodeHandler());
 
 		this.registerHandler(RequestHeartbeatMessage.class,
 				new WorkerRequestHeartbeatMessageHandler());

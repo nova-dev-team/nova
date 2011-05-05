@@ -37,7 +37,7 @@ public class TestNovaMaster {
 		MasterProxy mp = new MasterProxy(workerAddr);
 		mp.connect(masterAddr);
 		mp.sendPnodeStatus(new SimpleAddress(workerHost, workerPort),
-				Pnode.Status.PENDING);
+				Pnode.Status.ADD_PENDING);
 
 		try {
 			Thread.sleep(3000);
