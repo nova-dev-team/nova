@@ -46,7 +46,7 @@ public class Pnode {
 	/**
 	 * Status of the pnode.
 	 */
-	Pnode.Status status;
+	transient Pnode.Status status;
 
 	/**
 	 * The pnode's address.
@@ -82,9 +82,9 @@ public class Pnode {
 	transient Date lastAckTime = new Date();
 
 	/**
-	 * Last time a ping message was sent to this node.
+	 * Last time a message was sent to this node.
 	 */
-	transient Date lastPingTime = new Date();
+	transient Date lastReqTime = new Date();
 
 	/**
 	 * If lastAckTime is not updated in this interval, the node will be
@@ -140,12 +140,12 @@ public class Pnode {
 
 	public boolean needNewPingMessage() {
 		Date now = new Date();
-		long timespan = now.getTime() - this.lastPingTime.getTime();
+		long timespan = now.getTime() - this.lastReqTime.getTime();
 		return timespan > Pnode.PING_INTERVAL;
 	}
 
-	public void updateLastPingTime() {
-		this.lastPingTime = new Date();
+	public void updateLastReqTime() {
+		this.lastReqTime = new Date();
 	}
 
 	public void setAddr(SimpleAddress addr) {

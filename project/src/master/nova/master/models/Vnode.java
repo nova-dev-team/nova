@@ -1,6 +1,7 @@
 package nova.master.models;
 
 import java.util.Date;
+import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
 
@@ -58,26 +59,33 @@ public class Vnode {
 	/**
 	 * Status of the vnode.
 	 */
-	Vnode.Status status;
+	transient Vnode.Status status;
 
 	/**
 	 * The vnode's address.
 	 */
 	SimpleAddress addr;
 
-	/**
-	 * Id of the vnode.
-	 */
-	int id;
+	/** for sqlite db */
+	private long id = 1L;
+
+	UUID uuid;
 
 	/**
 	 * Time of last message from the vnode. Used to detect vnode failure.
 	 */
-	Date lastAliveTime;
+	transient Date lastAckTime;
 
 	/**
 	 * If the vnode is in a pool, this is set to the pool.
 	 */
 	VnodePool pool = null;
 
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public long getId() {
+		return id;
+	}
 }

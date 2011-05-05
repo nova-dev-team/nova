@@ -53,7 +53,7 @@ public class PnodeHealthCheckerDaemon extends SimpleDaemon {
 					continue;
 				}
 
-				pnode.updateLastPingTime();
+				pnode.updateLastReqTime();
 
 				logger.debug("pinging pnode: " + pnode + ", its status="
 						+ pnode.getStatus());
