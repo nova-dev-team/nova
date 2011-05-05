@@ -3,6 +3,7 @@ require 'pp'
 require 'rubygems'
 require 'builder'
 require 'rdiscount'
+require 'uv'
 
 #MIN_SIZE = 1200
 MIN_SIZE = 800
@@ -12,6 +13,7 @@ def do_replacements(html, type = :html)
   # highlight code
   html = html.gsub /<pre><code>ruby.*?<\/code><\/pre>/m do |code|
     code = code.gsub('<pre><code>ruby', '').gsub('</code></pre>', '').gsub('&lt;', '<').gsub('&gt;', '>').gsub('&amp;', '&')
+    Uv.parse(code, "xhtml", "ruby", false, "mac_classic")
   end
 
   # replace gitlinks
@@ -155,7 +157,7 @@ def do_html
       f.puts html_template
     end
     
-    `cp -Rf assets output/book/`
+    `cp -Rf ../assets output/book/`
     
   end
 end
@@ -168,6 +170,7 @@ def each_language
     ePath = File.join root_dir, e
     next unless File::directory? ePath
     chdir ePath
+    FileUtils.mkdir_p "output"
     yield
   end
 end
@@ -189,3 +192,6 @@ desc 'Merge all of the texttile output into a single file for pdf conversion'
 task :merge do
   each_language {do_merge}
 end
+
+
+task :default => :html
