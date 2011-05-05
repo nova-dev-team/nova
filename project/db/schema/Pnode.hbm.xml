@@ -10,13 +10,7 @@
 			<generator class="native"></generator>
 		</id>
 		
-		<property name="status">
-		  <type name="org.hibernate.type.EnumType">
-		     <param name="enumClass">
-		         nova.master.models.Pnode.Status
-		     </param>
-		  </type>
-	 	</property>
+		<property name="status"  column="status"  type="nova.master.models.PnodeStatusEnumType"></property>  
 		
 		<property name="ip" column="ip" type="string"></property>
 		<property name="port" column="port" type="integer"></property>
