@@ -27,25 +27,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 	Logger log = Logger.getLogger(StartVnodeHandler.class);
 
 	/**
-	 * Message for "start new vnode" request.
-	 * 
-	 * @author santa
-	 * 
-	 */
-	public static class Message {
-
-		public Message(SimpleAddress vAddr) {
-			Message.vAddr = vAddr;
-		}
-
-		/**
-		 * Basic information required to start a new vnode.
-		 */
-		public static SimpleAddress vAddr;
-
-	}
-
-	/**
 	 * Handle "start new vnode" request.
 	 */
 	@Override
@@ -63,36 +44,35 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			log.error("Error connecting " + virtService, ex);
 		}
 
-		StartVnodeMessage svm = new StartVnodeMessage(Message.vAddr);
 		// TODO @shayf get real config value from files
-		svm.setHyperVisor("kvm");
-		svm.setName("vm1");
-		svm.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
-		svm.setMemSize("524288");
-		svm.setCpuCount("1");
-		svm.setArch("i686");
-		svm.setCdImage("");
-		if ((svm.getCdImage() != null) && (svm.getCdImage() != "")) {
-			svm.setBootDevice("cdrom");
+		msg.setHyperVisor("kvm");
+		msg.setName("vm1");
+		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
+		msg.setMemSize("524288");
+		msg.setCpuCount("1");
+		msg.setArch("i686");
+		msg.setCdImage("");
+		if ((msg.getCdImage() != null) && (msg.getCdImage() != "")) {
+			msg.setBootDevice("cdrom");
 		} else {
-			svm.setBootDevice("hd");
+			msg.setBootDevice("hd");
 		}
-		if (svm.getHyperVisor() == "kvm") {
-			svm.setEmulatorPath("/usr/bin/kvm");
-		} else if (svm.getHyperVisor() == "xen") {
+		if (msg.getHyperVisor() == "kvm") {
+			msg.setEmulatorPath("/usr/bin/kvm");
+		} else if (msg.getHyperVisor() == "xen") {
 			// TODO @shayf update path
-			svm.setEmulatorPath("some other path");
+			msg.setEmulatorPath("some other path");
 		} else {
 			// TODO @shayf update path
-			svm.setEmulatorPath("some other path");
+			msg.setEmulatorPath("some other path");
 		}
-		svm.setRunAgent("false");
-		if (svm.getRunAgent() == "true") {
-			svm.setCdromPath(Utils.pathJoin(Utils.NOVA_HOME, svm.getName(),
+		msg.setRunAgent("false");
+		if (msg.getRunAgent() == "true") {
+			msg.setCdromPath(Utils.pathJoin(Utils.NOVA_HOME, msg.getName(),
 					"agent-cd.iso"));
-		} else if ((svm.getCdImage() != null) && (svm.getCdImage() != "")) {
-			svm.setCdromPath(Utils.pathJoin(Utils.NOVA_HOME, svm.getName(),
-					svm.getCdImage()));
+		} else if ((msg.getCdImage() != null) && (msg.getCdImage() != "")) {
+			msg.setCdromPath(Utils.pathJoin(Utils.NOVA_HOME, msg.getName(),
+					msg.getCdImage()));
 		}
 
 		// TODO @shayf read these values from some conf file
@@ -100,31 +80,31 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 		String vmNetworkBridge = "";
 		String fixVncMousePointer = "true";
 		if ((vmNetworkInterface != "") && (vmNetworkBridge != "")) {
-			svm.setInterfaceType("bridge");
-			svm.setSourcebridge(vmNetworkBridge);
-			svm.setMacAddress(Integer.toHexString((int) (Math.random() * 256))
+			msg.setInterfaceType("bridge");
+			msg.setSourcebridge(vmNetworkBridge);
+			msg.setMacAddress(Integer.toHexString((int) (Math.random() * 256))
 					+ ":" + Integer.toHexString((int) (Math.random() * 256))
 					+ ":" + Integer.toHexString((int) (Math.random() * 256))
 					+ ":" + Integer.toHexString((int) (Math.random() * 256))
 					+ ":" + Integer.toHexString((int) (Math.random() * 256))
 					+ ":" + Integer.toHexString((int) (Math.random() * 256)));
 		} else {
-			svm.setInterfaceType("network");
-			svm.setSourceNetwork("default");
+			msg.setInterfaceType("network");
+			msg.setSourceNetwork("default");
 		}
 		if (fixVncMousePointer == "true") {
-			svm.setInputType("tablet");
-			svm.setBus("usb");
+			msg.setInputType("tablet");
+			msg.setBus("usb");
 		} else {
 			// TODO @shayf set correct default value
-			svm.setInputType("tablet");
-			svm.setBus("usb");
+			msg.setInputType("tablet");
+			msg.setBus("usb");
 		}
 
 		// create domain and show some info
 		try {
 			Domain testDomain = conn.domainCreateLinux(
-					Kvm.emitDomain(svm.getHashMap()), 0);
+					Kvm.emitDomain(msg.getHashMap()), 0);
 			System.out
 					.println("Domain:" + testDomain.getName() + " id "
 							+ testDomain.getID() + " running "
