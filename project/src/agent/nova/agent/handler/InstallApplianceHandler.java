@@ -3,8 +3,9 @@ package nova.agent.handler;
 import java.util.concurrent.atomic.AtomicLong;
 
 import nova.agent.api.messages.InstallApplianceMessage;
-import nova.common.service.SimpleHandler;
+import nova.agent.daemons.PackageInstallDaemon;
 import nova.common.service.SimpleAddress;
+import nova.common.service.SimpleHandler;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -22,9 +23,8 @@ public class InstallApplianceHandler implements
 	@Override
 	public void handleMessage(InstallApplianceMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-		System.out.println(counter.incrementAndGet());
-		System.out.println(msg.getClass().getName());
-		System.out.println(xreply);
+
+		PackageInstallDaemon.getInstance().markInstall(msg.getAppName());
 	}
 
 }

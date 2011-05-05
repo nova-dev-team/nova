@@ -1,4 +1,4 @@
-package nova.test.json.simple;
+package nova.test.json;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public class TestJsonSimple {
 	@Test
 	public void testObject() {
 		Gson gson = new GsonBuilder().serializeNulls().create();
-		SomeObject empty = new SomeObject();
+		DemoJsonObject empty = new DemoJsonObject();
 		String emptyJson = gson.toJson(empty);
 		System.out.println(emptyJson);
 
@@ -39,7 +39,7 @@ public class TestJsonSimple {
 			Assert.assertNull(m.get(k));
 		}
 
-		SomeObject so = new SomeObject("foo", 34);
+		DemoJsonObject so = new DemoJsonObject("foo", 34);
 		String soJson = gson.toJson(so);
 		System.out.println(soJson);
 
@@ -57,27 +57,4 @@ public class TestJsonSimple {
 		}
 
 	}
-}
-
-class SomeObject {
-
-	public String text;
-
-	public Integer value;
-
-	public SomeObject() {
-		this.text = null;
-		this.value = null;
-	}
-
-	public SomeObject(String text, Integer value) {
-		this.text = text;
-		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return this.text + ", " + value;
-	}
-
 }

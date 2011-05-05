@@ -133,6 +133,7 @@ public class NovaWorker extends SimpleServer {
 	}
 
 	public void registerMaster(SimpleAddress xreply) {
+		// FIXME @santa: bindAddr should not be 0.0.0.0!
 		this.master = new MasterProxy(this.bindAddr);
 		master.connect(xreply.getInetSocketAddress());
 	}

@@ -1,7 +1,6 @@
 package nova.agent.daemons;
 
 import nova.agent.DownloadProgress;
-import nova.agent.GlobalPara;
 import nova.common.util.SimpleDaemon;
 
 /**
@@ -20,14 +19,6 @@ public class PackageDownloadDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
-		String softName = GlobalPara.downloadBuffer.read();
-		dlp.downLoad(softName);
-		GlobalPara.downloadedBuffer.write(softName);
-
-		while (!GlobalPara.downloadBuffer.isEmpty()) {
-			softName = GlobalPara.downloadBuffer.read();
-			dlp.downLoad(softName);
-			GlobalPara.downloadedBuffer.write(softName);
-		}
+		// TODO @santa
 	}
 }

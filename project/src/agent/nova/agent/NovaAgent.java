@@ -1,8 +1,7 @@
 package nova.agent;
 
-import java.net.InetAddress;
+import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 import nova.agent.api.messages.QueryApplianceStatusMessage;
 import nova.agent.daemons.AgentHeartbeatDaemon;
@@ -12,10 +11,15 @@ import nova.agent.daemons.PackageInstallDaemon;
 import nova.agent.handler.AgentQueryHeartbeatHandler;
 import nova.agent.handler.AgentQueryPerfHandler;
 import nova.agent.handler.QueryApplianceStatusHandler;
+import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.service.message.QueryPerfMessage;
+import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.common.util.Utils;
+import nova.master.NovaMaster;
+import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
@@ -29,6 +33,12 @@ import org.jboss.netty.channel.ExceptionEvent;
  * 
  */
 public class NovaAgent extends SimpleServer {
+
+	/**
+	 * Config info for agent.
+	 */
+	Conf conf = null;
+
 	/**
 	 * Log4j logger.
 	 */
@@ -45,8 +55,13 @@ public class NovaAgent extends SimpleServer {
 	 * All background working daemons for agent node.
 	 */
 	public SimpleDaemon[] daemons = new SimpleDaemon[] {
-			new PackageDownloadDaemon(), new PackageInstallDaemon(),
+			new PackageDownloadDaemon(), PackageInstallDaemon.getInstance(),
 			new AgentHeartbeatDaemon(), new AgentPerfInfoDaemon() };
+
+	/**
+	 * Connection to nova master.
+	 */
+	MasterProxy master = null;
 
 	/**
 	 * Start a server and register some handler.
@@ -62,6 +77,7 @@ public class NovaAgent extends SimpleServer {
 	@Override
 	public Channel bind(InetSocketAddress bindAddr) {
 		this.bindAddr = bindAddr;
+		logger.info("Nova agent running @ " + this.bindAddr);
 		Channel chnl = super.bind(this.bindAddr);
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
@@ -102,6 +118,41 @@ public class NovaAgent extends SimpleServer {
 	}
 
 	/**
+	 * Get config info.
+	 * 
+	 * @return The config info.
+	 */
+	public Conf getConf() {
+		return this.conf;
+	}
+
+	/**
+	 * Set config info.
+	 * 
+	 * @param conf
+	 *            The new config info.
+	 */
+	public void setConf(Conf conf) {
+		this.conf = conf;
+	}
+
+	public void registerMaster(SimpleAddress xreply) {
+		// FIXME @santa: bindAddr should not be 0.0.0.0!
+		this.master = new MasterProxy(this.bindAddr);
+		master.connect(xreply.getInetSocketAddress());
+	}
+
+	/**
+	 * Get current master proxy.
+	 * 
+	 * @return Current master proxy. Could be <code>NULL</code>, when no master
+	 *         node has connected.
+	 */
+	public MasterProxy getMaster() {
+		return this.master;
+	}
+
+	/**
 	 * Get the singleton of AgentServer.
 	 * 
 	 * @return AgentServer instance, singleton.
@@ -115,20 +166,6 @@ public class NovaAgent extends SimpleServer {
 
 	public static void main(String[] args) {
 
-		try {
-			logger.info("Nova agent running @ "
-					+ InetAddress.getLocalHost().getHostAddress());
-
-			// santa: bind to 0.0.0.0, so master could always connect to agent
-			// TODO @gaotao load bind address from conf!
-
-			NovaAgent.getInstance().bind(
-					new InetSocketAddress(GlobalPara.AGENT_BIND_HOST,
-							GlobalPara.AGENT_BIND_PORT));
-		} catch (UnknownHostException ex) {
-			logger.fatal("Error booting agent", ex);
-		}
-
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled
 		// gracefully
 		Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -136,8 +173,22 @@ public class NovaAgent extends SimpleServer {
 			public void run() {
 				// do cleanup work
 				NovaAgent.getInstance().shutdown();
-				logger.info("Cleanup agent done");
+				logger.info("Cleanup work done");
 			}
 		});
+
+		try {
+			Conf conf = Utils.loadAgentConf();
+			NovaAgent.getInstance().setConf(conf);
+			String bindHost = conf.getString("agent.bind_host");
+			Integer bindPort = conf.getInteger("agent.bind_port");
+			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
+					bindPort);
+			NovaMaster.getInstance().bind(bindAddr);
+		} catch (IOException e) {
+			logger.fatal("Error booting master", e);
+			System.exit(1);
+		}
+
 	}
 }

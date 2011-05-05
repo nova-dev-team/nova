@@ -1,4 +1,4 @@
-package nova.test.gson;
+package nova.test.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,33 +31,10 @@ public class TestGson {
 
 		System.out.println(gson.toJson(m));
 
-		SomeObject so = gson
-				.fromJson("{text:\"a\", value:2}", SomeObject.class);
+		DemoJsonObject so = gson.fromJson("{text:\"a\", value:2}",
+				DemoJsonObject.class);
 
 		System.out.println(so);
-		System.out.println(gson.toJson(new SomeObject("blah", 3)));
+		System.out.println(gson.toJson(new DemoJsonObject("blah", 3)));
 	}
-}
-
-class SomeObject {
-
-	public String text;
-
-	public Integer value;
-
-	public SomeObject() {
-		this.text = null;
-		this.value = null;
-	}
-
-	public SomeObject(String text, Integer value) {
-		this.text = text;
-		this.value = value;
-	}
-
-	@Override
-	public String toString() {
-		return this.text + ", " + value;
-	}
-
 }

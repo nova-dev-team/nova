@@ -1,7 +1,5 @@
 package nova.agent.daemons;
 
-import nova.agent.GlobalPara;
-import nova.agent.InstallProgress;
 import nova.common.util.SimpleDaemon;
 
 /**
@@ -12,16 +10,26 @@ import nova.common.util.SimpleDaemon;
  */
 public class PackageInstallDaemon extends SimpleDaemon {
 
-	public PackageInstallDaemon() {
+	private PackageInstallDaemon() {
 		super(100);
 	}
 
 	@Override
 	protected void workOneRound() {
-
-		String downloadedSoftware = GlobalPara.downloadedBuffer.read();
-		InstallProgress insP = new InstallProgress(downloadedSoftware,
-				GlobalPara.myPath);
-		insP.install();
+		// TODO @santa
 	}
+
+	public synchronized void markInstall(String appName) {
+		// TODO @santa
+	}
+
+	private static PackageInstallDaemon instance = null;
+
+	public static synchronized PackageInstallDaemon getInstance() {
+		if (PackageInstallDaemon.instance == null) {
+			PackageInstallDaemon.instance = new PackageInstallDaemon();
+		}
+		return PackageInstallDaemon.instance;
+	}
+
 }

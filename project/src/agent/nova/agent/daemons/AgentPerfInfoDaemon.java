@@ -1,7 +1,6 @@
 package nova.agent.daemons;
 
-import nova.agent.GlobalPara;
-import nova.common.service.SimpleAddress;
+import nova.agent.NovaAgent;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 
@@ -23,13 +22,9 @@ public class AgentPerfInfoDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
-		if (!GlobalPara.masterProxyMap.isEmpty()) {
-			for (SimpleAddress xreply : GlobalPara.masterProxyMap.keySet()) {
-				MasterProxy monitorProxy = GlobalPara.masterProxyMap
-						.get(xreply);
-				monitorProxy.sendMonitorInfo();
-			}
+		MasterProxy proxy = NovaAgent.getInstance().getMaster();
+		if (proxy != null) {
+			proxy.sendMonitorInfo();
 		}
 	}
-
 }
