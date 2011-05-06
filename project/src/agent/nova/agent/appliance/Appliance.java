@@ -2,32 +2,17 @@ package nova.agent.appliance;
 
 public class Appliance {
 
-	public String name;
+	public String name = "";
 
-	public enum Status {
+	Status status = Status.NOT_INSTALLED;
 
-		DOWNLOAD_PENDING,
+	String info = "";
 
-		DOWNLOADING,
-
-		INSTALL_PENDING,
-
-		INSTALLING,
-
-		INSTALLED,
-
-		CANCELLED,
-
-		DOWNLOAD_FAILURE,
-
-		INSTALL_FAILURE
-	};
-
-	Status status;
+	public Appliance() {
+	}
 
 	public Appliance(String name) {
 		this.name = name;
-		this.status = Status.DOWNLOAD_PENDING;
 	}
 
 	public synchronized Status getStatus() {
@@ -46,4 +31,43 @@ public class Appliance {
 		this.name = name;
 	}
 
+	@Override
+	public int hashCode() {
+		return this.name.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Appliance) {
+			Appliance app = (Appliance) o;
+			return this.name.equals(app.name);
+		}
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "{" + this.name + "," + this.status.toString() + "}";
+	}
+
+	public enum Status {
+
+		NOT_INSTALLED,
+
+		DOWNLOAD_PENDING,
+
+		DOWNLOADING,
+
+		INSTALL_PENDING,
+
+		INSTALLING,
+
+		INSTALLED,
+
+		CANCELLED,
+
+		DOWNLOAD_FAILURE,
+
+		INSTALL_FAILURE
+	};
 }

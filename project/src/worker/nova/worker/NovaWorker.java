@@ -20,8 +20,6 @@ import nova.worker.handler.WorkerQueryHeartbeatHandler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 
 /**
@@ -60,6 +58,16 @@ public class NovaWorker extends SimpleServer {
 
 		this.registerHandler(QueryHeartbeatMessage.class,
 				new WorkerQueryHeartbeatHandler());
+
+		try {
+			conf = Utils.loadConf();
+			conf.setDefaultValue("worker.bind_host", "0.0.0.0");
+			conf.setDefaultValue("worker.bind_port", 4000);
+		} catch (IOException e) {
+			logger.fatal("Error loading config files", e);
+			System.exit(1);
+		}
+
 	}
 
 	/**
@@ -113,16 +121,6 @@ public class NovaWorker extends SimpleServer {
 	}
 
 	/**
-	 * Set config info.
-	 * 
-	 * @param conf
-	 *            The new config info.
-	 */
-	public void setConf(Conf conf) {
-		this.conf = conf;
-	}
-
-	/**
 	 * Get current master proxy.
 	 * 
 	 * @return Current master proxy. Could be <code>NULL</code>, when no master
@@ -136,15 +134,6 @@ public class NovaWorker extends SimpleServer {
 		// FIXME @santa: bindAddr should not be 0.0.0.0!
 		this.master = new MasterProxy(this.bindAddr);
 		master.connect(xreply.getInetSocketAddress());
-	}
-
-	/**
-	 * Log exception.
-	 */
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-		logger.error(e.getCause());
-		super.exceptionCaught(ctx, e);
 	}
 
 	/**
@@ -188,21 +177,12 @@ public class NovaWorker extends SimpleServer {
 			}
 		});
 
-		try {
-			Conf conf = Utils.loadConf();
-			conf.setDefaultValue("worker.bind_host", "0.0.0.0");
-			conf.setDefaultValue("worker.bind_port", 4000);
-
-			NovaWorker.getInstance().setConf(conf);
-			String bindHost = conf.getString("worker.bind_host");
-			Integer bindPort = conf.getInteger("worker.bind_port");
-			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
-					bindPort);
-			NovaWorker.getInstance().bind(bindAddr);
-		} catch (IOException e) {
-			logger.fatal("Error booting worker", e);
-			System.exit(1);
-		}
+		String bindHost = NovaWorker.getInstance().getConf()
+				.getString("worker.bind_host");
+		Integer bindPort = NovaWorker.getInstance().getConf()
+				.getInteger("worker.bind_port");
+		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
+		NovaWorker.getInstance().bind(bindAddr);
 
 	}
 }

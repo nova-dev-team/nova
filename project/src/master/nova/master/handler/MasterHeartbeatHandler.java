@@ -1,9 +1,9 @@
 package nova.master.handler;
 
-import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
+import nova.common.service.SimpleHandler;
 import nova.common.service.message.HeartbeatMessage;
-import nova.master.NovaMaster;
+import nova.master.models.Pnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -27,7 +27,13 @@ public class MasterHeartbeatHandler implements SimpleHandler<HeartbeatMessage> {
 		}
 
 		// TODO @santa possibly update vnode
-		NovaMaster.getInstance().getDB().updatePnodeAliveTime(xreply);
+		Pnode pnode = Pnode.findByHost(xreply.ip);
+		if (pnode != null) {
+			pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
+			pnode.save();
+		} else {
+			log.error("Pnode with host " + xreply.ip + " not found!");
+		}
 
 	}
 

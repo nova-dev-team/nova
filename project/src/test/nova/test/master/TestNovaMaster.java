@@ -53,8 +53,7 @@ public class TestNovaMaster {
 		}
 
 		// master should detect worker stopped (heartbeat timeout)
-		Pnode pnode = NovaMaster.getInstance().getDB()
-				.getPnodeByAddress(new SimpleAddress(workerAddr));
+		Pnode pnode = Pnode.findByHost(workerHost);
 		Assert.assertNotNull(pnode);
 		Assert.assertTrue(pnode.getStatus() == Pnode.Status.CONNECT_FAILURE);
 		NovaMaster.getInstance().shutdown();

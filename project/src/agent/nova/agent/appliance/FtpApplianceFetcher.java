@@ -12,6 +12,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	public void fetch(Appliance app) throws IOException {
 		// TODO @santa Auto-generated method stub
 
+		// NovaAgent.getInstance().getAppliances().get(app.getName()).getStatus()
+		// == Appliance.Status.CANCELLED;
 	}
-
 }
