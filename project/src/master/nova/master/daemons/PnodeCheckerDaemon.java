@@ -28,8 +28,7 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		// ping all pnodes, check their health
-		ArrayList<Pnode> allPnodes = NovaMaster.getInstance().getDB()
-				.getAllPnodes();
+		ArrayList<Pnode> allPnodes = Pnode.all();
 		for (Pnode pnode : allPnodes)
 			try {
 				if (this.isStopping() == true) {

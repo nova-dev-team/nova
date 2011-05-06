@@ -16,7 +16,7 @@ public class TestVdiskDB extends TestCase {
 		vdisk.setDiskFormat(".qcow2");
 		vdisk.setOsFamily("linux");
 		vdisk.setDescription("lalalala");
-		vdisk.setOsName("Ubuntu 11.04");
+		vdisk.setOsName("Ubuntu 9.10");
 		vdisk.setSoftList("blahblah");
 
 		Session session = HibernateUtil.getSessionFactory().openSession();
@@ -24,6 +24,19 @@ public class TestVdiskDB extends TestCase {
 		session.save(vdisk);
 		tx.commit();
 		session.close();
+		HibernateUtil.shutdown();
+
+		Session sessionread = HibernateUtil.getSessionFactory().openSession();
+		Vdisk vdiskread = new Vdisk();
+		sessionread.load(vdiskread, vdisk.getId());
+		System.out.print("\n\nFileName: " + vdiskread.getFileName()
+				+ "\nDisplayName: " + vdiskread.getDisplayName()
+				+ "\nDiskFormat: " + vdiskread.getDiskFormat() + "\nOsFamily: "
+				+ vdiskread.getOsFamily() + "\nDescription: "
+				+ vdiskread.getDescription() + "\nOsName: "
+				+ vdiskread.getOsName() + "\nSoftList: "
+				+ vdiskread.getSoftList() + "\n\n");
+		sessionread.close();
 		HibernateUtil.shutdown();
 	}
 
