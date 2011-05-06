@@ -1,6 +1,11 @@
 package nova.test.worker;
 
+import java.io.IOException;
+
 import nova.common.service.SimpleAddress;
+import nova.common.util.Conf;
+import nova.common.util.Utils;
+import nova.worker.NovaWorker;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.handler.StartVnodeHandler;
 
@@ -28,6 +33,17 @@ public class TestStartVnode {
 		msg.setCdImage("");
 		msg.setEmulatorPath("/usr/bin/kvm");
 		msg.setRunAgent("false");
+		Conf conf = null;
+		try {
+			conf = Utils.loadConf();
+			// conf.setDefaultValue("vm_network_interface", "");
+			// conf.setDefaultValue("vm_network_bridge", "");
+			// conf.setDefaultValue("fix_vnc_mouse_pointer", "true");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		NovaWorker.getInstance().setConf(conf);
 
 		ChannelHandlerContext ctx = null;
 		MessageEvent e = null;

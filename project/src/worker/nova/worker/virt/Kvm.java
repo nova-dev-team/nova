@@ -3,6 +3,7 @@ package nova.worker.virt;
 import java.util.HashMap;
 
 import nova.common.util.Utils;
+import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
 
@@ -30,13 +31,13 @@ public class Kvm {
 		String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
 				"kvm-domain-template.xml");
 		if ((params.get("cdimg") != null)
-				&& (params.get("cdimg").toString() != "")) {
+				&& (!params.get("cdimg").toString().equals(""))) {
 			params.put("bootDevice", "cdrom");
 		} else {
 			params.put("bootDevice", "hd");
 		}
 
-		if (params.get("runAgent") == "true") {
+		if (params.get("runAgent").equals("true")) {
 			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME,
 					params.get("name").toString(), "agent-cd.iso"));
 			params.put("determinCdrom", "<disk type='file' device='cdrom'>"
@@ -44,7 +45,7 @@ public class Kvm {
 					+ params.get("cdromPath").toString() + "'/>"
 					+ "\n    <target dev='hdc'/>" + "\n  </disk>");
 		} else if ((params.get("cdimg") != null)
-				&& (params.get("cdimg").toString() != "")) {
+				&& (!params.get("cdimg").toString().equals(""))) {
 			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME,
 					params.get("name").toString(), params.get("cdImage")
 							.toString()));
@@ -57,11 +58,14 @@ public class Kvm {
 			params.put("determinCdrom", "");
 		}
 
-		// TODO @shayf get these three from conf files
-		String vmNetworkInterface = "";
-		String vmNetworkBridge = "";
-		String fixVncMousePointer = "true";
-		if ((vmNetworkInterface != "") && (vmNetworkBridge != "")) {
+		String vmNetworkInterface = NovaWorker.getInstance().getConf()
+				.getString("vm_network_interface");
+		String vmNetworkBridge = NovaWorker.getInstance().getConf()
+				.getString("vm_network_bridge");
+		String fixVncMousePointer = NovaWorker.getInstance().getConf()
+				.getString("fix_vnc_mouse_pointer");
+
+		if ((!vmNetworkInterface.equals("")) && (!vmNetworkBridge.equals(""))) {
 			params.put("interfaceType", "bridge");
 			params.put("sourceBridge", vmNetworkBridge);
 			params.put(
@@ -94,7 +98,7 @@ public class Kvm {
 							+ "'/></interface>");
 		}
 
-		if (fixVncMousePointer == "true") {
+		if (fixVncMousePointer.equals("true")) {
 			params.put("inputType", "tablet");
 			params.put("bus", "usb");
 			params.put("determinVnc", "<input type='"
