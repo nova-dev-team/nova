@@ -9,7 +9,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	}
 
 	@Override
-	public void fetch(String appName) throws IOException {
+	public void fetch(Appliance app) throws IOException {
 		// TODO @santa Auto-generated method stub
 
 	}

@@ -4,6 +4,6 @@ import java.io.IOException;
 
 public abstract class ApplianceFetcher {
 
-	public abstract void fetch(String appName) throws IOException;
+	public abstract void fetch(Appliance app) throws IOException;
 
 }

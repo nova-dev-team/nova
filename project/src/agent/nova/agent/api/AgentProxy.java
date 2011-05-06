@@ -1,9 +1,8 @@
 package nova.agent.api;
 
 import java.net.InetSocketAddress;
-import java.util.LinkedList;
 
-import nova.agent.api.messages.QueryApplianceStatusMessage;
+import nova.agent.api.messages.InstallApplianceMessage;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.CloseChannelMessage;
@@ -34,16 +33,16 @@ public class AgentProxy extends SimpleProxy {
 		super.sendRequest(new CloseChannelMessage());
 	}
 
-	public void sendSoftwareList(LinkedList<String> installSoftList) {
-		super.sendRequest(new QueryApplianceStatusMessage(installSoftList));
-	}
-
 	public void sendRequestMonitorInfo() {
 		super.sendRequest(new QueryPerfMessage());
 	}
 
 	public void sendRequestHeartbeat() {
 		super.sendRequest(new QueryHeartbeatMessage());
+	}
+
+	public void sendInstallAppliance(String... appNames) {
+		super.sendRequest(new InstallApplianceMessage(appNames));
 	}
 
 }
