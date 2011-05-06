@@ -4,7 +4,7 @@
 
 html { 
   margin: 0;
-  font: 10pt/1.26 "Gill Sans", sans-serif;
+  font: 10pt/1.26 "Palatino Linotype", "SimSun", sans-serif;
 }
 
 body { 
@@ -12,7 +12,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 { 
-  font-family: "Gill Sans", sans-serif;
+  font-family: "Microsoft YaHei", sans-serif;
   margin: 2em 0 0.5em 0;
   page-break-after: avoid;
 } 
@@ -27,13 +27,12 @@ h1 {
 
 h2 { 
   font-size: 1.2em;
-  text-transform: uppercase;
-  font-weight: bold;
+  font-weight: thin;
 }
 
 h3 { 
   font-size: 1em;
-  font-weight: bold;
+  font-weight: thin;
 }
 
 q::before {
@@ -60,10 +59,10 @@ a { text-decoration: none; color: black }
 
 /* cross-references */
 
-a.pageref::after { content: " on page " target-counter(attr(href), page); }
-a.chapref::before { content: " Chapter " target-counter(attr(href), chapter) ", "; }
-a.figref { content: " Figure " target-counter(attr(href), figure); }
-a.tableref { content: " Table " target-counter(attr(href), figure); }
+a.pageref::after { content: "第 " target-counter(attr(href), page) " 页，"; }
+a.chapref::before { content: "第 " target-counter(attr(href), chapter) " 章，"; }
+a.figref { content: "图 " target-counter(attr(href), figure); }
+a.tableref { content: "表 " target-counter(attr(href), figure); }
 
 /* sidenotes */
 
@@ -113,13 +112,13 @@ div.figure .caption, div.table .caption {
 }
 
 div.figure .caption::before {
-  content: "Figure " counter(figure) ": ";
-  font-weight: bold;
+  content: "图 " counter(figure) ": ";
+  font-weight: thin;
 }
 
 div.table .caption::before {
-  content: "Table " counter(table) ": ";
-  font-weight: bold;
+  content: "表 " counter(table) ": ";
+  font-weight: thin;
 }
 
 div.table {
@@ -161,14 +160,14 @@ table.lined td, table.lined th {
 
 @page :left {
   @top-left {
-    font: 11pt "Gill Sans", serif;
-    content: "The Nova Platform";
+    font: 11pt "Microsoft YaHei", serif;
+    content: "Nova 虚拟化平台";
     vertical-align: bottom;
     padding-bottom: 2em;
   }
 
   @bottom-left {
-    font: 11pt "Gill Sans", serif;
+    font: 11pt "Microsoft YaHei", serif;
     content: counter(page);
     padding-top: 2em;
     vertical-align: top;
@@ -177,14 +176,14 @@ table.lined td, table.lined th {
 
 @page :right {
   @top-right {
-    font: 11pt "Gill Sans", serif;
+    font: 11pt "Microsoft YaHei", serif;
     content: string(header, first); 
     vertical-align: bottom;
     padding-bottom: 2em; 
   }
 
   @bottom-right {
-    font: 11pt "Gill Sans", serif;
+    font: 11pt "Microsoft YaHei", serif;
     content: counter(page);
     text-align: right;
     vertical-align: top;
@@ -194,14 +193,14 @@ table.lined td, table.lined th {
 
 @page frontmatter :left {
   @top-left {
-    font: 11pt "Gill Sans", serif;
+    font: 11pt "Microsoft YaHei", serif;
     content: string(title);
     vertical-align: bottom;
     padding-bottom: 2em;
   }
 
   @bottom-left {
-    font: 11pt "Gill Sans", serif;
+    font: 11pt "Microsoft YaHei", serif;
     content: counter(page, lower-roman);
     padding-top: 2em;
     vertical-align: top;
@@ -212,14 +211,14 @@ table.lined td, table.lined th {
 
 @page frontmatter :right {
   @top-right {
-    font: 11pt "Gill Sans", serif;
+    font: 11pt "Microsoft YaHei", serif;
     content: string(header, first); 
     vertical-align: bottom;
     padding-bottom: 2em; 
   }
 
   @bottom-right {
-    font: 11pt "Gill Sans", serif;
+    font: 11pt "Microsoft YaHei", serif;
     content: counter(page, lower-roman);
     text-align: right;
     vertical-align: top;
@@ -365,8 +364,7 @@ div.frontcover p {
   left: 2cm; bottom: 1.5cm;
   font-size: 24pt;
   color: black;
-  font-weight: bold;
-  text-transform: uppercase;
+  font-weight: thin;
 }
 
 
@@ -377,7 +375,7 @@ div.titlepage h2, div.halftitlepage h2 { font-size: 1.2em; margin-bottom: 3em; }
 div.titlepage h3, div.halftitlepage h3 { font-size: 1em; margin-bottom: 3em; }
 div.titlepage p, div.halftitlepage p { 
   font-size: 1.4em;
-  font-weight: bold;
+  font-weight: thin;
   margin: 0; padding: 0;
 }
 
@@ -393,7 +391,7 @@ ul.toc ul {
   font-weight: normal;
 }
 ul.toc > li { 
-  font-weight: bold;
+  font-weight: thin;
   margin-bottom: 0.5em;
 }
 ul.toc a::after {
@@ -409,7 +407,7 @@ ul.toc > li.endmatter a::after {
   font-style: normal;
 }
 ul.toc > li.chapter::before {
-  content: "Chapter " counter(toc-chapter, decimal);
+  content: "第 " counter(toc-chapter, decimal) " 章";
   display: block;
   margin: 1em 0 0.1em -2.5cm;
   font-weight: normal;
@@ -428,14 +426,14 @@ h1::before {
   content: "\B0  \B0  \B0  \B0  \B0 \A";  /* ornaments */
 }
 
-div.chapter h1::before { content: "Chapter " counter(chapter) " \A"; }
+div.chapter h1::before { content: "第 " counter(chapter) " 章\A"; }
 
 div.frontcover h1::before, div.titlepage h1::before, div.halftitlepage h1::before {
   content: normal;                  /* that is, none */
 }
 
 h1 { string-set: header content();}
-div.chapter h1 { string-set: header "Chapter " counter(chapter) ": " content(); }
+div.chapter h1 { string-set: header "第 " counter(chapter) " 章： " content(); }
 
 /* index */
 
@@ -450,11 +448,10 @@ ul.index a::after { content: ", " target-counter(attr(href), page); }
 
 
 span.element, span.attribute {
-  text-transform: uppercase;
-  font-weight: bold;
+  font-weight: thin;
   font-size: 80%;
 }
-span.property { font-weight: bold }
+span.property { font-weight: thin; }
 code, pre, span.css, span.value, span.declaration {
   color: #600;
   font-size: 8pt;
@@ -463,7 +460,7 @@ code, pre, span.css, span.value, span.declaration {
 
 
 @media screen, handheld {
-  html { margin: 1em; font: 14px "Gill Sans", sans-serif; }
+  html { margin: 1em; font: 14px "Microsoft YaHei", sans-serif; }
   h1 { margin-bottom: 0.5em }
   div.frontcover, div.halftitlepage, div.titlepage, div.imprint, 
   div.dedication, div.foreword, div.toc, div.index { display: none }
