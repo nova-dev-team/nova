@@ -1,16 +1,15 @@
 package nova.master.handler;
 
-import nova.common.service.SimpleHandler;
 import nova.common.service.SimpleAddress;
-import nova.master.NovaMaster;
+import nova.common.service.SimpleHandler;
 import nova.master.api.messages.PnodeStatusMessage;
+import nova.master.models.Pnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
-public class PnodeStatusHandler implements
-		SimpleHandler<PnodeStatusMessage> {
+public class PnodeStatusHandler implements SimpleHandler<PnodeStatusMessage> {
 
 	/**
 	 * Log4j logger.
@@ -23,8 +22,13 @@ public class PnodeStatusHandler implements
 
 		// TODO @zhaoxun More verbose logging.
 		log.info("update pnode status");
-		NovaMaster.getInstance().getDB()
-				.updatePnodeStatus(msg.pAddr, msg.status);
+		Pnode pnode = Pnode.findByHost(xreply.ip);
+		if (pnode != null) {
+			pnode.setStatus(msg.status);
+			pnode.save();
+		} else {
+			log.error("Pnode with host " + xreply.ip + " not found!");
+		}
 
 	}
 

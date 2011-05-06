@@ -29,8 +29,6 @@ import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
 
 /**
  * The agent server model of nova
@@ -88,6 +86,14 @@ public class NovaAgent extends SimpleServer {
 				new QueryApplianceStatusHandler());
 		registerHandler(InstallApplianceMessage.class,
 				new InstallApplianceHandler());
+
+		try {
+			conf = Utils.loadConf();
+		} catch (IOException e) {
+			logger.fatal("Error loading config files", e);
+			System.exit(1);
+		}
+
 	}
 
 	@Override
@@ -122,15 +128,6 @@ public class NovaAgent extends SimpleServer {
 		super.shutdown();
 		this.bindAddr = null;
 		NovaAgent.instance = null;
-	}
-
-	/**
-	 * Log exception.
-	 */
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-		logger.error(e.getCause());
-		super.exceptionCaught(ctx, e);
 	}
 
 	public ConcurrentHashMap<String, Appliance> getAppliances() {
@@ -206,18 +203,12 @@ public class NovaAgent extends SimpleServer {
 			}
 		});
 
-		try {
-			Conf conf = Utils.loadConf();
-			NovaAgent.getInstance().setConf(conf);
-			String bindHost = conf.getString("agent.bind_host");
-			Integer bindPort = conf.getInteger("agent.bind_port");
-			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
-					bindPort);
-			NovaAgent.getInstance().bind(bindAddr);
-		} catch (IOException e) {
-			logger.fatal("Error booting master", e);
-			System.exit(1);
-		}
+		String bindHost = NovaAgent.getInstance().getConf()
+				.getString("agent.bind_host");
+		Integer bindPort = NovaAgent.getInstance().getConf()
+				.getInteger("agent.bind_port");
+		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
+		NovaAgent.getInstance().bind(bindAddr);
 
 	}
 }
