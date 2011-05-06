@@ -20,6 +20,15 @@ public class TestStartVnode {
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
 		StartVnodeMessage msg = new StartVnodeMessage(null);
+		msg.setName("vm");
+		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
+		msg.setMemSize("524288");
+		msg.setCpuCount("1");
+		msg.setArch("i686");
+		msg.setCdImage("");
+		msg.setEmulatorPath("/usr/bin/kvm");
+		msg.setRunAgent("false");
+
 		ChannelHandlerContext ctx = null;
 		MessageEvent e = null;
 		SimpleAddress xreply = null;

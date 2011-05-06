@@ -28,7 +28,7 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
-		// report actual vnodes status to master
+		// TODO @shayf report actual vnodes status to master
 		MasterProxy master = NovaWorker.getInstance().getMaster();
 		if (this.isStopping() == false && master != null) {
 			for (UUID uuid : allStatus.keySet()) {
