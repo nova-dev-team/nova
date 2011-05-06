@@ -1,14 +1,10 @@
-package nova.agent.daemons.helper;
+package nova.agent.appliance;
 
 import java.io.IOException;
 
-import nova.common.util.Conf;
-
 public class FtpApplianceFetcher extends ApplianceFetcher {
 
-	Conf conf;
-
-	public FtpApplianceFetcher(Conf conf) {
+	public FtpApplianceFetcher() {
 
 	}
 

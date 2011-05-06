@@ -1,4 +1,4 @@
-package nova.agent.daemons.helper;
+package nova.agent.appliance;
 
 import java.io.IOException;
 

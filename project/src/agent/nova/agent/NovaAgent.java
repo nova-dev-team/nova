@@ -18,7 +18,6 @@ import nova.common.service.message.QueryPerfMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
-import nova.master.NovaMaster;
 import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
@@ -172,6 +171,7 @@ public class NovaAgent extends SimpleServer {
 			@Override
 			public void run() {
 				// do cleanup work
+				this.setName("cleanup");
 				NovaAgent.getInstance().shutdown();
 				logger.info("Cleanup work done");
 			}
@@ -184,7 +184,7 @@ public class NovaAgent extends SimpleServer {
 			Integer bindPort = conf.getInteger("agent.bind_port");
 			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
 					bindPort);
-			NovaMaster.getInstance().bind(bindAddr);
+			NovaAgent.getInstance().bind(bindAddr);
 		} catch (IOException e) {
 			logger.fatal("Error booting master", e);
 			System.exit(1);
