@@ -11,6 +11,7 @@ public class TestKvm {
 	@Test
 	public void testEmitDomain() {
 		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("name", "vm-test-001");
 		System.out.println(Kvm.emitDomain(params));
 	}
 
