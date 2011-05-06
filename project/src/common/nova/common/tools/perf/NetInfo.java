@@ -9,13 +9,10 @@ import com.google.gson.Gson;
  * 
  */
 public class NetInfo {
+
 	public long bandWidth = 0;
 	public long upSpeed = 0;
 	public long downSpeed = 0;
-
-	public NetInfo() {
-
-	}
 
 	@Override
 	public String toString() {

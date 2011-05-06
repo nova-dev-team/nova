@@ -9,13 +9,10 @@ import com.google.gson.Gson;
  * 
  */
 public class DiskInfo {
+
 	public long totalDiskSize = 0;
 	public long usedDiskSize = 0;
 	public long freeDiskSize = 0;
-
-	public DiskInfo() {
-
-	}
 
 	@Override
 	public String toString() {

@@ -15,7 +15,7 @@
 
 		<mapping resource="schema/Pnode.hbm.xml" />
 		<mapping resource="schema/Vnode.hbm.xml" />
-		<mapping resource="schema/SoftwarePackage.hbm.xml" />
+		<mapping resource="schema/Appliance.hbm.xml" />
 		<mapping resource="schema/Vcluster.hbm.xml" />
 		<mapping resource="schema/Vdisk.hbm.xml" />
 	</session-factory>

@@ -1,0 +1,28 @@
+package nova.master.handler;
+
+import nova.common.service.SimpleHandler;
+import nova.common.service.SimpleAddress;
+import nova.master.api.messages.VnodeStatusMessage;
+
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+
+public class VnodeStatusHandler implements
+		SimpleHandler<VnodeStatusMessage> {
+
+	/**
+	 * Log4j logger.
+	 */
+	Logger log = Logger.getLogger(VnodeStatusHandler.class);
+
+	@Override
+	public void handleMessage(VnodeStatusMessage msg,
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
+		// TODO @zhaoxun Save update into database
+
+		log.info("update vnode status");
+
+	}
+
+}

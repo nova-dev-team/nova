@@ -38,7 +38,8 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 	ClientBootstrap bootstrap = null;
 	ChannelFuture channel = null;
 	Gson gson = new GsonBuilder().serializeNulls().create();
-	SimpleAddress replyAddr;
+	SimpleAddress replyAddr = null;
+	SimpleAddress serverAddr = null;
 	Logger log = null;
 
 	public SimpleProxy(InetSocketAddress replyAddr) {
@@ -81,6 +82,7 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 
 	public ChannelFuture connect(InetSocketAddress addr) {
 		this.channel = bootstrap.connect(addr);
+		this.serverAddr = new SimpleAddress(addr.getHostName(), addr.getPort());
 
 		// Using addlistener instead of awaitUninterruptibly to avoid deadlock
 		ChannelConnectFutureListener chfl = new ChannelConnectFutureListener();
@@ -103,6 +105,7 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 	public void close() {
 		this.channel.getChannel().getCloseFuture().awaitUninterruptibly();
 		this.factory.releaseExternalResources();
+		this.serverAddr = null;
 	}
 
 	protected final void sendRequest(Object req) {
@@ -121,6 +124,10 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
 		log.error("Exception caught", e.getCause());
 		e.getChannel().close();
+	}
+
+	public SimpleAddress getServerAddr() {
+		return this.serverAddr;
 	}
 }
 

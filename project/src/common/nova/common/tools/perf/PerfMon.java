@@ -17,6 +17,7 @@ import org.hyperic.sigar.ptql.ProcessFinder;
  * 
  */
 public class PerfMon {
+
 	static Logger logger = Logger.getLogger(PerfMon.class);
 
 	private static Sigar sigar = new Sigar();

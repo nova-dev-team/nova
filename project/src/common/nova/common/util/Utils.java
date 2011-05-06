@@ -3,7 +3,6 @@ package nova.common.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -82,44 +81,18 @@ public class Utils {
 	public static Conf loadConf() throws IOException {
 		Conf conf = new Conf();
 
-		final String confName = Utils.pathJoin(Utils.NOVA_HOME, "conf",
-				"nova.properties");
-		logger.info("Loading config file: " + confName);
-		FileInputStream fis = new FileInputStream(confName);
-		conf.load(fis);
-		fis.close();
+		File confDir = new File(Utils.pathJoin(Utils.NOVA_HOME, "conf"));
+		for (File f : confDir.listFiles()) {
+			if (f.isFile() && f.getName().startsWith("nova.")
+					&& f.getName().endsWith(".properties")) {
+				logger.info("Loading config from " + f.getAbsolutePath());
+				Conf subConf = new Conf();
+				FileInputStream fis = new FileInputStream(f);
+				subConf.load(fis);
+				fis.close();
 
-		// setting default config values
-		conf.setDefaultValue("master.bind_host", "0.0.0.0");
-		conf.setDefaultValue("master.bind_port", 3000);
-
-		conf.setDefaultValue("worker.bind_host", "0.0.0.0");
-		conf.setDefaultValue("worker.bind_port", 4000);
-
-		conf.setDefaultValue("storage.engine", "ftp");
-		conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
-		conf.setDefaultValue("storage.ftp.bind_port", 8021);
-		conf.setDefaultValue("storage.ftp.home", "storage");
-
-		return conf;
-	}
-
-	public static Conf loadAgentConf() {
-		Conf conf = new Conf();
-
-		final String confName = Utils.pathJoin(Utils.NOVA_HOME, "conf",
-				"nova.agent.properties");
-		logger.info("Loading config file: " + confName);
-		FileInputStream fis;
-		try {
-			fis = new FileInputStream(confName);
-
-			conf.load(fis);
-			fis.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+				conf.putAll(subConf);
+			}
 		}
 
 		return conf;

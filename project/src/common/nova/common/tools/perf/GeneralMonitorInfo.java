@@ -14,10 +14,6 @@ public class GeneralMonitorInfo {
 	public DiskInfo diskInfo = new DiskInfo();
 	public NetInfo netInfo = new NetInfo();
 
-	public GeneralMonitorInfo() {
-
-	}
-
 	@Override
 	public String toString() {
 		Gson gson = new Gson();

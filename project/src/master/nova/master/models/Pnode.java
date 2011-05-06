@@ -1,5 +1,6 @@
 package nova.master.models;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import nova.common.service.SimpleAddress;
@@ -227,5 +228,23 @@ public class Pnode {
 
 	public long getId() {
 		return id;
+	}
+
+	// TODO @zhaoxun
+	public void save() {
+
+	}
+
+	// TODO @zhaoxun
+	private static ArrayList<Pnode> allPnodes = new ArrayList<Pnode>();
+
+	public static ArrayList<Pnode> all() {
+		// TODO @zhaoxun
+		return allPnodes;
+	}
+
+	public static Pnode findByHost(String ip) {
+		// TODO @zhaoxun
+		return null;
 	}
 }

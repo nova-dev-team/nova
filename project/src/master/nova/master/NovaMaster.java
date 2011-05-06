@@ -4,26 +4,27 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
+import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
-import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.message.PerfMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
-import nova.master.daemons.PnodeHealthCheckerDaemon;
-import nova.master.handler.MasterGeneralMonitorMessageHandler;
+import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.MasterHeartbeatHandler;
-import nova.master.handler.MasterHttpRequestHandler;
-import nova.master.handler.PnodeStatusMessageHandler;
-import nova.master.handler.VnodeStatusMessageHandler;
-import nova.master.models.MasterDB;
+import nova.master.handler.MasterHttpHandler;
+import nova.master.handler.MasterPerfHandler;
+import nova.master.handler.PnodeStatusHandler;
+import nova.master.handler.VnodeStatusHandler;
 import nova.master.models.Pnode;
 import nova.worker.api.WorkerProxy;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -44,12 +45,12 @@ public class NovaMaster extends SimpleServer {
 	/**
 	 * All background working daemons for master node.
 	 */
-	SimpleDaemon daemons[] = { new PnodeHealthCheckerDaemon() };
+	SimpleDaemon daemons[] = { new PnodeCheckerDaemon() };
 
 	/**
-	 * Master's db.
+	 * Database session.
 	 */
-	MasterDB db = new MasterDB();
+	Session dbSession = HibernateUtil.getSessionFactory().openSession();
 
 	HashMap<SimpleAddress, WorkerProxy> workerProxyPool = new HashMap<SimpleAddress, WorkerProxy>();
 
@@ -60,22 +61,26 @@ public class NovaMaster extends SimpleServer {
 		// register handlers
 
 		// handle http requests
-		this.registerHandler(DefaultHttpRequest.class,
-				new MasterHttpRequestHandler());
+		this.registerHandler(DefaultHttpRequest.class, new MasterHttpHandler());
 
 		this.registerHandler(HeartbeatMessage.class,
 				new MasterHeartbeatHandler());
 
-		this.registerHandler(PnodeStatusMessage.class,
-				new PnodeStatusMessageHandler());
+		this.registerHandler(PnodeStatusMessage.class, new PnodeStatusHandler());
 
-		this.registerHandler(VnodeStatusMessage.class,
-				new VnodeStatusMessageHandler());
+		this.registerHandler(VnodeStatusMessage.class, new VnodeStatusHandler());
 
-		this.registerHandler(GeneralMonitorMessage.class,
-				new MasterGeneralMonitorMessageHandler());
+		this.registerHandler(PerfMessage.class, new MasterPerfHandler());
 
-		// TODO @zhaoxun connect db
+		try {
+			conf = Utils.loadConf();
+			conf.setDefaultValue("master.bind_host", "0.0.0.0");
+			conf.setDefaultValue("master.bind_port", 3000);
+		} catch (IOException e) {
+			logger.fatal("Error loading config files", e);
+			System.exit(1);
+		}
+
 	}
 
 	/**
@@ -108,8 +113,7 @@ public class NovaMaster extends SimpleServer {
 			try {
 				daemon.join();
 			} catch (InterruptedException e) {
-				logger.error("Error joining thread '" + daemon.getName() + "'",
-						e);
+				logger.error("Error joining thread " + daemon.getName(), e);
 			}
 		}
 		logger.info("All deamons stopped");
@@ -130,22 +134,12 @@ public class NovaMaster extends SimpleServer {
 	}
 
 	/**
-	 * Set config info.
-	 * 
-	 * @param conf
-	 *            The new config info.
-	 */
-	public void setConf(Conf conf) {
-		this.conf = conf;
-	}
-
-	/**
 	 * Get master's database.
 	 * 
 	 * @return Master's database.
 	 */
-	public MasterDB getDB() {
-		return this.db;
+	public Session getDbSession() {
+		return this.dbSession;
 	}
 
 	public WorkerProxy getWorkerProxy(final SimpleAddress pAddr) {
@@ -155,8 +149,14 @@ public class NovaMaster extends SimpleServer {
 				@Override
 				public void exceptionCaught(ChannelHandlerContext ctx,
 						ExceptionEvent e) {
-					getDB().updatePnodeStatus(pAddr,
-							Pnode.Status.CONNECT_FAILURE);
+					Pnode pnode = Pnode.findByHost(pAddr.ip);
+					if (pnode != null) {
+						pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
+						pnode.save();
+					} else {
+						logger.error("Pnode with host " + pAddr.ip
+								+ " not found!");
+					}
 					super.exceptionCaught(ctx, e);
 				}
 
@@ -165,15 +165,6 @@ public class NovaMaster extends SimpleServer {
 			workerProxyPool.put(pAddr, wp);
 		}
 		return workerProxyPool.get(pAddr);
-	}
-
-	/**
-	 * Log exception.
-	 */
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
-		logger.error(e.getCause());
-		super.exceptionCaught(ctx, e);
 	}
 
 	/**
@@ -220,18 +211,12 @@ public class NovaMaster extends SimpleServer {
 
 		});
 
-		try {
-			Conf conf = Utils.loadConf();
-			NovaMaster.getInstance().setConf(conf);
-			String bindHost = conf.getString("master.bind_host");
-			Integer bindPort = conf.getInteger("master.bind_port");
-			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
-					bindPort);
-			NovaMaster.getInstance().bind(bindAddr);
-		} catch (IOException e) {
-			logger.fatal("Error booting master", e);
-			System.exit(1);
-		}
+		String bindHost = NovaMaster.getInstance().getConf()
+				.getString("master.bind_host");
+		Integer bindPort = NovaMaster.getInstance().getConf()
+				.getInteger("master.bind_port");
+		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
+		NovaMaster.getInstance().bind(bindAddr);
 
 	}
 }

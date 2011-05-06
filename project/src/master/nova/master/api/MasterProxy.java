@@ -1,22 +1,19 @@
 package nova.master.api;
 
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.UUID;
 
+import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
-import nova.common.service.message.GeneralMonitorMessage;
 import nova.common.service.message.HeartbeatMessage;
-import nova.common.service.message.SoftwareInstallStatusMessage;
-import nova.common.service.protocol.HeartbeatProtocol;
-import nova.common.service.protocol.MonitorProtocol;
-import nova.common.service.protocol.PnodeStatusProtocol;
-import nova.common.service.protocol.SoftwareProtocol;
-import nova.common.service.protocol.VnodeStatusProtocol;
+import nova.common.service.message.PerfMessage;
+import nova.master.api.messages.ApplianceStatusMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Pnode;
-import nova.master.models.Vnode.Status;
+import nova.master.models.Vnode;
 
 /**
  * Proxy for Master node.
@@ -24,9 +21,7 @@ import nova.master.models.Vnode.Status;
  * @author santa
  * 
  */
-public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
-		MonitorProtocol, PnodeStatusProtocol, SoftwareProtocol,
-		VnodeStatusProtocol {
+public class MasterProxy extends SimpleProxy {
 
 	public MasterProxy(InetSocketAddress bindAddr) {
 		super(bindAddr);
@@ -39,7 +34,6 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 	/**
 	 * Report a heartbeat to Master node.
 	 */
-	@Override
 	public void sendHeartbeat() {
 		super.sendRequest(new HeartbeatMessage());
 	}
@@ -47,24 +41,21 @@ public class MasterProxy extends SimpleProxy implements HeartbeatProtocol,
 	/**
 	 * Send a monitor info to master node.
 	 */
-	@Override
 	public void sendMonitorInfo() {
-		super.sendRequest(new GeneralMonitorMessage());
+		super.sendRequest(new PerfMessage());
 	}
 
-	@Override
 	public void sendPnodeStatus(SimpleAddress pAddr, Pnode.Status status) {
 		super.sendRequest(new PnodeStatusMessage(pAddr, status));
 	}
 
-	@Override
-	public void sendSoftwareStatus() {
-		super.sendRequest(new SoftwareInstallStatusMessage());
+	public void sendVnodeStatus(UUID uuid, Vnode.Status status) {
+		super.sendRequest(new VnodeStatusMessage(uuid, status));
 	}
 
-	@Override
-	public void sendVnodeStatus(UUID uuid, Status status) {
-		super.sendRequest(new VnodeStatusMessage(uuid, status));
+	public void sendApplianceStatus(Collection<Appliance> appliances) {
+		super.sendRequest(new ApplianceStatusMessage((Appliance[]) appliances
+				.toArray()));
 	}
 
 }
