@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
+import nova.agent.appliance.ApplianceInstaller;
 import nova.common.util.SimpleDaemon;
 
 import org.apache.log4j.Logger;
@@ -30,7 +31,7 @@ public class ApplianceInstallDaemon extends SimpleDaemon {
 				try {
 					app.setStatus(Appliance.Status.INSTALLING);
 					log.info("Installing appliance: " + app.getName());
-					NovaAgent.getInstance().getApplianceFetcher().fetch(app);
+					ApplianceInstaller.install(app);
 					log.info("Appliance installed, mark INSTALLED: "
 							+ app.getName());
 					app.setStatus(Appliance.Status.INSTALLED);
