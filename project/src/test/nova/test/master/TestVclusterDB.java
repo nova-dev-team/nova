@@ -25,6 +25,11 @@ public class TestVclusterDB extends TestCase {
 		tx.commit();
 		session.close();
 		HibernateUtil.shutdown();
+
+		Session sessionread = HibernateUtil.getSessionFactory().openSession();
+		Vcluster vclusterread = new Vcluster();
+		sessionread.load(vclusterread, vcluster.getId());
+
 	}
 
 }

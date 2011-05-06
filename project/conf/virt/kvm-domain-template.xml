@@ -14,7 +14,7 @@
 <devices>
   <emulator>${emulatorPath}</emulator>
   <disk type='file' device='disk'>
-    <source file='/var/lib/libvirt/images/linux.img'/>
+    <source file='${sourceFile}'/>
     <target dev='hda'/>
   </disk>
   ${determinCdrom}

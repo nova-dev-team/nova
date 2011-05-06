@@ -1,5 +1,11 @@
 package nova.agent;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.UUID;
@@ -29,6 +35,9 @@ import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * The agent server model of nova
@@ -71,6 +80,7 @@ public class NovaAgent extends SimpleServer {
 	MasterProxy master = null;
 
 	ConcurrentHashMap<String, Appliance> appliances = new ConcurrentHashMap<String, Appliance>();
+	Gson gson = new GsonBuilder().serializeNulls().create();
 
 	// TODO [future] support protocols other than ftp
 	ApplianceFetcher fetcher = new FtpApplianceFetcher();
@@ -79,6 +89,12 @@ public class NovaAgent extends SimpleServer {
 	 * Start a server and register some handler.
 	 */
 	private NovaAgent() {
+
+		// create db/agent folder
+		File agentDbFolder = new File(Utils.pathJoin(Utils.NOVA_HOME, "db",
+				"agent"));
+		agentDbFolder.mkdirs();
+
 		registerHandler(QueryHeartbeatMessage.class,
 				new AgentQueryHeartbeatHandler());
 		registerHandler(QueryPerfMessage.class, new AgentQueryPerfHandler());
@@ -132,6 +148,70 @@ public class NovaAgent extends SimpleServer {
 
 	public ConcurrentHashMap<String, Appliance> getAppliances() {
 		return this.appliances;
+	}
+
+	/**
+	 * Read info of all appliances from the apps.json file
+	 */
+	public void loadAppliances() {
+		String filePath = Utils.pathJoin(Utils.NOVA_HOME, "db", "agent",
+				"apps.json");
+		try {
+			FileReader fr = new FileReader(filePath);
+			BufferedReader br = new BufferedReader(fr);
+
+			String line = null;
+			StringBuffer appsJson = new StringBuffer();
+			while ((line = br.readLine()) != null) {
+				appsJson.append(line);
+				appsJson.append("\n");
+			}
+			fr.close();
+
+			Appliance[] appsArray = gson.fromJson(appsJson.toString(),
+					Appliance[].class);
+
+			this.appliances.clear();
+			for (int i = 0; i < appsArray.length; i++) {
+				this.appliances.put(appsArray[i].getName(), appsArray[i]);
+			}
+
+		} catch (FileNotFoundException e) {
+			logger.error("Can't find the appliances list file: " + filePath, e);
+		} catch (IOException e) {
+			logger.error("Can't read from appliances list file: " + filePath, e);
+		}
+
+	}
+
+	/**
+	 * Write new appliances' info to the file
+	 */
+	public synchronized void saveAppliances() {
+		Appliance[] appsArray = new Appliance[this.appliances.size()];
+		int i = 0;
+		for (Appliance app : this.appliances.values()) {
+			appsArray[i] = app;
+			i++;
+		}
+		String appList = gson.toJson(appsArray);
+		String filePath = Utils.pathJoin(Utils.NOVA_HOME, "db", "agent",
+				"apps.json");
+
+		try {
+			FileWriter fw = new FileWriter(filePath);
+			BufferedWriter bw = new BufferedWriter(fw);
+
+			bw.write(appList);
+
+			bw.flush();
+			bw.close();
+			fw.close();
+		} catch (IOException e) {
+			logger.error("Can't write new appliances list into file: "
+					+ filePath, e);
+		}
+
 	}
 
 	public ApplianceFetcher getApplianceFetcher() {
