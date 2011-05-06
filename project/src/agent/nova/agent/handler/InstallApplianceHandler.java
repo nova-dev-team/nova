@@ -13,7 +13,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 /**
- * Report to master or worker the status of softwares' installation.
+ * Get list of softwares will be download and install
  * 
  * @author gaotao1987@gmail.com
  * 
@@ -29,9 +29,18 @@ public class InstallApplianceHandler implements
 		ConcurrentHashMap<String, Appliance> appliances = NovaAgent
 				.getInstance().getAppliances();
 
+		// if appliance is new for agent, then put it into the appliances list
+		// and change the status of this appliance to DOWNLOAD_PENDING
 		for (String appName : msg.getAppNames()) {
 			if (appliances.containsKey(appName) == false) {
-				appliances.put(appName, new Appliance(appName));
+				Appliance app = new Appliance(appName);
+				appliances.put(appName, app);
+			}
+			Appliance app = appliances.get(appName);
+			if (app.getStatus().equals(Appliance.Status.NOT_INSTALLED)) {
+				app.setStatus(Appliance.Status.DOWNLOAD_PENDING);
+				// save new appliances status
+				NovaAgent.getInstance().saveAppliances();
 			}
 		}
 
