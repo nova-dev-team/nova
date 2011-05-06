@@ -9,6 +9,7 @@ import nova.worker.NovaWorker;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.handler.StartVnodeHandler;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.junit.Test;
@@ -21,6 +22,9 @@ import org.junit.Test;
  * 
  */
 public class TestStartVnode {
+
+	Logger log = Logger.getLogger(TestStartVnode.class);
+
 	@Test
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
@@ -36,12 +40,8 @@ public class TestStartVnode {
 		Conf conf = null;
 		try {
 			conf = Utils.loadConf();
-			// conf.setDefaultValue("vm_network_interface", "");
-			// conf.setDefaultValue("vm_network_bridge", "");
-			// conf.setDefaultValue("fix_vnc_mouse_pointer", "true");
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			log.error("load conf file failed", e1);
 		}
 		NovaWorker.getInstance().setConf(conf);
 

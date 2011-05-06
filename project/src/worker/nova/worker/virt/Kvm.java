@@ -105,7 +105,7 @@ public class Kvm {
 					+ params.get("inputType").toString() + "' bus='"
 					+ params.get("bus").toString() + "'/>");
 		} else {
-
+			params.put("determinVnc", "");
 		}
 
 		return Utils.expandTemplateFile(templateFpath, params);
