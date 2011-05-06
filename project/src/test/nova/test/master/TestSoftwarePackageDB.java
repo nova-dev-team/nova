@@ -20,6 +20,10 @@ public class TestSoftwarePackageDB extends TestCase {
 		tx.commit();
 		session.close();
 		HibernateUtil.shutdown();
+
+		Session sessionread = HibernateUtil.getSessionFactory().openSession();
+		SoftwarePackage softread = new SoftwarePackage();
+		sessionread.load(softread, soft.getId());
 	}
 
 }
