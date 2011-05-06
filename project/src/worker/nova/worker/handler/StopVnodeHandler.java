@@ -42,11 +42,15 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 		try {
 			Domain dom = conn.domainLookupByUUIDString(msg.getUuid());
 			String name = dom.getName();
-			dom.destroy();
 
-			System.out.println("delete path = "
-					+ Utils.pathJoin(Utils.NOVA_HOME, "run", name));
-			delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
+			if (!msg.getPowerOffOnly()) {
+				dom.destroy();
+				System.out.println("delete path = "
+						+ Utils.pathJoin(Utils.NOVA_HOME, "run", name));
+				delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
+			} else {
+				dom.suspend();
+			}
 
 		} catch (LibvirtException ex) {
 			log.error("Error closing domain " + msg.getUuid(), ex);

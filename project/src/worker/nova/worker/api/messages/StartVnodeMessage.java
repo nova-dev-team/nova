@@ -15,6 +15,7 @@ public class StartVnodeMessage {
 	/**
 	 * params for config
 	 */
+	boolean wakeupOnly;
 	String name;
 	String uuid;
 	String memSize;
@@ -35,6 +36,14 @@ public class StartVnodeMessage {
 	String determinCdrom;
 	String determinNetwork;
 	String determinVnc;
+
+	public boolean isWakeupOnly() {
+		return wakeupOnly;
+	}
+
+	public void setWakeupOnly(boolean wakeupOnly) {
+		this.wakeupOnly = wakeupOnly;
+	}
 
 	public String getSourceFile() {
 		return sourceFile;

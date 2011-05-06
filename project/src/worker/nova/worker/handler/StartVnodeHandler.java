@@ -42,18 +42,26 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			log.error("Error connecting " + virtService, ex);
 		}
 
-		// System.out.println(Kvm.emitDomain(msg.getHashMap()));
-
-		// create domain and show some info
-		try {
-			Domain testDomain = conn.domainCreateLinux(
-					Kvm.emitDomain(msg.getHashMap()), 0);
-			System.out
-					.println("Domain:" + testDomain.getName() + " id "
-							+ testDomain.getID() + " running "
-							+ testDomain.getOSType());
-		} catch (LibvirtException ex) {
-			log.error("Create domain failed", ex);
+		if (msg.isWakeupOnly()) {
+			try {
+				Domain testDomain = conn
+						.domainLookupByUUIDString(msg.getUuid());
+				testDomain.resume();
+			} catch (LibvirtException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} else {
+			// create domain and show some info
+			try {
+				Domain testDomain = conn.domainCreateLinux(
+						Kvm.emitDomain(msg.getHashMap()), 0);
+				System.out.println("Domain:" + testDomain.getName() + " id "
+						+ testDomain.getID() + " running "
+						+ testDomain.getOSType());
+			} catch (LibvirtException ex) {
+				log.error("Create domain failed", ex);
+			}
 		}
 
 	}
