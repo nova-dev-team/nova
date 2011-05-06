@@ -125,7 +125,10 @@ public class NovaStorage extends SimpleServer {
 			conf.setDefaultValue("storage.engine", "ftp");
 			conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
 			conf.setDefaultValue("storage.ftp.bind_port", 8021);
-			conf.setDefaultValue("storage.ftp.home", "storage");
+			conf.setDefaultValue("storage.ftp.home", "data/ftp_home");
+			conf.setDefaultValue("storage.ftp.idle_time", 60);
+			conf.setDefaultValue("storage.ftp.admin.username", "admin");
+			conf.setDefaultValue("storage.ftp.admin.password", "liquid");
 
 			NovaStorage.getInstance().setConf(conf);
 			NovaStorage.getInstance().startFtpServer();

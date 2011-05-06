@@ -1,9 +1,11 @@
 package nova.agent.handler;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import nova.agent.NovaAgent;
 import nova.agent.api.messages.InstallApplianceMessage;
-import nova.agent.daemons.PackageInstallDaemon;
+import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 
@@ -24,7 +26,14 @@ public class InstallApplianceHandler implements
 	public void handleMessage(InstallApplianceMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
-		PackageInstallDaemon.getInstance().markInstall(msg.getAppName());
-	}
+		ConcurrentHashMap<String, Appliance> appliances = NovaAgent
+				.getInstance().getAppliances();
 
+		for (String appName : msg.getAppNames()) {
+			if (appliances.containsKey(appName) == false) {
+				appliances.put(appName, new Appliance(appName));
+			}
+		}
+
+	}
 }

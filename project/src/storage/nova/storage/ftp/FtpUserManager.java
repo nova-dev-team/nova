@@ -1,9 +1,6 @@
 package nova.storage.ftp;
 
-import java.io.IOException;
-
-import nova.common.util.Conf;
-import nova.common.util.Utils;
+import nova.storage.NovaStorage;
 
 import org.apache.ftpserver.ftplet.Authentication;
 import org.apache.ftpserver.ftplet.AuthenticationFailedException;
@@ -13,27 +10,12 @@ import org.apache.ftpserver.usermanager.AnonymousAuthentication;
 import org.apache.ftpserver.usermanager.Md5PasswordEncryptor;
 import org.apache.ftpserver.usermanager.UsernamePasswordAuthentication;
 import org.apache.ftpserver.usermanager.impl.AbstractUserManager;
-import org.apache.log4j.Logger;
 
 public class FtpUserManager extends AbstractUserManager {
 
-	static Conf conf = null;
+	static User admin = new FtpAdmin(NovaStorage.getInstance().getConf());
 
-	static User admin = null;
-
-	static User anonUser = null;
-
-	static {
-		Logger log = Logger.getLogger(FtpUserManager.class);
-		try {
-			conf = Utils.loadConf();
-		} catch (IOException e) {
-			log.fatal("Error loading config files", e);
-		}
-
-		admin = new FtpAdmin(conf);
-		anonUser = new FtpAnonymousUser(conf);
-	}
+	static User anonUser = new FtpAdmin(NovaStorage.getInstance().getConf());
 
 	public FtpUserManager() {
 		super(admin.getName(), new Md5PasswordEncryptor());

@@ -2,14 +2,21 @@ package nova.agent;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
+import nova.agent.api.messages.InstallApplianceMessage;
 import nova.agent.api.messages.QueryApplianceStatusMessage;
+import nova.agent.appliance.Appliance;
+import nova.agent.appliance.ApplianceFetcher;
+import nova.agent.appliance.FtpApplianceFetcher;
 import nova.agent.daemons.AgentHeartbeatDaemon;
 import nova.agent.daemons.AgentPerfInfoDaemon;
-import nova.agent.daemons.PackageDownloadDaemon;
-import nova.agent.daemons.PackageInstallDaemon;
+import nova.agent.daemons.ApplianceDownloadDaemon;
+import nova.agent.daemons.ApplianceInstallDaemon;
 import nova.agent.handler.AgentQueryHeartbeatHandler;
 import nova.agent.handler.AgentQueryPerfHandler;
+import nova.agent.handler.InstallApplianceHandler;
 import nova.agent.handler.QueryApplianceStatusHandler;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
@@ -18,7 +25,6 @@ import nova.common.service.message.QueryPerfMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
-import nova.master.NovaMaster;
 import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
@@ -39,6 +45,9 @@ public class NovaAgent extends SimpleServer {
 	 */
 	Conf conf = null;
 
+	// TODO @santa read this uuid from conf.
+	UUID uuid = UUID.randomUUID();
+
 	/**
 	 * Log4j logger.
 	 */
@@ -55,13 +64,18 @@ public class NovaAgent extends SimpleServer {
 	 * All background working daemons for agent node.
 	 */
 	public SimpleDaemon[] daemons = new SimpleDaemon[] {
-			new PackageDownloadDaemon(), PackageInstallDaemon.getInstance(),
-			new AgentHeartbeatDaemon(), new AgentPerfInfoDaemon() };
+			new ApplianceDownloadDaemon(), new AgentHeartbeatDaemon(),
+			new ApplianceInstallDaemon(), new AgentPerfInfoDaemon() };
 
 	/**
 	 * Connection to nova master.
 	 */
 	MasterProxy master = null;
+
+	ConcurrentHashMap<String, Appliance> appliances = new ConcurrentHashMap<String, Appliance>();
+
+	// TODO [future] support protocols other than ftp
+	ApplianceFetcher fetcher = new FtpApplianceFetcher();
 
 	/**
 	 * Start a server and register some handler.
@@ -72,6 +86,8 @@ public class NovaAgent extends SimpleServer {
 		registerHandler(QueryPerfMessage.class, new AgentQueryPerfHandler());
 		registerHandler(QueryApplianceStatusMessage.class,
 				new QueryApplianceStatusHandler());
+		registerHandler(InstallApplianceMessage.class,
+				new InstallApplianceHandler());
 	}
 
 	@Override
@@ -117,6 +133,14 @@ public class NovaAgent extends SimpleServer {
 		super.exceptionCaught(ctx, e);
 	}
 
+	public ConcurrentHashMap<String, Appliance> getAppliances() {
+		return this.appliances;
+	}
+
+	public ApplianceFetcher getApplianceFetcher() {
+		return this.fetcher;
+	}
+
 	/**
 	 * Get config info.
 	 * 
@@ -134,6 +158,10 @@ public class NovaAgent extends SimpleServer {
 	 */
 	public void setConf(Conf conf) {
 		this.conf = conf;
+	}
+
+	public UUID getUUID() {
+		return this.uuid;
 	}
 
 	public void registerMaster(SimpleAddress xreply) {
@@ -172,6 +200,7 @@ public class NovaAgent extends SimpleServer {
 			@Override
 			public void run() {
 				// do cleanup work
+				this.setName("cleanup");
 				NovaAgent.getInstance().shutdown();
 				logger.info("Cleanup work done");
 			}
@@ -184,7 +213,7 @@ public class NovaAgent extends SimpleServer {
 			Integer bindPort = conf.getInteger("agent.bind_port");
 			InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
 					bindPort);
-			NovaMaster.getInstance().bind(bindAddr);
+			NovaAgent.getInstance().bind(bindAddr);
 		} catch (IOException e) {
 			logger.fatal("Error booting master", e);
 			System.exit(1);

@@ -20,7 +20,6 @@ public class TestStorage {
 		conf.setDefaultValue("storage.ftp.home", "storage");
 
 		NovaStorage.getInstance().setConf(conf);
-
 		NovaStorage.getInstance().startFtpServer();
 		NovaStorage.getInstance().shutdown();
 	}

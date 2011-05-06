@@ -8,18 +8,22 @@ package nova.agent.api.messages;
  */
 public class InstallApplianceMessage {
 
-	public String appName;
+	public String[] appNames = null;
 
-	public InstallApplianceMessage(String appName) {
+	public InstallApplianceMessage() {
 
 	}
 
-	public void setAppName(String appName) {
-		this.appName = appName;
+	public InstallApplianceMessage(String[] appNames) {
+		this.appNames = appNames;
 	}
 
-	public String getAppName() {
-		return this.appName;
+	public void setAppNames(String[] appNames) {
+		this.appNames = appNames;
+	}
+
+	public String[] getAppNames() {
+		return this.appNames;
 	}
 
 }
