@@ -37,5 +37,19 @@ public class TestStartVnode {
 		MessageEvent e = null;
 		SimpleAddress xreply = null;
 		svh.handleMessage(msg, ctx, e, xreply);
+
+		msg.setName("vm2");
+		msg.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
+		msg.setMemSize("524288");
+		msg.setCpuCount("1");
+		msg.setArch("i686");
+		msg.setCdImage("");
+		msg.setEmulatorPath("/usr/bin/kvm");
+		msg.setRunAgent("false");
+
+		ChannelHandlerContext ctx2 = null;
+		MessageEvent e2 = null;
+		SimpleAddress xreply2 = null;
+		svh.handleMessage(msg, ctx2, e2, xreply2);
 	}
 }

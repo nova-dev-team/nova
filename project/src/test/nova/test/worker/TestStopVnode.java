@@ -24,5 +24,12 @@ public class TestStopVnode {
 		MessageEvent e = null;
 		SimpleAddress xreply = null;
 		svh.handleMessage(msg, ctx, e, xreply);
+
+		StopVnodeMessage msg2 = new StopVnodeMessage(
+				"1f7c794b-2e17-45ef-3c55-ece004e76aef");
+		ChannelHandlerContext ctx2 = null;
+		MessageEvent e2 = null;
+		SimpleAddress xreply2 = null;
+		svh.handleMessage(msg2, ctx2, e2, xreply2);
 	}
 }

@@ -42,7 +42,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			log.error("Error connecting " + virtService, ex);
 		}
 
-		System.out.println(Kvm.emitDomain(msg.getHashMap()));
+		// System.out.println(Kvm.emitDomain(msg.getHashMap()));
 
 		// create domain and show some info
 		try {

@@ -38,11 +38,12 @@ public class Kvm {
 				.get("name").toString()));
 		File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 				params.get("name").toString(), "linux.img"));
-		if (foder.exists() == false) {
+		if (!foder.exists()) {
 			foder.mkdirs();
 		} else {
-			// TODO @shayf rename or what?
-			log.error("vm name has been used!");
+			// TODO @santa rename or stop or what?
+			log.error("vm name " + params.get("name").toString()
+					+ " has been used!");
 		}
 		if (file.exists() == false) {
 			try {
