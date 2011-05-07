@@ -240,6 +240,10 @@ public class Vnode {
 		return vncPort;
 	}
 
+	public void save() {
+		MasterDb.save(this);
+	}
+
 	public void setAddr(SimpleAddress addr) {
 		this.addr = addr;
 		this.setIp(addr.ip);
@@ -329,4 +333,5 @@ public class Vnode {
 	public void setVncPort(Integer vncPort) {
 		this.vncPort = vncPort;
 	}
+
 }

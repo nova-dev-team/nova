@@ -11,7 +11,6 @@ public class TestPnodeDB {
 
 	@Test
 	public void testSave() {
-
 		Pnode pnode = new Pnode();
 		pnode.setHostname("blah");
 		pnode.setIp("127.0.0.1");
@@ -30,5 +29,14 @@ public class TestPnodeDB {
 		for (Pnode pnode : Pnode.all()) {
 			System.out.println(pnode);
 		}
+	}
+
+	@Test
+	public void testFindPnodeByIp() {
+		Pnode pnode = Pnode.findByIp("127.0.0.1");
+		System.out.println(pnode);
+
+		Pnode pnode2 = Pnode.findByIp("127.0.0.3");
+		System.out.println(pnode2);
 	}
 }

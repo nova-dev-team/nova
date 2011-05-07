@@ -22,7 +22,7 @@ public class PnodeStatusHandler implements SimpleHandler<PnodeStatusMessage> {
 
 		// TODO @zhaoxun More verbose logging.
 		log.info("update pnode status");
-		Pnode pnode = Pnode.findByHost(xreply.ip);
+		Pnode pnode = Pnode.findByIp(xreply.ip);
 		if (pnode != null) {
 			pnode.setStatus(msg.status);
 			pnode.save();

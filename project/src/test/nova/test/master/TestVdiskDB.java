@@ -19,7 +19,7 @@ public class TestVdiskDB extends TestCase {
 		vdisk.setOsName("Ubuntu 9.10");
 		vdisk.setSoftList("blahblah");
 
-		MasterDb.save(vdisk);
+		vdisk.save();
 
 		Vdisk vdiskRead = (Vdisk) MasterDb.load(Vdisk.class, vdisk.getId());
 		System.out.print("\n\nFileName: " + vdiskRead.getFileName()

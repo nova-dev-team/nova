@@ -2,7 +2,6 @@ package nova.test.master;
 
 import junit.framework.TestCase;
 import nova.master.models.Appliance;
-import nova.master.models.MasterDb;
 
 import org.junit.Test;
 
@@ -16,7 +15,7 @@ public class TestApplianceDB extends TestCase {
 		soft.setDescription("blahlalalal");
 		soft.setOsFamily("win7,Ubuntu");
 
-		MasterDb.save(soft);
+		soft.save();
 
 	}
 

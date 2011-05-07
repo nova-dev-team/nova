@@ -63,9 +63,16 @@ public class Pnode {
 		return (List<Pnode>) MasterDb.createQuery("from Pnode").list();
 	}
 
-	public static Pnode findByHost(String ip) {
-		// TODO @zhaoxun
-		return null;
+	public static Pnode findByIp(String ip) {
+		try {
+			return (Pnode) MasterDb
+					.createQuery("from Pnode where ip='" + ip + "'").list()
+					.get(0);
+		} catch (IndexOutOfBoundsException e) {
+			// nothing found
+			return null;
+		}
+
 	}
 
 	/** The host name of physical machine. */

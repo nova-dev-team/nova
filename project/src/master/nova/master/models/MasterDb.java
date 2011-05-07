@@ -16,19 +16,19 @@ public class MasterDb {
 	private static Session session = HibernateUtil.getSessionFactory()
 			.openSession();
 
-	public static Query createQuery(String query) {
+	public static synchronized Query createQuery(String query) {
 		return session.createQuery(query);
 	}
 
-	public static void save(Object obj) {
+	@SuppressWarnings("rawtypes")
+	public static synchronized Object load(Class klass, Serializable arg) {
+		return session.load(klass, arg);
+	}
+
+	public static synchronized void save(Object obj) {
 		Transaction tx = session.beginTransaction();
 		session.save(obj);
 		tx.commit();
-	}
-
-	@SuppressWarnings("rawtypes")
-	public static Object load(Class klass, Serializable arg) {
-		return session.load(klass, arg);
 	}
 
 }

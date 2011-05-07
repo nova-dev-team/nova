@@ -133,7 +133,7 @@ public class NovaMaster extends SimpleServer {
 				@Override
 				public void exceptionCaught(ChannelHandlerContext ctx,
 						ExceptionEvent e) {
-					Pnode pnode = Pnode.findByHost(pAddr.ip);
+					Pnode pnode = Pnode.findByIp(pAddr.ip);
 					if (pnode != null) {
 						pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
 						pnode.save();

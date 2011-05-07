@@ -20,7 +20,7 @@ public class TestVclusterDB extends TestCase {
 		vcluster.setSshPublicKey("sshpublickey");
 		vcluster.setUserId(123);
 
-		MasterDb.save(vcluster);
+		vcluster.save();
 
 		Vcluster vclusterRead = (Vcluster) MasterDb.load(Vcluster.class,
 				vcluster.getId());

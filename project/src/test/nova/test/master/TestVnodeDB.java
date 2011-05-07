@@ -17,7 +17,7 @@ public class TestVnodeDB extends TestCase {
 		vnode.setUuid("lalalalalalala");
 		vnode.setCpuCount(7);
 
-		MasterDb.save(vnode);
+		vnode.save();
 
 		Vnode vnodeRead = (Vnode) MasterDb.load(Vnode.class, vnode.getId());
 		System.out.println(vnodeRead);
