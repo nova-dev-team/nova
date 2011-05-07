@@ -104,13 +104,15 @@ public class Pnode {
 	public static final long PING_INTERVAL = 1000;
 
 	public Pnode() {
-		this.status = Pnode.Status.ADD_PENDING;
+		// this.status = Pnode.Status.ADD_PENDING;
 	}
 
-	public Pnode(Pnode.Status status, SimpleAddress addr, int pnodeId,
+	public Pnode(Pnode.Status status, String ip, int port, int pnodeId,
 			String hostname, String uuid, String macAddress, Integer vmCapacity) {
-		this.status = Pnode.Status.ADD_PENDING;
-		this.addr = addr;
+		this.status = status;
+		// this.addr = addr;
+		this.ip = ip;
+		this.port = port;
 		this.pnodeId = pnodeId;
 		this.hostname = hostname;
 		this.uuid = uuid;
