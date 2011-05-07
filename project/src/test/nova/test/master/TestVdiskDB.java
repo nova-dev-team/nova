@@ -40,6 +40,12 @@ public class TestVdiskDB extends TestCase {
 				+ vdiskread.getSoftList() + "\n\n");
 		sessionread.close();
 		HibernateUtil.shutdown();
+
+		// Session sessionquery =
+		// HibernateUtil.getSessionFactory().openSession();
+		// String hql = "from User user";
+		// List<Vdisk> listvdisk = sessionquery.createQuery(hql).list();
+
 	}
 
 }

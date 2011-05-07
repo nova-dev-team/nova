@@ -69,6 +69,7 @@ public class Pnode {
 		// TODO @zhaoxun
 		return null;
 	}
+
 	/**
 	 * The pnode's address.
 	 */
@@ -120,10 +121,10 @@ public class Pnode {
 		this.setStatus(Pnode.Status.ADD_PENDING);
 	}
 
-	public Pnode(Pnode.Status status, SimpleAddress addr, int pnodeId,
+	public Pnode(Pnode.Status status, String ip, int port, int pnodeId,
 			String hostname, String uuid, String macAddress, Integer vmCapacity) {
 		this.setStatus(Pnode.Status.ADD_PENDING);
-		this.addr = addr;
+		this.addr = new SimpleAddress(ip, port);
 		this.pnodeId = pnodeId;
 		this.hostname = hostname;
 		this.uuid = uuid;
