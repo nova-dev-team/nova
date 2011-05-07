@@ -72,7 +72,6 @@ public class Pnode {
 			// nothing found
 			return null;
 		}
-
 	}
 
 	/** The host name of physical machine. */

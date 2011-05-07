@@ -27,7 +27,7 @@ public class MasterDb {
 
 	public static synchronized void save(Object obj) {
 		Transaction tx = session.beginTransaction();
-		session.save(obj);
+		session.saveOrUpdate(obj);
 		tx.commit();
 	}
 

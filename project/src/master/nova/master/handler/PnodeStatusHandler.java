@@ -20,16 +20,17 @@ public class PnodeStatusHandler implements SimpleHandler<PnodeStatusMessage> {
 	public void handleMessage(PnodeStatusMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
-		// TODO @zhaoxun More verbose logging.
 		log.info("update pnode status");
 		Pnode pnode = Pnode.findByIp(xreply.ip);
-		if (pnode != null) {
-			pnode.setStatus(msg.status);
-			pnode.save();
-		} else {
-			log.error("Pnode with host " + xreply.ip + " not found!");
+		if (pnode == null) {
+			// new pnode
+			pnode = new Pnode();
+			pnode.setAddr(xreply);
 		}
-
+		pnode.setStatus(msg.status);
+		log.info("Update status of pnode @ " + pnode.getAddr() + " to "
+				+ pnode.getStatus());
+		pnode.save();
 	}
 
 }
