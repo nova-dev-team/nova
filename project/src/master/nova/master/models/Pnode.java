@@ -1,9 +1,10 @@
 package nova.master.models;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import nova.common.service.SimpleAddress;
+import nova.common.util.Utils;
 
 /**
  * Model for a physical node.
@@ -46,9 +47,6 @@ public class Pnode {
 		UNKNOWN
 	}
 
-	// TODO @zhaoxun
-	private static ArrayList<Pnode> allPnodes = new ArrayList<Pnode>();
-
 	/**
 	 * If lastAckTime is not updated in this interval, the node will be
 	 * considered as down.
@@ -60,9 +58,9 @@ public class Pnode {
 	 */
 	public static final long PING_INTERVAL = 1000;
 
-	public static ArrayList<Pnode> all() {
-		// TODO @zhaoxun
-		return allPnodes;
+	@SuppressWarnings("unchecked")
+	public static List<Pnode> all() {
+		return (List<Pnode>) MasterDb.createQuery("from Pnode").list();
 	}
 
 	public static Pnode findByHost(String ip) {
@@ -70,10 +68,6 @@ public class Pnode {
 		return null;
 	}
 
-	/**
-	 * The pnode's address.
-	 */
-	SimpleAddress addr;
 	/** The host name of physical machine. */
 	private String hostname;
 
@@ -124,7 +118,8 @@ public class Pnode {
 	public Pnode(Pnode.Status status, String ip, int port, int pnodeId,
 			String hostname, String uuid, String macAddress, Integer vmCapacity) {
 		this.setStatus(Pnode.Status.ADD_PENDING);
-		this.addr = new SimpleAddress(ip, port);
+		this.ip = ip;
+		this.port = port;
 		this.pnodeId = pnodeId;
 		this.hostname = hostname;
 		this.uuid = uuid;
@@ -133,9 +128,7 @@ public class Pnode {
 	}
 
 	public SimpleAddress getAddr() {
-		this.addr.ip = this.getIp();
-		this.addr.port = this.getPort();
-		return this.addr;
+		return new SimpleAddress(this.ip, this.port);
 	}
 
 	public String getHostname() {
@@ -194,13 +187,11 @@ public class Pnode {
 		return timespan > Pnode.PING_INTERVAL;
 	}
 
-	// TODO @zhaoxun
 	public void save() {
-
+		MasterDb.save(this);
 	}
 
 	public void setAddr(SimpleAddress addr) {
-		this.addr = addr;
 		this.ip = addr.ip;
 		this.port = addr.port;
 	}
@@ -250,7 +241,10 @@ public class Pnode {
 	 */
 	@Override
 	public String toString() {
-		return this.addr.toString();
+		return Utils
+				.expandTemplate(
+						"{Pnode @ ${ip}:${port}, hostname='${hostname}', Status='${statusCode}', uuid='${uuid}'}",
+						this);
 	}
 
 	public void updateLastReqTime() {

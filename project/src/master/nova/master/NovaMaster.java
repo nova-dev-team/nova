@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
-import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.HeartbeatMessage;
@@ -24,7 +23,6 @@ import nova.master.models.Pnode;
 import nova.worker.api.WorkerProxy;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
@@ -46,11 +44,6 @@ public class NovaMaster extends SimpleServer {
 	 * All background working daemons for master node.
 	 */
 	SimpleDaemon daemons[] = { new PnodeCheckerDaemon() };
-
-	/**
-	 * Database session.
-	 */
-	Session dbSession = HibernateUtil.getSessionFactory().openSession();
 
 	HashMap<SimpleAddress, WorkerProxy> workerProxyPool = new HashMap<SimpleAddress, WorkerProxy>();
 
@@ -131,15 +124,6 @@ public class NovaMaster extends SimpleServer {
 	 */
 	public Conf getConf() {
 		return this.conf;
-	}
-
-	/**
-	 * Get master's database.
-	 * 
-	 * @return Master's database.
-	 */
-	public Session getDbSession() {
-		return this.dbSession;
 	}
 
 	public WorkerProxy getWorkerProxy(final SimpleAddress pAddr) {

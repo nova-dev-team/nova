@@ -1,11 +1,10 @@
 package nova.test.master;
 
-import nova.common.db.HibernateUtil;
+import junit.framework.Assert;
+import nova.master.models.MasterDb;
 import nova.master.models.Pnode;
 import nova.master.models.Pnode.Status;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.junit.Test;
 
 public class TestPnodeDB {
@@ -20,16 +19,16 @@ public class TestPnodeDB {
 		pnode.setPort(1234);
 		pnode.setStatus(Status.ADD_PENDING);
 
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Transaction tx = session.beginTransaction();
-		session.save(pnode);
-		tx.commit();
+		pnode.save();
+		Pnode pnodeLoad = (Pnode) MasterDb.load(Pnode.class, pnode.getId());
+		System.out.println(pnodeLoad);
+		Assert.assertEquals(pnode, pnodeLoad);
+	}
 
-		Pnode pnodeLoad = (Pnode) session.load(Pnode.class, pnode.getId());
-		System.out.println(pnodeLoad.getIp());
-
-		session.close();
-		HibernateUtil.shutdown();
-
+	@Test
+	public void testGetAllPnode() {
+		for (Pnode pnode : Pnode.all()) {
+			System.out.println(pnode);
+		}
 	}
 }

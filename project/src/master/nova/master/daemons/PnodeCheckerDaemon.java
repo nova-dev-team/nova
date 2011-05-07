@@ -1,6 +1,6 @@
 package nova.master.daemons;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import nova.common.util.SimpleDaemon;
 import nova.master.NovaMaster;
@@ -28,7 +28,7 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		// ping all pnodes, check their health
-		ArrayList<Pnode> allPnodes = Pnode.all();
+		List<Pnode> allPnodes = Pnode.all();
 		for (Pnode pnode : allPnodes)
 			try {
 				if (this.isStopping() == true) {
