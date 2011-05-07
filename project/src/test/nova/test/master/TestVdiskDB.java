@@ -6,9 +6,11 @@ import nova.master.models.Vdisk;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.junit.Test;
 
 public class TestVdiskDB extends TestCase {
 
+	@Test
 	public void testSave() {
 		Vdisk vdisk = new Vdisk();
 		vdisk.setFileName("blah");

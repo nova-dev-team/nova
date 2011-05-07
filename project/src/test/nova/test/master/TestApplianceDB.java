@@ -6,8 +6,11 @@ import nova.master.models.Appliance;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.junit.Test;
 
 public class TestApplianceDB extends TestCase {
+
+	@Test
 	public void testSave() {
 		Appliance soft = new Appliance();
 		soft.setFileName("blah");
