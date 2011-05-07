@@ -1,5 +1,9 @@
 package nova.worker.virt;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 
 import nova.common.util.Utils;
@@ -18,7 +22,7 @@ public class Kvm {
 	/**
 	 * Log4j logger.
 	 */
-	Logger log = Logger.getLogger(Kvm.class);
+	static Logger log = Logger.getLogger(Kvm.class);
 
 	/**
 	 * Emit libvirt domain definitions.
@@ -30,6 +34,46 @@ public class Kvm {
 	public static String emitDomain(HashMap<String, Object> params) {
 		String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
 				"kvm-domain-template.xml");
+		File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", params
+				.get("name").toString()));
+		File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+				params.get("name").toString(), "linux.img"));
+		if (!foder.exists()) {
+			foder.mkdirs();
+		} else {
+			// TODO @santa rename or stop or what?
+			log.error("vm name " + params.get("name").toString()
+					+ " has been used!");
+		}
+		if (file.exists() == false) {
+			try {
+				System.out.println("copying file");
+				String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME, "run",
+						"linux.img");
+				String destUrl = Utils.pathJoin(Utils.NOVA_HOME, "run", params
+						.get("name").toString(), "linux.img");
+				File sourceFile = new File(sourceUrl);
+				if (sourceFile.isFile()) {
+					FileInputStream input = new FileInputStream(sourceFile);
+					FileOutputStream output = new FileOutputStream(destUrl);
+					byte[] b = new byte[1024 * 5];
+					int len;
+					while ((len = input.read(b)) != -1) {
+						output.write(b, 0, len);
+					}
+					output.flush();
+					output.close();
+					input.close();
+				}
+				params.put("sourceFile", destUrl);
+			} catch (IOException e) {
+				log.error("copy image fail", e);
+			}
+		} else {
+			params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
+					params.get("name").toString(), "linux.img"));
+		}
+
 		if ((params.get("cdimg") != null)
 				&& (!params.get("cdimg").toString().equals(""))) {
 			params.put("bootDevice", "cdrom");

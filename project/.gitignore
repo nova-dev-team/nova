@@ -1,6 +1,7 @@
 build/
 docs/
 payload/
+run/
 *.rrd
 *.png
 *.db

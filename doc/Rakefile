@@ -256,7 +256,7 @@ def do_pdf
   chdir "output"
   prince = Prince.new()
   html_string = File.new("index.html").read
-  prince.add_style_sheets 'book/assets/stylesheets/second.css', 'book/assets/stylesheets/mac_classic.css'
+  prince.add_style_sheets '../layout/book.css', 'book/assets/stylesheets/mac_classic.css'
 
   File.open('book.pdf', 'w') do |f|
     f.puts prince.pdf_from_string(html_string)

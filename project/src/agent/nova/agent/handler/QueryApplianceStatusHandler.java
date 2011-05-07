@@ -16,7 +16,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 /**
- * Download and install softwares in receive soft list.
+ * Get the status of all appliances
  * 
  * @author gaotao1987@gmail.com
  * 
