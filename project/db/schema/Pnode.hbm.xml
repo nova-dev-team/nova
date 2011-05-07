@@ -10,11 +10,7 @@
 			<generator class="native"></generator>
 		</id>
 		
-<<<<<<< HEAD
-		<property name="statusCode"  column="status_code"  type="string"></property>  
-=======
-		<property name="status"  column="status"  type="nova.master.models.PnodeStatusEnumType"></property> 
->>>>>>> dda0a07261bff0e4cee976bd41da373e1aea7368
+		<property name="statusCode"  column="status_code"  type="string"></property>
 		
 		<property name="ip" column="ip" type="string"></property>
 		<property name="port" column="port" type="integer"></property>
