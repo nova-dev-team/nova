@@ -10,7 +10,7 @@
 			<generator class="native"></generator>
 		</id>
 			
-		<property name="status"  column="status"  type="nova.master.models.VnodeStatusEnumType"></property>  
+		<property name="statusCode"  column="statusCode"  type="string"></property>  
 		
 		<property name="name" column="name" type="string"></property>
 		<property name="uuid" column="uuid" type="string"></property>

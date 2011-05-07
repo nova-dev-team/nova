@@ -21,19 +21,14 @@ public class Pnode {
 	 */
 	public enum Status {
 		/**
-		 * The pnode status is not known.
-		 */
-		UNKNOWN,
-
-		/**
 		 * The pnode is being added.
 		 */
 		ADD_PENDING,
 
 		/**
-		 * The pnode is running and healthy.
+		 * Cannot connect the pnode.
 		 */
-		RUNNING,
+		CONNECT_FAILURE,
 
 		/**
 		 * The pnode is running and retired (not for use).
@@ -41,56 +36,18 @@ public class Pnode {
 		RETIRED,
 
 		/**
-		 * Cannot connect the pnode.
+		 * The pnode is running and healthy.
 		 */
-		CONNECT_FAILURE,
+		RUNNING,
+
+		/**
+		 * The pnode status is not known.
+		 */
+		UNKNOWN
 	}
 
-	/** for sqlite db */
-	private long id = 1L;
-
-	/**
-	 * Status of the pnode.
-	 */
-	Pnode.Status status;
-
-	/**
-	 * The pnode's address.
-	 */
-	SimpleAddress addr;
-	private String ip;
-	private int port;
-
-	/**
-	 * Id of the pnode.
-	 */
-	private int pnodeId;
-
-	/** The host name of physical machine. */
-	private String hostname;
-
-	/** The uuid of the worker machine. */
-	private String uuid;
-
-	/** The MAC address of the worker machine, used for remote booting */
-	private String macAddress;
-
-	/**
-	 * The limit of running VMs on this machine. It is not a hard limit, but
-	 * creating VMs more than this limit will result in low performance.
-	 */
-	private int vmCapacity;
-
-	/**
-	 * Time of last message from the pnode. Used to detect pnode failure. Marked
-	 * "transient" because it does not need to be saved into database.
-	 */
-	transient Date lastAckTime = new Date();
-
-	/**
-	 * Last time a message was sent to this node.
-	 */
-	transient Date lastReqTime = new Date();
+	// TODO @zhaoxun
+	private static ArrayList<Pnode> allPnodes = new ArrayList<Pnode>();
 
 	/**
 	 * If lastAckTime is not updated in this interval, the node will be
@@ -103,13 +60,69 @@ public class Pnode {
 	 */
 	public static final long PING_INTERVAL = 1000;
 
+	public static ArrayList<Pnode> all() {
+		// TODO @zhaoxun
+		return allPnodes;
+	}
+
+	public static Pnode findByHost(String ip) {
+		// TODO @zhaoxun
+		return null;
+	}
+	/**
+	 * The pnode's address.
+	 */
+	SimpleAddress addr;
+	/** The host name of physical machine. */
+	private String hostname;
+
+	/** for sqlite db */
+	private long id = 1L;
+
+	private String ip;
+
+	/**
+	 * Time of last message from the pnode. Used to detect pnode failure. Marked
+	 * "transient" because it does not need to be saved into database.
+	 */
+	transient Date lastAckTime = new Date();
+
+	/**
+	 * Last time a message was sent to this node.
+	 */
+	transient Date lastReqTime = new Date();
+
+	/** The MAC address of the worker machine, used for remote booting */
+	private String macAddress;
+
+	/**
+	 * Id of the pnode.
+	 */
+	private int pnodeId;
+
+	private int port;
+
+	/**
+	 * Status of the pnode. Only used by Hibernate.
+	 */
+	private String statusCode;
+
+	/** The uuid of the worker machine. */
+	private String uuid;
+
+	/**
+	 * The limit of running VMs on this machine. It is not a hard limit, but
+	 * creating VMs more than this limit will result in low performance.
+	 */
+	private int vmCapacity;
+
 	public Pnode() {
-		this.status = Pnode.Status.ADD_PENDING;
+		this.setStatus(Pnode.Status.ADD_PENDING);
 	}
 
 	public Pnode(Pnode.Status status, SimpleAddress addr, int pnodeId,
 			String hostname, String uuid, String macAddress, Integer vmCapacity) {
-		this.status = Pnode.Status.ADD_PENDING;
+		this.setStatus(Pnode.Status.ADD_PENDING);
 		this.addr = addr;
 		this.pnodeId = pnodeId;
 		this.hostname = hostname;
@@ -118,20 +131,50 @@ public class Pnode {
 		this.vmCapacity = vmCapacity;
 	}
 
-	/**
-	 * Override string present.
-	 */
-	@Override
-	public String toString() {
-		return this.addr.toString();
+	public SimpleAddress getAddr() {
+		this.addr.ip = this.getIp();
+		this.addr.port = this.getPort();
+		return this.addr;
 	}
 
-	public void setStatus(Pnode.Status status) {
-		this.status = status;
+	public String getHostname() {
+		return hostname;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public String getMacAddress() {
+		return macAddress;
+	}
+
+	public int getPnodeId() {
+		return pnodeId;
+	}
+
+	public int getPort() {
+		return port;
 	}
 
 	public Status getStatus() {
-		return this.status;
+		return Status.valueOf(this.statusCode);
+	}
+
+	public String getStatusCode() {
+		return statusCode;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public Integer getVmCapacity() {
+		return vmCapacity;
 	}
 
 	public void gotAck() {
@@ -150,8 +193,9 @@ public class Pnode {
 		return timespan > Pnode.PING_INTERVAL;
 	}
 
-	public void updateLastReqTime() {
-		this.lastReqTime = new Date();
+	// TODO @zhaoxun
+	public void save() {
+
 	}
 
 	public void setAddr(SimpleAddress addr) {
@@ -160,91 +204,55 @@ public class Pnode {
 		this.port = addr.port;
 	}
 
-	public SimpleAddress getAddr() {
-		this.addr.ip = this.getIp();
-		this.addr.port = this.getPort();
-		return this.addr;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setPnodeId(int pnodeId) {
-		this.pnodeId = pnodeId;
-	}
-
-	public int getPnodeId() {
-		return pnodeId;
-	}
-
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setMacAddress(String macAddress) {
-		this.macAddress = macAddress;
-	}
-
-	public String getMacAddress() {
-		return macAddress;
-	}
-
-	public void setVmCapacity(Integer vmCapacity) {
-		this.vmCapacity = vmCapacity;
-	}
-
-	public Integer getVmCapacity() {
-		return vmCapacity;
 	}
 
 	public void setId(long id) {
 		this.id = id;
 	}
 
-	public long getId() {
-		return id;
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 
-	// TODO @zhaoxun
-	public void save() {
-
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
 	}
 
-	// TODO @zhaoxun
-	private static ArrayList<Pnode> allPnodes = new ArrayList<Pnode>();
-
-	public static ArrayList<Pnode> all() {
-		// TODO @zhaoxun
-		return allPnodes;
+	public void setPnodeId(int pnodeId) {
+		this.pnodeId = pnodeId;
 	}
 
-	public static Pnode findByHost(String ip) {
-		// TODO @zhaoxun
-		return null;
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public void setStatus(Pnode.Status status) {
+		this.statusCode = status.toString();
+	}
+
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public void setVmCapacity(Integer vmCapacity) {
+		this.vmCapacity = vmCapacity;
+	}
+
+	/**
+	 * Override string present.
+	 */
+	@Override
+	public String toString() {
+		return this.addr.toString();
+	}
+
+	public void updateLastReqTime() {
+		this.lastReqTime = new Date();
 	}
 }

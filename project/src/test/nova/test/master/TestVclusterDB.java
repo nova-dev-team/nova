@@ -6,8 +6,11 @@ import nova.master.models.Vcluster;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.junit.Test;
 
 public class TestVclusterDB extends TestCase {
+
+	@Test
 	public void testSave() {
 		Vcluster vcluster = new Vcluster();
 		vcluster.setClusterName("cluster123");
