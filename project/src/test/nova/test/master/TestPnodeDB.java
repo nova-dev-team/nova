@@ -13,7 +13,7 @@ public class TestPnodeDB {
 	public void testSave() {
 		Pnode pnode = new Pnode();
 		pnode.setHostname("blah");
-		pnode.setIp("127.0.0.1");
+		pnode.setIp("127.0.0.3");
 		pnode.setMacAddress("mac_addr");
 		pnode.setPort(1234);
 		pnode.setStatus(Status.ADD_PENDING);

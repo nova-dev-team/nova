@@ -20,7 +20,6 @@ public class PnodeStatusHandler implements SimpleHandler<PnodeStatusMessage> {
 	public void handleMessage(PnodeStatusMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
-		log.info("update pnode status");
 		Pnode pnode = Pnode.findByIp(xreply.ip);
 		if (pnode == null) {
 			// new pnode

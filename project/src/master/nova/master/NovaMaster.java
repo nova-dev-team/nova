@@ -136,6 +136,8 @@ public class NovaMaster extends SimpleServer {
 					Pnode pnode = Pnode.findByIp(pAddr.ip);
 					if (pnode != null) {
 						pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
+						logger.info("Update status of pnode @ "
+								+ pnode.getAddr() + " to " + pnode.getStatus());
 						pnode.save();
 					} else {
 						logger.error("Pnode with host " + pAddr.ip

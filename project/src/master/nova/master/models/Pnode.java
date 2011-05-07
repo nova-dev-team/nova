@@ -60,14 +60,13 @@ public class Pnode {
 
 	@SuppressWarnings("unchecked")
 	public static List<Pnode> all() {
-		return (List<Pnode>) MasterDb.createQuery("from Pnode").list();
+		return (List<Pnode>) MasterDb.queryResult("from Pnode");
 	}
 
 	public static Pnode findByIp(String ip) {
 		try {
-			return (Pnode) MasterDb
-					.createQuery("from Pnode where ip='" + ip + "'").list()
-					.get(0);
+			return (Pnode) MasterDb.queryResult(
+					"from Pnode where ip='" + ip + "'").get(0);
 		} catch (IndexOutOfBoundsException e) {
 			// nothing found
 			return null;
