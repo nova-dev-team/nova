@@ -1,11 +1,9 @@
 package nova.test.master;
 
 import junit.framework.TestCase;
-import nova.common.db.HibernateUtil;
 import nova.master.models.Appliance;
+import nova.master.models.MasterDb;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.junit.Test;
 
 public class TestApplianceDB extends TestCase {
@@ -17,17 +15,9 @@ public class TestApplianceDB extends TestCase {
 		soft.setDisplayName("haha");
 		soft.setDescription("blahlalalal");
 		soft.setOsFamily("win7,Ubuntu");
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Transaction tx = session.beginTransaction();
-		session.save(soft);
-		tx.commit();
-		session.close();
-		HibernateUtil.shutdown();
 
-		// Session sessionread =
-		// HibernateUtil.getSessionFactory().openSession();
-		// SoftwarePackage softread = new SoftwarePackage();
-		// sessionread.load(softread, soft.getId());
+		MasterDb.save(soft);
+
 	}
 
 }
