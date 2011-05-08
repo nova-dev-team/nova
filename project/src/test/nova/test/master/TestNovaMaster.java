@@ -47,7 +47,7 @@ public class TestNovaMaster {
 		NovaWorker.getInstance().shutdown();
 
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -55,8 +55,9 @@ public class TestNovaMaster {
 		// master should detect worker stopped (heartbeat timeout)
 		Pnode pnode = Pnode.findByIp(workerHost);
 		Assert.assertNotNull(pnode);
-		Assert.assertTrue(pnode.getStatus()
-				.equals(Pnode.Status.CONNECT_FAILURE));
+		if (!pnode.getStatus().equals(Pnode.Status.CONNECT_FAILURE)) {
+			throw new RuntimeException("pnode status is " + pnode.getStatus());
+		}
 		NovaMaster.getInstance().shutdown();
 	}
 }

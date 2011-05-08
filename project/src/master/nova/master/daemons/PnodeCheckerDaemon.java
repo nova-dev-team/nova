@@ -38,6 +38,7 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
 
 				if (pnode.getStatus() == Pnode.Status.CONNECT_FAILURE) {
 					// skip failed machines
+					// TODO @santa still need to contact failed machines
 					continue;
 				}
 
