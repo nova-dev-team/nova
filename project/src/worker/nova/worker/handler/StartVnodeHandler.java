@@ -60,6 +60,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					System.out.println("Domain:" + testDomain.getName()
 							+ " id " + testDomain.getID() + " running "
 							+ testDomain.getOSType());
+					// Domain testDomain = conn.domainLookupByName("test");
+					// System.out.println("xml desc\n" +
+					// testDomain.getXMLDesc(0));
 				} catch (LibvirtException ex) {
 					log.error("Create domain failed", ex);
 				}

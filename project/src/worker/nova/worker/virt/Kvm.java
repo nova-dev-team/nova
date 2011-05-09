@@ -74,8 +74,8 @@ public class Kvm {
 					params.get("name").toString(), "linux.img"));
 		}
 
-		if ((params.get("cdimg") != null)
-				&& (!params.get("cdimg").toString().equals(""))) {
+		if ((params.get("cdImage") != null)
+				&& (!params.get("cdImage").toString().equals(""))) {
 			params.put("bootDevice", "cdrom");
 		} else {
 			params.put("bootDevice", "hd");
@@ -88,8 +88,8 @@ public class Kvm {
 					+ "\n    <source file='"
 					+ params.get("cdromPath").toString() + "'/>"
 					+ "\n    <target dev='hdc'/>" + "\n  </disk>");
-		} else if ((params.get("cdimg") != null)
-				&& (!params.get("cdimg").toString().equals(""))) {
+		} else if ((params.get("cdImage") != null)
+				&& (!params.get("cdImage").toString().equals(""))) {
 			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME,
 					params.get("name").toString(), params.get("cdImage")
 							.toString()));
@@ -149,6 +149,7 @@ public class Kvm {
 			params.put("determinVnc", "");
 		}
 
+		System.out.println(Utils.expandTemplateFile(templateFpath, params));
 		return Utils.expandTemplateFile(templateFpath, params);
 	}
 }
