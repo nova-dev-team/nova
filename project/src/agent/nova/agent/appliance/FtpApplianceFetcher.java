@@ -1,8 +1,10 @@
 package nova.agent.appliance;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import nova.agent.NovaAgent;
 import nova.common.util.Conf;
@@ -11,10 +13,10 @@ import sun.net.TelnetInputStream;
 import sun.net.ftp.FtpClient;
 
 public class FtpApplianceFetcher extends ApplianceFetcher {
+
 	private String hostIp = null;
 	private String userName = null;
 	private String password = null;
-	private String softName = null;
 	private String myPath = null;
 
 	public FtpApplianceFetcher() {
@@ -24,13 +26,9 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 		this.myPath = Conf.getString("agent.software.save_path");
 	}
 
-	public void setSoftName(String softName) {
-		this.softName = softName;
-	}
-
 	@Override
 	public void fetch(Appliance app) throws IOException {
-		setSoftName(app.getName());
+		downloadDirFromFtp(app.getName());
 		// NovaAgent.getInstance().getAppliances().get(app.getName()).getStatus()
 		// == Appliance.Status.CANCELLED;
 	}
@@ -63,7 +61,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 			while ((c = is.read(bytes)) != -1) {
 				os.write(bytes, 0, c);
 
-				if (NovaAgent.getInstance().getAppliances().get(this.softName)
+				if (NovaAgent.getInstance().getAppliances().get(softName)
 						.getStatus() == Appliance.Status.CANCELLED) {
 					return false;
 				}
@@ -79,22 +77,103 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	private void downloadDirFromFtp(String dirName) {
 		FtpClient fc = connectToFtp();
 		try {
 			fc.cd(dirName);
 			DataInputStream dis = new DataInputStream(fc.list());
-			String filename = "";
 
-			while ((filename = dis.readLine()) != null) {
-				// if (filename.startsWith("drwxr")) {
-				System.out.println(filename);
-				// }
+			BufferedReader br = new BufferedReader(new InputStreamReader(dis));
+			String ftpEntry = null;
+			while ((ftpEntry = br.readLine()) != null) {
+				// System.out.println(nthField(ftpEntry, 0));
+				int fnameStart = nthFieldStart(ftpEntry, 8);
+				String fname = ftpEntry.substring(fnameStart);
 			}
+			dis.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * Check if a char is whitespace.
+	 * 
+	 * @param ch
+	 * @return
+	 */
+	private static boolean isWhiteSpace(byte ch) {
+		return ch == ' ' || ch == '\t' || ch == '\n';
+	}
+
+	/**
+	 * Get the n-th field in an ftp file entry.
+	 * 
+	 * @param ftpItem
+	 * @param nth
+	 * @return
+	 */
+	public static String nthField(String ftpItem, int nth) {
+		int start = nthFieldStart(ftpItem, nth);
+		int stop = nthFieldStop(ftpItem, nth);
+		return ftpItem.substring(start, stop);
+	}
+
+	/**
+	 * Get the start offset of the n-th field in an ftp entry.
+	 * 
+	 * @param ftpItem
+	 * @param nth
+	 * @return
+	 */
+	public static int nthFieldStart(String ftpItem, int nth) {
+		int currentFieldId = -1;
+		int idx = 0;
+		boolean inWhiteSpace = true;
+		byte[] ftpItemBytes = ftpItem.getBytes();
+		for (;;) {
+			byte ch = ftpItemBytes[idx];
+			if (inWhiteSpace == true) {
+				if (isWhiteSpace(ch)) {
+					// do nothing, pass along
+				} else {
+					inWhiteSpace = false;
+					currentFieldId++;
+					if (currentFieldId >= nth)
+						break;
+				}
+			} else {
+				if (isWhiteSpace(ch)) {
+					inWhiteSpace = true;
+				} else {
+					// do nothing, pass along
+				}
+			}
+			idx++;
+		}
+		return idx;
+	}
+
+	/**
+	 * Get the stop offset (surpass end) of the n-th field in an ftp entry.
+	 * 
+	 * @param ftpItem
+	 * @param nth
+	 * @return
+	 */
+	public static int nthFieldStop(String ftpItem, int nth) {
+		byte[] ftpItemBytes = ftpItem.getBytes();
+		int idx = nthFieldStart(ftpItem, nth);
+		for (;;) {
+			if (idx >= ftpItemBytes.length)
+				break;
+			byte ch = ftpItemBytes[idx];
+			if (isWhiteSpace(ch)) {
+				break;
+			}
+			idx++;
+		}
+		return idx;
 	}
 }
