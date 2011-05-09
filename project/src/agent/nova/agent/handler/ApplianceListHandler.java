@@ -1,48 +1,47 @@
 package nova.agent.handler;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 import nova.agent.NovaAgent;
-import nova.agent.api.messages.InstallApplianceMessage;
+import nova.agent.api.messages.ApplianceListMessage;
 import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Pair;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 /**
- * Get list of softwares will be download and install
+ * Reassign appliances' information of agent
  * 
  * @author gaotao1987@gmail.com
  * 
  */
-public class InstallApplianceHandler implements
-		SimpleHandler<InstallApplianceMessage> {
-	AtomicLong counter = new AtomicLong();
+public class ApplianceListHandler implements
+		SimpleHandler<ApplianceListMessage> {
 
 	@Override
-	public void handleMessage(InstallApplianceMessage msg,
+	public void handleMessage(ApplianceListMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
+		// Pair.first = appName;
+		// Pair.second = appInfo;
+		Pair<String, String>[] apps = msg.getApps();
 
 		ConcurrentHashMap<String, Appliance> appliances = NovaAgent
 				.getInstance().getAppliances();
 
-		// if appliance is new for agent, then put it into the appliances list
-		// and change the status of this appliance to DOWNLOAD_PENDING
-		for (String appName : msg.getAppNames()) {
+		for (int i = 0; i < apps.length; i++) {
+			String appName = apps[i].getFirst();
+
 			if (appliances.containsKey(appName) == false) {
 				Appliance app = new Appliance(appName);
 				appliances.put(appName, app);
 			}
 			Appliance app = appliances.get(appName);
-			if (app.getStatus().equals(Appliance.Status.NOT_INSTALLED)) {
-				app.setStatus(Appliance.Status.DOWNLOAD_PENDING);
-			}
+			app.setInfo(apps[i].getSecond());
 		}
-		// save new appliances status
-		NovaAgent.getInstance().saveAppliances();
 
+		NovaAgent.getInstance().saveAppliances();
 	}
 }

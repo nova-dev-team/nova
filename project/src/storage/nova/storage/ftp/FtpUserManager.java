@@ -1,7 +1,5 @@
 package nova.storage.ftp;
 
-import nova.storage.NovaStorage;
-
 import org.apache.ftpserver.ftplet.Authentication;
 import org.apache.ftpserver.ftplet.AuthenticationFailedException;
 import org.apache.ftpserver.ftplet.FtpException;
@@ -13,9 +11,9 @@ import org.apache.ftpserver.usermanager.impl.AbstractUserManager;
 
 public class FtpUserManager extends AbstractUserManager {
 
-	static User admin = new FtpAdmin(NovaStorage.getInstance().getConf());
+	static User admin = new FtpAdmin();
 
-	static User anonUser = new FtpAdmin(NovaStorage.getInstance().getConf());
+	static User anonUser = new FtpAnonymousUser();
 
 	public FtpUserManager() {
 		super(admin.getName(), new Md5PasswordEncryptor());

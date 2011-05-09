@@ -1,6 +1,5 @@
 package nova.worker;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleAddress;
@@ -8,7 +7,6 @@ import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
-import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.daemons.VnodeStatusDaemon;
@@ -29,8 +27,6 @@ import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
  * 
  */
 public class NovaWorker extends SimpleServer {
-
-	Conf conf = null;
 
 	InetSocketAddress bindAddr = null;
 
@@ -59,14 +55,8 @@ public class NovaWorker extends SimpleServer {
 		this.registerHandler(QueryHeartbeatMessage.class,
 				new WorkerQueryHeartbeatHandler());
 
-		try {
-			conf = Utils.loadConf();
-			conf.setDefaultValue("worker.bind_host", "0.0.0.0");
-			conf.setDefaultValue("worker.bind_port", 4000);
-		} catch (IOException e) {
-			logger.fatal("Error loading config files", e);
-			System.exit(1);
-		}
+		Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
+		Conf.setDefaultValue("worker.bind_port", 4000);
 
 	}
 
@@ -109,15 +99,6 @@ public class NovaWorker extends SimpleServer {
 		// TODO @shayf more cleanup work
 
 		NovaWorker.instance = null;
-	}
-
-	/**
-	 * Get config info.
-	 * 
-	 * @return The config info.
-	 */
-	public Conf getConf() {
-		return this.conf;
 	}
 
 	/**
@@ -177,10 +158,8 @@ public class NovaWorker extends SimpleServer {
 			}
 		});
 
-		String bindHost = NovaWorker.getInstance().getConf()
-				.getString("worker.bind_host");
-		Integer bindPort = NovaWorker.getInstance().getConf()
-				.getInteger("worker.bind_port");
+		String bindHost = Conf.getString("worker.bind_host");
+		Integer bindPort = Conf.getInteger("worker.bind_port");
 		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
 		NovaWorker.getInstance().bind(bindAddr);
 

@@ -16,7 +16,7 @@ public class Appliance {
 	}
 
 	public synchronized Status getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public synchronized void setStatus(Status status) {
@@ -24,11 +24,19 @@ public class Appliance {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getInfo() {
+		return this.info;
+	}
+
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 	@Override

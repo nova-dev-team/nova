@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
+import nova.common.util.Conf;
 import nova.common.util.Utils;
-import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
 
@@ -102,12 +102,9 @@ public class Kvm {
 			params.put("determinCdrom", "");
 		}
 
-		String vmNetworkInterface = NovaWorker.getInstance().getConf()
-				.getString("vm_network_interface");
-		String vmNetworkBridge = NovaWorker.getInstance().getConf()
-				.getString("vm_network_bridge");
-		String fixVncMousePointer = NovaWorker.getInstance().getConf()
-				.getString("fix_vnc_mouse_pointer");
+		String vmNetworkInterface = Conf.getString("vm_network_interface");
+		String vmNetworkBridge = Conf.getString("vm_network_bridge");
+		String fixVncMousePointer = Conf.getString("fix_vnc_mouse_pointer");
 
 		if ((!vmNetworkInterface.equals("")) && (!vmNetworkBridge.equals(""))) {
 			params.put("interfaceType", "bridge");
