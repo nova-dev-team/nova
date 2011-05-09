@@ -2,17 +2,22 @@ package nova.agent.appliance;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import nova.agent.NovaAgent;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
+
+import org.apache.log4j.Logger;
+
 import sun.net.TelnetInputStream;
 import sun.net.ftp.FtpClient;
 
 /**
- * Fetch appliances
+ * Fetch appliances through ftp
  * 
  * @author gaotao1987@gmail.com
  * 
@@ -23,6 +28,12 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	private String userName = null;
 	private String password = null;
 	private String myPath = null;
+	private String applianceName = null;
+
+	/**
+	 * Log4j logger.
+	 */
+	static Logger logger = Logger.getLogger(FtpApplianceFetcher.class);
 
 	public FtpApplianceFetcher() {
 		this.hostIp = Conf.getString("agent.ftp.host");
@@ -31,11 +42,18 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 		this.myPath = Conf.getString("agent.software.save_path");
 	}
 
+	public void setApplianceName(Appliance app) {
+		this.applianceName = app.getName();
+	}
+
 	@Override
 	public void fetch(Appliance app) throws IOException {
+		setApplianceName(app); // save the name of appliance being downloading
 		FtpClient fc = connect();
 		downloadDir(fc, "", app.getName());
-		close(fc);
+		if ((downloadDir(fc, "", app.getName())) == false)
+			// deleteDir("", app.getName());
+			close(fc);
 
 	}
 
@@ -70,6 +88,41 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	}
 
 	/**
+	 * Delete directory
+	 * 
+	 * @param rootPath
+	 *            whole path of one directory, default value is ""
+	 * @param dirName
+	 *            directory name
+	 */
+	public void deleteDir(String rootPath, String dirName) {
+		String absolutePath = Utils.pathJoin(Utils.NOVA_HOME, this.myPath,
+				rootPath, dirName);
+		File file = new File(absolutePath);
+		File[] fileList = file.listFiles();
+		String entry = null;
+		for (File f : fileList) {
+			entry = f.getName();
+			if (f.isDirectory()) {
+				deleteDir(Utils.pathJoin(rootPath, dirName), entry);
+			} else {
+				f.delete();
+			}
+		}
+		file.delete();
+	}
+
+	/**
+	 * judge if the downloading appliance is cancelled
+	 * 
+	 * @return
+	 */
+	private boolean statusCancelled() {
+		return NovaAgent.getInstance().getAppliances().get(this.applianceName)
+				.getStatus() == Appliance.Status.CANCELLED;
+	}
+
+	/**
 	 * Download one file from ftp server
 	 * 
 	 * @param fClient
@@ -96,11 +149,9 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 			while ((c = is.read(bytes)) != -1) {
 				os.write(bytes, 0, c);
 
-				// if (NovaAgent.getInstance().getAppliances().get(softName)
-				// .getStatus() == Appliance.Status.CANCELLED) {
-				// return false;
-				// }
-
+				if (statusCancelled()) {
+					break;
+				}
 			}
 
 			is.close();
@@ -116,11 +167,11 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * 
 	 * @param fc
 	 * @param rootPath
-	 *            whole path of one directory in ftp
+	 *            whole path of one directory in ftp, default value is ""
 	 * @param dirName
 	 *            the directory that will be downloaded
 	 */
-	private void downloadDir(FtpClient fc, String rootPath, String dirName) {
+	private boolean downloadDir(FtpClient fc, String rootPath, String dirName) {
 
 		try {
 			fc.cd(dirName);
@@ -130,7 +181,8 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 			BufferedReader br = new BufferedReader(new InputStreamReader(dis));
 
 			String ftpEntry = null;
-			while ((ftpEntry = br.readLine()) != null) {
+			// TODO by gaotao optimize there when cancelled!
+			while ((ftpEntry = br.readLine()) != null && !statusCancelled()) {
 				int fnameStart = nthFieldStart(ftpEntry, 8);
 				String entry = ftpEntry.substring(fnameStart);
 				if ((nthField(ftpEntry, 0)).startsWith("d")) {
@@ -138,14 +190,16 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 					downloadDir(fc, Utils.pathJoin(rootPath, dirName), entry);
 				} else {
 					downloadFile(fc, Utils.pathJoin(rootPath, dirName), entry);
+
 				}
 			}
 			dis.close();
 			fc.cdUp();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Download error: ", e);
+			return false;
 		}
-
+		return true;
 	}
 
 	/**

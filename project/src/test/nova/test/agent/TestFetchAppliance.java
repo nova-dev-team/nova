@@ -2,6 +2,7 @@ package nova.test.agent;
 
 import java.io.IOException;
 
+import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.FtpApplianceFetcher;
 import nova.storage.NovaStorage;
@@ -18,12 +19,16 @@ public class TestFetchAppliance {
 
 		FtpApplianceFetcher fp = new FtpApplianceFetcher();
 		try {
-			fp.fetch(new Appliance("picture"));
+
+			Appliance app = new Appliance("picture");
+			NovaAgent.getInstance().getAppliances().put("picture", app);
+			// app.setStatus(Status.CANCELLED);
+			fp.fetch(app);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		NovaStorage.getInstance().shutdown();
+		fp.deleteDir("", "picture");
 	}
 
 	private void testFtpFieldParsingHelper(String text, String... parts) {
