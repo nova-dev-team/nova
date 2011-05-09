@@ -1,10 +1,7 @@
 package nova.storage;
 
-import java.io.IOException;
-
 import nova.common.service.SimpleServer;
 import nova.common.util.Conf;
-import nova.common.util.Utils;
 import nova.storage.ftp.FtpUserManager;
 
 import org.apache.ftpserver.FtpServer;
@@ -17,11 +14,6 @@ public class NovaStorage extends SimpleServer {
 
 	static Logger logger = Logger.getLogger(NovaStorage.class);
 
-	/**
-	 * Config info for storage server.
-	 */
-	Conf conf = null;
-
 	FtpServer ftpServer = null;
 
 	/**
@@ -29,25 +21,13 @@ public class NovaStorage extends SimpleServer {
 	 */
 	private NovaStorage() {
 
-	}
-
-	/**
-	 * Get config info.
-	 * 
-	 * @return The config info.
-	 */
-	public Conf getConf() {
-		return this.conf;
-	}
-
-	/**
-	 * Set config info.
-	 * 
-	 * @param conf
-	 *            The new config info.
-	 */
-	public void setConf(Conf conf) {
-		this.conf = conf;
+		Conf.setDefaultValue("storage.engine", "ftp");
+		Conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
+		Conf.setDefaultValue("storage.ftp.bind_port", 8021);
+		Conf.setDefaultValue("storage.ftp.home", "data/ftp_home");
+		Conf.setDefaultValue("storage.ftp.idle_time", 60);
+		Conf.setDefaultValue("storage.ftp.admin.username", "admin");
+		Conf.setDefaultValue("storage.ftp.admin.password", "liquid");
 	}
 
 	public void startFtpServer() {
@@ -57,11 +37,11 @@ public class NovaStorage extends SimpleServer {
 
 		// set listener address
 		logger.info("FTP server will be running @ "
-				+ conf.getString("storage.ftp.bind_host") + ":"
-				+ conf.getInteger("storage.ftp.bind_port"));
+				+ Conf.getString("storage.ftp.bind_host") + ":"
+				+ Conf.getInteger("storage.ftp.bind_port"));
 
-		factory.setServerAddress(conf.getString("storage.ftp.bind_host"));
-		factory.setPort(conf.getInteger("storage.ftp.bind_port"));
+		factory.setServerAddress(Conf.getString("storage.ftp.bind_host"));
+		factory.setPort(Conf.getInteger("storage.ftp.bind_port"));
 
 		// replace the default listener
 		serverFactory.addListener("default", factory.createListener());
@@ -119,24 +99,6 @@ public class NovaStorage extends SimpleServer {
 			}
 		});
 
-		try {
-			Conf conf = Utils.loadConf();
-
-			conf.setDefaultValue("storage.engine", "ftp");
-			conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
-			conf.setDefaultValue("storage.ftp.bind_port", 8021);
-			conf.setDefaultValue("storage.ftp.home", "data/ftp_home");
-			conf.setDefaultValue("storage.ftp.idle_time", 60);
-			conf.setDefaultValue("storage.ftp.admin.username", "admin");
-			conf.setDefaultValue("storage.ftp.admin.password", "liquid");
-
-			NovaStorage.getInstance().setConf(conf);
-			NovaStorage.getInstance().startFtpServer();
-
-		} catch (IOException e) {
-			logger.fatal("Failed to load config file", e);
-			System.exit(1);
-		}
-
+		NovaStorage.getInstance().startFtpServer();
 	}
 }

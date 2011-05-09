@@ -14,10 +14,7 @@ public class FtpAnonymousUser extends BaseUser {
 
 	public static final String ANONYMOUS_USERNAME = "anonymous";
 
-	Conf conf = null;
-
-	public FtpAnonymousUser(Conf conf) {
-		this.conf = conf;
+	public FtpAnonymousUser() {
 
 		List<Authority> authorities = new ArrayList<Authority>();
 
@@ -36,7 +33,7 @@ public class FtpAnonymousUser extends BaseUser {
 
 	@Override
 	public int getMaxIdleTime() {
-		return conf.getInteger("storage.ftp.idle_time");
+		return Conf.getInteger("storage.ftp.idle_time");
 	}
 
 	@Override
@@ -46,7 +43,7 @@ public class FtpAnonymousUser extends BaseUser {
 
 	@Override
 	public String getHomeDirectory() {
-		return conf.getString("storage.ftp.home");
+		return Conf.getString("storage.ftp.home");
 	}
 
 }

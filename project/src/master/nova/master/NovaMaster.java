@@ -1,6 +1,5 @@
 package nova.master;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
@@ -11,7 +10,6 @@ import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.PerfMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
-import nova.common.util.Utils;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
@@ -37,8 +35,6 @@ import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
  * 
  */
 public class NovaMaster extends SimpleServer {
-
-	Conf conf = null;
 
 	InetSocketAddress bindAddr = null;
 
@@ -72,15 +68,8 @@ public class NovaMaster extends SimpleServer {
 
 		this.registerHandler(PerfMessage.class, new MasterPerfHandler());
 
-		try {
-			conf = Utils.loadConf();
-			conf.setDefaultValue("master.bind_host", "0.0.0.0");
-			conf.setDefaultValue("master.bind_port", 3000);
-		} catch (IOException e) {
-			logger.fatal("Error loading config files", e);
-			System.exit(1);
-		}
-
+		Conf.setDefaultValue("master.bind_host", "0.0.0.0");
+		Conf.setDefaultValue("master.bind_port", 3000);
 	}
 
 	/**
@@ -122,15 +111,6 @@ public class NovaMaster extends SimpleServer {
 		// TODO @zhaoxun more cleanup work
 
 		NovaMaster.instance = null;
-	}
-
-	/**
-	 * Get config info.
-	 * 
-	 * @return The config info.
-	 */
-	public Conf getConf() {
-		return this.conf;
 	}
 
 	/**
@@ -211,10 +191,8 @@ public class NovaMaster extends SimpleServer {
 
 		});
 
-		String bindHost = NovaMaster.getInstance().getConf()
-				.getString("master.bind_host");
-		Integer bindPort = NovaMaster.getInstance().getConf()
-				.getInteger("master.bind_port");
+		String bindHost = Conf.getString("master.bind_host");
+		Integer bindPort = Conf.getInteger("master.bind_port");
 		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
 		NovaMaster.getInstance().bind(bindAddr);
 

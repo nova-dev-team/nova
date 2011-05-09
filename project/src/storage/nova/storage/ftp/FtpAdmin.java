@@ -13,10 +13,7 @@ import org.apache.ftpserver.usermanager.impl.WritePermission;
 
 public class FtpAdmin extends BaseUser {
 
-	Conf conf = null;
-
-	public FtpAdmin(Conf conf) {
-		this.conf = conf;
+	public FtpAdmin() {
 
 		List<Authority> authorities = new ArrayList<Authority>();
 		authorities.add(new WritePermission());
@@ -30,18 +27,18 @@ public class FtpAdmin extends BaseUser {
 
 		authorities.add(new TransferRatePermission(downloadRate, uploadRate));
 
-		super.setName(conf.getString("storage.ftp.admin.username"));
+		super.setName(Conf.getString("storage.ftp.admin.username"));
 		super.setAuthorities(authorities);
 	}
 
 	@Override
 	public String getPassword() {
-		return conf.getString("storage.ftp.admin.password");
+		return Conf.getString("storage.ftp.admin.password");
 	}
 
 	@Override
 	public int getMaxIdleTime() {
-		return conf.getInteger("storage.ftp.idle_time");
+		return Conf.getInteger("storage.ftp.idle_time");
 	}
 
 	@Override
@@ -51,7 +48,7 @@ public class FtpAdmin extends BaseUser {
 
 	@Override
 	public String getHomeDirectory() {
-		return conf.getString("storage.ftp.home");
+		return Conf.getString("storage.ftp.home");
 	}
 
 }

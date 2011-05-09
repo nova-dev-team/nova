@@ -2,7 +2,6 @@ package nova.common.util;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
@@ -70,32 +69,10 @@ public class Utils {
 		}
 	}
 
-	/**
-	 * Load config file. It will automatically determine the location of
-	 * "nova.properties".
-	 * 
-	 * @return The loaded Conf object.
-	 * @throws IOException
-	 *             When failed to load config file.
-	 */
-	public static Conf loadConf() throws IOException {
-		Conf conf = new Conf();
-
-		File confDir = new File(Utils.pathJoin(Utils.NOVA_HOME, "conf"));
-		for (File f : confDir.listFiles()) {
-			if (f.isFile() && f.getName().startsWith("nova.")
-					&& f.getName().endsWith(".properties")) {
-				logger.info("Loading config from " + f.getAbsolutePath());
-				Conf subConf = new Conf();
-				FileInputStream fis = new FileInputStream(f);
-				subConf.load(fis);
-				fis.close();
-
-				conf.putAll(subConf);
-			}
-		}
-
-		return conf;
+	public static void mkdirs(String... paths) {
+		String path = Utils.pathJoin(paths);
+		File pathFile = new File(path);
+		pathFile.mkdirs();
 	}
 
 	/**
