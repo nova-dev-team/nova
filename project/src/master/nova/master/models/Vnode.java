@@ -2,6 +2,8 @@ package nova.master.models;
 
 import java.util.Date;
 
+import nova.common.db.DbManager;
+import nova.common.db.DbSpec;
 import nova.common.service.SimpleAddress;
 
 /**
@@ -11,6 +13,33 @@ import nova.common.service.SimpleAddress;
  * 
  */
 public class Vnode {
+
+	public long id = 1L;
+
+	public long getId() {
+		return this.id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	static DbManager dbm = null;
+
+	static {
+		DbSpec spec = new DbSpec();
+		spec.addIndex("ip");
+		spec.addIndex("uuid");
+		dbm = DbManager.forClass(Vnode.class, spec);
+	}
+
+	public static Vnode findById(long id) {
+		return (Vnode) dbm.findById(id);
+	}
+
+	public static Vnode findByUUID(String uuid) {
+		return (Vnode) dbm.findBy("uuid", uuid);
+	}
 
 	/**
 	 * Status for the virtual node.
@@ -81,8 +110,6 @@ public class Vnode {
 	private String hda;
 	/** The hypervisor to be used, could be "xen", "kvm", etc. */
 	private String hypervisor;
-	/** for sqlite db */
-	private long id = 1L;
 
 	private String ip;
 
@@ -180,10 +207,6 @@ public class Vnode {
 		return hypervisor;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	public String getIp() {
 		return ip;
 	}
@@ -241,7 +264,7 @@ public class Vnode {
 	}
 
 	public void save() {
-		MasterDb.save(this);
+		dbm.saveEx(this);
 	}
 
 	public void setAddr(SimpleAddress addr) {
@@ -272,10 +295,6 @@ public class Vnode {
 
 	public void setHypervisor(String hypervisor) {
 		this.hypervisor = hypervisor;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public void setIp(String ip) {

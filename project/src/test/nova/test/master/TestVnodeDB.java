@@ -2,7 +2,6 @@ package nova.test.master;
 
 import junit.framework.TestCase;
 import nova.common.service.SimpleAddress;
-import nova.master.models.MasterDb;
 import nova.master.models.Vnode;
 
 public class TestVnodeDB extends TestCase {
@@ -19,7 +18,7 @@ public class TestVnodeDB extends TestCase {
 
 		vnode.save();
 
-		Vnode vnodeRead = (Vnode) MasterDb.load(Vnode.class, vnode.getId());
+		Vnode vnodeRead = Vnode.findById(vnode.getId());
 		System.out.println(vnodeRead);
 	}
 
