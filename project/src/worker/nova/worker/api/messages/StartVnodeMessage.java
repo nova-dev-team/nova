@@ -16,6 +16,7 @@ public class StartVnodeMessage {
 	 * params for config
 	 */
 	boolean wakeupOnly;
+	String hyperVisor;
 	String name;
 	String uuid;
 	String memSize;
@@ -43,6 +44,14 @@ public class StartVnodeMessage {
 
 	public void setWakeupOnly(boolean wakeupOnly) {
 		this.wakeupOnly = wakeupOnly;
+	}
+
+	public String getHyperVisor() {
+		return hyperVisor;
+	}
+
+	public void setHyperVisor(String hyperVisor) {
+		this.hyperVisor = hyperVisor;
 	}
 
 	public String getSourceFile() {
