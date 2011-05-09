@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -85,15 +86,28 @@ public class Utils {
 	 */
 	public static String pathJoin(String... paths) {
 		StringBuffer sb = new StringBuffer();
-		if (paths.length > 0) {
-			sb.append(paths[0]);
-			for (int i = 1; i < paths.length; i++) {
-				if (paths[i].startsWith(File.separator)) {
+
+		// normalized path segments
+		ArrayList<String> normPaths = new ArrayList<String>();
+
+		for (String path : paths) {
+			if (path.equals("")) {
+				continue;
+			} else {
+				normPaths.add(path);
+			}
+		}
+
+		if (normPaths.size() > 0) {
+			sb.append(normPaths.get(0));
+			for (int i = 1; i < normPaths.size(); i++) {
+				String pathSegment = normPaths.get(i);
+				if (pathSegment.startsWith(File.separator)) {
 					sb = new StringBuffer();
 				} else {
 					sb.append(File.separator);
 				}
-				sb.append(paths[i]);
+				sb.append(pathSegment);
 			}
 		}
 		return sb.toString();

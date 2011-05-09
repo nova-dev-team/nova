@@ -6,12 +6,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import nova.agent.NovaAgent;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 import sun.net.TelnetInputStream;
 import sun.net.ftp.FtpClient;
 
+/**
+ * Fetch appliances
+ * 
+ * @author gaotao1987@gmail.com
+ * 
+ */
 public class FtpApplianceFetcher extends ApplianceFetcher {
 
 	private String hostIp = null;
@@ -28,12 +33,18 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 
 	@Override
 	public void fetch(Appliance app) throws IOException {
-		downloadDirFromFtp(app.getName());
-		// NovaAgent.getInstance().getAppliances().get(app.getName()).getStatus()
-		// == Appliance.Status.CANCELLED;
+		FtpClient fc = connect();
+		downloadDir(fc, "", app.getName());
+		close(fc);
+
 	}
 
-	private FtpClient connectToFtp() {
+	/**
+	 * Connect to one ftp
+	 * 
+	 * @return FtpClient
+	 */
+	private FtpClient connect() {
 		FtpClient fc = null;
 		try {
 			fc = new FtpClient(this.hostIp);
@@ -45,52 +56,92 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 		return fc;
 	}
 
-	private boolean downloadFromFtp(FtpClient fClient, String softName) {
+	/**
+	 * Close one connect to ftp
+	 * 
+	 * @param fc
+	 */
+	private void close(FtpClient fc) {
+		try {
+			fc.closeServer();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Download one file from ftp server
+	 * 
+	 * @param fClient
+	 * @param rootPath
+	 *            whole path of one directory in ftp
+	 * @param fileName
+	 *            the file that will be downloaded
+	 * @return
+	 */
+	private boolean downloadFile(FtpClient fClient, String rootPath,
+			String fileName) {
 
 		TelnetInputStream is = null;
 		FileOutputStream os = null;
 		try {
 			fClient.binary();
-			is = fClient.get(softName);
-			java.io.File outfile = new java.io.File(Utils.pathJoin(this.myPath
-					+ softName));
+			is = fClient.get(fileName);
+			java.io.File outfile = new java.io.File(Utils.pathJoin(
+					Utils.NOVA_HOME, this.myPath, rootPath, fileName));
 			os = new FileOutputStream(outfile);
-			byte[] bytes = new byte[1024];
+			byte[] bytes = new byte[32 * 1024];
 			int c = 0;
 
 			while ((c = is.read(bytes)) != -1) {
 				os.write(bytes, 0, c);
 
-				if (NovaAgent.getInstance().getAppliances().get(softName)
-						.getStatus() == Appliance.Status.CANCELLED) {
-					return false;
-				}
+				// if (NovaAgent.getInstance().getAppliances().get(softName)
+				// .getStatus() == Appliance.Status.CANCELLED) {
+				// return false;
+				// }
 
 			}
 
 			is.close();
 			os.close();
-			fClient.closeServer();
 		} catch (IOException e) {
 			return false;
 		}
 		return true;
 	}
 
-	private void downloadDirFromFtp(String dirName) {
-		FtpClient fc = connectToFtp();
+	/**
+	 * Download one directory from ftp
+	 * 
+	 * @param fc
+	 * @param rootPath
+	 *            whole path of one directory in ftp
+	 * @param dirName
+	 *            the directory that will be downloaded
+	 */
+	private void downloadDir(FtpClient fc, String rootPath, String dirName) {
+
 		try {
 			fc.cd(dirName);
+			Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, this.myPath, rootPath,
+					dirName));
 			DataInputStream dis = new DataInputStream(fc.list());
-
 			BufferedReader br = new BufferedReader(new InputStreamReader(dis));
+
 			String ftpEntry = null;
 			while ((ftpEntry = br.readLine()) != null) {
-				// System.out.println(nthField(ftpEntry, 0));
 				int fnameStart = nthFieldStart(ftpEntry, 8);
-				String fname = ftpEntry.substring(fnameStart);
+				String entry = ftpEntry.substring(fnameStart);
+				if ((nthField(ftpEntry, 0)).startsWith("d")) {
+					// d is directory
+					downloadDir(fc, Utils.pathJoin(rootPath, dirName), entry);
+				} else {
+					downloadFile(fc, Utils.pathJoin(rootPath, dirName), entry);
+				}
 			}
 			dis.close();
+			fc.cdUp();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
