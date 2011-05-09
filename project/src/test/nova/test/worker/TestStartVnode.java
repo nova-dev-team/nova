@@ -30,7 +30,7 @@ public class TestStartVnode {
 		msg.setMemSize("524288");
 		msg.setCpuCount("1");
 		msg.setArch("i686");
-		msg.setCdImage("");
+		msg.setCdImage("/media/data/ubuntu-10.04-desktop-i386.iso");
 		msg.setEmulatorPath("/usr/bin/kvm");
 		msg.setRunAgent("false");
 

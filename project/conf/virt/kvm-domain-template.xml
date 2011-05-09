@@ -4,7 +4,7 @@
 <memory>${memSize}</memory>
 <vcpu>${cpuCount}</vcpu>
 <os>
-  <type arch='${arch}' machine='pc'>hvm</type>
+  <type arch='${arch}' machine='pc-0.12'>hvm</type>
   <boot dev='${bootDevice}'/>
 </os>
 <features>
@@ -14,6 +14,7 @@
 <devices>
   <emulator>${emulatorPath}</emulator>
   <disk type='file' device='disk'>
+	<driver name='qemu' type='qcow2'/>
     <source file='${sourceFile}'/>
     <target dev='hda'/>
   </disk>
