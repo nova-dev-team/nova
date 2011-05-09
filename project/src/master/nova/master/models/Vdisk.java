@@ -19,13 +19,12 @@ public class Vdisk {
 		this.id = id;
 	}
 
-	static DbManager dbm = null;
+	static DbManager dbm = DbManager.forClass(Vdisk.class, Vdisk.getSpec());
 
-	static {
+	private static DbSpec getSpec() {
 		DbSpec spec = new DbSpec();
-		spec.addIndex("ip");
 		spec.addIndex("fileName");
-		dbm = DbManager.forClass(Vdisk.class, spec);
+		return spec;
 	}
 
 	public static Vdisk findById(long id) {

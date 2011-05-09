@@ -19,12 +19,12 @@ public class Vcluster {
 		this.id = id;
 	}
 
-	static DbManager dbm = null;
+	static DbManager dbm = DbManager.forClass(Vcluster.class,
+			Vcluster.getSpec());
 
-	static {
+	private static DbSpec getSpec() {
 		DbSpec spec = new DbSpec();
-		spec.addIndex("ip");
-		dbm = DbManager.forClass(Vcluster.class, spec);
+		return spec;
 	}
 
 	public static Vcluster findById(long id) {

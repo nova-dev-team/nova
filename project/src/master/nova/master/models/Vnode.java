@@ -24,13 +24,13 @@ public class Vnode {
 		this.id = id;
 	}
 
-	static DbManager dbm = null;
+	static DbManager dbm = DbManager.forClass(Vnode.class, Vnode.getSpec());
 
-	static {
+	private static DbSpec getSpec() {
 		DbSpec spec = new DbSpec();
 		spec.addIndex("ip");
 		spec.addIndex("uuid");
-		dbm = DbManager.forClass(Vnode.class, spec);
+		return spec;
 	}
 
 	public static Vnode findById(long id) {

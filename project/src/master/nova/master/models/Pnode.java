@@ -27,13 +27,13 @@ public class Pnode {
 		this.id = id;
 	}
 
-	static DbManager dbm = null;
+	static DbManager dbm = DbManager.forClass(Pnode.class, Pnode.getSpec());
 
-	static {
+	private static DbSpec getSpec() {
 		DbSpec spec = new DbSpec();
 		spec.addIndex("ip");
 		spec.addIndex("macAddress");
-		dbm = DbManager.forClass(Pnode.class, spec);
+		return spec;
 	}
 
 	/**

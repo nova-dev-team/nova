@@ -8,8 +8,6 @@ import nova.common.db.DbSpec;
  */
 public class Appliance {
 
-	static DbManager dbm = null;
-
 	public long id = 1L;
 
 	public long getId() {
@@ -20,11 +18,13 @@ public class Appliance {
 		this.id = id;
 	}
 
-	static {
+	static DbManager dbm = DbManager.forClass(Appliance.class,
+			Appliance.getSpec());
+
+	private static DbSpec getSpec() {
 		DbSpec spec = new DbSpec();
-		spec.addIndex("ip");
 		spec.addIndex("fileName");
-		dbm = DbManager.forClass(Appliance.class, spec);
+		return spec;
 	}
 
 	public static Appliance findById(long id) {

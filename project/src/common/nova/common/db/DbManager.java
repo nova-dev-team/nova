@@ -6,34 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class DbManager {
-
-	/**
-	 * Ugly class to hold DbManager's static values.
-	 * 
-	 * @author santa
-	 * 
-	 */
-	private static class StaticWrapper {
-
-		private Session session = HibernateUtil.getSessionFactory()
-				.openSession();
-
-		private Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();
-
-		private static StaticWrapper instance = null;
-
-		public static StaticWrapper getInstance() {
-			if (instance == null) {
-				instance = new StaticWrapper();
-			}
-			return instance;
-		}
-
-	}
 
 	private Class klass = null;
 
@@ -51,10 +29,13 @@ public class DbManager {
 			allIndex.put(colName, new HashMap<Serializable, Object>());
 		}
 		// TODO @santa load data
-		/*
-		 * for (Object obj : session.createQuery("from " +
-		 * klass.getSimpleName()) .list()) { cache.add((Object) obj); }
-		 */
+
+		Session session = StaticWrapper.getInstance().session;
+		Query query = session.createQuery("from " + klass.getSimpleName());
+		for (Object obj : query.list()) {
+			cache.add((Object) obj);
+		}
+
 	}
 
 	public Object findById(Serializable key) {
@@ -92,6 +73,29 @@ public class DbManager {
 			allDbManager.put(klass, dbm);
 		}
 		return allDbManager.get(klass);
+	}
+
+}
+
+/**
+ * Ugly class to hold DbManager's static values.
+ * 
+ * @author santa
+ * 
+ */
+class StaticWrapper {
+
+	Session session = HibernateUtil.getSessionFactory().openSession();
+
+	Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();
+
+	private static StaticWrapper instance = null;
+
+	public synchronized static StaticWrapper getInstance() {
+		if (instance == null) {
+			instance = new StaticWrapper();
+		}
+		return instance;
 	}
 
 }
