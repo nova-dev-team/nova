@@ -11,10 +11,29 @@ import org.hibernate.Transaction;
 
 public class DbManager {
 
-	private static Session session = HibernateUtil.getSessionFactory()
-			.openSession();
+	/**
+	 * Ugly class to hold DbManager's static values.
+	 * 
+	 * @author santa
+	 * 
+	 */
+	private static class StaticWrapper {
 
-	private static Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();
+		private Session session = HibernateUtil.getSessionFactory()
+				.openSession();
+
+		private Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();
+
+		private static StaticWrapper instance = null;
+
+		public static StaticWrapper getInstance() {
+			if (instance == null) {
+				instance = new StaticWrapper();
+			}
+			return instance;
+		}
+
+	}
 
 	private Class klass = null;
 
@@ -60,12 +79,14 @@ public class DbManager {
 	}
 
 	public void saveEx(Object obj) {
+		Session session = StaticWrapper.getInstance().session;
 		Transaction tx = session.beginTransaction();
 		session.save(obj);
 		tx.commit();
 	}
 
 	public static DbManager forClass(Class klass, DbSpec spec) {
+		Map<Class, DbManager> allDbManager = StaticWrapper.getInstance().allDbManager;
 		if (allDbManager.containsKey(klass) == false) {
 			DbManager dbm = new DbManager(klass, spec);
 			allDbManager.put(klass, dbm);
