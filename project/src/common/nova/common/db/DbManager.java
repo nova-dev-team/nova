@@ -13,6 +13,10 @@ import org.hibernate.Transaction;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DbManager {
 
+	static Session session = HibernateUtil.getSessionFactory().openSession();
+
+	static Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();
+
 	private Class klass = null;
 
 	private DbSpec spec = null;
@@ -30,7 +34,6 @@ public class DbManager {
 		}
 		// TODO @santa load data
 
-		Session session = StaticWrapper.getInstance().session;
 		Query query = session.createQuery("from " + klass.getSimpleName());
 		for (Object obj : query.list()) {
 			cache.add((Object) obj);
@@ -60,42 +63,18 @@ public class DbManager {
 	}
 
 	public void saveEx(Object obj) {
-		Session session = StaticWrapper.getInstance().session;
+
 		Transaction tx = session.beginTransaction();
 		session.save(obj);
 		tx.commit();
 	}
 
 	public static DbManager forClass(Class klass, DbSpec spec) {
-		Map<Class, DbManager> allDbManager = StaticWrapper.getInstance().allDbManager;
 		if (allDbManager.containsKey(klass) == false) {
 			DbManager dbm = new DbManager(klass, spec);
 			allDbManager.put(klass, dbm);
 		}
 		return allDbManager.get(klass);
-	}
-
-}
-
-/**
- * Ugly class to hold DbManager's static values.
- * 
- * @author santa
- * 
- */
-class StaticWrapper {
-
-	Session session = HibernateUtil.getSessionFactory().openSession();
-
-	Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();
-
-	private static StaticWrapper instance = null;
-
-	public synchronized static StaticWrapper getInstance() {
-		if (instance == null) {
-			instance = new StaticWrapper();
-		}
-		return instance;
 	}
 
 }
