@@ -8,17 +8,18 @@ public class HibernateUtil {
 
 	static Logger log = Logger.getLogger(HibernateUtil.class);
 
-	private static SessionFactory sessionFactory = null;
+	private static SessionFactory sessionFactory;
+
+	static {
+		try {
+			sessionFactory = new Configuration().configure()
+					.buildSessionFactory();
+		} catch (Exception e) {
+			log.error("Exception in creating hibernate session Factory", e);
+		}
+	}
 
 	public static synchronized SessionFactory getSessionFactory() {
-		if (sessionFactory == null) {
-			try {
-				sessionFactory = new Configuration().configure()
-						.buildSessionFactory();
-			} catch (Exception e) {
-				log.error("Exception in creating hibernate session Factory", e);
-			}
-		}
 		return sessionFactory;
 	}
 

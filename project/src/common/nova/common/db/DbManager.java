@@ -13,9 +13,17 @@ import org.hibernate.Transaction;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DbManager {
 
-	static Session session = HibernateUtil.getSessionFactory().openSession();
+	static final Session session;
 
-	static Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();
+	static final Map<Class, DbManager> allDbManager;
+
+	static {
+		System.err.println("called");
+		allDbManager = new HashMap<Class, DbManager>();
+		System.err.println(allDbManager);
+		session = HibernateUtil.getSessionFactory().openSession();
+		System.err.println(session);
+	}
 
 	private Class klass = null;
 
@@ -34,7 +42,9 @@ public class DbManager {
 		}
 		// TODO @santa load data
 
-		Query query = session.createQuery("from " + klass.getSimpleName());
+		String queryText = "from " + klass.getSimpleName();
+		System.err.println(queryText);
+		Query query = session.createQuery(queryText);
 		for (Object obj : query.list()) {
 			cache.add((Object) obj);
 		}
@@ -63,13 +73,13 @@ public class DbManager {
 	}
 
 	public void saveEx(Object obj) {
-
 		Transaction tx = session.beginTransaction();
 		session.save(obj);
 		tx.commit();
 	}
 
 	public static DbManager forClass(Class klass, DbSpec spec) {
+		System.err.println(allDbManager);
 		if (allDbManager.containsKey(klass) == false) {
 			DbManager dbm = new DbManager(klass, spec);
 			allDbManager.put(klass, dbm);
