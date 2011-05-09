@@ -6,20 +6,20 @@ package nova.master.models;
  */
 public class Vdisk {
 
-	/** for sqlite db */
-	private long id = 1L;
-
-	/** The name on storage server. */
-	private String fileName;
-
-	/** The name that will be seen by users. */
-	private String displayName;
-
 	/** The description for this disk image. */
 	private String description;
 
 	/** Type (format) of this image. */
 	private String diskFormat;
+
+	/** The name that will be seen by users. */
+	private String displayName;
+
+	/** The name on storage server. */
+	private String fileName;
+
+	/** for sqlite db */
+	private long id = 1L;
 
 	/**
 	 * The kind of operation system of this image. Could be "windows", "linux".
@@ -36,6 +36,10 @@ public class Vdisk {
 	/** Ths list of softwares for this vdisk. Separated by comma. */
 	private String softList;
 
+	/** default constructor */
+	public Vdisk() {
+	}
+
 	/** full constructor */
 	public Vdisk(String fileName, String displayName, String description,
 			String diskFormat, String osFamily, String osName, String softList) {
@@ -48,44 +52,12 @@ public class Vdisk {
 		this.softList = softList;
 	}
 
-	/** default constructor */
-	public Vdisk() {
-	}
-
-	/**
-	 * @hibernate.property column="file_name"
-	 * 
-	 */
-	public String getFileName() {
-		return this.fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
-
-	/**
-	 * @hibernate.property column="display_name"
-	 * 
-	 */
-	public String getDisplayName() {
-		return this.displayName;
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
-
 	/**
 	 * @hibernate.property column="description"
 	 * 
 	 */
 	public String getDescription() {
 		return this.description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	/**
@@ -96,8 +68,24 @@ public class Vdisk {
 		return this.diskFormat;
 	}
 
-	public void setDiskFormat(String diskFormat) {
-		this.diskFormat = diskFormat;
+	/**
+	 * @hibernate.property column="display_name"
+	 * 
+	 */
+	public String getDisplayName() {
+		return this.displayName;
+	}
+
+	/**
+	 * @hibernate.property column="file_name"
+	 * 
+	 */
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	/**
@@ -108,20 +96,12 @@ public class Vdisk {
 		return this.osFamily;
 	}
 
-	public void setOsFamily(String osFamily) {
-		this.osFamily = osFamily;
-	}
-
 	/**
 	 * @hibernate.property column="os_name"
 	 * 
 	 */
 	public String getOsName() {
 		return this.osName;
-	}
-
-	public void setOsName(String osName) {
-		this.osName = osName;
 	}
 
 	/**
@@ -132,16 +112,40 @@ public class Vdisk {
 		return this.softList;
 	}
 
-	public void setSoftList(String softList) {
-		this.softList = softList;
+	public void save() {
+		MasterDb.save(this);
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setDiskFormat(String diskFormat) {
+		this.diskFormat = diskFormat;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 
 	public void setId(long id) {
 		this.id = id;
 	}
 
-	public long getId() {
-		return id;
+	public void setOsFamily(String osFamily) {
+		this.osFamily = osFamily;
+	}
+
+	public void setOsName(String osName) {
+		this.osName = osName;
+	}
+
+	public void setSoftList(String softList) {
+		this.softList = softList;
 	}
 
 }

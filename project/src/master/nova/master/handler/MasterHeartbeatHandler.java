@@ -27,9 +27,11 @@ public class MasterHeartbeatHandler implements SimpleHandler<HeartbeatMessage> {
 		}
 
 		// TODO @santa possibly update vnode
-		Pnode pnode = Pnode.findByHost(xreply.ip);
+		Pnode pnode = Pnode.findByIp(xreply.ip);
 		if (pnode != null) {
-			pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
+			pnode.setStatus(Pnode.Status.RUNNING);
+			log.info("Update status of pnode @ " + pnode.getAddr() + " to "
+					+ pnode.getStatus());
 			pnode.save();
 		} else {
 			log.error("Pnode with host " + xreply.ip + " not found!");

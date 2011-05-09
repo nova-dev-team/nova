@@ -41,7 +41,7 @@ public class Conf extends Properties {
 					System.exit(1);
 				}
 
-				conf.putAll(subConf);
+				this.putAll(subConf);
 			}
 		}
 

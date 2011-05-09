@@ -20,19 +20,14 @@ public class Vnode {
 	 */
 	public static enum Status {
 		/**
-		 * The vnode status is not known.
+		 * The vnode failed to boot.
 		 */
-		UNKNOWN,
+		BOOT_FAILURE,
 
 		/**
-		 * The vnode is shut off.
+		 * Failed to connect to the vnode. Could be caused by pnode downtime.
 		 */
-		SHUT_OFF,
-
-		/**
-		 * The virtual node is being scheduled.
-		 */
-		SCHEDULING,
+		CONNECT_FAILURE,
 
 		/**
 		 * The vnode is scheduled and it is being prepared on a pnode.
@@ -45,43 +40,30 @@ public class Vnode {
 		RUNNING,
 
 		/**
+		 * The virtual node is being scheduled.
+		 */
+		SCHEDULING,
+
+		/**
+		 * The vnode is shut off.
+		 */
+		SHUT_OFF,
+
+		/**
 		 * The vnode is shutting down.
 		 */
 		SHUTTING_DOWN,
 
 		/**
-		 * The vnode failed to boot.
+		 * The vnode status is not known.
 		 */
-		BOOT_FAILURE,
-
-		/**
-		 * Failed to connect to the vnode. Could be caused by pnode downtime.
-		 */
-		CONNECT_FAILURE,
+		UNKNOWN,
 	}
 
-	/** for sqlite db */
-	private long id = 1L;
-
 	/**
-	 * Status of the vnode.
+	 * The vnode's address.
 	 */
-	Vnode.Status status;
-
-	private String name;
-	private String uuid;
-	private Integer cpuCount;
-	private String softList;
-
-	/** Unit of memory size is MB */
-	private Integer memorySize;
-
-	/**
-	 * Which device will the machine be booted. It could be "hd", or "cdrom"
-	 */
-	private String bootDevice;
-	private String hda;
-	private String cdrom;
+	SimpleAddress addr;
 
 	/**
 	 * The architecture of the VM. Could be "i686" or "x86_64", etc.
@@ -89,37 +71,59 @@ public class Vnode {
 	private String arch;
 
 	/**
-	 * The vnode's address.
+	 * Which device will the machine be booted. It could be "hd", or "cdrom"
 	 */
-	SimpleAddress addr;
-	private String ip;
-	private int port;
+	private String bootDevice;
 
-	private Integer vclusterId;
-	private Integer pnodeId;
+	private String cdrom;
 
-	/** The VNC port for the VM. */
-	private Integer vncPort;
-
+	private Integer cpuCount;
+	private String hda;
 	/** The hypervisor to be used, could be "xen", "kvm", etc. */
 	private String hypervisor;
+	/** for sqlite db */
+	private long id = 1L;
 
-	/** Migration info: the IP of physical machines. */
-	private String migrateFrom;
-	private String migrateTo;
-
-	/** Schedule info: on which pmachine should the VM run. */
-	private String schedTo;
+	private String ip;
 
 	/**
 	 * Time of last message from the vnode. Used to detect vnode failure.
 	 */
 	transient Date lastAckTime;
+	/** Unit of memory size is MB */
+	private Integer memorySize;
+	/** Migration info: the IP of physical machines. */
+	private String migrateFrom;
 
+	private String migrateTo;
+
+	private String name;
+	private Integer pnodeId;
 	/**
 	 * If the vnode is in a pool, this is set to the pool.
 	 */
 	VnodePool pool = null;
+
+	private int port;
+	/** Schedule info: on which pmachine should the VM run. */
+	private String schedTo;
+
+	private String softList;
+
+	/**
+	 * Status of the vnode.
+	 */
+	String statusCode;
+
+	private String uuid;
+	private Integer vclusterId;
+
+	/** The VNC port for the VM. */
+	private Integer vncPort;
+
+	/** default constructor */
+	public Vnode() {
+	}
 
 	/** full constructor */
 	public Vnode(String name, String uuid, Integer cpuCount, String softList,
@@ -146,8 +150,98 @@ public class Vnode {
 		this.setSchedTo(schedTo);
 	}
 
-	/** default constructor */
-	public Vnode() {
+	public SimpleAddress getAddr() {
+		this.addr.ip = this.getIp();
+		this.addr.port = this.getPort();
+		return this.addr;
+	}
+
+	public String getArch() {
+		return arch;
+	}
+
+	public String getBootDevice() {
+		return bootDevice;
+	}
+
+	public String getCdrom() {
+		return cdrom;
+	}
+
+	public Integer getCpuCount() {
+		return cpuCount;
+	}
+
+	public String getHda() {
+		return hda;
+	}
+
+	public String getHypervisor() {
+		return hypervisor;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public Integer getMemorySize() {
+		return memorySize;
+	}
+
+	public String getMigrateFrom() {
+		return migrateFrom;
+	}
+
+	public String getMigrateTo() {
+		return migrateTo;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Integer getPmachineId() {
+		return pnodeId;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public String getSchedTo() {
+		return schedTo;
+	}
+
+	public String getSoftList() {
+		return softList;
+	}
+
+	public Vnode.Status getStatus() {
+		return Status.valueOf(this.statusCode);
+	}
+
+	public String getStatusCode() {
+		return statusCode;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public Integer getVclusterId() {
+		return vclusterId;
+	}
+
+	public Integer getVncPort() {
+		return vncPort;
+	}
+
+	public void save() {
+		MasterDb.save(this);
 	}
 
 	public void setAddr(SimpleAddress addr) {
@@ -156,169 +250,88 @@ public class Vnode {
 		this.setPort(addr.port);
 	}
 
-	public SimpleAddress getAddr() {
-		this.addr.ip = this.getIp();
-		this.addr.port = this.getPort();
-		return this.addr;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setIp(String ip) {
-		this.ip = ip;
-	}
-
-	public String getIp() {
-		return ip;
-	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
-	public String getUuid() {
-		return uuid;
-	}
-
-	public void setCpuCount(Integer cpuCount) {
-		this.cpuCount = cpuCount;
-	}
-
-	public Integer getCpuCount() {
-		return cpuCount;
-	}
-
-	public void setSoftList(String softList) {
-		this.softList = softList;
-	}
-
-	public String getSoftList() {
-		return softList;
-	}
-
-	public void setMemorySize(Integer memorySize) {
-		this.memorySize = memorySize;
-	}
-
-	public Integer getMemorySize() {
-		return memorySize;
-	}
-
-	public void setHda(String hda) {
-		this.hda = hda;
-	}
-
-	public String getHda() {
-		return hda;
-	}
-
-	public void setCdrom(String cdrom) {
-		this.cdrom = cdrom;
-	}
-
-	public String getCdrom() {
-		return cdrom;
-	}
-
 	public void setArch(String arch) {
 		this.arch = arch;
-	}
-
-	public String getArch() {
-		return arch;
-	}
-
-	public void setVclusterId(Integer vclusterId) {
-		this.vclusterId = vclusterId;
-	}
-
-	public Integer getVclusterId() {
-		return vclusterId;
-	}
-
-	public void setPmachineId(Integer pmachineId) {
-		this.pnodeId = pmachineId;
-	}
-
-	public Integer getPmachineId() {
-		return pnodeId;
-	}
-
-	public void setVncPort(Integer vncPort) {
-		this.vncPort = vncPort;
-	}
-
-	public Integer getVncPort() {
-		return vncPort;
-	}
-
-	public void setHypervisor(String hypervisor) {
-		this.hypervisor = hypervisor;
-	}
-
-	public String getHypervisor() {
-		return hypervisor;
-	}
-
-	public void setMigrateFrom(String migrateFrom) {
-		this.migrateFrom = migrateFrom;
-	}
-
-	public String getMigrateFrom() {
-		return migrateFrom;
-	}
-
-	public void setMigrateTo(String migrateTo) {
-		this.migrateTo = migrateTo;
-	}
-
-	public String getMigrateTo() {
-		return migrateTo;
-	}
-
-	public void setSchedTo(String schedTo) {
-		this.schedTo = schedTo;
-	}
-
-	public String getSchedTo() {
-		return schedTo;
 	}
 
 	public void setBootDevice(String bootDevice) {
 		this.bootDevice = bootDevice;
 	}
 
-	public String getBootDevice() {
-		return bootDevice;
+	public void setCdrom(String cdrom) {
+		this.cdrom = cdrom;
+	}
+
+	public void setCpuCount(Integer cpuCount) {
+		this.cpuCount = cpuCount;
+	}
+
+	public void setHda(String hda) {
+		this.hda = hda;
+	}
+
+	public void setHypervisor(String hypervisor) {
+		this.hypervisor = hypervisor;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public void setMemorySize(Integer memorySize) {
+		this.memorySize = memorySize;
+	}
+
+	public void setMigrateFrom(String migrateFrom) {
+		this.migrateFrom = migrateFrom;
+	}
+
+	public void setMigrateTo(String migrateTo) {
+		this.migrateTo = migrateTo;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setPmachineId(Integer pmachineId) {
+		this.pnodeId = pmachineId;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public void setSchedTo(String schedTo) {
+		this.schedTo = schedTo;
+	}
+
+	public void setSoftList(String softList) {
+		this.softList = softList;
 	}
 
 	public void setStatus(Vnode.Status status) {
-		this.status = status;
+		this.statusCode = status.toString();
 	}
 
-	public Vnode.Status getStatus() {
-		return status;
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
 	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public void setVclusterId(Integer vclusterId) {
+		this.vclusterId = vclusterId;
+	}
+
+	public void setVncPort(Integer vncPort) {
+		this.vncPort = vncPort;
+	}
+
 }

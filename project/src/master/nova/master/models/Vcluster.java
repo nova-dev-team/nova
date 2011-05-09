@@ -6,17 +6,8 @@ package nova.master.models;
  */
 public class Vcluster {
 
-	/** for sqlite db */
-	private long id = 1L;
-
 	/** cluster_name */
 	private String clusterName;
-
-	/**
-	 * The first IP allocated to this cluster. # The VM's IP are determined
-	 * according to this value.
-	 */
-	private String fristIp;
 
 	/**
 	 * Maximum size of this cluster. It is the limit of vmachines in this
@@ -24,20 +15,33 @@ public class Vcluster {
 	 */
 	private Integer clusterSize;
 
-	/** the owner's id */
-	private Integer userId;
+	/**
+	 * The first IP allocated to this cluster. # The VM's IP are determined
+	 * according to this value.
+	 */
+	private String fristIp;
 
-	/** the public key for ssh */
-	private String sshPublicKey;
+	/** for sqlite db */
+	private long id = 1L;
 
-	/** the private key for ssh */
-	private String sshPrivateKey;
+	/** the password for the OS */
+	private String osPassword;
 
 	/** the username for the OS */
 	private String osUsername;
 
-	/** the password for the OS */
-	private String osPassword;
+	/** the private key for ssh */
+	private String sshPrivateKey;
+
+	/** the public key for ssh */
+	private String sshPublicKey;
+
+	/** the owner's id */
+	private Integer userId;
+
+	/** default constructor */
+	public Vcluster() {
+	}
 
 	/** full constructor */
 	public Vcluster(String clusterName, String fristIp, Integer clusterSize,
@@ -53,32 +57,12 @@ public class Vcluster {
 		this.osPassword = osPassword;
 	}
 
-	/** default constructor */
-	public Vcluster() {
-	}
-
 	/**
 	 * @hibernate.property column="cluster_name"
 	 * 
 	 */
 	public String getClusterName() {
 		return this.clusterName;
-	}
-
-	public void setClusterName(String clusterName) {
-		this.clusterName = clusterName;
-	}
-
-	/**
-	 * @hibernate.property column="frist_ip"
-	 * 
-	 */
-	public String getFristIp() {
-		return this.fristIp;
-	}
-
-	public void setFristIp(String fristIp) {
-		this.fristIp = fristIp;
 	}
 
 	/**
@@ -89,56 +73,16 @@ public class Vcluster {
 		return this.clusterSize;
 	}
 
-	public void setClusterSize(Integer clusterSize) {
-		this.clusterSize = clusterSize;
-	}
-
 	/**
-	 * @hibernate.property column="user_id"
+	 * @hibernate.property column="frist_ip"
 	 * 
 	 */
-	public Integer getUserId() {
-		return this.userId;
+	public String getFristIp() {
+		return this.fristIp;
 	}
 
-	public void setUserId(Integer userId) {
-		this.userId = userId;
-	}
-
-	/**
-	 * @hibernate.property column="ssh_public_key"
-	 * 
-	 */
-	public String getSshPublicKey() {
-		return this.sshPublicKey;
-	}
-
-	public void setSshPublicKey(String sshPublicKey) {
-		this.sshPublicKey = sshPublicKey;
-	}
-
-	/**
-	 * @hibernate.property column="ssh_private_key"
-	 * 
-	 */
-	public String getSshPrivateKey() {
-		return this.sshPrivateKey;
-	}
-
-	public void setSshPrivateKey(String sshPrivateKey) {
-		this.sshPrivateKey = sshPrivateKey;
-	}
-
-	/**
-	 * @hibernate.property column="os_username"
-	 * 
-	 */
-	public String getOsUsername() {
-		return this.osUsername;
-	}
-
-	public void setOsUsername(String osUsername) {
-		this.osUsername = osUsername;
+	public long getId() {
+		return id;
 	}
 
 	/**
@@ -149,16 +93,76 @@ public class Vcluster {
 		return this.osPassword;
 	}
 
-	public void setOsPassword(String osPassword) {
-		this.osPassword = osPassword;
+	/**
+	 * @hibernate.property column="os_username"
+	 * 
+	 */
+	public String getOsUsername() {
+		return this.osUsername;
+	}
+
+	/**
+	 * @hibernate.property column="ssh_private_key"
+	 * 
+	 */
+	public String getSshPrivateKey() {
+		return this.sshPrivateKey;
+	}
+
+	/**
+	 * @hibernate.property column="ssh_public_key"
+	 * 
+	 */
+	public String getSshPublicKey() {
+		return this.sshPublicKey;
+	}
+
+	/**
+	 * @hibernate.property column="user_id"
+	 * 
+	 */
+	public Integer getUserId() {
+		return this.userId;
+	}
+
+	public void save() {
+		MasterDb.save(this);
+	}
+
+	public void setClusterName(String clusterName) {
+		this.clusterName = clusterName;
+	}
+
+	public void setClusterSize(Integer clusterSize) {
+		this.clusterSize = clusterSize;
+	}
+
+	public void setFristIp(String fristIp) {
+		this.fristIp = fristIp;
 	}
 
 	public void setId(long id) {
 		this.id = id;
 	}
 
-	public long getId() {
-		return id;
+	public void setOsPassword(String osPassword) {
+		this.osPassword = osPassword;
+	}
+
+	public void setOsUsername(String osUsername) {
+		this.osUsername = osUsername;
+	}
+
+	public void setSshPrivateKey(String sshPrivateKey) {
+		this.sshPrivateKey = sshPrivateKey;
+	}
+
+	public void setSshPublicKey(String sshPublicKey) {
+		this.sshPublicKey = sshPublicKey;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 
 }

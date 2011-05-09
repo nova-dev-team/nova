@@ -3,8 +3,6 @@
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-
-
 	<class name="nova.master.models.Appliance" table="appliance">
 		<id name="id" column="id" type="long">
 			<generator class="native"></generator>

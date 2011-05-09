@@ -1,13 +1,14 @@
 package nova.test.master;
 
 import junit.framework.TestCase;
-import nova.common.db.HibernateUtil;
+import nova.master.models.MasterDb;
 import nova.master.models.Vcluster;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.junit.Test;
 
 public class TestVclusterDB extends TestCase {
+
+	@Test
 	public void testSave() {
 		Vcluster vcluster = new Vcluster();
 		vcluster.setClusterName("cluster123");
@@ -19,16 +20,12 @@ public class TestVclusterDB extends TestCase {
 		vcluster.setSshPublicKey("sshpublickey");
 		vcluster.setUserId(123);
 
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Transaction tx = session.beginTransaction();
-		session.save(vcluster);
-		tx.commit();
-		session.close();
-		HibernateUtil.shutdown();
+		vcluster.save();
 
-		Session sessionread = HibernateUtil.getSessionFactory().openSession();
-		Vcluster vclusterread = new Vcluster();
-		sessionread.load(vclusterread, vcluster.getId());
+		Vcluster vclusterRead = (Vcluster) MasterDb.load(Vcluster.class,
+				vcluster.getId());
+
+		System.out.println(vclusterRead);
 
 	}
 

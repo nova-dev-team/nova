@@ -15,6 +15,7 @@ public class StartVnodeMessage {
 	/**
 	 * params for config
 	 */
+	boolean wakeupOnly;
 	String name;
 	String uuid;
 	String memSize;
@@ -25,6 +26,7 @@ public class StartVnodeMessage {
 	String hdaImage;
 	String runAgent;
 	String emulatorPath;
+	String sourceFile;
 	String cdromPath;
 	String interfaceType;
 	String sourcebridge;
@@ -34,6 +36,22 @@ public class StartVnodeMessage {
 	String determinCdrom;
 	String determinNetwork;
 	String determinVnc;
+
+	public boolean isWakeupOnly() {
+		return wakeupOnly;
+	}
+
+	public void setWakeupOnly(boolean wakeupOnly) {
+		this.wakeupOnly = wakeupOnly;
+	}
+
+	public String getSourceFile() {
+		return sourceFile;
+	}
+
+	public void setSourceFile(String sourceFile) {
+		this.sourceFile = sourceFile;
+	}
 
 	public String getDeterminVnc() {
 		return determinVnc;
@@ -222,6 +240,7 @@ public class StartVnodeMessage {
 		values.put("macAddress", macAddress);
 		values.put("sourceNetwork", sourceNetwork);
 		values.put("inputType", inputType);
+		values.put("sourceFile", sourceFile);
 		return values;
 	}
 

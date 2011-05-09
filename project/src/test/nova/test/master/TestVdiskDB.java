@@ -1,14 +1,14 @@
 package nova.test.master;
 
 import junit.framework.TestCase;
-import nova.common.db.HibernateUtil;
+import nova.master.models.MasterDb;
 import nova.master.models.Vdisk;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.junit.Test;
 
 public class TestVdiskDB extends TestCase {
 
+	@Test
 	public void testSave() {
 		Vdisk vdisk = new Vdisk();
 		vdisk.setFileName("blah");
@@ -19,25 +19,17 @@ public class TestVdiskDB extends TestCase {
 		vdisk.setOsName("Ubuntu 9.10");
 		vdisk.setSoftList("blahblah");
 
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Transaction tx = session.beginTransaction();
-		session.save(vdisk);
-		tx.commit();
-		session.close();
-		HibernateUtil.shutdown();
+		vdisk.save();
 
-		Session sessionread = HibernateUtil.getSessionFactory().openSession();
-		Vdisk vdiskread = new Vdisk();
-		sessionread.load(vdiskread, vdisk.getId());
-		System.out.print("\n\nFileName: " + vdiskread.getFileName()
-				+ "\nDisplayName: " + vdiskread.getDisplayName()
-				+ "\nDiskFormat: " + vdiskread.getDiskFormat() + "\nOsFamily: "
-				+ vdiskread.getOsFamily() + "\nDescription: "
-				+ vdiskread.getDescription() + "\nOsName: "
-				+ vdiskread.getOsName() + "\nSoftList: "
-				+ vdiskread.getSoftList() + "\n\n");
-		sessionread.close();
-		HibernateUtil.shutdown();
+		Vdisk vdiskRead = (Vdisk) MasterDb.load(Vdisk.class, vdisk.getId());
+		System.out.print("\n\nFileName: " + vdiskRead.getFileName()
+				+ "\nDisplayName: " + vdiskRead.getDisplayName()
+				+ "\nDiskFormat: " + vdiskRead.getDiskFormat() + "\nOsFamily: "
+				+ vdiskRead.getOsFamily() + "\nDescription: "
+				+ vdiskRead.getDescription() + "\nOsName: "
+				+ vdiskRead.getOsName() + "\nSoftList: "
+				+ vdiskRead.getSoftList() + "\n\n");
+
 	}
 
 }

@@ -11,14 +11,14 @@ import java.util.ArrayList;
 public class VnodePool {
 
 	/**
-	 * Id of the vnode pool.
-	 */
-	int id;
-
-	/**
 	 * the commonly used disk.
 	 */
 	Vdisk disk;
+
+	/**
+	 * Id of the vnode pool.
+	 */
+	int id;
 
 	/**
 	 * Size of the pool.
