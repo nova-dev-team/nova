@@ -1,5 +1,8 @@
 package nova.master.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
@@ -11,6 +14,14 @@ import nova.common.db.DbSpec;
 public class Vcluster extends DbObject {
 
 	private static DbManager manager = null;
+
+	public static List<Vcluster> all() {
+		List<Vcluster> all = new ArrayList<Vcluster>();
+		for (DbObject obj : getManager().all()) {
+			all.add((Vcluster) obj);
+		}
+		return all;
+	}
 
 	public static Vcluster findById(long id) {
 		return (Vcluster) getManager().findById(id);

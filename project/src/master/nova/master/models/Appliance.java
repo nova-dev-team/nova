@@ -1,5 +1,8 @@
 package nova.master.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
@@ -10,6 +13,18 @@ import nova.common.db.DbSpec;
 public class Appliance extends DbObject {
 
 	private static DbManager manager = null;
+
+	public static List<Appliance> all() {
+		List<Appliance> all = new ArrayList<Appliance>();
+		for (DbObject obj : getManager().all()) {
+			all.add((Appliance) obj);
+		}
+		return null;
+	}
+
+	public static Appliance findById(long id) {
+		return (Appliance) getManager().findById(id);
+	}
 
 	public static DbManager getManager() {
 		if (manager == null) {

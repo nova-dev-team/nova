@@ -1,6 +1,8 @@
 package nova.master.models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
@@ -65,8 +67,20 @@ public class Vnode extends DbObject {
 
 	private static DbManager manager = null;
 
+	public static List<Vnode> all() {
+		List<Vnode> all = new ArrayList<Vnode>();
+		for (DbObject obj : getManager().all()) {
+			all.add((Vnode) obj);
+		}
+		return all;
+	}
+
 	public static Vnode findById(long id) {
 		return (Vnode) getManager().findById(id);
+	}
+
+	public static Vnode findByIP(String ip) {
+		return (Vnode) getManager().findBy("ip", ip);
 	}
 
 	public static DbManager getManager() {
