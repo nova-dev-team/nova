@@ -89,10 +89,6 @@ public class DbManager {
 			throw new IllegalArgumentException("No DbSpec index on field: "
 					+ fieldName);
 		}
-		System.err.println("get key = " + key + " from field: " + fieldName);
-		for (Serializable k : index.keySet()) {
-			System.err.println("key = " + k + " value: " + index.get(k));
-		}
 		return index.get(key);
 	}
 
