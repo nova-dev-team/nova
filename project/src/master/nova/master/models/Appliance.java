@@ -26,6 +26,10 @@ public class Appliance extends DbObject {
 		return (Appliance) getManager().findById(id);
 	}
 
+	public static Appliance findByFileName(String fileName) {
+		return (Appliance) getManager().findBy("fileName", fileName);
+	}
+
 	public static DbManager getManager() {
 		if (manager == null) {
 			DbSpec spec = new DbSpec();

@@ -27,6 +27,10 @@ public class Vdisk extends DbObject {
 		return (Vdisk) getManager().findById(id);
 	}
 
+	public static Vdisk findByFileName(String fileName) {
+		return (Vdisk) getManager().findBy("fileName", fileName);
+	}
+
 	public static DbManager getManager() {
 		if (manager == null) {
 			DbSpec spec = new DbSpec();

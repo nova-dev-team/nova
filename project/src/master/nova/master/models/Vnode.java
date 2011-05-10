@@ -79,7 +79,7 @@ public class Vnode extends DbObject {
 		return (Vnode) getManager().findById(id);
 	}
 
-	public static Vnode findByIP(String ip) {
+	public static Vnode findByIp(String ip) {
 		return (Vnode) getManager().findBy("ip", ip);
 	}
 
