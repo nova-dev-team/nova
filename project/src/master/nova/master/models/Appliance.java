@@ -8,31 +8,15 @@ import nova.common.db.DbSpec;
  */
 public class Appliance {
 
-	public long id = 1L;
+	static DbManager manager = null;
 
-	public long getId() {
-		return this.id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	static DbManager dbm = DbManager.forClass(Appliance.class,
-			Appliance.getSpec());
-
-	private static DbSpec getSpec() {
-		DbSpec spec = new DbSpec();
-		spec.addIndex("fileName");
-		return spec;
-	}
-
-	public static Appliance findById(long id) {
-		return (Appliance) dbm.findById(id);
-	}
-
-	public static Appliance findByFileName(String fileName) {
-		return (Appliance) dbm.findBy("fileName", fileName);
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("fileName");
+			manager = DbManager.forClass(Appliance.class, spec);
+		}
+		return manager;
 	}
 
 	/** description for the software. */
@@ -43,6 +27,9 @@ public class Appliance {
 
 	/** the real file name on storage server */
 	private String fileName;
+
+	/** for sqlite3 db */
+	private long id = 1L;
 
 	/** the os family that best matchs the software */
 	private String osFamily;
@@ -84,6 +71,10 @@ public class Appliance {
 		return this.fileName;
 	}
 
+	public long getId() {
+		return id;
+	}
+
 	/**
 	 * @hibernate.property column="os_family"
 	 * 
@@ -93,7 +84,7 @@ public class Appliance {
 	}
 
 	public void save() {
-		dbm.saveEx(this);
+		getManager().save(this);
 	}
 
 	public void setDescription(String description) {
@@ -106,6 +97,10 @@ public class Appliance {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public void setOsFamily(String osFamily) {

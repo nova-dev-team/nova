@@ -9,30 +9,19 @@ import nova.common.db.DbSpec;
  */
 public class Vdisk {
 
-	public long id = 1L;
+	static DbManager manager = null;
 
-	public long getId() {
-		return this.id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	static DbManager dbm = DbManager.forClass(Vdisk.class, Vdisk.getSpec());
-
-	private static DbSpec getSpec() {
-		DbSpec spec = new DbSpec();
-		spec.addIndex("fileName");
-		return spec;
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("fileName");
+			manager = DbManager.forClass(Vdisk.class, spec);
+		}
+		return manager;
 	}
 
 	public static Vdisk findById(long id) {
-		return (Vdisk) dbm.findById(id);
-	}
-
-	public static Vdisk findByFileName(String fileName) {
-		return (Vdisk) dbm.findBy("fileName", fileName);
+		return (Vdisk) getManager().findById(id);
 	}
 
 	/** The description for this disk image. */
@@ -46,6 +35,9 @@ public class Vdisk {
 
 	/** The name on storage server. */
 	private String fileName;
+
+	/** for sqlite db */
+	private long id = 1L;
 
 	/**
 	 * The kind of operation system of this image. Could be "windows", "linux".
@@ -110,6 +102,10 @@ public class Vdisk {
 		return this.fileName;
 	}
 
+	public long getId() {
+		return id;
+	}
+
 	/**
 	 * @hibernate.property column="os_family"
 	 * 
@@ -135,7 +131,7 @@ public class Vdisk {
 	}
 
 	public void save() {
-		dbm.saveEx(this);
+		getManager().save(this);
 	}
 
 	public void setDescription(String description) {
@@ -152,6 +148,10 @@ public class Vdisk {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public void setOsFamily(String osFamily) {

@@ -26,5 +26,4 @@ public class TestVclusterDB extends TestCase {
 		System.out.println(vclusterRead);
 
 	}
-
 }

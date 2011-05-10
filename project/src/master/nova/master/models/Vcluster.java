@@ -9,26 +9,18 @@ import nova.common.db.DbSpec;
  */
 public class Vcluster {
 
-	public long id = 1L;
+	static DbManager manager = null;
 
-	public long getId() {
-		return this.id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	static DbManager dbm = DbManager.forClass(Vcluster.class,
-			Vcluster.getSpec());
-
-	private static DbSpec getSpec() {
-		DbSpec spec = new DbSpec();
-		return spec;
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			manager = DbManager.forClass(Vcluster.class, spec);
+		}
+		return manager;
 	}
 
 	public static Vcluster findById(long id) {
-		return (Vcluster) dbm.findById(id);
+		return (Vcluster) getManager().findById(id);
 	}
 
 	/** cluster_name */
@@ -45,6 +37,9 @@ public class Vcluster {
 	 * according to this value.
 	 */
 	private String fristIp;
+
+	/** for sqlite db */
+	private long id = 1L;
 
 	/** the password for the OS */
 	private String osPassword;
@@ -103,6 +98,10 @@ public class Vcluster {
 		return this.fristIp;
 	}
 
+	public long getId() {
+		return id;
+	}
+
 	/**
 	 * @hibernate.property column="os_password"
 	 * 
@@ -144,7 +143,7 @@ public class Vcluster {
 	}
 
 	public void save() {
-		dbm.saveEx(this);
+		getManager().save(this);
 	}
 
 	public void setClusterName(String clusterName) {
@@ -157,6 +156,10 @@ public class Vcluster {
 
 	public void setFristIp(String fristIp) {
 		this.fristIp = fristIp;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public void setOsPassword(String osPassword) {

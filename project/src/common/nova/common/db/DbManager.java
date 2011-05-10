@@ -1,32 +1,26 @@
 package nova.common.db;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings("rawtypes")
 public class DbManager {
 
-	static final Map<Class, DbManager> allDbManager;
+	static Session session = HibernateUtil.getSessionFactory().openSession();
 
-	static {
-		System.err.println("called");
-
-		allDbManager = new HashMap<Class, DbManager>();
-		System.err.println(allDbManager);
-	}
+	static final Map<Class, DbManager> allDbManager = new HashMap<Class, DbManager>();;
 
 	private Class klass = null;
 
 	private DbSpec spec = null;
-
-	private List<Object> cache = new ArrayList();
 
 	// TODO @santa make all members concurrnt
 	private Map<String, Map<Serializable, Object>> allIndex = new HashMap<String, Map<Serializable, Object>>();
@@ -37,15 +31,39 @@ public class DbManager {
 		for (String colName : this.spec.getAllIndex()) {
 			allIndex.put(colName, new HashMap<Serializable, Object>());
 		}
-		// TODO @santa load data
 
-		String queryText = "from " + klass.getSimpleName();
-		System.err.println(queryText);
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		System.err.println(session);
+		String queryText = "from " + this.klass.getSimpleName();
 		Query query = session.createQuery(queryText);
+		ArrayList<Object> queryResult = new ArrayList<Object>();
 		for (Object obj : query.list()) {
-			cache.add((Object) obj);
+			queryResult.add(obj);
+		}
+
+		// create index
+		for (String indexName : spec.getAllIndex()) {
+			Map<Serializable, Object> index = new HashMap<Serializable, Object>();
+			allIndex.put(indexName, index);
+			if (queryResult.size() > 0) {
+				Field field;
+				try {
+					field = queryResult.get(0).getClass()
+							.getDeclaredField(indexName);
+					field.setAccessible(true);
+					for (Object obj : queryResult) {
+						index.put((Serializable) field.get(obj), obj);
+					}
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				} catch (NoSuchFieldException e) {
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+
+			}
+
 		}
 
 	}
@@ -63,24 +81,21 @@ public class DbManager {
 		return index.get(key);
 	}
 
-	public List<Object> all() {
-		return cache;
+	public Collection<Object> all() {
+		return allIndex.get("id").values();
 	}
 
 	public Map<Serializable, Object> getIndex(String colName) {
 		return this.allIndex.get(colName);
 	}
 
-	public void saveEx(Object obj) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		System.err.println(session);
+	public void save(Object obj) {
 		Transaction tx = session.beginTransaction();
 		session.save(obj);
 		tx.commit();
 	}
 
 	public static DbManager forClass(Class klass, DbSpec spec) {
-		System.err.println(allDbManager);
 		if (allDbManager.containsKey(klass) == false) {
 			DbManager dbm = new DbManager(klass, spec);
 			allDbManager.put(klass, dbm);

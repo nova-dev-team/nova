@@ -14,31 +14,19 @@ import nova.common.service.SimpleAddress;
  */
 public class Vnode {
 
-	public long id = 1L;
+	static DbManager manager = null;
 
-	public long getId() {
-		return this.id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	static DbManager dbm = DbManager.forClass(Vnode.class, Vnode.getSpec());
-
-	private static DbSpec getSpec() {
-		DbSpec spec = new DbSpec();
-		spec.addIndex("ip");
-		spec.addIndex("uuid");
-		return spec;
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("uuid");
+			manager = DbManager.forClass(Vnode.class, spec);
+		}
+		return manager;
 	}
 
 	public static Vnode findById(long id) {
-		return (Vnode) dbm.findById(id);
-	}
-
-	public static Vnode findByUUID(String uuid) {
-		return (Vnode) dbm.findBy("uuid", uuid);
+		return (Vnode) getManager().findById(id);
 	}
 
 	/**
@@ -110,6 +98,8 @@ public class Vnode {
 	private String hda;
 	/** The hypervisor to be used, could be "xen", "kvm", etc. */
 	private String hypervisor;
+	/** for sqlite db */
+	private long id = 1L;
 
 	private String ip;
 
@@ -207,6 +197,10 @@ public class Vnode {
 		return hypervisor;
 	}
 
+	public long getId() {
+		return id;
+	}
+
 	public String getIp() {
 		return ip;
 	}
@@ -264,7 +258,7 @@ public class Vnode {
 	}
 
 	public void save() {
-		dbm.saveEx(this);
+		getManager().save(this);
 	}
 
 	public void setAddr(SimpleAddress addr) {
@@ -295,6 +289,10 @@ public class Vnode {
 
 	public void setHypervisor(String hypervisor) {
 		this.hypervisor = hypervisor;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public void setIp(String ip) {

@@ -17,23 +17,15 @@ import nova.common.util.Utils;
  */
 public class Pnode {
 
-	public long id = 1L;
+	static DbManager manager = null;
 
-	public long getId() {
-		return this.id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	static DbManager dbm = DbManager.forClass(Pnode.class, Pnode.getSpec());
-
-	private static DbSpec getSpec() {
-		DbSpec spec = new DbSpec();
-		spec.addIndex("ip");
-		spec.addIndex("macAddress");
-		return spec;
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("ip");
+			manager = DbManager.forClass(Pnode.class, spec);
+		}
+		return manager;
 	}
 
 	/**
@@ -82,22 +74,25 @@ public class Pnode {
 
 	public static List<Pnode> all() {
 		List<Pnode> all = new ArrayList<Pnode>();
-		for (Object obj : dbm.all()) {
+		for (Object obj : getManager().all()) {
 			all.add((Pnode) obj);
 		}
 		return all;
 	}
 
 	public static Pnode findById(long id) {
-		return (Pnode) dbm.findById(id);
+		return (Pnode) getManager().findById(id);
 	}
 
 	public static Pnode findByIp(String ip) {
-		return (Pnode) dbm.findBy("ip", ip);
+		return (Pnode) getManager().findBy("ip", ip);
 	}
 
 	/** The host name of physical machine. */
 	private String hostname;
+
+	/** for sqlite db */
+	private long id = 1L;
 
 	private String ip;
 
@@ -160,6 +155,10 @@ public class Pnode {
 		return hostname;
 	}
 
+	public long getId() {
+		return id;
+	}
+
 	public String getIp() {
 		return ip;
 	}
@@ -209,7 +208,7 @@ public class Pnode {
 	}
 
 	public void save() {
-		dbm.saveEx(this);
+		getManager().save(this);
 	}
 
 	public void setAddr(SimpleAddress addr) {
@@ -219,6 +218,10 @@ public class Pnode {
 
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 	public void setIp(String ip) {
