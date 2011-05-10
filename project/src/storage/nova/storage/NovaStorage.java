@@ -84,7 +84,7 @@ public class NovaStorage extends SimpleServer {
 
 	public static void main(String[] args) {
 
-		// TODO [future] support protocols other than ftp?
+		// TODO @future support protocols other than ftp?
 
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled
 		// gracefully

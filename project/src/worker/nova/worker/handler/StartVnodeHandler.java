@@ -31,7 +31,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 	@Override
 	public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
-		// TODO @shayf [future] support both xen and kvm.
+		// TODO @future support both xen and kvm.
 		final String virtService = "qemu:///system";
 		Connect conn = null;
 		try {
@@ -47,9 +47,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				Domain testDomain = conn
 						.domainLookupByUUIDString(msg.getUuid());
 				testDomain.resume();
-			} catch (LibvirtException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (LibvirtException ex) {
+				log.error("Domain with UUID='" + msg.getUuid()
+						+ "' can't be found!", ex);
 			}
 		} else {
 			// create domain and show some info

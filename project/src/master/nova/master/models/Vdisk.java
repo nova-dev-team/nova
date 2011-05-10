@@ -1,15 +1,16 @@
 package nova.master.models;
 
 import nova.common.db.DbManager;
+import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
 
 /**
  * @hibernate.class table="vdisk"
  * 
  */
-public class Vdisk {
+public class Vdisk extends DbObject {
 
-	static DbManager manager = null;
+	private static DbManager manager = null;
 
 	public static Vdisk findById(long id) {
 		return (Vdisk) getManager().findById(id);
@@ -35,9 +36,6 @@ public class Vdisk {
 
 	/** The name on storage server. */
 	private String fileName;
-
-	/** for sqlite db */
-	private long id = 1L;
 
 	/**
 	 * The kind of operation system of this image. Could be "windows", "linux".
@@ -102,10 +100,6 @@ public class Vdisk {
 		return this.fileName;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	/**
 	 * @hibernate.property column="os_family"
 	 * 
@@ -147,11 +141,9 @@ public class Vdisk {
 	}
 
 	public void setFileName(String fileName) {
+		getManager().getIndex("fileName").remove(this.fileName);
 		this.fileName = fileName;
-	}
-
-	public void setId(long id) {
-		this.id = id;
+		getManager().getIndex("fileName").put(this.fileName, this);
 	}
 
 	public void setOsFamily(String osFamily) {

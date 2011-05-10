@@ -191,7 +191,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 						dis));
 
 				String ftpEntry = null;
-				// TODO by gaotao optimize there when cancelled!
+				// TODO @gaotao optimize there when cancelled!
 				while ((ftpEntry = br.readLine()) != null && !statusCancelled()) {
 					int fnameStart = nthFieldStart(ftpEntry, 8);
 					String entry = ftpEntry.substring(fnameStart);
