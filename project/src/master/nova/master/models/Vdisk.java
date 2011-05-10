@@ -10,7 +10,7 @@ import nova.common.db.DbSpec;
  */
 public class Vdisk extends DbObject {
 
-	static DbManager manager = null;
+	private static DbManager manager = null;
 
 	public static Vdisk findById(long id) {
 		return (Vdisk) getManager().findById(id);

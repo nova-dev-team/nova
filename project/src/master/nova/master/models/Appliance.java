@@ -9,7 +9,7 @@ import nova.common.db.DbSpec;
  */
 public class Appliance extends DbObject {
 
-	static DbManager manager = null;
+	private static DbManager manager = null;
 
 	public static DbManager getManager() {
 		if (manager == null) {

@@ -63,7 +63,7 @@ public class Vnode extends DbObject {
 		UNKNOWN,
 	}
 
-	static DbManager manager = null;
+	private static DbManager manager = null;
 
 	public static Vnode findById(long id) {
 		return (Vnode) getManager().findById(id);

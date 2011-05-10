@@ -10,7 +10,7 @@ import nova.common.db.DbSpec;
  */
 public class Vcluster extends DbObject {
 
-	static DbManager manager = null;
+	private static DbManager manager = null;
 
 	public static Vcluster findById(long id) {
 		return (Vcluster) getManager().findById(id);

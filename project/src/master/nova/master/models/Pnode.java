@@ -57,7 +57,7 @@ public class Pnode extends DbObject {
 	 */
 	public static final long HEARTBEAT_TIMEOUT = 1000;
 
-	static DbManager manager = null;
+	private static DbManager manager = null;
 
 	/**
 	 * Interval between each ping messages.
@@ -66,7 +66,7 @@ public class Pnode extends DbObject {
 
 	public static List<Pnode> all() {
 		List<Pnode> all = new ArrayList<Pnode>();
-		for (Object obj : getManager().all()) {
+		for (DbObject obj : getManager().all()) {
 			all.add((Pnode) obj);
 		}
 		return all;
