@@ -64,12 +64,22 @@ public class ApplianceInstaller {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+<<<<<<< HEAD
 			// Install statement used in linux
 		} else if (isUnix()) {
 			Runtime.getRuntime().exec(Utils.pathJoin(folderPath, "autorun.sh"));
 		} else {
 			logger.error("Can't find the autorun file for this appliance: "
 					+ folderPath);
+=======
+			if (!hasAutorun) {
+				logger.info("Can't find the autorun file for this appliance: "
+						+ path);
+				// TODO @gaotao discuss with santa what to do here
+			}
+		} else {
+			// TODO @gaotao discuss with santa what to do here
+>>>>>>> 0e865314b6104994d2de47bdc74ac2a6905bc84f
 		}
 
 	}

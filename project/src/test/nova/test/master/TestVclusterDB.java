@@ -1,7 +1,6 @@
 package nova.test.master;
 
 import junit.framework.TestCase;
-import nova.master.models.MasterDb;
 import nova.master.models.Vcluster;
 
 import org.junit.Test;
@@ -22,11 +21,9 @@ public class TestVclusterDB extends TestCase {
 
 		vcluster.save();
 
-		Vcluster vclusterRead = (Vcluster) MasterDb.load(Vcluster.class,
-				vcluster.getId());
+		Vcluster vclusterRead = Vcluster.findById(vcluster.getId());
 
 		System.out.println(vclusterRead);
 
 	}
-
 }

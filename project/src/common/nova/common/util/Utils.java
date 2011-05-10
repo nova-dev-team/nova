@@ -113,6 +113,44 @@ public class Utils {
 		return sb.toString();
 	}
 
+	@SuppressWarnings("rawtypes")
+	public static Object getField(Object obj, String fieldName) {
+		Class objClass = obj.getClass();
+		try {
+			Field field = objClass.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			return field.get(obj);
+		} catch (SecurityException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		} catch (NoSuchFieldException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		} catch (IllegalArgumentException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		} catch (IllegalAccessException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		}
+		return null;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static boolean hasField(Object obj, String fieldName) {
+		Class objClass = obj.getClass();
+		try {
+			objClass.getDeclaredField(fieldName);
+			return true;
+		} catch (SecurityException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		} catch (NoSuchFieldException e) {
+			return false;
+		}
+		return false;
+	}
+
 	/**
 	 * Expand from a template. The values are extracted from an object.
 	 * 
@@ -125,25 +163,9 @@ public class Utils {
 	public static String expandTemplate(String template, final Object obj) {
 		StringFinder finder = new StringFinder() {
 
-			@SuppressWarnings("rawtypes")
-			Class objClass = obj.getClass();
-
 			@Override
 			public Object getObject(String key) {
-				try {
-					Field field = objClass.getDeclaredField(key);
-					field.setAccessible(true);
-					return field.get(obj);
-				} catch (SecurityException e) {
-					e.printStackTrace();
-				} catch (NoSuchFieldException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-				return null;
+				return getField(obj, key);
 			}
 
 			@Override
@@ -153,12 +175,7 @@ public class Utils {
 
 			@Override
 			public boolean contains(String key) {
-				try {
-					objClass.getField(key);
-					return true;
-				} catch (NoSuchFieldException e) {
-					return false;
-				}
+				return hasField(obj, key);
 			}
 
 			@Override

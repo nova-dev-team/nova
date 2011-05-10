@@ -1,9 +1,43 @@
 package nova.master.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nova.common.db.DbManager;
+import nova.common.db.DbObject;
+import nova.common.db.DbSpec;
+
 /**
  * table="softwarepackage"
  */
-public class Appliance {
+public class Appliance extends DbObject {
+
+	private static DbManager manager = null;
+
+	public static List<Appliance> all() {
+		List<Appliance> all = new ArrayList<Appliance>();
+		for (DbObject obj : getManager().all()) {
+			all.add((Appliance) obj);
+		}
+		return null;
+	}
+
+	public static Appliance findById(long id) {
+		return (Appliance) getManager().findById(id);
+	}
+
+	public static Appliance findByFileName(String fileName) {
+		return (Appliance) getManager().findBy("fileName", fileName);
+	}
+
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("fileName");
+			manager = DbManager.forClass(Appliance.class, spec);
+		}
+		return manager;
+	}
 
 	/** description for the software. */
 	private String description;;
@@ -13,9 +47,6 @@ public class Appliance {
 
 	/** the real file name on storage server */
 	private String fileName;
-
-	/** for sqlite3 db */
-	private long id = 1L;
 
 	/** the os family that best matchs the software */
 	private String osFamily;
@@ -57,10 +88,6 @@ public class Appliance {
 		return this.fileName;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	/**
 	 * @hibernate.property column="os_family"
 	 * 
@@ -70,7 +97,7 @@ public class Appliance {
 	}
 
 	public void save() {
-		MasterDb.save(this);
+		getManager().save(this);
 	}
 
 	public void setDescription(String description) {
@@ -82,11 +109,9 @@ public class Appliance {
 	}
 
 	public void setFileName(String fileName) {
+		getManager().getIndex("fileName").remove(this.fileName);
 		this.fileName = fileName;
-	}
-
-	public void setId(long id) {
-		this.id = id;
+		getManager().getIndex("fileName").put(this.fileName, this);
 	}
 
 	public void setOsFamily(String osFamily) {

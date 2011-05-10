@@ -1,7 +1,12 @@
 package nova.master.models;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import nova.common.db.DbManager;
+import nova.common.db.DbObject;
+import nova.common.db.DbSpec;
 import nova.common.service.SimpleAddress;
 
 /**
@@ -10,7 +15,7 @@ import nova.common.service.SimpleAddress;
  * @author santa
  * 
  */
-public class Vnode {
+public class Vnode extends DbObject {
 
 	/**
 	 * Status for the virtual node.
@@ -60,6 +65,33 @@ public class Vnode {
 		UNKNOWN,
 	}
 
+	private static DbManager manager = null;
+
+	public static List<Vnode> all() {
+		List<Vnode> all = new ArrayList<Vnode>();
+		for (DbObject obj : getManager().all()) {
+			all.add((Vnode) obj);
+		}
+		return all;
+	}
+
+	public static Vnode findById(long id) {
+		return (Vnode) getManager().findById(id);
+	}
+
+	public static Vnode findByIp(String ip) {
+		return (Vnode) getManager().findBy("ip", ip);
+	}
+
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("uuid");
+			manager = DbManager.forClass(Vnode.class, spec);
+		}
+		return manager;
+	}
+
 	/**
 	 * The vnode's address.
 	 */
@@ -81,8 +113,6 @@ public class Vnode {
 	private String hda;
 	/** The hypervisor to be used, could be "xen", "kvm", etc. */
 	private String hypervisor;
-	/** for sqlite db */
-	private long id = 1L;
 
 	private String ip;
 
@@ -180,10 +210,6 @@ public class Vnode {
 		return hypervisor;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	public String getIp() {
 		return ip;
 	}
@@ -241,7 +267,7 @@ public class Vnode {
 	}
 
 	public void save() {
-		MasterDb.save(this);
+		getManager().save(this);
 	}
 
 	public void setAddr(SimpleAddress addr) {
@@ -272,10 +298,6 @@ public class Vnode {
 
 	public void setHypervisor(String hypervisor) {
 		this.hypervisor = hypervisor;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public void setIp(String ip) {
@@ -323,7 +345,9 @@ public class Vnode {
 	}
 
 	public void setUuid(String uuid) {
+		getManager().getIndex("uuid").remove(this.uuid);
 		this.uuid = uuid;
+		getManager().getIndex("uuid").put(this.uuid, this);
 	}
 
 	public void setVclusterId(Integer vclusterId) {

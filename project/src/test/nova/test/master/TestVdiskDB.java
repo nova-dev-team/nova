@@ -1,7 +1,6 @@
 package nova.test.master;
 
 import junit.framework.TestCase;
-import nova.master.models.MasterDb;
 import nova.master.models.Vdisk;
 
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class TestVdiskDB extends TestCase {
 
 		vdisk.save();
 
-		Vdisk vdiskRead = (Vdisk) MasterDb.load(Vdisk.class, vdisk.getId());
+		Vdisk vdiskRead = Vdisk.findById(vdisk.getId());
 		System.out.print("\n\nFileName: " + vdiskRead.getFileName()
 				+ "\nDisplayName: " + vdiskRead.getDisplayName()
 				+ "\nDiskFormat: " + vdiskRead.getDiskFormat() + "\nOsFamily: "

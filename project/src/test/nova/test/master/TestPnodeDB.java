@@ -1,7 +1,6 @@
 package nova.test.master;
 
 import junit.framework.Assert;
-import nova.master.models.MasterDb;
 import nova.master.models.Pnode;
 import nova.master.models.Pnode.Status;
 
@@ -19,7 +18,7 @@ public class TestPnodeDB {
 		pnode.setStatus(Status.ADD_PENDING);
 
 		pnode.save();
-		Pnode pnodeLoad = (Pnode) MasterDb.load(Pnode.class, pnode.getId());
+		Pnode pnodeLoad = Pnode.findById(pnode.getId());
 		System.out.println(pnodeLoad);
 		Assert.assertEquals(pnode, pnodeLoad);
 	}

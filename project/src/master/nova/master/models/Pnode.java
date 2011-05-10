@@ -1,8 +1,12 @@
 package nova.master.models;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import nova.common.db.DbManager;
+import nova.common.db.DbObject;
+import nova.common.db.DbSpec;
 import nova.common.service.SimpleAddress;
 import nova.common.util.Utils;
 
@@ -12,7 +16,7 @@ import nova.common.util.Utils;
  * @author santa
  * 
  */
-public class Pnode {
+public class Pnode extends DbObject {
 
 	/**
 	 * Status for the physical node.
@@ -53,31 +57,40 @@ public class Pnode {
 	 */
 	public static final long HEARTBEAT_TIMEOUT = 1000;
 
+	private static DbManager manager = null;
+
 	/**
 	 * Interval between each ping messages.
 	 */
 	public static final long PING_INTERVAL = 1000;
 
-	@SuppressWarnings("unchecked")
 	public static List<Pnode> all() {
-		return (List<Pnode>) MasterDb.queryResult("from Pnode");
+		List<Pnode> all = new ArrayList<Pnode>();
+		for (DbObject obj : getManager().all()) {
+			all.add((Pnode) obj);
+		}
+		return all;
+	}
+
+	public static Pnode findById(long id) {
+		return (Pnode) getManager().findById(id);
 	}
 
 	public static Pnode findByIp(String ip) {
-		try {
-			return (Pnode) MasterDb.queryResult(
-					"from Pnode where ip='" + ip + "'").get(0);
-		} catch (IndexOutOfBoundsException e) {
-			// nothing found
-			return null;
+		return (Pnode) getManager().findBy("ip", ip);
+	}
+
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("ip");
+			manager = DbManager.forClass(Pnode.class, spec);
 		}
+		return manager;
 	}
 
 	/** The host name of physical machine. */
 	private String hostname;
-
-	/** for sqlite db */
-	private long id = 1L;
 
 	private String ip;
 
@@ -140,10 +153,6 @@ public class Pnode {
 		return hostname;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	public String getIp() {
 		return ip;
 	}
@@ -193,7 +202,7 @@ public class Pnode {
 	}
 
 	public void save() {
-		MasterDb.save(this);
+		getManager().save(this);
 	}
 
 	public void setAddr(SimpleAddress addr) {
@@ -205,12 +214,10 @@ public class Pnode {
 		this.hostname = hostname;
 	}
 
-	public void setId(long id) {
-		this.id = id;
-	}
-
 	public void setIp(String ip) {
+		getManager().getIndex("ip").remove(this.ip);
 		this.ip = ip;
+		getManager().getIndex("ip").put(this.ip, this);
 	}
 
 	public void setMacAddress(String macAddress) {
