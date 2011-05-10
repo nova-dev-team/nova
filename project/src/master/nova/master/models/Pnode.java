@@ -17,17 +17,6 @@ import nova.common.util.Utils;
  */
 public class Pnode {
 
-	static DbManager manager = null;
-
-	public static DbManager getManager() {
-		if (manager == null) {
-			DbSpec spec = new DbSpec();
-			spec.addIndex("ip");
-			manager = DbManager.forClass(Pnode.class, spec);
-		}
-		return manager;
-	}
-
 	/**
 	 * Status for the physical node.
 	 * 
@@ -67,6 +56,8 @@ public class Pnode {
 	 */
 	public static final long HEARTBEAT_TIMEOUT = 1000;
 
+	static DbManager manager = null;
+
 	/**
 	 * Interval between each ping messages.
 	 */
@@ -86,6 +77,15 @@ public class Pnode {
 
 	public static Pnode findByIp(String ip) {
 		return (Pnode) getManager().findBy("ip", ip);
+	}
+
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("ip");
+			manager = DbManager.forClass(Pnode.class, spec);
+		}
+		return manager;
 	}
 
 	/** The host name of physical machine. */

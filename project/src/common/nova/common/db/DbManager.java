@@ -7,12 +7,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 @SuppressWarnings("rawtypes")
 public class DbManager {
+
+	Logger log = Logger.getLogger(DbManager.class);
 
 	static Session session = HibernateUtil.getSessionFactory().openSession();
 
@@ -43,25 +46,33 @@ public class DbManager {
 		for (String indexName : spec.getAllIndex()) {
 			Map<Serializable, Object> index = new HashMap<Serializable, Object>();
 			allIndex.put(indexName, index);
-			if (queryResult.size() > 0) {
-				Field field;
-				try {
-					field = queryResult.get(0).getClass()
-							.getDeclaredField(indexName);
-					field.setAccessible(true);
-					for (Object obj : queryResult) {
-						index.put((Serializable) field.get(obj), obj);
-					}
-				} catch (SecurityException e) {
-					e.printStackTrace();
-				} catch (NoSuchFieldException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
+			if (queryResult.size() == 0) {
+				continue;
+			}
 
+			try {
+				Field field = queryResult.get(0).getClass()
+						.getDeclaredField(indexName);
+				field.setAccessible(true);
+				for (Object obj : queryResult) {
+					index.put((Serializable) field.get(obj), obj);
+				}
+			} catch (SecurityException e) {
+				log.fatal("Error creating index on field " + indexName
+						+ " of class " + klass.getSimpleName(), e);
+				System.exit(1);
+			} catch (NoSuchFieldException e) {
+				log.fatal("Error creating index on field " + indexName
+						+ " of class " + klass.getSimpleName(), e);
+				System.exit(1);
+			} catch (IllegalArgumentException e) {
+				log.fatal("Error creating index on field " + indexName
+						+ " of class " + klass.getSimpleName(), e);
+				System.exit(1);
+			} catch (IllegalAccessException e) {
+				log.fatal("Error creating index on field " + indexName
+						+ " of class " + klass.getSimpleName(), e);
+				System.exit(1);
 			}
 
 		}
@@ -85,8 +96,8 @@ public class DbManager {
 		return allIndex.get("id").values();
 	}
 
-	public Map<Serializable, Object> getIndex(String colName) {
-		return this.allIndex.get(colName);
+	public Map<Serializable, Object> getIndex(String fieldName) {
+		return this.allIndex.get(fieldName);
 	}
 
 	public void save(Object obj) {

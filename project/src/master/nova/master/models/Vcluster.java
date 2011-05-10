@@ -11,16 +11,16 @@ public class Vcluster {
 
 	static DbManager manager = null;
 
+	public static Vcluster findById(long id) {
+		return (Vcluster) getManager().findById(id);
+	}
+
 	public static DbManager getManager() {
 		if (manager == null) {
 			DbSpec spec = new DbSpec();
 			manager = DbManager.forClass(Vcluster.class, spec);
 		}
 		return manager;
-	}
-
-	public static Vcluster findById(long id) {
-		return (Vcluster) getManager().findById(id);
 	}
 
 	/** cluster_name */

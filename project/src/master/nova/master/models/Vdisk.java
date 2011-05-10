@@ -11,6 +11,10 @@ public class Vdisk {
 
 	static DbManager manager = null;
 
+	public static Vdisk findById(long id) {
+		return (Vdisk) getManager().findById(id);
+	}
+
 	public static DbManager getManager() {
 		if (manager == null) {
 			DbSpec spec = new DbSpec();
@@ -18,10 +22,6 @@ public class Vdisk {
 			manager = DbManager.forClass(Vdisk.class, spec);
 		}
 		return manager;
-	}
-
-	public static Vdisk findById(long id) {
-		return (Vdisk) getManager().findById(id);
 	}
 
 	/** The description for this disk image. */

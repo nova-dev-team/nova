@@ -5,17 +5,17 @@ import java.util.Set;
 
 public class DbSpec {
 
-	Set<String> indexCols = new HashSet<String>();
+	Set<String> indexFields = new HashSet<String>();
 
 	public DbSpec() {
 		this.addIndex("id");
 	}
 
-	public void addIndex(String colName) {
-		indexCols.add(colName);
+	public void addIndex(String fieldName) {
+		indexFields.add(fieldName);
 	}
 
 	public Set<String> getAllIndex() {
-		return this.indexCols;
+		return this.indexFields;
 	}
 }

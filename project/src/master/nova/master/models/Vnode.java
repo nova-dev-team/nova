@@ -14,21 +14,6 @@ import nova.common.service.SimpleAddress;
  */
 public class Vnode {
 
-	static DbManager manager = null;
-
-	public static DbManager getManager() {
-		if (manager == null) {
-			DbSpec spec = new DbSpec();
-			spec.addIndex("uuid");
-			manager = DbManager.forClass(Vnode.class, spec);
-		}
-		return manager;
-	}
-
-	public static Vnode findById(long id) {
-		return (Vnode) getManager().findById(id);
-	}
-
 	/**
 	 * Status for the virtual node.
 	 * 
@@ -75,6 +60,21 @@ public class Vnode {
 		 * The vnode status is not known.
 		 */
 		UNKNOWN,
+	}
+
+	static DbManager manager = null;
+
+	public static Vnode findById(long id) {
+		return (Vnode) getManager().findById(id);
+	}
+
+	public static DbManager getManager() {
+		if (manager == null) {
+			DbSpec spec = new DbSpec();
+			spec.addIndex("uuid");
+			manager = DbManager.forClass(Vnode.class, spec);
+		}
+		return manager;
 	}
 
 	/**
