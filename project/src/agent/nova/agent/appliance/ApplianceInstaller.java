@@ -49,10 +49,10 @@ public class ApplianceInstaller {
 			if (!hasAutorun) {
 				logger.info("Can't find the autorun file for this appliance: "
 						+ path);
-				// TODO by gaotao discuss with santa what to do here
+				// TODO @gaotao discuss with santa what to do here
 			}
 		} else {
-			// TODO discuss with santa what to do here
+			// TODO @gaotao discuss with santa what to do here
 		}
 	}
 }

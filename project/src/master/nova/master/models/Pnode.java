@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import nova.common.db.DbManager;
+import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
 import nova.common.service.SimpleAddress;
 import nova.common.util.Utils;
@@ -15,7 +16,7 @@ import nova.common.util.Utils;
  * @author santa
  * 
  */
-public class Pnode {
+public class Pnode extends DbObject {
 
 	/**
 	 * Status for the physical node.
@@ -91,9 +92,6 @@ public class Pnode {
 	/** The host name of physical machine. */
 	private String hostname;
 
-	/** for sqlite db */
-	private long id = 1L;
-
 	private String ip;
 
 	/**
@@ -155,10 +153,6 @@ public class Pnode {
 		return hostname;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	public String getIp() {
 		return ip;
 	}
@@ -218,10 +212,6 @@ public class Pnode {
 
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public void setIp(String ip) {

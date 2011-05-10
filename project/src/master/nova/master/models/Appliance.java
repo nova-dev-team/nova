@@ -1,12 +1,13 @@
 package nova.master.models;
 
 import nova.common.db.DbManager;
+import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
 
 /**
  * table="softwarepackage"
  */
-public class Appliance {
+public class Appliance extends DbObject {
 
 	static DbManager manager = null;
 
@@ -27,9 +28,6 @@ public class Appliance {
 
 	/** the real file name on storage server */
 	private String fileName;
-
-	/** for sqlite3 db */
-	private long id = 1L;
 
 	/** the os family that best matchs the software */
 	private String osFamily;
@@ -71,10 +69,6 @@ public class Appliance {
 		return this.fileName;
 	}
 
-	public long getId() {
-		return id;
-	}
-
 	/**
 	 * @hibernate.property column="os_family"
 	 * 
@@ -97,10 +91,6 @@ public class Appliance {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public void setOsFamily(String osFamily) {

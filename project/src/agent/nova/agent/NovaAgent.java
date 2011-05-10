@@ -77,7 +77,7 @@ public class NovaAgent extends SimpleServer {
 	ConcurrentHashMap<String, Appliance> appliances = new ConcurrentHashMap<String, Appliance>();
 	Gson gson = new GsonBuilder().serializeNulls().create();
 
-	// TODO [future] support protocols other than ftp
+	// TODO @future support protocols other than ftp
 	ApplianceFetcher fetcher = new FtpApplianceFetcher();
 
 	/**
