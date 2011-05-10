@@ -13,16 +13,13 @@ import org.hibernate.Transaction;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DbManager {
 
-	static final Session session;
-
 	static final Map<Class, DbManager> allDbManager;
 
 	static {
 		System.err.println("called");
+
 		allDbManager = new HashMap<Class, DbManager>();
 		System.err.println(allDbManager);
-		session = HibernateUtil.getSessionFactory().openSession();
-		System.err.println(session);
 	}
 
 	private Class klass = null;
@@ -44,6 +41,8 @@ public class DbManager {
 
 		String queryText = "from " + klass.getSimpleName();
 		System.err.println(queryText);
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		System.err.println(session);
 		Query query = session.createQuery(queryText);
 		for (Object obj : query.list()) {
 			cache.add((Object) obj);
@@ -73,6 +72,8 @@ public class DbManager {
 	}
 
 	public void saveEx(Object obj) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		System.err.println(session);
 		Transaction tx = session.beginTransaction();
 		session.save(obj);
 		tx.commit();
