@@ -24,12 +24,13 @@ public class TestStartVnode {
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
 		StartVnodeMessage msg = new StartVnodeMessage(null);
+		msg.setHyperVisor("kvm");
 		msg.setName("vm");
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
 		msg.setMemSize("524288");
 		msg.setCpuCount("1");
 		msg.setArch("i686");
-		msg.setCdImage("");
+		msg.setCdImage("/media/data/ubuntu-10.04-desktop-i386.iso");
 		msg.setEmulatorPath("/usr/bin/kvm");
 		msg.setRunAgent("false");
 
@@ -38,6 +39,7 @@ public class TestStartVnode {
 		SimpleAddress xreply = null;
 		svh.handleMessage(msg, ctx, e, xreply);
 
+		msg.setHyperVisor("KVM");
 		msg.setName("vm2");
 		msg.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
 		msg.setMemSize("524288");

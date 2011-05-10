@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
+import nova.common.util.Conf;
 import nova.common.util.Utils;
-import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
 
@@ -74,8 +74,8 @@ public class Kvm {
 					params.get("name").toString(), "linux.img"));
 		}
 
-		if ((params.get("cdimg") != null)
-				&& (!params.get("cdimg").toString().equals(""))) {
+		if ((params.get("cdImage") != null)
+				&& (!params.get("cdImage").toString().equals(""))) {
 			params.put("bootDevice", "cdrom");
 		} else {
 			params.put("bootDevice", "hd");
@@ -88,8 +88,8 @@ public class Kvm {
 					+ "\n    <source file='"
 					+ params.get("cdromPath").toString() + "'/>"
 					+ "\n    <target dev='hdc'/>" + "\n  </disk>");
-		} else if ((params.get("cdimg") != null)
-				&& (!params.get("cdimg").toString().equals(""))) {
+		} else if ((params.get("cdImage") != null)
+				&& (!params.get("cdImage").toString().equals(""))) {
 			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME,
 					params.get("name").toString(), params.get("cdImage")
 							.toString()));
@@ -102,12 +102,9 @@ public class Kvm {
 			params.put("determinCdrom", "");
 		}
 
-		String vmNetworkInterface = NovaWorker.getInstance().getConf()
-				.getString("vm_network_interface");
-		String vmNetworkBridge = NovaWorker.getInstance().getConf()
-				.getString("vm_network_bridge");
-		String fixVncMousePointer = NovaWorker.getInstance().getConf()
-				.getString("fix_vnc_mouse_pointer");
+		String vmNetworkInterface = Conf.getString("vm_network_interface");
+		String vmNetworkBridge = Conf.getString("vm_network_bridge");
+		String fixVncMousePointer = Conf.getString("fix_vnc_mouse_pointer");
 
 		if ((!vmNetworkInterface.equals("")) && (!vmNetworkBridge.equals(""))) {
 			params.put("interfaceType", "bridge");
@@ -152,6 +149,7 @@ public class Kvm {
 			params.put("determinVnc", "");
 		}
 
+		System.out.println(Utils.expandTemplateFile(templateFpath, params));
 		return Utils.expandTemplateFile(templateFpath, params);
 	}
 }

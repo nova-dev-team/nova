@@ -1,6 +1,12 @@
 package nova.common.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 /**
  * Config file abstraction.
@@ -9,6 +15,39 @@ import java.util.Properties;
  * 
  */
 public class Conf extends Properties {
+
+	/**
+	 * Log4j logger.
+	 */
+	static Logger logger = Logger.getLogger(Utils.class);
+
+	private Conf() {
+		File confDir = new File(Utils.pathJoin(Utils.NOVA_HOME, "conf"));
+		for (File f : confDir.listFiles()) {
+			if (f.isFile() && f.getName().startsWith("nova.")
+					&& f.getName().endsWith(".properties")) {
+				logger.info("Loading config from " + f.getAbsolutePath());
+				Properties subConf = new Properties();
+
+				try {
+					FileInputStream fis = new FileInputStream(f);
+					subConf.load(fis);
+					fis.close();
+				} catch (FileNotFoundException e) {
+					logger.fatal("Error loading config files", e);
+					System.exit(1);
+				} catch (IOException e) {
+					logger.fatal("Error loading config files", e);
+					System.exit(1);
+				}
+
+				this.putAll(subConf);
+			}
+		}
+
+	}
+
+	private static Conf conf = new Conf();
 
 	/**
 	 * Generated serial version uid.
@@ -23,9 +62,9 @@ public class Conf extends Properties {
 	 * @param value
 	 *            The default value.
 	 */
-	public void setDefaultValue(String key, Object value) {
-		if (this.containsKey(key) == false) {
-			this.put(key, value);
+	public static void setDefaultValue(String key, Object value) {
+		if (conf.containsKey(key) == false) {
+			conf.put(key, value);
 		}
 	}
 
@@ -36,9 +75,9 @@ public class Conf extends Properties {
 	 *            The config name.
 	 * @return The config info, as string. If not found, null will be returned.
 	 */
-	public String getString(String key) {
-		if (this.containsKey(key)) {
-			return this.get(key).toString();
+	public static String getString(String key) {
+		if (conf.containsKey(key)) {
+			return conf.get(key).toString();
 		} else {
 			return null;
 		}
@@ -54,9 +93,9 @@ public class Conf extends Properties {
 	 * @throws NumberFormatException
 	 *             If the number is not valid.
 	 */
-	public Integer getInteger(String key) throws NumberFormatException {
-		if (this.containsKey(key)) {
-			return Integer.parseInt(this.get(key).toString());
+	public static Integer getInteger(String key) throws NumberFormatException {
+		if (conf.containsKey(key)) {
+			return Integer.parseInt(conf.get(key).toString());
 		} else {
 			return null;
 		}

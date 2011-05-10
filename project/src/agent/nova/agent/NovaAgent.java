@@ -47,11 +47,6 @@ import com.google.gson.GsonBuilder;
  */
 public class NovaAgent extends SimpleServer {
 
-	/**
-	 * Config info for agent.
-	 */
-	Conf conf = null;
-
 	// TODO @santa read this uuid from conf.
 	UUID uuid = UUID.randomUUID();
 
@@ -102,14 +97,6 @@ public class NovaAgent extends SimpleServer {
 				new QueryApplianceStatusHandler());
 		registerHandler(InstallApplianceMessage.class,
 				new InstallApplianceHandler());
-
-		try {
-			conf = Utils.loadConf();
-		} catch (IOException e) {
-			logger.fatal("Error loading config files", e);
-			System.exit(1);
-		}
-
 	}
 
 	@Override
@@ -218,25 +205,6 @@ public class NovaAgent extends SimpleServer {
 		return this.fetcher;
 	}
 
-	/**
-	 * Get config info.
-	 * 
-	 * @return The config info.
-	 */
-	public Conf getConf() {
-		return this.conf;
-	}
-
-	/**
-	 * Set config info.
-	 * 
-	 * @param conf
-	 *            The new config info.
-	 */
-	public void setConf(Conf conf) {
-		this.conf = conf;
-	}
-
 	public UUID getUUID() {
 		return this.uuid;
 	}
@@ -283,10 +251,8 @@ public class NovaAgent extends SimpleServer {
 			}
 		});
 
-		String bindHost = NovaAgent.getInstance().getConf()
-				.getString("agent.bind_host");
-		Integer bindPort = NovaAgent.getInstance().getConf()
-				.getInteger("agent.bind_port");
+		String bindHost = Conf.getString("agent.bind_host");
+		Integer bindPort = Conf.getInteger("agent.bind_port");
 		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
 		NovaAgent.getInstance().bind(bindAddr);
 

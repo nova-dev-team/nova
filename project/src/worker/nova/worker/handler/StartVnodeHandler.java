@@ -53,14 +53,24 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			}
 		} else {
 			// create domain and show some info
-			try {
-				Domain testDomain = conn.domainCreateLinux(
-						Kvm.emitDomain(msg.getHashMap()), 0);
-				System.out.println("Domain:" + testDomain.getName() + " id "
-						+ testDomain.getID() + " running "
-						+ testDomain.getOSType());
-			} catch (LibvirtException ex) {
-				log.error("Create domain failed", ex);
+			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
+				try {
+					Domain testDomain = conn.domainCreateLinux(
+							Kvm.emitDomain(msg.getHashMap()), 0);
+					System.out.println("Domain:" + testDomain.getName()
+							+ " id " + testDomain.getID() + " running "
+							+ testDomain.getOSType());
+					// Domain testDomain = conn.domainLookupByName("test");
+					// System.out.println("xml desc\n" +
+					// testDomain.getXMLDesc(0));
+				} catch (LibvirtException ex) {
+					log.error("Create domain failed", ex);
+				}
+			} else if (msg.getHyperVisor().equalsIgnoreCase("xen")) {
+				// TODO @shayf add xen process
+				log.error("xen not supported yet");
+			} else {
+				log.error("so such type hypervisor " + msg.getHyperVisor());
 			}
 		}
 
