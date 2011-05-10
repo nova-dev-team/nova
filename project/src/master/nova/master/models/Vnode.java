@@ -331,7 +331,9 @@ public class Vnode extends DbObject {
 	}
 
 	public void setUuid(String uuid) {
+		getManager().getIndex("uuid").remove(this.uuid);
 		this.uuid = uuid;
+		getManager().getIndex("uuid").put(this.uuid, this);
 	}
 
 	public void setVclusterId(Integer vclusterId) {
