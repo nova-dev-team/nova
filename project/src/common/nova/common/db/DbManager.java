@@ -45,21 +45,20 @@ public class DbManager {
 		}
 
 		// create index on other columns
-		for (String indexName : spec.getAllIndex()) {
-			Map<Serializable, DbObject> index = new HashMap<Serializable, DbObject>();
-			allIndex.put(indexName, index);
-			if (queryResult.size() == 0) {
-				continue;
-			}
+		if (queryResult.size() > 0) {
+			for (String indexName : spec.getAllIndex()) {
+				Map<Serializable, DbObject> index = allIndex.get(indexName);
 
-			if (indexName.equals(DbSpec.ID_COLUMN_NAME)) {
-				for (DbObject obj : queryResult) {
-					index.put(obj.getId(), obj);
-				}
-			} else {
-				for (DbObject obj : queryResult) {
-					index.put((Serializable) Utils.getField(obj, indexName),
-							obj);
+				if (indexName.equals(DbSpec.ID_COLUMN_NAME)) {
+					for (DbObject obj : queryResult) {
+						index.put(obj.getId(), obj);
+					}
+				} else {
+					for (DbObject obj : queryResult) {
+						index.put(
+								(Serializable) Utils.getField(obj, indexName),
+								obj);
+					}
 				}
 			}
 		}
