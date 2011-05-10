@@ -29,20 +29,27 @@ public class ApplianceInstaller {
 			String path = Utils.pathJoin(Utils.NOVA_HOME, localPath,
 					app.getName());
 			File file = new File(path);
+			boolean hasAutorun = false; // Whether or not this appliance has a
+										// autorun file
 
 			File[] fileList = file.listFiles();
 			for (File f : fileList) {
 				if (f.getName().equals("autorun.sh")) {
 					Runtime.getRuntime().exec(
 							Utils.pathJoin(path, "autorun.sh"));
+					hasAutorun = true;
+					break;
 				} else if (f.getName().equals("autorun.bash")) {
 					Runtime.getRuntime().exec(
 							Utils.pathJoin(path, "autorun.bash"));
-				} else {
-					logger.error("Can't install " + app.getName()
-							+ "! Because there is no autorun file");
-					// TODO by gaotao maybe delete this appliance
+					hasAutorun = true;
+					break;
 				}
+			}
+			if (!hasAutorun) {
+				logger.info("Can't find the autorun file for this appliance: "
+						+ path);
+				// TODO by gaotao discuss with santa what to do here
 			}
 		} else {
 			// TODO discuss with santa what to do here
