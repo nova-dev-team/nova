@@ -225,7 +225,9 @@ public class Pnode {
 	}
 
 	public void setIp(String ip) {
+		getManager().getIndex("ip").remove(this.ip);
 		this.ip = ip;
+		getManager().getIndex("ip").put(this.ip, this);
 	}
 
 	public void setMacAddress(String macAddress) {

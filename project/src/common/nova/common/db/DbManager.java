@@ -83,11 +83,15 @@ public class DbManager {
 		return findBy("id", key);
 	}
 
-	public Object findBy(String colName, Serializable key) {
-		Map<Serializable, Object> index = allIndex.get(colName);
+	public Object findBy(String fieldName, Serializable key) {
+		Map<Serializable, Object> index = allIndex.get(fieldName);
 		if (index == null) {
-			throw new IllegalArgumentException("No DbSpec index on colume: "
-					+ colName);
+			throw new IllegalArgumentException("No DbSpec index on field: "
+					+ fieldName);
+		}
+		System.err.println("get key = " + key + " from field: " + fieldName);
+		for (Serializable k : index.keySet()) {
+			System.err.println("key = " + k + " value: " + index.get(k));
 		}
 		return index.get(key);
 	}
@@ -104,6 +108,28 @@ public class DbManager {
 		Transaction tx = session.beginTransaction();
 		session.save(obj);
 		tx.commit();
+
+		// TODO @santa move id into DbObject
+		try {
+			// update id index
+			Field field = obj.getClass().getDeclaredField("id");
+			field.setAccessible(true);
+			long id = (Long) field.get(obj);
+			getIndex("id").put(id, obj);
+		} catch (SecurityException e) {
+			log.fatal("Error fetching object index", e);
+			System.exit(1);
+		} catch (NoSuchFieldException e) {
+			log.fatal("Error fetching object index", e);
+			System.exit(1);
+		} catch (IllegalArgumentException e) {
+			log.fatal("Error fetching object index", e);
+			System.exit(1);
+		} catch (IllegalAccessException e) {
+			log.fatal("Error fetching object index", e);
+			System.exit(1);
+		}
+
 	}
 
 	public static DbManager forClass(Class klass, DbSpec spec) {
