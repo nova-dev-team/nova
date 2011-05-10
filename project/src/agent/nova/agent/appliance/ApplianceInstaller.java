@@ -1,9 +1,10 @@
 package nova.agent.appliance;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
-import nova.agent.NovaAgent;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 
@@ -21,38 +22,55 @@ public class ApplianceInstaller {
 	 */
 	static Logger logger = Logger.getLogger(ApplianceInstaller.class);
 
-	public static void install(Appliance app) throws IOException {
-		if (NovaAgent.getInstance().getAppliances().get(app.getName())
-				.getStatus().equals(Appliance.Status.INSTALL_PENDING)) {
-			// Wait for install
-			String localPath = Conf.getString("agent.software.save_path");
-			String path = Utils.pathJoin(Utils.NOVA_HOME, localPath,
-					app.getName());
-			File file = new File(path);
-			boolean hasAutorun = false; // Whether or not this appliance has a
-										// autorun file
+	private static boolean isWindows() {
+		String os = System.getProperty("os.name").toLowerCase();
+		return os.indexOf("win") >= 0;
+	}
 
-			File[] fileList = file.listFiles();
-			for (File f : fileList) {
-				if (f.getName().equals("autorun.sh")) {
-					Runtime.getRuntime().exec(
-							Utils.pathJoin(path, "autorun.sh"));
-					hasAutorun = true;
-					break;
-				} else if (f.getName().equals("autorun.bash")) {
-					Runtime.getRuntime().exec(
-							Utils.pathJoin(path, "autorun.bash"));
-					hasAutorun = true;
-					break;
-				}
-			}
-			if (!hasAutorun) {
-				logger.info("Can't find the autorun file for this appliance: "
-						+ path);
-				// TODO by gaotao discuss with santa what to do here
-			}
+	private static boolean isUnix() {
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.indexOf("mac") >= 0 || os.indexOf("nix") >= 0
+				|| os.indexOf("nux") >= 0) {
+			return true;
 		} else {
-			// TODO discuss with santa what to do here
+			return false;
 		}
+	}
+
+	/**
+	 * Install one appliance
+	 * 
+	 * @param app
+	 *            {@link Appliance}
+	 * @throws IOException
+	 *             IOException of Runtime.getRuntime().exec()
+	 */
+	public static void install(Appliance app) throws IOException {
+		String relativePath = Conf.getString("agent.software.save_path");
+		String folderPath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
+				app.getName());
+		// Install statement used in windows
+		if (isWindows()) {
+			Process p = Runtime.getRuntime().exec("cmd /c autorun.bat",
+					new String[0], new File(folderPath));
+
+			try {
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+						p.getInputStream()));
+				while ((br.readLine()) != null) {
+				}
+				br.close();
+				p.waitFor();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			// Install statement used in linux
+		} else if (isUnix()) {
+			Runtime.getRuntime().exec(Utils.pathJoin(folderPath, "autorun.sh"));
+		} else {
+			logger.error("Can't find the autorun file for this appliance: "
+					+ folderPath);
+		}
+
 	}
 }

@@ -25,26 +25,40 @@ public class ApplianceInstallDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
+
 		for (Appliance app : NovaAgent.getInstance().getAppliances().values()) {
 			if (app.getStatus().equals(Appliance.Status.INSTALL_PENDING)) {
 				log.info("Found INSTALL_PENDING appliance: " + app.getName());
-				try {
-					app.setStatus(Appliance.Status.INSTALLING);
+				// Create a new thread to avoid block when Spawn
+				new Thread(new InstallThread(app)).start();
 
-					log.info("Installing appliance: " + app.getName());
-					ApplianceInstaller.install(app);
-
-					log.info("Appliance installed, mark INSTALLED: "
-							+ app.getName());
-					app.setStatus(Appliance.Status.INSTALLED);
-				} catch (IOException e) {
-					log.error(
-							"Error installing appliance, set to INSTALL_FAILURE "
-									+ app.getName(), e);
-					app.setStatus(Appliance.Status.INSTALL_FAILURE);
-				}
 			}
 		}
+
 	}
 
+}
+
+class InstallThread implements Runnable {
+	Logger log = Logger.getLogger(InstallThread.class);
+
+	private Appliance app = null;
+
+	public InstallThread(Appliance app) {
+		this.app = app;
+	}
+
+	@Override
+	public void run() {
+		try {
+			this.app.setStatus(Appliance.Status.INSTALLING);
+
+			ApplianceInstaller.install(this.app);
+
+			this.app.setStatus(Appliance.Status.INSTALLED);
+		} catch (IOException e) {
+			log.error("Install failure!", e);
+			this.app.setStatus(Appliance.Status.INSTALL_FAILURE);
+		}
+	}
 }
