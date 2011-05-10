@@ -51,9 +51,13 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 		setApplianceName(app); // save the name of appliance being downloading
 		FtpClient fc = connect();
 		downloadDir(fc, "", app.getName());
-		if ((downloadDir(fc, "", app.getName())) == false)
-			// deleteDir("", app.getName());
-			close(fc);
+		if (statusCancelled()) {
+			NovaAgent.getInstance().getAppliances().get(app.getName())
+					.setStatus(Appliance.Status.NOT_INSTALLED);
+			deleteDir("", app.getName());
+		}
+
+		close(fc);
 
 	}
 
@@ -99,27 +103,31 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 		String absolutePath = Utils.pathJoin(Utils.NOVA_HOME, this.myPath,
 				rootPath, dirName);
 		File file = new File(absolutePath);
-		File[] fileList = file.listFiles();
-		String entry = null;
-		for (File f : fileList) {
-			entry = f.getName();
-			if (f.isDirectory()) {
-				deleteDir(Utils.pathJoin(rootPath, dirName), entry);
-			} else {
-				f.delete();
+		if (file.exists()) {
+			File[] fileList = file.listFiles();
+			String entry = null;
+			for (File f : fileList) {
+				entry = f.getName();
+				if (f.isDirectory()) {
+					deleteDir(Utils.pathJoin(rootPath, dirName), entry);
+				} else {
+					f.delete();
+				}
 			}
+			file.delete();
+		} else {
+			logger.error("No such file: " + absolutePath);
 		}
-		file.delete();
 	}
 
 	/**
-	 * judge if the downloading appliance is cancelled
+	 * Judge if the downloading appliance is cancelled
 	 * 
 	 * @return
 	 */
 	private boolean statusCancelled() {
 		return NovaAgent.getInstance().getAppliances().get(this.applianceName)
-				.getStatus() == Appliance.Status.CANCELLED;
+				.getStatus().equals(Appliance.Status.CANCELLED);
 	}
 
 	/**
@@ -173,33 +181,39 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 */
 	private boolean downloadDir(FtpClient fc, String rootPath, String dirName) {
 
-		try {
-			fc.cd(dirName);
-			Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, this.myPath, rootPath,
-					dirName));
-			DataInputStream dis = new DataInputStream(fc.list());
-			BufferedReader br = new BufferedReader(new InputStreamReader(dis));
+		if (!statusCancelled()) {
+			try {
+				fc.cd(dirName);
+				Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, this.myPath,
+						rootPath, dirName));
+				DataInputStream dis = new DataInputStream(fc.list());
+				BufferedReader br = new BufferedReader(new InputStreamReader(
+						dis));
 
-			String ftpEntry = null;
-			// TODO by gaotao optimize there when cancelled!
-			while ((ftpEntry = br.readLine()) != null && !statusCancelled()) {
-				int fnameStart = nthFieldStart(ftpEntry, 8);
-				String entry = ftpEntry.substring(fnameStart);
-				if ((nthField(ftpEntry, 0)).startsWith("d")) {
-					// d is directory
-					downloadDir(fc, Utils.pathJoin(rootPath, dirName), entry);
-				} else {
-					downloadFile(fc, Utils.pathJoin(rootPath, dirName), entry);
+				String ftpEntry = null;
+				// TODO by gaotao optimize there when cancelled!
+				while ((ftpEntry = br.readLine()) != null && !statusCancelled()) {
+					int fnameStart = nthFieldStart(ftpEntry, 8);
+					String entry = ftpEntry.substring(fnameStart);
+					if ((nthField(ftpEntry, 0)).startsWith("d")) {
+						// d is directory
+						downloadDir(fc, Utils.pathJoin(rootPath, dirName),
+								entry);
+					} else {
+						downloadFile(fc, Utils.pathJoin(rootPath, dirName),
+								entry);
 
+					}
 				}
+				dis.close();
+				fc.cdUp();
+			} catch (IOException e) {
+				logger.error("Download error: ", e);
+				return false;
 			}
-			dis.close();
-			fc.cdUp();
-		} catch (IOException e) {
-			logger.error("Download error: ", e);
+			return true;
+		} else
 			return false;
-		}
-		return true;
 	}
 
 	/**

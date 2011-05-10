@@ -14,7 +14,7 @@ public class AgentHeartbeatDaemon extends SimpleDaemon {
 	/**
 	 * Heartbeat time interval
 	 */
-	public static final long HEARTBEAT_INTERVAL = 2000;
+	public static final long HEARTBEAT_INTERVAL = 1000;
 
 	public AgentHeartbeatDaemon() {
 		super(HEARTBEAT_INTERVAL);

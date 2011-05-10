@@ -26,12 +26,14 @@ public class ApplianceInstallDaemon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		for (Appliance app : NovaAgent.getInstance().getAppliances().values()) {
-			if (app.getStatus() == Appliance.Status.INSTALL_PENDING) {
+			if (app.getStatus().equals(Appliance.Status.INSTALL_PENDING)) {
 				log.info("Found INSTALL_PENDING appliance: " + app.getName());
 				try {
 					app.setStatus(Appliance.Status.INSTALLING);
+
 					log.info("Installing appliance: " + app.getName());
 					ApplianceInstaller.install(app);
+
 					log.info("Appliance installed, mark INSTALLED: "
 							+ app.getName());
 					app.setStatus(Appliance.Status.INSTALLED);
