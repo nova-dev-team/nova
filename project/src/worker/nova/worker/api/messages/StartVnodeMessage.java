@@ -37,6 +37,7 @@ public class StartVnodeMessage {
 	String determinCdrom;
 	String determinNetwork;
 	String determinVnc;
+	String bus;
 
 	public boolean isWakeupOnly() {
 		return wakeupOnly;
@@ -101,8 +102,6 @@ public class StartVnodeMessage {
 	public void setBus(String bus) {
 		this.bus = bus;
 	}
-
-	String bus;
 
 	public String getInterfaceType() {
 		return interfaceType;
