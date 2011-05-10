@@ -1,5 +1,8 @@
 package nova.master.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
@@ -11,6 +14,14 @@ import nova.common.db.DbSpec;
 public class Vdisk extends DbObject {
 
 	private static DbManager manager = null;
+
+	public static List<Vdisk> all() {
+		List<Vdisk> all = new ArrayList<Vdisk>();
+		for (DbObject obj : getManager().all()) {
+			all.add((Vdisk) obj);
+		}
+		return all;
+	}
 
 	public static Vdisk findById(long id) {
 		return (Vdisk) getManager().findById(id);
