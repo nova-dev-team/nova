@@ -44,7 +44,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 		String fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
 				"index.html");
 		HashMap<String, Object> values = new HashMap<String, Object>();
-		values.put("content", "hello, this is nova master!");
+
+		values.put("content", "NOVA MASTER");
 		return Utils.expandTemplateFile(fpath, values);
 	}
 }
