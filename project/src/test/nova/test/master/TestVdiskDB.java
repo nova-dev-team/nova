@@ -29,6 +29,8 @@ public class TestVdiskDB extends TestCase {
 				+ vdiskRead.getOsName() + "\nSoftList: "
 				+ vdiskRead.getSoftList() + "\n\n");
 
+		Vdisk.delete(vdiskRead);
+
 	}
 
 }

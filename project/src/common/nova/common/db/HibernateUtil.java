@@ -12,8 +12,10 @@ public class HibernateUtil {
 
 	static {
 		try {
+			log.info("Starting Hibernate session");
 			sessionFactory = new Configuration().configure()
 					.buildSessionFactory();
+			log.info("Hibernate session started");
 		} catch (Exception e) {
 			log.error("Exception in creating hibernate session Factory", e);
 		}

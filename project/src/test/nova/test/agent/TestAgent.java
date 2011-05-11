@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 import nova.agent.NovaAgent;
@@ -22,31 +21,17 @@ public class TestAgent {
 
 	@Test
 	public void testStartupAgent() {
-		InetSocketAddress bindAddr = new InetSocketAddress("127.0.0.1", 7783);
-
-		NovaAgent.getInstance().bind(bindAddr);
+		NovaAgent.getInstance().start();
 		NovaAgent.getInstance().shutdown();
 	}
 
 	@Test
 	public void testInstallAgent() {
-		String agentHost = "127.0.0.1";
-		int agentPort = 8173;
+		NovaAgent.getInstance().start();
+		NovaMaster.getInstance().start();
 
-		String masterHost = "127.0.0.1";
-		int masterPort = 9912;
-
-		InetSocketAddress agentAddr = new InetSocketAddress(agentHost,
-				agentPort);
-
-		InetSocketAddress masterAddr = new InetSocketAddress(masterHost,
-				masterPort);
-
-		NovaAgent.getInstance().bind(agentAddr);
-		NovaMaster.getInstance().bind(masterAddr);
-
-		AgentProxy proxy = new AgentProxy(masterAddr);
-		proxy.connect(agentAddr);
+		AgentProxy proxy = new AgentProxy(NovaAgent.getInstance().getAddr());
+		proxy.connect(NovaMaster.getInstance().getAddr().getInetSocketAddress());
 
 		proxy.sendInstallAppliance("demo1", "demo3");
 

@@ -65,8 +65,9 @@ public class Utils {
 
 		NOVA_HOME = folderPath;
 		if (NOVA_HOME == null) {
+			System.err.println("Failed to locate conf/nova.properties!");
 			System.err
-					.println("Fatal error: failed to locate conf/nova.properties!");
+					.println("Create the config files according to examples!");
 			System.exit(1);
 		}
 	}

@@ -9,11 +9,10 @@
 #########################
 
 # where should the master bind to
-master.bind_host=0.0.0.0
+master.bind_host=10.0.1.193
 
 # listen port for master
 master.bind_port=3000
-storage.ftp.bind_port=8021
 
 
 #########################
@@ -21,7 +20,7 @@ storage.ftp.bind_port=8021
 #########################
 
 # where should the worker bind to
-worker.bind_host=0.0.0.0
+worker.bind_host=10.0.1.193
 
 # listen port for worker
 worker.bind_port=4000
@@ -46,7 +45,8 @@ fix_vnc_mouse_pointer=true
 storage.engine=ftp
 
 # ftp bind host
-storage.ftp.bind_host=0.0.0.0
+storage.ftp.bind_host=10.0.1.193
+
 
 # ftp listen port
 storage.ftp.bind_port=8021

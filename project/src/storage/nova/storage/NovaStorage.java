@@ -91,10 +91,12 @@ public class NovaStorage extends SimpleServer {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				// do cleanup work
-				this.setName("cleanup");
-				NovaStorage.getInstance().shutdown();
-				logger.info("Cleanup work done");
+				if (NovaStorage.instance != null) {
+					// do cleanup work
+					this.setName("cleanup");
+					NovaStorage.getInstance().shutdown();
+					logger.info("Cleanup work done");
+				}
 			}
 		});
 

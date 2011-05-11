@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,7 +59,8 @@ public class NovaAgent extends SimpleServer {
 	 */
 	private static NovaAgent instance = null;
 
-	InetSocketAddress bindAddr = null;
+	SimpleAddress addr = new SimpleAddress(Conf.getString("agent.bind_host"),
+			Conf.getInteger("agent.bind_port"));;
 
 	/**
 	 * All background working daemons for agent node.
@@ -99,11 +99,13 @@ public class NovaAgent extends SimpleServer {
 				new InstallApplianceHandler());
 	}
 
-	@Override
-	public Channel bind(InetSocketAddress bindAddr) {
-		this.bindAddr = bindAddr;
-		logger.info("Nova agent running @ " + this.bindAddr);
-		Channel chnl = super.bind(this.bindAddr);
+	public SimpleAddress getAddr() {
+		return this.addr;
+	}
+
+	public Channel start() {
+		logger.info("Nova agent running @ " + this.addr);
+		Channel chnl = super.bind(this.addr.getInetSocketAddress());
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
 		}
@@ -129,7 +131,7 @@ public class NovaAgent extends SimpleServer {
 		}
 		logger.info("All deamons stopped");
 		super.shutdown();
-		this.bindAddr = null;
+		this.addr = null;
 		NovaAgent.instance = null;
 	}
 
@@ -211,7 +213,7 @@ public class NovaAgent extends SimpleServer {
 
 	public void registerMaster(SimpleAddress xreply) {
 		// FIXME @santa: bindAddr should not be 0.0.0.0!
-		this.master = new MasterProxy(this.bindAddr);
+		this.master = new MasterProxy(this.addr);
 		master.connect(xreply.getInetSocketAddress());
 	}
 
@@ -244,17 +246,15 @@ public class NovaAgent extends SimpleServer {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				// do cleanup work
-				this.setName("cleanup");
-				NovaAgent.getInstance().shutdown();
-				logger.info("Cleanup work done");
+				if (NovaAgent.instance != null) {
+					// do cleanup work
+					this.setName("cleanup");
+					NovaAgent.getInstance().shutdown();
+					logger.info("Cleanup work done");
+				}
 			}
 		});
 
-		String bindHost = Conf.getString("agent.bind_host");
-		Integer bindPort = Conf.getInteger("agent.bind_port");
-		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
-		NovaAgent.getInstance().bind(bindAddr);
-
+		NovaAgent.getInstance().start();
 	}
 }

@@ -21,6 +21,8 @@ public class TestPnodeDB {
 		Pnode pnodeLoad = Pnode.findById(pnode.getId());
 		System.out.println(pnodeLoad);
 		Assert.assertEquals(pnode, pnodeLoad);
+
+		Pnode.delete(pnodeLoad);
 	}
 
 	@Test

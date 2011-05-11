@@ -34,7 +34,8 @@ import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
  */
 public class NovaMaster extends SimpleServer {
 
-	InetSocketAddress bindAddr = null;
+	SimpleAddress addr = new SimpleAddress(Conf.getString("master.bind_host"),
+			Conf.getInteger("master.bind_port"));
 
 	/**
 	 * All background working daemons for master node.
@@ -47,6 +48,7 @@ public class NovaMaster extends SimpleServer {
 	 * Constructor made private for singleton pattern.
 	 */
 	private NovaMaster() {
+
 		// register handlers
 
 		// handle http requests
@@ -65,14 +67,18 @@ public class NovaMaster extends SimpleServer {
 		Conf.setDefaultValue("master.bind_port", 3000);
 	}
 
+	public SimpleAddress getAddr() {
+		return this.addr;
+	}
+
 	/**
-	 * Override the bind() function, do a few housekeeping work.
+	 * Start server.
+	 * 
+	 * @return
 	 */
-	@Override
-	public Channel bind(InetSocketAddress bindAddr) {
-		this.bindAddr = bindAddr;
-		logger.info("Nova master running @ " + this.bindAddr);
-		Channel chnl = super.bind(this.bindAddr);
+	public Channel start() {
+		logger.info("Nova master running @ " + this.addr);
+		Channel chnl = super.bind(this.addr.getInetSocketAddress());
 		// start all daemons
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
@@ -100,7 +106,7 @@ public class NovaMaster extends SimpleServer {
 		}
 		logger.info("All deamons stopped");
 		super.shutdown();
-		this.bindAddr = null;
+		this.addr = null;
 		// TODO @zhaoxun more cleanup work
 		// HibernateUtil.shutdown();
 
@@ -109,7 +115,7 @@ public class NovaMaster extends SimpleServer {
 
 	public WorkerProxy getWorkerProxy(final SimpleAddress pAddr) {
 		if (workerProxyPool.get(pAddr) == null) {
-			WorkerProxy wp = new WorkerProxy(this.bindAddr) {
+			WorkerProxy wp = new WorkerProxy(this.addr) {
 
 				@Override
 				public void exceptionCaught(ChannelHandlerContext ctx,
@@ -170,18 +176,17 @@ public class NovaMaster extends SimpleServer {
 
 			@Override
 			public void run() {
-				// do cleanup work
-				this.setName("cleanup");
-				NovaMaster.getInstance().shutdown();
-				logger.info("Cleanup work done");
+				if (NovaMaster.instance != null) {
+					// do cleanup work
+					this.setName("cleanup");
+					NovaMaster.getInstance().shutdown();
+					logger.info("Cleanup work done");
+				}
 			}
 
 		});
 
-		String bindHost = Conf.getString("master.bind_host");
-		Integer bindPort = Conf.getInteger("master.bind_port");
-		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
-		NovaMaster.getInstance().bind(bindAddr);
+		NovaMaster.getInstance().start();
 
 	}
 }

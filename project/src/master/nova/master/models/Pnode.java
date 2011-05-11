@@ -72,6 +72,10 @@ public class Pnode extends DbObject {
 		return all;
 	}
 
+	public static void delete(Pnode pnode) {
+		getManager().delete(pnode);
+	}
+
 	public static Pnode findById(long id) {
 		return (Pnode) getManager().findById(id);
 	}

@@ -1,10 +1,6 @@
 package nova.test.worker;
 
-import java.net.InetSocketAddress;
-
 import nova.worker.NovaWorker;
-
-import org.junit.Test;
 
 /**
  * test vdisk pool functions
@@ -13,13 +9,9 @@ import org.junit.Test;
  * 
  */
 public class TestVdiskPool {
-	@Test
-	public void test() {
-		String workerHost = "127.0.0.1";
-		int workerPort = 9283;
-		InetSocketAddress workerAddr = new InetSocketAddress(workerHost,
-				workerPort);
-		NovaWorker.getInstance().bind(workerAddr);
+
+	public static void main(String[] args) {
+		NovaWorker.getInstance().start();
 
 		// StartVnodeHandler svh = new StartVnodeHandler();
 		// StartVnodeMessage msg = new StartVnodeMessage(null);

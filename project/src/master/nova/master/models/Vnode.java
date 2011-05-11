@@ -75,6 +75,10 @@ public class Vnode extends DbObject {
 		return all;
 	}
 
+	public static void delete(Vnode vnode) {
+		getManager().delete(vnode);
+	}
+
 	public static Vnode findById(long id) {
 		return (Vnode) getManager().findById(id);
 	}
