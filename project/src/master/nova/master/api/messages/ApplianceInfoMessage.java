@@ -2,11 +2,11 @@ package nova.master.api.messages;
 
 import nova.agent.appliance.Appliance;
 
-public class ApplianceStatusMessage {
+public class ApplianceInfoMessage {
 
 	Appliance[] appList;
 
-	public ApplianceStatusMessage(Appliance[] appList) {
+	public ApplianceInfoMessage(Appliance[] appList) {
 		this.appList = appList;
 	}
 

@@ -38,10 +38,20 @@ import nova.agent.appliance.FtpApplianceFetcher;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 
+import org.apache.log4j.Logger;
+
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
+/**
+ * Simple on demand software install user interface
+ * 
+ * @author gaotao1987@gmail.com
+ * 
+ */
 public class AgentFrame extends JFrame {
+
+	Logger logger = Logger.getLogger(AgentFrame.class);
 
 	private static final long serialVersionUID = 1L;
 	private DefaultListModel listModel = new DefaultListModel();
@@ -51,18 +61,36 @@ public class AgentFrame extends JFrame {
 	private JButton install = new JButton("install"); // 安装按钮
 	private ConcurrentHashMap<String, Appliance> apps = NovaAgent.getInstance()
 			.getAppliances();
-	private JLabel statusInfo = new JLabel("Download process");
+	private JLabel statusInfo = new JLabel("Download process"); // 安装状态条
 	private JProgressBar downProcess = new JProgressBar(); // 安装进度条
 
+	/**
+	 * Display one info
+	 * 
+	 * @param info
+	 *            The info you want to display
+	 */
 	private void setStatusInfo(String info) {
 		this.statusInfo.setText(info);
 		this.statusInfo.setBackground(Color.BLACK);
 	}
 
+	/**
+	 * Change the percent of down
+	 * 
+	 * @param currentValue
+	 * @param totalValue
+	 */
 	public void setDownProcessValue(double currentValue, double totalValue) {
 		this.downProcess.setValue((int) ((currentValue / totalValue) * 100));
 	}
 
+	/**
+	 * Display something when download start
+	 * 
+	 * @param info
+	 *            The info you want to display
+	 */
 	public void setInfoDisplayWhenDown(String info) {
 		this.downProcess.setBorderPainted(true);
 		this.downProcess.setBackground(Color.pink);
@@ -73,10 +101,20 @@ public class AgentFrame extends JFrame {
 		setStatusInfo(info);
 	}
 
+	/**
+	 * Display info when install
+	 * 
+	 * @param info
+	 */
 	public void setInfoDisplayWhenInstall(String info) {
 		setStatusInfo(info);
 	}
 
+	/**
+	 * Get rid of something after install
+	 * 
+	 * @param info
+	 */
 	public void setInfoDisplayAfterInstall(String info) {
 		this.statusInfo.setText(info);
 		this.downProcess.setVisible(false);
@@ -166,7 +204,8 @@ public class AgentFrame extends JFrame {
 							faf.fetch(app);
 							ApplianceInstaller.install(app);
 						} catch (IOException e1) {
-							e1.printStackTrace();
+							logger.error(
+									"Install " + app.getName() + " failed", e1);
 						}
 					}
 				}
@@ -185,17 +224,12 @@ public class AgentFrame extends JFrame {
 					String relativeLocalPath = Conf
 							.getString("agent.software.image_path");
 
-					try {
-
-						changeSize(Utils.pathJoin(Utils.NOVA_HOME,
-								relativeOriginPath, softName, ".jpg"), Utils
-								.pathJoin(Utils.NOVA_HOME, relativeLocalPath,
-										softName, ".jpg"),
-								picture.getBounds().width,
-								picture.getBounds().height);
-					} catch (Exception ex) {
-						System.out.println("can't change it!");
-					}
+					changeSize(Utils.pathJoin(Utils.NOVA_HOME,
+							relativeOriginPath, softName, ".jpg"), Utils
+							.pathJoin(Utils.NOVA_HOME, relativeLocalPath,
+									softName, ".jpg"),
+							picture.getBounds().width,
+							picture.getBounds().height);
 
 					ImageIcon pic = new ImageIcon(Utils.pathJoin(
 							Utils.NOVA_HOME, relativeLocalPath, softName,
@@ -220,26 +254,40 @@ public class AgentFrame extends JFrame {
 		con.add(com, gbConstraints);
 	}
 
+	/**
+	 * 
+	 * @param absolutePath
+	 *            Origin image path
+	 * @param localSavePath
+	 *            New image path
+	 * @param wid
+	 * @param hei
+	 */
 	public void changeSize(String absolutePath, String localSavePath, int wid,
-			int hei) throws Exception {// 控制图片大小
+			int hei) {// 控制图片大小
 		File _file = new File(absolutePath); // 读入文件
+		try {
+			Image src = ImageIO.read(_file); // 构造对象
 
-		Image src = ImageIO.read(_file); // 构造对象
+			BufferedImage tag = new BufferedImage(wid, hei,
+					BufferedImage.TYPE_INT_RGB);
 
-		BufferedImage tag = new BufferedImage(wid, hei,
-				BufferedImage.TYPE_INT_RGB);
+			tag.getGraphics().drawImage(src, 0, 0, wid, hei, null);
+			FileOutputStream out = new FileOutputStream(localSavePath);// 输出到文件流
 
-		tag.getGraphics().drawImage(src, 0, 0, wid, hei, null);
-		FileOutputStream out = new FileOutputStream(localSavePath);// 输出到文件流
+			JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
 
-		JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-
-		encoder.encode(tag);
-		// System.out.println(wid+"*"+hei);
-		out.close();
+			encoder.encode(tag);
+			out.close();
+		} catch (IOException e) {
+			logger.error("Change image size failed!", e);
+		}
 	}
 
-	public static void displayAgentFrame() {
+	/**
+	 * Display this frame
+	 */
+	public void displayAgentFrame() {
 		AgentFrame window = new AgentFrame();
 		window.setTitle("EasyAppliance");
 	}
