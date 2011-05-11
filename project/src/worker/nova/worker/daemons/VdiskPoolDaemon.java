@@ -121,6 +121,9 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
+		if (this.isStopping() == true) {
+			return;
+		}
 		final String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "vdiskpool");
 		for (int i = POOL_SIZE; i > 0; i--) {
 			if (VdiskFiles[i - 1].getStat().equals(VdiskFile.Status.NOT_EXIST)) {

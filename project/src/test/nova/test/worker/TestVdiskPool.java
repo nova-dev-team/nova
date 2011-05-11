@@ -16,7 +16,7 @@ public class TestVdiskPool {
 	@Test
 	public void test() {
 		String workerHost = "127.0.0.1";
-		int workerPort = 9283;
+		int workerPort = 9285;
 		InetSocketAddress workerAddr = new InetSocketAddress(workerHost,
 				workerPort);
 		NovaWorker.getInstance().bind(workerAddr);
@@ -55,7 +55,7 @@ public class TestVdiskPool {
 
 		try {
 			while (true) {
-				Thread.sleep(1000);
+				Thread.sleep(10000);
 			}
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
