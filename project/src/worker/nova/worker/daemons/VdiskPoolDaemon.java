@@ -19,20 +19,10 @@ import org.apache.log4j.Logger;
 public class VdiskPoolDaemon extends SimpleDaemon {
 
 	public VdiskPoolDaemon() {
-		super();
+		super(5 * 1000);
 		VdiskFiles = new VdiskFile[POOL_SIZE];
 		for (int i = 0; i < POOL_SIZE; i++) {
 			VdiskFiles[i] = new VdiskFile();
-			// System.out.println(VdiskFiles[i].getStat().toString());
-			VdiskFiles[i].setStatValue(i + 1);
-			System.out.println(VdiskFiles[i].getStat().toString());
-		}
-	}
-
-	public VdiskPoolDaemon(long sleepMilli) {
-		super(sleepMilli);
-		VdiskFiles = new VdiskFile[POOL_SIZE];
-		for (int i = 0; i < POOL_SIZE; i++) {
 			VdiskFiles[i].setStatValue(i + 1);
 		}
 	}
