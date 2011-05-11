@@ -12,10 +12,24 @@ import nova.common.service.SimpleAddress;
  */
 public class StartVnodeMessage {
 
+	public StartVnodeMessage(SimpleAddress vAddr) {
+		this.vAddr = vAddr;
+	}
+
+	public StartVnodeMessage(SimpleAddress vAddr, String wakeupOnly,
+			String memSize, String cpuCount, String runAgent) {
+		super();
+		this.vAddr = vAddr;
+		this.wakeupOnly = wakeupOnly;
+		this.memSize = memSize;
+		this.cpuCount = cpuCount;
+		this.runAgent = runAgent;
+	}
+
 	/**
 	 * params for config
 	 */
-	boolean wakeupOnly;
+	String wakeupOnly;
 	String hyperVisor;
 	String name;
 	String uuid;
@@ -39,11 +53,11 @@ public class StartVnodeMessage {
 	String determinVnc;
 	String bus;
 
-	public boolean isWakeupOnly() {
+	public String getWakeupOnly() {
 		return wakeupOnly;
 	}
 
-	public void setWakeupOnly(boolean wakeupOnly) {
+	public void setWakeupOnly(String wakeupOnly) {
 		this.wakeupOnly = wakeupOnly;
 	}
 
@@ -221,10 +235,6 @@ public class StartVnodeMessage {
 
 	public void setRunAgent(String runAgent) {
 		this.runAgent = runAgent;
-	}
-
-	public StartVnodeMessage(SimpleAddress vAddr) {
-		this.vAddr = vAddr;
 	}
 
 	public HashMap<String, Object> getHashMap() {
