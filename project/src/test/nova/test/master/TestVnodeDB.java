@@ -20,6 +20,8 @@ public class TestVnodeDB extends TestCase {
 
 		Vnode vnodeRead = Vnode.findById(vnode.getId());
 		System.out.println(vnodeRead);
+
+		Vnode.delete(vnodeRead);
 	}
 
 }

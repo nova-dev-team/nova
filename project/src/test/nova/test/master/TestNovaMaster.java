@@ -1,9 +1,6 @@
 package nova.test.master;
 
-import java.net.InetSocketAddress;
-
 import junit.framework.Assert;
-import nova.common.service.SimpleAddress;
 import nova.master.NovaMaster;
 import nova.master.api.MasterProxy;
 import nova.master.models.Pnode;
@@ -16,27 +13,20 @@ public class TestNovaMaster {
 	@Test
 	public void testStartAndShutdown() {
 		// test simple start/shutdown
-		InetSocketAddress bindAddr = new InetSocketAddress("127.0.0.1", 9983);
-
-		NovaMaster.getInstance().bind(bindAddr);
+		NovaMaster.getInstance().start();
 		NovaMaster.getInstance().shutdown();
 	}
 
 	@Test
 	public void testAddWorker() {
 		// test simple start/shutdown with connections
-		InetSocketAddress masterAddr = new InetSocketAddress("127.0.0.1", 9281);
-		String workerHost = "127.0.0.1";
-		int workerPort = 9283;
-		InetSocketAddress workerAddr = new InetSocketAddress(workerHost,
-				workerPort);
 
-		NovaMaster.getInstance().bind(masterAddr);
-		NovaWorker.getInstance().bind(workerAddr);
+		NovaMaster.getInstance().start();
+		NovaWorker.getInstance().start();
 
-		MasterProxy mp = new MasterProxy(workerAddr);
-		mp.connect(masterAddr);
-		mp.sendPnodeStatus(new SimpleAddress(workerHost, workerPort),
+		MasterProxy mp = new MasterProxy(NovaWorker.getInstance().getAddr());
+		mp.connect(NovaMaster.getInstance().getAddr().getInetSocketAddress());
+		mp.sendPnodeStatus(NovaWorker.getInstance().getAddr(),
 				Pnode.Status.ADD_PENDING);
 
 		try {
@@ -44,6 +34,13 @@ public class TestNovaMaster {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		Pnode pnode = Pnode
+				.findByIp(NovaWorker.getInstance().getAddr().getIp());
+		Assert.assertNotNull(pnode);
+		if (!pnode.getStatus().equals(Pnode.Status.RUNNING)) {
+			throw new RuntimeException("pnode status is " + pnode.getStatus());
+		}
+
 		NovaWorker.getInstance().shutdown();
 
 		try {
@@ -53,7 +50,7 @@ public class TestNovaMaster {
 		}
 
 		// master should detect worker stopped (heartbeat timeout)
-		Pnode pnode = Pnode.findByIp(workerHost);
+		pnode = Pnode.findByIp(NovaWorker.getInstance().getAddr().getIp());
 		Assert.assertNotNull(pnode);
 		if (!pnode.getStatus().equals(Pnode.Status.CONNECT_FAILURE)) {
 			throw new RuntimeException("pnode status is " + pnode.getStatus());

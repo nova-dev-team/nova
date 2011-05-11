@@ -17,6 +17,8 @@ public class TestApplianceDB extends TestCase {
 
 		soft.save();
 
+		Appliance.delete(soft);
+
 	}
 
 }

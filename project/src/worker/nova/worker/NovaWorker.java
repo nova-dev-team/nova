@@ -29,7 +29,8 @@ import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
  */
 public class NovaWorker extends SimpleServer {
 
-	InetSocketAddress bindAddr = null;
+	SimpleAddress addr = new SimpleAddress(Conf.getString("worker.bind_host"),
+			Conf.getInteger("worker.bind_port"));
 
 	/**
 	 * All background working daemons for worker node.
@@ -62,14 +63,13 @@ public class NovaWorker extends SimpleServer {
 
 	}
 
-	/**
-	 * Override the bind() function, do a few housekeeping work.
-	 */
-	@Override
-	public Channel bind(InetSocketAddress bindAddr) {
-		this.bindAddr = bindAddr;
-		logger.info("Nova worker running @ " + this.bindAddr);
-		Channel chnl = super.bind(this.bindAddr);
+	public SimpleAddress getAddr() {
+		return this.addr;
+	}
+
+	public Channel start() {
+		logger.info("Nova worker running @ " + this.addr);
+		Channel chnl = super.bind(this.addr.getInetSocketAddress());
 		// start all daemons
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
@@ -97,7 +97,6 @@ public class NovaWorker extends SimpleServer {
 		}
 		logger.info("All deamons stopped");
 		super.shutdown();
-		this.bindAddr = null;
 		// TODO @shayf more cleanup work
 
 		NovaWorker.instance = null;
@@ -114,8 +113,6 @@ public class NovaWorker extends SimpleServer {
 	}
 
 	public void registerMaster(SimpleAddress xreply) {
-		// FIXME @santa: bindAddr should not be 0.0.0.0!
-		this.master = new MasterProxy(this.bindAddr);
 		master.connect(xreply.getInetSocketAddress());
 	}
 
@@ -153,10 +150,12 @@ public class NovaWorker extends SimpleServer {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				// do cleanup work
-				this.setName("cleanup");
-				NovaWorker.getInstance().shutdown();
-				logger.info("Cleanup work done");
+				if (NovaWorker.instance != null) {
+					// do cleanup work
+					this.setName("cleanup");
+					NovaWorker.getInstance().shutdown();
+					logger.info("Cleanup work done");
+				}
 			}
 		});
 

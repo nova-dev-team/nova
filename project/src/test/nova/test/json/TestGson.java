@@ -26,8 +26,8 @@ public class TestGson {
 
 		HashMap<String, Integer> m = new HashMap<String, Integer>();
 
-		m.put("wtf", 1);
-		m.put("wtf2", 4);
+		m.put("test", 1);
+		m.put("test2", 4);
 
 		System.out.println(gson.toJson(m));
 

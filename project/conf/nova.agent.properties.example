@@ -7,14 +7,16 @@
 # agent conifg section #
 ########################
 
+# TODO extract these info from nova.properties
+
 # where should the agent bind to
-agent.bind_host=0.0.0.0
+agent.bind_host=10.0.1.193
 
 # listen port for master
 agent.bind_port=4100
 
 # ftp server host
-agent.ftp.host=127.0.0.1
+agent.ftp.host=10.0.1.193
 
 # ftp server port
 agent.ftp.port=8021
@@ -23,7 +25,7 @@ agent.ftp.port=8021
 agent.ftp.user_name=anonymous
 
 #ftp password
-agent.ftp.password=1478963
+agent.ftp.password=nova-develop@googlegroups.com
 
 # note: agent uses anonymous login
 
@@ -33,3 +35,4 @@ agent.software.image_path=data/agent/images
 
 # where to save downloaded softwares
 agent.software.save_path=data/agent/appliances
+

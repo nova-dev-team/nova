@@ -23,6 +23,10 @@ public class Vcluster extends DbObject {
 		return all;
 	}
 
+	public static void delete(Vcluster vcluster) {
+		getManager().delete(vcluster);
+	}
+
 	public static Vcluster findById(long id) {
 		return (Vcluster) getManager().findById(id);
 	}

@@ -23,6 +23,10 @@ public class Vdisk extends DbObject {
 		return all;
 	}
 
+	public static void delete(Vdisk vdisk) {
+		getManager().delete(vdisk);
+	}
+
 	public static Vdisk findById(long id) {
 		return (Vdisk) getManager().findById(id);
 	}

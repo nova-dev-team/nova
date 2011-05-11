@@ -22,6 +22,10 @@ public class Appliance extends DbObject {
 		return null;
 	}
 
+	public static void delete(Appliance appliance) {
+		getManager().delete(appliance);
+	}
+
 	public static Appliance findById(long id) {
 		return (Appliance) getManager().findById(id);
 	}

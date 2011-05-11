@@ -44,7 +44,6 @@ public class Conf extends Properties {
 				this.putAll(subConf);
 			}
 		}
-
 	}
 
 	private static Conf conf = new Conf();

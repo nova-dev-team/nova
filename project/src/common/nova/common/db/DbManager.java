@@ -86,13 +86,29 @@ public class DbManager {
 		return this.allIndex.get(fieldName);
 	}
 
-	public void save(DbObject obj) {
+	public synchronized void save(DbObject obj) {
 		synchronized (session) {
 			Transaction tx = session.beginTransaction();
 			session.save(obj);
 			tx.commit();
 		}
 		getIndex(DbSpec.ID_COLUMN_NAME).put(obj.getId(), obj);
+	}
+
+	public synchronized void delete(DbObject obj) {
+		for (String indexName : spec.getAllIndex()) {
+			Map<Serializable, DbObject> index = allIndex.get(indexName);
+			if (indexName.equals(DbSpec.ID_COLUMN_NAME)) {
+				index.remove(obj.getId());
+			} else {
+				index.remove((Serializable) Utils.getField(obj, indexName));
+			}
+		}
+		synchronized (session) {
+			Transaction tx = session.beginTransaction();
+			session.delete(obj);
+			tx.commit();
+		}
 	}
 
 	public static synchronized DbManager forClass(Class klass, DbSpec spec) {
