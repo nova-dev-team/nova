@@ -9,6 +9,8 @@ import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 
 import org.apache.log4j.Logger;
+import org.libvirt.Connect;
+import org.libvirt.LibvirtException;
 
 /**
  * Daemon thread that maintains vdisk pool
@@ -30,6 +32,9 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 					+ VdiskFiles[i].getLen() + "\tvisittime\t"
 					+ VdiskFiles[i].getLastVisitTime());
 		}
+		this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
+		this.setMbps(1);
+		this.setVmRunning(true);
 	}
 
 	/**
@@ -38,6 +43,50 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 	Logger log = Logger.getLogger(VdiskPoolDaemon.class);
 
 	static int POOL_SIZE = 5;
+
+	private long lastCheckIsVmRunningTime;
+	private int mbps;
+	private boolean vmRunning;
+
+	public boolean isVmRunning() throws LibvirtException {
+		if (System.currentTimeMillis() - this.getLastCheckIsVmRunningTime() < 5000) {
+			return this.vmRunning;
+		} else {
+			this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
+			Connect conn = null;
+			conn = new Connect("qemu:///system", true);
+			if (conn.numOfDomains() > 0) {
+				System.out.println("numofdomains\t"
+						+ Integer.toString(conn.numOfDomains()));
+				conn.close();
+				this.setVmRunning(true);
+			} else {
+				conn.close();
+				this.setVmRunning(false);
+			}
+			return this.vmRunning;
+		}
+	}
+
+	public void setVmRunning(boolean vmRunning) {
+		this.vmRunning = vmRunning;
+	}
+
+	public int getMbps() {
+		return mbps;
+	}
+
+	public void setMbps(int mbps) {
+		this.mbps = mbps;
+	}
+
+	public long getLastCheckIsVmRunningTime() {
+		return lastCheckIsVmRunningTime;
+	}
+
+	public void setLastCheckIsVmRunningTime(long lastCheckIsVmRunningTime) {
+		this.lastCheckIsVmRunningTime = lastCheckIsVmRunningTime;
+	}
 
 	private static class VdiskFile {
 		Status stat;
@@ -118,6 +167,66 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		POOL_SIZE = poolSize;
 	}
 
+	private void autoSpeedCopy(File sourceFile, File tmpFile)
+			throws IOException, LibvirtException {
+		FileInputStream input = new FileInputStream(sourceFile);
+		FileOutputStream output = new FileOutputStream(tmpFile);
+		long bytesCopied = 0;
+		byte[] b = new byte[1024 * 5];
+		int cnt;
+		// int loop = 0;
+		long timeStamp = System.currentTimeMillis();
+		double sleepUsec = 1.0;
+		while (!this.isStopping()) {
+			// loop++;
+			// if (loop % 1024 == 0) {
+			// if (loop > 1)
+			// break;
+			// }
+
+			cnt = input.read(b);
+			if (cnt <= 0)
+				break;
+			output.write(b, 0, cnt);
+			if (this.getMbps() > 0) {
+				System.out.println("low speed copy file" + tmpFile.getName());
+				bytesCopied += cnt;
+				if (bytesCopied > this.getMbps() * 1024 * 1024) {
+					timeStamp -= System.currentTimeMillis();
+					if (bytesCopied < 1024 * 1024 * this.getMbps() * timeStamp
+							/ 1000) {
+						sleepUsec /= 1.1;
+					} else {
+						sleepUsec *= 1.1;
+					}
+					if (sleepUsec > 1000 * 20) {
+						sleepUsec = 1000 * 20;
+					}
+					try {
+						Thread.sleep(Math.round(sleepUsec));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+
+				if (!this.isVmRunning()) {
+					this.setMbps(0);
+				}
+			} else {
+				System.out.println("high speed copy file" + tmpFile.getName());
+				if (this.isVmRunning()) {
+					timeStamp = System.currentTimeMillis();
+					sleepUsec = 1.0;
+					this.setMbps(1);
+					bytesCopied = 0;
+				}
+			}
+		}
+		output.flush();
+		output.close();
+		input.close();
+	}
+
 	@Override
 	protected void workOneRound() {
 		if (this.isStopping() == true) {
@@ -131,8 +240,8 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 					System.out.println("file"
 							+ Utils.pathJoin(path,
 									"linux.img.pool." + Integer.toString(i))
-							+ VdiskFile.Status.NOT_EXIST.toString());
-					System.out.println("copying file"
+							+ " " + VdiskFile.Status.NOT_EXIST.toString());
+					System.out.println("going to copy file"
 							+ Utils.pathJoin(path,
 									"linux.img.pool." + Integer.toString(i)));
 					String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME, "run",
@@ -140,24 +249,17 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 					String destUrl = Utils.pathJoin(path, "linux.img.pool."
 							+ Integer.toString(i) + ".lock");
 					File sourceFile = new File(sourceUrl);
-					if (sourceFile.isFile()) {
-						FileInputStream input = new FileInputStream(sourceFile);
-						FileOutputStream output = new FileOutputStream(destUrl);
-						byte[] b = new byte[1024 * 5];
-						int len;
-						while ((!this.isStopping())
-								&& ((len = input.read(b)) != -1)) {
-							output.write(b, 0, len);
-						}
-						output.flush();
-						output.close();
-						input.close();
-					}
 					File tmpFile = new File(destUrl);
 					File destFile = new File(Utils.pathJoin(path,
 							"linux.img.pool." + Integer.toString(i)));
+					if (sourceFile.isFile()) {
+						this.autoSpeedCopy(sourceFile, tmpFile);
+					}
+
 					if (tmpFile.length() == sourceFile.length()) {
 						tmpFile.renameTo(destFile);
+						System.out.println("rename file" + tmpFile.getName()
+								+ " to " + destFile.getName());
 						VdiskFiles[i - 1].setStat(VdiskFile.Status.AVAILABLE);
 						VdiskFiles[i - 1].setLen(destFile.length());
 						VdiskFiles[i - 1].setLastVisitTime(System
@@ -172,6 +274,8 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 					}
 				} catch (IOException e) {
 					log.error("copy image fail", e);
+				} catch (LibvirtException e) {
+					log.error("libvirt connection fail", e);
 				}
 
 			} else if (VdiskFiles[i - 1].getStat().equals(
@@ -196,4 +300,5 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			}
 		}
 	}
+
 }
