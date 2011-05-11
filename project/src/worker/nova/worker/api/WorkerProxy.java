@@ -23,8 +23,10 @@ public class WorkerProxy extends SimpleProxy {
 		super(replyAddr);
 	}
 
-	public void sendStartVnode(SimpleAddress vAddr) {
-		StartVnodeMessage msg = new StartVnodeMessage(vAddr);
+	public void sendStartVnode(SimpleAddress vAddr, String wakeupOnly,
+			String memSize, String cpuCount, String runAgent) {
+		StartVnodeMessage msg = new StartVnodeMessage(vAddr, wakeupOnly,
+				memSize, cpuCount, runAgent);
 		super.sendRequest(msg);
 	}
 

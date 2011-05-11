@@ -113,7 +113,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			}
 		}
 
-		if (msg.isWakeupOnly()) {
+		if (msg.getWakeupOnly().equalsIgnoreCase("true")) {
 			try {
 				Domain testDomain = conn
 						.domainLookupByUUIDString(msg.getUuid());
