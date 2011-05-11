@@ -96,23 +96,21 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		final String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "vdiskpool");
-		for (int i = POOL_SIZE - 1; i >= 0; i--) {
-			if (VdiskFiles[i].getStat().equals(VdiskFile.Status.NOT_EXIST)) {
-				VdiskFiles[i].setStat(VdiskFile.Status.LOCKED);
+		for (int i = POOL_SIZE; i > 0; i--) {
+			if (VdiskFiles[i - 1].getStat().equals(VdiskFile.Status.NOT_EXIST)) {
+				VdiskFiles[i - 1].setStat(VdiskFile.Status.LOCKED);
 				try {
-					System.out
-							.println("file"
-									+ Utils.pathJoin(path, "linux.img.pool."
-											+ Integer.toString(i + 1))
-									+ VdiskFile.Status.NOT_EXIST.toString());
-					System.out
-							.println("copying file"
-									+ Utils.pathJoin(path, "linux.img.pool."
-											+ Integer.toString(i + 1)));
+					System.out.println("file"
+							+ Utils.pathJoin(path,
+									"linux.img.pool." + Integer.toString(i))
+							+ VdiskFile.Status.NOT_EXIST.toString());
+					System.out.println("copying file"
+							+ Utils.pathJoin(path,
+									"linux.img.pool." + Integer.toString(i)));
 					String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME, "run",
 							"linux.img");
 					String destUrl = Utils.pathJoin(Utils.pathJoin(path,
-							"linux.img.pool." + Integer.toString(i + 1)));
+							"linux.img.pool." + Integer.toString(i)));
 					File sourceFile = new File(sourceUrl);
 					if (sourceFile.isFile()) {
 						FileInputStream input = new FileInputStream(sourceFile);
@@ -129,9 +127,11 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 				} catch (IOException e) {
 					log.error("copy image fail", e);
 				}
-				VdiskFiles[i].setStat(VdiskFile.Status.AVAILABLE);
-			} else if (VdiskFiles[i].getStat().equals(VdiskFile.Status.LOCKED)) {
+				VdiskFiles[i - 1].setStat(VdiskFile.Status.AVAILABLE);
+			} else if (VdiskFiles[i - 1].getStat().equals(
+					VdiskFile.Status.LOCKED)) {
 				// TODO @shayf test if copy fails
+
 			}
 		}
 	}
