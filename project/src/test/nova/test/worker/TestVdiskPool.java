@@ -16,7 +16,7 @@ public class TestVdiskPool {
 	@Test
 	public void test() {
 		String workerHost = "127.0.0.1";
-		int workerPort = 9285;
+		int workerPort = 9283;
 		InetSocketAddress workerAddr = new InetSocketAddress(workerHost,
 				workerPort);
 		NovaWorker.getInstance().bind(workerAddr);
@@ -54,13 +54,13 @@ public class TestVdiskPool {
 		// svh.handleMessage(msg, ctx2, e2, xreply2);
 
 		try {
-			while (true) {
-				Thread.sleep(10000);
-			}
+			// while (true) {
+			Thread.sleep(1000);
+			// }
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}
-		// NovaWorker.getInstance().shutdown();
+		NovaWorker.getInstance().shutdown();
 
 		// File src = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 		// "linux.img"));

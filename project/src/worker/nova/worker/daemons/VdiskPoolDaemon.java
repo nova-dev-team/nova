@@ -23,8 +23,8 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		VdiskFiles = new VdiskFile[POOL_SIZE];
 		for (int i = 0; i < POOL_SIZE; i++) {
 			VdiskFiles[i] = new VdiskFile();
-			VdiskFiles[i].setStatValue(i + 1);
-			// VdiskFiles[i].setLastVisitTime(System.currentTimeMillis());
+			VdiskFiles[i].setStatValue(i + 1); // also set len values here
+			VdiskFiles[i].setLastVisitTime(System.currentTimeMillis());
 			System.out.println(Integer.toString(i + 1) + "\t"
 					+ VdiskFiles[i].getStat().toString() + "\tlen\t"
 					+ VdiskFiles[i].getLen() + "\tvisittime\t"
@@ -88,7 +88,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 				this.stat = Status.AVAILABLE;
 				len = img.length();
 			}
-			lastVisitTime = System.currentTimeMillis();
 		}
 
 		enum Status {
