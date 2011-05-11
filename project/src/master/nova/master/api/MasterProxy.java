@@ -9,7 +9,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.PerfMessage;
-import nova.master.api.messages.ApplianceStatusMessage;
+import nova.master.api.messages.ApplianceInfoMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Pnode;
@@ -54,7 +54,7 @@ public class MasterProxy extends SimpleProxy {
 	}
 
 	public void sendApplianceStatus(Collection<Appliance> appliances) {
-		super.sendRequest(new ApplianceStatusMessage((Appliance[]) appliances
+		super.sendRequest(new ApplianceInfoMessage((Appliance[]) appliances
 				.toArray()));
 	}
 
