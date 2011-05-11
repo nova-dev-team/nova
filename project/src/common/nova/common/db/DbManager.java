@@ -109,6 +109,7 @@ public class DbManager {
 			session.delete(obj);
 			tx.commit();
 		}
+		obj.setId(DbObject.INVALID_ID);
 	}
 
 	public static synchronized DbManager forClass(Class klass, DbSpec spec) {

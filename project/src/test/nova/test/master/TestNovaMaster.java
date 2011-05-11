@@ -30,7 +30,7 @@ public class TestNovaMaster {
 				Pnode.Status.ADD_PENDING);
 
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -44,7 +44,7 @@ public class TestNovaMaster {
 		NovaWorker.getInstance().shutdown();
 
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

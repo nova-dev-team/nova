@@ -39,7 +39,7 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 	ChannelFuture channel = null;
 	Gson gson = new GsonBuilder().serializeNulls().create();
 	SimpleAddress replyAddr = null;
-	SimpleAddress serverAddr = null;
+
 	Logger log = null;
 
 	public SimpleProxy(InetSocketAddress replyAddr) {
@@ -82,7 +82,6 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 
 	public ChannelFuture connect(InetSocketAddress addr) {
 		this.channel = bootstrap.connect(addr);
-		this.serverAddr = new SimpleAddress(addr.getHostName(), addr.getPort());
 
 		// Using addlistener instead of awaitUninterruptibly to avoid deadlock
 		ChannelConnectFutureListener chfl = new ChannelConnectFutureListener();
@@ -105,17 +104,16 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 	public void close() {
 		this.channel.getChannel().getCloseFuture().awaitUninterruptibly();
 		this.factory.releaseExternalResources();
-		this.serverAddr = null;
 	}
 
 	protected final void sendRequest(Object req) {
 		Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req,
-				replyAddr);
+				this.replyAddr);
 		String message = gson.toJson(packet) + "\r\n";
 		if (message.length() > SimpleServer.MAX_PACKET_SIZE) {
 			throw new MessageTooLongException();
 		}
-		// System.out.println(message);
+		// System.err.println(message);
 		this.channel.getChannel().write(message);
 
 	}
@@ -126,9 +124,6 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
 		e.getChannel().close();
 	}
 
-	public SimpleAddress getServerAddr() {
-		return this.serverAddr;
-	}
 }
 
 class ChannelConnectFutureListener implements ChannelFutureListener {

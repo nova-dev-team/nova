@@ -2,7 +2,9 @@ package nova.common.db;
 
 public abstract class DbObject {
 
-	protected long id = 1L;
+	public static final long INVALID_ID = -1L;
+
+	protected long id = INVALID_ID;
 
 	public final long getId() {
 		return this.id;
