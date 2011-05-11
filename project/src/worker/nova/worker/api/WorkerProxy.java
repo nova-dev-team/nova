@@ -5,6 +5,8 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.QueryHeartbeatMessage;
+import nova.worker.api.messages.QueryPnodeInfoMessage;
+import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.api.messages.StopVnodeMessage;
 
@@ -38,6 +40,14 @@ public class WorkerProxy extends SimpleProxy {
 
 	public void sendRequestHeartbeat() {
 		super.sendRequest(new QueryHeartbeatMessage());
+	}
+
+	public void sendRequestPnodeInfo() {
+		super.sendRequest(new QueryPnodeInfoMessage());
+	}
+
+	public void sendRequestVnodeInfo() {
+		super.sendRequest(new QueryVnodeInfoMessage());
 	}
 
 }
