@@ -19,11 +19,16 @@ import org.apache.log4j.Logger;
 public class VdiskPoolDaemon extends SimpleDaemon {
 
 	public VdiskPoolDaemon() {
-		super(5 * 1000);
+		super(2000);
 		VdiskFiles = new VdiskFile[POOL_SIZE];
 		for (int i = 0; i < POOL_SIZE; i++) {
 			VdiskFiles[i] = new VdiskFile();
 			VdiskFiles[i].setStatValue(i + 1);
+			// VdiskFiles[i].setLastVisitTime(System.currentTimeMillis());
+			System.out.println(Integer.toString(i + 1) + "\t"
+					+ VdiskFiles[i].getStat().toString() + "\tlen\t"
+					+ VdiskFiles[i].getLen() + "\tvisittime\t"
+					+ VdiskFiles[i].getLastVisitTime());
 		}
 	}
 
@@ -116,6 +121,9 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 
 	@Override
 	protected void workOneRound() {
+		if (this.isStopping() == true) {
+			return;
+		}
 		final String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "vdiskpool");
 		for (int i = POOL_SIZE; i > 0; i--) {
 			if (VdiskFiles[i - 1].getStat().equals(VdiskFile.Status.NOT_EXIST)) {
@@ -169,8 +177,11 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 
 			} else if (VdiskFiles[i - 1].getStat().equals(
 					VdiskFile.Status.LOCKED)) {
+				System.out.println("time step:\t"
+						+ Long.toString(System.currentTimeMillis()
+								- VdiskFiles[i - 1].getLastVisitTime()));
 				if (System.currentTimeMillis()
-						- VdiskFiles[i - 1].getLastVisitTime() > 100000) {
+						- VdiskFiles[i - 1].getLastVisitTime() > 1000) {
 					File lockedImg = new File(Utils.pathJoin(Utils.NOVA_HOME,
 							"run", "vdiskpool",
 							"linux.img.pool." + Integer.toString(i) + ".lock"));

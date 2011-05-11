@@ -50,6 +50,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
 		values.put("content", "NOVA MASTER");
 		values.put("pnode_info", pnode);
+
 		return Utils.expandTemplateFile(fpath, values);
 	}
 }
