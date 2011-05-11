@@ -3,7 +3,6 @@ package nova.master;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
-import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.HeartbeatMessage;
@@ -103,7 +102,7 @@ public class NovaMaster extends SimpleServer {
 		super.shutdown();
 		this.bindAddr = null;
 		// TODO @zhaoxun more cleanup work
-		HibernateUtil.shutdown();
+		// HibernateUtil.shutdown();
 
 		NovaMaster.instance = null;
 	}
