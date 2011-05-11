@@ -5,6 +5,7 @@ import java.util.HashMap;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
 import nova.common.util.Utils;
+import nova.master.models.Pnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -40,12 +41,15 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 	@Override
 	public String renderResult(DefaultHttpRequest req) {
 		// TODO @zhaoxun render results
+		Pnode pnode = new Pnode();
+		pnode.setIp("0.0.0.0");
 
 		String fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
 				"index.html");
 		HashMap<String, Object> values = new HashMap<String, Object>();
 
 		values.put("content", "NOVA MASTER");
+		values.put("pnode_info", pnode);
 		return Utils.expandTemplateFile(fpath, values);
 	}
 }

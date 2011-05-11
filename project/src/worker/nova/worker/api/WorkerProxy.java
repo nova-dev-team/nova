@@ -6,6 +6,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.worker.api.messages.StartVnodeMessage;
+import nova.worker.api.messages.StopVnodeMessage;
 
 /**
  * Connection to worker module.
@@ -27,6 +28,11 @@ public class WorkerProxy extends SimpleProxy {
 			String memSize, String cpuCount, String runAgent) {
 		StartVnodeMessage msg = new StartVnodeMessage(vAddr, wakeupOnly,
 				memSize, cpuCount, runAgent);
+		super.sendRequest(msg);
+	}
+
+	public void sendStopVnode(String uuid, boolean powerOffOnly) {
+		StopVnodeMessage msg = new StopVnodeMessage(uuid, powerOffOnly);
 		super.sendRequest(msg);
 	}
 
