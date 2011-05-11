@@ -46,23 +46,12 @@ public class TestVdiskPool {
 		// svh.handleMessage(msg, ctx2, e2, xreply2);
 
 		try {
-			while (true) {
-				Thread.sleep(10000);
-			}
+			// while (true) {
+			Thread.sleep(1000);
+			// }
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}
-		// NovaWorker.getInstance().shutdown();
-
-		// File src = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-		// "linux.img"));
-		// long len = src.length();
-		// for (int i = 1; i <= VdiskPoolDaemon.getPOOL_SIZE(); i++) {
-		// File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-		// "vdiskpool", "linux.img.pool." + Integer.toString(i)));
-		// Assert.assertTrue(tmp.exists());
-		// Assert.assertTrue(tmp.length() == len);
-		// }
-
+		NovaWorker.getInstance().shutdown();
 	}
 }
