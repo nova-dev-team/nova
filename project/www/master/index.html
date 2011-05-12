@@ -1,16 +1,31 @@
 <html>
 <head><title>Nova master</title></head>
 <body>
-<h3><font color="#FF0000">${content}<br></font></h4>
+<h3><font color="#FF0000">${content}<br></font></h3>
+
 <h4><font color="#33CC00">Info of Pnode<br></font></h4>
 ${pnode_info}<br>
+
 <h4><font color="#33CC00">Info of Vnode<br></font></h4>
 ${vnode_info}<br>
+
 <h4><font color="#33CC00">Info of Vcluster<br></font></h4>
 ${vcluster_info}<br>
+
 <h4><font color="#33CC00">Info of Vdisk<br></font></h4>
 ${vdisk_info}<br>
+
 <h4><font color="#33CC00">Info of Appliance<br></font></h4>
 ${appliance_info}<br>
+
+<h3><font color="#FF0000">Worker machines<br></font></h3>
+<form action="add_pnode" method="get">
+	Pnode Ip<input type="text" name="pnode_ip">
+	VM Capacity<input type="text" name="vm_capacity">
+	<input type="submit" value="Add new pnode">
+</form>
+
+${input_info}<br>
+
 </body>
 </html>
