@@ -49,70 +49,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			log.error("Error connecting " + virtService, ex);
 		}
 
-		// mv img files from vdiskpool
-		File stdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-				"linux.img"));
-		long stdLen = stdFile.length();
-		boolean found = false;
-		for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
-			File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-					"vdiskpool", "linux.img.pool." + Integer.toString(i)));
-			if (srcFile.exists() && (srcFile.length() == stdLen)) {
-				System.out.println("file " + "linux.img.pool."
-						+ Integer.toString(i) + "exists!");
-				File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-						msg.getName()));
-				if (!foder.exists()) {
-					foder.mkdirs();
-				}
-				File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-						msg.getName(), "linux.img"));
-				srcFile.renameTo(dstFile);
-				found = true;
-				break;
-			} else {
-				System.out.println("file " + "linux.img.pool."
-						+ Integer.toString(i) + "not exist!");
-			}
-		}
-		if (!found) {
-			// copy img files
-			File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-					msg.getName()));
-			File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-					msg.getName(), "linux.img"));
-			if (!foder.exists()) {
-				foder.mkdirs();
-			} else {
-				// TODO @santa rename or stop or what?
-				log.error("vm name " + msg.getName() + " has been used!");
-			}
-			if (file.exists() == false) {
-				try {
-					System.out.println("copying file");
-					String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME, "run",
-							"linux.img");
-					String destUrl = Utils.pathJoin(Utils.NOVA_HOME, "run",
-							msg.getName(), "linux.img");
-					File sourceFile = new File(sourceUrl);
-					if (sourceFile.isFile()) {
-						FileInputStream input = new FileInputStream(sourceFile);
-						FileOutputStream output = new FileOutputStream(destUrl);
-						byte[] b = new byte[1024 * 5];
-						int len;
-						while ((len = input.read(b)) != -1) {
-							output.write(b, 0, len);
-						}
-						output.flush();
-						output.close();
-						input.close();
-					}
-				} catch (IOException ex) {
-					log.error("copy image fail", ex);
-				}
-			}
-		}
-
 		if ((msg.getWakeupOnly() != null)
 				&& (msg.getWakeupOnly().equalsIgnoreCase("true"))) {
 			try {
@@ -124,8 +60,95 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						+ "' can't be found!", ex);
 			}
 		} else {
+			if ((msg.getMemSize() != null) && (!msg.getMemSize().equals(""))) {
+				if (Integer.parseInt(msg.getMemSize()) <= 0)
+					msg.setMemSize("524288");
+			} else {
+				msg.setMemSize("524288");
+			}
+
+			if ((msg.getCpuCount() != null) && (!msg.getCpuCount().equals(""))) {
+				// TODO @shayf get actual cpu nums
+				if ((Integer.parseInt(msg.getCpuCount()) <= 0)
+						|| (Integer.parseInt(msg.getCpuCount()) >= 10))
+					msg.setCpuCount("1");
+			} else {
+				msg.setCpuCount("1");
+			}
+
+			// mv img files from vdiskpool
+			String stdImgFile = "linux.img";
+			if ((msg.getHdaImage() != null) && (!msg.getHdaImage().equals(""))) {
+				stdImgFile = msg.getHdaImage();
+			}
+			File stdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+					stdImgFile));
+			long stdLen = stdFile.length();
+			boolean found = false;
+			for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
+				File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						"vdiskpool",
+						stdImgFile + ".pool." + Integer.toString(i)));
+				if (srcFile.exists() && (srcFile.length() == stdLen)) {
+					System.out.println("file " + stdImgFile + ".pool."
+							+ Integer.toString(i) + "exists!");
+					File foder = new File(Utils.pathJoin(Utils.NOVA_HOME,
+							"run", msg.getName()));
+					if (!foder.exists()) {
+						foder.mkdirs();
+					}
+					File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+							"run", msg.getName(), stdImgFile));
+					srcFile.renameTo(dstFile);
+					found = true;
+					break;
+				} else {
+					System.out.println("file " + stdImgFile + ".pool."
+							+ Integer.toString(i) + "not exist!");
+				}
+			}
+			if (!found) {
+				// copy img files
+				File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						msg.getName()));
+				File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						msg.getName(), stdImgFile));
+				if (!foder.exists()) {
+					foder.mkdirs();
+				} else {
+					// TODO @santa rename or stop or what?
+					log.error("vm name " + msg.getName() + " has been used!");
+				}
+				if (file.exists() == false) {
+					try {
+						System.out.println("copying file");
+						String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
+								"run", stdImgFile);
+						String destUrl = Utils.pathJoin(Utils.NOVA_HOME, "run",
+								msg.getName(), stdImgFile);
+						File sourceFile = new File(sourceUrl);
+						if (sourceFile.isFile()) {
+							FileInputStream input = new FileInputStream(
+									sourceFile);
+							FileOutputStream output = new FileOutputStream(
+									destUrl);
+							byte[] b = new byte[1024 * 5];
+							int len;
+							while ((len = input.read(b)) != -1) {
+								output.write(b, 0, len);
+							}
+							output.flush();
+							output.close();
+							input.close();
+						}
+					} catch (IOException ex) {
+						log.error("copy image fail", ex);
+					}
+				}
+			}
 			// create domain and show some info
 			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
+				msg.setEmulatorPath("/usr/bin/kvm");
 				try {
 					Domain testDomain = conn.domainCreateLinux(
 							Kvm.emitDomain(msg.getHashMap()), 0);

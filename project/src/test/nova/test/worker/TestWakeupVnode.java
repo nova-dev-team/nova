@@ -18,8 +18,8 @@ public class TestWakeupVnode {
 	@Test
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
-		StartVnodeMessage msg = new StartVnodeMessage(null);
-		msg.setWakeupOnly("true");
+		StartVnodeMessage msg = new StartVnodeMessage("kvm", "true", "false",
+				null);
 		msg.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
 		ChannelHandlerContext ctx = null;
 		MessageEvent e = null;
