@@ -46,7 +46,7 @@ public class RunVdiskPoolDaemon {
 		// svh.handleMessage(msg, ctx2, e2, xreply2);
 
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(20000);
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}
