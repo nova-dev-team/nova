@@ -21,7 +21,6 @@ import org.libvirt.LibvirtException;
  */
 public class VdiskPoolDaemon extends SimpleDaemon {
 
-	// private String stdImgFile = "small.img";
 	private HashMap<String, VdiskFile> fileStatus;
 
 	public VdiskPoolDaemon() {
@@ -188,8 +187,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		}
 	}
 
-	// VdiskFile[] VdiskFiles;
-
 	public static int getPOOL_SIZE() {
 		return POOL_SIZE;
 	}
@@ -205,15 +202,14 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		long bytesCopied = 0;
 		byte[] b = new byte[1024 * 5];
 		int cnt;
-		// int loop = 0;
+		int loop = 0;
 		long timeStamp = System.currentTimeMillis();
 		double sleepUsec = 1.0;
 		while (!this.isStopping()) {
-			// loop++;
-			// if (loop % 1024 == 0) {
-			// if (loop > 1)
-			// break;
-			// }
+			loop++;
+			if (loop % 1024 == 0) {
+				// TODO @shayf check if revoke needed
+			}
 
 			cnt = input.read(b);
 			if (cnt <= 0)

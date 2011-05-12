@@ -81,6 +81,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				msg.setCpuCount("1");
 			}
 
+			if ((msg.getArch() == null) || msg.getArch().equals("")) {
+				msg.setArch("i686");
+			}
+
 			// mv img files from vdiskpool
 			String stdImgFile = "linux.img";
 			if ((msg.getHdaImage() != null) && (!msg.getHdaImage().equals(""))) {
