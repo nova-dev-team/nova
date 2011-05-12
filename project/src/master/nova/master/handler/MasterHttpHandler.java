@@ -8,6 +8,7 @@ import java.util.Map;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
 import nova.common.util.Utils;
+import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -45,23 +46,35 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 		// TODO @zhaoxun render results
 		String fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
 				"index.html");
+		HashMap<String, Object> values = new HashMap<String, Object>();
+		values.put("content", "NOVA MASTER");
 		// Pnode pnode = new Pnode();
 		// pnode.setIp("0.0.0.0");
 
+		MasterProxy mp = new MasterProxy(new SimpleAddress("10.0.1.240", 3000));
+
 		URL url = null;
 		try {
-			url = new URL("http://10.0.1.240:3000/" + req.getUri());
+			url = new URL("http://10.0.1.240:3000" + req.getUri());
 		} catch (MalformedURLException e) {
 			log.error(e);
 		}
 
 		String act = getAction(url.getFile());
-		String query = url.getQuery();
-		Map<String, String> queryMap = getQueryMap(query);
+		values.put("act", "act:" + act);
+		Map<String, String> queryMap = null;
+		if (act != null) {
+			String query = url.getQuery();
+			queryMap = getQueryMap(query);
 
-		HashMap<String, Object> values = new HashMap<String, Object>();
-		values.put("content", "NOVA MASTER");
-		// values.put("pnode_info", urilfpath);
+			if (act == "add_pnode1") {
+				mp.sendAddPnode(new SimpleAddress(queryMap.get("pnode_ip"),
+						3000));
+			}
+
+			values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
+		}
+
 		return Utils.expandTemplateFile(fpath, values);
 
 	}
@@ -71,14 +84,20 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 		Map<String, String> map = new HashMap<String, String>();
 		for (String param : params) {
 			String name = param.split("=")[0];
-			String value = param.split("=")[1];
+			String value = null;
+			if (param.split("=").length > 1) {
+				value = param.split("=")[1];
+			}
 			map.put(name, value);
 		}
 		return map;
 	}
 
 	public static String getAction(String actFile) {
-		String[] act = actFile.split("\\?");
-		return act[0].split("/")[1];
+		if (actFile.length() > 1) {
+			String[] act = actFile.split("\\?");
+			return act[0].split("/")[1];
+		} else
+			return null;
 	}
 }
