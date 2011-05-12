@@ -45,25 +45,20 @@ public class DbManager {
 		}
 
 		// create index on other columns
-		if (queryResult.size() > 0) {
+		for (DbObject obj : queryResult) {
+			updateIndex(obj);
+		}
+	}
 
-			for (String indexName : spec.getAllIndex()) {
-				Map<Serializable, DbObject> index = allIndex.get(indexName);
-
-				if (indexName.equals(DbSpec.ID_COLUMN_NAME)) {
-					for (DbObject obj : queryResult) {
-						index.put(obj.getId(), obj);
-					}
-				} else {
-					for (DbObject obj : queryResult) {
-						index.put(
-								(Serializable) Utils.getField(obj, indexName),
-								obj);
-					}
-				}
+	private void updateIndex(DbObject obj) {
+		for (String indexName : spec.getAllIndex()) {
+			Map<Serializable, DbObject> index = allIndex.get(indexName);
+			if (indexName.equals(DbSpec.ID_COLUMN_NAME)) {
+				index.put(obj.getId(), obj);
+			} else {
+				index.put((Serializable) Utils.getField(obj, indexName), obj);
 			}
 		}
-
 	}
 
 	public Object findById(Serializable key) {
@@ -103,12 +98,19 @@ public class DbManager {
 	}
 
 	public synchronized void save(DbObject obj) {
+		boolean updateIndex = false;
+		if (obj.getId() == DbObject.INVALID_ID) {
+			// newly created objects, when saved, need to update all indexes
+			updateIndex = true;
+		}
 		synchronized (session) {
 			Transaction tx = session.beginTransaction();
 			session.save(obj);
 			tx.commit();
 		}
-		getIndex(DbSpec.ID_COLUMN_NAME).put(obj.getId(), obj);
+		if (updateIndex) {
+			updateIndex(obj);
+		}
 	}
 
 	public synchronized void delete(DbObject obj) {
