@@ -33,8 +33,6 @@ import javax.swing.event.ListSelectionListener;
 
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
-import nova.agent.appliance.ApplianceInstaller;
-import nova.agent.appliance.FtpApplianceFetcher;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 
@@ -61,19 +59,8 @@ public class AgentFrame extends JFrame {
 	private JButton install = new JButton("install"); // 安装按钮
 	private ConcurrentHashMap<String, Appliance> apps = NovaAgent.getInstance()
 			.getAppliances();
-	private JLabel statusInfo = new JLabel("Download process"); // 安装状态条
-	private JProgressBar downProcess = new JProgressBar(); // 安装进度条
-
-	/**
-	 * Display one info
-	 * 
-	 * @param info
-	 *            The info you want to display
-	 */
-	private void setStatusInfo(String info) {
-		this.statusInfo.setText(info);
-		this.statusInfo.setBackground(Color.BLACK);
-	}
+	public static JLabel statusInfo = new JLabel("Download process"); // 安装状态条
+	public static JProgressBar downProcess = new JProgressBar(); // 安装进度条
 
 	/**
 	 * Change the percent of down
@@ -81,8 +68,9 @@ public class AgentFrame extends JFrame {
 	 * @param currentValue
 	 * @param totalValue
 	 */
-	public void setDownProcessValue(double currentValue, double totalValue) {
-		this.downProcess.setValue((int) ((currentValue / totalValue) * 100));
+	public static void setDownProcessValue(double currentValue,
+			double totalValue) {
+		downProcess.setValue((int) ((currentValue / totalValue) * 100));
 	}
 
 	/**
@@ -91,23 +79,14 @@ public class AgentFrame extends JFrame {
 	 * @param info
 	 *            The info you want to display
 	 */
-	public void setInfoDisplayWhenDown(String info) {
-		this.downProcess.setBorderPainted(true);
-		this.downProcess.setBackground(Color.pink);
-		this.downProcess.setStringPainted(true);
-		this.downProcess.setVisible(true);
-		this.downProcess.setValue(0);
-		this.downProcess.setMaximum(100);
-		setStatusInfo(info);
-	}
-
-	/**
-	 * Display info when install
-	 * 
-	 * @param info
-	 */
-	public void setInfoDisplayWhenInstall(String info) {
-		setStatusInfo(info);
+	public static void setInfoDisplayWhenDown(String info) {
+		downProcess.setBorderPainted(true);
+		downProcess.setBackground(Color.pink);
+		downProcess.setStringPainted(true);
+		downProcess.setVisible(true);
+		downProcess.setValue(0);
+		downProcess.setMaximum(100);
+		statusInfo.setText(info);
 	}
 
 	/**
@@ -115,9 +94,9 @@ public class AgentFrame extends JFrame {
 	 * 
 	 * @param info
 	 */
-	public void setInfoDisplayAfterInstall(String info) {
-		this.statusInfo.setText(info);
-		this.downProcess.setVisible(false);
+	public static void setInfoDisplayAfterInstall(String info) {
+		statusInfo.setText(info);
+		downProcess.setVisible(false);
 		NovaAgent.getInstance().saveAppliances();
 	}
 
@@ -197,16 +176,8 @@ public class AgentFrame extends JFrame {
 							JOptionPane.PLAIN_MESSAGE, null, new Object[] {
 									"Install", "Cancel" }, "Install");
 					if (value == 0) {
-						FtpApplianceFetcher faf = new FtpApplianceFetcher();
 						Appliance app = apps.get(softList.getSelectedValue());
-
-						try {
-							faf.fetch(app);
-							ApplianceInstaller.install(app);
-						} catch (IOException e1) {
-							logger.error(
-									"Install " + app.getName() + " failed", e1);
-						}
+						app.setStatus(Appliance.Status.DOWNLOAD_PENDING);
 					}
 				}
 
@@ -230,7 +201,6 @@ public class AgentFrame extends JFrame {
 									softName, ".jpg"),
 							picture.getBounds().width,
 							picture.getBounds().height);
-
 					ImageIcon pic = new ImageIcon(Utils.pathJoin(
 							Utils.NOVA_HOME, relativeLocalPath, softName,
 							".jpg"));
@@ -282,13 +252,5 @@ public class AgentFrame extends JFrame {
 		} catch (IOException e) {
 			logger.error("Change image size failed!", e);
 		}
-	}
-
-	/**
-	 * Display this frame
-	 */
-	public void displayAgentFrame() {
-		AgentFrame window = new AgentFrame();
-		window.setTitle("EasyAppliance");
 	}
 }

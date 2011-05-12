@@ -5,6 +5,7 @@ import java.io.IOException;
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.ApplianceInstaller;
+import nova.agent.ui.AgentFrame;
 import nova.common.util.SimpleDaemon;
 
 import org.apache.log4j.Logger;
@@ -54,8 +55,10 @@ class InstallThread implements Runnable {
 			this.app.setStatus(Appliance.Status.INSTALLING);
 
 			ApplianceInstaller.install(this.app);
-
 			this.app.setStatus(Appliance.Status.INSTALLED);
+
+			// AgentFrame display after install
+			AgentFrame.setInfoDisplayAfterInstall("Install Complete ");
 		} catch (IOException e) {
 			log.error("Install failure!", e);
 			this.app.setStatus(Appliance.Status.INSTALL_FAILURE);
