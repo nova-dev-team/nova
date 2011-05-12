@@ -46,7 +46,7 @@ public class TestVdiskPool {
 		// svh.handleMessage(msg, ctx2, e2, xreply2);
 
 		try {
-			Thread.sleep(60000);
+			Thread.sleep(5000);
 		} catch (InterruptedException ex) {
 			ex.printStackTrace();
 		}

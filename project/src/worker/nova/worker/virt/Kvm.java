@@ -30,8 +30,16 @@ public class Kvm {
 	public static String emitDomain(HashMap<String, Object> params) {
 		String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
 				"kvm-domain-template.xml");
-		params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run", params
-				.get("name").toString(), "linux.img"));
+		// TODO @shayf add multiple img file choices
+		if ((params.get("hdaImage") != null)
+				&& !params.get("hdaImage").toString().equals("")) {
+			params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
+					params.get("name").toString(), params.get("hdaImage")
+							.toString()));
+		} else {
+			params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
+					params.get("name").toString(), "linux.img"));
+		}
 
 		if ((params.get("cdImage") != null)
 				&& (!params.get("cdImage").toString().equals(""))) {

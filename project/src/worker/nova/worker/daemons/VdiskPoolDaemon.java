@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
@@ -20,21 +21,50 @@ import org.libvirt.LibvirtException;
  */
 public class VdiskPoolDaemon extends SimpleDaemon {
 
+	private HashMap<String, VdiskFile> fileStatus;
+
 	public VdiskPoolDaemon() {
 		super(2000);
-		VdiskFiles = new VdiskFile[POOL_SIZE];
-		for (int i = 0; i < POOL_SIZE; i++) {
-			VdiskFiles[i] = new VdiskFile();
-			VdiskFiles[i].setStatValue(i + 1); // also set len values here
-			VdiskFiles[i].setLastVisitTime(System.currentTimeMillis());
-			System.out.println(Integer.toString(i + 1) + "\t"
-					+ VdiskFiles[i].getStat().toString() + "\tlen\t"
-					+ VdiskFiles[i].getLen() + "\tvisittime\t"
-					+ VdiskFiles[i].getLastVisitTime());
+		fileStatus = new HashMap<String, VdiskFile>();
+		File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
+		for (String stdImgFile : pathFile.list()) {
+			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+					stdImgFile));
+			System.out.println("tmp.getname() is " + tmp.getName());
+			System.out.println("tmp.isDirectory() is " + tmp.isDirectory());
+			System.out.println("tmp.length() is " + tmp.length());
+			if (!tmp.isDirectory()) {
+				System.out.println("list files " + stdImgFile);
+				for (int i = 1; i <= POOL_SIZE; i++) {
+					VdiskFile tmpVdiskFile = new VdiskFile();
+					tmpVdiskFile.setStatValue(i, stdImgFile);
+					tmpVdiskFile.setLastVisitTime(System.currentTimeMillis());
+					fileStatus.put(stdImgFile + ".pool." + Integer.toString(i),
+							tmpVdiskFile);
+					System.out.println(stdImgFile
+							+ ".pool."
+							+ Integer.toString(i)
+							+ "\nstatus: "
+							+ fileStatus
+									.get(stdImgFile + ".pool."
+											+ Integer.toString(i)).getStat()
+									.toString()
+							+ "\nlen: "
+							+ fileStatus
+									.get(stdImgFile + ".pool."
+											+ Integer.toString(i)).getLen()
+							+ "\n visittime: "
+							+ fileStatus
+									.get(stdImgFile + ".pool."
+											+ Integer.toString(i))
+									.getLastVisitTime());
+				}
+
+			}
 		}
 		this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
 		this.setMbps(1);
-		this.setVmRunning(true);
+		this.setVmRunning(false);
 	}
 
 	/**
@@ -117,11 +147,11 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			this.stat = stat;
 		}
 
-		public void setStatValue(int i) {
+		public void setStatValue(int i, String stdImgFile) {
 			File img = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-					"vdiskpool", "linux.img.pool." + Integer.toString(i)));
+					"vdiskpool", stdImgFile + ".pool." + Integer.toString(i)));
 			File lockedImg = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-					"vdiskpool", "linux.img.pool." + Integer.toString(i)
+					"vdiskpool", stdImgFile + ".pool." + Integer.toString(i)
 							+ ".lock"));
 			if (!img.exists() && !lockedImg.exists()) {
 				this.stat = Status.NOT_EXIST;
@@ -157,8 +187,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		}
 	}
 
-	VdiskFile[] VdiskFiles;
-
 	public static int getPOOL_SIZE() {
 		return POOL_SIZE;
 	}
@@ -174,22 +202,22 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		long bytesCopied = 0;
 		byte[] b = new byte[1024 * 5];
 		int cnt;
-		// int loop = 0;
+		int loop = 0;
 		long timeStamp = System.currentTimeMillis();
 		double sleepUsec = 1.0;
 		while (!this.isStopping()) {
-			// loop++;
-			// if (loop % 1024 == 0) {
-			// if (loop > 1)
-			// break;
-			// }
+			loop++;
+			if (loop % 1024 == 0) {
+				// TODO @shayf check if revoke needed
+			}
 
 			cnt = input.read(b);
 			if (cnt <= 0)
 				break;
 			output.write(b, 0, cnt);
 			if (this.getMbps() > 0) {
-				System.out.println("low speed copy file" + tmpFile.getName());
+				// System.out.println("low speed copy file" +
+				// tmpFile.getName());
 				bytesCopied += cnt;
 				if (bytesCopied > this.getMbps() * 1024 * 1024) {
 					timeStamp -= System.currentTimeMillis();
@@ -213,7 +241,8 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 					this.setMbps(0);
 				}
 			} else {
-				System.out.println("high speed copy file" + tmpFile.getName());
+				// System.out.println("high speed copy file" +
+				// tmpFile.getName());
 				if (this.isVmRunning()) {
 					timeStamp = System.currentTimeMillis();
 					sleepUsec = 1.0;
@@ -233,72 +262,121 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			return;
 		}
 		final String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "vdiskpool");
-		for (int i = POOL_SIZE; i > 0; i--) {
-			if (VdiskFiles[i - 1].getStat().equals(VdiskFile.Status.NOT_EXIST)) {
-				VdiskFiles[i - 1].setStat(VdiskFile.Status.LOCKED);
-				try {
-					System.out.println("file"
-							+ Utils.pathJoin(path,
-									"linux.img.pool." + Integer.toString(i))
-							+ " " + VdiskFile.Status.NOT_EXIST.toString());
-					System.out.println("going to copy file"
-							+ Utils.pathJoin(path,
-									"linux.img.pool." + Integer.toString(i)));
-					String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME, "run",
-							"linux.img");
-					String destUrl = Utils.pathJoin(path, "linux.img.pool."
-							+ Integer.toString(i) + ".lock");
-					File sourceFile = new File(sourceUrl);
-					File tmpFile = new File(destUrl);
-					File destFile = new File(Utils.pathJoin(path,
-							"linux.img.pool." + Integer.toString(i)));
-					if (sourceFile.isFile()) {
-						this.autoSpeedCopy(sourceFile, tmpFile);
-					}
+		File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
+		for (String stdImgFile : pathFile.list()) {
+			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+					stdImgFile));
+			if (!tmp.isDirectory()) {
+				// System.out.println("list files " + stdImgFile);
+				for (int i = POOL_SIZE; i > 0; i--) {
+					if (fileStatus
+							.get(stdImgFile + ".pool." + Integer.toString(i))
+							.getStat().equals(VdiskFile.Status.NOT_EXIST)) {
+						fileStatus.get(
+								stdImgFile + ".pool." + Integer.toString(i))
+								.setStat(VdiskFile.Status.LOCKED);
+						try {
+							System.out.println("file"
+									+ Utils.pathJoin(path, stdImgFile
+											+ ".pool." + Integer.toString(i))
+									+ " "
+									+ VdiskFile.Status.NOT_EXIST.toString());
+							System.out.println("going to copy file"
+									+ Utils.pathJoin(path, stdImgFile
+											+ ".pool." + Integer.toString(i)));
+							String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
+									"run", stdImgFile);
+							String destUrl = Utils.pathJoin(path, stdImgFile
+									+ ".pool." + Integer.toString(i) + ".lock");
+							File sourceFile = new File(sourceUrl);
+							File tmpFile = new File(destUrl);
+							File destFile = new File(
+									Utils.pathJoin(path, stdImgFile + ".pool."
+											+ Integer.toString(i)));
+							if (sourceFile.isFile()) {
+								this.autoSpeedCopy(sourceFile, tmpFile);
+							}
 
-					if (tmpFile.length() == sourceFile.length()) {
-						tmpFile.renameTo(destFile);
-						System.out.println("rename file" + tmpFile.getName()
-								+ " to " + destFile.getName());
-						VdiskFiles[i - 1].setStat(VdiskFile.Status.AVAILABLE);
-						VdiskFiles[i - 1].setLen(destFile.length());
-						VdiskFiles[i - 1].setLastVisitTime(System
-								.currentTimeMillis());
-					} else {
-						VdiskFiles[i - 1].setLen(tmpFile.length());
-						VdiskFiles[i - 1].setLastVisitTime(System
-								.currentTimeMillis());
-					}
-					if (this.isStopping()) {
-						break;
-					}
-				} catch (IOException e) {
-					log.error("copy image fail", e);
-				} catch (LibvirtException e) {
-					log.error("libvirt connection fail", e);
-				}
+							if (tmpFile.length() == sourceFile.length()) {
+								tmpFile.renameTo(destFile);
+								System.out.println("rename file"
+										+ tmpFile.getName() + " to "
+										+ destFile.getName());
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i)).setStat(
+										VdiskFile.Status.AVAILABLE);
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i)).setLen(
+										destFile.length());
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i))
+										.setLastVisitTime(
+												System.currentTimeMillis());
+							} else {
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i)).setLen(
+										tmpFile.length());
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i))
+										.setLastVisitTime(
+												System.currentTimeMillis());
+							}
+							if (this.isStopping()) {
+								break;
+							}
+						} catch (IOException e) {
+							log.error("copy image fail", e);
+						} catch (LibvirtException e) {
+							log.error("libvirt connection fail", e);
+						}
 
-			} else if (VdiskFiles[i - 1].getStat().equals(
-					VdiskFile.Status.LOCKED)) {
-				System.out.println("time step:\t"
-						+ Long.toString(System.currentTimeMillis()
-								- VdiskFiles[i - 1].getLastVisitTime()));
-				if (System.currentTimeMillis()
-						- VdiskFiles[i - 1].getLastVisitTime() > 1000) {
-					File lockedImg = new File(Utils.pathJoin(Utils.NOVA_HOME,
-							"run", "vdiskpool",
-							"linux.img.pool." + Integer.toString(i) + ".lock"));
-					if (VdiskFiles[i - 1].getLen() == lockedImg.length()) {
-						// copy failed
-						lockedImg.delete();
+					} else if (fileStatus
+							.get(stdImgFile + ".pool." + Integer.toString(i))
+							.getStat().equals(VdiskFile.Status.LOCKED)) {
+						System.out.println("time step:\t"
+								+ Long.toString(System.currentTimeMillis()
+										- fileStatus.get(
+												stdImgFile + ".pool."
+														+ Integer.toString(i))
+												.getLastVisitTime()));
+						if (System.currentTimeMillis()
+								- fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i))
+										.getLastVisitTime() > 1000) {
+							File lockedImg = new File(Utils.pathJoin(
+									Utils.NOVA_HOME, "run", "vdiskpool",
+									stdImgFile + ".pool." + Integer.toString(i)
+											+ ".lock"));
+							if (fileStatus
+									.get(stdImgFile + ".pool."
+											+ Integer.toString(i)).getLen() == lockedImg
+									.length()) {
+								// copy failed
+								lockedImg.delete();
+							}
+							fileStatus
+									.get(stdImgFile + ".pool."
+											+ Integer.toString(i)).setStat(
+											VdiskFile.Status.NOT_EXIST);
+							fileStatus
+									.get(stdImgFile + ".pool."
+											+ Integer.toString(i)).setLen(-1);
+							fileStatus
+									.get(stdImgFile + ".pool."
+											+ Integer.toString(i))
+									.setLastVisitTime(
+											System.currentTimeMillis());
+						}
 					}
-					VdiskFiles[i - 1].setStat(VdiskFile.Status.NOT_EXIST);
-					VdiskFiles[i - 1].setLen(-1);
-					VdiskFiles[i - 1].setLastVisitTime(System
-							.currentTimeMillis());
 				}
 			}
 		}
-	}
 
+	}
 }
