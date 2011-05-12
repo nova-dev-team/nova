@@ -18,18 +18,18 @@ public class TestStopVnode {
 	@Test
 	public void test() {
 		StopVnodeHandler svh = new StopVnodeHandler();
-		StopVnodeMessage msg = new StopVnodeMessage(
+		StopVnodeMessage msg = new StopVnodeMessage("kvm",
 				"0f7c794b-2e17-45ef-3c55-ece004e76aef");
 		ChannelHandlerContext ctx = null;
 		MessageEvent e = null;
 		SimpleAddress xreply = null;
 		svh.handleMessage(msg, ctx, e, xreply);
 
-		StopVnodeMessage msg2 = new StopVnodeMessage(
+		StopVnodeMessage msg2 = new StopVnodeMessage("kvm",
 				"1f7c794b-2e17-45ef-3c55-ece004e76aef", true);
 		svh.handleMessage(msg2, ctx, e, xreply);
 
-		StopVnodeMessage msg3 = new StopVnodeMessage(
+		StopVnodeMessage msg3 = new StopVnodeMessage("kvm",
 				"1f7c794b-2e17-45ef-3c55-ece004e76aef");
 		svh.handleMessage(msg3, ctx, e, xreply);
 	}

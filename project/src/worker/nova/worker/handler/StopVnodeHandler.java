@@ -30,7 +30,13 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 	@Override
 	public void handleMessage(StopVnodeMessage msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
-		final String virtService = "qemu:///system";
+		final String virtService;
+		if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
+			virtService = "qemu:///system";
+		} else {
+			// TODO @shayf get correct xen service address
+			virtService = "some xen address";
+		}
 		Connect conn = null;
 		try {
 			// connect the qemu system
@@ -43,7 +49,7 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 			Domain dom = conn.domainLookupByUUIDString(msg.getUuid());
 			String name = dom.getName();
 
-			if (!msg.getPowerOffOnly()) {
+			if (!msg.isSuspendOnly()) {
 				dom.destroy();
 				System.out.println("delete path = "
 						+ Utils.pathJoin(Utils.NOVA_HOME, "run", name));

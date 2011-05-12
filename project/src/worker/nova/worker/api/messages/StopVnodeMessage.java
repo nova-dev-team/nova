@@ -8,15 +8,24 @@ package nova.worker.api.messages;
  */
 public class StopVnodeMessage {
 
+	public String hyperVisor;
 	public String uuid;
-	public boolean powerOffOnly;
+	public boolean suspendOnly;
 
-	public boolean getPowerOffOnly() {
-		return powerOffOnly;
+	public boolean isSuspendOnly() {
+		return suspendOnly;
 	}
 
-	public void setPowerOffOnly(boolean powerOffOnly) {
-		this.powerOffOnly = powerOffOnly;
+	public void setSuspendOnly(boolean suspendOnly) {
+		this.suspendOnly = suspendOnly;
+	}
+
+	public String getHyperVisor() {
+		return hyperVisor;
+	}
+
+	public void setHyperVisor(String hyperVisor) {
+		this.hyperVisor = hyperVisor;
 	}
 
 	public String getUuid() {
@@ -27,13 +36,15 @@ public class StopVnodeMessage {
 		this.uuid = uuid;
 	}
 
-	public StopVnodeMessage(String uuid) {
+	public StopVnodeMessage(String hyperVisor, String uuid) {
+		this.hyperVisor = hyperVisor;
 		this.uuid = uuid;
-		this.powerOffOnly = false;
+		this.suspendOnly = false;
 	}
 
-	public StopVnodeMessage(String uuid, boolean powerOffOnly) {
+	public StopVnodeMessage(String hyperVisor, String uuid, boolean suspendOnly) {
+		this.hyperVisor = hyperVisor;
 		this.uuid = uuid;
-		this.powerOffOnly = powerOffOnly;
+		this.suspendOnly = suspendOnly;
 	}
 }

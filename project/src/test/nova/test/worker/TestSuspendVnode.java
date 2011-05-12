@@ -18,7 +18,7 @@ public class TestSuspendVnode {
 	@Test
 	public void test() {
 		StopVnodeHandler svh = new StopVnodeHandler();
-		StopVnodeMessage msg = new StopVnodeMessage(
+		StopVnodeMessage msg = new StopVnodeMessage("kvm",
 				"1f7c794b-2e17-45ef-3c55-ece004e76aef", true);
 		ChannelHandlerContext ctx = null;
 		MessageEvent e = null;

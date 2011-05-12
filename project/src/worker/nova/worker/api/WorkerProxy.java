@@ -86,8 +86,38 @@ public class WorkerProxy extends SimpleProxy {
 		super.sendRequest(msg);
 	}
 
-	public void sendStopVnode(String uuid, boolean powerOffOnly) {
-		StopVnodeMessage msg = new StopVnodeMessage(uuid, powerOffOnly);
+	/**
+	 * destroy vm message, default shutdown. same function as
+	 * sendStopVnode(hyperVisor, uuid, false)
+	 * 
+	 * author shayf
+	 * 
+	 * @param hyperVisor
+	 *            hypervisor type, use "kvm" or "xen" ignore case
+	 * @param uuid
+	 *            uuid of vm to shut down
+	 */
+	public void sendStopVnode(String hyperVisor, String uuid) {
+		StopVnodeMessage msg = new StopVnodeMessage(hyperVisor, uuid);
+		super.sendRequest(msg);
+	}
+
+	/**
+	 * destroy or suspend vm message
+	 * 
+	 * author shayf
+	 * 
+	 * @param hyperVisor
+	 *            hypervisor type, use "kvm" or "xen" ignore case
+	 * @param uuid
+	 *            uuid of vm to shut down
+	 * @param suspendOnly
+	 *            "true" suspend, "false" destroy
+	 */
+	public void sendStopVnode(String hyperVisor, String uuid,
+			boolean suspendOnly) {
+		StopVnodeMessage msg = new StopVnodeMessage(hyperVisor, uuid,
+				suspendOnly);
 		super.sendRequest(msg);
 	}
 

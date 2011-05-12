@@ -38,8 +38,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 	@Override
 	public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
-		// TODO @future support both xen and kvm.
-		final String virtService = "qemu:///system";
+		final String virtService;
+		if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
+			virtService = "qemu:///system";
+		} else {
+			// TODO @shayf get correct xen service address
+			virtService = "some xen address";
+		}
 		Connect conn = null;
 		try {
 			// connect the qemu system
