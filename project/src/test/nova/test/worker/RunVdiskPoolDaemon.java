@@ -8,7 +8,7 @@ import nova.worker.NovaWorker;
  * @author shayf
  * 
  */
-public class TestVdiskPool {
+public class RunVdiskPoolDaemon {
 
 	public static void main(String[] args) {
 		NovaWorker.getInstance().start();
