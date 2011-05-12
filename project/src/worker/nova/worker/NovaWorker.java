@@ -8,12 +8,14 @@ import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
+import nova.worker.api.messages.RevokeImageMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.api.messages.StopVnodeMessage;
 import nova.worker.daemons.VdiskPoolDaemon;
 import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.daemons.WorkerHeartbeatDaemon;
 import nova.worker.daemons.WorkerPerfInfoDaemon;
+import nova.worker.handler.RevokeImageHandler;
 import nova.worker.handler.StartVnodeHandler;
 import nova.worker.handler.StopVnodeHandler;
 import nova.worker.handler.WorkerHttpHandler;
@@ -61,6 +63,8 @@ public class NovaWorker extends SimpleServer {
 
 		this.registerHandler(QueryHeartbeatMessage.class,
 				new WorkerQueryHeartbeatHandler());
+
+		this.registerHandler(RevokeImageMessage.class, new RevokeImageHandler());
 
 		Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("worker.bind_port", 4000);

@@ -195,6 +195,43 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		POOL_SIZE = poolSize;
 	}
 
+	private void checkRevoke(String parent) {
+		// TODO Auto-generated method stub
+		File parentPath = new File(parent);
+		boolean found = false;
+		while (true) {
+			String prefix = null;
+			for (String fn : parentPath.list()) {
+				if (fn.endsWith(".revoke")) {
+					prefix = fn.substring(0, fn.length() - 7);
+					found = true;
+					System.out.println("found " + fn);
+					break;
+				}
+			}
+			if (found) {
+				System.out.println("start delete " + prefix);
+				File[] delList = parentPath.listFiles();
+				for (File delfn : delList) {
+					if (delfn.getName().startsWith(prefix)) {
+						System.out.println("del match prefix " + delfn);
+						delfn.delete();
+					}
+				}
+				File[] delList2 = parentPath.getParentFile().listFiles();
+				for (File delfn : delList2) {
+					if (delfn.getName().startsWith(prefix)) {
+						System.out.println("del match prefix " + delfn);
+						delfn.delete();
+					}
+				}
+				found = false;
+			} else {
+				break;
+			}
+		}
+	}
+
 	private void autoSpeedCopy(File sourceFile, File tmpFile)
 			throws IOException, LibvirtException {
 		FileInputStream input = new FileInputStream(sourceFile);
@@ -208,7 +245,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		while (!this.isStopping()) {
 			loop++;
 			if (loop % 1024 == 0) {
-				// TODO @shayf check if revoke needed
+				checkRevoke(tmpFile.getParent());
 			}
 
 			cnt = input.read(b);
@@ -262,6 +299,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			return;
 		}
 		final String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "vdiskpool");
+		checkRevoke(path);
 		File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
 		for (String stdImgFile : pathFile.list()) {
 			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",

@@ -7,6 +7,7 @@ import nova.common.service.SimpleProxy;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
+import nova.worker.api.messages.RevokeImageMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.api.messages.StopVnodeMessage;
 
@@ -119,6 +120,17 @@ public class WorkerProxy extends SimpleProxy {
 		StopVnodeMessage msg = new StopVnodeMessage(hyperVisor, uuid,
 				suspendOnly);
 		super.sendRequest(msg);
+	}
+
+	/**
+	 * author shayf
+	 * 
+	 * @param name
+	 *            the name of image file you want to del
+	 */
+	public void sendRevokeImage(String name) {
+		RevokeImageMessage rim = new RevokeImageMessage(name);
+		super.sendRequest(rim);
 	}
 
 	public void sendRequestHeartbeat() {
