@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
+import nova.agent.ui.AgentFrame;
 import nova.common.util.SimpleDaemon;
 
 import org.apache.log4j.Logger;
@@ -26,19 +27,20 @@ public class ApplianceDownloadDaemon extends SimpleDaemon {
 	protected void workOneRound() {
 		for (Appliance app : NovaAgent.getInstance().getAppliances().values()) {
 			if (app.getStatus().equals(Appliance.Status.DOWNLOAD_PENDING)) {
-
 				log.info("Found DOWNLOAD_PENDING appliance: " + app.getName());
 				try {
+					// AgentFrame downloading status
+					AgentFrame.setInfoDisplayWhenDown("Downloading "
+							+ app.getName());
 
 					app.setStatus(Appliance.Status.DOWNLOADING);
-					log.info("Downloading appliance: " + app.getName());
+
 					NovaAgent.getInstance().getApplianceFetcher().fetch(app);
 
-					log.info("Appliance downloaded, mark INSTALL_PENDING: "
-							+ app.getName());
 					if (app.getStatus().equals(Appliance.Status.DOWNLOADING)) {
 						app.setStatus(Appliance.Status.INSTALL_PENDING);
 					}
+
 				} catch (IOException e) {
 					log.error(
 							"Error downloading appliance, set to DOWNLOAD_FAILURE "
@@ -48,5 +50,4 @@ public class ApplianceDownloadDaemon extends SimpleDaemon {
 			}
 		}
 	}
-
 }
