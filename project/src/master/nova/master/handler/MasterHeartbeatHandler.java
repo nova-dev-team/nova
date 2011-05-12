@@ -26,7 +26,7 @@ public class MasterHeartbeatHandler implements SimpleHandler<HeartbeatMessage> {
 			log.info("Got heartbeat message from: " + xreply);
 		}
 
-		// TODO @santa possibly update vnode
+		// TODO @zhaoxun possibly update vnode
 		Pnode pnode = Pnode.findByIp(xreply.ip);
 		if (pnode != null) {
 			pnode.setStatus(Pnode.Status.RUNNING);

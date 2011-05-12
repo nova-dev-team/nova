@@ -13,4 +13,5 @@ public abstract class DbObject {
 	public final void setId(long id) {
 		this.id = id;
 	}
+
 }

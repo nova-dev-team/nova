@@ -66,15 +66,11 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * 
 	 * @return FtpClient
 	 */
-	private FtpClient connect() {
+	private FtpClient connect() throws IOException {
 		FtpClient fc = null;
-		try {
-			fc = new FtpClient(this.hostIp);
-			fc.openServer(hostIp, 8021);
-			fc.login(this.userName, this.password);
-		} catch (IOException e) {
-			return null;
-		}
+		fc = new FtpClient(this.hostIp);
+		fc.openServer(hostIp, 8021);
+		fc.login(this.userName, this.password);
 		return fc;
 	}
 

@@ -26,20 +26,29 @@ public class ApplianceListHandler implements
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		// Pair.first = appName;
 		// Pair.second = appInfo;
-		Pair<String, String>[] apps = msg.getApps();
+		Pair<String, String>[] appsFromMaster = msg.getApps();
 
 		ConcurrentHashMap<String, Appliance> appliances = NovaAgent
 				.getInstance().getAppliances();
 
-		for (int i = 0; i < apps.length; i++) {
-			String appName = apps[i].getFirst();
+		// Delete appliance that stay in local appliances but not in new master
+		// appliance list
+		for (Appliance app : appliances.values()) {
+			for (Pair<String, String> appsMaster : appsFromMaster)
+				if (appsMaster.getFirst().equals(app.getName()))
+					appliances.remove(app.getName());
+		}
+
+		// Update to new list
+		for (int i = 0; i < appsFromMaster.length; i++) {
+			String appName = appsFromMaster[i].getFirst();
 
 			if (appliances.containsKey(appName) == false) {
 				Appliance app = new Appliance(appName);
 				appliances.put(appName, app);
 			}
 			Appliance app = appliances.get(appName);
-			app.setInfo(apps[i].getSecond());
+			app.setInfo(appsFromMaster[i].getSecond());
 		}
 
 		NovaAgent.getInstance().saveAppliances();

@@ -211,10 +211,10 @@ public class NovaAgent extends SimpleServer {
 		return this.uuid;
 	}
 
-	public void registerMaster(SimpleAddress xreply) {
-		// FIXME @santa: bindAddr should not be 0.0.0.0!
-		this.master = new MasterProxy(this.addr);
-		master.connect(xreply.getInetSocketAddress());
+	public void registerMaster(SimpleAddress masterAddr) {
+		MasterProxy proxy = new MasterProxy(this.addr);
+		proxy.connect(masterAddr.getInetSocketAddress());
+		this.master = proxy;
 	}
 
 	/**

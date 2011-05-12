@@ -9,9 +9,11 @@ import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.PerfMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
+import nova.master.handler.AddPnodeHandler;
 import nova.master.handler.MasterHeartbeatHandler;
 import nova.master.handler.MasterHttpHandler;
 import nova.master.handler.MasterPerfHandler;
@@ -56,6 +58,8 @@ public class NovaMaster extends SimpleServer {
 
 		this.registerHandler(HeartbeatMessage.class,
 				new MasterHeartbeatHandler());
+
+		this.registerHandler(AddPnodeMessage.class, new AddPnodeHandler());
 
 		this.registerHandler(PnodeStatusMessage.class, new PnodeStatusHandler());
 

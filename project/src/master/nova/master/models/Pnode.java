@@ -210,7 +210,7 @@ public class Pnode extends DbObject {
 	}
 
 	public void setAddr(SimpleAddress addr) {
-		this.ip = addr.ip;
+		this.setIp(addr.ip);
 		this.port = addr.port;
 	}
 
@@ -219,9 +219,7 @@ public class Pnode extends DbObject {
 	}
 
 	public void setIp(String ip) {
-		getManager().getIndex("ip").remove(this.ip);
-		this.ip = ip;
-		getManager().getIndex("ip").put(this.ip, this);
+		getManager().updateField(this, "ip", ip);
 	}
 
 	public void setMacAddress(String macAddress) {

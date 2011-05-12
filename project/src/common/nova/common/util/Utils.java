@@ -138,6 +138,28 @@ public class Utils {
 	}
 
 	@SuppressWarnings("rawtypes")
+	public static void setField(Object obj, String fieldName, Object newValue) {
+		Class objClass = obj.getClass();
+		try {
+			Field field = objClass.getDeclaredField(fieldName);
+			field.setAccessible(true);
+			field.set(obj, newValue);
+		} catch (SecurityException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		} catch (NoSuchFieldException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		} catch (IllegalArgumentException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		} catch (IllegalAccessException e) {
+			logger.error("Error fetching field " + fieldName + " from class "
+					+ objClass.getName(), e);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
 	public static boolean hasField(Object obj, String fieldName) {
 		Class objClass = obj.getClass();
 		try {
@@ -256,4 +278,5 @@ public class Utils {
 		}
 		return Utils.expandTemplate(template, values);
 	}
+
 }

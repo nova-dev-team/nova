@@ -160,9 +160,7 @@ public class Vdisk extends DbObject {
 	}
 
 	public void setFileName(String fileName) {
-		getManager().getIndex("fileName").remove(this.fileName);
-		this.fileName = fileName;
-		getManager().getIndex("fileName").put(this.fileName, this);
+		getManager().updateField(this, "fileName", fileName);
 	}
 
 	public void setOsFamily(String osFamily) {

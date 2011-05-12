@@ -26,8 +26,8 @@ public class TestNovaMaster {
 
 		MasterProxy mp = new MasterProxy(NovaWorker.getInstance().getAddr());
 		mp.connect(NovaMaster.getInstance().getAddr().getInetSocketAddress());
-		mp.sendPnodeStatus(NovaWorker.getInstance().getAddr(),
-				Pnode.Status.ADD_PENDING);
+
+		mp.sendAddPnode(NovaWorker.getInstance().getAddr());
 
 		try {
 			Thread.sleep(5000);

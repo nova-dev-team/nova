@@ -90,6 +90,7 @@ public class Vnode extends DbObject {
 	public static DbManager getManager() {
 		if (manager == null) {
 			DbSpec spec = new DbSpec();
+			spec.addIndex("ip");
 			spec.addIndex("uuid");
 			manager = DbManager.forClass(Vnode.class, spec);
 		}
@@ -305,7 +306,7 @@ public class Vnode extends DbObject {
 	}
 
 	public void setIp(String ip) {
-		this.ip = ip;
+		getManager().updateField(this, "ip", ip);
 	}
 
 	public void setMemorySize(Integer memorySize) {
@@ -349,9 +350,7 @@ public class Vnode extends DbObject {
 	}
 
 	public void setUuid(String uuid) {
-		getManager().getIndex("uuid").remove(this.uuid);
-		this.uuid = uuid;
-		getManager().getIndex("uuid").put(this.uuid, this);
+		getManager().updateField(this, "uuid", uuid);
 	}
 
 	public void setVclusterId(Integer vclusterId) {

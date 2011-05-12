@@ -117,8 +117,9 @@ public class NovaWorker extends SimpleServer {
 	}
 
 	public void registerMaster(SimpleAddress masterAddr) {
-		master = new MasterProxy(this.addr);
-		master.connect(masterAddr.getInetSocketAddress());
+		MasterProxy proxy = new MasterProxy(this.addr);
+		proxy.connect(masterAddr.getInetSocketAddress());
+		this.master = proxy;
 	}
 
 	/**

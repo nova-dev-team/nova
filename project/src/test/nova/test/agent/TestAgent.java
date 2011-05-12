@@ -26,21 +26,27 @@ public class TestAgent {
 	}
 
 	@Test
+	public void testAgentSendToMaster() {
+	}
+
+	@Test
 	public void testInstallAgent() {
 		NovaAgent.getInstance().start();
 		NovaMaster.getInstance().start();
 
-		AgentProxy proxy = new AgentProxy(NovaAgent.getInstance().getAddr());
-		proxy.connect(NovaMaster.getInstance().getAddr().getInetSocketAddress());
+		AgentProxy proxy = new AgentProxy(NovaMaster.getInstance().getAddr());
 
-		proxy.sendInstallAppliance("demo1", "demo3");
+		proxy.connect(NovaAgent.getInstance().getAddr().getInetSocketAddress());
+		String[] appList1 = new String[] { "demo1", "demo3" };
+		proxy.sendInstallAppliance(appList1);
 
-		String[] appList = new String[] { "demo2", "demo4" };
+		String[] appList2 = new String[] { "demo2", "demo4" };
+		proxy.sendInstallAppliance(appList2);
 
-		proxy.sendInstallAppliance(appList);
+		proxy.sendRequestHeartbeat();
 
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

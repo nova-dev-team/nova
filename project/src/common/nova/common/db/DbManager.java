@@ -46,6 +46,7 @@ public class DbManager {
 
 		// create index on other columns
 		if (queryResult.size() > 0) {
+
 			for (String indexName : spec.getAllIndex()) {
 				Map<Serializable, DbObject> index = allIndex.get(indexName);
 
@@ -84,6 +85,21 @@ public class DbManager {
 
 	public Map<Serializable, DbObject> getIndex(String fieldName) {
 		return this.allIndex.get(fieldName);
+	}
+
+	public void updateField(DbObject obj, String fieldName,
+			Serializable newValue) {
+		if (obj.getId() != DbObject.INVALID_ID) {
+			Object oldValue = Utils.getField(obj, fieldName);
+			getIndex(fieldName).remove(oldValue);
+		}
+
+		Utils.setField(obj, fieldName, newValue);
+
+		if (obj.getId() != DbObject.INVALID_ID) {
+			getIndex(fieldName).put(newValue, obj);
+		}
+
 	}
 
 	public synchronized void save(DbObject obj) {

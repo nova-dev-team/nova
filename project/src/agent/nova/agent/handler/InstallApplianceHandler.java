@@ -1,7 +1,6 @@
 package nova.agent.handler;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 import nova.agent.NovaAgent;
 import nova.agent.api.messages.InstallApplianceMessage;
@@ -20,7 +19,6 @@ import org.jboss.netty.channel.MessageEvent;
  */
 public class InstallApplianceHandler implements
 		SimpleHandler<InstallApplianceMessage> {
-	AtomicLong counter = new AtomicLong();
 
 	@Override
 	public void handleMessage(InstallApplianceMessage msg,

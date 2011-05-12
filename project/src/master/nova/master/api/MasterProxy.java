@@ -9,6 +9,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.PerfMessage;
+import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.VnodeStatusMessage;
@@ -43,6 +44,10 @@ public class MasterProxy extends SimpleProxy {
 	 */
 	public void sendMonitorInfo() {
 		super.sendRequest(new PerfMessage());
+	}
+
+	public void sendAddPnode(SimpleAddress pAddr) {
+		super.sendRequest(new AddPnodeMessage(pAddr));
 	}
 
 	public void sendPnodeStatus(SimpleAddress pAddr, Pnode.Status status) {
