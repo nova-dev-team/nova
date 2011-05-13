@@ -42,13 +42,48 @@ public class ApplianceInstaller {
 	 * 
 	 * @param app
 	 *            {@link Appliance}
-	 * @throws IOException
-	 *             IOException of Runtime.getRuntime().exec()
 	 */
-	public static void install(Appliance app) throws IOException {
+	public static void casualInstall(Appliance app) {
 		String relativePath = Conf.getString("agent.software.save_path");
 		String folderPath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
 				app.getName());
+		try {
+			install(folderPath);
+		} catch (IOException e) {
+			app.setStatus(Appliance.Status.INSTALL_FAILURE);
+			logger.error("Can't install " + app.getName(), e);
+		}
+
+	}
+
+	/**
+	 * Install one appliance when first start up this vm
+	 * 
+	 * @param app
+	 *            {@link Appliance}
+	 * 
+	 */
+	public static void firstInstall(Appliance app) {
+		String relativePath = Conf.getString("agent.iso.save_path");
+		String folderPath = Utils.pathJoin(relativePath, "appliances",
+				app.getName());
+		try {
+			install(folderPath);
+		} catch (IOException e) {
+			app.setStatus(Appliance.Status.INSTALL_FAILURE);
+			logger.error("Can't install " + app.getName(), e);
+		}
+	}
+
+	/**
+	 * Install one appliance
+	 * 
+	 * @param folderPath
+	 *            where find the appliance
+	 * @throws IOException
+	 *             IOException of Runtime.getRuntime().exec()
+	 */
+	private static void install(String folderPath) throws IOException {
 		// Install statement used in windows
 		if (isWindows()) {
 			Process p = Runtime.getRuntime().exec("cmd /c autorun.bat",
@@ -72,6 +107,5 @@ public class ApplianceInstaller {
 			logger.error("Can't find the autorun file for this appliance: "
 					+ folderPath);
 		}
-
 	}
 }
