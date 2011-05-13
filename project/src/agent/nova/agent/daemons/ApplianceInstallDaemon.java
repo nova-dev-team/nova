@@ -1,7 +1,5 @@
 package nova.agent.daemons;
 
-import java.io.IOException;
-
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.ApplianceInstaller;
@@ -51,17 +49,12 @@ class InstallThread implements Runnable {
 
 	@Override
 	public void run() {
-		try {
-			this.app.setStatus(Appliance.Status.INSTALLING);
+		this.app.setStatus(Appliance.Status.INSTALLING);
 
-			ApplianceInstaller.install(this.app);
-			this.app.setStatus(Appliance.Status.INSTALLED);
+		ApplianceInstaller.casualInstall(this.app);
+		this.app.setStatus(Appliance.Status.INSTALLED);
 
-			// AgentFrame display after install
-			AgentFrame.setInfoDisplayAfterInstall("Install Complete ");
-		} catch (IOException e) {
-			log.error("Install failure!", e);
-			this.app.setStatus(Appliance.Status.INSTALL_FAILURE);
-		}
+		// AgentFrame display after install
+		AgentFrame.setInfoDisplayAfterInstall("Install Complete ");
 	}
 }

@@ -15,6 +15,7 @@ import nova.agent.api.messages.QueryApplianceStatusMessage;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.ApplianceFetcher;
 import nova.agent.appliance.FtpApplianceFetcher;
+import nova.agent.appliance.ApplianceFirstInstall;
 import nova.agent.daemons.AgentHeartbeatDaemon;
 import nova.agent.daemons.AgentPerfInfoDaemon;
 import nova.agent.daemons.ApplianceDownloadDaemon;
@@ -241,6 +242,10 @@ public class NovaAgent extends SimpleServer {
 
 	public static void main(String[] args) {
 
+		// Install appliances when startup
+		if (args.length != 0) {
+			new Thread(new ApplianceFirstInstall(args)).start();
+		}
 		// add a shutdown hook, so a Ctrl-C or kill signal will be handled
 		// gracefully
 		Runtime.getRuntime().addShutdownHook(new Thread() {

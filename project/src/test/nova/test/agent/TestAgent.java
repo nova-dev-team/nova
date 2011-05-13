@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import junit.framework.Assert;
 import nova.agent.NovaAgent;
 import nova.agent.api.AgentProxy;
 import nova.agent.appliance.Appliance;
@@ -50,6 +51,9 @@ public class TestAgent {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		for (Appliance app : NovaAgent.getInstance().getAppliances().values())
+			Assert.assertEquals(Appliance.Status.DOWNLOAD_FAILURE,
+					app.getStatus());
 
 		NovaAgent.getInstance().shutdown();
 		NovaMaster.getInstance().shutdown();
