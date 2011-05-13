@@ -7,7 +7,9 @@ import java.io.IOException;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Conf;
 import nova.common.util.Utils;
+import nova.storage.NovaStorage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.daemons.VdiskPoolDaemon;
 import nova.worker.virt.Kvm;
@@ -86,12 +88,22 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			}
 
 			// mv img files from vdiskpool
-			String stdImgFile = "linux.img";
+			String stdImgFile = "small.img";
 			if ((msg.getHdaImage() != null) && (!msg.getHdaImage().equals(""))) {
 				stdImgFile = msg.getHdaImage();
 			}
 			File stdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 					stdImgFile));
+			if (!stdFile.exists()) {
+				// TODO #shayf get from ftp
+				if (NovaStorage.getInstance().getFtpServer() == null) {
+					NovaStorage.getInstance().startFtpServer();
+				}
+				// FtpApplianceFetcher fp = new FtpApplianceFetcher();
+				System.out.println(Conf.getString("worker.software.save_path"));
+				// fp.setMyPath(Conf.getString("worker.software.save_path"));
+				NovaStorage.getInstance().shutdown();
+			}
 			long stdLen = stdFile.length();
 			boolean found = false;
 			for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {

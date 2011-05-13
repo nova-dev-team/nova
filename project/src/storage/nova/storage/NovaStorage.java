@@ -14,7 +14,15 @@ public class NovaStorage extends SimpleServer {
 
 	static Logger logger = Logger.getLogger(NovaStorage.class);
 
-	FtpServer ftpServer = null;
+	private FtpServer ftpServer = null;
+
+	public FtpServer getFtpServer() {
+		return ftpServer;
+	}
+
+	public void setFtpServer(FtpServer ftpServer) {
+		this.ftpServer = ftpServer;
+	}
 
 	/**
 	 * Constructor made private for singleton pattern.
