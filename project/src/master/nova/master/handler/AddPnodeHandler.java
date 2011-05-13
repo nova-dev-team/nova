@@ -14,7 +14,7 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
 	/**
 	 * Log4j logger.
 	 */
-	Logger log = Logger.getLogger(MasterHeartbeatHandler.class);
+	Logger log = Logger.getLogger(AddPnodeMessage.class);
 
 	@Override
 	public void handleMessage(AddPnodeMessage msg, ChannelHandlerContext ctx,

@@ -25,6 +25,30 @@ ${appliance_info}<br>
 	<input type="submit" value="Add new pnode">
 </form>
 
+<h3><font color="#FF0000">Vdisk images<br></font></h3>
+<form action="add_vdisk" method="get">
+	Display name<input type="text" name="display_name">
+	File name<input type="text" name="file_name">
+	
+	Image type
+	<select name="image_type" >
+    	<option value="qcow2">qcow2
+   	 	<option value="img">img
+    	<option value="other">other
+ 	</select>
+	
+	OS family
+	<select name="os_family" >
+    	<option value="linux">linux
+   	 	<option value="windows">windows
+    	<option value="other">other
+ 	</select><br>
+	
+	OS name<input type="text" name="os_name">
+	Description<input type="text" name="description"><br>
+	<input type="submit" value="Register vdisk">
+</form>
+
 ${act}<br>
 ${pnode_ip}<br>
 
