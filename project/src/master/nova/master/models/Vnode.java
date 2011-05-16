@@ -60,6 +60,11 @@ public class Vnode extends DbObject {
 		SHUTTING_DOWN,
 
 		/**
+		 * The vnode is paused by user
+		 */
+		PAUSED,
+
+		/**
 		 * The vnode status is not known.
 		 */
 		UNKNOWN,
