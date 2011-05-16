@@ -69,6 +69,8 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 				delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
 			} else {
 				dom.suspend();
+				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
+						Vnode.Status.PAUSED);
 			}
 
 		} catch (LibvirtException ex) {
