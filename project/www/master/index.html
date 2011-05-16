@@ -49,6 +49,46 @@ ${appliance_info}<br>
 	<input type="submit" value="Register vdisk">
 </form>
 
+<h3><font color="#FF0000">Appliance packages<br></font></h3>
+<form action="add_vdisk" method="get">
+	Display name<input type="text" name="display_name">
+	File name<input type="text" name="file_name">
+		
+	OS family
+	<select name="os_family" >
+    	<option value="linux">linux
+   	 	<option value="windows">windows
+    	<option value="other">other
+ 	</select><br>
+	
+	Description<input type="text" name="description"><br>
+	<input type="submit" value="Register appliance">
+</form>
+
+<h3><font color="#FF0000">Create vnode<br></font></h3>
+<form action="create_vnode" method="get">
+	VM Image<input type="text" name="vnode_image"><br>
+	VM Name<input type="text" name="vnode_name"><br>
+	
+	CPU Count	
+	<select name="cpu_count" >
+    	<option value="1">1
+   	 	<option value="2">2
+    	<option value="4">4
+ 	</select>
+	
+	Memory Size<input type="text" name="memory_size">MB<br>
+	Appliance<input type="text" name="appliance">
+	<input type="submit" value="Create vnode">
+</form>
+
+<h3><font color="#FF0000">Create vcluster<br></font></h3>
+<form action="create_vcluster" method="get">
+	Cluster Name<input type="text" name="vcluster_name">
+	Cluster Size<input type="text" name="vcluster_size">MB
+	<input type="submit" value="Create vcluster">
+</form>
+
 ${act}<br>
 ${pnode_ip}<br>
 
