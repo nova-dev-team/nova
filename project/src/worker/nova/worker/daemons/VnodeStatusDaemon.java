@@ -27,7 +27,15 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 	 */
 	Logger logger = Logger.getLogger(VnodeStatusDaemon.class);
 
-	Map<UUID, Vnode.Status> allStatus = new HashMap<UUID, Vnode.Status>();
+	public static Map<UUID, Vnode.Status> allStatus = new HashMap<UUID, Vnode.Status>();
+
+	public static void putStatus(UUID uu, Vnode.Status vs) {
+		allStatus.put(uu, vs);
+	}
+
+	public static void delStatus(UUID uu) {
+		allStatus.remove(uu);
+	}
 
 	@Override
 	protected void workOneRound() {

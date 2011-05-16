@@ -4,14 +4,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
+import nova.master.models.Vnode;
 import nova.storage.NovaStorage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.daemons.VdiskPoolDaemon;
+import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.virt.Kvm;
 
 import org.apache.log4j.Logger;
@@ -173,6 +176,11 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				try {
 					Domain testDomain = conn.domainCreateLinux(
 							Kvm.emitDomain(msg.getHashMap()), 0);
+					if (testDomain != null) {
+						VnodeStatusDaemon.putStatus(
+								UUID.fromString(testDomain.getUUIDString()),
+								Vnode.Status.PREPARING);
+					}
 					System.out.println("Domain:" + testDomain.getName()
 							+ " id " + testDomain.getID() + " running "
 							+ testDomain.getOSType());

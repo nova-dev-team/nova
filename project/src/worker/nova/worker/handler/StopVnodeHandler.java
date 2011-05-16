@@ -1,11 +1,14 @@
 package nova.worker.handler;
 
 import java.io.File;
+import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Utils;
+import nova.master.models.Vnode;
 import nova.worker.api.messages.StopVnodeMessage;
+import nova.worker.daemons.VnodeStatusDaemon;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -47,10 +50,20 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 
 		try {
 			Domain dom = conn.domainLookupByUUIDString(msg.getUuid());
+			if (dom == null) {
+				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
+						Vnode.Status.CONNECT_FAILURE);
+				log.error("cannot connect and close domain " + msg.getUuid());
+				return;
+			}
 			String name = dom.getName();
 
 			if (!msg.isSuspendOnly()) {
+				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
+						Vnode.Status.SHUTTING_DOWN);
 				dom.destroy();
+				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
+						Vnode.Status.SHUT_OFF);
 				System.out.println("delete path = "
 						+ Utils.pathJoin(Utils.NOVA_HOME, "run", name));
 				delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
