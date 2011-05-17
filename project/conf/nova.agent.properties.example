@@ -36,3 +36,6 @@ agent.software.image_path=data/agent/images
 # where to save downloaded softwares
 agent.software.save_path=data/agent/appliances
 
+# the iso path
+agent.iso.save_path=E:/
+

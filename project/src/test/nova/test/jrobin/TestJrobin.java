@@ -15,7 +15,7 @@ public class TestJrobin {
 	@Test
 	public void testRRDTools() {
 		long startTime = Util.getTime();
-		long endTime = startTime + 1000;
+		long endTime = startTime + 86400;
 
 		String rootPath = "build/demo_flow.rrd";
 		int timeInterval = 10;

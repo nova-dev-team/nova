@@ -14,8 +14,8 @@ import nova.agent.api.messages.InstallApplianceMessage;
 import nova.agent.api.messages.QueryApplianceStatusMessage;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.ApplianceFetcher;
-import nova.agent.appliance.FtpApplianceFetcher;
 import nova.agent.appliance.ApplianceFirstInstall;
+import nova.agent.appliance.FtpApplianceFetcher;
 import nova.agent.daemons.AgentHeartbeatDaemon;
 import nova.agent.daemons.AgentPerfInfoDaemon;
 import nova.agent.daemons.ApplianceDownloadDaemon;
@@ -61,7 +61,7 @@ public class NovaAgent extends SimpleServer {
 	private static NovaAgent instance = null;
 
 	SimpleAddress addr = new SimpleAddress(Conf.getString("agent.bind_host"),
-			Conf.getInteger("agent.bind_port"));;
+			Conf.getInteger("agent.bind_port"));
 
 	/**
 	 * All background working daemons for agent node.

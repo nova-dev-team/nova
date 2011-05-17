@@ -89,7 +89,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	}
 
 	/**
-	 * Delete directory
+	 * Delete directory recursively
 	 * 
 	 * @param rootPath
 	 *            whole path of one directory, default value is ""
@@ -120,7 +120,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	/**
 	 * Judge if the downloading appliance is cancelled
 	 * 
-	 * @return
+	 * @return {@link Boolean}
 	 */
 	private boolean statusCancelled() {
 		return NovaAgent.getInstance().getAppliances().get(this.applianceName)
@@ -136,34 +136,33 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @param fileName
 	 *            the file that will be downloaded
 	 * @return
+	 * @throws IOException
+	 *             Download one file exception
 	 */
 	private boolean downloadFile(FtpClient fClient, String rootPath,
-			String fileName) {
+			String fileName) throws IOException {
 
 		TelnetInputStream is = null;
 		FileOutputStream os = null;
-		try {
-			fClient.binary();
-			is = fClient.get(fileName);
-			java.io.File outfile = new java.io.File(Utils.pathJoin(
-					Utils.NOVA_HOME, this.myPath, rootPath, fileName));
-			os = new FileOutputStream(outfile);
-			byte[] bytes = new byte[32 * 1024];
-			int c = 0;
 
-			while ((c = is.read(bytes)) != -1) {
-				os.write(bytes, 0, c);
+		fClient.binary();
+		is = fClient.get(fileName);
+		java.io.File outfile = new java.io.File(Utils.pathJoin(Utils.NOVA_HOME,
+				this.myPath, rootPath, fileName));
+		os = new FileOutputStream(outfile);
+		byte[] bytes = new byte[32 * 1024];
+		int c = 0;
 
-				if (statusCancelled()) {
-					break;
-				}
+		while ((c = is.read(bytes)) != -1) {
+			os.write(bytes, 0, c);
+
+			if (statusCancelled()) {
+				break;
 			}
-
-			is.close();
-			os.close();
-		} catch (IOException e) {
-			return false;
 		}
+
+		is.close();
+		os.close();
 		return true;
 	}
 
