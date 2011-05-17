@@ -209,8 +209,9 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 				return false;
 			}
 			return true;
-		} else
+		} else {
 			return false;
+		}
 	}
 
 	/**
