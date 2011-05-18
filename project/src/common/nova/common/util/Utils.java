@@ -88,8 +88,18 @@ public class Utils {
 	/**
 	 * Recursively remove dirs and files.
 	 */
-	public static void rmdir() {
-		// TODO @santa
+	public static void rmdir(String dirPath) {
+		File dir = new File(dirPath);
+		if (dir.exists()) {
+			for (File f : dir.listFiles()) {
+				if (f.isFile()) {
+					f.delete();
+				} else if (f.isDirectory()) {
+					rmdir(f.getAbsolutePath());
+				}
+			}
+			dir.delete();
+		}
 	}
 
 	/**
