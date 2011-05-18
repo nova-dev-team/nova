@@ -25,7 +25,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher implements
 	private int ftpPort = Conf.getInteger("agent.ftp.port");
 	private String userName = Conf.getString("agent.ftp.user_name");
 	private String password = Conf.getString("agent.ftp.password");
-	private String workingPath = Utils.pathJoin(Utils.NOVA_HOME,
+	private String savePath = Utils.pathJoin(Utils.NOVA_HOME,
 			Conf.getString("agent.software.save_path"));
 	private String applianceName = null;
 
@@ -42,11 +42,11 @@ public class FtpApplianceFetcher extends ApplianceFetcher implements
 		this.applianceName = app.getName();
 		FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName, password);
 		FtpUtils.downloadDir(fc, Utils.pathJoin("appliances", app.getName()),
-				Utils.pathJoin(workingPath, app.getName()), this);
+				Utils.pathJoin(savePath, app.getName()), this);
 		if (isCancelled()) {
 			NovaAgent.getInstance().getAppliances().get(app.getName())
 					.setStatus(Appliance.Status.NOT_INSTALLED);
-			Utils.rmdir(Utils.pathJoin(this.workingPath, app.getName()));
+			Utils.rmdir(Utils.pathJoin(this.savePath, app.getName()));
 		}
 		try {
 			fc.closeServer();

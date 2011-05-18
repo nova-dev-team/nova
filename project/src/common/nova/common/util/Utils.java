@@ -90,14 +90,16 @@ public class Utils {
 	 */
 	public static void rmdir(String dirPath) {
 		File dir = new File(dirPath);
-		for (File f : dir.listFiles()) {
-			if (f.isFile()) {
-				f.delete();
-			} else if (f.isDirectory()) {
-				rmdir(f.getAbsolutePath());
+		if (dir.exists()) {
+			for (File f : dir.listFiles()) {
+				if (f.isFile()) {
+					f.delete();
+				} else if (f.isDirectory()) {
+					rmdir(f.getAbsolutePath());
+				}
 			}
+			dir.delete();
 		}
-		dir.delete();
 	}
 
 	/**
