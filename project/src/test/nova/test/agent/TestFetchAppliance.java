@@ -6,6 +6,7 @@ import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.FtpApplianceFetcher;
 import nova.common.util.Conf;
+import nova.common.util.FtpUtils;
 import nova.storage.NovaStorage;
 
 import org.junit.Assert;
@@ -24,6 +25,7 @@ public class TestFetchAppliance {
 			Appliance app = new Appliance("picture");
 			NovaAgent.getInstance().getAppliances().put("picture", app);
 			// app.setStatus(Appliance.Status.CANCELLED);
+
 			fp.fetch(app);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -31,13 +33,15 @@ public class TestFetchAppliance {
 
 		String mySavePath = Conf.getString("agent.software.save_path");
 		NovaStorage.getInstance().shutdown();
+
 		fp.deleteDir(mySavePath, "", "picture");
+
 	}
 
 	private void testFtpFieldParsingHelper(String text, String... parts) {
 		for (int i = 0; i < parts.length; i++) {
-			int start = FtpApplianceFetcher.nthFieldStart(text, i);
-			int stop = FtpApplianceFetcher.nthFieldStop(text, i);
+			int start = FtpUtils.nthFieldStart(text, i);
+			int stop = FtpUtils.nthFieldStop(text, i);
 			Assert.assertEquals(text.substring(start, stop), parts[i]);
 		}
 	}

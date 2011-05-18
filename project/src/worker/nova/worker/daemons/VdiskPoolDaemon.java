@@ -27,6 +27,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		super(2000);
 		fileStatus = new HashMap<String, VdiskFile>();
 		File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
+		Utils.mkdirs(pathFile.getAbsolutePath());
 		for (String stdImgFile : pathFile.list()) {
 			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 					stdImgFile));
@@ -196,7 +197,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 	}
 
 	private void checkRevoke(String parent) {
-		// TODO Auto-generated method stub
 		File parentPath = new File(parent);
 		boolean found = false;
 		while (true) {
