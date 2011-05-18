@@ -102,7 +102,9 @@ public class ApplianceInstaller {
 
 			// Install statement used in linux
 		} else if (isUnix()) {
-			Runtime.getRuntime().exec(Utils.pathJoin(folderPath, "autorun.sh"));
+			Runtime.getRuntime().exec(
+					"sh " + Utils.pathJoin(folderPath, "autorun.sh"),
+					new String[0], new File(folderPath));
 		} else {
 			logger.error("Can't find the autorun file for this appliance: "
 					+ folderPath);

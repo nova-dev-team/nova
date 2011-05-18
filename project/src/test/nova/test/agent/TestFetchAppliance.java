@@ -23,8 +23,8 @@ public class TestFetchAppliance {
 		FtpApplianceFetcher fp = new FtpApplianceFetcher();
 		try {
 
-			Appliance app = new Appliance("picture");
-			NovaAgent.getInstance().getAppliances().put("picture", app);
+			Appliance app = new Appliance("demo_appliance");
+			NovaAgent.getInstance().getAppliances().put("demo_appliance", app);
 			// app.setStatus(Status.CANCELLED);
 			fp.fetch(app);
 		} catch (IOException e) {

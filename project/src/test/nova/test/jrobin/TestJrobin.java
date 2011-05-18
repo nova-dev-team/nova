@@ -18,7 +18,7 @@ public class TestJrobin {
 		long endTime = startTime + 86400;
 
 		String rootPath = "build/demo_flow.rrd";
-		int timeInterval = 10;
+		int timeInterval = 600;
 		int rrdLength = 8640;
 
 		String picPath = "build/demo_flow.png";
