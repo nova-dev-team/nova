@@ -10,9 +10,9 @@ import org.junit.Test;
 public class TestInstallAppliance {
 	@Test
 	public void testInstallAppliance() {
-		Appliance app = new Appliance("picture");
+		Appliance app = new Appliance("demo_appliance");
 		app.setStatus(Appliance.Status.INSTALL_PENDING);
-		NovaAgent.getInstance().getAppliances().put("picture", app);
+		NovaAgent.getInstance().getAppliances().put("demo_appliance", app);
 		ApplianceInstaller.casualInstall(app);
 	}
 

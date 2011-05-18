@@ -20,15 +20,15 @@ public class TestFetchAppliance {
 		FtpApplianceFetcher fp = new FtpApplianceFetcher();
 		try {
 
-			Appliance app = new Appliance("picture");
-			NovaAgent.getInstance().getAppliances().put("picture", app);
+			Appliance app = new Appliance("demo_appliance");
+			NovaAgent.getInstance().getAppliances().put("demo_appliance", app);
 			// app.setStatus(Status.CANCELLED);
 			fp.fetch(app);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		NovaStorage.getInstance().shutdown();
-		fp.deleteDir("", "picture");
+		fp.deleteDir("", "demo_appliance");
 	}
 
 	private void testFtpFieldParsingHelper(String text, String... parts) {
