@@ -72,7 +72,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 						3000));
 			}
 
-			values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
+			// values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
 		}
 
 		return Utils.expandTemplateFile(fpath, values);

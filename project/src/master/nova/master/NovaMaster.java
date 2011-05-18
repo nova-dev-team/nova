@@ -11,14 +11,22 @@ import nova.common.service.message.PerfMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.messages.AddPnodeMessage;
+import nova.master.api.messages.CreateVclusterMessage;
+import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
+import nova.master.api.messages.RegisterApplianceMessage;
+import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.AddPnodeHandler;
+import nova.master.handler.CreateVclusterHandler;
+import nova.master.handler.CreateVnodeHandler;
 import nova.master.handler.MasterHeartbeatHandler;
 import nova.master.handler.MasterHttpHandler;
 import nova.master.handler.MasterPerfHandler;
 import nova.master.handler.PnodeStatusHandler;
+import nova.master.handler.RegisterApplianceHandler;
+import nova.master.handler.RegisterVdiskHandler;
 import nova.master.handler.VnodeStatusHandler;
 import nova.master.models.Pnode;
 import nova.worker.api.WorkerProxy;
@@ -61,6 +69,17 @@ public class NovaMaster extends SimpleServer {
 				new MasterHeartbeatHandler());
 
 		this.registerHandler(AddPnodeMessage.class, new AddPnodeHandler());
+
+		this.registerHandler(CreateVnodeMessage.class, new CreateVnodeHandler());
+
+		this.registerHandler(CreateVclusterMessage.class,
+				new CreateVclusterHandler());
+
+		this.registerHandler(RegisterVdiskMessage.class,
+				new RegisterVdiskHandler());
+
+		this.registerHandler(RegisterApplianceMessage.class,
+				new RegisterApplianceHandler());
 
 		this.registerHandler(PnodeStatusMessage.class, new PnodeStatusHandler());
 
