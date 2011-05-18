@@ -23,8 +23,8 @@ public class TestFetchAppliance {
 		FtpApplianceFetcher fp = new FtpApplianceFetcher();
 		try {
 
-			Appliance app = new Appliance("demo_appliance");
-			NovaAgent.getInstance().getAppliances().put("demo_appliance", app);
+			Appliance app = new Appliance("picture");
+			NovaAgent.getInstance().getAppliances().put("picture", app);
 			// app.setStatus(Status.CANCELLED);
 			fp.fetch(app);
 		} catch (IOException e) {
@@ -32,7 +32,7 @@ public class TestFetchAppliance {
 		}
 		NovaStorage.getInstance().shutdown();
 		Utils.rmdir(Utils.pathJoin(Utils.NOVA_HOME,
-				Conf.getString("agent.software.save_path"), "pictures"));
+				Conf.getString("agent.software.save_path"), "picture"));
 	}
 
 	private void testFtpFieldParsingHelper(String text, String... parts) {

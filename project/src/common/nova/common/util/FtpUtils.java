@@ -144,29 +144,32 @@ public class FtpUtils {
 
 	public static void downloadDir(FtpClient fc, String remotePath,
 			String localPath, Cancellable cancelFlag) throws IOException {
-		String oldCwd = fc.pwd();
+		if (shouldStop(cancelFlag) == false) {
+			String oldCwd = fc.pwd();
 
-		fc.cd(remotePath);
-		Utils.mkdirs(localPath);
+			fc.cd(remotePath);
+			Utils.mkdirs(localPath);
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(fc.list()));
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					fc.list()));
 
-		String ftpEntry = null;
-		while ((ftpEntry = br.readLine()) != null
-				&& shouldStop(cancelFlag) == false) {
-			String entry = ftpEntry.substring(nthFieldStart(ftpEntry, 8));
-			if ((nthField(ftpEntry, 0)).startsWith("d")) {
-				// d is directory
-				FtpUtils.downloadDir(fc, remotePath + "/" + entry,
-						Utils.pathJoin(localPath, entry), cancelFlag);
-			} else {
-				FtpUtils.downloadFileInCwd(fc, entry,
-						Utils.pathJoin(localPath, entry), cancelFlag);
+			String ftpEntry = null;
+			while ((ftpEntry = br.readLine()) != null
+					&& shouldStop(cancelFlag) == false) {
+				String entry = ftpEntry.substring(nthFieldStart(ftpEntry, 8));
+				if ((nthField(ftpEntry, 0)).startsWith("d")) {
+					// d is directory
+					FtpUtils.downloadDir(fc, remotePath + "/" + entry,
+							Utils.pathJoin(localPath, entry), cancelFlag);
+				} else {
+					FtpUtils.downloadFileInCwd(fc, entry,
+							Utils.pathJoin(localPath, entry), cancelFlag);
+				}
 			}
-		}
-		br.close();
+			br.close();
 
-		fc.cd(oldCwd);
+			fc.cd(oldCwd);
+		}
 	}
 
 	private static boolean shouldStop(Cancellable cancelFlag) {

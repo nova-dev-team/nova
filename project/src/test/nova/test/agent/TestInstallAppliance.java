@@ -11,9 +11,10 @@ public class TestInstallAppliance {
 	@Test
 	public void testInstallAppliance() {
 		Appliance app = new Appliance("picture");
-		app.setStatus(Appliance.Status.INSTALL_PENDING);
+		app.setStatus(Appliance.Status.INSTALLING);
 		NovaAgent.getInstance().getAppliances().put("picture", app);
 		ApplianceInstaller.install(app);
+		app.setStatus(Appliance.Status.INSTALLED);
 	}
 
 	// If you have three directory demo1 blah at E:\ then assert will be false
