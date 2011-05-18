@@ -76,4 +76,14 @@ public class TestUtils {
 
 	}
 
+	@Test
+	public void testRmDir() {
+		String testRoot = Utils
+				.pathJoin(Utils.NOVA_HOME, "build", "test-rmdir");
+		Utils.mkdirs(Utils.pathJoin(testRoot, "1", "2", "3", "4"));
+
+		Utils.rmdir(testRoot);
+		File f = new File(testRoot);
+		Assert.assertTrue(f.exists() == false);
+	}
 }
