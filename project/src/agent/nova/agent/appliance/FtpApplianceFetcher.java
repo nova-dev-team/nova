@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 
 import nova.agent.NovaAgent;
 import nova.common.util.Conf;
+import nova.common.util.FtpUtils;
 import nova.common.util.Utils;
 
 import org.apache.log4j.Logger;
@@ -25,6 +26,7 @@ import sun.net.ftp.FtpClient;
 public class FtpApplianceFetcher extends ApplianceFetcher {
 
 	private String hostIp = null;
+	private int ftpPort = -1;
 	private String userName = null;
 	private String password = null;
 	private String myPath = null;
@@ -37,6 +39,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 
 	public FtpApplianceFetcher() {
 		this.hostIp = Conf.getString("agent.ftp.host");
+		this.ftpPort = Conf.getInteger("agent.ftp.port");
 		this.userName = Conf.getString("agent.ftp.user_name");
 		this.password = Conf.getString("agent.ftp.password");
 		this.myPath = Conf.getString("agent.software.save_path");
@@ -56,9 +59,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 					.setStatus(Appliance.Status.NOT_INSTALLED);
 			deleteDir("", app.getName());
 		}
-
 		close(fc);
-
 	}
 
 	/**
@@ -67,12 +68,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @return FtpClient
 	 */
 	private FtpClient connect() throws IOException {
-		FtpClient fc = null;
-		final int ftpPort = Conf.getInteger("agent.ftp.port");
-		fc = new FtpClient(hostIp, ftpPort);
-		fc.openServer(hostIp, ftpPort);
-		fc.login(this.userName, this.password);
-		return fc;
+		return FtpUtils.connect(hostIp, ftpPort, userName, password);
 	}
 
 	/**
@@ -85,6 +81,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 			fc.closeServer();
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error("Failed to close connection to FTP server", e);
 		}
 	}
 
@@ -230,7 +227,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @param nth
 	 * @return
 	 */
-	public static String nthField(String ftpItem, int nth) {
+	private static String nthField(String ftpItem, int nth) {
 		int start = nthFieldStart(ftpItem, nth);
 		int stop = nthFieldStop(ftpItem, nth);
 		return ftpItem.substring(start, stop);
@@ -243,7 +240,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @param nth
 	 * @return
 	 */
-	public static int nthFieldStart(String ftpItem, int nth) {
+	private static int nthFieldStart(String ftpItem, int nth) {
 		int currentFieldId = -1;
 		int idx = 0;
 		boolean inWhiteSpace = true;
@@ -278,7 +275,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @param nth
 	 * @return
 	 */
-	public static int nthFieldStop(String ftpItem, int nth) {
+	private static int nthFieldStop(String ftpItem, int nth) {
 		byte[] ftpItemBytes = ftpItem.getBytes();
 		int idx = nthFieldStart(ftpItem, nth);
 		for (;;) {

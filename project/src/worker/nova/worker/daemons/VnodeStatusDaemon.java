@@ -50,7 +50,7 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 				for (int i = 0; i < ids.length; i++) {
 					Domain dom = conn.domainLookupByID(ids[i]);
 					if (dom != null) {
-						UUID uu = UUID.fromString(dom.getUUID().toString());
+						UUID uu = UUID.fromString(dom.getUUIDString());
 						String info = dom.getInfo().state.toString();
 						Vnode.Status vs = null;
 						// TODO @shayf discuss status and finish status enum

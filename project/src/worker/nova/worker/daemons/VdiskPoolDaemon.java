@@ -197,7 +197,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 	}
 
 	private void checkRevoke(String parent) {
-		// TODO Auto-generated method stub
 		File parentPath = new File(parent);
 		boolean found = false;
 		while (true) {

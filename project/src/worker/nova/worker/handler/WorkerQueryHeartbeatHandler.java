@@ -15,7 +15,6 @@ public class WorkerQueryHeartbeatHandler implements
 	public void handleMessage(QueryHeartbeatMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
-		// where is isstop flag?
 		if (NovaWorker.getInstance().getMaster() == null) {
 			NovaWorker.getInstance().registerMaster(xreply);
 		}
