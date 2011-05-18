@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -72,10 +73,23 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Recursively create dirs.
+	 * 
+	 * @param paths
+	 *            The whole path to be created.
+	 */
 	public static void mkdirs(String... paths) {
 		String path = Utils.pathJoin(paths);
 		File pathFile = new File(path);
 		pathFile.mkdirs();
+	}
+
+	/**
+	 * Recursively remove dirs and files.
+	 */
+	public static void rmdir() {
+		// TODO @santa
 	}
 
 	/**
@@ -84,6 +98,8 @@ public class Utils {
 	 * @param paths
 	 *            Arbitrary length arguments, each is a path segment.
 	 * @return The joined full path.
+	 * @throws IllegalArgumentException
+	 *             If the path segments is badly formed.
 	 */
 	public static String pathJoin(String... paths) {
 		StringBuffer sb = new StringBuffer();
@@ -111,7 +127,47 @@ public class Utils {
 				sb.append(pathSegment);
 			}
 		}
-		return sb.toString();
+
+		LinkedList<String> normSegs = new LinkedList<String>();
+
+		String[] splt = sb.toString().split(File.separator);
+
+		for (String seg : splt) {
+			if (seg.equals(".")) {
+				continue;
+			} else if (seg.equals("..")) {
+				if (normSegs.size() > 0) {
+					normSegs.removeLast();
+				} else {
+					logger.error("Bad path segments in: " + sb.toString());
+					throw new IllegalArgumentException("Bad path segments");
+				}
+			} else {
+				normSegs.addLast(seg);
+			}
+		}
+
+		StringBuffer normSb = new StringBuffer();
+		for (String seg : normSegs) {
+			if (normSb.length() > 0) {
+				normSb.append(File.separator);
+			}
+			normSb.append(seg);
+		}
+		if (sb.toString().startsWith(File.separator)) {
+			normSb.insert(0, File.separator);
+		}
+
+		if (normSb.length() == 0) {
+			normSb.append(".");
+		}
+
+		return normSb.toString();
+	}
+
+	public static String[] pathSplit(String path) {
+		File f = new File(path);
+		return new String[] { f.getParent(), f.getName() };
 	}
 
 	@SuppressWarnings("rawtypes")

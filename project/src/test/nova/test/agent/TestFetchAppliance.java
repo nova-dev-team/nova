@@ -5,6 +5,7 @@ import java.io.IOException;
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.FtpApplianceFetcher;
+import nova.common.util.FtpUtils;
 import nova.storage.NovaStorage;
 
 import org.junit.Assert;
@@ -33,8 +34,8 @@ public class TestFetchAppliance {
 
 	private void testFtpFieldParsingHelper(String text, String... parts) {
 		for (int i = 0; i < parts.length; i++) {
-			int start = FtpApplianceFetcher.nthFieldStart(text, i);
-			int stop = FtpApplianceFetcher.nthFieldStop(text, i);
+			int start = FtpUtils.nthFieldStart(text, i);
+			int stop = FtpUtils.nthFieldStop(text, i);
 			Assert.assertEquals(text.substring(start, stop), parts[i]);
 		}
 	}
