@@ -1,5 +1,6 @@
 package nova.test.common.util;
 
+import java.io.File;
 import java.io.IOException;
 
 import junit.framework.Assert;
@@ -22,20 +23,23 @@ public class TestFtpUtils {
 			FtpClient fc = FtpUtils.connect(
 					Conf.getString("storage.ftp.bind_host"),
 					Conf.getInteger("storage.ftp.bind_port"));
-			FtpUtils.downloadFile(fc, "appliances/demo_appliance/demo.py",
+			FtpUtils.downloadFile(fc,
+					Utils.pathJoin("appliances", "demo_appliance", "demo.py"),
 					Utils.pathJoin(Utils.NOVA_HOME, "build", "demo.py-1"));
 
 			fc.cd("appliances");
 
-			FtpUtils.downloadFile(fc, "demo_appliance/demo.py",
+			FtpUtils.downloadFile(fc,
+					Utils.pathJoin("demo_appliance", "demo.py"),
 					Utils.pathJoin(Utils.NOVA_HOME, "build", "demo.py-2"));
 
-			Assert.assertEquals(fc.pwd(), "/appliances");
+			Assert.assertEquals(fc.pwd(), File.separator + "appliances");
 
-			FtpUtils.downloadFile(fc, "/appliances/demo_appliance/demo.py",
-					Utils.pathJoin(Utils.NOVA_HOME, "build", "demo.py-3"));
+			FtpUtils.downloadFile(fc, Utils.pathJoin(File.separator,
+					"appliances", "demo_appliance", "demo.py"), Utils.pathJoin(
+					Utils.NOVA_HOME, "build", "demo.py-3"));
 
-			Assert.assertEquals(fc.pwd(), "/appliances");
+			Assert.assertEquals(fc.pwd(), File.separator + "appliances");
 
 			fc.closeServer();
 		} catch (NumberFormatException e) {

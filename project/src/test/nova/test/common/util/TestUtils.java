@@ -22,10 +22,11 @@ public class TestUtils {
 		testPathSplitHelper(Utils.pathJoin("a", "b"), "a", "b");
 		testPathSplitHelper("a", null, "a");
 		testPathSplitHelper("a" + File.separator, null, "a");
-		testPathSplitHelper(File.separator + "a", "/", "a");
-		testPathSplitHelper(Utils.pathJoin("a", "b", "c"), "a/b", "c");
+		testPathSplitHelper(File.separator + "a", File.separator, "a");
+		testPathSplitHelper(Utils.pathJoin("a", "b", "c"), "a" + File.separator
+				+ "b", "c");
 		testPathSplitHelper(File.separator + Utils.pathJoin("a", "b", "c"),
-				"/a/b", "c");
+				File.separator + "a" + File.separator + "b", "c");
 	}
 
 	private void testPathJoinHelper(String expect, String... paths) {

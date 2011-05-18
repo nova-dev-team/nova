@@ -140,7 +140,14 @@ public class Utils {
 
 		LinkedList<String> normSegs = new LinkedList<String>();
 
-		String[] splt = sb.toString().split(File.separator);
+		// split string should be *regular expression*!!
+		String splitToken = null;
+		if (File.separator.equals("\\")) {
+			splitToken = "\\\\";
+		} else {
+			splitToken = "/";
+		}
+		String[] splt = sb.toString().split(splitToken);
 
 		for (String seg : splt) {
 			if (seg.equals(".")) {
