@@ -5,6 +5,7 @@ import java.io.IOException;
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
 import nova.agent.appliance.FtpApplianceFetcher;
+import nova.common.util.Conf;
 import nova.storage.NovaStorage;
 
 import org.junit.Assert;
@@ -22,13 +23,15 @@ public class TestFetchAppliance {
 
 			Appliance app = new Appliance("picture");
 			NovaAgent.getInstance().getAppliances().put("picture", app);
-			// app.setStatus(Status.CANCELLED);
+			// app.setStatus(Appliance.Status.CANCELLED);
 			fp.fetch(app);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		String mySavePath = Conf.getString("agent.software.save_path");
 		NovaStorage.getInstance().shutdown();
-		fp.deleteDir("", "picture");
+		fp.deleteDir(mySavePath, "", "picture");
 	}
 
 	private void testFtpFieldParsingHelper(String text, String... parts) {

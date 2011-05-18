@@ -43,12 +43,12 @@ public class ApplianceInstaller {
 	 * @param app
 	 *            {@link Appliance}
 	 */
-	public static void casualInstall(Appliance app) {
+	public static void install(Appliance app) {
 		String relativePath = Conf.getString("agent.software.save_path");
 		String folderPath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
 				app.getName());
 		try {
-			install(folderPath);
+			executeInstall(folderPath);
 		} catch (IOException e) {
 			app.setStatus(Appliance.Status.INSTALL_FAILURE);
 			logger.error("Can't install " + app.getName(), e);
@@ -68,7 +68,7 @@ public class ApplianceInstaller {
 		String folderPath = Utils.pathJoin(relativePath, "appliances",
 				app.getName());
 		try {
-			install(folderPath);
+			executeInstall(folderPath);
 		} catch (IOException e) {
 			app.setStatus(Appliance.Status.INSTALL_FAILURE);
 			logger.error("Can't install " + app.getName(), e);
@@ -83,7 +83,7 @@ public class ApplianceInstaller {
 	 * @throws IOException
 	 *             IOException of Runtime.getRuntime().exec()
 	 */
-	private static void install(String folderPath) throws IOException {
+	private static void executeInstall(String folderPath) throws IOException {
 		// Install statement used in windows
 		if (isWindows()) {
 			Process p = Runtime.getRuntime().exec("cmd /c autorun.bat",
@@ -102,7 +102,9 @@ public class ApplianceInstaller {
 
 			// Install statement used in linux
 		} else if (isUnix()) {
-			Runtime.getRuntime().exec(Utils.pathJoin(folderPath, "autorun.sh"));
+			Runtime.getRuntime().exec(
+					"sh " + Utils.pathJoin(folderPath, "autorun.sh"),
+					new String[0], new File(folderPath));
 		} else {
 			logger.error("Can't find the autorun file for this appliance: "
 					+ folderPath);

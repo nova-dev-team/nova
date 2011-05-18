@@ -13,7 +13,7 @@ public class TestInstallAppliance {
 		Appliance app = new Appliance("picture");
 		app.setStatus(Appliance.Status.INSTALL_PENDING);
 		NovaAgent.getInstance().getAppliances().put("picture", app);
-		ApplianceInstaller.casualInstall(app);
+		ApplianceInstaller.install(app);
 	}
 
 	// If you have three directory demo1 blah at E:\ then assert will be false

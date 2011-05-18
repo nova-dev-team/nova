@@ -50,11 +50,11 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	public void fetch(Appliance app) throws IOException {
 		setApplianceName(app); // save the name of appliance being downloading
 		FtpClient fc = connect();
-		downloadDir(fc, "", app.getName());
+		downloadDir(fc, this.myPath, "", app.getName());
 		if (statusCancelled()) {
 			NovaAgent.getInstance().getAppliances().get(app.getName())
 					.setStatus(Appliance.Status.NOT_INSTALLED);
-			deleteDir("", app.getName());
+			deleteDir(this.myPath, "", app.getName());
 		}
 
 		close(fc);
@@ -96,8 +96,8 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @param dirName
 	 *            directory name
 	 */
-	public void deleteDir(String rootPath, String dirName) {
-		String absolutePath = Utils.pathJoin(Utils.NOVA_HOME, this.myPath,
+	public void deleteDir(String mySavePath, String rootPath, String dirName) {
+		String absolutePath = Utils.pathJoin(Utils.NOVA_HOME, mySavePath,
 				rootPath, dirName);
 		File file = new File(absolutePath);
 		if (file.exists()) {
@@ -106,7 +106,8 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 			for (File f : fileList) {
 				entry = f.getName();
 				if (f.isDirectory()) {
-					deleteDir(Utils.pathJoin(rootPath, dirName), entry);
+					deleteDir(mySavePath, Utils.pathJoin(rootPath, dirName),
+							entry);
 				} else {
 					f.delete();
 				}
@@ -131,6 +132,8 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * Download one file from ftp server
 	 * 
 	 * @param fClient
+	 * @param mySavePath
+	 *            local save place
 	 * @param rootPath
 	 *            whole path of one directory in ftp
 	 * @param fileName
@@ -139,8 +142,8 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @throws IOException
 	 *             Download one file exception
 	 */
-	private boolean downloadFile(FtpClient fClient, String rootPath,
-			String fileName) throws IOException {
+	private boolean downloadFile(FtpClient fClient, String mySavePath,
+			String rootPath, String fileName) throws IOException {
 
 		TelnetInputStream is = null;
 		FileOutputStream os = null;
@@ -148,7 +151,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 		fClient.binary();
 		is = fClient.get(fileName);
 		java.io.File outfile = new java.io.File(Utils.pathJoin(Utils.NOVA_HOME,
-				this.myPath, rootPath, fileName));
+				mySavePath, rootPath, fileName));
 		os = new FileOutputStream(outfile);
 		byte[] bytes = new byte[32 * 1024];
 		int c = 0;
@@ -172,15 +175,18 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 	 * @param fc
 	 * @param rootPath
 	 *            whole path of one directory in ftp, default value is ""
+	 * @param mySavePath
+	 *            local save place
 	 * @param dirName
 	 *            the directory that will be downloaded
 	 */
-	private boolean downloadDir(FtpClient fc, String rootPath, String dirName) {
+	private boolean downloadDir(FtpClient fc, String mySavePath,
+			String rootPath, String dirName) {
 
 		if (!statusCancelled()) {
 			try {
 				fc.cd(dirName);
-				Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, this.myPath,
+				Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, mySavePath,
 						rootPath, dirName));
 				DataInputStream dis = new DataInputStream(fc.list());
 				BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -193,11 +199,11 @@ public class FtpApplianceFetcher extends ApplianceFetcher {
 					String entry = ftpEntry.substring(fnameStart);
 					if ((nthField(ftpEntry, 0)).startsWith("d")) {
 						// d is directory
-						downloadDir(fc, Utils.pathJoin(rootPath, dirName),
-								entry);
+						downloadDir(fc, mySavePath,
+								Utils.pathJoin(rootPath, dirName), entry);
 					} else {
-						downloadFile(fc, Utils.pathJoin(rootPath, dirName),
-								entry);
+						downloadFile(fc, mySavePath,
+								Utils.pathJoin(rootPath, dirName), entry);
 
 					}
 				}
