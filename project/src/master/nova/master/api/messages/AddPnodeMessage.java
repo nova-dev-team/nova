@@ -13,6 +13,7 @@ public class AddPnodeMessage {
 
 	public AddPnodeMessage(SimpleAddress pAddr) {
 		this.pAddr = pAddr;
+		// System.out.println(pAddr.toString());
 	}
 
 	/**
