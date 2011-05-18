@@ -41,7 +41,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher implements
 	public synchronized void fetch(Appliance app) throws IOException {
 		this.applianceName = app.getName();
 		FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName, password);
-		FtpUtils.downloadDir(fc, Utils.pathJoin("appliances", app.getName()),
+		FtpUtils.downloadDir(fc, "/appliances/" + app.getName(),
 				Utils.pathJoin(savePath, app.getName()), this);
 		if (isCancelled()) {
 			NovaAgent.getInstance().getAppliances().get(app.getName())

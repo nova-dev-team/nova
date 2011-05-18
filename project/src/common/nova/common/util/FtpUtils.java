@@ -95,9 +95,6 @@ public class FtpUtils {
 		TelnetInputStream is = fClient.get(remoteFileName);
 
 		File localFile = new File(localPath);
-		if (localFile.isDirectory()) {
-			localFile = new File(Utils.pathJoin(localPath, remoteFileName));
-		}
 
 		Utils.mkdirs(localFile.getParentFile().getAbsolutePath());
 		FileOutputStream os = new FileOutputStream(localFile);
@@ -160,7 +157,7 @@ public class FtpUtils {
 			String entry = ftpEntry.substring(nthFieldStart(ftpEntry, 8));
 			if ((nthField(ftpEntry, 0)).startsWith("d")) {
 				// d is directory
-				FtpUtils.downloadDir(fc, Utils.pathJoin(remotePath, entry),
+				FtpUtils.downloadDir(fc, remotePath + "/" + entry,
 						Utils.pathJoin(localPath, entry), cancelFlag);
 			} else {
 				FtpUtils.downloadFileInCwd(fc, entry,
