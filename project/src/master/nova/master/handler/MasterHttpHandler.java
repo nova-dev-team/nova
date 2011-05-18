@@ -7,8 +7,10 @@ import java.util.Map;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
+import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
+import nova.master.models.Pnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -51,7 +53,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 		// Pnode pnode = new Pnode();
 		// pnode.setIp("0.0.0.0");
 
-		MasterProxy mp = new MasterProxy(new SimpleAddress("10.0.1.240", 3000));
+		MasterProxy mp = new MasterProxy(new SimpleAddress(
+				Conf.getString("master.bind_host"), Integer.parseInt(Conf
+						.getString("master.bind_port"))));
 
 		URL url = null;
 		try {
@@ -67,32 +71,34 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 			String query = url.getQuery();
 			queryMap = getQueryMap(query);
 
-			if (act == "add_pnode1") {
+			System.out.println(act);
+			if (act.equals("add_pnode")) {
+				System.out.println(111);
 				mp.sendAddPnode(new SimpleAddress(queryMap.get("pnode_ip"),
-						3000));
-			} else if (act == "register_vdisk1") {
+						4000));
+				System.out.println(222);
+				// values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
+			} else if (act.equals("register_vdisk1")) {
 				mp.SendRegisterVdisk(queryMap.get("display_name"),
 						queryMap.get("file_name"), queryMap.get("image_type"),
 						queryMap.get("os_family"), queryMap.get("os_name"),
 						queryMap.get("description"));
-			} else if (act == "register_appliance1") {
+			} else if (act.equals("register_appliance1")) {
 				mp.SendRegisterAppliance(queryMap.get("display_name"),
 						queryMap.get("file_name"), queryMap.get("os_family"),
 						queryMap.get("description"));
-			} else if (act == "create_vnode1") {
+			} else if (act.equals("create_vnode1")) {
 				mp.sendCreateVnode(queryMap.get("vm_image"),
 						queryMap.get("vm_name"),
 						Integer.parseInt(queryMap.get("cpu_count")),
 						Integer.parseInt(queryMap.get("memory_size")),
 						queryMap.get("appliance_list"));
-			} else if (act == "create_vcluster") {
+			} else if (act.equals("create_vcluster1")) {
 				mp.sendCreateVcluster(queryMap.get("vcluster_name"),
 						Integer.parseInt(queryMap.get("vcluster_size")));
 			}
-
-			// values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
 		}
-
+		values.put("pnode_info", Pnode.all());
 		return Utils.expandTemplateFile(fpath, values);
 
 	}
