@@ -70,6 +70,24 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 			if (act == "add_pnode1") {
 				mp.sendAddPnode(new SimpleAddress(queryMap.get("pnode_ip"),
 						3000));
+			} else if (act == "register_vdisk1") {
+				mp.SendRegisterVdisk(queryMap.get("display_name"),
+						queryMap.get("file_name"), queryMap.get("image_type"),
+						queryMap.get("os_family"), queryMap.get("os_name"),
+						queryMap.get("description"));
+			} else if (act == "register_appliance1") {
+				mp.SendRegisterAppliance(queryMap.get("display_name"),
+						queryMap.get("file_name"), queryMap.get("os_family"),
+						queryMap.get("description"));
+			} else if (act == "create_vnode1") {
+				mp.sendCreateVnode(queryMap.get("vm_image"),
+						queryMap.get("vm_name"),
+						Integer.parseInt(queryMap.get("cpu_count")),
+						Integer.parseInt(queryMap.get("memory_size")),
+						queryMap.get("appliance_list"));
+			} else if (act == "create_vcluster") {
+				mp.sendCreateVcluster(queryMap.get("vcluster_name"),
+						Integer.parseInt(queryMap.get("vcluster_size")));
 			}
 
 			// values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
