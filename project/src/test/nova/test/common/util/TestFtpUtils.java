@@ -33,13 +33,13 @@ public class TestFtpUtils {
 					Utils.pathJoin("demo_appliance", "demo.py"),
 					Utils.pathJoin(Utils.NOVA_HOME, "build", "demo.py-2"));
 
-			Assert.assertEquals(fc.pwd(), File.separator + "appliances");
+			Assert.assertEquals(fc.pwd(), "/appliances");
 
 			FtpUtils.downloadFile(fc, Utils.pathJoin(File.separator,
 					"appliances", "demo_appliance", "demo.py"), Utils.pathJoin(
 					Utils.NOVA_HOME, "build", "demo.py-3"));
 
-			Assert.assertEquals(fc.pwd(), File.separator + "appliances");
+			Assert.assertEquals(fc.pwd(), "/appliances");
 
 			fc.closeServer();
 		} catch (NumberFormatException e) {
