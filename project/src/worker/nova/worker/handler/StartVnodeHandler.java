@@ -9,6 +9,7 @@ import java.util.UUID;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
+import nova.common.util.FtpUtils;
 import nova.common.util.Utils;
 import nova.master.models.Vnode;
 import nova.storage.NovaStorage;
@@ -23,6 +24,8 @@ import org.jboss.netty.channel.MessageEvent;
 import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
+
+import sun.net.ftp.FtpClient;
 
 /**
  * Handler for "start new vnode" request.
@@ -98,13 +101,26 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			File stdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 					stdImgFile));
 			if (!stdFile.exists()) {
-				// TODO #shayf get from ftp
 				if (NovaStorage.getInstance().getFtpServer() == null) {
 					NovaStorage.getInstance().startFtpServer();
 				}
-				// FtpApplianceFetcher fp = new FtpApplianceFetcher();
 				System.out.println(Conf.getString("worker.software.save_path"));
-				// fp.setMyPath(Conf.getString("worker.software.save_path"));
+				try {
+					FtpClient fc = FtpUtils.connect(
+							Conf.getString("storage.ftp.bind_host"),
+							Conf.getInteger("storage.ftp.bind_port"),
+							Conf.getString("storage.ftp.admin.username"),
+							Conf.getString("storage.ftp.admin.password"));
+					fc.cd("img");
+					FtpUtils.downloadFile(fc, Utils.pathJoin(stdImgFile),
+							Utils.pathJoin(Utils.NOVA_HOME, "run", stdImgFile));
+					System.out.println("download file " + stdImgFile);
+					fc.closeServer();
+				} catch (NumberFormatException e1) {
+					log.error("port format error!", e1);
+				} catch (IOException e1) {
+					log.error("ftp connection fail!", e1);
+				}
 				NovaStorage.getInstance().shutdown();
 			}
 			long stdLen = stdFile.length();
@@ -135,14 +151,14 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				// copy img files
 				File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 						msg.getName()));
-				File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-						msg.getName(), stdImgFile));
 				if (!foder.exists()) {
 					foder.mkdirs();
 				} else {
 					// TODO @santa rename or stop or what?
 					log.error("vm name " + msg.getName() + " has been used!");
 				}
+				File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						msg.getName(), stdImgFile));
 				if (file.exists() == false) {
 					try {
 						System.out.println("copying file");
@@ -174,8 +190,12 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
 				msg.setEmulatorPath("/usr/bin/kvm");
 				try {
+					System.out.println();
+					System.out.println(Kvm.emitDomain(msg.getHashMap()));
+					System.out.println();
 					Domain testDomain = conn.domainCreateLinux(
 							Kvm.emitDomain(msg.getHashMap()), 0);
+
 					if (testDomain != null) {
 						VnodeStatusDaemon.putStatus(
 								UUID.fromString(testDomain.getUUIDString()),
