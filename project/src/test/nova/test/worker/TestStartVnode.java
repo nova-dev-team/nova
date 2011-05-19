@@ -20,9 +20,9 @@ public class TestStartVnode {
 	@Test
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
-		StartVnodeMessage msg = new StartVnodeMessage("kvm", null, "false",
-				"100288", "1", "small.img", "false");
-		msg.setName("vm");
+		StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
+				"false", "100288", "1", "small.img", "false");
+		// msg.setName("vm");
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
 		msg.setCdImage("");
 
@@ -31,9 +31,9 @@ public class TestStartVnode {
 		SimpleAddress xreply = null;
 		svh.handleMessage(msg, ctx, e, xreply);
 
-		StartVnodeMessage msg2 = new StartVnodeMessage("KVM", null, "false",
-				"100288", "1", "small.img", "false");
-		msg2.setName("vm2");
+		StartVnodeMessage msg2 = new StartVnodeMessage("KVM", "vm2", null,
+				"false", "100288", "1", "small.img", "false");
+		// msg2.setName("vm2");
 		msg2.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
 		msg2.setCdImage("");
 

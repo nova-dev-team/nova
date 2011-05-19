@@ -1,5 +1,7 @@
 package nova.master.handler;
 
+import java.net.InetSocketAddress;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.master.api.messages.CreateVnodeMessage;
@@ -44,9 +46,15 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		log.info("Created new vnode: " + vnode.getIp());
 
 		Pnode pnode = Pnode.findById(pid);
-		WorkerProxy wp = new WorkerProxy(pnode.getAddr());
-		wp.sendStartVnode("kvm", vAddr, "true", String.valueOf(msg.memorySize),
-				String.valueOf(msg.cpuCount), msg.vmImage, "false");
+		System.out.println(pnode.getIp());
+		WorkerProxy wp = new WorkerProxy(new SimpleAddress("127.0.0.1", 3000));
+		wp.connect(new InetSocketAddress("127.0.0.1", 4000));
+		System.out.println("kvm" + vAddr + "true"
+				+ String.valueOf(msg.memorySize) + String.valueOf(msg.cpuCount)
+				+ msg.vmImage + "false");
+		wp.sendStartVnode("kvm", msg.vmName, vAddr, "false",
+				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
+				msg.vmImage, "false");
 
 	}
 }

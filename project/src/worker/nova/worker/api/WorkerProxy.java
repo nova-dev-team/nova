@@ -28,31 +28,6 @@ public class WorkerProxy extends SimpleProxy {
 	}
 
 	/**
-	 * send message using default values
-	 * 
-	 * author shayf
-	 * 
-	 * @param hyperVisor
-	 *            hypervisor type, use "kvm" or "xen" ignore case
-	 * 
-	 * @param vAddr
-	 *            vnode address
-	 * 
-	 * @param wakeupOnly
-	 *            wakeup from suspend: set "true" ignore case , to create:
-	 *            others
-	 * 
-	 * @param runAgent
-	 *            if need to run agent, set "true" ignore case
-	 */
-	public void sendStartVnode(String hyperVisor, String wakeupOnly,
-			String runAgent, SimpleAddress vAddr) {
-		StartVnodeMessage msg = new StartVnodeMessage(hyperVisor, wakeupOnly,
-				runAgent, vAddr);
-		super.sendRequest(msg);
-	}
-
-	/**
 	 * send message using defined values
 	 * 
 	 * author shayf
@@ -79,12 +54,12 @@ public class WorkerProxy extends SimpleProxy {
 	 * @param runAgent
 	 *            if need to run agent, set "true" ignore case
 	 */
-	public void sendStartVnode(String hyperVisor, SimpleAddress vAddr,
-			String wakeupOnly, String memSize, String cpuCount,
-			String hdaImage, String runAgent) {
-		StartVnodeMessage msg = new StartVnodeMessage(hyperVisor, vAddr,
-				wakeupOnly, memSize, cpuCount, hdaImage, runAgent);
-		super.sendRequest(msg);
+	public void sendStartVnode(String hyperVisor, String name,
+			SimpleAddress vAddr, String wakeupOnly, String memSize,
+			String cpuCount, String hdaImage, String runAgent) {
+		System.out.println("recv message:" + name);
+		super.sendRequest(new StartVnodeMessage(hyperVisor, name, vAddr,
+				wakeupOnly, memSize, cpuCount, hdaImage, runAgent));
 	}
 
 	/**
@@ -129,8 +104,7 @@ public class WorkerProxy extends SimpleProxy {
 	 *            the name of image file you want to del
 	 */
 	public void sendRevokeImage(String name) {
-		RevokeImageMessage rim = new RevokeImageMessage(name);
-		super.sendRequest(rim);
+		super.sendRequest(new RevokeImageMessage(name));
 	}
 
 	public void sendRequestHeartbeat() {

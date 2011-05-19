@@ -12,6 +12,10 @@ import nova.common.service.SimpleAddress;
  */
 public class StartVnodeMessage {
 
+	public StartVnodeMessage() {
+		super();
+	}
+
 	public StartVnodeMessage(String hyperVisor, String wakeupOnly,
 			String runAgent, SimpleAddress vAddr) {
 		super();
@@ -21,11 +25,12 @@ public class StartVnodeMessage {
 		this.vAddr = vAddr;
 	}
 
-	public StartVnodeMessage(String hyperVisor, SimpleAddress vAddr,
-			String wakeupOnly, String memSize, String cpuCount,
-			String hdaImage, String runAgent) {
+	public StartVnodeMessage(String hyperVisor, String name,
+			SimpleAddress vAddr, String wakeupOnly, String memSize,
+			String cpuCount, String hdaImage, String runAgent) {
 		super();
 		this.hyperVisor = hyperVisor;
+		this.name = name;
 		this.vAddr = vAddr;
 		this.wakeupOnly = wakeupOnly;
 		this.memSize = memSize;
