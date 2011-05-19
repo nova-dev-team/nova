@@ -30,7 +30,6 @@ public class Kvm {
 	public static String emitDomain(HashMap<String, Object> params) {
 		String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
 				"kvm-domain-template.xml");
-		// TODO @shayf add multiple img file choices
 		if ((params.get("hdaImage") != null)
 				&& !params.get("hdaImage").toString().equals("")) {
 			params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
@@ -72,8 +71,9 @@ public class Kvm {
 		String vmNetworkInterface = Conf.getString("vm_network_interface");
 		String vmNetworkBridge = Conf.getString("vm_network_bridge");
 		String fixVncMousePointer = Conf.getString("fix_vnc_mouse_pointer");
-		System.out.println("vmNetworkInterface is " + vmNetworkInterface);
-		System.out.println("vmNetworkBridge is " + vmNetworkBridge);
+		System.out.println("vmNetworkInterface is "
+				+ vmNetworkInterface.equals(""));
+		System.out.println("vmNetworkBridge is " + vmNetworkBridge.equals(""));
 		System.out.println("fixVncMousePointer is " + fixVncMousePointer);
 
 		if ((!vmNetworkInterface.equals("")) && (!vmNetworkBridge.equals(""))) {

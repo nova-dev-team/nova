@@ -112,8 +112,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 							Conf.getString("storage.ftp.admin.username"),
 							Conf.getString("storage.ftp.admin.password"));
 					fc.cd("img");
-					FtpUtils.downloadFile(fc, Utils.pathJoin(stdImgFile), Utils
-							.pathJoin(Utils.NOVA_HOME, "build", stdImgFile));
+					FtpUtils.downloadFile(fc, Utils.pathJoin(stdImgFile),
+							Utils.pathJoin(Utils.NOVA_HOME, "run", stdImgFile));
 					System.out.println("download file " + stdImgFile);
 					fc.closeServer();
 				} catch (NumberFormatException e1) {
