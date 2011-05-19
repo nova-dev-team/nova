@@ -9,7 +9,6 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
 import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
-import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
@@ -112,17 +111,38 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 								Integer.parseInt(queryMap.get("memory_size")),
 								queryMap.get("appliance_list")), null, null,
 						null);
-			} else if (act.equals("create_vcluster1")) {
-				new CreateVclusterHandler()
-						.handleMessage(
-								new CreateVclusterMessage(queryMap
-										.get("vcluster_name"),
-										Integer.parseInt(queryMap
-												.get("vcluster_size"))), null,
-								null, null);
+			} else if (act.equals("create_vcluster")) {
+				String vclusterFrame = "";
+				for (int i = 0; i < Integer.parseInt(queryMap
+						.get("vcluster_size")); i++) {
+					vclusterFrame += "<h3><font color=\"#FF0000\">"
+							+ "Create vnode"
+							+ (i + 1)
+							+ "<br></font></h3>"
+							+ "<form action=\"create_vnode\" method=\"get\">"
+							+ "VM Image<input type=\"text\" name=\"vnode_image\"><br>"
+							+ "VM Name<input type=\"text\" name=\"vnode_name\"><br>"
+							+ "CPU Count	<select name=\"cpu_count\" >"
+							+ "<option value=\"1\">1"
+							+ "<option value=\"2\">2"
+							+ "<option value=\"4\">4"
+							+ "</select>"
+							+ "Memory Size<input type=\"text\" name=\"memory_size\">MB<br>"
+							+ "Appliance<input type=\"text\" name=\"appliance\">"
+							+ "<input type=\"submit\" value=\"Create vnode\">"
+							+ "</form>";
+				}
+				values.put("vcluster_frame", vclusterFrame);
+				/*
+				 * new CreateVclusterHandler() .handleMessage( new
+				 * CreateVclusterMessage(queryMap .get("vcluster_name"),
+				 * Integer.parseInt(queryMap .get("vcluster_size"))), null,
+				 * null, null);
+				 */
 			}
 		}
 		values.put("pnode_info", Pnode.all());
+
 		return Utils.expandTemplateFile(fpath, values);
 
 	}
