@@ -161,8 +161,8 @@ public class AgentFrame extends JFrame {
 				{
 					JOptionPane.showMessageDialog(null,
 							"Please select one soft");
-				} else if (apps.get(softList.getSelectedValue()).getStatus()
-						.equals(Appliance.Status.INSTALLED)) {
+				} else if (!apps.get(softList.getSelectedValue()).getStatus()
+						.equals(Appliance.Status.NOT_INSTALLED)) {
 					JOptionPane
 							.showMessageDialog(null,
 									"You have already install this software, please select another one.");
@@ -189,21 +189,17 @@ public class AgentFrame extends JFrame {
 			public void valueChanged(ListSelectionEvent e) {
 				if (softList.getSelectedIndex() != -1) {
 					String softName = softList.getSelectedValue().toString();
-
-					String relativeOriginPath = Conf
-							.getString("agent.software.save_path");
 					String relativeLocalPath = Conf
 							.getString("agent.software.image_path");
-
 					changeSize(Utils.pathJoin(Utils.NOVA_HOME,
-							relativeOriginPath, softName, ".jpg"), Utils
+							relativeLocalPath, softName + ".jpg"), Utils
 							.pathJoin(Utils.NOVA_HOME, relativeLocalPath,
-									softName, ".jpg"),
+									softName + ".jpg"),
 							picture.getBounds().width,
 							picture.getBounds().height);
 					ImageIcon pic = new ImageIcon(Utils.pathJoin(
-							Utils.NOVA_HOME, relativeLocalPath, softName,
-							".jpg"));
+							Utils.NOVA_HOME, relativeLocalPath, softName
+									+ ".jpg"));
 					picture.setIcon(pic);
 					softInfo.setText(apps.get(softName).getInfo());
 				}
