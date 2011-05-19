@@ -102,31 +102,6 @@ public class NovaAgent extends SimpleServer {
 		registerHandler(InstallApplianceMessage.class,
 				new InstallApplianceHandler());
 
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				String hostIp = Conf.getString("agent.ftp.host");
-				int ftpPort = Conf.getInteger("agent.ftp.port");
-				String userName = Conf.getString("agent.ftp.user_name");
-				String password = Conf.getString("agent.ftp.password");
-				String savePath = Utils.pathJoin(Utils.NOVA_HOME,
-						Conf.getString("agent.software.image_path"));
-				try {
-					FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName,
-							password);
-					FtpUtils.downloadDir(fc, "/images/",
-							Utils.pathJoin(savePath));
-
-					logger.info("Have downloaded images from server!");
-
-				} catch (IOException e) {
-					logger.error("Downloading images fail: ", e);
-				}
-
-			}
-
-		}).start();
 		// TODO add master register
 		// SimpleAddress masterAddress = new SimpleAddress("10.0.1.242", 3000);
 		// registerMaster(masterAddress);
@@ -138,6 +113,7 @@ public class NovaAgent extends SimpleServer {
 
 	public Channel start() {
 		logger.info("Nova agent running @ " + this.addr);
+		this.localInitial();
 		Channel chnl = super.bind(this.addr.getInetSocketAddress());
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
@@ -176,7 +152,8 @@ public class NovaAgent extends SimpleServer {
 	 * Read info of all appliances from the apps.json file
 	 */
 	public void loadAppliances() {
-		String filePath = Utils.pathJoin(Utils.NOVA_HOME, "db", "agent",
+		String relativePath = Conf.getString("agent.software.save_path");
+		String filePath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
 				"apps.json");
 		try {
 			FileReader fr = new FileReader(filePath);
@@ -217,7 +194,8 @@ public class NovaAgent extends SimpleServer {
 			i++;
 		}
 		String appList = gson.toJson(appsArray);
-		String filePath = Utils.pathJoin(Utils.NOVA_HOME, "db", "agent",
+		String relativePath = Conf.getString("agent.software.save_path");
+		String filePath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
 				"apps.json");
 
 		try {
@@ -272,6 +250,56 @@ public class NovaAgent extends SimpleServer {
 		return NovaAgent.instance;
 	}
 
+	/**
+	 * Create some dir and file and download images when agent start
+	 */
+	private void localInitial() {
+
+		String save_path = Conf.getString("agent.software.save_path");
+		String image_path = Conf.getString("agent.software.image_path");
+
+		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, save_path));
+		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, image_path));
+		File appsJsonFile = new File(Utils.pathJoin(Utils.NOVA_HOME, save_path,
+				"apps.json"));
+		if (!appsJsonFile.exists()) {
+			try {
+				appsJsonFile.createNewFile();
+			} catch (IOException e) {
+				logger.error(
+						"Can't make this file: "
+								+ Utils.pathJoin(Utils.NOVA_HOME, save_path,
+										"apps.json"), e);
+			}
+		}
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				String hostIp = Conf.getString("agent.ftp.host");
+				int ftpPort = Conf.getInteger("agent.ftp.port");
+				String userName = Conf.getString("agent.ftp.user_name");
+				String password = Conf.getString("agent.ftp.password");
+				String savePath = Utils.pathJoin(Utils.NOVA_HOME,
+						Conf.getString("agent.software.image_path"));
+				try {
+					FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName,
+							password);
+					FtpUtils.downloadDir(fc, "/images/",
+							Utils.pathJoin(savePath));
+
+					logger.info("Have downloaded images from server!");
+
+				} catch (IOException e) {
+					logger.error("Downloading images fail: ", e);
+				}
+
+			}
+
+		}).start();
+
+	}
+
 	public static void main(String[] args) {
 
 		// Install appliances when startup
@@ -291,7 +319,6 @@ public class NovaAgent extends SimpleServer {
 				}
 			}
 		});
-
 		NovaAgent.getInstance().start();
 	}
 }
