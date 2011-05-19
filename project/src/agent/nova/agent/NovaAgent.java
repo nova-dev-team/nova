@@ -29,12 +29,15 @@ import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.service.message.QueryPerfMessage;
 import nova.common.util.Conf;
+import nova.common.util.FtpUtils;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
+
+import sun.net.ftp.FtpClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -98,6 +101,35 @@ public class NovaAgent extends SimpleServer {
 				new QueryApplianceStatusHandler());
 		registerHandler(InstallApplianceMessage.class,
 				new InstallApplianceHandler());
+
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				String hostIp = Conf.getString("agent.ftp.host");
+				int ftpPort = Conf.getInteger("agent.ftp.port");
+				String userName = Conf.getString("agent.ftp.user_name");
+				String password = Conf.getString("agent.ftp.password");
+				String savePath = Utils.pathJoin(Utils.NOVA_HOME,
+						Conf.getString("agent.software.image_path"));
+				try {
+					FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName,
+							password);
+					FtpUtils.downloadDir(fc, "/images/",
+							Utils.pathJoin(savePath));
+
+					logger.info("Have downloaded images from server!");
+
+				} catch (IOException e) {
+					logger.error("Downloading images fail: ", e);
+				}
+
+			}
+
+		}).start();
+		// TODO add master register
+		// SimpleAddress masterAddress = new SimpleAddress("10.0.1.242", 3000);
+		// registerMaster(masterAddress);
 	}
 
 	public SimpleAddress getAddr() {
