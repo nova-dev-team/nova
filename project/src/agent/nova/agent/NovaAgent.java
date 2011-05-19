@@ -89,11 +89,6 @@ public class NovaAgent extends SimpleServer {
 	 */
 	private NovaAgent() {
 
-		// create db/agent folder
-		File agentDbFolder = new File(Utils.pathJoin(Utils.NOVA_HOME, "db",
-				"agent"));
-		agentDbFolder.mkdirs();
-
 		registerHandler(QueryHeartbeatMessage.class,
 				new AgentQueryHeartbeatHandler());
 		registerHandler(QueryPerfMessage.class, new AgentQueryPerfHandler());
