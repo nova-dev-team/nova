@@ -27,9 +27,13 @@ public class CreateVclusterHandler implements
 		// to modify
 
 		List<Integer> usedIpSegments = new ArrayList<Integer>();
+		// System.out.println("111");
 		int gatewayIpIval = Ipv4ToInteger("10.0.2.255");
+		// System.out.println("222");
 		usedIpSegments.add(gatewayIpIval);
 		usedIpSegments.add(gatewayIpIval);
+
+		// System.out.println("10.0.2.255     " + gatewayIpIval);
 
 		for (Vcluster vcluster : Vcluster.all()) {
 			usedIpSegments.add(Ipv4ToInteger(vcluster.getFristIp()));
@@ -42,6 +46,9 @@ public class CreateVclusterHandler implements
 		int lastUsableIpIval = Ipv4ToInteger("10.0.2.254");
 
 		int testIpIval = firstUsableIpIval;
+
+		// System.out.println("10.0.2.0     " + testIpIval);
+
 		while (testIpIval + msg.vclusterSize - 1 < lastUsableIpIval) {
 			int testLastIpIval = testIpIval + msg.vclusterSize - 1;
 			boolean usable = true;
@@ -71,6 +78,11 @@ public class CreateVclusterHandler implements
 			log.info("There is not enough Ip address available for VMs.");
 		}
 
+		// System.out.println(msg.vclusterName);
+		// System.out.println(msg.vclusterSize);
+		// System.out.println(testIpIval);
+		// System.out.println(IntegerToIpv4(testIpIval));
+
 		Vcluster vcluster = new Vcluster();
 		vcluster.setClusterName(msg.vclusterName);
 		vcluster.setClusterSize(msg.vclusterSize);
@@ -79,14 +91,14 @@ public class CreateVclusterHandler implements
 	}
 
 	public int Ipv4ToInteger(String ipv4) {
-		String params[] = ipv4.split(".");
+		String[] params = ipv4.split("\\.");
 		return ((Integer.parseInt(params[0]) * 256 + Integer
 				.parseInt(params[1])) * 256 + Integer.parseInt(params[2]))
 				* 256 + Integer.parseInt(params[3]);
 	}
 
 	public String IntegerToIpv4(int intIp) {
-		int params[] = new int[4];
+		int[] params = new int[4];
 		for (int i = 3; i > -1; i--) {
 			params[i] = intIp % 256;
 			intIp = intIp / 256;

@@ -4,6 +4,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.models.Pnode;
+import nova.master.models.Vcluster;
 import nova.master.models.Vnode;
 import nova.worker.api.WorkerProxy;
 
@@ -22,7 +23,12 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 	public void handleMessage(CreateVnodeMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		// TODO Auto-generated method stub
-		SimpleAddress vAddr = new SimpleAddress("10.0.2.1", 4000);
+		Vcluster vcluster = new Vcluster();
+		for (Vcluster vc : Vcluster.all()) {
+			vcluster = vc;
+		}
+		SimpleAddress vAddr = new SimpleAddress(vcluster.getFristIp(), 4000);
+
 		int pid = 1;
 
 		Vnode vnode = new Vnode();

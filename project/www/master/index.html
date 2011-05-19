@@ -3,6 +3,7 @@
 <body>
 <h3><font color="#FF0000">${content}<br></font></h3>
 
+
 <h4><font color="#33CC00">Info of Pnode<br></font></h4>
 ${pnode_info}<br>
 
@@ -85,12 +86,13 @@ ${appliance_info}<br>
 <h3><font color="#FF0000">Create vcluster<br></font></h3>
 <form action="create_vcluster" method="get">
 	Cluster Name<input type="text" name="vcluster_name">
-	Cluster Size<input type="text" name="vcluster_size">MB
+	Cluster Size<input type="text" name="vcluster_size">
 	<input type="submit" value="Create vcluster">
 </form>
 
 ${act}<br>
 ${pnode_ip}<br>
+${vcluster_frame}
 
 </body>
 </html>

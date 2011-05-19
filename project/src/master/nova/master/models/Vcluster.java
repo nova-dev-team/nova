@@ -6,6 +6,7 @@ import java.util.List;
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
+import nova.common.util.Utils;
 
 /**
  * @hibernate.class table="vcluster"
@@ -185,6 +186,17 @@ public class Vcluster extends DbObject {
 
 	public void setUserId(Integer userId) {
 		this.userId = userId;
+	}
+
+	/**
+	 * Override string present.
+	 */
+	@Override
+	public String toString() {
+		return Utils
+				.expandTemplate(
+						"{Vcluster @ cluster_name='${clusterName}', cluster_size='${clusterSize}', first_ip='${firstIp}'}",
+						this);
 	}
 
 }
