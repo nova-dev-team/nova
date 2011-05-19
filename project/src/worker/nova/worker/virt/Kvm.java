@@ -72,6 +72,9 @@ public class Kvm {
 		String vmNetworkInterface = Conf.getString("vm_network_interface");
 		String vmNetworkBridge = Conf.getString("vm_network_bridge");
 		String fixVncMousePointer = Conf.getString("fix_vnc_mouse_pointer");
+		System.out.println("vmNetworkInterface is " + vmNetworkInterface);
+		System.out.println("vmNetworkBridge is " + vmNetworkBridge);
+		System.out.println("fixVncMousePointer is " + fixVncMousePointer);
 
 		if ((!vmNetworkInterface.equals("")) && (!vmNetworkBridge.equals(""))) {
 			params.put("interfaceType", "bridge");

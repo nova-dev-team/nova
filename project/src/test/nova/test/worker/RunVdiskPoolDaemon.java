@@ -18,15 +18,12 @@ public class RunVdiskPoolDaemon {
 		NovaWorker.getInstance().start();
 
 		// StartVnodeHandler svh = new StartVnodeHandler();
-		// StartVnodeMessage msg = new StartVnodeMessage(null);
-		// msg.setHyperVisor("kvm");
+		// StartVnodeMessage msg = new StartVnodeMessage("kvm", null, "false",
+		// null);
 		// msg.setName("vm");
 		// msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
-		// msg.setMemSize("524288");
-		// msg.setCpuCount("1");
-		// msg.setArch("i686");
-		// msg.setCdImage("/media/data/ubuntu-10.04-desktop-i386.iso");
-		// msg.setEmulatorPath("/usr/bin/kvm");
+		// msg.setHdaImage("small.img");
+		// msg.setCdImage("");
 		// msg.setRunAgent("false");
 		//
 		// ChannelHandlerContext ctx = null;
@@ -34,20 +31,16 @@ public class RunVdiskPoolDaemon {
 		// SimpleAddress xreply = null;
 		// svh.handleMessage(msg, ctx, e, xreply);
 		//
-		// msg.setHyperVisor("KVM");
-		// msg.setName("vm2");
-		// msg.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
-		// msg.setMemSize("524288");
-		// msg.setCpuCount("1");
-		// msg.setArch("i686");
-		// msg.setCdImage("");
-		// msg.setEmulatorPath("/usr/bin/kvm");
-		// msg.setRunAgent("false");
+		// StartVnodeMessage msg2 = new StartVnodeMessage("KVM", null, "false",
+		// "524288", "1", "small.img", "false");
+		// msg2.setName("vm2");
+		// msg2.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
+		// msg2.setCdImage("");
 		//
 		// ChannelHandlerContext ctx2 = null;
 		// MessageEvent e2 = null;
 		// SimpleAddress xreply2 = null;
-		// svh.handleMessage(msg, ctx2, e2, xreply2);
+		// svh.handleMessage(msg2, ctx2, e2, xreply2);
 
 		try {
 			Thread.sleep(2000);

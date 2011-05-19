@@ -21,13 +21,14 @@ import org.libvirt.LibvirtException;
  */
 public class VdiskPoolDaemon extends SimpleDaemon {
 
+	// TODO @shayf need to update fileStatus when add or del imgs
 	private HashMap<String, VdiskFile> fileStatus;
 
-	public VdiskPoolDaemon() {
-		super(2000);
-		fileStatus = new HashMap<String, VdiskFile>();
+	private void updateFileStatus() {
 		File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
-		Utils.mkdirs(pathFile.getAbsolutePath());
+		if (!pathFile.exists()) {
+			Utils.mkdirs(pathFile.getAbsolutePath());
+		}
 		for (String stdImgFile : pathFile.list()) {
 			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 					stdImgFile));
@@ -63,6 +64,12 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 
 			}
 		}
+	}
+
+	public VdiskPoolDaemon() {
+		super(2000);
+		fileStatus = new HashMap<String, VdiskFile>();
+		updateFileStatus();
 		this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
 		this.setMbps(1);
 		this.setVmRunning(false);
@@ -300,116 +307,142 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		}
 		final String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "vdiskpool");
 		checkRevoke(path);
+		updateFileStatus();
 		File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
-		for (String stdImgFile : pathFile.list()) {
-			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-					stdImgFile));
-			if (!tmp.isDirectory()) {
-				// System.out.println("list files " + stdImgFile);
-				for (int i = POOL_SIZE; i > 0; i--) {
-					if (fileStatus
-							.get(stdImgFile + ".pool." + Integer.toString(i))
-							.getStat().equals(VdiskFile.Status.NOT_EXIST)) {
-						fileStatus.get(
-								stdImgFile + ".pool." + Integer.toString(i))
-								.setStat(VdiskFile.Status.LOCKED);
-						try {
-							System.out.println("file"
-									+ Utils.pathJoin(path, stdImgFile
-											+ ".pool." + Integer.toString(i))
-									+ " "
-									+ VdiskFile.Status.NOT_EXIST.toString());
-							System.out.println("going to copy file"
-									+ Utils.pathJoin(path, stdImgFile
-											+ ".pool." + Integer.toString(i)));
-							String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
-									"run", stdImgFile);
-							String destUrl = Utils.pathJoin(path, stdImgFile
-									+ ".pool." + Integer.toString(i) + ".lock");
-							File sourceFile = new File(sourceUrl);
-							File tmpFile = new File(destUrl);
-							File destFile = new File(
-									Utils.pathJoin(path, stdImgFile + ".pool."
-											+ Integer.toString(i)));
-							if (sourceFile.isFile()) {
-								this.autoSpeedCopy(sourceFile, tmpFile);
-							}
-
-							if (tmpFile.length() == sourceFile.length()) {
-								tmpFile.renameTo(destFile);
-								System.out.println("rename file"
-										+ tmpFile.getName() + " to "
-										+ destFile.getName());
-								fileStatus.get(
-										stdImgFile + ".pool."
-												+ Integer.toString(i)).setStat(
-										VdiskFile.Status.AVAILABLE);
-								fileStatus.get(
-										stdImgFile + ".pool."
-												+ Integer.toString(i)).setLen(
-										destFile.length());
-								fileStatus.get(
-										stdImgFile + ".pool."
-												+ Integer.toString(i))
-										.setLastVisitTime(
-												System.currentTimeMillis());
-							} else {
-								fileStatus.get(
-										stdImgFile + ".pool."
-												+ Integer.toString(i)).setLen(
-										tmpFile.length());
-								fileStatus.get(
-										stdImgFile + ".pool."
-												+ Integer.toString(i))
-										.setLastVisitTime(
-												System.currentTimeMillis());
-							}
-							if (this.isStopping()) {
-								break;
-							}
-						} catch (IOException e) {
-							log.error("copy image fail", e);
-						} catch (LibvirtException e) {
-							log.error("libvirt connection fail", e);
-						}
-
-					} else if (fileStatus
-							.get(stdImgFile + ".pool." + Integer.toString(i))
-							.getStat().equals(VdiskFile.Status.LOCKED)) {
-						System.out.println("time step:\t"
-								+ Long.toString(System.currentTimeMillis()
-										- fileStatus.get(
-												stdImgFile + ".pool."
-														+ Integer.toString(i))
-												.getLastVisitTime()));
-						if (System.currentTimeMillis()
-								- fileStatus.get(
-										stdImgFile + ".pool."
-												+ Integer.toString(i))
-										.getLastVisitTime() > 1000) {
-							File lockedImg = new File(Utils.pathJoin(
-									Utils.NOVA_HOME, "run", "vdiskpool",
-									stdImgFile + ".pool." + Integer.toString(i)
-											+ ".lock"));
-							if (fileStatus
-									.get(stdImgFile + ".pool."
-											+ Integer.toString(i)).getLen() == lockedImg
-									.length()) {
-								// copy failed
-								lockedImg.delete();
-							}
+		if (pathFile.list().length > 0) {
+			for (String stdImgFile : pathFile.list()) {
+				File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						stdImgFile));
+				if (!tmp.isDirectory()) {
+					System.out.println("current file is " + tmp.getName());
+					// System.out.println("list files " + stdImgFile);
+					for (int i = POOL_SIZE; i > 0; i--) {
+						if (fileStatus
+								.get(stdImgFile + ".pool."
+										+ Integer.toString(i)).getStat()
+								.equals(VdiskFile.Status.NOT_EXIST)) {
 							fileStatus
 									.get(stdImgFile + ".pool."
 											+ Integer.toString(i)).setStat(
-											VdiskFile.Status.NOT_EXIST);
-							fileStatus
-									.get(stdImgFile + ".pool."
-											+ Integer.toString(i)).setLen(-1);
-							fileStatus
-									.get(stdImgFile + ".pool."
-											+ Integer.toString(i))
-									.setLastVisitTime(
-											System.currentTimeMillis());
+											VdiskFile.Status.LOCKED);
+							try {
+								System.out
+										.println("file"
+												+ Utils.pathJoin(
+														path,
+														stdImgFile
+																+ ".pool."
+																+ Integer
+																		.toString(i))
+												+ " "
+												+ VdiskFile.Status.NOT_EXIST
+														.toString());
+								System.out.println("going to copy file"
+										+ Utils.pathJoin(
+												path,
+												stdImgFile + ".pool."
+														+ Integer.toString(i)));
+								String sourceUrl = Utils.pathJoin(
+										Utils.NOVA_HOME, "run", stdImgFile);
+								String destUrl = Utils
+										.pathJoin(path, stdImgFile + ".pool."
+												+ Integer.toString(i) + ".lock");
+								File sourceFile = new File(sourceUrl);
+								File tmpFile = new File(destUrl);
+								File destFile = new File(Utils.pathJoin(
+										path,
+										stdImgFile + ".pool."
+												+ Integer.toString(i)));
+								if (sourceFile.isFile()) {
+									this.autoSpeedCopy(sourceFile, tmpFile);
+								}
+
+								if (tmpFile.length() == sourceFile.length()) {
+									tmpFile.renameTo(destFile);
+									System.out.println("rename file"
+											+ tmpFile.getName() + " to "
+											+ destFile.getName());
+									fileStatus
+											.get(stdImgFile + ".pool."
+													+ Integer.toString(i))
+											.setStat(VdiskFile.Status.AVAILABLE);
+									fileStatus.get(
+											stdImgFile + ".pool."
+													+ Integer.toString(i))
+											.setLen(destFile.length());
+									fileStatus.get(
+											stdImgFile + ".pool."
+													+ Integer.toString(i))
+											.setLastVisitTime(
+													System.currentTimeMillis());
+								} else {
+									fileStatus.get(
+											stdImgFile + ".pool."
+													+ Integer.toString(i))
+											.setLen(tmpFile.length());
+									fileStatus.get(
+											stdImgFile + ".pool."
+													+ Integer.toString(i))
+											.setLastVisitTime(
+													System.currentTimeMillis());
+								}
+								if (this.isStopping()) {
+									break;
+								}
+							} catch (IOException e) {
+								log.error("copy image fail", e);
+							} catch (LibvirtException e) {
+								log.error("libvirt connection fail", e);
+							}
+
+						} else if (fileStatus
+								.get(stdImgFile + ".pool."
+										+ Integer.toString(i)).getStat()
+								.equals(VdiskFile.Status.LOCKED)) {
+							System.out
+									.println("time step:\t"
+											+ Long.toString(System
+													.currentTimeMillis()
+													- fileStatus
+															.get(stdImgFile
+																	+ ".pool."
+																	+ Integer
+																			.toString(i))
+															.getLastVisitTime()));
+							if (System.currentTimeMillis()
+									- fileStatus.get(
+											stdImgFile + ".pool."
+													+ Integer.toString(i))
+											.getLastVisitTime() > 1000) {
+								File lockedImg = new File(
+										Utils.pathJoin(
+												Utils.NOVA_HOME,
+												"run",
+												"vdiskpool",
+												stdImgFile + ".pool."
+														+ Integer.toString(i)
+														+ ".lock"));
+								if (fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i)).getLen() == lockedImg
+										.length()) {
+									// copy failed
+									lockedImg.delete();
+								}
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i)).setStat(
+										VdiskFile.Status.NOT_EXIST);
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i)).setLen(
+										-1);
+								fileStatus.get(
+										stdImgFile + ".pool."
+												+ Integer.toString(i))
+										.setLastVisitTime(
+												System.currentTimeMillis());
+							}
 						}
 					}
 				}
