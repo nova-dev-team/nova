@@ -1,12 +1,7 @@
 package nova.agent.ui;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +22,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -102,46 +96,28 @@ public class AgentFrame extends JFrame {
 
 	public AgentFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new GridBagLayout());
-		GridBagConstraints gbConstraints = new GridBagConstraints();
-
-		gbConstraints.fill = GridBagConstraints.BOTH;
-		gbConstraints.anchor = GridBagConstraints.CENTER;
-
-		Container container = getContentPane();
-
-		gbConstraints.insets = new Insets(10, 10, 10, 10);
+		setLayout(null);
 		for (Appliance app : apps.values())
 			listModel.addElement(app.getName());
-
-		JScrollPane softListPane = new JScrollPane(softList);
-		softListPane
-				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		addComp(softListPane, container, gbConstraints, 0, 0, 6, 3, 1, 1);
-
-		gbConstraints.insets = new Insets(10, 10, 10, 10);
-		addComp(picture, container, gbConstraints, 0, 3, 3, 3, 1, 1);
-
-		gbConstraints.insets = new Insets(10, 10, 10, 10);
 		JScrollPane softInfoPane = new JScrollPane(softInfo);
-		softInfoPane
-				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		softInfoPane
-				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		addComp(softInfoPane, container, gbConstraints, 3, 3, 3, 3, 1, 1);
-		softInfo.setEditable(false);
+		softList.setBounds(10, 10, 200, 500);
 
-		gbConstraints.insets = new Insets(10, 10, 10, 10);
-		addComp(statusInfo, container, gbConstraints, 6, 0, 1, 1, 0, 0);
+		picture.setBounds(250, 10, 300, 300);
+		softInfoPane.setBounds(250, 300, 300, 210);
+		statusInfo.setBounds(10, 520, 100, 20);
 
-		gbConstraints.insets = new Insets(10, 10, 10, 10);
-		addComp(downProcess, container, gbConstraints, 6, 1, 1, 3, 0, 0);
+		downProcess.setBounds(250, 520, 100, 20);
+		install.setBounds(470, 520, 80, 20);
+
+		add(softList);
+		add(picture);
+		add(softInfoPane);
+		add(statusInfo);
+		add(downProcess);
+		add(install);
+		picture.setVisible(true);
 		downProcess.setVisible(false);
-
-		gbConstraints.insets = new Insets(10, 10, 10, 10);
-		gbConstraints.fill = GridBagConstraints.NONE;
-		gbConstraints.anchor = GridBagConstraints.EAST;
-		addComp(install, container, gbConstraints, 6, 5, 1, 1, 0, 0);
+		setResizable(false);
 		// 居中显示
 		setSize(600, 600);
 		double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
@@ -189,35 +165,22 @@ public class AgentFrame extends JFrame {
 			public void valueChanged(ListSelectionEvent e) {
 				if (softList.getSelectedIndex() != -1) {
 					String softName = softList.getSelectedValue().toString();
+
 					String relativeLocalPath = Conf
 							.getString("agent.software.image_path");
 					changeSize(Utils.pathJoin(Utils.NOVA_HOME,
 							relativeLocalPath, softName + ".jpg"), Utils
 							.pathJoin(Utils.NOVA_HOME, relativeLocalPath,
-									softName + ".jpg"),
-							picture.getBounds().width,
-							picture.getBounds().height);
+									softName + ".jpg"), 300, 250);
 					ImageIcon pic = new ImageIcon(Utils.pathJoin(
 							Utils.NOVA_HOME, relativeLocalPath, softName
 									+ ".jpg"));
 					picture.setIcon(pic);
+					picture.setVerticalAlignment(JLabel.TOP);
 					softInfo.setText(apps.get(softName).getInfo());
 				}
 			}
 		});
-	}
-
-	private void addComp(Component com, Container con,
-			GridBagConstraints gbConstraints, int row, int column,
-			int numberOfRow, int numberOfColumn, int weightx, int weighty) {
-		gbConstraints.gridx = column;
-		gbConstraints.gridy = row;
-		gbConstraints.gridwidth = numberOfColumn;
-		gbConstraints.gridheight = numberOfRow;
-		gbConstraints.weightx = weightx;
-		gbConstraints.weighty = weighty;
-
-		con.add(com, gbConstraints);
 	}
 
 	/**

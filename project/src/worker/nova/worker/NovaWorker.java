@@ -8,6 +8,8 @@ import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
+import nova.worker.api.messages.QueryPnodeInfoMessage;
+import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.api.messages.StopVnodeMessage;
@@ -20,6 +22,8 @@ import nova.worker.handler.StartVnodeHandler;
 import nova.worker.handler.StopVnodeHandler;
 import nova.worker.handler.WorkerHttpHandler;
 import nova.worker.handler.WorkerQueryHeartbeatHandler;
+import nova.worker.handler.WorkerQueryPnodeInfoMessageHandler;
+import nova.worker.handler.WorkerQueryVnodeInfoMessageHandler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
@@ -65,6 +69,12 @@ public class NovaWorker extends SimpleServer {
 				new WorkerQueryHeartbeatHandler());
 
 		this.registerHandler(RevokeImageMessage.class, new RevokeImageHandler());
+
+		this.registerHandler(QueryPnodeInfoMessage.class,
+				new WorkerQueryPnodeInfoMessageHandler());
+
+		this.registerHandler(QueryVnodeInfoMessage.class,
+				new WorkerQueryVnodeInfoMessageHandler());
 
 		Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("worker.bind_port", 4000);
