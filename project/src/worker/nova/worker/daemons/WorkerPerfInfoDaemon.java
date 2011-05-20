@@ -12,6 +12,12 @@ import nova.worker.NovaWorker;
  */
 public class WorkerPerfInfoDaemon extends SimpleDaemon {
 
+	public static final long PERF_INFO_INTERVAL = 2000;
+
+	public WorkerPerfInfoDaemon() {
+		super(PERF_INFO_INTERVAL);
+	}
+
 	/**
 	 * Send monitor information.
 	 */
