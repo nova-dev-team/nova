@@ -32,34 +32,34 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		for (String stdImgFile : pathFile.list()) {
 			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 					stdImgFile));
-			System.out.println("tmp.getname() is " + tmp.getName());
-			System.out.println("tmp.isDirectory() is " + tmp.isDirectory());
-			System.out.println("tmp.length() is " + tmp.length());
+			// System.out.println("tmp.getname() is " + tmp.getName());
+			// System.out.println("tmp.isDirectory() is " + tmp.isDirectory());
+			// System.out.println("tmp.length() is " + tmp.length());
 			if (!tmp.isDirectory()) {
-				System.out.println("list files " + stdImgFile);
+				// System.out.println("list files " + stdImgFile);
 				for (int i = 1; i <= POOL_SIZE; i++) {
 					VdiskFile tmpVdiskFile = new VdiskFile();
 					tmpVdiskFile.setStatValue(i, stdImgFile);
 					tmpVdiskFile.setLastVisitTime(System.currentTimeMillis());
 					fileStatus.put(stdImgFile + ".pool." + Integer.toString(i),
 							tmpVdiskFile);
-					System.out.println(stdImgFile
-							+ ".pool."
-							+ Integer.toString(i)
-							+ "\nstatus: "
-							+ fileStatus
-									.get(stdImgFile + ".pool."
-											+ Integer.toString(i)).getStat()
-									.toString()
-							+ "\nlen: "
-							+ fileStatus
-									.get(stdImgFile + ".pool."
-											+ Integer.toString(i)).getLen()
-							+ "\n visittime: "
-							+ fileStatus
-									.get(stdImgFile + ".pool."
-											+ Integer.toString(i))
-									.getLastVisitTime());
+					// System.out.println(stdImgFile
+					// + ".pool."
+					// + Integer.toString(i)
+					// + "\nstatus: "
+					// + fileStatus
+					// .get(stdImgFile + ".pool."
+					// + Integer.toString(i)).getStat()
+					// .toString()
+					// + "\nlen: "
+					// + fileStatus
+					// .get(stdImgFile + ".pool."
+					// + Integer.toString(i)).getLen()
+					// + "\n visittime: "
+					// + fileStatus
+					// .get(stdImgFile + ".pool."
+					// + Integer.toString(i))
+					// .getLastVisitTime());
 				}
 
 			}
@@ -94,8 +94,8 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			Connect conn = null;
 			conn = new Connect("qemu:///system", true);
 			if (conn.numOfDomains() > 0) {
-				System.out.println("numofdomains\t"
-						+ Integer.toString(conn.numOfDomains()));
+				// System.out.println("numofdomains\t"
+				// + Integer.toString(conn.numOfDomains()));
 				conn.close();
 				this.setVmRunning(true);
 			} else {
@@ -314,7 +314,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 				File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 						stdImgFile));
 				if (!tmp.isDirectory()) {
-					System.out.println("current file is " + tmp.getName());
+					// System.out.println("current file is " + tmp.getName());
 					// System.out.println("list files " + stdImgFile);
 					for (int i = POOL_SIZE; i > 0; i--) {
 						if (fileStatus
@@ -326,22 +326,22 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 											+ Integer.toString(i)).setStat(
 											VdiskFile.Status.LOCKED);
 							try {
-								System.out
-										.println("file"
-												+ Utils.pathJoin(
-														path,
-														stdImgFile
-																+ ".pool."
-																+ Integer
-																		.toString(i))
-												+ " "
-												+ VdiskFile.Status.NOT_EXIST
-														.toString());
-								System.out.println("going to copy file"
-										+ Utils.pathJoin(
-												path,
-												stdImgFile + ".pool."
-														+ Integer.toString(i)));
+								// System.out
+								// .println("file"
+								// + Utils.pathJoin(
+								// path,
+								// stdImgFile
+								// + ".pool."
+								// + Integer
+								// .toString(i))
+								// + " "
+								// + VdiskFile.Status.NOT_EXIST
+								// .toString());
+								// System.out.println("going to copy file"
+								// + Utils.pathJoin(
+								// path,
+								// stdImgFile + ".pool."
+								// + Integer.toString(i)));
 								String sourceUrl = Utils.pathJoin(
 										Utils.NOVA_HOME, "run", stdImgFile);
 								String destUrl = Utils
@@ -359,9 +359,9 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 
 								if (tmpFile.length() == sourceFile.length()) {
 									tmpFile.renameTo(destFile);
-									System.out.println("rename file"
-											+ tmpFile.getName() + " to "
-											+ destFile.getName());
+									// System.out.println("rename file"
+									// + tmpFile.getName() + " to "
+									// + destFile.getName());
 									fileStatus
 											.get(stdImgFile + ".pool."
 													+ Integer.toString(i))
@@ -399,16 +399,16 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 								.get(stdImgFile + ".pool."
 										+ Integer.toString(i)).getStat()
 								.equals(VdiskFile.Status.LOCKED)) {
-							System.out
-									.println("time step:\t"
-											+ Long.toString(System
-													.currentTimeMillis()
-													- fileStatus
-															.get(stdImgFile
-																	+ ".pool."
-																	+ Integer
-																			.toString(i))
-															.getLastVisitTime()));
+							// System.out
+							// .println("time step:\t"
+							// + Long.toString(System
+							// .currentTimeMillis()
+							// - fileStatus
+							// .get(stdImgFile
+							// + ".pool."
+							// + Integer
+							// .toString(i))
+							// .getLastVisitTime()));
 							if (System.currentTimeMillis()
 									- fileStatus.get(
 											stdImgFile + ".pool."

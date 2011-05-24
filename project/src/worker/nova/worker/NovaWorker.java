@@ -13,6 +13,7 @@ import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.api.messages.StopVnodeMessage;
+import nova.worker.daemons.PnodeStatusDaemon;
 import nova.worker.daemons.VdiskPoolDaemon;
 import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.daemons.WorkerHeartbeatDaemon;
@@ -45,7 +46,7 @@ public class NovaWorker extends SimpleServer {
 	 */
 	SimpleDaemon daemons[] = { new WorkerHeartbeatDaemon(),
 			new WorkerPerfInfoDaemon(), new VnodeStatusDaemon(),
-			new VdiskPoolDaemon() };
+			new VdiskPoolDaemon(), new PnodeStatusDaemon() };
 
 	/**
 	 * Connection to nova master.
