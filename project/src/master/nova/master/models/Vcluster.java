@@ -24,6 +24,14 @@ public class Vcluster extends DbObject {
 		return all;
 	}
 
+	public static Vcluster last() {
+		Vcluster last = new Vcluster();
+		for (DbObject obj : getManager().all()) {
+			last = (Vcluster) obj;
+		}
+		return last;
+	}
+
 	public static void delete(Vcluster vcluster) {
 		getManager().delete(vcluster);
 	}
@@ -195,7 +203,7 @@ public class Vcluster extends DbObject {
 	public String toString() {
 		return Utils
 				.expandTemplate(
-						"{Vcluster @ cluster_name='${clusterName}', cluster_size='${clusterSize}', first_ip='${firstIp}'}",
+						"{Vcluster @ cluster_name='${clusterName}', cluster_size='${clusterSize}', first_ip='${fristIp}'}",
 						this);
 	}
 

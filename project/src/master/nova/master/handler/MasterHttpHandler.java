@@ -107,15 +107,15 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 										.get("description")), null, null, null);
 			} else if (act.equals("create_vnode")) {
 				new CreateVnodeHandler().handleMessage(
-						new CreateVnodeMessage(queryMap.get("vm_image"),
-								queryMap.get("vm_name"), Integer
+						new CreateVnodeMessage(queryMap.get("vnode_image"),
+								queryMap.get("vnode_name"), Integer
 										.parseInt(queryMap.get("cpu_count")),
 								Integer.parseInt(queryMap.get("memory_size")),
 								queryMap.get("appliance_list")), null, null,
 						null);
 			} else if (act.equals("create_vcluster")) {
 
-				String vclusterFrame = "<form action=\"create_vnode\" method=\"get\">";
+				String vclusterFrame = "<form action=\"create_vcluster_node\" method=\"get\">";
 				for (int i = 0; i < Integer.parseInt(queryMap
 						.get("vcluster_size")); i++) {
 					vclusterFrame += "<h3><font color=\"#FF0000\">"
@@ -155,8 +155,24 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 												.get("vcluster_size"))), null,
 								null, null);
 
+			} else if (act.equals("create_vcluster_node")) {
+				for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
+					new CreateVnodeHandler().handleMessage(
+							new CreateVnodeMessage(queryMap.get("vnode_image"
+									+ String.valueOf(i + 1)), queryMap
+									.get("vnode_name" + String.valueOf(i + 1)),
+									Integer.parseInt(queryMap.get("cpu_count"
+											+ String.valueOf(i + 1))),
+									Integer.parseInt(queryMap.get("memory_size"
+											+ String.valueOf(i + 1))), queryMap
+											.get("appliance_list"
+													+ String.valueOf(i + 1))),
+							null, null, null);
+				}
+
 			}
 		}
+
 		values.put("pnode_info", Pnode.all());
 		values.put("vcluster_info", Vcluster.all());
 
