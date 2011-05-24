@@ -168,6 +168,22 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 											.get("appliance_list"
 													+ String.valueOf(i + 1))),
 							null, null, null);
+					System.out
+							.println(queryMap.get("vnode_image"
+									+ String.valueOf(i + 1))
+									+ "~~~~~~"
+									+ queryMap.get("vnode_name"
+											+ String.valueOf(i + 1))
+									+ "~~~~~~"
+									+ Integer.parseInt(queryMap.get("cpu_count"
+											+ String.valueOf(i + 1)))
+									+ "~~~~~~"
+									+ Integer.parseInt(queryMap
+											.get("memory_size"
+													+ String.valueOf(i + 1)))
+									+ "~~~~~~"
+									+ queryMap.get("appliance_list"
+											+ String.valueOf(i + 1)));
 				}
 
 			}

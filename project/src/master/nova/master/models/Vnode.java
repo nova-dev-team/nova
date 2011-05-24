@@ -8,6 +8,7 @@ import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
 import nova.common.service.SimpleAddress;
+import nova.common.util.Utils;
 
 /**
  * Model for a virtual node.
@@ -364,6 +365,17 @@ public class Vnode extends DbObject {
 
 	public void setVncPort(Integer vncPort) {
 		this.vncPort = vncPort;
+	}
+
+	/**
+	 * Override string present.
+	 */
+	@Override
+	public String toString() {
+		return Utils
+				.expandTemplate(
+						"{Vnode @ ${ip}:${port}, vid='${id}', name='${name}', pnode_id='${pnodeId}', cpu_count='${cpuCount}', memory_size='${memorySize}'}",
+						this);
 	}
 
 }
