@@ -114,22 +114,36 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 								queryMap.get("appliance_list")), null, null,
 						null);
 			} else if (act.equals("create_vcluster")) {
-				/*
-				 * String vclusterFrame = ""; for (int i = 0; i <
-				 * Integer.parseInt(queryMap .get("vcluster_size")); i++) {
-				 * vclusterFrame += "<h3><font color=\"#FF0000\">" +
-				 * "Create vnode" + (i + 1) + "<br></font></h3>" +
-				 * "<form action=\"create_vnode\" method=\"get\">" +
-				 * "VM Image<input type=\"text\" name=\"vnode_image\"><br>" +
-				 * "VM Name<input type=\"text\" name=\"vnode_name\"><br>" +
-				 * "CPU Count	<select name=\"cpu_count\" >" +
-				 * "<option value=\"1\">1" + "<option value=\"2\">2" +
-				 * "<option value=\"4\">4" + "</select>" +
-				 * "Memory Size<input type=\"text\" name=\"memory_size\">MB<br>"
-				 * + "Appliance<input type=\"text\" name=\"appliance\">" +
-				 * "<input type=\"submit\" value=\"Create vnode\">" + "</form>";
-				 * } values.put("vcluster_frame", vclusterFrame);
-				 */
+
+				String vclusterFrame = "<form action=\"create_vnode\" method=\"get\">";
+				for (int i = 0; i < Integer.parseInt(queryMap
+						.get("vcluster_size")); i++) {
+					vclusterFrame += "<h3><font color=\"#FF0000\">"
+							+ "Create vnode"
+							+ (i + 1)
+							+ "<br></font></h3>"
+							+ "VM Image<input type=\"text\" name=\"vnode_image"
+							+ (i + 1)
+							+ "\"><br>"
+							+ "VM Name<input type=\"text\" name=\"vnode_name"
+							+ (i + 1)
+							+ "\"><br>"
+							+ "CPU Count	<select name=\"cpu_count"
+							+ (i + 1)
+							+ "\" >"
+							+ "<option value=\"1\">1"
+							+ "<option value=\"2\">2"
+							+ "<option value=\"4\">4"
+							+ "</select>"
+							+ "Memory Size<input type=\"text\" name=\"memory_size"
+							+ (i + 1) + "\">KB<br>"
+							+ "Appliance<input type=\"text\" name=\"appliance"
+							+ (i + 1) + "\">";
+				}
+				vclusterFrame += "<input type=\"submit\" value=\"create vnode\">"
+						+ "</form>";
+				values.put("vcluster_frame", vclusterFrame);
+
 				System.out.println(queryMap.get("vcluster_name") + "       "
 						+ Integer.parseInt(queryMap.get("vcluster_size")));
 
