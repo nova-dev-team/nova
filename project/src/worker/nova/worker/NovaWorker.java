@@ -1,7 +1,5 @@
 package nova.worker;
 
-import java.net.InetSocketAddress;
-
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
@@ -180,10 +178,11 @@ public class NovaWorker extends SimpleServer {
 			}
 		});
 
-		String bindHost = Conf.getString("worker.bind_host");
-		Integer bindPort = Conf.getInteger("worker.bind_port");
-		InetSocketAddress bindAddr = new InetSocketAddress(bindHost, bindPort);
-		NovaWorker.getInstance().bind(bindAddr);
-
+		// String bindHost = Conf.getString("worker.bind_host");
+		// Integer bindPort = Conf.getInteger("worker.bind_port");
+		// InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
+		// bindPort);
+		// NovaWorker.getInstance().bind(bindAddr);
+		NovaWorker.getInstance().start();
 	}
 }
