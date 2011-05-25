@@ -18,7 +18,7 @@ public class WorkerQueryHeartbeatHandler implements
 		if (NovaWorker.getInstance().getMaster() == null) {
 			NovaWorker.getInstance().registerMaster(xreply);
 		}
-		NovaWorker.getInstance().getMaster().sendHeartbeat();
+		NovaWorker.getInstance().getMaster().sendPnodeHeartbeat();
 	}
 
 }

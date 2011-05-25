@@ -6,6 +6,6 @@ package nova.common.service.message;
  * @author gaotao1987@gmail.com
  * 
  */
-public class HeartbeatMessage {
+public class PnodeHeartbeatMessage {
 
 }

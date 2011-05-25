@@ -2,28 +2,29 @@ package nova.master.handler;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
-import nova.common.service.message.HeartbeatMessage;
+import nova.common.service.message.PnodeHeartbeatMessage;
 import nova.master.models.Pnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
-public class MasterHeartbeatHandler implements SimpleHandler<HeartbeatMessage> {
+public class MasterPnodeHeartbeatHandler implements
+		SimpleHandler<PnodeHeartbeatMessage> {
 
 	/**
 	 * Log4j logger.
 	 */
-	Logger log = Logger.getLogger(MasterHeartbeatHandler.class);
+	Logger log = Logger.getLogger(MasterPnodeHeartbeatHandler.class);
 
 	@Override
-	public void handleMessage(HeartbeatMessage msg, ChannelHandlerContext ctx,
-			MessageEvent e, SimpleAddress xreply) {
+	public void handleMessage(PnodeHeartbeatMessage msg,
+			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
 		if (xreply == null) {
-			log.warn("Got a heartbeat message, but the reply address is null!");
+			log.warn("Got a pnode heartbeat message, but the reply address is null!");
 		} else {
-			log.info("Got heartbeat message from: " + xreply);
+			log.info("Got pnode heartbeat message from: " + xreply);
 		}
 
 		// TODO @zhaoxun possibly update vnode

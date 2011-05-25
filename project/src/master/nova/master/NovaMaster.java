@@ -6,8 +6,9 @@ import java.util.HashMap;
 import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
-import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.PerfMessage;
+import nova.common.service.message.PnodeHeartbeatMessage;
+import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.messages.AddPnodeMessage;
@@ -21,9 +22,10 @@ import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.AddPnodeHandler;
 import nova.master.handler.CreateVclusterHandler;
 import nova.master.handler.CreateVnodeHandler;
-import nova.master.handler.MasterHeartbeatHandler;
 import nova.master.handler.MasterHttpHandler;
 import nova.master.handler.MasterPerfHandler;
+import nova.master.handler.MasterPnodeHeartbeatHandler;
+import nova.master.handler.MasterVnodeHeartbeatHandler;
 import nova.master.handler.PnodeStatusHandler;
 import nova.master.handler.RegisterApplianceHandler;
 import nova.master.handler.RegisterVdiskHandler;
@@ -65,8 +67,11 @@ public class NovaMaster extends SimpleServer {
 		// handle http requests
 		this.registerHandler(DefaultHttpRequest.class, new MasterHttpHandler());
 
-		this.registerHandler(HeartbeatMessage.class,
-				new MasterHeartbeatHandler());
+		this.registerHandler(PnodeHeartbeatMessage.class,
+				new MasterPnodeHeartbeatHandler());
+
+		this.registerHandler(VnodeHeartbeatMessage.class,
+				new MasterVnodeHeartbeatHandler());
 
 		this.registerHandler(AddPnodeMessage.class, new AddPnodeHandler());
 

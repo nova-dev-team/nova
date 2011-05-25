@@ -7,8 +7,9 @@ import java.util.UUID;
 import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
-import nova.common.service.message.HeartbeatMessage;
 import nova.common.service.message.PerfMessage;
+import nova.common.service.message.PnodeHeartbeatMessage;
+import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
 import nova.master.api.messages.CreateVclusterMessage;
@@ -39,8 +40,12 @@ public class MasterProxy extends SimpleProxy {
 	/**
 	 * Report a heartbeat to Master node.
 	 */
-	public void sendHeartbeat() {
-		super.sendRequest(new HeartbeatMessage());
+	public void sendPnodeHeartbeat() {
+		super.sendRequest(new PnodeHeartbeatMessage());
+	}
+
+	public void sendVnodeHeartbeat() {
+		super.sendRequest(new VnodeHeartbeatMessage());
 	}
 
 	/**

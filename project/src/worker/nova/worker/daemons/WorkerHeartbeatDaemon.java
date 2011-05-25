@@ -26,7 +26,7 @@ public class WorkerHeartbeatDaemon extends SimpleDaemon {
 		if (this.isStopping() == false) {
 			MasterProxy master = NovaWorker.getInstance().getMaster();
 			if (master != null) {
-				master.sendHeartbeat();
+				master.sendPnodeHeartbeat();
 			}
 		}
 	}
