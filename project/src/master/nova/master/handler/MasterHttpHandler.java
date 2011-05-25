@@ -90,7 +90,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 						null, null, null);
 				// System.out.println(222);
 				// values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
-			} else if (act.equals("register_vdisk1")) {
+			} else if (act.equals("register_vdisk")) {
 				new RegisterVdiskHandler().handleMessage(
 						new RegisterVdiskMessage(queryMap.get("display_name"),
 								queryMap.get("file_name"), queryMap
@@ -98,7 +98,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 										.get("os_family"), queryMap
 										.get("os_name"), queryMap
 										.get("description")), null, null, null);
-			} else if (act.equals("register_appliance1")) {
+			} else if (act.equals("register_appliance")) {
 				new RegisterApplianceHandler().handleMessage(
 						new RegisterApplianceMessage(queryMap
 								.get("display_name"),
@@ -168,25 +168,29 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 											.get("appliance_list"
 													+ String.valueOf(i + 1))),
 							null, null, null);
-					System.out
-							.println(queryMap.get("vnode_image"
-									+ String.valueOf(i + 1))
-									+ "~~~~~~"
-									+ queryMap.get("vnode_name"
-											+ String.valueOf(i + 1))
-									+ "~~~~~~"
-									+ Integer.parseInt(queryMap.get("cpu_count"
-											+ String.valueOf(i + 1)))
-									+ "~~~~~~"
-									+ Integer.parseInt(queryMap
-											.get("memory_size"
-													+ String.valueOf(i + 1)))
-									+ "~~~~~~"
-									+ queryMap.get("appliance_list"
-											+ String.valueOf(i + 1)));
+					/*
+					 * System.out .println(queryMap.get("vnode_image" +
+					 * String.valueOf(i + 1)) + "~~~~~~" +
+					 * queryMap.get("vnode_name" + String.valueOf(i + 1)) +
+					 * "~~~~~~" + Integer.parseInt(queryMap.get("cpu_count" +
+					 * String.valueOf(i + 1))) + "~~~~~~" +
+					 * Integer.parseInt(queryMap .get("memory_size" +
+					 * String.valueOf(i + 1))) + "~~~~~~" +
+					 * queryMap.get("appliance_list" + String.valueOf(i + 1)));
+					 */
 				}
+			} else if (act.equals("delete_pnode")) {
+
+			} else if (act.equals("delete_vnode")) {
+
+			} else if (act.equals("delete_vcluster")) {
+
+			} else if (act.equals("unregister_vdisk")) {
+
+			} else if (act.equals("unregister_appliance")) {
 
 			}
+
 		}
 
 		values.put("pnode_info", Pnode.all());

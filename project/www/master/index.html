@@ -7,17 +7,48 @@
 <h4><font color="#33CC00">Info of Pnode<br></font></h4>
 ${pnode_info}<br>
 
+<form action="delete_pnode" method="get">
+	Pnode Id<input type="text" name="pnode_id">
+	<input type="submit" Delete pnode">
+</form>
+
 <h4><font color="#33CC00">Info of Vnode<br></font></h4>
 ${vnode_info}<br>
+
+<form action="delete_vnode" method="get">
+	Vnode Id<input type="text" name="vnode_id">
+	<input type="submit" value="Delete pnode">
+</form>
 
 <h4><font color="#33CC00">Info of Vcluster<br></font></h4>
 ${vcluster_info}<br>
 
+<form action="delete_vcluster" method="get">
+	Vcluster Id<input type="text" name="vcluster_id">
+	<input type="submit" value="Delete vcluster">
+</form>
+
 <h4><font color="#33CC00">Info of Vdisk<br></font></h4>
 ${vdisk_info}<br>
 
+<form action="unregister_vdisk" method="get">
+	Vdisk Id<input type="text" name="vdisk_id">
+	<input type="submit" value="Unregister vdisk">
+</form>
+
 <h4><font color="#33CC00">Info of Appliance<br></font></h4>
 ${appliance_info}<br>
+
+<form action="unregister_appliance" method="get">
+	<input type="text" name="appliance_id">
+	<input type="submit" value="Unregister app">
+</form>
+
+
+
+
+
+
 
 <h3><font color="#FF0000">Worker machines<br></font></h3>
 <form action="add_pnode" method="get">
