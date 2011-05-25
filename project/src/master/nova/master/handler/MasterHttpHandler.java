@@ -11,8 +11,13 @@ import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
+import nova.master.api.messages.DeletePnodeMessage;
+import nova.master.api.messages.DeleteVclusterMessage;
+import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
+import nova.master.api.messages.UnregisterApplianceMessage;
+import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
 
@@ -180,15 +185,29 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 					 */
 				}
 			} else if (act.equals("delete_pnode")) {
+				new DeletePnodeHandler().handleMessage(new DeletePnodeMessage(
+						Long.parseLong(queryMap.get("pnode_id"))), null, null,
+						null);
 
 			} else if (act.equals("delete_vnode")) {
+				new DeleteVnodeHandler().handleMessage(new DeleteVnodeMessage(
+						Long.parseLong(queryMap.get("vnode_id"))), null, null,
+						null);
 
 			} else if (act.equals("delete_vcluster")) {
+				new DeleteVclusterHandler().handleMessage(
+						new DeleteVclusterMessage(Long.parseLong(queryMap
+								.get("vcluster_id"))), null, null, null);
 
 			} else if (act.equals("unregister_vdisk")) {
+				new UnregisterVdiskHandler().handleMessage(
+						new UnregisterVdiskMessage(Long.parseLong(queryMap
+								.get("vdisk_id"))), null, null, null);
 
 			} else if (act.equals("unregister_appliance")) {
-
+				new UnregisterApplianceHandler().handleMessage(
+						new UnregisterApplianceMessage(Long.parseLong(queryMap
+								.get("appliance_id"))), null, null, null);
 			}
 
 		}

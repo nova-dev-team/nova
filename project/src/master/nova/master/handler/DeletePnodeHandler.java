@@ -24,6 +24,7 @@ public class DeletePnodeHandler implements SimpleHandler<DeletePnodeMessage> {
 	public void handleMessage(DeletePnodeMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		// TODO Auto-generated method stub
+		System.out.println("~~~~~~~~~~~~~~~1~~~~~~~~~~~~~~~~~~");
 		Pnode pnode = Pnode.findById(msg.id);
 		if (pnode != null) {
 			List<Vnode> all = Vnode.all();
@@ -34,7 +35,7 @@ public class DeletePnodeHandler implements SimpleHandler<DeletePnodeMessage> {
 							null);
 				}
 			}
-
+			System.out.println("~~~~~~~~~~~~~~~2~~~~~~~~~~~~~~~~~~");
 			log.info("Delete pnode: " + pnode.getHostname());
 			Pnode.delete(pnode);
 		} else {
