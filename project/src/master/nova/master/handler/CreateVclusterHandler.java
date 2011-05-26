@@ -6,6 +6,7 @@ import java.util.List;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Utils;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.models.Vcluster;
 
@@ -28,7 +29,7 @@ public class CreateVclusterHandler implements
 
 		List<Integer> usedIpSegments = new ArrayList<Integer>();
 		// System.out.println("111");
-		int gatewayIpIval = Ipv4ToInteger("10.0.2.255");
+		int gatewayIpIval = Utils.ipv4ToInteger("10.0.2.255");
 		// System.out.println("222");
 		usedIpSegments.add(gatewayIpIval);
 		usedIpSegments.add(gatewayIpIval);
@@ -36,14 +37,14 @@ public class CreateVclusterHandler implements
 		// System.out.println("10.0.2.255     " + gatewayIpIval);
 
 		for (Vcluster vcluster : Vcluster.all()) {
-			usedIpSegments.add(Ipv4ToInteger(vcluster.getFristIp()));
-			usedIpSegments.add(Ipv4ToInteger(vcluster.getFristIp())
+			usedIpSegments.add(Utils.ipv4ToInteger(vcluster.getFristIp()));
+			usedIpSegments.add(Utils.ipv4ToInteger(vcluster.getFristIp())
 					+ vcluster.getClusterSize() - 1);
 		}
 		Collections.sort(usedIpSegments);
 
-		int firstUsableIpIval = Ipv4ToInteger("10.0.2.0");
-		int lastUsableIpIval = Ipv4ToInteger("10.0.2.254");
+		int firstUsableIpIval = Utils.ipv4ToInteger("10.0.2.0");
+		int lastUsableIpIval = Utils.ipv4ToInteger("10.0.2.254");
 
 		int testIpIval = firstUsableIpIval;
 
@@ -86,27 +87,7 @@ public class CreateVclusterHandler implements
 		Vcluster vcluster = new Vcluster();
 		vcluster.setClusterName(msg.vclusterName);
 		vcluster.setClusterSize(msg.vclusterSize);
-		vcluster.setFristIp(IntegerToIpv4(testIpIval));
+		vcluster.setFristIp(Utils.integerToIpv4(testIpIval));
 		vcluster.save();
 	}
-
-	public int Ipv4ToInteger(String ipv4) {
-		String[] params = ipv4.split("\\.");
-		return ((Integer.parseInt(params[0]) * 256 + Integer
-				.parseInt(params[1])) * 256 + Integer.parseInt(params[2]))
-				* 256 + Integer.parseInt(params[3]);
-	}
-
-	public String IntegerToIpv4(int intIp) {
-		int[] params = new int[4];
-		for (int i = 3; i > -1; i--) {
-			params[i] = intIp % 256;
-			intIp = intIp / 256;
-			;
-		}
-		return String.valueOf(params[0]) + "." + String.valueOf(params[1])
-				+ "." + String.valueOf(params[2]) + "."
-				+ String.valueOf(params[3]);
-	}
-
 }

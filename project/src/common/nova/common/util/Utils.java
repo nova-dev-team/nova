@@ -352,4 +352,35 @@ public class Utils {
 		return Utils.expandTemplate(template, values);
 	}
 
+	/**
+	 * Change ipv4 to integer.
+	 * 
+	 * @param ipv4
+	 * @return intIp
+	 */
+	public static int ipv4ToInteger(String ipv4) {
+		String[] params = ipv4.split("\\.");
+		return ((Integer.parseInt(params[0]) * 256 + Integer
+				.parseInt(params[1])) * 256 + Integer.parseInt(params[2]))
+				* 256 + Integer.parseInt(params[3]);
+	}
+
+	/**
+	 * Change intIp to ipv4.
+	 * 
+	 * @param intIp
+	 * @return ipv4
+	 */
+	public static String integerToIpv4(int intIp) {
+		int[] params = new int[4];
+		for (int i = 3; i > -1; i--) {
+			params[i] = intIp % 256;
+			intIp = intIp / 256;
+			;
+		}
+		return String.valueOf(params[0]) + "." + String.valueOf(params[1])
+				+ "." + String.valueOf(params[2]) + "."
+				+ String.valueOf(params[3]);
+	}
+
 }

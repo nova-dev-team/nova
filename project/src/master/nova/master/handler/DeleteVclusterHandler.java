@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
+import nova.common.util.Utils;
 import nova.master.api.messages.DeleteVclusterMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
@@ -31,8 +32,8 @@ public class DeleteVclusterHandler implements
 		Vnode vnode = new Vnode();
 		if (vcluster != null) {
 			for (int i = 0; i < vcluster.getClusterSize(); i++) {
-				vnode = Vnode.findByIp(IntegerToIpv4(Ipv4ToInteger(vcluster
-						.getFristIp()) + i));
+				vnode = Vnode.findByIp(Utils.integerToIpv4(Utils
+						.ipv4ToInteger(vcluster.getFristIp()) + i));
 				if (vnode != null) {
 					WorkerProxy wp = new WorkerProxy(new SimpleAddress(
 							Conf.getString("master.bind_host"),
@@ -54,24 +55,4 @@ public class DeleteVclusterHandler implements
 		}
 
 	}
-
-	public int Ipv4ToInteger(String ipv4) {
-		String[] params = ipv4.split("\\.");
-		return ((Integer.parseInt(params[0]) * 256 + Integer
-				.parseInt(params[1])) * 256 + Integer.parseInt(params[2]))
-				* 256 + Integer.parseInt(params[3]);
-	}
-
-	public String IntegerToIpv4(int intIp) {
-		int[] params = new int[4];
-		for (int i = 3; i > -1; i--) {
-			params[i] = intIp % 256;
-			intIp = intIp / 256;
-			;
-		}
-		return String.valueOf(params[0]) + "." + String.valueOf(params[1])
-				+ "." + String.valueOf(params[2]) + "."
-				+ String.valueOf(params[3]);
-	}
-
 }
