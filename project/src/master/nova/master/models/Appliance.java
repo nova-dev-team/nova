@@ -6,6 +6,7 @@ import java.util.List;
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
+import nova.common.util.Utils;
 
 /**
  * table="softwarepackage"
@@ -118,6 +119,18 @@ public class Appliance extends DbObject {
 
 	public void setOsFamily(String osFamily) {
 		this.osFamily = osFamily;
+	}
+
+	/**
+	 * Override string present.
+	 */
+	@Override
+	public String toString() {
+		return Utils
+				.expandTemplate(
+						"Appliance @ display_name = '${displayName}', file_name = '${fileName}', os_family = '${osFamily}'",
+						this);
+
 	}
 
 }

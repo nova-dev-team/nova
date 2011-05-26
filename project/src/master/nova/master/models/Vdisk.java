@@ -6,6 +6,7 @@ import java.util.List;
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
+import nova.common.util.Utils;
 
 /**
  * @hibernate.class table="vdisk"
@@ -175,4 +176,15 @@ public class Vdisk extends DbObject {
 		this.softList = softList;
 	}
 
+	/**
+	 * Override string present.
+	 */
+	@Override
+	public String toString() {
+		return Utils
+				.expandTemplate(
+						"Vdisk @ display_name = '${displayName}', file_name = '${fileName}'",
+						this);
+
+	}
 }
