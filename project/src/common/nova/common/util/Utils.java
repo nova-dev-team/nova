@@ -187,27 +187,35 @@ public class Utils {
 		return new String[] { f.getParent(), f.getName() };
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes" })
 	public static Object getField(Object obj, String fieldName) {
 		Class objClass = obj.getClass();
-		try {
-			Field field = objClass.getDeclaredField(fieldName);
-			field.setAccessible(true);
-			return field.get(obj);
-		} catch (SecurityException e) {
-			logger.error("Error fetching field " + fieldName + " from class "
-					+ objClass.getName(), e);
-		} catch (NoSuchFieldException e) {
-			logger.error("Error fetching field " + fieldName + " from class "
-					+ objClass.getName(), e);
-		} catch (IllegalArgumentException e) {
-			logger.error("Error fetching field " + fieldName + " from class "
-					+ objClass.getName(), e);
-		} catch (IllegalAccessException e) {
-			logger.error("Error fetching field " + fieldName + " from class "
-					+ objClass.getName(), e);
+		for (;;) {
+			try {
+				Field field = objClass.getDeclaredField(fieldName);
+				field.setAccessible(true);
+				return field.get(obj);
+			} catch (SecurityException e) {
+				logger.error("Error fetching field " + fieldName
+						+ " from class " + objClass.getName(), e);
+			} catch (NoSuchFieldException e) {
+				Class superClass = objClass.getSuperclass();
+				if (superClass == null) {
+					logger.error("Error fetching field " + fieldName
+							+ " from class " + objClass.getName(), e);
+				} else {
+					objClass = superClass;
+					continue;
+				}
+			} catch (IllegalArgumentException e) {
+				logger.error("Error fetching field " + fieldName
+						+ " from class " + objClass.getName(), e);
+			} catch (IllegalAccessException e) {
+				logger.error("Error fetching field " + fieldName
+						+ " from class " + objClass.getName(), e);
+			}
+			return null;
 		}
-		return null;
 	}
 
 	@SuppressWarnings("rawtypes")
