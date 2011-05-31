@@ -7,6 +7,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.service.message.PerfMessage;
 import nova.common.util.RRDTools;
+import nova.master.models.Vnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -30,7 +31,8 @@ public class MasterPerfHandler implements SimpleHandler<PerfMessage> {
 			MessageEvent e, SimpleAddress xreply) {
 		// TODO @zhaoxun get pair of uuid/rrdPath from database
 
-		String rrdPath = "build/demo.rrd";
+		Vnode vnode = Vnode.findByIp(xreply.ip);
+		String rrdPath = "build/" + vnode.getUuid() + ".rrd";
 
 		int timeInterval = 5;
 		int rrdLength = 5000;

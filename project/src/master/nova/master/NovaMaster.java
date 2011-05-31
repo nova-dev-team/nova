@@ -6,6 +6,7 @@ import java.util.HashMap;
 import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
+import nova.common.service.message.AgentHeartbeatMessage;
 import nova.common.service.message.PerfMessage;
 import nova.common.service.message.PnodeHeartbeatMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
@@ -20,6 +21,7 @@ import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.AddPnodeHandler;
+import nova.master.handler.MasterAgentHeartbeatHandler;
 import nova.master.handler.CreateVclusterHandler;
 import nova.master.handler.CreateVnodeHandler;
 import nova.master.handler.MasterHttpHandler;
@@ -72,6 +74,9 @@ public class NovaMaster extends SimpleServer {
 
 		this.registerHandler(VnodeHeartbeatMessage.class,
 				new MasterVnodeHeartbeatHandler());
+
+		this.registerHandler(AgentHeartbeatMessage.class,
+				new MasterAgentHeartbeatHandler());
 
 		this.registerHandler(AddPnodeMessage.class, new AddPnodeHandler());
 

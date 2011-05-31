@@ -159,6 +159,8 @@ public class Vnode extends DbObject {
 	private String uuid;
 	private Integer vclusterId;
 
+	private String agentStatus;
+
 	/** The VNC port for the VM. */
 	private Integer vncPort;
 
@@ -376,6 +378,14 @@ public class Vnode extends DbObject {
 				.expandTemplate(
 						"{Vnode @ ${ip}:${port}, vid='${id}', name='${name}', pnode_id='${pnodeId}', cpu_count='${cpuCount}', memory_size='${memorySize}'}",
 						this);
+	}
+
+	public void setAgentStatus(String agentStatus) {
+		this.agentStatus = agentStatus;
+	}
+
+	public String getAgentStatus() {
+		return agentStatus;
 	}
 
 }
