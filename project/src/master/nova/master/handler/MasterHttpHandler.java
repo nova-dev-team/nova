@@ -14,6 +14,7 @@ import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.api.messages.DeletePnodeMessage;
 import nova.master.api.messages.DeleteVclusterMessage;
 import nova.master.api.messages.DeleteVnodeMessage;
+import nova.master.api.messages.MasterInstallApplianceMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.UnregisterApplianceMessage;
@@ -208,6 +209,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 				new UnregisterApplianceHandler().handleMessage(
 						new UnregisterApplianceMessage(Long.parseLong(queryMap
 								.get("appliance_id"))), null, null, null);
+			} else if (act.equals("install_app")) {
+				String[] appNames = queryMap.get("app_name").split(",");
+				new MasterInstallApplianceHandler()
+						.handleMessage(
+								new MasterInstallApplianceMessage(Long
+										.parseLong(queryMap.get("vnode_id")),
+										appNames), null, null, null);
 			}
 
 		}
