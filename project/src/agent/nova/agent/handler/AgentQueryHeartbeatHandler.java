@@ -34,7 +34,7 @@ public class AgentQueryHeartbeatHandler implements
 			proxy = NovaAgent.getInstance().getMaster();
 		}
 		if (proxy != null) {
-			proxy.sendPnodeHeartbeat();
+			proxy.sendAgentHeartbeat();
 		}
 
 	}

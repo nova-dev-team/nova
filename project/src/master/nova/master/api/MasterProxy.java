@@ -7,6 +7,7 @@ import java.util.UUID;
 import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
+import nova.common.service.message.AgentHeartbeatMessage;
 import nova.common.service.message.PerfMessage;
 import nova.common.service.message.PnodeHeartbeatMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
@@ -46,6 +47,10 @@ public class MasterProxy extends SimpleProxy {
 
 	public void sendVnodeHeartbeat() {
 		super.sendRequest(new VnodeHeartbeatMessage());
+	}
+
+	public void sendAgentHeartbeat() {
+		super.sendRequest(new AgentHeartbeatMessage());
 	}
 
 	/**

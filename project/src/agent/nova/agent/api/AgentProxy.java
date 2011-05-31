@@ -6,7 +6,6 @@ import nova.agent.api.messages.ApplianceListMessage;
 import nova.agent.api.messages.InstallApplianceMessage;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
-import nova.common.service.message.AgentHeartbeatMessage;
 import nova.common.service.message.CloseChannelMessage;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.service.message.QueryPerfMessage;
@@ -25,10 +24,6 @@ public class AgentProxy extends SimpleProxy {
 
 	public AgentProxy(SimpleAddress replyAddr) {
 		super(replyAddr);
-	}
-
-	public void sendHeartbeat() {
-		super.sendRequest(new AgentHeartbeatMessage());
 	}
 
 	public void sendCloseChannelRequest() {

@@ -24,7 +24,7 @@ public class AgentHeartbeatDaemon extends SimpleDaemon {
 	protected void workOneRound() {
 		MasterProxy proxy = NovaAgent.getInstance().getMaster();
 		if (proxy != null) {
-			proxy.sendPnodeHeartbeat();
+			proxy.sendAgentHeartbeat();
 		}
 	}
 
