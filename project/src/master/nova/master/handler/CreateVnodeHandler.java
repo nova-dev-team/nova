@@ -63,27 +63,5 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		wp.sendStartVnode("kvm", msg.vmName, vAddr, "false",
 				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
 				msg.vmImage, "false");
-
-		/**
-		 * ArrayList<Pair<String, String>> appList = new ArrayList<Pair<String,
-		 * String>>(); Pair<String, String> pair = new Pair<String, String>();
-		 * for (Appliance appliance : Appliance.all()) {
-		 * pair.setFirst(appliance.getDisplayName());
-		 * pair.setSecond(appliance.getDescription()); appList.add(pair); }
-		 * 
-		 * @SuppressWarnings("unchecked") Pair<String, String>[] apps = new
-		 *                                Pair[appList.size()]; for (int i = 0;
-		 *                                i < appList.size(); i++) { apps[i] =
-		 *                                appList.get(i); }
-		 * 
-		 *                                AgentProxy ap = new AgentProxy(new
-		 *                                SimpleAddress(
-		 *                                Conf.getString("master.bind_host"),
-		 *                                Conf.getInteger("master.bind_port")));
-		 *                                ap.connect(new
-		 *                                InetSocketAddress(vAddr.ip, Conf
-		 *                                .getInteger("agent.bind_port")));
-		 *                                ap.sendApplianceList(apps);
-		 */
 	}
 }

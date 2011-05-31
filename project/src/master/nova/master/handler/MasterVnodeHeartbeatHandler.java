@@ -28,6 +28,7 @@ public class MasterVnodeHeartbeatHandler implements
 		}
 
 		// TODO @zhaoxun possibly update vnode
+
 		Vnode vnode = Vnode.findByIp(xreply.ip);
 		if (vnode != null) {
 			vnode.setStatus(Vnode.Status.RUNNING);
@@ -39,5 +40,4 @@ public class MasterVnodeHeartbeatHandler implements
 		}
 
 	}
-
 }
