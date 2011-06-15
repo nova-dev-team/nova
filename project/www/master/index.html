@@ -122,10 +122,19 @@ ${appliance_info}<br>
 </form>
 
 <h3><font color="#FF0000">Install appliance<br></font></h3>
-<form action="install app" method="get">
+<form action="install_app" method="get">
 	Vnode Id<input type="text" name="vnode_id">
 	App Name<input type="text" name="app_name">
 	<input type="submit" value="Install app">
+</form>
+
+
+<h3><font color="#FF0000">Migration<br></font></h3>
+<form action="migrate" method="get">
+	Vnode Id<input type="text" name="vnode_id">
+	Migrate From<input type="text" name="migrate_from">
+	Migrate To<input type="text" name="migrate_to">
+	<input type="submit" value="Migrate">
 </form>
 
 
