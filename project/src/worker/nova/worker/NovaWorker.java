@@ -1,11 +1,15 @@
 package nova.worker;
 
+import java.util.HashMap;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
+import nova.worker.api.messages.InstallApplianceMessage;
+import nova.worker.api.messages.MigrateVnodeMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
@@ -16,6 +20,8 @@ import nova.worker.daemons.VdiskPoolDaemon;
 import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.daemons.WorkerHeartbeatDaemon;
 import nova.worker.daemons.WorkerPerfInfoDaemon;
+import nova.worker.handler.InstallApplianceHandler;
+import nova.worker.handler.MigrateVnodeHandler;
 import nova.worker.handler.RevokeImageHandler;
 import nova.worker.handler.StartVnodeHandler;
 import nova.worker.handler.StopVnodeHandler;
@@ -52,6 +58,19 @@ public class NovaWorker extends SimpleServer {
 	MasterProxy master = null;
 
 	/**
+	 * currently installed app list
+	 */
+	HashMap<String, String> appStatus = new HashMap<String, String>();
+
+	public HashMap<String, String> getAppStatus() {
+		return appStatus;
+	}
+
+	public void setAppStatus(HashMap<String, String> appStatus) {
+		this.appStatus = appStatus;
+	}
+
+	/**
 	 * Constructor made private for singleton pattern.
 	 */
 	private NovaWorker() {
@@ -74,6 +93,12 @@ public class NovaWorker extends SimpleServer {
 
 		this.registerHandler(QueryVnodeInfoMessage.class,
 				new WorkerQueryVnodeInfoMessageHandler());
+
+		this.registerHandler(InstallApplianceMessage.class,
+				new InstallApplianceHandler());
+
+		this.registerHandler(MigrateVnodeMessage.class,
+				new MigrateVnodeHandler());
 
 		Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("worker.bind_port", 4000);
