@@ -48,17 +48,19 @@ public class Kvm {
 		}
 
 		if ("true".equals(params.get("runAgent"))) {
-			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME,
-					params.get("name").toString(), "agent-cd.iso"));
+			params.put("bootDevice", "hd");
+			// agent cdImage put in NOVA_HOME/agentcd
+			params.put("cdromPath",
+					Utils.pathJoin(Utils.NOVA_HOME, "agentcd", "agent-cd.iso"));
 			params.put("determinCdrom", "<disk type='file' device='cdrom'>"
 					+ "\n    <source file='"
 					+ params.get("cdromPath").toString() + "'/>"
 					+ "\n    <target dev='hdc'/>" + "\n  </disk>");
 		} else if ((params.get("cdImage") != null)
 				&& (!params.get("cdImage").toString().equals(""))) {
-			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME,
-					params.get("name").toString(), params.get("cdImage")
-							.toString()));
+			// cdImage put in NOVA_HOME/run
+			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
+					params.get("cdImage").toString()));
 			params.put("determinCdrom", "<disk type='file' device='cdrom'>"
 					+ "\n    <source file='"
 					+ params.get("cdromPath").toString() + "'/>"
