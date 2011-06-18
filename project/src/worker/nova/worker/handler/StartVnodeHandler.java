@@ -154,7 +154,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				if (!foder.exists()) {
 					foder.mkdirs();
 				} else {
-					// TODO @santa rename or stop or what?
+					// TODO @whoever rename or stop or what?
 					log.error("vm name " + msg.getName() + " has been used!");
 				}
 				File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
