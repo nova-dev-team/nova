@@ -11,6 +11,7 @@ import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.FtpUtils;
 import nova.common.util.Utils;
+import nova.storage.NovaStorage;
 import nova.worker.NovaWorker;
 import nova.worker.api.messages.InstallApplianceMessage;
 
@@ -45,6 +46,9 @@ public class InstallApplianceHandler implements
 		for (String appName : msg.appNames) {
 			if (NovaWorker.getInstance().getAppStatus().containsKey(appName) == false) {
 				try {
+					if (NovaStorage.getInstance().getFtpServer() == null) {
+						NovaStorage.getInstance().startFtpServer();
+					}
 					FtpClient fc = FtpUtils.connect(
 							Conf.getString("storage.ftp.bind_host"),
 							Conf.getInteger("storage.ftp.bind_port"),
@@ -66,7 +70,9 @@ public class InstallApplianceHandler implements
 
 		// TODO @shayf pack ISO files
 		Process p;
-		String cmd = "mkisofs -J -T -R -V agent -o agent-cd.iso ./softwares";
+		String cmd = "mkisofs -J -T -R -V agent -o "
+				+ Utils.pathJoin(Utils.NOVA_HOME, "run", "agent-cd.iso") + " "
+				+ Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares");
 
 		try {
 			p = Runtime.getRuntime().exec(cmd);
