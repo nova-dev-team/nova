@@ -11,7 +11,7 @@ public class TestExecCmd {
 	@Test
 	public void test() {
 		Process p;
-		String cmd = "ls";
+		String cmd = "cd run";
 
 		try {
 			p = Runtime.getRuntime().exec(cmd);

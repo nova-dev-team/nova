@@ -1,9 +1,12 @@
 package nova.worker.daemons;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import nova.common.util.SimpleDaemon;
@@ -29,6 +32,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		if (!pathFile.exists()) {
 			Utils.mkdirs(pathFile.getAbsolutePath());
 		}
+
 		for (String stdImgFile : pathFile.list()) {
 			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 					stdImgFile));
@@ -49,6 +53,27 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		super(2000);
 		fileStatus = new HashMap<String, VdiskFile>();
 		updateFileStatus();
+		File imgfile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+				"small.img"));
+		if (!imgfile.exists()) {
+			Process p;
+			String cmd = "sudo qemu-img create -f qcow2 "
+					+ Utils.pathJoin(Utils.NOVA_HOME, "run", "small.img")
+					+ " 4G";
+			System.out.println(cmd);
+			try {
+				p = Runtime.getRuntime().exec(cmd);
+				InputStream fis = p.getInputStream();
+				InputStreamReader isr = new InputStreamReader(fis);
+				BufferedReader br = new BufferedReader(isr);
+				String line = null;
+				while ((line = br.readLine()) != null) {
+					System.out.println(line);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
 		this.setMbps(1);
 		this.setVmRunning(false);

@@ -1,6 +1,10 @@
 package nova.worker.handler;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
@@ -33,7 +37,11 @@ public class InstallApplianceHandler implements
 	@Override
 	public void handleMessage(InstallApplianceMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-		// TODO @shayf download softwares and pack an iso file
+		File pathfile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+				"softwares"));
+		if (!pathfile.exists()) {
+			Utils.mkdirs(pathfile.getAbsolutePath());
+		}
 		for (String appName : msg.appNames) {
 			if (NovaWorker.getInstance().getAppStatus().containsKey(appName) == false) {
 				try {
@@ -43,8 +51,9 @@ public class InstallApplianceHandler implements
 							Conf.getString("storage.ftp.admin.username"),
 							Conf.getString("storage.ftp.admin.password"));
 					fc.cd("appliances");
-					FtpUtils.downloadDir(fc, Utils.pathJoin(appName),
-							Utils.pathJoin(Utils.NOVA_HOME, "run", appName));
+					FtpUtils.downloadDir(fc, Utils.pathJoin(appName), Utils
+							.pathJoin(Utils.NOVA_HOME, "run", "softwares",
+									appName));
 					System.out.println("download file " + appName);
 					fc.closeServer();
 				} catch (NumberFormatException e1) {
@@ -56,5 +65,20 @@ public class InstallApplianceHandler implements
 		}
 
 		// TODO @shayf pack ISO files
+		Process p;
+		String cmd = "mkisofs -J -T -R -V agent -o agent-cd.iso ./softwares";
+
+		try {
+			p = Runtime.getRuntime().exec(cmd);
+			InputStream fis = p.getInputStream();
+			InputStreamReader isr = new InputStreamReader(fis);
+			BufferedReader br = new BufferedReader(isr);
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				System.out.println(line);
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 }
