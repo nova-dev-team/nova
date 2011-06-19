@@ -65,15 +65,22 @@ public class InstallApplianceHandler implements
 				} catch (IOException e1) {
 					log.error("ftp connection fail!", e1);
 				}
+				NovaWorker.getInstance().getAppStatus().put(appName, appName);
 			}
 		}
 
-		// TODO @shayf pack ISO files
+		File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+				"agentcd"));
+		if (!agentCdFile.exists()) {
+			Utils.mkdirs(agentCdFile.getAbsolutePath());
+		}
+		System.out.println("packing iso");
 		Process p;
 		String cmd = "mkisofs -J -T -R -V agent -o "
-				+ Utils.pathJoin(Utils.NOVA_HOME, "run", "agent-cd.iso") + " "
+				+ Utils.pathJoin(Utils.NOVA_HOME, "run", "agentcd",
+						"agent-cd.iso") + " "
 				+ Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares");
-
+		System.out.println(cmd);
 		try {
 			p = Runtime.getRuntime().exec(cmd);
 			InputStream fis = p.getInputStream();

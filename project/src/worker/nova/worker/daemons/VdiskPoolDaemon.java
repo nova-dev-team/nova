@@ -57,7 +57,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 				"small.img"));
 		if (!imgfile.exists()) {
 			Process p;
-			String cmd = "sudo qemu-img create -f qcow2 "
+			String cmd = "qemu-img create -f qcow2 "
 					+ Utils.pathJoin(Utils.NOVA_HOME, "run", "small.img")
 					+ " 4G";
 			System.out.println(cmd);
