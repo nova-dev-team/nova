@@ -61,9 +61,9 @@ public class WorkerProxy extends SimpleProxy {
 	 */
 	public void sendStartVnode(String hyperVisor, String name,
 			SimpleAddress vAddr, String wakeupOnly, String memSize,
-			String cpuCount, String hdaImage, String runAgent) {
+			String cpuCount, String hdaImage, String runAgent, String apps[]) {
 		super.sendRequest(new StartVnodeMessage(hyperVisor, name, vAddr,
-				wakeupOnly, memSize, cpuCount, hdaImage, runAgent));
+				wakeupOnly, memSize, cpuCount, hdaImage, runAgent, apps));
 	}
 
 	/**

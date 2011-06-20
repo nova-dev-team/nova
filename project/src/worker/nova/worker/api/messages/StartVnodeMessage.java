@@ -39,6 +39,21 @@ public class StartVnodeMessage {
 		this.runAgent = runAgent;
 	}
 
+	public StartVnodeMessage(String hyperVisor, String name,
+			SimpleAddress vAddr, String wakeupOnly, String memSize,
+			String cpuCount, String hdaImage, String runAgent, String apps[]) {
+		super();
+		this.hyperVisor = hyperVisor;
+		this.name = name;
+		this.vAddr = vAddr;
+		this.wakeupOnly = wakeupOnly;
+		this.memSize = memSize;
+		this.cpuCount = cpuCount;
+		this.hdaImage = hdaImage;
+		this.runAgent = runAgent;
+		this.apps = apps;
+	}
+
 	/**
 	 * params for config
 	 */
@@ -65,6 +80,15 @@ public class StartVnodeMessage {
 	String determinNetwork;
 	String determinVnc;
 	String bus;
+	String apps[];
+
+	public String[] getApps() {
+		return apps;
+	}
+
+	public void setApps(String[] apps) {
+		this.apps = apps;
+	}
 
 	public String getWakeupOnly() {
 		return wakeupOnly;

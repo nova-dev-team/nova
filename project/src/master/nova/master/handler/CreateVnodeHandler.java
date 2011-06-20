@@ -62,6 +62,6 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		 */
 		wp.sendStartVnode("kvm", msg.vmName, vAddr, "false",
 				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
-				msg.vmImage, "false");
+				msg.vmImage, "false", null);
 	}
 }

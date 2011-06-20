@@ -20,10 +20,11 @@ public class TestStartVnode {
 	@Test
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
+		String apps[] = { "demo_appliance" };
 		// StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
 		// "false", "100288", "1", "small.img", "false");
 		StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu_vm", null,
-				"false", "300000", "1", "ubuntu.img", "false");
+				"false", "300000", "1", "ubuntu.img", "false", apps);
 		// msg.setName("vm");
 
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
