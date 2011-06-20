@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+
+	<class name="nova.master.models.Migration" table="migration">
+		<id name="id" column="id" type="long">
+			<generator class="native"></generator>
+		</id>
+		
+		<property name="vnodeId" column="vnode_id" type="long"></property>
+		<property name="migrateFrom" column="migrate_from" type="long"></property>
+		<property name="migrateTo" column="migrate_to" type="long"></property>
+				
+	</class>
+</hibernate-mapping>

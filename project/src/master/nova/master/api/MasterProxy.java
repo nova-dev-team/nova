@@ -15,9 +15,17 @@ import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
+import nova.master.api.messages.DeletePnodeMessage;
+import nova.master.api.messages.DeleteVclusterMessage;
+import nova.master.api.messages.DeleteVnodeMessage;
+import nova.master.api.messages.MasterInstallApplianceMessage;
+import nova.master.api.messages.MasterMigrateCompleteMessage;
+import nova.master.api.messages.MasterMigrateVnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
+import nova.master.api.messages.UnregisterApplianceMessage;
+import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vnode;
@@ -97,6 +105,39 @@ public class MasterProxy extends SimpleProxy {
 	public void sendApplianceStatus(Collection<Appliance> appliances) {
 		super.sendRequest(new ApplianceInfoMessage((Appliance[]) appliances
 				.toArray()));
+	}
+
+	public void sendDeletePnode(long id) {
+		super.sendRequest(new DeletePnodeMessage(id));
+	}
+
+	public void sendDeleteVnode(long id) {
+		super.sendRequest(new DeleteVnodeMessage(id));
+	}
+
+	public void sendDeleteVcluster(long id) {
+		super.sendRequest(new DeleteVclusterMessage(id));
+	}
+
+	public void sendUnregisterAppliance(long id) {
+		super.sendRequest(new UnregisterApplianceMessage(id));
+	}
+
+	public void sendUnregisterVdisk(long id) {
+		super.sendRequest(new UnregisterVdiskMessage(id));
+	}
+
+	public void sendInstallAppliance(long aid, String[] appNames) {
+		super.sendRequest(new MasterInstallApplianceMessage(aid, appNames));
+	}
+
+	public void sendMigrateVnode(long vnodeId, long migrateFrom, long migrateTo) {
+		super.sendRequest(new MasterMigrateVnodeMessage(vnodeId, migrateFrom,
+				migrateTo));
+	}
+
+	public void sendMigrateComplete(String migrateUuid) {
+		super.sendRequest(new MasterMigrateCompleteMessage(migrateUuid));
 	}
 
 }
