@@ -186,6 +186,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					}
 				}
 			}
+			if (msg.getRunAgent().equalsIgnoreCase("true")) {
+				// TODO @shayf do some work similar to InstallApplianceHandler
+			}
 			// create domain and show some info
 			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
 				msg.setEmulatorPath("/usr/bin/kvm");
