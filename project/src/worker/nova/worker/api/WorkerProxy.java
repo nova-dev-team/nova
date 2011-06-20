@@ -5,6 +5,8 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.QueryHeartbeatMessage;
+import nova.worker.api.messages.InstallApplianceMessage;
+import nova.worker.api.messages.MigrateVnodeMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
@@ -116,6 +118,15 @@ public class WorkerProxy extends SimpleProxy {
 
 	public void sendRequestVnodeInfo() {
 		super.sendRequest(new QueryVnodeInfoMessage());
+	}
+
+	public void sendInstallAppliance(String[] appNames) {
+		super.sendRequest(new InstallApplianceMessage(appNames));
+	}
+
+	public void sendMigrateVnode(String vnodeId, String migrateToPnodeId) {
+		super.sendRequest(new MigrateVnodeMessage(vnodeId, migrateToPnodeId));
+
 	}
 
 }

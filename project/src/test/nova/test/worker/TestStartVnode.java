@@ -25,7 +25,9 @@ public class TestStartVnode {
 		// msg.setName("vm");
 
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
-		msg.setCdImage("");// ubuntu-8.04.1-server-i386.iso");
+
+		msg.setCdImage("");
+		msg.setRunAgent("true");
 
 		ChannelHandlerContext ctx = null;
 		MessageEvent e = null;
@@ -34,7 +36,6 @@ public class TestStartVnode {
 
 		// StartVnodeMessage msg2 = new StartVnodeMessage("KVM", "vm2", null,
 		// "false", "100288", "1", "small.img", "false");
-		// // msg2.setName("vm2");
 		// msg2.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
 		// msg2.setCdImage("");
 		//

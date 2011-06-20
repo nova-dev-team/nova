@@ -154,7 +154,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				if (!foder.exists()) {
 					foder.mkdirs();
 				} else {
-					// TODO @santa rename or stop or what?
+					// TODO @whoever rename or stop or what?
 					log.error("vm name " + msg.getName() + " has been used!");
 				}
 				File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
@@ -185,6 +185,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						log.error("copy image fail", ex);
 					}
 				}
+			}
+			if (msg.getRunAgent().equalsIgnoreCase("true")) {
+				// TODO @shayf do some work similar to InstallApplianceHandler
 			}
 			// create domain and show some info
 			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
