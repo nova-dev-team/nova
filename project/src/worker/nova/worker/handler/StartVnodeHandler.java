@@ -3,10 +3,12 @@ package nova.worker.handler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
@@ -192,11 +194,31 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			}
 
 			if (msg.getRunAgent().equalsIgnoreCase("true")) {
-				File pathfile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+				File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 						"softwares"));
-				if (!pathfile.exists()) {
-					Utils.mkdirs(pathfile.getAbsolutePath());
+				if (!pathFile.exists()) {
+					Utils.mkdirs(pathFile.getAbsolutePath());
 				}
+				File paramsFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+						"run", "softwares", "params"));
+				if (!paramsFile.exists()) {
+					Utils.mkdirs(paramsFile.getAbsolutePath());
+				}
+				File ipFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						"softwares", "params", "ipconfig.txt"));
+
+				try {
+					if (!ipFile.exists()) {
+						ipFile.createNewFile();
+					}
+					OutputStream os = new FileOutputStream(ipFile);
+					os.write("166.111.131.55".getBytes());
+				} catch (FileNotFoundException e1) {
+					log.error("file not found!", e1);
+				} catch (IOException e1) {
+					log.error("file write fail!", e1);
+				}
+
 				for (String appName : msg.getApps()) {
 					if (NovaWorker.getInstance().getAppStatus()
 							.containsKey(appName) == false) {
