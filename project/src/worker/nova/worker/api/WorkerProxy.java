@@ -126,8 +126,8 @@ public class WorkerProxy extends SimpleProxy {
 		super.sendRequest(new InstallApplianceMessage(appNames));
 	}
 
-	public void sendMigrateVnode(String vnodeId, String migrateToPnodeId) {
-		super.sendRequest(new MigrateVnodeMessage(vnodeId, migrateToPnodeId));
+	public void sendMigrateVnode(long vnodeId, long migrateTo) {
+		super.sendRequest(new MigrateVnodeMessage(vnodeId, migrateTo));
 
 	}
 

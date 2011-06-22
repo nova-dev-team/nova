@@ -4,10 +4,10 @@ public class MigrateVnodeMessage {
 	public MigrateVnodeMessage() {
 	}
 
-	public MigrateVnodeMessage(String vnodeId, String migrateToPnodeId) {
+	public MigrateVnodeMessage(long vnodeId, long migrateTo) {
 		this.vnodeId = vnodeId;
-		this.migrateToPnodeId = migrateToPnodeId;
+		this.migrateTo = migrateTo;
 	}
 
-	public String vnodeId, migrateToPnodeId;
+	public long vnodeId, migrateTo;
 }
