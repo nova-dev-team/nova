@@ -31,7 +31,9 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 		try {
 			conn = new Connect("qemu:///system", true);
 			dconn = new Connect("qemu://otherPnode/system", true);
-			Domain srcDomain = conn.domainLookupByID((int) msg.vnodeId);
+
+			// TODO @shayf
+			Domain srcDomain = conn.domainLookupByID(0);
 			long flag = 0;
 			String uri = null;
 			srcDomain.migrate(dconn, flag, srcDomain.getName(), uri, bandWidth);
@@ -40,5 +42,4 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 			e1.printStackTrace();
 		}
 	}
-
 }

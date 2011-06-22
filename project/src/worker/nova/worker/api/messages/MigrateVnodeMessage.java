@@ -1,13 +1,16 @@
 package nova.worker.api.messages;
 
+import nova.common.service.SimpleAddress;
+
 public class MigrateVnodeMessage {
 	public MigrateVnodeMessage() {
 	}
 
-	public MigrateVnodeMessage(long vnodeId, long migrateTo) {
-		this.vnodeId = vnodeId;
-		this.migrateTo = migrateTo;
+	public MigrateVnodeMessage(String vnodeUuid, SimpleAddress migrateToAddr) {
+		this.vnodeUuid = vnodeUuid;
+		this.migrateToAddr = migrateToAddr;
 	}
 
-	public long vnodeId, migrateTo;
+	public String vnodeUuid;
+	public SimpleAddress migrateToAddr;
 }

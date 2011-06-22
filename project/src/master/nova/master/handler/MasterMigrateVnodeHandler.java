@@ -29,7 +29,7 @@ public class MasterMigrateVnodeHandler implements
 		// to do
 		Vnode vnode = Vnode.findById(msg.vnodeId);
 		Pnode pnodeFrom = Pnode.findById(msg.migrateFrom);
-		// Pnode pnodeTo = Pnode.findById(msg.migrateTo);
+		Pnode pnodeTo = Pnode.findById(msg.migrateTo);
 
 		vnode.setStatus(Vnode.Status.MIGRATING);
 		vnode.save();
@@ -40,5 +40,6 @@ public class MasterMigrateVnodeHandler implements
 
 		wp.connect(new InetSocketAddress(pnodeFrom.getIp(), pnodeFrom.getPort()));
 
+		wp.sendMigrateVnode(vnode.getUuid(), pnodeTo.getAddr());
 	}
 }
