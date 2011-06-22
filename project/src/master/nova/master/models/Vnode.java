@@ -66,6 +66,12 @@ public class Vnode extends DbObject {
 		PAUSED,
 
 		/**
+		 * The vnode is migrating
+		 */
+
+		MIGRATING,
+
+		/**
 		 * The vnode status is not known.
 		 */
 		UNKNOWN,
@@ -91,6 +97,10 @@ public class Vnode extends DbObject {
 
 	public static Vnode findByIp(String ip) {
 		return (Vnode) getManager().findBy("ip", ip);
+	}
+
+	public static Vnode findByUuid(String uuid) {
+		return (Vnode) getManager().findBy("uuid", uuid);
 	}
 
 	public static DbManager getManager() {

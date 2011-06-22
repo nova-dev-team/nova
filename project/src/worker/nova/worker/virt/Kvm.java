@@ -55,7 +55,8 @@ public class Kvm {
 			params.put("determinCdrom", "<disk type='file' device='cdrom'>"
 					+ "\n    <source file='"
 					+ params.get("cdromPath").toString() + "'/>"
-					+ "\n    <target dev='hdc'/>"// + "\n    <boot order='3'/>"
+					+ "\n    <target dev='hdc'/>"// + "\n    <boot order='2'/>"
+
 					+ "\n  </disk>");
 		} else if ((params.get("cdImage") != null)
 				&& (!params.get("cdImage").toString().equals(""))) {

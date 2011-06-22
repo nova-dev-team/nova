@@ -16,18 +16,10 @@ public class StartVnodeMessage {
 		super();
 	}
 
-	public StartVnodeMessage(String hyperVisor, String wakeupOnly,
-			String runAgent, SimpleAddress vAddr) {
-		super();
-		this.wakeupOnly = wakeupOnly;
-		this.hyperVisor = hyperVisor;
-		this.runAgent = runAgent;
-		this.vAddr = vAddr;
-	}
-
 	public StartVnodeMessage(String hyperVisor, String name,
 			SimpleAddress vAddr, String wakeupOnly, String memSize,
-			String cpuCount, String hdaImage, String runAgent) {
+			String cpuCount, String hdaImage, String runAgent, String apps[],
+			String ipAddr, String subnetMask, String gateWay) {
 		super();
 		this.hyperVisor = hyperVisor;
 		this.name = name;
@@ -37,6 +29,19 @@ public class StartVnodeMessage {
 		this.cpuCount = cpuCount;
 		this.hdaImage = hdaImage;
 		this.runAgent = runAgent;
+		this.apps = apps;
+		this.ipAddr = ipAddr;
+		this.subnetMask = subnetMask;
+		this.gateWay = gateWay;
+	}
+
+	public StartVnodeMessage(String hyperVisor, String wakeupOnly,
+			String runAgent, SimpleAddress vAddr) {
+		super();
+		this.wakeupOnly = wakeupOnly;
+		this.hyperVisor = hyperVisor;
+		this.runAgent = runAgent;
+		this.vAddr = vAddr;
 	}
 
 	/**
@@ -65,6 +70,42 @@ public class StartVnodeMessage {
 	String determinNetwork;
 	String determinVnc;
 	String bus;
+	String apps[];
+	String ipAddr;
+	String subnetMask;
+	String gateWay;
+
+	public String getIpAddr() {
+		return ipAddr;
+	}
+
+	public void setIpAddr(String ipAddr) {
+		this.ipAddr = ipAddr;
+	}
+
+	public String getSubnetMask() {
+		return subnetMask;
+	}
+
+	public void setSubnetMask(String subnetMask) {
+		this.subnetMask = subnetMask;
+	}
+
+	public String getGateWay() {
+		return gateWay;
+	}
+
+	public void setGateWay(String gateWay) {
+		this.gateWay = gateWay;
+	}
+
+	public String[] getApps() {
+		return apps;
+	}
+
+	public void setApps(String[] apps) {
+		this.apps = apps;
+	}
 
 	public String getWakeupOnly() {
 		return wakeupOnly;

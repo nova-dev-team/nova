@@ -1,9 +1,14 @@
 package nova.worker.handler;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
@@ -13,6 +18,7 @@ import nova.common.util.FtpUtils;
 import nova.common.util.Utils;
 import nova.master.models.Vnode;
 import nova.storage.NovaStorage;
+import nova.worker.NovaWorker;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.daemons.VdiskPoolDaemon;
 import nova.worker.daemons.VnodeStatusDaemon;
@@ -186,9 +192,92 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					}
 				}
 			}
+
 			if (msg.getRunAgent().equalsIgnoreCase("true")) {
-				// TODO @shayf do some work similar to InstallApplianceHandler
+				File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						"softwares"));
+				if (!pathFile.exists()) {
+					Utils.mkdirs(pathFile.getAbsolutePath());
+				}
+				File paramsFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+						"run", "softwares", "params"));
+				if (!paramsFile.exists()) {
+					Utils.mkdirs(paramsFile.getAbsolutePath());
+				}
+				File ipFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+						"softwares", "params", "ipconfig.txt"));
+
+				try {
+					if (!ipFile.exists()) {
+						ipFile.createNewFile();
+					}
+					OutputStream os = new FileOutputStream(ipFile);
+					os.write(msg.getIpAddr().getBytes());
+					os.write("\n".getBytes());
+					os.write(msg.getSubnetMask().getBytes());
+					os.write("\n".getBytes());
+					os.write(msg.getGateWay().getBytes());
+				} catch (FileNotFoundException e1) {
+					log.error("file not found!", e1);
+				} catch (IOException e1) {
+					log.error("file write fail!", e1);
+				}
+
+				for (String appName : msg.getApps()) {
+					if (NovaWorker.getInstance().getAppStatus()
+							.containsKey(appName) == false) {
+						try {
+							if (NovaStorage.getInstance().getFtpServer() == null) {
+								NovaStorage.getInstance().startFtpServer();
+							}
+							FtpClient fc = FtpUtils
+									.connect(
+											Conf.getString("storage.ftp.bind_host"),
+											Conf.getInteger("storage.ftp.bind_port"),
+											Conf.getString("storage.ftp.admin.username"),
+											Conf.getString("storage.ftp.admin.password"));
+							fc.cd("appliances");
+							FtpUtils.downloadDir(fc, Utils.pathJoin(appName),
+									Utils.pathJoin(Utils.NOVA_HOME, "run",
+											"softwares", appName));
+							System.out.println("download file " + appName);
+							fc.closeServer();
+						} catch (NumberFormatException e1) {
+							log.error("port format error!", e1);
+						} catch (IOException e1) {
+							log.error("ftp connection fail!", e1);
+						}
+						NovaWorker.getInstance().getAppStatus()
+								.put(appName, appName);
+					}
+				}
+
+				File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+						"run", "agentcd"));
+				if (!agentCdFile.exists()) {
+					Utils.mkdirs(agentCdFile.getAbsolutePath());
+				}
+				System.out.println("packing iso");
+				Process p;
+				String cmd = "mkisofs -J -T -R -V agent -o "
+						+ Utils.pathJoin(Utils.NOVA_HOME, "run", "agentcd",
+								"agent-cd.iso") + " "
+						+ Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares");
+				System.out.println(cmd);
+				try {
+					p = Runtime.getRuntime().exec(cmd);
+					InputStream fis = p.getInputStream();
+					InputStreamReader isr = new InputStreamReader(fis);
+					BufferedReader br = new BufferedReader(isr);
+					String line = null;
+					while ((line = br.readLine()) != null) {
+						System.out.println(line);
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
+
 			// create domain and show some info
 			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
 				msg.setEmulatorPath("/usr/bin/kvm");

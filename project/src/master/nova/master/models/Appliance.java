@@ -20,7 +20,7 @@ public class Appliance extends DbObject {
 		for (DbObject obj : getManager().all()) {
 			all.add((Appliance) obj);
 		}
-		return null;
+		return all;
 	}
 
 	public static void delete(Appliance appliance) {
