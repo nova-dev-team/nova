@@ -11,7 +11,7 @@ import org.junit.Test;
 public class TestInstallApplianceHandler {
 
 	@Test
-	public void test() {
+	public void Mytest() {
 		String[] appNames = { "demo_appliance" };
 		InstallApplianceMessage iam = new InstallApplianceMessage(appNames);
 		InstallApplianceHandler iah = new InstallApplianceHandler();

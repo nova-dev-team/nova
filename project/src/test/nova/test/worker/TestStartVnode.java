@@ -25,7 +25,6 @@ public class TestStartVnode {
 		// msg.setName("vm");
 
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
-
 		msg.setCdImage("");
 		msg.setRunAgent("true");
 
