@@ -212,7 +212,11 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						ipFile.createNewFile();
 					}
 					OutputStream os = new FileOutputStream(ipFile);
-					os.write("166.111.131.55".getBytes());
+					os.write(msg.getIpAddr().getBytes());
+					os.write("\n".getBytes());
+					os.write(msg.getSubnetMask().getBytes());
+					os.write("\n".getBytes());
+					os.write(msg.getGateWay().getBytes());
 				} catch (FileNotFoundException e1) {
 					log.error("file not found!", e1);
 				} catch (IOException e1) {

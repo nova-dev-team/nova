@@ -24,7 +24,8 @@ public class TestStartVnode {
 		// StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
 		// "false", "100288", "1", "small.img", "false");
 		StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu_vm", null,
-				"false", "300000", "1", "ubuntu.img", "false", apps);
+				"false", "300000", "1", "ubuntu.img", "false", apps, "1.0.0.0",
+				"1.0.0.1", "1.0.0.2");
 		// msg.setName("vm");
 
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
