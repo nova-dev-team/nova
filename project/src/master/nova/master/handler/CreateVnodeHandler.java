@@ -62,9 +62,9 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		 */
 		// TODO @zhaoxun pass the correct params
 		String apps[] = { "demo_appliance" };
-		String ipAddr = "ipaddress";
-		String subnetMask = "subnetmask";
-		String gateWay = "gateway";
+		String ipAddr = vAddr.getIp();
+		String subnetMask = "255.255.255.0";
+		String gateWay = "10.0.2.255";
 		wp.sendStartVnode("kvm", msg.vmName, vAddr, "false",
 				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
 				msg.vmImage, "false", apps, ipAddr, subnetMask, gateWay);
