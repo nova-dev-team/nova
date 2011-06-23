@@ -32,28 +32,30 @@ public class MasterPerfHandler implements SimpleHandler<PerfMessage> {
 		// TODO @zhaoxun get pair of uuid/rrdPath from database
 
 		Vnode vnode = Vnode.findByIp(xreply.ip);
-		String rrdPath = "build/" + vnode.getUuid() + ".rrd";
+		if (vnode != null) {
+			String rrdPath = "build/" + vnode.getUuid() + ".rrd";
 
-		int timeInterval = 5;
-		int rrdLength = 5000;
+			int timeInterval = 5;
+			int rrdLength = 5000;
 
-		File file = new File(rrdPath);
-		if (file.exists() == false) {
-			RRDTools.CreateMonitorInfoRRD(rrdPath, timeInterval, rrdLength);
-			logger.info(xreply.ip + ": RRD file is created!");
+			File file = new File(rrdPath);
+			if (file.exists() == false) {
+				RRDTools.CreateMonitorInfoRRD(rrdPath, timeInterval, rrdLength);
+				logger.info(xreply.ip + ": RRD file is created!");
+			}
+			try {
+				RrdDb rrdDb = new RrdDb(rrdPath);
+				RRDTools.addMonitorInfoInRRD(rrdDb,
+						msg.getGeneralMonitorInfo(), Util.getTime());
+				rrdDb.close();
+			} catch (IOException ex) {
+				logger.error("Error updating RRD", ex);
+			} catch (RrdException ex) {
+				logger.error("Error updating RRD", ex);
+			}
+
+			logger.info("Got GeneralMonitorInfo from " + xreply);
 		}
-		try {
-			RrdDb rrdDb = new RrdDb(rrdPath);
-			RRDTools.addMonitorInfoInRRD(rrdDb, msg.getGeneralMonitorInfo(),
-					Util.getTime());
-			rrdDb.close();
-		} catch (IOException ex) {
-			logger.error("Error updating RRD", ex);
-		} catch (RrdException ex) {
-			logger.error("Error updating RRD", ex);
-		}
-
-		logger.info("Got GeneralMonitorInfo from " + xreply);
 	}
 
 }
