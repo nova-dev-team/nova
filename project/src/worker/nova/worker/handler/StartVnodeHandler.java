@@ -266,6 +266,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				System.out.println(cmd);
 				try {
 					p = Runtime.getRuntime().exec(cmd);
+					try {
+						if (p.waitFor() != 0) {
+							log.error("pack iso returned abnormal value!");
+						}
+					} catch (InterruptedException e1) {
+						log.error("pack iso process terminated", e1);
+					}
 					InputStream fis = p.getInputStream();
 					InputStreamReader isr = new InputStreamReader(fis);
 					BufferedReader br = new BufferedReader(isr);
@@ -274,7 +281,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						System.out.println(line);
 					}
 				} catch (IOException e1) {
-					e1.printStackTrace();
+					log.error("exec mkisofs cmd error!", e1);
 				}
 			}
 
