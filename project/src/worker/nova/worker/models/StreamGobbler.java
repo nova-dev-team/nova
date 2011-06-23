@@ -48,16 +48,18 @@ public class StreamGobbler extends Thread {
 				pw.flush();
 		} catch (IOException ioe) {
 			log.error("ioexception", ioe);
+		} finally {
+			try {
+				if (pw != null)
+					pw.close();
+				if (br != null)
+					br.close();
+				if (isr != null)
+					isr.close();
+			} catch (IOException e) {
+				log.error("ioexception", e);
+			}
+
 		}
-		// finally {
-		// try {
-		// pw.close();
-		// br.close();
-		// isr.close();
-		// } catch (IOException e) {
-		// log.error("ioexception", e);
-		// }
-		//
-		// }
 	}
 }

@@ -1,9 +1,6 @@
 package nova.test.worker;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import nova.common.util.Utils;
 import nova.worker.models.StreamGobbler;
@@ -38,16 +35,11 @@ public class TestPackISO {
 			}
 			System.out.println("here");
 
-			InputStream fis = p.getInputStream();
-			InputStreamReader isr = new InputStreamReader(fis);
-			BufferedReader br = new BufferedReader(isr);
-			while (br.ready()) {
-				System.out.println(br.readLine());
-			}
-
-			// String line = null;
-			// while ((line = br.readLine()) != null) {
-			// System.out.println(line);
+			// InputStream fis = p.getInputStream();
+			// InputStreamReader isr = new InputStreamReader(fis);
+			// BufferedReader br = new BufferedReader(isr);
+			// while (br.ready()) {
+			// System.out.println(br.readLine());
 			// }
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
