@@ -22,6 +22,7 @@ import nova.worker.NovaWorker;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.daemons.VdiskPoolDaemon;
 import nova.worker.daemons.VnodeStatusDaemon;
+import nova.worker.models.StreamGobbler;
 import nova.worker.virt.Kvm;
 
 import org.apache.log4j.Logger;
@@ -266,6 +267,12 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				System.out.println(cmd);
 				try {
 					p = Runtime.getRuntime().exec(cmd);
+					StreamGobbler errorGobbler = new StreamGobbler(
+							p.getErrorStream(), "ERROR");
+					errorGobbler.start();
+					StreamGobbler outGobbler = new StreamGobbler(
+							p.getErrorStream(), "STDOUT");
+					outGobbler.start();
 					try {
 						if (p.waitFor() != 0) {
 							log.error("pack iso returned abnormal value!");
