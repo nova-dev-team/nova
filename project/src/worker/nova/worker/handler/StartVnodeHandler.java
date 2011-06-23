@@ -259,7 +259,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				}
 				System.out.println("packing iso");
 				Process p;
-				String cmd = "mkisofs -J -T -R -V agent -o "
+				String cmd = "mkisofs -J -T -R -V cdrom -o "
 						+ Utils.pathJoin(Utils.NOVA_HOME, "run", "agentcd",
 								"agent-cd.iso") + " "
 						+ Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares");
