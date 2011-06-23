@@ -13,6 +13,10 @@ import nova.master.models.Vnode;
  */
 public class VnodeStatusMessage {
 
+	public VnodeStatusMessage() {
+
+	}
+
 	public VnodeStatusMessage(UUID uuid, Vnode.Status status) {
 		this.uuid = uuid;
 		this.status = status;

@@ -67,6 +67,6 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		String gateWay = "10.0.2.255";
 		wp.sendStartVnode("kvm", msg.vmName, vAddr, "false",
 				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
-				msg.vmImage, "false", apps, ipAddr, subnetMask, gateWay);
+				msg.vmImage, "true", apps, ipAddr, subnetMask, gateWay);
 	}
 }
