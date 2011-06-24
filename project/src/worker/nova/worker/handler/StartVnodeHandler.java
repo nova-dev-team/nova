@@ -272,7 +272,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 							p.getErrorStream(), "ERROR");
 					errorGobbler.start();
 					StreamGobbler outGobbler = new StreamGobbler(
-							p.getErrorStream(), "STDOUT");
+							p.getInputStream(), "STDOUT");
 					outGobbler.start();
 					try {
 						if (p.waitFor() != 0) {
