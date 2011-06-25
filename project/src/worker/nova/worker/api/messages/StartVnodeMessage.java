@@ -17,8 +17,8 @@ public class StartVnodeMessage {
 	}
 
 	public StartVnodeMessage(String hyperVisor, String name,
-			SimpleAddress vAddr, String wakeupOnly, String memSize,
-			String cpuCount, String hdaImage, String runAgent, String apps[],
+			SimpleAddress vAddr, boolean wakeupOnly, String memSize,
+			String cpuCount, String hdaImage, boolean runAgent, String apps[],
 			String ipAddr, String subnetMask, String gateWay) {
 		super();
 		this.hyperVisor = hyperVisor;
@@ -35,8 +35,8 @@ public class StartVnodeMessage {
 		this.gateWay = gateWay;
 	}
 
-	public StartVnodeMessage(String hyperVisor, String wakeupOnly,
-			String runAgent, SimpleAddress vAddr) {
+	public StartVnodeMessage(String hyperVisor, boolean wakeupOnly,
+			boolean runAgent, SimpleAddress vAddr) {
 		super();
 		this.wakeupOnly = wakeupOnly;
 		this.hyperVisor = hyperVisor;
@@ -47,7 +47,7 @@ public class StartVnodeMessage {
 	/**
 	 * params for config
 	 */
-	String wakeupOnly;
+	boolean wakeupOnly;
 	String hyperVisor;
 	String name;
 	String uuid;
@@ -57,7 +57,7 @@ public class StartVnodeMessage {
 	String bootDevice;
 	String cdImage;
 	String hdaImage;
-	String runAgent;
+	boolean runAgent;
 	String emulatorPath;
 	String sourceFile;
 	String cdromPath;
@@ -107,11 +107,11 @@ public class StartVnodeMessage {
 		this.apps = apps;
 	}
 
-	public String getWakeupOnly() {
+	public boolean getWakeupOnly() {
 		return wakeupOnly;
 	}
 
-	public void setWakeupOnly(String wakeupOnly) {
+	public void setWakeupOnly(boolean wakeupOnly) {
 		this.wakeupOnly = wakeupOnly;
 	}
 
@@ -283,11 +283,11 @@ public class StartVnodeMessage {
 		this.hdaImage = hdaImage;
 	}
 
-	public String getRunAgent() {
+	public boolean getRunAgent() {
 		return runAgent;
 	}
 
-	public void setRunAgent(String runAgent) {
+	public void setRunAgent(boolean runAgent) {
 		this.runAgent = runAgent;
 	}
 

@@ -66,8 +66,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			log.error("Error connecting " + virtService, ex);
 		}
 
-		if ((msg.getWakeupOnly() != null)
-				&& (msg.getWakeupOnly().equalsIgnoreCase("true"))) {
+		if (msg.getWakeupOnly()) {
 			try {
 				Domain testDomain = conn
 						.domainLookupByUUIDString(msg.getUuid());
@@ -191,7 +190,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				}
 			}
 
-			if (msg.getRunAgent().equalsIgnoreCase("true")) {
+			if (msg.getRunAgent()) {
 				File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 						"softwares"));
 				if (!pathFile.exists()) {
