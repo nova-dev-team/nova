@@ -2,6 +2,9 @@ package nova.worker.handler;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.master.api.MasterProxy;
+import nova.master.models.Pnode;
+import nova.worker.NovaWorker;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -13,7 +16,11 @@ public class WorkerQueryPnodeInfoMessageHandler implements
 	@Override
 	public void handleMessage(QueryPnodeInfoMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-		// TODO Auto-generated method stub
+		MasterProxy master = NovaWorker.getInstance().getMaster();
+		if (master != null) {
+			master.sendPnodeStatus(NovaWorker.getInstance().getAddr(),
+					Pnode.Status.RUNNING);
+		}
 
 	}
 

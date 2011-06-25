@@ -38,8 +38,7 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 			String uri = null;
 			srcDomain.migrate(dconn, flag, srcDomain.getName(), uri, bandWidth);
 		} catch (LibvirtException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			log.error("migrate error, maybe caused by libvirt ", e1);
 		}
 	}
 }

@@ -94,7 +94,7 @@ public class WorkerProxy extends SimpleProxy {
 	 * @param hyperVisor
 	 *            hypervisor type, use "kvm" or "xen" ignore case
 	 * @param uuid
-	 *            uuid of vm to shut down
+	 *            uuid of vm to suspend
 	 */
 	public void sendSuspendVnode(String hyperVisor, String uuid) {
 		super.sendRequest(new StopVnodeMessage(hyperVisor, uuid, true));
