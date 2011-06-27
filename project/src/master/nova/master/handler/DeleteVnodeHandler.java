@@ -26,7 +26,8 @@ public class DeleteVnodeHandler implements SimpleHandler<DeleteVnodeMessage> {
 		// TODO Auto-generated method stub
 		Vnode vnode = Vnode.findById(msg.id);
 		if (vnode != null) {
-			WorkerProxy wp = new WorkerProxy(new SimpleAddress("", 3000));
+			WorkerProxy wp = new WorkerProxy(new SimpleAddress("127.0.0.1",
+					3000));
 			wp.connect(new InetSocketAddress(Pnode.findById(msg.id).getIp(),
 					Pnode.findById(msg.id).getPort()));
 			wp.sendStopVnode("kvm", vnode.getUuid());
