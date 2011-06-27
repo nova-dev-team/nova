@@ -22,6 +22,7 @@ import nova.master.api.messages.UnregisterApplianceMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
+import nova.master.models.Vnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -77,7 +78,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
 		URL url = null;
 		try {
-			url = new URL("http://10.0.1.240:3000" + req.getUri());
+			url = new URL("http://127.0.0.1:3000" + req.getUri());
 		} catch (MalformedURLException e) {
 			log.error(e);
 		}
@@ -228,6 +229,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 		}
 
 		values.put("pnode_info", Pnode.all());
+		values.put("vnode_info", Vnode.all());
 		values.put("vcluster_info", Vcluster.all());
 
 		return Utils.expandTemplateFile(fpath, values);
@@ -235,17 +237,21 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 	}
 
 	public static Map<String, String> getQueryMap(String query) {
-		String[] params = query.split("&");
-		Map<String, String> map = new HashMap<String, String>();
-		for (String param : params) {
-			String name = param.split("=")[0];
-			String value = null;
-			if (param.split("=").length > 1) {
-				value = param.split("=")[1];
+		if (query != null) {
+			String[] params = query.split("&");
+			Map<String, String> map = new HashMap<String, String>();
+			for (String param : params) {
+				String name = param.split("=")[0];
+				String value = null;
+				if (param.split("=").length > 1) {
+					value = param.split("=")[1];
+				}
+				map.put(name, value);
 			}
-			map.put(name, value);
+			return map;
+		} else {
+			return null;
 		}
-		return map;
 	}
 
 	public static String getAction(String actFile) {

@@ -91,7 +91,7 @@ public class InstallApplianceHandler implements
 				System.out.println(line);
 			}
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			log.error("mkisofs command exec error", e1);
 		}
 	}
 }

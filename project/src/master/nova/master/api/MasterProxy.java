@@ -8,8 +8,9 @@ import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.AgentHeartbeatMessage;
-import nova.common.service.message.PerfMessage;
+import nova.common.service.message.AgentPerfMessage;
 import nova.common.service.message.PnodeHeartbeatMessage;
+import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
@@ -64,8 +65,12 @@ public class MasterProxy extends SimpleProxy {
 	/**
 	 * Send a monitor info to master node.
 	 */
-	public void sendMonitorInfo() {
-		super.sendRequest(new PerfMessage());
+	public void sendPnodeMonitorInfo() {
+		super.sendRequest(new PnodePerfMessage());
+	}
+
+	public void sendVnodeMonitorInfo() {
+		super.sendRequest(new AgentPerfMessage());
 	}
 
 	public void sendAddPnode(SimpleAddress pAddr) {

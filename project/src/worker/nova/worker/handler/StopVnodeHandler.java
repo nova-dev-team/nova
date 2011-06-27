@@ -42,7 +42,6 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 		}
 		Connect conn = null;
 		try {
-			// connect the qemu system
 			conn = new Connect(virtService, false);
 		} catch (LibvirtException ex) {
 			log.error("Error connecting " + virtService, ex);

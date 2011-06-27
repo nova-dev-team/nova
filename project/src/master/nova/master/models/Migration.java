@@ -6,6 +6,7 @@ import java.util.List;
 import nova.common.db.DbManager;
 import nova.common.db.DbObject;
 import nova.common.db.DbSpec;
+import nova.common.util.Utils;
 
 public class Migration extends DbObject {
 
@@ -69,5 +70,17 @@ public class Migration extends DbObject {
 
 	public long getMigrateTo() {
 		return migrateTo;
+	}
+
+	/**
+	 * Override string present.
+	 */
+	@Override
+	public String toString() {
+		return Utils
+				.expandTemplate(
+						"Migration @ vnode_id= '${vnodeId}', id = '${id}' , migrate_from = '${migrateFrom}', migrate_to = '${migrateTo}'",
+						this);
+
 	}
 }

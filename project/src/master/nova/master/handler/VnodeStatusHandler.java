@@ -27,7 +27,7 @@ public class VnodeStatusHandler implements SimpleHandler<VnodeStatusMessage> {
 			vnode.setAddr(xreply);
 		}
 		vnode.setStatus(msg.status);
-		log.info("Update status of pnode @ " + vnode.getAddr() + " to "
+		log.info("Update status of pnode @ " + vnode.getIp() + " to "
 				+ vnode.getStatus());
 		vnode.save();
 
