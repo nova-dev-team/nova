@@ -10,7 +10,7 @@ import nova.common.tools.perf.PerfMon;
  * @author gaotao1987@gmail.com
  * 
  */
-public class PerfMessage {
+public class AgentPerfMessage {
 
 	private GeneralMonitorInfo monitorInfo = PerfMon.getGeneralMonitorInfo();
 

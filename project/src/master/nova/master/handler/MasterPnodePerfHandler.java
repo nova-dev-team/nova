@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
-import nova.common.service.message.PerfMessage;
+import nova.common.service.message.PnodePerfMessage;
 import nova.common.util.RRDTools;
-import nova.master.models.Vnode;
+import nova.master.models.Pnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -22,18 +22,18 @@ import org.jrobin.core.Util;
  * @author gaotao1987@gmail.com
  * 
  */
-public class MasterPerfHandler implements SimpleHandler<PerfMessage> {
+public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
 
-	Logger logger = Logger.getLogger(MasterPerfHandler.class);
+	Logger logger = Logger.getLogger(MasterPnodePerfHandler.class);
 
 	@Override
-	public void handleMessage(PerfMessage msg, ChannelHandlerContext ctx,
+	public void handleMessage(PnodePerfMessage msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
 		// TODO @zhaoxun get pair of uuid/rrdPath from database
 
-		Vnode vnode = Vnode.findByIp(xreply.ip);
-		if (vnode != null) {
-			String rrdPath = "build/" + vnode.getUuid() + ".rrd";
+		Pnode pnode = Pnode.findByIp(xreply.ip);
+		if (pnode != null) {
+			String rrdPath = "build/" + pnode.getId() + ".rrd";
 
 			int timeInterval = 5;
 			int rrdLength = 5000;
