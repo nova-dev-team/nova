@@ -16,7 +16,7 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 	/**
 	 * band width during migration
 	 */
-	private long bandWidth;
+	private long bandWidth = 1;
 
 	/**
 	 * Log4j logger.
@@ -30,7 +30,8 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 		Connect conn = null, dconn = null;
 		try {
 			conn = new Connect("qemu:///system", true);
-			dconn = new Connect("qemu://otherPnode/system", true);
+			dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
+					true);
 
 			// TODO @shayf
 			Domain srcDomain = conn.domainLookupByUUIDString(msg.vnodeUuid);
