@@ -252,6 +252,22 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					}
 				}
 
+				// copy files to Novahome/run/softwares
+				File agentProgramFile = new File(Utils.pathJoin(
+						Utils.NOVA_HOME, "run", "softwares", "run"));
+				if (!agentProgramFile.exists()) {
+					Utils.mkdirs(agentProgramFile.getAbsolutePath());
+				}
+				Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "conf"), Utils
+						.pathJoin(agentProgramFile.getAbsolutePath(), "conf"));
+				Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "bin"), Utils
+						.pathJoin(agentProgramFile.getAbsolutePath(), "bin"));
+				Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "lib"), Utils
+						.pathJoin(agentProgramFile.getAbsolutePath(), "lib"));
+				Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "data"), Utils
+						.pathJoin(agentProgramFile.getAbsolutePath(), "data"));
+
+				// pack iso files
 				File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
 						"run", "agentcd"));
 				if (!agentCdFile.exists()) {
