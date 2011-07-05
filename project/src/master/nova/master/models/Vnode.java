@@ -386,7 +386,7 @@ public class Vnode extends DbObject {
 	public String toString() {
 		return Utils
 				.expandTemplate(
-						"{Vnode @ ${ip}:${port}, vid='${id}', name='${name}', pnode_id='${pnodeId}', cpu_count='${cpuCount}', memory_size='${memorySize}'}",
+						"{Vnode @ ${ip}:${port}, vid='${id}', name='${name}', pnode_id='${pnodeId}', cpu_count='${cpuCount}', memory_size='${memorySize}', uuid = '${uuid}'}",
 						this);
 	}
 

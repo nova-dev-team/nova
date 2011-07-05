@@ -2,7 +2,6 @@ package nova.master.api;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.UUID;
 
 import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
@@ -103,8 +102,8 @@ public class MasterProxy extends SimpleProxy {
 		super.sendRequest(new PnodeStatusMessage(pAddr, status));
 	}
 
-	public void sendVnodeStatus(UUID uuid, Vnode.Status status) {
-		super.sendRequest(new VnodeStatusMessage(uuid, status));
+	public void sendVnodeStatus(String vnodeIp, String uuid, Vnode.Status status) {
+		super.sendRequest(new VnodeStatusMessage(vnodeIp, uuid, status));
 	}
 
 	public void sendApplianceStatus(Collection<Appliance> appliances) {

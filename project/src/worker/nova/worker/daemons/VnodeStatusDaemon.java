@@ -100,7 +100,7 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 		if (this.isStopping() == false && master != null) {
 			for (UUID uuid : allStatus.keySet()) {
 				Vnode.Status status = allStatus.get(uuid);
-				master.sendVnodeStatus(uuid, status);
+				master.sendVnodeStatus(null, uuid.toString(), status);
 			}
 		}
 	}

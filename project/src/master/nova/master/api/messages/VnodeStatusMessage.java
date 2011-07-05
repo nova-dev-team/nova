@@ -17,7 +17,8 @@ public class VnodeStatusMessage {
 
 	}
 
-	public VnodeStatusMessage(UUID uuid, Vnode.Status status) {
+	public VnodeStatusMessage(String vnodeIp, String uuid, Vnode.Status status) {
+		this.vnodeIp = vnodeIp;
 		this.uuid = uuid;
 		this.status = status;
 	}
@@ -25,11 +26,12 @@ public class VnodeStatusMessage {
 	/**
 	 * The {@link UUID} for vnode.
 	 */
-	public UUID uuid;
+	public String uuid;
 
 	/**
 	 * The {@link Vnode.Status}.
 	 */
 	public Vnode.Status status;
 
+	public String vnodeIp;
 }
