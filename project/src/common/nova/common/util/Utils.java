@@ -443,4 +443,38 @@ public class Utils {
 		}
 	}
 
+	public static void delAllFile(String path) {
+		File file = new File(path);
+		if (!file.exists()) {
+			return;
+		}
+		if (!file.isDirectory()) {
+			return;
+		}
+		String[] tempList = file.list();
+		File temp = null;
+		for (int i = 0; i < tempList.length; i++) {
+			temp = new File(Utils.pathJoin(path, tempList[i]));
+			if (temp.isFile()) {
+				temp.delete();
+			}
+			if (temp.isDirectory()) {
+				delAllFile(Utils.pathJoin(path, tempList[i]));
+				delFolder(Utils.pathJoin(path, tempList[i]));
+			}
+		}
+		delFolder(path);
+		return;
+	}
+
+	public static void delFolder(String folderPath) {
+		try {
+			java.io.File myFilePath = new java.io.File(folderPath);
+			myFilePath.delete();
+		} catch (Exception e) {
+			logger.error("del folder " + folderPath + " error", e);
+		}
+
+	}
+
 }
