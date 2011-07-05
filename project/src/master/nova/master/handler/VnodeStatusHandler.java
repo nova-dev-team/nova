@@ -21,11 +21,12 @@ public class VnodeStatusHandler implements SimpleHandler<VnodeStatusMessage> {
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
 		// @zhaoxun Save update into database
-		Vnode vnode = Vnode.findByIp(xreply.ip);
+		Vnode vnode = Vnode.findByIp(msg.vnodeIp);
 		if (vnode == null) {
 			vnode = new Vnode();
-			vnode.setAddr(xreply);
+			vnode.setAddr(new SimpleAddress(msg.vnodeIp, 4100));
 		}
+		vnode.setUuid(msg.uuid);
 		vnode.setStatus(msg.status);
 		System.out
 				.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");

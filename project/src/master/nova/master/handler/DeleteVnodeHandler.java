@@ -28,8 +28,10 @@ public class DeleteVnodeHandler implements SimpleHandler<DeleteVnodeMessage> {
 		if (vnode != null) {
 			WorkerProxy wp = new WorkerProxy(new SimpleAddress("127.0.0.1",
 					3000));
-			wp.connect(new InetSocketAddress(Pnode.findById(msg.id).getIp(),
-					Pnode.findById(msg.id).getPort()));
+			wp.connect(new InetSocketAddress(Pnode.findById(
+					vnode.getPmachineId()).getIp(), Pnode.findById(
+					vnode.getPmachineId()).getPort()));
+			// System.out.println(Pnode.findById(vnode.getPmachineId()).getIp());
 			wp.sendStopVnode("kvm", vnode.getUuid());
 			log.info("Delete vnode: " + vnode.getName());
 			Vnode.delete(vnode);
