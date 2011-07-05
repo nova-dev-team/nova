@@ -29,7 +29,7 @@ public class CreateVclusterHandler implements
 
 		List<Integer> usedIpSegments = new ArrayList<Integer>();
 		// System.out.println("111");
-		int gatewayIpIval = Utils.ipv4ToInteger("10.0.2.255");
+		int gatewayIpIval = Utils.ipv4ToInteger("10.0.1.254");
 		// System.out.println("222");
 		usedIpSegments.add(gatewayIpIval);
 		usedIpSegments.add(gatewayIpIval);
@@ -43,8 +43,8 @@ public class CreateVclusterHandler implements
 		}
 		Collections.sort(usedIpSegments);
 
-		int firstUsableIpIval = Utils.ipv4ToInteger("10.0.2.0");
-		int lastUsableIpIval = Utils.ipv4ToInteger("10.0.2.254");
+		int firstUsableIpIval = Utils.ipv4ToInteger("10.0.1.90");
+		int lastUsableIpIval = Utils.ipv4ToInteger("10.0.1.100");
 
 		int testIpIval = firstUsableIpIval;
 

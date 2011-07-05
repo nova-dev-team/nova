@@ -25,6 +25,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 	@Override
 	public void handleMessage(CreateVnodeMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
+
 		// TODO Auto-generated method stub
 		Vcluster vcluster = new Vcluster();
 		for (Vcluster vc : Vcluster.all()) {
@@ -43,6 +44,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		vnode.setSoftList(msg.applianceList);
 		vnode.setCdrom(msg.vmImage);
 		vnode.setStatus(Vnode.Status.PREPARING);
+		System.out
+				.println("======================================================================================================");
 		vnode.save();
 		log.info("Created new vnode: " + vnode.getIp());
 
@@ -64,7 +67,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		String apps[] = { "demo_appliance" };
 		String ipAddr = vAddr.getIp();
 		String subnetMask = "255.255.255.0";
-		String gateWay = "10.0.2.255";
+		String gateWay = "10.0.1.254";
 		wp.sendStartVnode("kvm", msg.vmName, vAddr,
 				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
 				msg.vmImage, true, apps, ipAddr, subnetMask, gateWay);
