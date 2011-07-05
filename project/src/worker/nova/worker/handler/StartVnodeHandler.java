@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
@@ -280,6 +282,28 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				} catch (IOException e1) {
 					log.error("exec mkisofs cmd error!", e1);
 				}
+			}
+
+			// write nova.agent.ipaddress.properties file
+			File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "conf",
+					"nova.agent.ipaddress.properties"));
+			if (!ipAddrFile.exists()) {
+				try {
+					ipAddrFile.createNewFile();
+				} catch (IOException e1) {
+					log.error(
+							"create nova.agent.ipaddress.properties file fail!",
+							e1);
+				}
+			}
+
+			try {
+				PrintWriter outpw = new PrintWriter(new FileWriter(ipAddrFile));
+				outpw.println("agent.bind_host=" + msg.getIpAddr());
+				outpw.close();
+			} catch (IOException e1) {
+				log.error("write nova.agent.ipaddress.properties file fail!",
+						e1);
 			}
 
 			// create domain and show some info
