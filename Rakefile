@@ -89,20 +89,5 @@ CMD
   puts "Created #{tar_main_fn}.tar.gz in source root folder!"
 end
 
-desc "Check coding style"
-task :check do
-  puts "TODO check coding style"
-end
-
-desc "Fix coding style"
-task :fix do
-  puts "TODO fix codeing style"
-end
-
-desc "Announce new version"
-task :announce do
-  puts "TODO announce new version"
-end
-
-task :default => :check
+task :default => :dist
 
