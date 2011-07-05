@@ -94,6 +94,7 @@
 	<target name="clean" description="clean build files">
 		<delete dir="${build}" />
 		<delete dir="${javadoc}" />
+		<delete dir="log/" />
 		<delete file="${bin}/nova-${version}.jar" />
 	</target>
 
