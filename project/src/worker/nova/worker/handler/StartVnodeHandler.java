@@ -336,6 +336,12 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						VnodeStatusDaemon.putStatus(
 								UUID.fromString(testDomain.getUUIDString()),
 								Vnode.Status.PREPARING);
+						NovaWorker
+								.getInstance()
+								.getVnodeIP()
+								.put(UUID
+										.fromString(testDomain.getUUIDString()),
+										msg.getIpAddr());
 					}
 					System.out.println("Domain:" + testDomain.getName()
 							+ " id " + testDomain.getID() + " running "
