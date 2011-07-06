@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import nova.agent.NovaAgent;
 import nova.agent.api.AgentProxy;
 import nova.agent.appliance.Appliance;
+import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.NovaMaster;
 
@@ -84,7 +85,8 @@ public class TestAgent {
 			System.out.println(appsArray2[i].toString());
 		}
 
-		String filePath = Utils.pathJoin(Utils.NOVA_HOME, "db", "agent",
+		String relativePath = Conf.getString("agent.software.save_path");
+		String filePath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
 				"apps.json");
 
 		System.out.println("Reassignment of appliances: ");

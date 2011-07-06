@@ -251,10 +251,10 @@ public class NovaAgent extends SimpleServer {
 	private void localInitial() {
 
 		String save_path = Conf.getString("agent.software.save_path");
-		String image_path = Conf.getString("agent.software.image_path");
+		String picture_path = Conf.getString("agent.software.picture_path");
 
 		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, save_path));
-		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, image_path));
+		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, picture_path));
 		File appsJsonFile = new File(Utils.pathJoin(Utils.NOVA_HOME, save_path,
 				"apps.json"));
 		if (!appsJsonFile.exists()) {
@@ -276,17 +276,17 @@ public class NovaAgent extends SimpleServer {
 				String userName = Conf.getString("agent.ftp.user_name");
 				String password = Conf.getString("agent.ftp.password");
 				String savePath = Utils.pathJoin(Utils.NOVA_HOME,
-						Conf.getString("agent.software.image_path"));
+						Conf.getString("agent.software.picture_path"));
 				try {
 					FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName,
 							password);
-					FtpUtils.downloadDir(fc, "/images/",
+					FtpUtils.downloadDir(fc, "/pictures/",
 							Utils.pathJoin(savePath));
 
-					logger.info("Have downloaded images from server!");
+					logger.info("Have downloaded pictures from server!");
 
 				} catch (IOException e) {
-					logger.error("Downloading images fail: ", e);
+					logger.error("Downloading pictures fail: ", e);
 				}
 
 			}
