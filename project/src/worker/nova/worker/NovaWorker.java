@@ -217,11 +217,8 @@ public class NovaWorker extends SimpleServer {
 			}
 		});
 
-		// String bindHost = Conf.getString("worker.bind_host");
-		// Integer bindPort = Conf.getInteger("worker.bind_port");
-		// InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
-		// bindPort);
-		// NovaWorker.getInstance().bind(bindAddr);
+		// create br0
+
 		NovaWorker.getInstance().start();
 	}
 }

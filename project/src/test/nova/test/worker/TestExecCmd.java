@@ -1,29 +1,37 @@
 package nova.test.worker;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
+import nova.worker.models.StreamGobbler;
+
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 public class TestExecCmd {
 	@Test
 	public void test() {
-		Process p;
-		String cmd = "cd run";
+		Logger log = Logger.getLogger(TestExecCmd.class);
 
+		Process p;
+		String cmd = "ifconfig";
+		System.out.println(cmd);
 		try {
 			p = Runtime.getRuntime().exec(cmd);
-			InputStream fis = p.getInputStream();
-			InputStreamReader isr = new InputStreamReader(fis);
-			BufferedReader br = new BufferedReader(isr);
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				System.out.println(line);
+			StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(),
+					"ERROR");
+			errorGobbler.start();
+			StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
+					"STDOUT");
+			outGobbler.start();
+			try {
+				if (p.waitFor() != 0) {
+					log.error("pack iso returned abnormal value!");
+				}
+			} catch (InterruptedException e1) {
+				log.error("pack iso process terminated", e1);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e1) {
+			log.error("exec mkisofs cmd error!", e1);
 		}
 	}
 }
