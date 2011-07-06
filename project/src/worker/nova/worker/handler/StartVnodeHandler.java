@@ -302,13 +302,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
 			// write nova.agent.ipaddress.properties file
 			File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "conf",
-					"nova.agent.ipaddress.properties"));
+					"nova.agent.extrainfo.properties"));
 			if (!ipAddrFile.exists()) {
 				try {
 					ipAddrFile.createNewFile();
 				} catch (IOException e1) {
 					log.error(
-							"create nova.agent.ipaddress.properties file fail!",
+							"create nova.agent.extrainfo.properties file fail!",
 							e1);
 				}
 			}
@@ -316,9 +316,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			try {
 				PrintWriter outpw = new PrintWriter(new FileWriter(ipAddrFile));
 				outpw.println("agent.bind_host=" + msg.getIpAddr());
+				outpw.println("master.bind_host="
+						+ Conf.getString("master.bind_host"));
+				outpw.println("master.bind_port="
+						+ Conf.getString("master.bind_port"));
 				outpw.close();
 			} catch (IOException e1) {
-				log.error("write nova.agent.ipaddress.properties file fail!",
+				log.error("write nova.agent.extrainfo.properties file fail!",
 						e1);
 			}
 
