@@ -84,49 +84,49 @@ public class Kvm {
 		System.out.println("vmNetworkBridge is " + vmNetworkBridge.equals(""));
 		System.out.println("fixVncMousePointer is " + fixVncMousePointer);
 
-		if ((!vmNetworkInterface.equals("")) && (!vmNetworkBridge.equals(""))) {
-			params.put("interfaceType", "bridge");
-			params.put("sourceBridge", vmNetworkBridge);
-			params.put(
-					"macAddress",
-					"54:7E:" + Integer.toHexString((int) (Math.random() * 256))
-							+ ":"
-							+ Integer.toHexString((int) (Math.random() * 256))
-							+ ":"
-							+ Integer.toHexString((int) (Math.random() * 256))
-							+ ":"
-							+ Integer.toHexString((int) (Math.random() * 256)));
-			params.put(
-					"determinNetwork",
-					"<interface type='"
-							+ params.get("interfaceType").toString() + "'>"
-							+ "\n    <source bridge='"
-							+ params.get("sourceBridge").toString() + "'/>"
-							+ "\n    <mac address='"
-							+ params.get("macAddress").toString() + "'/>"
-							+ "\n  </interface>");
-		} else {
-			params.put("interfaceType", "network");
-			params.put("sourceNetwork", "default");
-			params.put(
-					"macAddress",
-					"54:7E:" + Integer.toHexString((int) (Math.random() * 256))
-							+ ":"
-							+ Integer.toHexString((int) (Math.random() * 256))
-							+ ":"
-							+ Integer.toHexString((int) (Math.random() * 256))
-							+ ":"
-							+ Integer.toHexString((int) (Math.random() * 256)));
-			params.put(
-					"determinNetwork",
-					"<interface type='"
-							+ params.get("interfaceType").toString()
-							+ "'>\n    <source network='"
-							+ params.get("sourceNetwork").toString() + "'/>"
-							+ "\n    <mac address='"
-							+ params.get("macAddress").toString() + "'/>"
-							+ "</interface>");
-		}
+		// if ((!vmNetworkInterface.equals("")) &&
+		// (!vmNetworkBridge.equals(""))) {
+		params.put("interfaceType", "bridge");
+		params.put("sourceBridge", vmNetworkBridge);
+		params.put(
+				"macAddress",
+				"54:7E:" + Integer.toHexString((int) (Math.random() * 256))
+						+ ":"
+						+ Integer.toHexString((int) (Math.random() * 256))
+						+ ":"
+						+ Integer.toHexString((int) (Math.random() * 256))
+						+ ":"
+						+ Integer.toHexString((int) (Math.random() * 256)));
+		params.put(
+				"determinNetwork",
+				"<interface type='" + params.get("interfaceType").toString()
+						+ "'>" + "\n    <source bridge='"
+						+ params.get("sourceBridge").toString() + "'/>"
+						+ "\n    <mac address='"
+						+ params.get("macAddress").toString() + "'/>"
+						+ "\n  </interface>");
+		// } else {
+		// params.put("interfaceType", "network");
+		// params.put("sourceNetwork", "default");
+		// params.put(
+		// "macAddress",
+		// "54:7E:" + Integer.toHexString((int) (Math.random() * 256))
+		// + ":"
+		// + Integer.toHexString((int) (Math.random() * 256))
+		// + ":"
+		// + Integer.toHexString((int) (Math.random() * 256))
+		// + ":"
+		// + Integer.toHexString((int) (Math.random() * 256)));
+		// params.put(
+		// "determinNetwork",
+		// "<interface type='"
+		// + params.get("interfaceType").toString()
+		// + "'>\n    <source network='"
+		// + params.get("sourceNetwork").toString() + "'/>"
+		// + "\n    <mac address='"
+		// + params.get("macAddress").toString() + "'/>"
+		// + "</interface>");
+		// }
 
 		if (fixVncMousePointer.equals("true")) {
 			params.put("inputType", "tablet");
