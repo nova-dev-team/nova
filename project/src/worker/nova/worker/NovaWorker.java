@@ -1,5 +1,6 @@
 package nova.worker;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -30,6 +31,7 @@ import nova.worker.handler.WorkerHttpHandler;
 import nova.worker.handler.WorkerQueryHeartbeatHandler;
 import nova.worker.handler.WorkerQueryPnodeInfoMessageHandler;
 import nova.worker.handler.WorkerQueryVnodeInfoMessageHandler;
+import nova.worker.models.StreamGobbler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
@@ -217,11 +219,42 @@ public class NovaWorker extends SimpleServer {
 			}
 		});
 
-		// String bindHost = Conf.getString("worker.bind_host");
-		// Integer bindPort = Conf.getInteger("worker.bind_port");
-		// InetSocketAddress bindAddr = new InetSocketAddress(bindHost,
-		// bindPort);
-		// NovaWorker.getInstance().bind(bindAddr);
+		// create br0
+		String[] createBridgeCmds = {
+				"ifconfig br0 down",
+				"brctl delbr br0",
+				"brctl addbr br0",
+				"brctl setbridgeprio br0 0",
+				"brctl addif br0 eth0",
+				"ifconfig eth0 0.0.0.0",
+				"ifconfig br0 " + Conf.getString("worker.bind_host")
+						+ " netmask " + Conf.getString("worker.bind_host"),
+				"brctl sethello br0 1", "brctl setmaxage br0 4",
+				"brctl setfd br0 4", "ifconfig br0 up",
+				"route add default gw " + Conf.getString("worker.gateway") };
+
+		Process p;
+		try {
+			for (String cmd : createBridgeCmds) {
+				p = Runtime.getRuntime().exec(cmd);
+				StreamGobbler errorGobbler = new StreamGobbler(
+						p.getErrorStream(), "ERROR");
+				errorGobbler.start();
+				StreamGobbler outGobbler = new StreamGobbler(
+						p.getInputStream(), "STDOUT");
+				outGobbler.start();
+				try {
+					if (p.waitFor() != 0) {
+						logger.error("create bridge returned abnormal value!");
+					}
+				} catch (InterruptedException e1) {
+					logger.error("create bridge terminated", e1);
+				}
+			}
+		} catch (IOException e1) {
+			logger.error("create bridge cmd error!", e1);
+		}
+
 		NovaWorker.getInstance().start();
 	}
 }
