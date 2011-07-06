@@ -1,6 +1,7 @@
 package nova.worker;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
@@ -61,6 +62,19 @@ public class NovaWorker extends SimpleServer {
 	 * currently installed app list
 	 */
 	HashMap<String, String> appStatus = new HashMap<String, String>();
+
+	/**
+	 * vnode ip address
+	 */
+	HashMap<UUID, String> vnodeIP = new HashMap<UUID, String>();
+
+	public HashMap<UUID, String> getVnodeIP() {
+		return vnodeIP;
+	}
+
+	public void setVnodeIP(HashMap<UUID, String> vnodeIP) {
+		this.vnodeIP = vnodeIP;
+	}
 
 	public HashMap<String, String> getAppStatus() {
 		return appStatus;

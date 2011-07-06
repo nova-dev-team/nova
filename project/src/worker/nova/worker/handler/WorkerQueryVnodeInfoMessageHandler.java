@@ -63,7 +63,8 @@ public class WorkerQueryVnodeInfoMessageHandler implements
 				}
 			}
 			MasterProxy master = NovaWorker.getInstance().getMaster();
-			master.sendVnodeStatus(null, uu.toString(), vs);
+			master.sendVnodeStatus(NovaWorker.getInstance().getVnodeIP()
+					.get(uu), uu.toString(), vs);
 		} else {
 			try {
 				Connect conn = new Connect("qemu:///system", true);
@@ -106,7 +107,8 @@ public class WorkerQueryVnodeInfoMessageHandler implements
 			MasterProxy master = NovaWorker.getInstance().getMaster();
 			for (UUID uuid : VnodeStatusDaemon.allStatus.keySet()) {
 				Vnode.Status status = VnodeStatusDaemon.allStatus.get(uuid);
-				master.sendVnodeStatus(null, uuid.toString(), status);
+				master.sendVnodeStatus(NovaWorker.getInstance().getVnodeIP()
+						.get(uuid), uuid.toString(), status);
 			}
 		}
 	}
