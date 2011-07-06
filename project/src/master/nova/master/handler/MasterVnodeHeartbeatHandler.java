@@ -2,7 +2,7 @@ package nova.master.handler;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
-import nova.common.service.message.VnodeHeartbeatMessage;
+import nova.common.service.message.AgentHeartbeatMessage;
 import nova.master.models.Vnode;
 
 import org.apache.log4j.Logger;
@@ -10,7 +10,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 public class MasterVnodeHeartbeatHandler implements
-		SimpleHandler<VnodeHeartbeatMessage> {
+		SimpleHandler<AgentHeartbeatMessage> {
 
 	/**
 	 * Log4j logger.
@@ -18,7 +18,7 @@ public class MasterVnodeHeartbeatHandler implements
 	Logger log = Logger.getLogger(MasterVnodeHeartbeatHandler.class);
 
 	@Override
-	public void handleMessage(VnodeHeartbeatMessage msg,
+	public void handleMessage(AgentHeartbeatMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
 		if (xreply == null) {

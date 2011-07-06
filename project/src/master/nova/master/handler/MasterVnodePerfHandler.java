@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
-import nova.common.service.message.PnodePerfMessage;
+import nova.common.service.message.AgentPerfMessage;
 import nova.common.util.RRDTools;
 import nova.master.models.Vnode;
 
@@ -22,15 +22,14 @@ import org.jrobin.core.Util;
  * @author gaotao1987@gmail.com
  * 
  */
-public class MasterVnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
+public class MasterVnodePerfHandler implements SimpleHandler<AgentPerfMessage> {
 
 	Logger logger = Logger.getLogger(MasterVnodePerfHandler.class);
 
 	@Override
-	public void handleMessage(PnodePerfMessage msg, ChannelHandlerContext ctx,
+	public void handleMessage(AgentPerfMessage msg, ChannelHandlerContext ctx,
 			MessageEvent e, SimpleAddress xreply) {
 		// TODO @zhaoxun get pair of uuid/rrdPath from database
-
 		Vnode vnode = Vnode.findByIp(xreply.ip);
 		if (vnode != null) {
 			String rrdPath = "build/" + vnode.getUuid() + ".rrd";

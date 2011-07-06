@@ -7,8 +7,9 @@ import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.AgentHeartbeatMessage;
-import nova.common.service.message.PnodePerfMessage;
+import nova.common.service.message.AgentPerfMessage;
 import nova.common.service.message.PnodeHeartbeatMessage;
+import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
@@ -21,13 +22,14 @@ import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.AddPnodeHandler;
-import nova.master.handler.MasterAgentHeartbeatHandler;
 import nova.master.handler.CreateVclusterHandler;
 import nova.master.handler.CreateVnodeHandler;
+import nova.master.handler.MasterAgentHeartbeatHandler;
 import nova.master.handler.MasterHttpHandler;
-import nova.master.handler.MasterPnodePerfHandler;
 import nova.master.handler.MasterPnodeHeartbeatHandler;
+import nova.master.handler.MasterPnodePerfHandler;
 import nova.master.handler.MasterVnodeHeartbeatHandler;
+import nova.master.handler.MasterVnodePerfHandler;
 import nova.master.handler.PnodeStatusHandler;
 import nova.master.handler.RegisterApplianceHandler;
 import nova.master.handler.RegisterVdiskHandler;
@@ -95,7 +97,11 @@ public class NovaMaster extends SimpleServer {
 
 		this.registerHandler(VnodeStatusMessage.class, new VnodeStatusHandler());
 
-		this.registerHandler(PnodePerfMessage.class, new MasterPnodePerfHandler());
+		this.registerHandler(PnodePerfMessage.class,
+				new MasterPnodePerfHandler());
+
+		this.registerHandler(AgentPerfMessage.class,
+				new MasterVnodePerfHandler());
 
 		Conf.setDefaultValue("master.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("master.bind_port", 3000);
