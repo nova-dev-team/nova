@@ -1,5 +1,9 @@
 package nova.worker.virt;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 import nova.common.util.Conf;
@@ -134,7 +138,25 @@ public class Kvm {
 			params.put("determinVnc", "");
 		}
 
-		// System.out.println(Utils.expandTemplateFile(templateFpath, params));
-		return Utils.expandTemplateFile(templateFpath, params);
+		String rt = Utils.expandTemplateFile(templateFpath, params);
+		// write nova.agent.ipaddress.properties file
+		File confFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", params
+				.get("name").toString(), "conf.xml"));
+		if (!confFile.exists()) {
+			try {
+				confFile.createNewFile();
+			} catch (IOException e1) {
+				log.error("create conf.xml fail!", e1);
+			}
+		}
+
+		try {
+			PrintWriter outpw = new PrintWriter(new FileWriter(confFile));
+			outpw.println(rt);
+			outpw.close();
+		} catch (IOException e1) {
+			log.error("write conf.xml file fail!", e1);
+		}
+		return rt;
 	}
 }

@@ -29,9 +29,9 @@ agent.ftp.password=nova-develop@googlegroups.com
 
 # note: agent uses anonymous login
 
-# where to save softwares' images
+# where to save softwares' pictures
 # TODO: deprecate this path. save all info into appliances?
-agent.software.image_path=data/agent/images
+agent.software.picture_path=data/agent/pictures
 
 # where to save downloaded softwares
 agent.software.save_path=data/agent/appliances
