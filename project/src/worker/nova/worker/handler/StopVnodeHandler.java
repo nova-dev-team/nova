@@ -6,6 +6,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Utils;
 import nova.master.models.Vnode;
+import nova.worker.NovaWorker;
 import nova.worker.api.messages.StopVnodeMessage;
 import nova.worker.daemons.VnodeStatusDaemon;
 
@@ -62,6 +63,8 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 				dom.destroy();
 				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
 						Vnode.Status.SHUT_OFF);
+				NovaWorker.getInstance().getVnodeIP()
+						.remove(UUID.fromString(msg.getUuid()));
 				System.out.println("delete path = "
 						+ Utils.pathJoin(Utils.NOVA_HOME, "run", name));
 				Utils.delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
