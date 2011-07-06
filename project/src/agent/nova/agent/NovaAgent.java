@@ -97,9 +97,10 @@ public class NovaAgent extends SimpleServer {
 		registerHandler(InstallApplianceMessage.class,
 				new InstallApplianceHandler());
 
-		// TODO add master register
-		// SimpleAddress masterAddress = new SimpleAddress("10.0.1.242", 3000);
-		// registerMaster(masterAddress);
+		String ipAdress = Conf.getString("master.bind_host");
+		int port = Conf.getInteger("master.bind_port");
+		SimpleAddress masterAddress = new SimpleAddress(ipAdress, port);
+		registerMaster(masterAddress);
 	}
 
 	public SimpleAddress getAddr() {
