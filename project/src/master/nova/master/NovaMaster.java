@@ -29,7 +29,7 @@ import nova.master.handler.MasterHttpHandler;
 import nova.master.handler.MasterPnodeHeartbeatHandler;
 import nova.master.handler.MasterPnodePerfHandler;
 import nova.master.handler.MasterVnodeHeartbeatHandler;
-import nova.master.handler.MasterVnodePerfHandler;
+import nova.master.handler.MasterAgentPerfHandler;
 import nova.master.handler.PnodeStatusHandler;
 import nova.master.handler.RegisterApplianceHandler;
 import nova.master.handler.RegisterVdiskHandler;
@@ -101,7 +101,7 @@ public class NovaMaster extends SimpleServer {
 				new MasterPnodePerfHandler());
 
 		this.registerHandler(AgentPerfMessage.class,
-				new MasterVnodePerfHandler());
+				new MasterAgentPerfHandler());
 
 		Conf.setDefaultValue("master.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("master.bind_port", 3000);
