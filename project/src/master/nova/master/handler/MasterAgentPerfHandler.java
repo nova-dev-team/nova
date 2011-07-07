@@ -22,9 +22,9 @@ import org.jrobin.core.Util;
  * @author gaotao1987@gmail.com
  * 
  */
-public class MasterVnodePerfHandler implements SimpleHandler<AgentPerfMessage> {
+public class MasterAgentPerfHandler implements SimpleHandler<AgentPerfMessage> {
 
-	Logger logger = Logger.getLogger(MasterVnodePerfHandler.class);
+	Logger logger = Logger.getLogger(MasterAgentPerfHandler.class);
 
 	@Override
 	public void handleMessage(AgentPerfMessage msg, ChannelHandlerContext ctx,
