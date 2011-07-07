@@ -63,3 +63,18 @@ storage.ftp.admin.username=admin
 # ftp admin password
 storage.ftp.admin.password=liquid
 
+#########################
+# vnode conifg section #
+#########################
+#vnode gateway
+vnode.gateway_ip=10.0.1.254
+
+#vnode subnet mask
+vnode.subnet_mask=255.255.255.0
+
+#vnode first usable ip
+vnode.first_usable_ip=10.0.1.90
+
+#vnode last usable ip
+vnode.last_usable_ip=10.0.1.100
+
