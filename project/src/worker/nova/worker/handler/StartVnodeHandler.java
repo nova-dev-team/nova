@@ -252,6 +252,34 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					}
 				}
 
+				// write nova.agent.ipaddress.properties file
+				File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+						"conf", "nova.agent.extrainfo.properties"));
+				if (!ipAddrFile.exists()) {
+					try {
+						ipAddrFile.createNewFile();
+					} catch (IOException e1) {
+						log.error(
+								"create nova.agent.extrainfo.properties file fail!",
+								e1);
+					}
+				}
+
+				try {
+					PrintWriter outpw = new PrintWriter(new FileWriter(
+							ipAddrFile));
+					outpw.println("agent.bind_host=" + msg.getIpAddr());
+					outpw.println("master.bind_host="
+							+ Conf.getString("master.bind_host"));
+					outpw.println("master.bind_port="
+							+ Conf.getString("master.bind_port"));
+					outpw.close();
+				} catch (IOException e1) {
+					log.error(
+							"write nova.agent.extrainfo.properties file fail!",
+							e1);
+				}
+
 				// copy files to Novahome/run/softwares
 				File agentProgramFile = new File(Utils.pathJoin(
 						Utils.NOVA_HOME, "run", "softwares", "run"));
@@ -300,32 +328,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				} catch (IOException e1) {
 					log.error("exec mkisofs cmd error!", e1);
 				}
-			}
-
-			// write nova.agent.ipaddress.properties file
-			File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "conf",
-					"nova.agent.extrainfo.properties"));
-			if (!ipAddrFile.exists()) {
-				try {
-					ipAddrFile.createNewFile();
-				} catch (IOException e1) {
-					log.error(
-							"create nova.agent.extrainfo.properties file fail!",
-							e1);
-				}
-			}
-
-			try {
-				PrintWriter outpw = new PrintWriter(new FileWriter(ipAddrFile));
-				outpw.println("agent.bind_host=" + msg.getIpAddr());
-				outpw.println("master.bind_host="
-						+ Conf.getString("master.bind_host"));
-				outpw.println("master.bind_port="
-						+ Conf.getString("master.bind_port"));
-				outpw.close();
-			} catch (IOException e1) {
-				log.error("write nova.agent.extrainfo.properties file fail!",
-						e1);
 			}
 
 			// create domain and show some info
