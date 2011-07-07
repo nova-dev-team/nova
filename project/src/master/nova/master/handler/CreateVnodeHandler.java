@@ -31,7 +31,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		for (Vcluster vc : Vcluster.all()) {
 			vcluster = vc;
 		}
-		SimpleAddress vAddr = new SimpleAddress(vcluster.getFristIp(), 4000);
+		SimpleAddress vAddr = new SimpleAddress(vcluster.getFristIp(),
+				Conf.getInteger("worker.bind_port"));
 
 		int pid = 1;
 
@@ -66,8 +67,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		// TODO @zhaoxun pass the correct params
 		String apps[] = { "demo_appliance" };
 		String ipAddr = vAddr.getIp();
-		String subnetMask = "255.255.255.0";
-		String gateWay = "10.0.1.254";
+		String subnetMask = Conf.getString("vnode.subnet_mask");
+		String gateWay = Conf.getString("vnode.gateway_ip");
 		wp.sendStartVnode("kvm", msg.vmName, vAddr,
 				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
 				msg.vmImage, true, apps, ipAddr, subnetMask, gateWay);

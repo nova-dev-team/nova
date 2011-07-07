@@ -7,6 +7,7 @@ import java.util.Map;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
+import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.CreateVclusterMessage;
@@ -93,9 +94,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 			System.out.println(act);
 			if (act.equals("add_pnode")) {
 				// System.out.println(111);
-				new AddPnodeHandler().handleMessage(new AddPnodeMessage(
-						new SimpleAddress(queryMap.get("pnode_ip"), 4000)),
-						null, null, null);
+				new AddPnodeHandler().handleMessage(
+						new AddPnodeMessage(new SimpleAddress(queryMap
+								.get("pnode_ip"), Conf
+								.getInteger("worker.bind_port"))), null, null,
+						null);
 				// System.out.println(222);
 				// values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
 			} else if (act.equals("register_vdisk")) {
