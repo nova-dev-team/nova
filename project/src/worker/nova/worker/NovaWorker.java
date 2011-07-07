@@ -228,7 +228,7 @@ public class NovaWorker extends SimpleServer {
 				"brctl addif br0 eth0",
 				"ifconfig eth0 0.0.0.0",
 				"ifconfig br0 " + Conf.getString("worker.bind_host")
-						+ " netmask " + Conf.getString("worker.bind_host"),
+						+ " netmask " + Conf.getString("worker.mask"),
 				"brctl sethello br0 1", "brctl setmaxage br0 4",
 				"brctl setfd br0 4", "ifconfig br0 up",
 				"route add default gw " + Conf.getString("worker.gateway") };
@@ -236,6 +236,7 @@ public class NovaWorker extends SimpleServer {
 		Process p;
 		try {
 			for (String cmd : createBridgeCmds) {
+				System.out.println(cmd);
 				p = Runtime.getRuntime().exec(cmd);
 				StreamGobbler errorGobbler = new StreamGobbler(
 						p.getErrorStream(), "ERROR");
