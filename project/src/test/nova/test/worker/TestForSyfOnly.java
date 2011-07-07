@@ -30,6 +30,7 @@ public class TestForSyfOnly {
 		// write nova.agent.ipaddress.properties file
 		File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "conf",
 				"nova.agent.ipaddress.properties"));
+		System.out.println(ipAddrFile.getName());
 		if (!ipAddrFile.exists()) {
 			try {
 				ipAddrFile.createNewFile();
@@ -46,6 +47,8 @@ public class TestForSyfOnly {
 		} catch (IOException e1) {
 			log.error("write nova.agent.ipaddress.properties file fail!", e1);
 		}
+		// String[] ignore = { "shit1", "shit2" };
+		// Utils.copyWithIgnore("fuck1", "fuck2", ignore);
 	}
 
 }

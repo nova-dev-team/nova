@@ -258,8 +258,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 				if (!agentProgramFile.exists()) {
 					Utils.mkdirs(agentProgramFile.getAbsolutePath());
 				}
-				Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "conf"), Utils
-						.pathJoin(agentProgramFile.getAbsolutePath(), "conf"));
+				String[] ignoreList = { "nova.properties" };
+				Utils.copyWithIgnore(Utils.pathJoin(Utils.NOVA_HOME, "conf"),
+						Utils.pathJoin(agentProgramFile.getAbsolutePath(),
+								"conf"), ignoreList);
 				Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "bin"), Utils
 						.pathJoin(agentProgramFile.getAbsolutePath(), "bin"));
 				Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "lib"), Utils
