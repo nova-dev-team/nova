@@ -244,8 +244,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 							fc.closeServer();
 						} catch (NumberFormatException e1) {
 							log.error("port format error!", e1);
+							return;
 						} catch (IOException e1) {
 							log.error("ftp connection fail!", e1);
+							return;
 						}
 						NovaWorker.getInstance().getAppStatus()
 								.put(appName, appName);
@@ -329,6 +331,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					}
 				} catch (IOException e1) {
 					log.error("exec mkisofs cmd error!", e1);
+					return;
 				}
 			}
 
