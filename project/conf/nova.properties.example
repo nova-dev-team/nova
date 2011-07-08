@@ -25,11 +25,17 @@ worker.bind_host=10.0.1.193
 # listen port for worker
 worker.bind_port=4000
 
+# mask for vm in worker
+worker.mask=255.255.255.0
+
+# gateway for vm in worker
+worker.gateway=10.0.1.254
+
 # network interface for worker
-vm_network_interface=
+vm_network_interface=eth0
 
 # network bridge for worker
-vm_network_bridge=
+vm_network_bridge=br0
 
 # vnc mouse pointer for worker
 fix_vnc_mouse_pointer=true
