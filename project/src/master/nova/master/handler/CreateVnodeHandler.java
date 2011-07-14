@@ -34,7 +34,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		SimpleAddress vAddr = new SimpleAddress(vcluster.getFristIp(),
 				Conf.getInteger("worker.bind_port"));
 
-		int pid = 1;
+		int pid = msg.pnodeId;
 
 		Vnode vnode = new Vnode();
 		vnode.setAddr(vAddr);
@@ -57,8 +57,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 				Conf.getInteger("master.bind_port")));
 
 		// @ zhaoxun to do...
-		wp.connect(new InetSocketAddress(Conf.getString("worker.bind_host"),
-				Conf.getInteger("worker.bind_port")));
+		wp.connect(new InetSocketAddress(pnode.getIp(), Conf
+				.getInteger("worker.bind_port")));
 		/*
 		 * System.out.println("kvm" + vAddr + "true" +
 		 * String.valueOf(msg.memorySize) + String.valueOf(msg.cpuCount) +

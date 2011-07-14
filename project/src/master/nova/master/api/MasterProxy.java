@@ -77,9 +77,9 @@ public class MasterProxy extends SimpleProxy {
 	}
 
 	public void sendCreateVnode(String vmImage, String vmName, int cpuCount,
-			int memorySize, String applianceList) {
+			int memorySize, String applianceList, int pnodeId) {
 		super.sendRequest(new CreateVnodeMessage(vmImage, vmName, cpuCount,
-				memorySize, applianceList));
+				memorySize, applianceList, pnodeId));
 	}
 
 	public void sendCreateVcluster(String vclusterName, int vclusterSize) {
