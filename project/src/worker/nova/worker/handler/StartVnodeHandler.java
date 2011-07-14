@@ -61,7 +61,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 		}
 
 		if (msg.getWakeupOnly()) {
-			synchronized (NovaWorker.getInstance().connLock) {
+			synchronized (NovaWorker.getInstance().getConnLock()) {
 				try {
 					Connect conn = new Connect(virtService, false);
 
@@ -337,7 +337,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			// create domain and show some info
 			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
 				msg.setEmulatorPath("/usr/bin/kvm");
-				synchronized (NovaWorker.getInstance().connLock) {
+				synchronized (NovaWorker.getInstance().getConnLock()) {
 					try {
 						System.out.println();
 						System.out.println(Kvm.emitDomain(msg.getHashMap()));

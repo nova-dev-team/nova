@@ -36,6 +36,9 @@ public class StopVnodeMessage {
 		this.uuid = uuid;
 	}
 
+	public StopVnodeMessage() {
+	}
+
 	public StopVnodeMessage(String hyperVisor, String uuid) {
 		this.hyperVisor = hyperVisor;
 		this.uuid = uuid;

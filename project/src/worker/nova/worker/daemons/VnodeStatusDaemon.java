@@ -46,10 +46,9 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		// TODO @shayf report actual vnodes status to master
-		Connect conn = null;
 		try {
-			synchronized (NovaWorker.getInstance().connLock) {
-				conn = new Connect("qemu:///system", true);
+			synchronized (NovaWorker.getInstance().getConnLock()) {
+				Connect conn = new Connect("qemu:///system", true);
 				if (conn.numOfDomains() > 0) {
 					System.out.println("numofdomains\t"
 							+ Integer.toString(conn.numOfDomains()));

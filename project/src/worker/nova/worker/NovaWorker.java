@@ -59,7 +59,15 @@ public class NovaWorker extends SimpleServer {
 
 	public Connect conn;
 
-	public Object connLock = new Object();
+	private Object connLock = new Object();
+
+	public Object getConnLock() {
+		return connLock;
+	}
+
+	public void setConnLock(Object connLock) {
+		this.connLock = connLock;
+	}
 
 	/**
 	 * Connection to nova master.
