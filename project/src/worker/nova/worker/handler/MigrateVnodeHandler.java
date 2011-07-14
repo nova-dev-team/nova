@@ -29,6 +29,8 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 		// TODO @shayf finish migration
 		Connect conn = null, dconn = null;
 		try {
+			// Todo @shayf synchronized (NovaWorker.getInstance().connLock)
+			// blabla
 			conn = new Connect("qemu:///system", true);
 			dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
 					true);

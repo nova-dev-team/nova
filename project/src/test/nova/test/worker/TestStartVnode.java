@@ -20,7 +20,7 @@ public class TestStartVnode {
 	@Test
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
-		String apps[] = { "demo_appliance" };
+		String apps[] = null;// { "demo_appliance" };
 		// StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
 		// "false", "100288", "1", "small.img", "false");
 		StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu_vm", null,

@@ -36,6 +36,8 @@ import nova.worker.models.StreamGobbler;
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+import org.libvirt.Connect;
+import org.libvirt.LibvirtException;
 
 /**
  * The worker module of Nova.
@@ -54,6 +56,10 @@ public class NovaWorker extends SimpleServer {
 	SimpleDaemon daemons[] = { new WorkerHeartbeatDaemon(),
 			new WorkerPerfInfoDaemon(), new VnodeStatusDaemon(),
 			new VdiskPoolDaemon(), new PnodeStatusDaemon() };
+
+	public Connect conn;
+
+	public Object connLock = new Object();
 
 	/**
 	 * Connection to nova master.
@@ -118,6 +124,12 @@ public class NovaWorker extends SimpleServer {
 
 		Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("worker.bind_port", 4000);
+
+		try {
+			conn = new Connect("qemu:///system", true);
+		} catch (LibvirtException e) {
+			logger.error("libvirt connection fail!", e);
+		}
 
 	}
 

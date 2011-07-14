@@ -59,23 +59,19 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			// TODO @shayf get correct xen service address
 			virtService = "some xen address";
 		}
-		Connect conn = null;
-		try {
-			// connect the qemu system
-			conn = new Connect(virtService, false);
-		} catch (LibvirtException ex) {
-			// TODO @santa might need to restart libvirt deamon and retry
-			log.error("Error connecting " + virtService, ex);
-		}
 
 		if (msg.getWakeupOnly()) {
-			try {
-				Domain testDomain = conn
-						.domainLookupByUUIDString(msg.getUuid());
-				testDomain.resume();
-			} catch (LibvirtException ex) {
-				log.error("Domain with UUID='" + msg.getUuid()
-						+ "' can't be found!", ex);
+			synchronized (NovaWorker.getInstance().connLock) {
+				try {
+					Connect conn = new Connect(virtService, false);
+
+					Domain testDomain = conn.domainLookupByUUIDString(msg
+							.getUuid());
+					testDomain.resume();
+				} catch (LibvirtException ex) {
+					log.error("Domain with UUID='" + msg.getUuid()
+							+ "' can't be found!", ex);
+				}
 			}
 		} else {
 			if ((msg.getMemSize() != null) && (!msg.getMemSize().equals(""))) {
@@ -223,34 +219,37 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					log.error("file write fail!", e1);
 				}
 
-				for (String appName : msg.getApps()) {
-					if (NovaWorker.getInstance().getAppStatus()
-							.containsKey(appName) == false) {
-						try {
-							if (NovaStorage.getInstance().getFtpServer() == null) {
-								NovaStorage.getInstance().startFtpServer();
+				if (msg.getApps() != null) {
+					for (String appName : msg.getApps()) {
+						if (NovaWorker.getInstance().getAppStatus()
+								.containsKey(appName) == false) {
+							try {
+								if (NovaStorage.getInstance().getFtpServer() == null) {
+									NovaStorage.getInstance().startFtpServer();
+								}
+								FtpClient fc = FtpUtils
+										.connect(
+												Conf.getString("storage.ftp.bind_host"),
+												Conf.getInteger("storage.ftp.bind_port"),
+												Conf.getString("storage.ftp.admin.username"),
+												Conf.getString("storage.ftp.admin.password"));
+								fc.cd("appliances");
+								FtpUtils.downloadDir(fc, Utils
+										.pathJoin(appName), Utils.pathJoin(
+										Utils.NOVA_HOME, "run", "softwares",
+										appName));
+								System.out.println("download file " + appName);
+								fc.closeServer();
+							} catch (NumberFormatException e1) {
+								log.error("port format error!", e1);
+								return;
+							} catch (IOException e1) {
+								log.error("ftp connection fail!", e1);
+								return;
 							}
-							FtpClient fc = FtpUtils
-									.connect(
-											Conf.getString("storage.ftp.bind_host"),
-											Conf.getInteger("storage.ftp.bind_port"),
-											Conf.getString("storage.ftp.admin.username"),
-											Conf.getString("storage.ftp.admin.password"));
-							fc.cd("appliances");
-							FtpUtils.downloadDir(fc, Utils.pathJoin(appName),
-									Utils.pathJoin(Utils.NOVA_HOME, "run",
-											"softwares", appName));
-							System.out.println("download file " + appName);
-							fc.closeServer();
-						} catch (NumberFormatException e1) {
-							log.error("port format error!", e1);
-							return;
-						} catch (IOException e1) {
-							log.error("ftp connection fail!", e1);
-							return;
+							NovaWorker.getInstance().getAppStatus()
+									.put(appName, appName);
 						}
-						NovaWorker.getInstance().getAppStatus()
-								.put(appName, appName);
 					}
 				}
 
@@ -338,32 +337,35 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			// create domain and show some info
 			if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
 				msg.setEmulatorPath("/usr/bin/kvm");
-				try {
-					System.out.println();
-					System.out.println(Kvm.emitDomain(msg.getHashMap()));
-					System.out.println();
-					Domain testDomain = conn.domainCreateLinux(
-							Kvm.emitDomain(msg.getHashMap()), 0);
+				synchronized (NovaWorker.getInstance().connLock) {
+					try {
+						System.out.println();
+						System.out.println(Kvm.emitDomain(msg.getHashMap()));
+						System.out.println();
+						Connect conn = new Connect(virtService, false);
+						Domain testDomain = conn.domainCreateLinux(
+								Kvm.emitDomain(msg.getHashMap()), 0);
 
-					if (testDomain != null) {
-						VnodeStatusDaemon.putStatus(
-								UUID.fromString(testDomain.getUUIDString()),
-								Vnode.Status.PREPARING);
-						NovaWorker
-								.getInstance()
-								.getVnodeIP()
-								.put(UUID
-										.fromString(testDomain.getUUIDString()),
-										msg.getIpAddr());
+						if (testDomain != null) {
+							VnodeStatusDaemon
+									.putStatus(UUID.fromString(testDomain
+											.getUUIDString()),
+											Vnode.Status.PREPARING);
+							NovaWorker
+									.getInstance()
+									.getVnodeIP()
+									.put(UUID.fromString(testDomain
+											.getUUIDString()), msg.getIpAddr());
+						}
+						System.out.println("Domain:" + testDomain.getName()
+								+ " id " + testDomain.getID() + " running "
+								+ testDomain.getOSType());
+						// Domain testDomain = conn.domainLookupByName("test");
+						// System.out.println("xml desc\n" +
+						// testDomain.getXMLDesc(0));
+					} catch (LibvirtException ex) {
+						log.error("Create domain failed", ex);
 					}
-					System.out.println("Domain:" + testDomain.getName()
-							+ " id " + testDomain.getID() + " running "
-							+ testDomain.getOSType());
-					// Domain testDomain = conn.domainLookupByName("test");
-					// System.out.println("xml desc\n" +
-					// testDomain.getXMLDesc(0));
-				} catch (LibvirtException ex) {
-					log.error("Create domain failed", ex);
 				}
 			} else if (msg.getHyperVisor().equalsIgnoreCase("xen")) {
 				// TODO @shayf add xen process

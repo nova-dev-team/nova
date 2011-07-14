@@ -40,15 +40,14 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 			// TODO @shayf get correct xen service address
 			virtService = "some xen address";
 		}
-		Connect conn = null;
-		try {
-			conn = new Connect(virtService, false);
-		} catch (LibvirtException ex) {
-			log.error("Error connecting " + virtService, ex);
-		}
 
 		try {
-			Domain dom = conn.domainLookupByUUIDString(msg.getUuid());
+			Domain dom = null;
+			synchronized (NovaWorker.getInstance().connLock) {
+				Connect conn = new Connect(virtService, false);
+				dom = conn.domainLookupByUUIDString(msg.getUuid());
+				conn.close();
+			}
 			if (dom == null) {
 				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
 						Vnode.Status.CONNECT_FAILURE);

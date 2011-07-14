@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
+import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
 import org.libvirt.Connect;
@@ -95,14 +96,17 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			return this.vmRunning;
 		} else {
 			this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
-			Connect conn = null;
-			conn = new Connect("qemu:///system", true);
-			if (conn.numOfDomains() > 0) {
-				conn.close();
-				this.setVmRunning(true);
-			} else {
-				conn.close();
-				this.setVmRunning(false);
+
+			synchronized (NovaWorker.getInstance().connLock) {
+				Connect conn = new Connect("qemu:///system", true);
+
+				if (conn.numOfDomains() > 0) {
+					conn.close();
+					this.setVmRunning(true);
+				} else {
+					conn.close();
+					this.setVmRunning(false);
+				}
 			}
 			return this.vmRunning;
 		}
