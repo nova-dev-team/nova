@@ -63,7 +63,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 			synchronized (NovaWorker.getInstance().getConnLock()) {
 				try {
 					Domain testDomain = NovaWorker.getInstance()
-							.getConn("qemu:///system", true)
+							.getConn("qemu:///system", false)
 							.domainLookupByUUIDString(msg.getUuid());
 					testDomain.resume();
 					// NovaWorker.getInstance().closeConnectToKvm();
