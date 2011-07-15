@@ -301,7 +301,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
 				// pack iso files
 				File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-						"run", "agentcd"));
+						"run", msg.getName(), "agentcd"));
 				if (!agentCdFile.exists()) {
 					Utils.mkdirs(agentCdFile.getAbsolutePath());
 				}
