@@ -84,7 +84,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 	 */
 	Logger log = Logger.getLogger(VdiskPoolDaemon.class);
 
-	static int POOL_SIZE = 5;
+	static int POOL_SIZE = 2;
 
 	private long lastCheckIsVmRunningTime;
 	private int mbps;
