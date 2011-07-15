@@ -13,7 +13,6 @@ import nova.worker.daemons.VnodeStatusDaemon;
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
-import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
@@ -44,9 +43,10 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 		try {
 			Domain dom = null;
 			synchronized (NovaWorker.getInstance().getConnLock()) {
-				Connect conn = new Connect(virtService, false);
-				dom = conn.domainLookupByUUIDString(msg.getUuid());
-				conn.close();
+				NovaWorker.getInstance().connectToKvm(virtService, false);
+				dom = NovaWorker.getInstance().getConn()
+						.domainLookupByUUIDString(msg.getUuid());
+				// NovaWorker.getInstance().closeConnectToKvm();
 			}
 			if (dom == null) {
 				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),

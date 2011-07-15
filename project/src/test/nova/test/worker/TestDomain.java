@@ -1,17 +1,18 @@
 package nova.test.worker;
 
+import nova.worker.NovaWorker;
+
 import org.junit.Test;
-import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
 
 public class TestDomain {
 	@Test
 	public void test() {
 		final String virtService = "qemu:///system";
-		Connect conn = null;
 		try {
-			conn = new Connect(virtService, false);
-			System.out.println(conn.numOfDomains());
+			NovaWorker.getInstance().connectToKvm(virtService, false);
+			System.out.println(NovaWorker.getInstance().getConn()
+					.numOfDomains());
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

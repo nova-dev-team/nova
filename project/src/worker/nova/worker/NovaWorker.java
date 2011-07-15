@@ -57,7 +57,31 @@ public class NovaWorker extends SimpleServer {
 			new WorkerPerfInfoDaemon(), new VnodeStatusDaemon(),
 			new VdiskPoolDaemon(), new PnodeStatusDaemon() };
 
-	public Connect conn;
+	private Connect conn;
+
+	public Connect getConn() throws LibvirtException {
+		if (conn == null) {
+			connectToKvm("qemu:///system", false);
+		}
+		return conn;
+	}
+
+	public void setConn(Connect conn) {
+		this.conn = conn;
+	}
+
+	public void connectToKvm(String virtService, boolean b)
+			throws LibvirtException {
+		if (conn == null) {
+			conn = new Connect(virtService, b);
+		}
+	}
+
+	public void closeConnToKvm() throws LibvirtException {
+		if (conn != null) {
+			conn.close();
+		}
+	}
 
 	private Object connLock = new Object();
 
@@ -133,11 +157,13 @@ public class NovaWorker extends SimpleServer {
 		Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("worker.bind_port", 4000);
 
-		try {
-			conn = new Connect("qemu:///system", true);
-		} catch (LibvirtException e) {
-			logger.error("libvirt connection fail!", e);
-		}
+		conn = null;
+
+		// try {
+		// conn = new Connect("qemu:///system", true);
+		// } catch (LibvirtException e) {
+		// logger.error("libvirt connection fail!", e);
+		// }
 
 	}
 

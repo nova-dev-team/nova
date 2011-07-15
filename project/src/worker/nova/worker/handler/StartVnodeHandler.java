@@ -27,7 +27,6 @@ import nova.worker.virt.Kvm;
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
-import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
@@ -63,11 +62,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 		if (msg.getWakeupOnly()) {
 			synchronized (NovaWorker.getInstance().getConnLock()) {
 				try {
-					Connect conn = new Connect(virtService, false);
+					NovaWorker.getInstance().connectToKvm("qemu:///system",
+							true);
 
-					Domain testDomain = conn.domainLookupByUUIDString(msg
-							.getUuid());
+					Domain testDomain = NovaWorker.getInstance().getConn()
+							.domainLookupByUUIDString(msg.getUuid());
 					testDomain.resume();
+					// NovaWorker.getInstance().closeConnectToKvm();
 				} catch (LibvirtException ex) {
 					log.error("Domain with UUID='" + msg.getUuid()
 							+ "' can't be found!", ex);
@@ -342,9 +343,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						System.out.println();
 						System.out.println(Kvm.emitDomain(msg.getHashMap()));
 						System.out.println();
-						Connect conn = new Connect(virtService, false);
-						Domain testDomain = conn.domainCreateLinux(
-								Kvm.emitDomain(msg.getHashMap()), 0);
+						NovaWorker.getInstance().connectToKvm(virtService,
+								false);
+						Domain testDomain = NovaWorker
+								.getInstance()
+								.getConn()
+								.domainCreateLinux(
+										Kvm.emitDomain(msg.getHashMap()), 0);
 
 						if (testDomain != null) {
 							VnodeStatusDaemon
@@ -363,6 +368,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						// Domain testDomain = conn.domainLookupByName("test");
 						// System.out.println("xml desc\n" +
 						// testDomain.getXMLDesc(0));
+						// NovaWorker.getInstance().closeConnectToKvm();
 					} catch (LibvirtException ex) {
 						log.error("Create domain failed", ex);
 					}

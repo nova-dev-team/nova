@@ -10,7 +10,6 @@ import nova.master.models.Vnode;
 import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
-import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
@@ -46,15 +45,25 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 	@Override
 	protected void workOneRound() {
 		// TODO @shayf report actual vnodes status to master
-		try {
-			synchronized (NovaWorker.getInstance().getConnLock()) {
-				Connect conn = new Connect("qemu:///system", true);
-				if (conn.numOfDomains() > 0) {
-					System.out.println("numofdomains\t"
-							+ Integer.toString(conn.numOfDomains()));
-					int[] ids = conn.listDomains();
+		synchronized (NovaWorker.getInstance().getConnLock()) {
+			try {
+
+				// NovaWorker.getInstance().connectToKvm("qemu:///system",
+				// true);
+				// if (NovaWorker.getInstance().getConn() == null) {
+				// System.out
+				// .println("conn null, why??????????????????????????????????????????????????????????????????????????????");
+				//
+				// }
+				if (NovaWorker.getInstance().getConn().numOfDomains() > 0) {
+					// System.out.println("numofdomains\t"
+					// + Integer.toString(NovaWorker.getInstance()
+					// .getConn().numOfDomains()));
+					int[] ids = NovaWorker.getInstance().getConn()
+							.listDomains();
 					for (int i = 0; i < ids.length; i++) {
-						Domain dom = conn.domainLookupByID(ids[i]);
+						Domain dom = NovaWorker.getInstance().getConn()
+								.domainLookupByID(ids[i]);
 						if (dom != null) {
 							UUID uu = UUID.fromString(dom.getUUIDString());
 							String info = dom.getInfo().state.toString();
@@ -95,12 +104,14 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 							}
 							allStatus.put(uu, vs);
 						}
+						// NovaWorker.getInstance().closeConnectToKvm();
 					}
 				}
-				conn.close();
+				// NovaWorker.getInstance().closeConnectToKvm();
+
+			} catch (LibvirtException e) {
+				logger.error("libvirt connection fail", e);
 			}
-		} catch (LibvirtException e) {
-			logger.error("libvirt connection fail", e);
 		}
 
 		MasterProxy master = NovaWorker.getInstance().getMaster();

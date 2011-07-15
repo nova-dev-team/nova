@@ -2,6 +2,7 @@ package nova.worker.handler;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.worker.NovaWorker;
 import nova.worker.api.messages.MigrateVnodeMessage;
 
 import org.apache.log4j.Logger;
@@ -27,16 +28,17 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 	public void handleMessage(MigrateVnodeMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 		// TODO @shayf finish migration
-		Connect conn = null, dconn = null;
+		Connect dconn = null;
 		try {
 			// Todo @shayf synchronized (NovaWorker.getInstance().connLock)
 			// blabla
-			conn = new Connect("qemu:///system", true);
+			NovaWorker.getInstance().connectToKvm("qemu:///system", true);
 			dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
 					true);
 
 			// TODO @shayf
-			Domain srcDomain = conn.domainLookupByUUIDString(msg.vnodeUuid);
+			Domain srcDomain = NovaWorker.getInstance().getConn()
+					.domainLookupByUUIDString(msg.vnodeUuid);
 			long flag = 0;
 			String uri = null;
 			srcDomain.migrate(dconn, flag, srcDomain.getName(), uri, bandWidth);

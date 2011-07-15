@@ -14,7 +14,6 @@ import nova.common.util.Utils;
 import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
-import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
 
 /**
@@ -98,13 +97,13 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
 
 			synchronized (NovaWorker.getInstance().getConnLock()) {
-				Connect conn = new Connect("qemu:///system", true);
+				NovaWorker.getInstance().connectToKvm("qemu:///system", true);
 
-				if (conn.numOfDomains() > 0) {
-					conn.close();
+				if (NovaWorker.getInstance().getConn().numOfDomains() > 0) {
+					// NovaWorker.getInstance().closeConnectToKvm();
 					this.setVmRunning(true);
 				} else {
-					conn.close();
+					// NovaWorker.getInstance().closeConnectToKvm();
 					this.setVmRunning(false);
 				}
 			}
