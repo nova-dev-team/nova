@@ -59,9 +59,10 @@ public class NovaWorker extends SimpleServer {
 
 	private Connect conn;
 
-	public Connect getConn() throws LibvirtException {
+	public Connect getConn(String virtService, boolean b)
+			throws LibvirtException {
 		if (conn == null) {
-			connectToKvm("qemu:///system", false);
+			connectToKvm(virtService, b);
 		}
 		return conn;
 	}
@@ -70,7 +71,7 @@ public class NovaWorker extends SimpleServer {
 		this.conn = conn;
 	}
 
-	public void connectToKvm(String virtService, boolean b)
+	private void connectToKvm(String virtService, boolean b)
 			throws LibvirtException {
 		if (conn == null) {
 			conn = new Connect(virtService, b);

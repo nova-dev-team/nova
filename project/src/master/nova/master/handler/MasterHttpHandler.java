@@ -183,7 +183,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 											+ String.valueOf(i + 1))), queryMap
 											.get("appliance_list"
 													+ String.valueOf(i + 1)),
-									Integer.parseInt(queryMap.get("pnode_ip"
+									Integer.parseInt(queryMap.get("pnode_id"
 											+ String.valueOf(i + 1)))), null,
 							null, null);
 					/*

@@ -35,9 +35,8 @@ public class WorkerQueryVnodeInfoMessageHandler implements
 			if (vs == null) {
 				synchronized (NovaWorker.getInstance().getConnLock()) {
 					try {
-						NovaWorker.getInstance().connectToKvm("qemu:///system",
-								true);
-						Domain dom = NovaWorker.getInstance().getConn()
+						Domain dom = NovaWorker.getInstance()
+								.getConn("qemu:///system", true)
 								.domainLookupByUUID(msg.getUuid());
 						if (dom != null) {
 							String info = dom.getInfo().state.toString();
@@ -78,13 +77,13 @@ public class WorkerQueryVnodeInfoMessageHandler implements
 		} else {
 			synchronized (NovaWorker.getInstance().getConnLock()) {
 				try {
-					NovaWorker.getInstance().connectToKvm("qemu:///system",
-							true);
-					if (NovaWorker.getInstance().getConn().numOfDomains() > 0) {
-						int[] ids = NovaWorker.getInstance().getConn()
-								.listDomains();
+					if (NovaWorker.getInstance()
+							.getConn("qemu:///system", true).numOfDomains() > 0) {
+						int[] ids = NovaWorker.getInstance()
+								.getConn("qemu:///system", true).listDomains();
 						for (int i = 0; i < ids.length; i++) {
-							Domain dom = NovaWorker.getInstance().getConn()
+							Domain dom = NovaWorker.getInstance()
+									.getConn("qemu:///system", true)
 									.domainLookupByID(ids[i]);
 							if (dom != null) {
 								uu = UUID.fromString(dom.getUUIDString());

@@ -97,9 +97,8 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
 
 			synchronized (NovaWorker.getInstance().getConnLock()) {
-				NovaWorker.getInstance().connectToKvm("qemu:///system", true);
-
-				if (NovaWorker.getInstance().getConn().numOfDomains() > 0) {
+				if (NovaWorker.getInstance().getConn("qemu:///system", true)
+						.numOfDomains() > 0) {
 					// NovaWorker.getInstance().closeConnectToKvm();
 					this.setVmRunning(true);
 				} else {

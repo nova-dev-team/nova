@@ -47,22 +47,17 @@ public class VnodeStatusDaemon extends SimpleDaemon {
 		// TODO @shayf report actual vnodes status to master
 		synchronized (NovaWorker.getInstance().getConnLock()) {
 			try {
-
-				// NovaWorker.getInstance().connectToKvm("qemu:///system",
-				// true);
-				// if (NovaWorker.getInstance().getConn() == null) {
-				// System.out
-				// .println("conn null, why??????????????????????????????????????????????????????????????????????????????");
-				//
-				// }
-				if (NovaWorker.getInstance().getConn().numOfDomains() > 0) {
-					// System.out.println("numofdomains\t"
-					// + Integer.toString(NovaWorker.getInstance()
-					// .getConn().numOfDomains()));
-					int[] ids = NovaWorker.getInstance().getConn()
-							.listDomains();
+				if (NovaWorker.getInstance().getConn("qemu:///system", true)
+						.numOfDomains() > 0) {
+					System.out.println("numofdomains\t"
+							+ Integer.toString(NovaWorker.getInstance()
+									.getConn("qemu:///system", true)
+									.numOfDomains()));
+					int[] ids = NovaWorker.getInstance()
+							.getConn("qemu:///system", true).listDomains();
 					for (int i = 0; i < ids.length; i++) {
-						Domain dom = NovaWorker.getInstance().getConn()
+						Domain dom = NovaWorker.getInstance()
+								.getConn("qemu:///system", true)
 								.domainLookupByID(ids[i]);
 						if (dom != null) {
 							UUID uu = UUID.fromString(dom.getUUIDString());

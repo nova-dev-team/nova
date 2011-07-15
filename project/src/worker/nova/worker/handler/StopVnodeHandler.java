@@ -43,8 +43,7 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 		try {
 			Domain dom = null;
 			synchronized (NovaWorker.getInstance().getConnLock()) {
-				NovaWorker.getInstance().connectToKvm(virtService, false);
-				dom = NovaWorker.getInstance().getConn()
+				dom = NovaWorker.getInstance().getConn(virtService, false)
 						.domainLookupByUUIDString(msg.getUuid());
 				// NovaWorker.getInstance().closeConnectToKvm();
 			}

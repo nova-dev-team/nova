@@ -62,10 +62,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 		if (msg.getWakeupOnly()) {
 			synchronized (NovaWorker.getInstance().getConnLock()) {
 				try {
-					NovaWorker.getInstance().connectToKvm("qemu:///system",
-							true);
-
-					Domain testDomain = NovaWorker.getInstance().getConn()
+					Domain testDomain = NovaWorker.getInstance()
+							.getConn("qemu:///system", true)
 							.domainLookupByUUIDString(msg.getUuid());
 					testDomain.resume();
 					// NovaWorker.getInstance().closeConnectToKvm();
@@ -343,11 +341,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 						System.out.println();
 						System.out.println(Kvm.emitDomain(msg.getHashMap()));
 						System.out.println();
-						NovaWorker.getInstance().connectToKvm(virtService,
-								false);
 						Domain testDomain = NovaWorker
 								.getInstance()
-								.getConn()
+								.getConn(virtService, false)
 								.domainCreateLinux(
 										Kvm.emitDomain(msg.getHashMap()), 0);
 

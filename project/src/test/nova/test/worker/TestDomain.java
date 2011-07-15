@@ -10,9 +10,8 @@ public class TestDomain {
 	public void test() {
 		final String virtService = "qemu:///system";
 		try {
-			NovaWorker.getInstance().connectToKvm(virtService, false);
-			System.out.println(NovaWorker.getInstance().getConn()
-					.numOfDomains());
+			System.out.println(NovaWorker.getInstance()
+					.getConn(virtService, false).numOfDomains());
 		} catch (LibvirtException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

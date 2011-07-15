@@ -32,12 +32,12 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 		try {
 			// Todo @shayf synchronized (NovaWorker.getInstance().connLock)
 			// blabla
-			NovaWorker.getInstance().connectToKvm("qemu:///system", true);
 			dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
 					true);
 
 			// TODO @shayf
-			Domain srcDomain = NovaWorker.getInstance().getConn()
+			Domain srcDomain = NovaWorker.getInstance()
+					.getConn("qemu:///system", true)
 					.domainLookupByUUIDString(msg.vnodeUuid);
 			long flag = 0;
 			String uri = null;
