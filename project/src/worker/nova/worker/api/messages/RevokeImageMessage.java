@@ -7,6 +7,10 @@ package nova.worker.api.messages;
  * 
  */
 public class RevokeImageMessage {
+	public RevokeImageMessage() {
+		super();
+	}
+
 	public RevokeImageMessage(String name) {
 		super();
 		this.name = name;
