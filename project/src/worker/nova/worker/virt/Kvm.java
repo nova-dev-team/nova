@@ -55,7 +55,7 @@ public class Kvm {
 			params.put("bootDevice", "hd");
 			// agent cdImage put in NOVA_HOME/run/agentcd
 			params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
-					"agentcd", "agent-cd.iso"));
+					params.get("name").toString(), "agentcd", "agent-cd.iso"));
 			params.put("determinCdrom", "<disk type='file' device='cdrom'>"
 					+ "\n    <source file='"
 					+ params.get("cdromPath").toString() + "'/>"
