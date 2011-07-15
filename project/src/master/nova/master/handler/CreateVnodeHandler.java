@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
+import nova.common.util.Utils;
 import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
@@ -31,7 +32,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		for (Vcluster vc : Vcluster.all()) {
 			vcluster = vc;
 		}
-		SimpleAddress vAddr = new SimpleAddress(vcluster.getFristIp(),
+		SimpleAddress vAddr = new SimpleAddress(Utils.integerToIpv4((Utils
+				.ipv4ToInteger(vcluster.getFristIp()) + msg.ipOffset)),
 				Conf.getInteger("worker.bind_port"));
 
 		int pid = msg.pnodeId;
