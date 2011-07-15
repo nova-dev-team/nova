@@ -37,7 +37,7 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 
 			// TODO @shayf
 			Domain srcDomain = NovaWorker.getInstance()
-					.getConn("qemu:///system", true)
+					.getConn("qemu:///system", false)
 					.domainLookupByUUIDString(msg.vnodeUuid);
 			long flag = 0;
 			String uri = null;
