@@ -212,6 +212,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 					os.write("\n".getBytes());
 					os.write(msg.getGateWay().getBytes());
 					os.write("\n".getBytes());
+					os.close();
 				} catch (FileNotFoundException e1) {
 					log.error("file not found!", e1);
 				} catch (IOException e1) {
