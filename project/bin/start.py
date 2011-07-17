@@ -69,7 +69,7 @@ for fn in os.listdir(lib_dir):
 class_path += ":bin/nova-%s.jar" % nova_ver
 
 # create dirs if necessary
-for dir_name in ["log", "run", "fuck/up"]:
+for dir_name in ["log", "run"]:
   dir_path = os.path.join(nova_home, dir_name)
   if os.path.exists(dir_path) == False:
     os.makedirs(dir_path)
