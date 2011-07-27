@@ -13,7 +13,7 @@ public class TestExecCmd {
 		Logger log = Logger.getLogger(TestExecCmd.class);
 
 		Process p;
-		String[] cmds = { "ifconfig", "ls" };
+		String[] cmds = { "ipconfig", "dir" };
 		// String[] cmds = {
 		// "ifconfig br0 down",
 		// "brctl delbr br0",

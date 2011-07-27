@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import nova.agent.api.messages.ApplianceListMessage;
 import nova.agent.api.messages.InstallApplianceMessage;
 import nova.agent.api.messages.QueryApplianceStatusMessage;
 import nova.agent.appliance.Appliance;
@@ -22,6 +23,7 @@ import nova.agent.daemons.ApplianceDownloadDaemon;
 import nova.agent.daemons.ApplianceInstallDaemon;
 import nova.agent.handler.AgentQueryHeartbeatHandler;
 import nova.agent.handler.AgentQueryPerfHandler;
+import nova.agent.handler.ApplianceListHandler;
 import nova.agent.handler.InstallApplianceHandler;
 import nova.agent.handler.QueryApplianceStatusHandler;
 import nova.common.service.SimpleAddress;
@@ -96,6 +98,7 @@ public class NovaAgent extends SimpleServer {
 				new QueryApplianceStatusHandler());
 		registerHandler(InstallApplianceMessage.class,
 				new InstallApplianceHandler());
+		registerHandler(ApplianceListMessage.class, new ApplianceListHandler());
 
 		SimpleAddress masterAddress = new SimpleAddress(
 				Conf.getString("master.bind_host"),
