@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import nova.agent.appliance.FtpApplianceFetcher;
-
 import org.apache.log4j.Logger;
 
 import sun.net.TelnetInputStream;
@@ -24,7 +22,7 @@ public class FtpUtils {
 	/**
 	 * Log4j logger.
 	 */
-	static Logger logger = Logger.getLogger(FtpApplianceFetcher.class);
+	static Logger logger = Logger.getLogger(FtpUtils.class);
 
 	/**
 	 * Connect to an ftp server.
