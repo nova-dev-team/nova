@@ -52,21 +52,21 @@ if java_home == None:
   print "[WARN] JAVA_HOME not set!"
   # TODO use jre/ if JAVA_HOME not set
 
-class_path = "conf:db"
+class_path = "conf;db"
 
 orig_class_path = os.getenv("CLASSPATH")
 if orig_class_path != None:
-  class_path += ":%s" % orig_class_path
+  class_path += ";%s" % orig_class_path
 if java_home != None:
-  class_path += ":%s" % java_home
+  class_path += ";%s" % java_home
 
 for fn in os.listdir(lib_dir):
   if fn.startswith("."):
     continue
   if fn.lower().endswith(".jar"):
-    class_path += ":lib/%s" % fn
+    class_path += ";../lib/%s" % fn
 
-class_path += ":bin/nova-%s.jar" % nova_ver
+class_path += ";nova-%s.jar" % nova_ver
 
 # create dirs if necessary
 for dir_name in ["log", "run"]:
@@ -74,11 +74,9 @@ for dir_name in ["log", "run"]:
   if os.path.exists(dir_path) == False:
     os.makedirs(dir_path)
 
-os.system(
-"""
-cd %s
-java -server -classpath "%s" %s
-""" % (nova_home, class_path, nova_module)
-)
-
+os.system("""java -server -classpath "%s" %s""" % (class_path, nova_module))
+#print "nova_home:%s" % nova_home
+#print "class_path:%s" % class_path
+#print "nova_module:%s" % nova_module
+print "++++++++++++++++++++++++++++++++++++"
 
