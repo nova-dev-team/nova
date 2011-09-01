@@ -64,9 +64,9 @@ for fn in os.listdir(lib_dir):
   if fn.startswith("."):
     continue
   if fn.lower().endswith(".jar"):
-    class_path += ";../lib/%s" % fn
+    class_path += ";lib/%s" % fn
 
-class_path += ";nova-%s.jar" % nova_ver
+class_path += ";bin/nova-%s.jar" % nova_ver
 
 # create dirs if necessary
 for dir_name in ["log", "run"]:
@@ -74,6 +74,7 @@ for dir_name in ["log", "run"]:
   if os.path.exists(dir_path) == False:
     os.makedirs(dir_path)
 
+os.system("cd %s" % (nova_home))
 os.system("""java -server -classpath "%s" %s""" % (class_path, nova_module))
 #print "nova_home:%s" % nova_home
 #print "class_path:%s" % class_path
