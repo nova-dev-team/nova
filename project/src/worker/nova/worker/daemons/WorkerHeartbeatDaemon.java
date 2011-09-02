@@ -27,6 +27,8 @@ public class WorkerHeartbeatDaemon extends SimpleDaemon {
 			MasterProxy master = NovaWorker.getInstance().getMaster();
 			if (master != null) {
 				master.sendPnodeHeartbeat();
+				System.out
+						.println("**********************************************************");
 			}
 		}
 	}
