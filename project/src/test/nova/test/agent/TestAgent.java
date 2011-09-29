@@ -113,6 +113,5 @@ public class TestAgent {
 		for (Appliance app : appliances.values()) {
 			System.out.println(app.toString());
 		}
-
 	}
 }
