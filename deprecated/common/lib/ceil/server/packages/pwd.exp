@@ -1,9 +1,0 @@
-set username [lindex $argv 0]
-set new [lindex $argv 1]
-
-spawn passwd $username
-expect "*Enter*"
-send "$new\n"
-expect "*Retype*"
-send "$new\n"
-expect eof
