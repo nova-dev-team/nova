@@ -125,6 +125,9 @@ public class NovaMaster extends SimpleServer {
 			daemon.start();
 		}
 		logger.info("All deamons started");
+
+		// start FTP Server added by gaotao
+		NovaStorage.getInstance().startFtpServer();
 		return chnl;
 	}
 
@@ -151,6 +154,8 @@ public class NovaMaster extends SimpleServer {
 		// TODO @zhaoxun more cleanup work
 		HibernateUtil.shutdown();
 
+		// stop FTP Server added by gaotao
+		NovaStorage.getInstance().shutdown();
 		NovaMaster.instance = null;
 	}
 
@@ -228,8 +233,5 @@ public class NovaMaster extends SimpleServer {
 		});
 
 		NovaMaster.getInstance().start();
-		// start FTP Server added by gaotao
-		NovaStorage.getInstance().startFtpServer();
-
 	}
 }

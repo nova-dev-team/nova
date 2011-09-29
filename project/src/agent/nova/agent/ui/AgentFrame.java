@@ -1,10 +1,19 @@
 package nova.agent.ui;
 
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -22,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -55,6 +65,9 @@ public class AgentFrame extends JFrame {
 			.getAppliances();
 	public static JLabel statusInfo = new JLabel("Download process"); // 安装状态条
 	public static JProgressBar downProcess = new JProgressBar(); // 安装进度条
+
+	public TrayIcon trayIcon;// 托盘图标，但不是Image类型的
+	public SystemTray Tray;// 系统托盘
 
 	/**
 	 * Change the percent of down
@@ -95,8 +108,8 @@ public class AgentFrame extends JFrame {
 	}
 
 	public AgentFrame() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(null);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setLayout(null);
 		for (Appliance app : apps.values())
 			listModel.addElement(app.getName());
 		JScrollPane softInfoPane = new JScrollPane(softInfo);
@@ -109,24 +122,24 @@ public class AgentFrame extends JFrame {
 		downProcess.setBounds(250, 520, 100, 20);
 		install.setBounds(470, 520, 80, 20);
 
-		add(softList);
-		add(picture);
-		add(softInfoPane);
-		add(statusInfo);
-		add(downProcess);
-		add(install);
+		this.add(softList);
+		this.add(picture);
+		this.add(softInfoPane);
+		this.add(statusInfo);
+		this.add(downProcess);
+		this.add(install);
 		picture.setVisible(true);
 		downProcess.setVisible(false);
-		setResizable(false);
+		this.setResizable(false);
 		// 居中显示
-		setSize(600, 600);
+		this.setSize(600, 600);
 		double width = Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 		double height = Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-		setLocation((int) (width - this.getWidth()) / 2,
+		this.setLocation((int) (width - this.getWidth()) / 2,
 				(int) (height - this.getHeight()) / 2);
 		// show();
 
-		setVisible(true);
+		this.setVisible(false);
 		// setResizable(false);
 
 		// 下载并安装一个所选软件
@@ -181,6 +194,65 @@ public class AgentFrame extends JFrame {
 				}
 			}
 		});
+
+		// Create system tray icon
+		Tray = SystemTray.getSystemTray();// 获得系统托盘实例
+		// 创建系统托盘的右键弹出菜单
+		PopupMenu pm = new PopupMenu();
+		MenuItem mi0 = new MenuItem("Open");
+		MenuItem mi1 = new MenuItem("Close");
+		pm.add(mi0);
+		pm.add(mi1);
+
+		String trayIconPath = Conf.getString("agent.software.trayicon_path");
+		Image img = (new ImageIcon(
+				Utils.pathJoin(Utils.NOVA_HOME, trayIconPath))).getImage();// 托盘图标，建议使用较小的图片
+
+		trayIcon = new TrayIcon(img, "", pm);// 创建托盘图标实例
+		trayIcon.setImageAutoSize(true);// 图标自动适应托盘，也就是说它自动改变大小
+		trayIcon.setToolTip("SoftWare");// 设置提示语
+		try {
+			Tray.add(trayIcon);
+		} catch (AWTException e1) {
+			e1.printStackTrace();
+		}
+
+		this.addWindowListener(new WindowAdapter() {// 当“关闭”窗口时，同时关闭系统托盘图标
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+				Tray.remove(trayIcon);
+			}
+		});
+		this.addWindowListener(new WindowAdapter() {// 当“关闭”窗口时，同时关闭系统托盘图标
+			public void windowIconified(WindowEvent e) {
+				AgentFrame.instance.setVisible(false);
+			}
+		});
+
+		mi0.addActionListener(new ActionListener() { // 右键弹出菜单的事件监听
+			public void actionPerformed(ActionEvent e) {
+				AgentFrame.instance.setExtendedState(JFrame.NORMAL);
+				AgentFrame.instance.setVisible(true);
+			}
+		});
+
+		mi1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				AgentFrame.instance.setVisible(false);
+				Tray.remove(trayIcon);// 退出程序，移出系统托盘处的图标
+			}
+		});
+
+		trayIcon.addMouseListener(new MouseAdapter() {// 单击鼠标左键，也是显示窗口
+			public void mouseClicked(MouseEvent e) {
+				if (SwingUtilities.isLeftMouseButton(e)) {// 如果点击的是鼠标左键
+					AgentFrame.instance.setExtendedState(JFrame.NORMAL);
+					AgentFrame.instance.setVisible(true);
+					// Tray.remove(trayIcon);
+				}
+			}
+		});
+
 	}
 
 	/**
@@ -227,13 +299,41 @@ public class AgentFrame extends JFrame {
 		return AgentFrame.instance;
 	}
 
+	// TODO Add this to img and implement on per-user installation
 	/**
-	 * Start AgentFrame.
+	 * Start AgentFrame and run in back.
 	 * 
 	 * @return
 	 */
 	public void autoStart() {
-		AgentFrame.getInstance().setVisible(false);
+		if (AgentFrame.instance == null) {
+			AgentFrame.instance = new AgentFrame();
+		}
+		logger.info("AgentFrame has started and run in the back!");
+	}
+
+	/**
+	 * Start AgentFrame by user.
+	 * 
+	 * @return
+	 */
+	public void userStart() {
+		if (AgentFrame.instance == null) {
+			AgentFrame.instance = new AgentFrame();
+		}
+		AgentFrame.instance.setVisible(true);
+	}
+
+	/**
+	 * Shutdown one AgentFrame
+	 */
+	public void shutdown() {
+		logger.info("Shutting down AgentFrame");
+		if (AgentFrame.instance != null) {
+			AgentFrame.instance.setVisible(false);
+			Tray.remove(trayIcon);
+		}
+		AgentFrame.instance = null;
 	}
 
 }

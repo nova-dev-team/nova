@@ -144,6 +144,8 @@ public class NovaAgent extends SimpleServer {
 		logger.info("All deamons stopped");
 		super.shutdown();
 		this.addr = null;
+
+		// AgentFrame.getInstance().shutdown();
 		NovaAgent.instance = null;
 	}
 
