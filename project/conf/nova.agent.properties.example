@@ -39,3 +39,6 @@ agent.software.save_path=data/agent/appliances
 # the iso path
 agent.iso.save_path=E:/
 
+#where to get the trayicon picture
+agent.software.trayicon_path=data/agent/pictures/demo1.jpg
+
