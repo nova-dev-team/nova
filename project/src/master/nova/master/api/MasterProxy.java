@@ -2,22 +2,30 @@ package nova.master.api;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.UUID;
 
 import nova.agent.appliance.Appliance;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.AgentHeartbeatMessage;
-import nova.common.service.message.PerfMessage;
+import nova.common.service.message.AgentPerfMessage;
 import nova.common.service.message.PnodeHeartbeatMessage;
+import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
+import nova.master.api.messages.DeletePnodeMessage;
+import nova.master.api.messages.DeleteVclusterMessage;
+import nova.master.api.messages.DeleteVnodeMessage;
+import nova.master.api.messages.MasterInstallApplianceMessage;
+import nova.master.api.messages.MasterMigrateCompleteMessage;
+import nova.master.api.messages.MasterMigrateVnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
+import nova.master.api.messages.UnregisterApplianceMessage;
+import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vnode;
@@ -56,8 +64,12 @@ public class MasterProxy extends SimpleProxy {
 	/**
 	 * Send a monitor info to master node.
 	 */
-	public void sendMonitorInfo() {
-		super.sendRequest(new PerfMessage());
+	public void sendPnodeMonitorInfo() {
+		super.sendRequest(new PnodePerfMessage());
+	}
+
+	public void sendVnodeMonitorInfo() {
+		super.sendRequest(new AgentPerfMessage());
 	}
 
 	public void sendAddPnode(SimpleAddress pAddr) {
@@ -65,9 +77,9 @@ public class MasterProxy extends SimpleProxy {
 	}
 
 	public void sendCreateVnode(String vmImage, String vmName, int cpuCount,
-			int memorySize, String applianceList) {
+			int memorySize, String applianceList, int pnodeId, int ipOffset) {
 		super.sendRequest(new CreateVnodeMessage(vmImage, vmName, cpuCount,
-				memorySize, applianceList));
+				memorySize, applianceList, pnodeId, ipOffset));
 	}
 
 	public void sendCreateVcluster(String vclusterName, int vclusterSize) {
@@ -90,13 +102,46 @@ public class MasterProxy extends SimpleProxy {
 		super.sendRequest(new PnodeStatusMessage(pAddr, status));
 	}
 
-	public void sendVnodeStatus(UUID uuid, Vnode.Status status) {
-		super.sendRequest(new VnodeStatusMessage(uuid, status));
+	public void sendVnodeStatus(String vnodeIp, String uuid, Vnode.Status status) {
+		super.sendRequest(new VnodeStatusMessage(vnodeIp, uuid, status));
 	}
 
 	public void sendApplianceStatus(Collection<Appliance> appliances) {
 		super.sendRequest(new ApplianceInfoMessage((Appliance[]) appliances
 				.toArray()));
+	}
+
+	public void sendDeletePnode(long id) {
+		super.sendRequest(new DeletePnodeMessage(id));
+	}
+
+	public void sendDeleteVnode(long id) {
+		super.sendRequest(new DeleteVnodeMessage(id));
+	}
+
+	public void sendDeleteVcluster(long id) {
+		super.sendRequest(new DeleteVclusterMessage(id));
+	}
+
+	public void sendUnregisterAppliance(long id) {
+		super.sendRequest(new UnregisterApplianceMessage(id));
+	}
+
+	public void sendUnregisterVdisk(long id) {
+		super.sendRequest(new UnregisterVdiskMessage(id));
+	}
+
+	public void sendInstallAppliance(long aid, String[] appNames) {
+		super.sendRequest(new MasterInstallApplianceMessage(aid, appNames));
+	}
+
+	public void sendMigrateVnode(long vnodeId, long migrateFrom, long migrateTo) {
+		super.sendRequest(new MasterMigrateVnodeMessage(vnodeId, migrateFrom,
+				migrateTo));
+	}
+
+	public void sendMigrateComplete(String migrateUuid) {
+		super.sendRequest(new MasterMigrateCompleteMessage(migrateUuid));
 	}
 
 }

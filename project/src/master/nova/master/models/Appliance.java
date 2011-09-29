@@ -20,7 +20,7 @@ public class Appliance extends DbObject {
 		for (DbObject obj : getManager().all()) {
 			all.add((Appliance) obj);
 		}
-		return null;
+		return all;
 	}
 
 	public static void delete(Appliance appliance) {
@@ -128,7 +128,7 @@ public class Appliance extends DbObject {
 	public String toString() {
 		return Utils
 				.expandTemplate(
-						"Appliance @ display_name = '${displayName}', file_name = '${fileName}', os_family = '${osFamily}'",
+						"Appliance @ display_name = '${displayName}', id = '${id}' , file_name = '${fileName}', os_family = '${osFamily}'",
 						this);
 
 	}

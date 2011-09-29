@@ -1,19 +1,18 @@
 package nova.worker.handler;
 
-import java.io.File;
 import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Utils;
 import nova.master.models.Vnode;
+import nova.worker.NovaWorker;
 import nova.worker.api.messages.StopVnodeMessage;
 import nova.worker.daemons.VnodeStatusDaemon;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
-import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
@@ -40,16 +39,14 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 			// TODO @shayf get correct xen service address
 			virtService = "some xen address";
 		}
-		Connect conn = null;
-		try {
-			// connect the qemu system
-			conn = new Connect(virtService, false);
-		} catch (LibvirtException ex) {
-			log.error("Error connecting " + virtService, ex);
-		}
 
 		try {
-			Domain dom = conn.domainLookupByUUIDString(msg.getUuid());
+			Domain dom = null;
+			synchronized (NovaWorker.getInstance().getConnLock()) {
+				dom = NovaWorker.getInstance().getConn(virtService, false)
+						.domainLookupByUUIDString(msg.getUuid());
+				// NovaWorker.getInstance().closeConnectToKvm();
+			}
 			if (dom == null) {
 				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
 						Vnode.Status.CONNECT_FAILURE);
@@ -64,9 +61,11 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 				dom.destroy();
 				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
 						Vnode.Status.SHUT_OFF);
+				NovaWorker.getInstance().getVnodeIP()
+						.remove(UUID.fromString(msg.getUuid()));
 				System.out.println("delete path = "
 						+ Utils.pathJoin(Utils.NOVA_HOME, "run", name));
-				delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
+				Utils.delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
 			} else {
 				dom.suspend();
 				VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
@@ -79,37 +78,4 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 
 	}
 
-	private void delAllFile(String path) {
-		File file = new File(path);
-		if (!file.exists()) {
-			return;
-		}
-		if (!file.isDirectory()) {
-			return;
-		}
-		String[] tempList = file.list();
-		File temp = null;
-		for (int i = 0; i < tempList.length; i++) {
-			temp = new File(Utils.pathJoin(path, tempList[i]));
-			if (temp.isFile()) {
-				temp.delete();
-			}
-			if (temp.isDirectory()) {
-				delAllFile(Utils.pathJoin(path, tempList[i]));
-				delFolder(Utils.pathJoin(path, tempList[i]));
-			}
-		}
-		delFolder(path);
-		return;
-	}
-
-	private void delFolder(String folderPath) {
-		try {
-			java.io.File myFilePath = new java.io.File(folderPath);
-			myFilePath.delete();
-		} catch (Exception e) {
-			log.error("del folder " + folderPath + " error", e);
-		}
-
-	}
 }

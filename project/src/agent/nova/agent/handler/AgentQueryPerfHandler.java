@@ -32,7 +32,7 @@ public class AgentQueryPerfHandler implements SimpleHandler<QueryPerfMessage> {
 			proxy = NovaAgent.getInstance().getMaster();
 		}
 		if (proxy != null) {
-			proxy.sendMonitorInfo();
+			proxy.sendVnodeMonitorInfo();
 		}
 
 	}

@@ -78,6 +78,7 @@ public class Conf extends Properties {
 		if (conf.containsKey(key)) {
 			return conf.get(key).toString();
 		} else {
+			logger.warn("Conf for '" + key + "' not found! (type: string)");
 			return null;
 		}
 	}
@@ -96,6 +97,7 @@ public class Conf extends Properties {
 		if (conf.containsKey(key)) {
 			return Integer.parseInt(conf.get(key).toString());
 		} else {
+			logger.warn("Conf for '" + key + "' not found! (type: integer)");
 			return null;
 		}
 	}

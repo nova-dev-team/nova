@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class TestRevokeImage {
 	@Test
-	public void test() {
+	public void mytest() {
 		RevokeImageHandler rih = new RevokeImageHandler();
 		RevokeImageMessage rim = new RevokeImageMessage("del.img");
 		ChannelHandlerContext ctx = null;

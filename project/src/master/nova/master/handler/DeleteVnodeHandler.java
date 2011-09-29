@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Conf;
 import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vnode;
@@ -26,9 +27,13 @@ public class DeleteVnodeHandler implements SimpleHandler<DeleteVnodeMessage> {
 		// TODO Auto-generated method stub
 		Vnode vnode = Vnode.findById(msg.id);
 		if (vnode != null) {
-			WorkerProxy wp = new WorkerProxy(new SimpleAddress("", 3000));
-			wp.connect(new InetSocketAddress(Pnode.findById(msg.id).getIp(),
-					Pnode.findById(msg.id).getPort()));
+			WorkerProxy wp = new WorkerProxy(new SimpleAddress(
+					Conf.getString("master.bind_host"),
+					Conf.getInteger("master.bind_port")));
+			wp.connect(new InetSocketAddress(Pnode.findById(
+					vnode.getPmachineId()).getIp(), Pnode.findById(
+					vnode.getPmachineId()).getPort()));
+			// System.out.println(Pnode.findById(vnode.getPmachineId()).getIp());
 			wp.sendStopVnode("kvm", vnode.getUuid());
 			log.info("Delete vnode: " + vnode.getName());
 			Vnode.delete(vnode);

@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
+import nova.common.util.Utils;
 import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
@@ -25,14 +26,17 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 	@Override
 	public void handleMessage(CreateVnodeMessage msg,
 			ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
+
 		// TODO Auto-generated method stub
 		Vcluster vcluster = new Vcluster();
 		for (Vcluster vc : Vcluster.all()) {
 			vcluster = vc;
 		}
-		SimpleAddress vAddr = new SimpleAddress(vcluster.getFristIp(), 4000);
+		SimpleAddress vAddr = new SimpleAddress(Utils.integerToIpv4((Utils
+				.ipv4ToInteger(vcluster.getFristIp()) + msg.ipOffset)),
+				Conf.getInteger("worker.bind_port"));
 
-		int pid = 1;
+		int pid = msg.pnodeId;
 
 		Vnode vnode = new Vnode();
 		vnode.setAddr(vAddr);
@@ -43,6 +47,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 		vnode.setSoftList(msg.applianceList);
 		vnode.setCdrom(msg.vmImage);
 		vnode.setStatus(Vnode.Status.PREPARING);
+		System.out
+				.println("======================================================================================================");
 		vnode.save();
 		log.info("Created new vnode: " + vnode.getIp());
 
@@ -53,37 +59,21 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 				Conf.getInteger("master.bind_port")));
 
 		// @ zhaoxun to do...
-		wp.connect(new InetSocketAddress(Conf.getString("worker.bind_host"),
-				Conf.getInteger("worker.bind_port")));
+		wp.connect(new InetSocketAddress(pnode.getIp(), Conf
+				.getInteger("worker.bind_port")));
 		/*
 		 * System.out.println("kvm" + vAddr + "true" +
 		 * String.valueOf(msg.memorySize) + String.valueOf(msg.cpuCount) +
 		 * msg.vmImage + "false");
 		 */
-		wp.sendStartVnode("kvm", msg.vmName, vAddr, "false",
+		// TODO @zhaoxun pass the correct params
+		String apps[] = { "demo_appliance" };
+		String ipAddr = vAddr.getIp();
+		String subnetMask = Conf.getString("vnode.subnet_mask");
+		String gateWay = Conf.getString("vnode.gateway_ip");
+		// System.out.println();
+		wp.sendStartVnode("kvm", msg.vmName, vAddr,
 				String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
-				msg.vmImage, "false");
-
-		/**
-		 * ArrayList<Pair<String, String>> appList = new ArrayList<Pair<String,
-		 * String>>(); Pair<String, String> pair = new Pair<String, String>();
-		 * for (Appliance appliance : Appliance.all()) {
-		 * pair.setFirst(appliance.getDisplayName());
-		 * pair.setSecond(appliance.getDescription()); appList.add(pair); }
-		 * 
-		 * @SuppressWarnings("unchecked") Pair<String, String>[] apps = new
-		 *                                Pair[appList.size()]; for (int i = 0;
-		 *                                i < appList.size(); i++) { apps[i] =
-		 *                                appList.get(i); }
-		 * 
-		 *                                AgentProxy ap = new AgentProxy(new
-		 *                                SimpleAddress(
-		 *                                Conf.getString("master.bind_host"),
-		 *                                Conf.getInteger("master.bind_port")));
-		 *                                ap.connect(new
-		 *                                InetSocketAddress(vAddr.ip, Conf
-		 *                                .getInteger("agent.bind_port")));
-		 *                                ap.sendApplianceList(apps);
-		 */
+				msg.vmImage, true, apps, ipAddr, subnetMask, gateWay);
 	}
 }

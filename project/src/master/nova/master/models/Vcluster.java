@@ -203,7 +203,7 @@ public class Vcluster extends DbObject {
 	public String toString() {
 		return Utils
 				.expandTemplate(
-						"{Vcluster @ cluster_name='${clusterName}', cluster_size='${clusterSize}', first_ip='${fristIp}'}",
+						"{Vcluster @ cluster_name='${clusterName}', id='${id}',cluster_size='${clusterSize}', first_ip='${fristIp}'}",
 						this);
 	}
 

@@ -8,10 +8,13 @@ import nova.common.service.SimpleHandler;
 import nova.common.util.Utils;
 import nova.worker.api.messages.RevokeImageMessage;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 public class RevokeImageHandler implements SimpleHandler<RevokeImageMessage> {
+
+	Logger log = Logger.getLogger(RevokeImageHandler.class);
 
 	@Override
 	public void handleMessage(RevokeImageMessage msg,
@@ -22,8 +25,9 @@ public class RevokeImageHandler implements SimpleHandler<RevokeImageMessage> {
 			try {
 				revokeFile.createNewFile();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				log.error(
+						"create revokeFile " + revokeFile.getName() + " fail",
+						e1);
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
+import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.CreateVclusterMessage;
@@ -15,12 +16,14 @@ import nova.master.api.messages.DeletePnodeMessage;
 import nova.master.api.messages.DeleteVclusterMessage;
 import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.api.messages.MasterInstallApplianceMessage;
+import nova.master.api.messages.MasterMigrateVnodeMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.UnregisterApplianceMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
+import nova.master.models.Vnode;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -76,7 +79,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
 		URL url = null;
 		try {
-			url = new URL("http://10.0.1.240:3000" + req.getUri());
+			url = new URL("http://127.0.0.1:3000" + req.getUri());
 		} catch (MalformedURLException e) {
 			log.error(e);
 		}
@@ -91,9 +94,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 			System.out.println(act);
 			if (act.equals("add_pnode")) {
 				// System.out.println(111);
-				new AddPnodeHandler().handleMessage(new AddPnodeMessage(
-						new SimpleAddress(queryMap.get("pnode_ip"), 4000)),
-						null, null, null);
+				new AddPnodeHandler().handleMessage(
+						new AddPnodeMessage(new SimpleAddress(queryMap
+								.get("pnode_ip"), Conf
+								.getInteger("worker.bind_port"))), null, null,
+						null);
 				// System.out.println(222);
 				// values.put("pnode_ip", "ip:" + queryMap.get("pnode_ip"));
 			} else if (act.equals("register_vdisk")) {
@@ -112,13 +117,19 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 										.get("os_family"), queryMap
 										.get("description")), null, null, null);
 			} else if (act.equals("create_vnode")) {
-				new CreateVnodeHandler().handleMessage(
-						new CreateVnodeMessage(queryMap.get("vnode_image"),
-								queryMap.get("vnode_name"), Integer
+				int j = 0;
+				new CreateVnodeHandler()
+						.handleMessage(
+								new CreateVnodeMessage(queryMap
+										.get("vnode_image"), queryMap
+										.get("vnode_name"), Integer
 										.parseInt(queryMap.get("cpu_count")),
-								Integer.parseInt(queryMap.get("memory_size")),
-								queryMap.get("appliance_list")), null, null,
-						null);
+										Integer.parseInt(queryMap
+												.get("memory_size")), queryMap
+												.get("appliance_list"), Integer
+												.parseInt(queryMap
+														.get("pnode_ip")), j),
+								null, null, null);
 			} else if (act.equals("create_vcluster")) {
 
 				String vclusterFrame = "<form action=\"create_vcluster_node\" method=\"get\">";
@@ -142,8 +153,12 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 							+ "<option value=\"4\">4"
 							+ "</select>"
 							+ "Memory Size<input type=\"text\" name=\"memory_size"
-							+ (i + 1) + "\">KB<br>"
+							+ (i + 1)
+							+ "\">KB<br>"
 							+ "Appliance<input type=\"text\" name=\"appliance"
+							+ (i + 1)
+							+ "\"><br>"
+							+ "Pnode Id<input type=\"text\" name=\"pnode_id"
 							+ (i + 1) + "\">";
 				}
 				vclusterFrame += "<input type=\"submit\" value=\"create vnode\">"
@@ -172,7 +187,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 									Integer.parseInt(queryMap.get("memory_size"
 											+ String.valueOf(i + 1))), queryMap
 											.get("appliance_list"
-													+ String.valueOf(i + 1))),
+													+ String.valueOf(i + 1)),
+									Integer.parseInt(queryMap.get("pnode_id"
+											+ String.valueOf(i + 1))), i),
 							null, null, null);
 					/*
 					 * System.out .println(queryMap.get("vnode_image" +
@@ -216,11 +233,18 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 								new MasterInstallApplianceMessage(Long
 										.parseLong(queryMap.get("vnode_id")),
 										appNames), null, null, null);
+			} else if (act.equals("migrate")) {
+				new MasterMigrateVnodeHandler().handleMessage(
+						new MasterMigrateVnodeMessage(Long.parseLong(queryMap
+								.get("vnode_id")), Long.parseLong(queryMap
+								.get("migration_from")), Long
+								.parseLong(queryMap.get("migrate_to"))), null,
+						null, null);
 			}
-
 		}
 
 		values.put("pnode_info", Pnode.all());
+		values.put("vnode_info", Vnode.all());
 		values.put("vcluster_info", Vcluster.all());
 
 		return Utils.expandTemplateFile(fpath, values);
@@ -228,17 +252,21 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 	}
 
 	public static Map<String, String> getQueryMap(String query) {
-		String[] params = query.split("&");
-		Map<String, String> map = new HashMap<String, String>();
-		for (String param : params) {
-			String name = param.split("=")[0];
-			String value = null;
-			if (param.split("=").length > 1) {
-				value = param.split("=")[1];
+		if (query != null) {
+			String[] params = query.split("&");
+			Map<String, String> map = new HashMap<String, String>();
+			for (String param : params) {
+				String name = param.split("=")[0];
+				String value = null;
+				if (param.split("=").length > 1) {
+					value = param.split("=")[1];
+				}
+				map.put(name, value);
 			}
-			map.put(name, value);
+			return map;
+		} else {
+			return null;
 		}
-		return map;
 	}
 
 	public static String getAction(String actFile) {

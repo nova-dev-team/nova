@@ -5,6 +5,8 @@ import java.net.InetSocketAddress;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleProxy;
 import nova.common.service.message.QueryHeartbeatMessage;
+import nova.worker.api.messages.InstallApplianceMessage;
+import nova.worker.api.messages.MigrateVnodeMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
@@ -41,10 +43,6 @@ public class WorkerProxy extends SimpleProxy {
 	 * @param vAddr
 	 *            vnode address
 	 * 
-	 * @param wakeupOnly
-	 *            wakeup from suspend: set "true" ignore case , to create:
-	 *            others
-	 * 
 	 * @param memSize
 	 *            memory size, default 524288
 	 * 
@@ -58,15 +56,24 @@ public class WorkerProxy extends SimpleProxy {
 	 *            if need to run agent, set "true" ignore case
 	 */
 	public void sendStartVnode(String hyperVisor, String name,
-			SimpleAddress vAddr, String wakeupOnly, String memSize,
-			String cpuCount, String hdaImage, String runAgent) {
-		super.sendRequest(new StartVnodeMessage(hyperVisor, name, vAddr,
-				wakeupOnly, memSize, cpuCount, hdaImage, runAgent));
+			SimpleAddress vAddr, String memSize, String cpuCount,
+			String hdaImage, boolean runAgent, String apps[], String ipAddr,
+			String subnetMask, String gateWay) {
+		// 4th param false means wakeuponly = false
+		super.sendRequest(new StartVnodeMessage(hyperVisor, name, vAddr, false,
+				memSize, cpuCount, hdaImage, runAgent, apps, ipAddr,
+				subnetMask, gateWay));
+	}
+
+	public void sendWakeupVnode(String hyperVisor, boolean runAgent,
+			SimpleAddress vAddr) {
+		// 4th param false means wakeuponly = true
+		super.sendRequest(new StartVnodeMessage(hyperVisor, true, runAgent,
+				vAddr));
 	}
 
 	/**
-	 * destroy vm message, default shutdown. same function as
-	 * sendStopVnode(hyperVisor, uuid, false)
+	 * destroy vm message
 	 * 
 	 * author shayf
 	 * 
@@ -76,24 +83,21 @@ public class WorkerProxy extends SimpleProxy {
 	 *            uuid of vm to shut down
 	 */
 	public void sendStopVnode(String hyperVisor, String uuid) {
-		super.sendRequest(new StopVnodeMessage(hyperVisor, uuid));
+		super.sendRequest(new StopVnodeMessage(hyperVisor, uuid, false));
 	}
 
 	/**
-	 * destroy or suspend vm message
+	 * suspend vm message
 	 * 
 	 * author shayf
 	 * 
 	 * @param hyperVisor
 	 *            hypervisor type, use "kvm" or "xen" ignore case
 	 * @param uuid
-	 *            uuid of vm to shut down
-	 * @param suspendOnly
-	 *            "true" suspend, "false" destroy
+	 *            uuid of vm to suspend
 	 */
-	public void sendStopVnode(String hyperVisor, String uuid,
-			boolean suspendOnly) {
-		super.sendRequest(new StopVnodeMessage(hyperVisor, uuid, suspendOnly));
+	public void sendSuspendVnode(String hyperVisor, String uuid) {
+		super.sendRequest(new StopVnodeMessage(hyperVisor, uuid, true));
 	}
 
 	/**
@@ -116,6 +120,14 @@ public class WorkerProxy extends SimpleProxy {
 
 	public void sendRequestVnodeInfo() {
 		super.sendRequest(new QueryVnodeInfoMessage());
+	}
+
+	public void sendInstallAppliance(String[] appNames) {
+		super.sendRequest(new InstallApplianceMessage(appNames));
+	}
+
+	public void sendMigrateVnode(String vnodeUuid, SimpleAddress migrateToAddr) {
+		super.sendRequest(new MigrateVnodeMessage(vnodeUuid, migrateToAddr));
 	}
 
 }

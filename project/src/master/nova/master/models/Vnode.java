@@ -66,6 +66,12 @@ public class Vnode extends DbObject {
 		PAUSED,
 
 		/**
+		 * The vnode is migrating
+		 */
+
+		MIGRATING,
+
+		/**
 		 * The vnode status is not known.
 		 */
 		UNKNOWN,
@@ -91,6 +97,10 @@ public class Vnode extends DbObject {
 
 	public static Vnode findByIp(String ip) {
 		return (Vnode) getManager().findBy("ip", ip);
+	}
+
+	public static Vnode findByUuid(String uuid) {
+		return (Vnode) getManager().findBy("uuid", uuid);
 	}
 
 	public static DbManager getManager() {
@@ -158,6 +168,8 @@ public class Vnode extends DbObject {
 
 	private String uuid;
 	private Integer vclusterId;
+
+	private String agentStatus;
 
 	/** The VNC port for the VM. */
 	private Integer vncPort;
@@ -374,8 +386,16 @@ public class Vnode extends DbObject {
 	public String toString() {
 		return Utils
 				.expandTemplate(
-						"{Vnode @ ${ip}:${port}, vid='${id}', name='${name}', pnode_id='${pnodeId}', cpu_count='${cpuCount}', memory_size='${memorySize}'}",
+						"{Vnode @ ${ip}:${port}, vid='${id}', name='${name}', pnode_id='${pnodeId}', cpu_count='${cpuCount}', memory_size='${memorySize}', uuid = '${uuid}'}",
 						this);
+	}
+
+	public void setAgentStatus(String agentStatus) {
+		this.agentStatus = agentStatus;
+	}
+
+	public String getAgentStatus() {
+		return agentStatus;
 	}
 
 }

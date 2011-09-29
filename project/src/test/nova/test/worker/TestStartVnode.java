@@ -20,27 +20,32 @@ public class TestStartVnode {
 	@Test
 	public void test() {
 		StartVnodeHandler svh = new StartVnodeHandler();
-		StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
-				"false", "100288", "1", "small.img", "false");
+		String apps[] = null;// { "demo_appliance" };
+		// StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
+		// "false", "100288", "1", "small.img", "false");
+		StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu_vm", null,
+				false, "300000", "1", "ubuntu.img", false, apps,
+				"192.168.0.220", "255.255.255.0", "192.168.0.1");
 		// msg.setName("vm");
+		// msg.setMemSize("1024000");
 		msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
-		msg.setCdImage("");
+		msg.setCdImage("agent-cd.iso");
+		msg.setRunAgent(true);
 
 		ChannelHandlerContext ctx = null;
 		MessageEvent e = null;
 		SimpleAddress xreply = null;
 		svh.handleMessage(msg, ctx, e, xreply);
 
-		StartVnodeMessage msg2 = new StartVnodeMessage("KVM", "vm2", null,
-				"false", "100288", "1", "small.img", "false");
-		// msg2.setName("vm2");
-		msg2.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
-		msg2.setCdImage("");
-
-		ChannelHandlerContext ctx2 = null;
-		MessageEvent e2 = null;
-		SimpleAddress xreply2 = null;
-		svh.handleMessage(msg2, ctx2, e2, xreply2);
+		// StartVnodeMessage msg2 = new StartVnodeMessage("KVM", "vm2", null,
+		// "false", "100288", "1", "small.img", "false");
+		// msg2.setUuid("1f7c794b-2e17-45ef-3c55-ece004e76aef");
+		// msg2.setCdImage("");
+		//
+		// ChannelHandlerContext ctx2 = null;
+		// MessageEvent e2 = null;
+		// SimpleAddress xreply2 = null;
+		// svh.handleMessage(msg2, ctx2, e2, xreply2);
 
 		// StartVnodeMessage msg3 = new StartVnodeMessage("kvm", null, "false",
 		// "100288", "1", "small.img", "false");

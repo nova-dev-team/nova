@@ -14,13 +14,13 @@
 <devices>
   <emulator>${emulatorPath}</emulator>
   <disk type='file' device='disk'>
-	<driver name='qemu' type='qcow2'/>
+    <driver name='qemu' type='qcow2'/>
     <source file='${sourceFile}'/>
     <target dev='hda'/>
   </disk>
   ${determinCdrom}
-  ${determinNetwork}  
+  ${determinNetwork}
   <graphics type='vnc' port='-1' listen='0.0.0.0'/>
-    ${determinVnc}
+  ${determinVnc}
 </devices>
 </domain>

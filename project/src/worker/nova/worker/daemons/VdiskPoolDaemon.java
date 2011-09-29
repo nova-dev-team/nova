@@ -1,16 +1,19 @@
 package nova.worker.daemons;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
+import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
-import org.libvirt.Connect;
 import org.libvirt.LibvirtException;
 
 /**
@@ -29,37 +32,17 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		if (!pathFile.exists()) {
 			Utils.mkdirs(pathFile.getAbsolutePath());
 		}
+
 		for (String stdImgFile : pathFile.list()) {
 			File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 					stdImgFile));
-			// System.out.println("tmp.getname() is " + tmp.getName());
-			// System.out.println("tmp.isDirectory() is " + tmp.isDirectory());
-			// System.out.println("tmp.length() is " + tmp.length());
 			if (!tmp.isDirectory()) {
-				// System.out.println("list files " + stdImgFile);
 				for (int i = 1; i <= POOL_SIZE; i++) {
 					VdiskFile tmpVdiskFile = new VdiskFile();
 					tmpVdiskFile.setStatValue(i, stdImgFile);
 					tmpVdiskFile.setLastVisitTime(System.currentTimeMillis());
 					fileStatus.put(stdImgFile + ".pool." + Integer.toString(i),
 							tmpVdiskFile);
-					// System.out.println(stdImgFile
-					// + ".pool."
-					// + Integer.toString(i)
-					// + "\nstatus: "
-					// + fileStatus
-					// .get(stdImgFile + ".pool."
-					// + Integer.toString(i)).getStat()
-					// .toString()
-					// + "\nlen: "
-					// + fileStatus
-					// .get(stdImgFile + ".pool."
-					// + Integer.toString(i)).getLen()
-					// + "\n visittime: "
-					// + fileStatus
-					// .get(stdImgFile + ".pool."
-					// + Integer.toString(i))
-					// .getLastVisitTime());
 				}
 
 			}
@@ -70,6 +53,27 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 		super(2000);
 		fileStatus = new HashMap<String, VdiskFile>();
 		updateFileStatus();
+		File imgfile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+				"small.img"));
+		if (!imgfile.exists()) {
+			Process p;
+			String cmd = "qemu-img create -f qcow2 "
+					+ Utils.pathJoin(Utils.NOVA_HOME, "run", "small.img")
+					+ " 4G";
+			System.out.println(cmd);
+			try {
+				p = Runtime.getRuntime().exec(cmd);
+				InputStream fis = p.getInputStream();
+				InputStreamReader isr = new InputStreamReader(fis);
+				BufferedReader br = new BufferedReader(isr);
+				String line = null;
+				while ((line = br.readLine()) != null) {
+					System.out.println(line);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
 		this.setMbps(1);
 		this.setVmRunning(false);
@@ -80,7 +84,7 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 	 */
 	Logger log = Logger.getLogger(VdiskPoolDaemon.class);
 
-	static int POOL_SIZE = 5;
+	static int POOL_SIZE = 2;
 
 	private long lastCheckIsVmRunningTime;
 	private int mbps;
@@ -91,16 +95,16 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			return this.vmRunning;
 		} else {
 			this.setLastCheckIsVmRunningTime(System.currentTimeMillis());
-			Connect conn = null;
-			conn = new Connect("qemu:///system", true);
-			if (conn.numOfDomains() > 0) {
-				// System.out.println("numofdomains\t"
-				// + Integer.toString(conn.numOfDomains()));
-				conn.close();
-				this.setVmRunning(true);
-			} else {
-				conn.close();
-				this.setVmRunning(false);
+
+			synchronized (NovaWorker.getInstance().getConnLock()) {
+				if (NovaWorker.getInstance().getConn("qemu:///system", false)
+						.numOfDomains() > 0) {
+					// NovaWorker.getInstance().closeConnectToKvm();
+					this.setVmRunning(true);
+				} else {
+					// NovaWorker.getInstance().closeConnectToKvm();
+					this.setVmRunning(false);
+				}
 			}
 			return this.vmRunning;
 		}
@@ -212,23 +216,19 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 				if (fn.endsWith(".revoke")) {
 					prefix = fn.substring(0, fn.length() - 7);
 					found = true;
-					System.out.println("found " + fn);
 					break;
 				}
 			}
 			if (found) {
-				System.out.println("start delete " + prefix);
 				File[] delList = parentPath.listFiles();
 				for (File delfn : delList) {
 					if (delfn.getName().startsWith(prefix)) {
-						System.out.println("del match prefix " + delfn);
 						delfn.delete();
 					}
 				}
 				File[] delList2 = parentPath.getParentFile().listFiles();
 				for (File delfn : delList2) {
 					if (delfn.getName().startsWith(prefix)) {
-						System.out.println("del match prefix " + delfn);
 						delfn.delete();
 					}
 				}
@@ -260,8 +260,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 				break;
 			output.write(b, 0, cnt);
 			if (this.getMbps() > 0) {
-				// System.out.println("low speed copy file" +
-				// tmpFile.getName());
 				bytesCopied += cnt;
 				if (bytesCopied > this.getMbps() * 1024 * 1024) {
 					timeStamp -= System.currentTimeMillis();
@@ -285,8 +283,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 					this.setMbps(0);
 				}
 			} else {
-				// System.out.println("high speed copy file" +
-				// tmpFile.getName());
 				if (this.isVmRunning()) {
 					timeStamp = System.currentTimeMillis();
 					sleepUsec = 1.0;
@@ -306,6 +302,10 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 			return;
 		}
 		final String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "vdiskpool");
+		File vdiskpoolFoder = new File(path);
+		if (!vdiskpoolFoder.exists()) {
+			vdiskpoolFoder.mkdirs();
+		}
 		checkRevoke(path);
 		updateFileStatus();
 		File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
@@ -314,8 +314,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 				File tmp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
 						stdImgFile));
 				if (!tmp.isDirectory()) {
-					// System.out.println("current file is " + tmp.getName());
-					// System.out.println("list files " + stdImgFile);
 					for (int i = POOL_SIZE; i > 0; i--) {
 						if (fileStatus
 								.get(stdImgFile + ".pool."
@@ -326,22 +324,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 											+ Integer.toString(i)).setStat(
 											VdiskFile.Status.LOCKED);
 							try {
-								// System.out
-								// .println("file"
-								// + Utils.pathJoin(
-								// path,
-								// stdImgFile
-								// + ".pool."
-								// + Integer
-								// .toString(i))
-								// + " "
-								// + VdiskFile.Status.NOT_EXIST
-								// .toString());
-								// System.out.println("going to copy file"
-								// + Utils.pathJoin(
-								// path,
-								// stdImgFile + ".pool."
-								// + Integer.toString(i)));
 								String sourceUrl = Utils.pathJoin(
 										Utils.NOVA_HOME, "run", stdImgFile);
 								String destUrl = Utils
@@ -359,9 +341,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 
 								if (tmpFile.length() == sourceFile.length()) {
 									tmpFile.renameTo(destFile);
-									// System.out.println("rename file"
-									// + tmpFile.getName() + " to "
-									// + destFile.getName());
 									fileStatus
 											.get(stdImgFile + ".pool."
 													+ Integer.toString(i))
@@ -399,16 +378,6 @@ public class VdiskPoolDaemon extends SimpleDaemon {
 								.get(stdImgFile + ".pool."
 										+ Integer.toString(i)).getStat()
 								.equals(VdiskFile.Status.LOCKED)) {
-							// System.out
-							// .println("time step:\t"
-							// + Long.toString(System
-							// .currentTimeMillis()
-							// - fileStatus
-							// .get(stdImgFile
-							// + ".pool."
-							// + Integer
-							// .toString(i))
-							// .getLastVisitTime()));
 							if (System.currentTimeMillis()
 									- fileStatus.get(
 											stdImgFile + ".pool."

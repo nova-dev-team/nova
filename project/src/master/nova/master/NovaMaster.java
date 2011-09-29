@@ -6,8 +6,10 @@ import java.util.HashMap;
 import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
-import nova.common.service.message.PerfMessage;
+import nova.common.service.message.AgentHeartbeatMessage;
+import nova.common.service.message.AgentPerfMessage;
 import nova.common.service.message.PnodeHeartbeatMessage;
+import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
@@ -22,15 +24,18 @@ import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.AddPnodeHandler;
 import nova.master.handler.CreateVclusterHandler;
 import nova.master.handler.CreateVnodeHandler;
+import nova.master.handler.MasterAgentHeartbeatHandler;
+import nova.master.handler.MasterAgentPerfHandler;
 import nova.master.handler.MasterHttpHandler;
-import nova.master.handler.MasterPerfHandler;
 import nova.master.handler.MasterPnodeHeartbeatHandler;
+import nova.master.handler.MasterPnodePerfHandler;
 import nova.master.handler.MasterVnodeHeartbeatHandler;
 import nova.master.handler.PnodeStatusHandler;
 import nova.master.handler.RegisterApplianceHandler;
 import nova.master.handler.RegisterVdiskHandler;
 import nova.master.handler.VnodeStatusHandler;
 import nova.master.models.Pnode;
+import nova.storage.NovaStorage;
 import nova.worker.api.WorkerProxy;
 
 import org.apache.log4j.Logger;
@@ -73,6 +78,9 @@ public class NovaMaster extends SimpleServer {
 		this.registerHandler(VnodeHeartbeatMessage.class,
 				new MasterVnodeHeartbeatHandler());
 
+		this.registerHandler(AgentHeartbeatMessage.class,
+				new MasterAgentHeartbeatHandler());
+
 		this.registerHandler(AddPnodeMessage.class, new AddPnodeHandler());
 
 		this.registerHandler(CreateVnodeMessage.class, new CreateVnodeHandler());
@@ -90,7 +98,11 @@ public class NovaMaster extends SimpleServer {
 
 		this.registerHandler(VnodeStatusMessage.class, new VnodeStatusHandler());
 
-		this.registerHandler(PerfMessage.class, new MasterPerfHandler());
+		this.registerHandler(PnodePerfMessage.class,
+				new MasterPnodePerfHandler());
+
+		this.registerHandler(AgentPerfMessage.class,
+				new MasterAgentPerfHandler());
 
 		Conf.setDefaultValue("master.bind_host", "0.0.0.0");
 		Conf.setDefaultValue("master.bind_port", 3000);
@@ -216,6 +228,8 @@ public class NovaMaster extends SimpleServer {
 		});
 
 		NovaMaster.getInstance().start();
+		// start FTP Server added by gaotao
+		NovaStorage.getInstance().startFtpServer();
 
 	}
 }

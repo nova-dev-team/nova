@@ -38,6 +38,8 @@
 		<property name="migrateFrom" column="migrate_from" type="string"></property> 
 		<property name="migrateTo" column="migrate_to" type="string"></property>
 		
+		<property name="agentStatus" column="agent_status" type="string"></property>
+		
 		<property name="schedTo" column="sched_to" type="string"></property>
 
 	</class>

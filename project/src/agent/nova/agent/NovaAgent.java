@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import nova.agent.api.messages.ApplianceListMessage;
 import nova.agent.api.messages.InstallApplianceMessage;
 import nova.agent.api.messages.QueryApplianceStatusMessage;
 import nova.agent.appliance.Appliance;
@@ -22,8 +23,10 @@ import nova.agent.daemons.ApplianceDownloadDaemon;
 import nova.agent.daemons.ApplianceInstallDaemon;
 import nova.agent.handler.AgentQueryHeartbeatHandler;
 import nova.agent.handler.AgentQueryPerfHandler;
+import nova.agent.handler.ApplianceListHandler;
 import nova.agent.handler.InstallApplianceHandler;
 import nova.agent.handler.QueryApplianceStatusHandler;
+import nova.agent.ui.AgentFrame;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
@@ -96,10 +99,12 @@ public class NovaAgent extends SimpleServer {
 				new QueryApplianceStatusHandler());
 		registerHandler(InstallApplianceMessage.class,
 				new InstallApplianceHandler());
+		registerHandler(ApplianceListMessage.class, new ApplianceListHandler());
 
-		// TODO add master register
-		// SimpleAddress masterAddress = new SimpleAddress("10.0.1.242", 3000);
-		// registerMaster(masterAddress);
+		SimpleAddress masterAddress = new SimpleAddress(
+				Conf.getString("master.bind_host"),
+				Conf.getInteger("master.bind_port"));
+		registerMaster(masterAddress);
 	}
 
 	public SimpleAddress getAddr() {
@@ -113,6 +118,9 @@ public class NovaAgent extends SimpleServer {
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
 		}
+
+		NovaAgent.getInstance().loadAppliances();
+		AgentFrame.getInstance().autoStart(); // start download ui
 		return chnl;
 	}
 
@@ -251,10 +259,10 @@ public class NovaAgent extends SimpleServer {
 	private void localInitial() {
 
 		String save_path = Conf.getString("agent.software.save_path");
-		String image_path = Conf.getString("agent.software.image_path");
+		String picture_path = Conf.getString("agent.software.picture_path");
 
 		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, save_path));
-		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, image_path));
+		Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, picture_path));
 		File appsJsonFile = new File(Utils.pathJoin(Utils.NOVA_HOME, save_path,
 				"apps.json"));
 		if (!appsJsonFile.exists()) {
@@ -276,17 +284,17 @@ public class NovaAgent extends SimpleServer {
 				String userName = Conf.getString("agent.ftp.user_name");
 				String password = Conf.getString("agent.ftp.password");
 				String savePath = Utils.pathJoin(Utils.NOVA_HOME,
-						Conf.getString("agent.software.image_path"));
+						Conf.getString("agent.software.picture_path"));
 				try {
 					FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName,
 							password);
-					FtpUtils.downloadDir(fc, "/images/",
+					FtpUtils.downloadDir(fc, "/pictures/",
 							Utils.pathJoin(savePath));
 
-					logger.info("Have downloaded images from server!");
+					logger.info("Have downloaded pictures from server!");
 
 				} catch (IOException e) {
-					logger.error("Downloading images fail: ", e);
+					logger.error("Downloading pictures fail: ", e);
 				}
 
 			}

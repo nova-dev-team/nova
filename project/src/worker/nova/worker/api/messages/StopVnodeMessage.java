@@ -8,9 +8,9 @@ package nova.worker.api.messages;
  */
 public class StopVnodeMessage {
 
-	public String hyperVisor;
-	public String uuid;
-	public boolean suspendOnly;
+	String hyperVisor;
+	String uuid;
+	boolean suspendOnly;
 
 	public boolean isSuspendOnly() {
 		return suspendOnly;
@@ -34,6 +34,9 @@ public class StopVnodeMessage {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+
+	public StopVnodeMessage() {
 	}
 
 	public StopVnodeMessage(String hyperVisor, String uuid) {

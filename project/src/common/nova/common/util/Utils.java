@@ -2,6 +2,9 @@ package nova.common.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -389,6 +392,153 @@ public class Utils {
 		return String.valueOf(params[0]) + "." + String.valueOf(params[1])
 				+ "." + String.valueOf(params[2]) + "."
 				+ String.valueOf(params[3]);
+	}
+
+	/**
+	 * copy folder
+	 */
+	public static void copy(String srcFile, String dstFile) {
+		File in = new File(srcFile);
+		File out = new File(dstFile);
+		if (!in.exists()) {
+			System.out.println(in.getAbsolutePath() + "源文件路径错误！！！");
+			return;
+		}
+
+		if (!out.exists())
+			out.mkdirs();
+		File[] file = in.listFiles();
+		FileInputStream fin = null;
+		FileOutputStream fout = null;
+		for (int i = 0; i < file.length; i++) {
+			if (file[i].isFile()) {
+				try {
+					fin = new FileInputStream(file[i]);
+				} catch (FileNotFoundException e) {
+					logger.error("file " + file[i].getName() + " not found ", e);
+				}
+
+				try {
+					fout = new FileOutputStream(new File(dstFile + "/"
+							+ file[i].getName()));
+				} catch (FileNotFoundException e) {
+					logger.error("file " + file[i].getName() + " not found ", e);
+				}
+				int c;
+				byte[] b = new byte[1024 * 5];
+				try {
+					while ((c = fin.read(b)) != -1) {
+						fout.write(b, 0, c);
+					}
+					fin.close();
+					fout.flush();
+					fout.close();
+				} catch (IOException e) {
+					logger.error("copy file error", e);
+				}
+			} else {
+				copy(Utils.pathJoin(srcFile, file[i].getName()),
+						Utils.pathJoin(dstFile, file[i].getName()));
+			}
+		}
+	}
+
+	/**
+	 * copy folder with ignore list
+	 */
+	public static void copyWithIgnore(String srcFile, String dstFile,
+			String[] ignoreList) {
+		File in = new File(srcFile);
+		File out = new File(dstFile);
+		if (!in.exists()) {
+			System.out.println(in.getAbsolutePath() + "源文件路径错误！！！");
+			return;
+		}
+
+		if (!out.exists())
+			out.mkdirs();
+		File[] file = in.listFiles();
+		FileInputStream fin = null;
+		FileOutputStream fout = null;
+		for (int i = 0; i < file.length; i++) {
+			if (!isInclude(ignoreList, file[i].getName())) {
+				if (file[i].isFile()) {
+					try {
+						fin = new FileInputStream(file[i]);
+					} catch (FileNotFoundException e) {
+						logger.error("file " + file[i].getName()
+								+ " not found ", e);
+					}
+
+					try {
+						fout = new FileOutputStream(new File(dstFile + "/"
+								+ file[i].getName()));
+					} catch (FileNotFoundException e) {
+						logger.error("file " + file[i].getName()
+								+ " not found ", e);
+					}
+					int c;
+					byte[] b = new byte[1024 * 5];
+					try {
+						while ((c = fin.read(b)) != -1) {
+							fout.write(b, 0, c);
+						}
+						fin.close();
+						fout.flush();
+						fout.close();
+					} catch (IOException e) {
+						logger.error("copy file error", e);
+					}
+				} else {
+					copyWithIgnore(Utils.pathJoin(srcFile, file[i].getName()),
+							Utils.pathJoin(dstFile, file[i].getName()),
+							ignoreList);
+				}
+			}
+		}
+	}
+
+	private static boolean isInclude(String[] names, String name) {
+		for (String s : names) {
+			if (name.equalsIgnoreCase(s)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void delAllFile(String path) {
+		File file = new File(path);
+		if (!file.exists()) {
+			return;
+		}
+		if (!file.isDirectory()) {
+			return;
+		}
+		String[] tempList = file.list();
+		File temp = null;
+		for (int i = 0; i < tempList.length; i++) {
+			temp = new File(Utils.pathJoin(path, tempList[i]));
+			if (temp.isFile()) {
+				temp.delete();
+			}
+			if (temp.isDirectory()) {
+				delAllFile(Utils.pathJoin(path, tempList[i]));
+				delFolder(Utils.pathJoin(path, tempList[i]));
+			}
+		}
+		delFolder(path);
+		return;
+	}
+
+	public static void delFolder(String folderPath) {
+		try {
+			java.io.File myFilePath = new java.io.File(folderPath);
+			myFilePath.delete();
+		} catch (Exception e) {
+			logger.error("del folder " + folderPath + " error", e);
+		}
+
 	}
 
 }

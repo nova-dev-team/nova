@@ -257,7 +257,7 @@ public class Pnode extends DbObject {
 	public String toString() {
 		return Utils
 				.expandTemplate(
-						"{Pnode @ ${ip}:${port}, hostname='${hostname}', Status='${statusCode}', uuid='${uuid}'}",
+						"{Pnode @ ${ip}:${port}, pid='${id}',hostname='${hostname}', Status='${statusCode}', uuid='${uuid}'}",
 						this);
 	}
 

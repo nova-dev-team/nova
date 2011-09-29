@@ -6,6 +6,7 @@ import java.util.List;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.models.Vcluster;
@@ -29,7 +30,8 @@ public class CreateVclusterHandler implements
 
 		List<Integer> usedIpSegments = new ArrayList<Integer>();
 		// System.out.println("111");
-		int gatewayIpIval = Utils.ipv4ToInteger("10.0.2.255");
+		int gatewayIpIval = Utils.ipv4ToInteger(Conf
+				.getString("vnode.gateway_ip"));
 		// System.out.println("222");
 		usedIpSegments.add(gatewayIpIval);
 		usedIpSegments.add(gatewayIpIval);
@@ -43,8 +45,10 @@ public class CreateVclusterHandler implements
 		}
 		Collections.sort(usedIpSegments);
 
-		int firstUsableIpIval = Utils.ipv4ToInteger("10.0.2.0");
-		int lastUsableIpIval = Utils.ipv4ToInteger("10.0.2.254");
+		int firstUsableIpIval = Utils.ipv4ToInteger(Conf
+				.getString("vnode.first_usable_ip"));
+		int lastUsableIpIval = Utils.ipv4ToInteger(Conf
+				.getString("vnode.last_usable_ip"));
 
 		int testIpIval = firstUsableIpIval;
 
