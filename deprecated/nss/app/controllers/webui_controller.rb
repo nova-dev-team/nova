@@ -1,2 +1,0 @@
-class WebuiController < ApplicationController
-end
