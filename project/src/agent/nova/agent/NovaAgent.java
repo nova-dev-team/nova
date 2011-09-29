@@ -26,6 +26,7 @@ import nova.agent.handler.AgentQueryPerfHandler;
 import nova.agent.handler.ApplianceListHandler;
 import nova.agent.handler.InstallApplianceHandler;
 import nova.agent.handler.QueryApplianceStatusHandler;
+import nova.agent.ui.AgentFrame;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
@@ -117,6 +118,9 @@ public class NovaAgent extends SimpleServer {
 		for (SimpleDaemon daemon : this.daemons) {
 			daemon.start();
 		}
+
+		NovaAgent.getInstance().loadAppliances();
+		AgentFrame.getInstance().autoStart(); // start download ui
 		return chnl;
 	}
 

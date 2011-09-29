@@ -167,7 +167,7 @@ public class AgentFrame extends JFrame {
 					String softName = softList.getSelectedValue().toString();
 
 					String relativeLocalPath = Conf
-							.getString("agent.software.image_path");
+							.getString("agent.software.picture_path");
 					changeSize(Utils.pathJoin(Utils.NOVA_HOME,
 							relativeLocalPath, softName + ".jpg"), Utils
 							.pathJoin(Utils.NOVA_HOME, relativeLocalPath,
@@ -212,4 +212,28 @@ public class AgentFrame extends JFrame {
 			logger.error("Change image size failed!", e);
 		}
 	}
+
+	private static AgentFrame instance = null;
+
+	/**
+	 * Get the singleton of AgentFrame.
+	 * 
+	 * @return AgentFrame instance, singleton.
+	 */
+	public static synchronized AgentFrame getInstance() {
+		if (AgentFrame.instance == null) {
+			AgentFrame.instance = new AgentFrame();
+		}
+		return AgentFrame.instance;
+	}
+
+	/**
+	 * Start AgentFrame.
+	 * 
+	 * @return
+	 */
+	public void autoStart() {
+		AgentFrame.getInstance().setVisible(false);
+	}
+
 }

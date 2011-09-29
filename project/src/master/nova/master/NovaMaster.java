@@ -25,16 +25,17 @@ import nova.master.handler.AddPnodeHandler;
 import nova.master.handler.CreateVclusterHandler;
 import nova.master.handler.CreateVnodeHandler;
 import nova.master.handler.MasterAgentHeartbeatHandler;
+import nova.master.handler.MasterAgentPerfHandler;
 import nova.master.handler.MasterHttpHandler;
 import nova.master.handler.MasterPnodeHeartbeatHandler;
 import nova.master.handler.MasterPnodePerfHandler;
 import nova.master.handler.MasterVnodeHeartbeatHandler;
-import nova.master.handler.MasterAgentPerfHandler;
 import nova.master.handler.PnodeStatusHandler;
 import nova.master.handler.RegisterApplianceHandler;
 import nova.master.handler.RegisterVdiskHandler;
 import nova.master.handler.VnodeStatusHandler;
 import nova.master.models.Pnode;
+import nova.storage.NovaStorage;
 import nova.worker.api.WorkerProxy;
 
 import org.apache.log4j.Logger;
@@ -227,6 +228,8 @@ public class NovaMaster extends SimpleServer {
 		});
 
 		NovaMaster.getInstance().start();
+		// start FTP Server added by gaotao
+		NovaStorage.getInstance().startFtpServer();
 
 	}
 }
