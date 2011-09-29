@@ -16,39 +16,11 @@ def do_replacements(html, type = :html)
     Uv.parse(code, "xhtml", "ruby", false, "mac_classic")
   end
 
-  # replace gitlinks
-  html.gsub! /linkgit:(.*?)\[\d\]/ do |code, waa|
-    "<a href=\"http://www.kernel.org/pub/software/scm/git/docs/#{$1}.html\">#{$1.gsub('git-', 'git ')}</a>"
-  end
-  
-  # replace figures
-  html.gsub! /\[fig:(.*?)\]/, '<div class="center"><img src="images/figure/\1.png"></div>'
-  
-  # fix images in pdf
-  html.gsub!('src="images', 'src="assets/images')
-
-  # replace/remove gitcasts
-  
-  html = html.gsub /\[gitcast:.*?\]\(.*?\)/ do |code|
-    if type == :html
-      puts code
-      if match = /gitcast:(.*?)\]\((.*?)\)/.match(code)
-        cast = match[1].gsub('_', '%2D')
-        code = '<div class="gitcast">
-        <embed src="http://gitcasts.com/flowplayer/FlowPlayerLight.swf?config=%7Bembedded%3Atrue%2CbaseURL%3A%27http%3A%2F%2Fgitcasts%2Ecom%2Fflowplayer%27%2CvideoFile%3A%27http%3A%2F%2Fmedia%2Egitcasts%2Ecom%2F' + cast + '%2Eflv%27%2CautoBuffering%3Afalse%2CautoPlay%3Afalse%7D" width="620" height="445" scale="noscale" bgcolor="111111" type="application/x-shockwave-flash" allowFullScreen="true" allowScriptAccess="always" allowNetworking="all" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed>
-        <br>' +  match[2] + '
-        </div>'
-      end
-    else
-      code = ''
-    end
-    code
-  end
-  
   html
 end
 
-def do_html
+desc 'Create the HTML version'
+task :html => :merge do
   if File.exists?('output/full_book.markdown')
     output = File.new('output/full_book.markdown').read
     output = RDiscount.new(output).to_html
@@ -61,7 +33,6 @@ def do_html
 
       html_template = File.new("layout/pdf_template.html").read
       html_template.gsub!("#body", body)
-
       
       f.puts html_template
     end
@@ -157,40 +128,22 @@ def do_html
       f.puts html_template
     end
     
-    `cp -Rf ../assets output/book/`
+    FileUtils.mkdir_p 'output/book/assets'
     
-  end
-end
-
-def each_language
-  root_dir = (File.split __FILE__)[0]
-  Dir.entries(root_dir).each do |e|
-    next if e.start_with? "."
-    next if e == "assets"
-    ePath = File.join root_dir, e
-    next unless File::directory? ePath
-    chdir ePath
-    FileUtils.mkdir_p "output"
-    yield
-  end
-end
-
-desc 'Create the HTML version'
-task :html => :merge do
-  each_language {do_html}
-end
-
-def do_merge
-  File.open('output/full_book.markdown', 'w+') do |f|
-    Dir["text/**/*.markdown"].sort.each do |path|
-      f << File.new(path).read + "\r\n"
-    end
+    `cp -Rf images output/book/assets`
+    `cp -Rf stylesheets output/book/assets`
+    
   end
 end
 
 desc 'Merge all of the texttile output into a single file for pdf conversion'
 task :merge do
-  each_language {do_merge}
+  FileUtils.mkdir_p 'output'
+  File.open('output/full_book.markdown', 'w+') do |f|
+    Dir["text/**/*.markdown"].sort.each do |path|
+      f << File.new(path).read + "\r\n"
+    end
+  end
 end
 
 class Prince
@@ -252,7 +205,8 @@ class Prince
   end
 end
 
-def do_pdf
+desc 'Create the PDF version'
+task :pdf => :html do
   chdir "output"
   prince = Prince.new()
   html_string = File.new("index.html").read
@@ -262,11 +216,5 @@ def do_pdf
     f.puts prince.pdf_from_string(html_string)
   end
 end
-
-desc 'Create the PDF version'
-task :pdf => :html do
-  each_language {do_pdf}
-end
-
 
 task :default => :pdf
