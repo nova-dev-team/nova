@@ -1,2 +1,0 @@
-module VdiskPoolHelper
-end

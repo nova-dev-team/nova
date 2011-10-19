@@ -1,0 +1,44 @@
+# config file for nova system
+#
+# note: do not put spaces between '=' and values
+# note: relative path are referenced to "nova home", that is, ".."
+
+########################
+# agent conifg section #
+########################
+
+# TODO extract these info from nova.properties
+
+# where should the agent bind to
+agent.bind_host=10.0.1.193
+
+# listen port for master
+agent.bind_port=4100
+
+# ftp server host
+agent.ftp.host=10.0.1.193
+
+# ftp server port
+agent.ftp.port=8021
+
+#ftp username
+agent.ftp.user_name=anonymous
+
+#ftp password
+agent.ftp.password=nova-develop@googlegroups.com
+
+# note: agent uses anonymous login
+
+# where to save softwares' pictures
+# TODO: deprecate this path. save all info into appliances?
+agent.software.picture_path=data/agent/pictures
+
+# where to save downloaded softwares
+agent.software.save_path=data/agent/appliances
+
+# the iso path
+agent.iso.save_path=E:/
+
+#where to get the trayicon picture
+agent.software.trayicon_path=data/agent/pictures/demo1.jpg
+

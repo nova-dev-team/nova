@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ======================================================================
+     Mar 24, 2011 9:31:31 PM
+
+     Nova
+     Virtualization management system
+
+     Santa Zhang (santa1987@gmail.com)
+     ====================================================================== -->
+<project name="Nova" default="build">
+    <description>
+        Virtualization management system
+    </description>
+
+    <loadfile property="version" srcFile="VERSION">
+        <filterchain>
+            <striplinebreaks />
+        </filterchain>
+    </loadfile>
+    <property name="conf" value="conf/" />
+    <property name="bin" value="bin" />
+    <property name="build" value="data/ant_build" />
+    <property name="src" value="src" />
+    <property name="lib" value="lib" />
+    <property name="build.test" value="${build}/test" />
+    <property name="src.test" value="${src}/test" />
+    <property name="javadoc" value="doc/api" />
+
+    <target name="build" description="build project">
+        <mkdir dir="${build}" />
+        <javac srcdir="src" destdir="${build}" includeantruntime="false">
+            <classpath>
+                <fileset dir="${lib}">
+                    <include name="**/*.jar" />
+                </fileset>
+            </classpath>
+        </javac>
+        <copy todir="${build}">
+            <fileset dir="${src}/master" excludes="**/*.java" />
+            <fileset dir="${src}/worker" excludes="**/*.java" />
+            <fileset dir="${src}/agent" excludes="**/*.java" />
+            <fileset dir="${src}/common" excludes="**/*.java" />
+            <fileset dir="${src}/storage" excludes="**/*.java" />
+            <fileset dir="${src}/ui" excludes="**/*.java" />
+        </copy>
+        <jar destfile="${bin}/nova-${version}.jar" basedir="${build}" includes="nova/**" excludes="${build.test}/**" />
+    </target>
+
+
+    <target name="doc" description="generate javadoc">
+        <javadoc destdir="${javadoc}" author="true" version="true" use="true">
+            <fileset dir="src" defaultexcludes="yes">
+                <include name="**" />
+                <exclude name="**/*.bxml" />
+                <exclude name="test/**" />
+            </fileset>
+            <bottom>
+                <![CDATA[Copyright &#169; 2011 Nova Development Team. All Rights Reserved.]]>
+            </bottom>
+            <group title="Master Packages" packages="nova.master*" />
+            <group title="Worker Packages" packages="nova.worker*" />
+            <group title="Agent Packages" packages="nova.agent*" />
+            <group title="Storage Packages" packages="nova.storage*" />
+            <group title="Common Utilities" packages="nova.common*" />
+        </javadoc>
+    </target>
+
+
+    <target name="test" depends="build" description="run junit4 tests">
+        <junit showoutput="false" printsummary="true" haltonfailure="false" fork="no" forkmode="perTest" dir="${build}">
+            <classpath>
+                <path>
+                    <pathelement location="${conf}" />
+                    <pathelement location="${build}" />
+                    <pathelement location="${src.test}" />
+                    <fileset dir="${lib}">
+                        <include name="**/*.jar" />
+                    </fileset>
+                </path>
+            </classpath>
+            <formatter type="xml" />
+            <batchtest todir="${build}" unless="testcase">
+                <fileset dir="${src.test}" includes="**/*Test*.java">
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+
+    <target name="clean" description="clean build files">
+        <delete dir="${build}" />
+        <delete dir="${javadoc}" />
+        <delete dir="data/log/" />
+        <delete dir="data/eclipse_build/" />
+        <delete dir="data/ext_build/" />
+        <delete file="${bin}/nova-${version}.jar" />
+    </target>
+
+</project>

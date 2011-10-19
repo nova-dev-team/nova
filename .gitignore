@@ -18,4 +18,12 @@ nova-*.tar.gz
 r147.sh
 r149.sh
 *.properties
-
+build/
+docs/
+payload/
+run/
+*.rrd
+*.png
+*.db
+*.log
+data/
