@@ -1,10 +1,12 @@
 package nova.test.unit;
 
+import java.io.File;
 import java.io.IOException;
 
 import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.common.tools.perf.PerfMon;
 import nova.common.util.RRDTools;
+import nova.common.util.Utils;
 
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdException;
@@ -17,11 +19,14 @@ public class TestJrobin {
         long startTime = Util.getTime();
         long endTime = startTime + 86400;
 
-        String rootPath = "build/demo_flow.rrd";
+        File tmpDir = new File(Utils.pathJoin(Utils.NOVA_HOME, "data", "tmp"));
+        tmpDir.mkdirs();
+
+        String rootPath = Utils.pathJoin(tmpDir.getPath(), "demo_flow.rrd");
         int timeInterval = 600;
         int rrdLength = 8640;
 
-        String picPath = "build/demo_flow.png";
+        String picPath = Utils.pathJoin(tmpDir.getPath(), "demo_flow.png");
 
         /*
          * 测试创建RrdDb
