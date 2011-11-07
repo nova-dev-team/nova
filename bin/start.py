@@ -43,13 +43,30 @@ my_abs_path = os.path.abspath(__file__)
 bin_dir = os.path.dirname(my_abs_path)
 nova_home = os.path.abspath(os.path.join(bin_dir, ".."))
 
-f = open(os.path.join(nova_home, "../VERSION"))
-nova_ver = f.read().strip()
-print "[INFO] Nova version: %s" % nova_ver
-f.close()
+# search for VERSION file
+nova_ver = None
+cur_dir = nova_home
+while True:
+    ver_fn = os.path.join(cur_dir, "VERSION")
+    if os.path.exists(ver_fn):
+        f = open(ver_fn)
+        nova_ver = f.read().strip()
+        print "[INFO] Nova version: %s" % nova_ver
+        f.close()
+        break
+    else:
+        parent_dir = os.path.abspath(os.path.join(cur_dir, ".."))
+        if parent_dir != cur_dir:
+            cur_dir = parent_dir    # search in parent dir
+        else:
+            break
+
+if nova_ver == None:
+    print "[ERROR] cannot determine Nova version!"
+    exit(1)
 
 if os.path.exists(os.path.join(bin_dir, "nova-%s.jar" % nova_ver)) == False:
-    print "[ERROR] '%s' not found under '%s'" % ("nova-%s.jar" % nova_ver, bin_dir)
+    print "[ERROR] '%s' not found under '%s'!" % ("nova-%s.jar" % nova_ver, bin_dir)
     exit(1)
 
 lib_dir = os.path.join(nova_home, "lib")
@@ -89,3 +106,4 @@ for dir_name in ["log", "run"]:
 
 os.chdir(nova_home)
 os.system('java -server -classpath "%s" %s' % (class_path, nova_module))
+
