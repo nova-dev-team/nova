@@ -90,7 +90,9 @@
     <target name="clean" description="clean build files">
         <delete dir="${build}" />
         <delete dir="${javadoc}" />
-        <delete dir="data/log/" />
+        <delete>
+            <fileset dir="data/log" includes="*.log" />
+        </delete>
         <delete dir="data/eclipse_build/" />
         <delete dir="data/ext_build/" />
         <delete file="${bin}/nova-${version}.jar" />
