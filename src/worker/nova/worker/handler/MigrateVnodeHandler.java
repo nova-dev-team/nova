@@ -34,6 +34,11 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             // blabla
             dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
                     true);
+            // add by eagle
+            dconn = new Connect("qemu+ssh://" + msg.migrateToUserName + ":"
+                    + msg.migrateToPasswd + "@" + msg.migrateToAddr.getIp()
+                    + ":" + msg.migrateToAddr.getPort() + "/system");
+            // eagle--end
 
             // TODO @shayf
             Domain srcDomain = NovaWorker.getInstance()

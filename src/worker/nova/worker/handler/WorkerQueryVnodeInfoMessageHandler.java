@@ -109,6 +109,9 @@ public class WorkerQueryVnodeInfoMessageHandler implements
                                         .equalsIgnoreCase("VIR_DOMAIN_SHUTOFF")) {
                                     vs = Vnode.Status.SHUT_OFF;
                                 }
+                                // add by eagle
+                                VnodeStatusDaemon.allStatus.put(uu, vs);
+                                // eagle--end
                             }
                         }
                     }
