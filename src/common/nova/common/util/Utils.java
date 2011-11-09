@@ -410,35 +410,39 @@ public class Utils {
         File[] file = in.listFiles();
         FileInputStream fin = null;
         FileOutputStream fout = null;
-        for (int i = 0; i < file.length; i++) {
-            if (file[i].isFile()) {
-                try {
-                    fin = new FileInputStream(file[i]);
-                } catch (FileNotFoundException e) {
-                    logger.error("file " + file[i].getName() + " not found ", e);
-                }
-
-                try {
-                    fout = new FileOutputStream(new File(dstFile + "/"
-                            + file[i].getName()));
-                } catch (FileNotFoundException e) {
-                    logger.error("file " + file[i].getName() + " not found ", e);
-                }
-                int c;
-                byte[] b = new byte[1024 * 5];
-                try {
-                    while ((c = fin.read(b)) != -1) {
-                        fout.write(b, 0, c);
+        if (file != null) {
+            for (int i = 0; i < file.length; i++) {
+                if (file[i].isFile()) {
+                    try {
+                        fin = new FileInputStream(file[i]);
+                    } catch (FileNotFoundException e) {
+                        logger.error("file " + file[i].getName()
+                                + " not found ", e);
                     }
-                    fin.close();
-                    fout.flush();
-                    fout.close();
-                } catch (IOException e) {
-                    logger.error("copy file error", e);
+
+                    try {
+                        fout = new FileOutputStream(new File(dstFile + "/"
+                                + file[i].getName()));
+                    } catch (FileNotFoundException e) {
+                        logger.error("file " + file[i].getName()
+                                + " not found ", e);
+                    }
+                    int c;
+                    byte[] b = new byte[1024 * 5];
+                    try {
+                        while ((c = fin.read(b)) != -1) {
+                            fout.write(b, 0, c);
+                        }
+                        fin.close();
+                        fout.flush();
+                        fout.close();
+                    } catch (IOException e) {
+                        logger.error("copy file error", e);
+                    }
+                } else {
+                    copy(Utils.pathJoin(srcFile, file[i].getName()),
+                            Utils.pathJoin(dstFile, file[i].getName()));
                 }
-            } else {
-                copy(Utils.pathJoin(srcFile, file[i].getName()),
-                        Utils.pathJoin(dstFile, file[i].getName()));
             }
         }
     }
