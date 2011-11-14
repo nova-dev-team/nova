@@ -32,7 +32,7 @@ elif sys.argv[1] == "agent":
 elif sys.argv[1] == "storage":
     nova_module = "nova.storage.NovaStorage"
 elif sys.argv[1] == "client":
-    nova_module = "org.apache.pivot.wtk.DesktopApplicationContext nova.ui.NovaUI"
+    nova_module = "nova.agent.ui.AgentFrameUserStart"
 else:
     print_help()
     exit(1)

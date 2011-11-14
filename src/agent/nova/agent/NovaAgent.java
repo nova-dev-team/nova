@@ -21,6 +21,7 @@ import nova.agent.daemons.AgentHeartbeatDaemon;
 import nova.agent.daemons.AgentPerfInfoDaemon;
 import nova.agent.daemons.ApplianceDownloadDaemon;
 import nova.agent.daemons.ApplianceInstallDaemon;
+import nova.agent.daemons.CheckApplianceFirstInstalledDaemon;
 import nova.agent.handler.AgentQueryHeartbeatHandler;
 import nova.agent.handler.AgentQueryPerfHandler;
 import nova.agent.handler.ApplianceListHandler;
@@ -317,7 +318,10 @@ public class NovaAgent extends SimpleServer {
 
         // Install appliances when startup
         if (args.length != 0) {
+            // start install these apps
             new Thread(new ApplianceFirstInstall(args)).start();
+            // check if all apps is installed
+            new CheckApplianceFirstInstalledDaemon(args).start();
         }
         // add a shutdown hook, so a Ctrl-C or kill signal will be handled
         // gracefully
