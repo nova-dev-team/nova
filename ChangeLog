@@ -39,7 +39,7 @@ v0.3.2, 2010-08-26:
 * a few bug fixes in image_pool_maintainer of NSS module
 
 v0.3.1, 2010-08-09:
-First public release.
+* First public release.
 + Xen support (with live-migration)
 + added NSS module
 
