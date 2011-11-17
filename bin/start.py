@@ -66,7 +66,8 @@ if nova_ver == None:
     exit(1)
 
 if os.path.exists(os.path.join(bin_dir, "nova-%s.jar" % nova_ver)) == False:
-    print "[ERROR] '%s' not found under '%s'!" % ("nova-%s.jar" % nova_ver, bin_dir)
+    jar_fname = "nova-%s.jar" % nova_ver
+    print "[ERROR] '%s' not found under '%s'!" % (jar_fname, bin_dir)
     exit(1)
 
 lib_dir = os.path.join(nova_home, "lib")
@@ -105,5 +106,11 @@ for dir_name in ["log", "run"]:
         os.makedirs(dir_path)
 
 os.chdir(nova_home)
-os.system('java -server -classpath "%s" %s' % (class_path, nova_module))
-
+cmd = 'java -server -classpath "%s" %s' % (class_path, nova_module)
+for i in range(2, len(sys.argv)):
+    param = sys.argv[i]
+    if ' ' in param:
+        cmd += ' "%s"' % param
+    else:
+        cmd += ' ' + param
+os.system(cmd)
