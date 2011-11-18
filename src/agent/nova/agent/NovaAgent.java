@@ -21,6 +21,7 @@ import nova.agent.daemons.AgentHeartbeatDaemon;
 import nova.agent.daemons.AgentPerfInfoDaemon;
 import nova.agent.daemons.ApplianceDownloadDaemon;
 import nova.agent.daemons.ApplianceInstallDaemon;
+import nova.agent.daemons.CheckApplianceFirstInstalledDaemon;
 import nova.agent.handler.AgentQueryHeartbeatHandler;
 import nova.agent.handler.AgentQueryPerfHandler;
 import nova.agent.handler.ApplianceListHandler;
@@ -160,30 +161,38 @@ public class NovaAgent extends SimpleServer {
         String relativePath = Conf.getString("agent.software.save_path");
         String filePath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
                 "apps.json");
-        try {
-            FileReader fr = new FileReader(filePath);
-            BufferedReader br = new BufferedReader(fr);
+        File f = new File(filePath);
+        // judge the file is exists or not
+        if (f.exists()) {
+            try {
+                FileReader fr = new FileReader(filePath);
+                BufferedReader br = new BufferedReader(fr);
 
-            String line = null;
-            StringBuffer appsJson = new StringBuffer();
-            while ((line = br.readLine()) != null) {
-                appsJson.append(line);
-                appsJson.append("\n");
+                String line = null;
+                StringBuffer appsJson = new StringBuffer();
+                while ((line = br.readLine()) != null) {
+                    appsJson.append(line);
+                    appsJson.append("\n");
+                }
+                fr.close();
+                if (!appsJson.toString().isEmpty()) {
+                    Appliance[] appsArray = gson.fromJson(appsJson.toString(),
+                            Appliance[].class);
+
+                    this.appliances.clear();
+                    for (int i = 0; i < appsArray.length; i++) {
+                        this.appliances.put(appsArray[i].getName(),
+                                appsArray[i]);
+                    }
+                }
+
+            } catch (FileNotFoundException e) {
+                logger.error(
+                        "Can't find the appliances list file: " + filePath, e);
+            } catch (IOException e) {
+                logger.error("Can't read from appliances list file: "
+                        + filePath, e);
             }
-            fr.close();
-
-            Appliance[] appsArray = gson.fromJson(appsJson.toString(),
-                    Appliance[].class);
-
-            this.appliances.clear();
-            for (int i = 0; i < appsArray.length; i++) {
-                this.appliances.put(appsArray[i].getName(), appsArray[i]);
-            }
-
-        } catch (FileNotFoundException e) {
-            logger.error("Can't find the appliances list file: " + filePath, e);
-        } catch (IOException e) {
-            logger.error("Can't read from appliances list file: " + filePath, e);
         }
 
     }
@@ -309,7 +318,10 @@ public class NovaAgent extends SimpleServer {
 
         // Install appliances when startup
         if (args.length != 0) {
+            // start install these apps
             new Thread(new ApplianceFirstInstall(args)).start();
+            // check if all apps is installed
+            new CheckApplianceFirstInstalledDaemon(args).start();
         }
         // add a shutdown hook, so a Ctrl-C or kill signal will be handled
         // gracefully

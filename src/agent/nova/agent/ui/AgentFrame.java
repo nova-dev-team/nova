@@ -219,11 +219,11 @@ public class AgentFrame extends JFrame {
 
         this.addWindowListener(new WindowAdapter() {// 当“关闭”窗口时，同时关闭系统托盘图标
             public void windowClosing(WindowEvent e) {
-                System.exit(0);
+                AgentFrame.instance.setVisible(false);
                 Tray.remove(trayIcon);
             }
         });
-        this.addWindowListener(new WindowAdapter() {// 当“关闭”窗口时，同时关闭系统托盘图标
+        this.addWindowListener(new WindowAdapter() {// 最小化时
             public void windowIconified(WindowEvent e) {
                 AgentFrame.instance.setVisible(false);
             }
@@ -233,6 +233,7 @@ public class AgentFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 AgentFrame.instance.setExtendedState(JFrame.NORMAL);
                 AgentFrame.instance.setVisible(true);
+                AgentFrame.instance.setAlwaysOnTop(true);
             }
         });
 
@@ -248,6 +249,7 @@ public class AgentFrame extends JFrame {
                 if (SwingUtilities.isLeftMouseButton(e)) {// 如果点击的是鼠标左键
                     AgentFrame.instance.setExtendedState(JFrame.NORMAL);
                     AgentFrame.instance.setVisible(true);
+                    AgentFrame.instance.setAlwaysOnTop(true);
                     // Tray.remove(trayIcon);
                 }
             }

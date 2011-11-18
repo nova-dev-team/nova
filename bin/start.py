@@ -22,7 +22,11 @@ elif sys.argv[1] == "agent":
 elif sys.argv[1] == "storage":
   nova_module = "nova.storage.NovaStorage"
 elif sys.argv[1] == "client":
+<<<<<<< HEAD
   nova_module = "org.apache.pivot.wtk.DesktopApplicationContext nova.ui.NovaUI"
+=======
+    nova_module = "nova.agent.ui.AgentFrameUserStart"
+>>>>>>> a558805e0bcce63c7bdd95dbcefefc396da5d0c2
 else:
   print_help()
   exit(1)
@@ -34,15 +38,39 @@ bin_dir = os.path.split(my_abs_path)[0]
 
 nova_home = os.path.split(bin_dir)[0]
 
-f = open(os.path.join(nova_home, "../VERSION"))
-nova_ver = f.read().strip()
-print "[INFO] Nova version: %s" % nova_ver
-f.close()
+# search for VERSION file
+nova_ver = None
+cur_dir = nova_home
+while True:
+    ver_fn = os.path.join(cur_dir, "VERSION")
+    if os.path.exists(ver_fn):
+        f = open(ver_fn)
+        nova_ver = f.read().strip()
+        print "[INFO] Nova version: %s" % nova_ver
+        f.close()
+        break
+    else:
+        parent_dir = os.path.abspath(os.path.join(cur_dir, ".."))
+        if parent_dir != cur_dir:
+            cur_dir = parent_dir    # search in parent dir
+        else:
+            break
+
+if nova_ver == None:
+    print "[ERROR] cannot determine Nova version!"
+    exit(1)
 
 if os.path.exists(os.path.join(bin_dir, "nova-%s.jar" % nova_ver)) == False:
+<<<<<<< HEAD
   print "[ERROR] '%s' not found under '%s'" % ("nova-%s.jar" % nova_ver, bin_dir)
   exit(1)
 fuyfuyfuyyu
+=======
+    jar_fname = "nova-%s.jar" % nova_ver
+    print "[ERROR] '%s' not found under '%s'!" % (jar_fname, bin_dir)
+    exit(1)
+
+>>>>>>> a558805e0bcce63c7bdd95dbcefefc396da5d0c2
 lib_dir = os.path.join(nova_home, "lib")
 conf_dir = os.path.join(nova_home, "conf")
 db_dir = os.path.join(nova_home, "db")
@@ -81,3 +109,15 @@ os.system("""java -server -classpath "%s" %s""" % (class_path, nova_module))
 #print "nova_module:%s" % nova_module
 print "++++++++++++++++++++++++++++++++++++"
 
+<<<<<<< HEAD
+=======
+os.chdir(nova_home)
+cmd = 'java -server -classpath "%s" %s' % (class_path, nova_module)
+for i in range(2, len(sys.argv)):
+    param = sys.argv[i]
+    if ' ' in param:
+        cmd += ' "%s"' % param
+    else:
+        cmd += ' ' + param
+os.system(cmd)
+>>>>>>> a558805e0bcce63c7bdd95dbcefefc396da5d0c2
