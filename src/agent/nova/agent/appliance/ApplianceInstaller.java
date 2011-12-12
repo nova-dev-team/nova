@@ -64,7 +64,12 @@ public class ApplianceInstaller {
      * 
      */
     public static void firstInstall(Appliance app) {
-        String relativePath = Conf.getString("agent.iso.save_path");
+        String relativePath = "";
+        if (isWindows()) {
+            relativePath = Conf.getString("agent.iso.windows.save_path");
+        } else {
+            relativePath = Conf.getString("agent.iso.linux.save_path");
+        }
         String folderPath = Utils.pathJoin(relativePath, "appliances",
                 app.getName());
         try {

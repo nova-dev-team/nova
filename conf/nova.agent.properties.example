@@ -36,8 +36,11 @@ agent.software.picture_path=data/agent/pictures
 # where to save downloaded softwares
 agent.software.save_path=data/agent/appliances
 
-# the iso path
-agent.iso.save_path=E:/
+# the iso path under windows
+agent.iso.windows.save_path=E:/
+
+# the iso path under linux
+agent.iso.linux.save_path=/mnt/appliances
 
 #where to get the trayicon picture
 agent.software.trayicon_path=data/agent/pictures/demo1.jpg
