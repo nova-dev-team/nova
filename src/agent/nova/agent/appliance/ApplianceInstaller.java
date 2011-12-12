@@ -47,6 +47,17 @@ public class ApplianceInstaller {
         String relativePath = Conf.getString("agent.software.save_path");
         String folderPath = Utils.pathJoin(Utils.NOVA_HOME, relativePath,
                 app.getName());
+        // if first install we have different folderPath
+        if (app.getStatus().equals(Appliance.Status.FIRST_INSTALLING)) {
+            if (isWindows()) {
+                relativePath = Conf.getString("agent.iso.windows.save_path");
+            } else {
+                relativePath = Conf.getString("agent.iso.linux.save_path");
+            }
+            folderPath = Utils.pathJoin(relativePath, "appliances",
+                    app.getName());
+        }
+
         try {
             executeInstall(folderPath);
         } catch (IOException e) {
@@ -54,31 +65,6 @@ public class ApplianceInstaller {
             logger.error("Can't install " + app.getName(), e);
         }
 
-    }
-
-    /**
-     * Install one appliance when first start up this vm
-     * 
-     * @param app
-     *            {@link Appliance}
-     * 
-     */
-    public static void firstInstall(Appliance app) {
-        String relativePath = "";
-        if (isWindows()) {
-            relativePath = Conf.getString("agent.iso.windows.save_path");
-        } else {
-            relativePath = Conf.getString("agent.iso.linux.save_path");
-        }
-        String folderPath = Utils.pathJoin(relativePath, "appliances",
-                app.getName());
-        try {
-            logger.info("Installing " + folderPath);
-            executeInstall(folderPath);
-        } catch (IOException e) {
-            app.setStatus(Appliance.Status.INSTALL_FAILURE);
-            logger.error("Can't install " + app.getName(), e);
-        }
     }
 
     /**

@@ -31,6 +31,10 @@ public class ApplianceInstallDaemon extends SimpleDaemon {
                 // Create a new thread to avoid block when Spawn
                 new Thread(new InstallThread(app)).start();
 
+            } else if (app.getStatus().equals(Appliance.Status.FIRST_INSTALL)) {
+                log.info("Found FIRST_INSTALL appliance: " + app.getName());
+                // Create a new thread to avoid block when Spawn
+                new Thread(new InstallThread(app)).start();
             }
         }
 
@@ -49,7 +53,11 @@ class InstallThread implements Runnable {
 
     @Override
     public void run() {
-        this.app.setStatus(Appliance.Status.INSTALLING);
+        if (this.app.getStatus().equals(Appliance.Status.INSTALL_PENDING)) {
+            this.app.setStatus(Appliance.Status.INSTALLING);
+        } else {
+            this.app.setStatus(Appliance.Status.FIRST_INSTALLING);
+        }
 
         ApplianceInstaller.install(this.app);
         this.app.setStatus(Appliance.Status.INSTALLED);

@@ -322,7 +322,9 @@ public class NovaAgent extends SimpleServer {
             new Thread(new ApplianceFirstInstall(args)).start();
             // check if all apps is installed
             new CheckApplianceFirstInstalledDaemon(args).start();
+            logger.info("in first");
         }
+        logger.info("out");
         // add a shutdown hook, so a Ctrl-C or kill signal will be handled
         // gracefully
         Runtime.getRuntime().addShutdownHook(new Thread() {

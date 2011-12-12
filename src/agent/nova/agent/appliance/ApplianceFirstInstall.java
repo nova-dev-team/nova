@@ -25,17 +25,16 @@ public class ApplianceFirstInstall implements Runnable {
         for (String appName : appsInstall) {
             if (appliancesMaster.containsKey(appName)) {
                 Appliance app = appliancesMaster.get(appName);
-                app.setStatus(Appliance.Status.INSTALL_PENDING);
-                ApplianceInstaller.firstInstall(app);
+                app.setStatus(Appliance.Status.FIRST_INSTALL);
             } else {
                 Appliance app = new Appliance(appName);
                 appliancesMaster.put(appName, app);
-                app.setStatus(Appliance.Status.INSTALL_PENDING);
-                ApplianceInstaller.firstInstall(app);
+                app.setStatus(Appliance.Status.FIRST_INSTALL);
 
             }
         }
 
         NovaAgent.getInstance().saveAppliances();
+        NovaAgent.getInstance().loadAppliances();
     }
 }

@@ -66,6 +66,10 @@ public class Appliance {
 
         DOWNLOADING,
 
+        FIRST_INSTALL,
+
+        FIRST_INSTALLING,
+
         INSTALL_PENDING,
 
         INSTALLING,
