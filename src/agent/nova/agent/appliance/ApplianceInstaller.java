@@ -73,6 +73,7 @@ public class ApplianceInstaller {
         String folderPath = Utils.pathJoin(relativePath, "appliances",
                 app.getName());
         try {
+            logger.info("Installing " + folderPath);
             executeInstall(folderPath);
         } catch (IOException e) {
             app.setStatus(Appliance.Status.INSTALL_FAILURE);

@@ -5,7 +5,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
+import nova.common.service.SimpleAddress;
+import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.master.api.MasterProxy;
 
 import org.apache.log4j.Logger;
 
@@ -69,6 +72,10 @@ public class CheckApplianceFirstInstalledDaemon extends SimpleDaemon {
                     // eject the iso in linux
                     String[] cmd = new String[] { "/bin/sh", "-c", "eject" };
                     Runtime.getRuntime().exec(cmd);
+                    MasterProxy proxy = NovaAgent.getInstance().getMaster();
+                    proxy.sendAppliancesFirstInstalledMessage(new SimpleAddress(
+                            Conf.getString("agent.bind_host"), Conf
+                                    .getInteger("agent.bind_port")));
                 } catch (IOException e) {
                     log.error("Can't eject the cdrom!", e);
                 }

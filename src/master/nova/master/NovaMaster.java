@@ -14,6 +14,7 @@ import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.messages.AddPnodeMessage;
+import nova.master.api.messages.AppliancesFirstInstalledMessage;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
@@ -22,6 +23,7 @@ import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.handler.AddPnodeHandler;
+import nova.master.handler.ApplicancesFirstInstalledHandler;
 import nova.master.handler.CreateVclusterHandler;
 import nova.master.handler.CreateVnodeHandler;
 import nova.master.handler.MasterAgentHeartbeatHandler;
@@ -103,6 +105,8 @@ public class NovaMaster extends SimpleServer {
 
         this.registerHandler(AgentPerfMessage.class,
                 new MasterAgentPerfHandler());
+        this.registerHandler(AppliancesFirstInstalledMessage.class,
+                new ApplicancesFirstInstalledHandler());
 
         Conf.setDefaultValue("master.bind_host", "0.0.0.0");
         Conf.setDefaultValue("master.bind_port", 3000);

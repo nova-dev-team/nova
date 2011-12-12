@@ -13,6 +13,7 @@ import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
+import nova.master.api.messages.AppliancesFirstInstalledMessage;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.api.messages.DeletePnodeMessage;
@@ -144,4 +145,7 @@ public class MasterProxy extends SimpleProxy {
         super.sendRequest(new MasterMigrateCompleteMessage(migrateUuid));
     }
 
+    public void sendAppliancesFirstInstalledMessage(SimpleAddress simpleAddress) {
+        super.sendRequest(new AppliancesFirstInstalledMessage(simpleAddress));
+    }
 }

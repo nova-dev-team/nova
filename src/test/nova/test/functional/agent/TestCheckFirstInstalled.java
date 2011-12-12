@@ -10,7 +10,7 @@ import org.junit.Test;
 public class TestCheckFirstInstalled {
     @Test
     public void testCheckFirstInstalled() {
-        String[] appsInstalled = { "demo1", "demo2", "demo3", "picture" };
+        String[] appsInstalled = { "demo1", "demo2", "demo3" };
 
         // load apps info in data/appliances/apps.json
         NovaAgent.getInstance().loadAppliances();
