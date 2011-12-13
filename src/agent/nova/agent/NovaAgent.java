@@ -143,6 +143,9 @@ public class NovaAgent extends SimpleServer {
             }
         }
         logger.info("All deamons stopped");
+
+        this.saveAppliances(); // save current appliances status
+
         super.shutdown();
         this.addr = null;
 

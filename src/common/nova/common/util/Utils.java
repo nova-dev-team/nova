@@ -502,6 +502,53 @@ public class Utils {
         }
     }
 
+    public static void copyWithIgnoreFolder(String srcFile, String dstFile,
+            String[] ignoreList) {
+        File in = new File(srcFile);
+        File out = new File(dstFile);
+        if (!in.exists()) {
+            System.out.println(in.getAbsolutePath() + "源文件路径错误！！！");
+            return;
+        }
+
+        if (!out.exists())
+            out.mkdirs();
+        File[] file = in.listFiles();
+        FileInputStream fin = null;
+        FileOutputStream fout = null;
+        for (int i = 0; i < file.length; i++) {
+            if (file[i].isFile()) {
+                try {
+                    fin = new FileInputStream(file[i]);
+                } catch (FileNotFoundException e) {
+                    logger.error("file " + file[i].getName() + " not found ", e);
+                }
+
+                try {
+                    fout = new FileOutputStream(new File(dstFile + "/"
+                            + file[i].getName()));
+                } catch (FileNotFoundException e) {
+                    logger.error("file " + file[i].getName() + " not found ", e);
+                }
+                int c;
+                byte[] b = new byte[1024 * 5];
+                try {
+                    while ((c = fin.read(b)) != -1) {
+                        fout.write(b, 0, c);
+                    }
+                    fin.close();
+                    fout.flush();
+                    fout.close();
+                } catch (IOException e) {
+                    logger.error("copy file error", e);
+                }
+            } else if (!isInclude(ignoreList, file[i].getName())) {
+                copyWithIgnore(Utils.pathJoin(srcFile, file[i].getName()),
+                        Utils.pathJoin(dstFile, file[i].getName()), ignoreList);
+            }
+        }
+    }
+
     private static boolean isInclude(String[] names, String name) {
         for (String s : names) {
             if (name.equalsIgnoreCase(s)) {

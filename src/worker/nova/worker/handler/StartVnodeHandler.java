@@ -237,7 +237,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 FtpUtils.downloadDir(fc, Utils
                                         .pathJoin(appName), Utils.pathJoin(
                                         Utils.NOVA_HOME, "run", "softwares",
-                                        appName));
+                                        "appliances", appName)); // first
+                                                                 // install
+                                                                 // appliances
                                 System.out.println("download file " + appName);
                                 fc.closeServer();
                             } catch (NumberFormatException e1) {
@@ -297,10 +299,16 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         .pathJoin(agentProgramFile.getAbsolutePath(), "bin"));
                 Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "lib"), Utils
                         .pathJoin(agentProgramFile.getAbsolutePath(), "lib"));
-                Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "data"), Utils
-                        .pathJoin(agentProgramFile.getAbsolutePath(), "data"));
-                Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "VERSION"), Utils
-                        .pathJoin(agentProgramFile.getAbsolutePath(), "VERSION"));
+
+                // copy without ftp_home folder
+                String[] ingoreList = { "ftp_home" };
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
+
+                Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "VERSION"),
+                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
+                                "VERSION"));
 
                 // pack iso files
                 File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME,

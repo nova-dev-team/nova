@@ -69,6 +69,7 @@ public class InstallApplianceHandler implements
             }
         }
 
+        // pack into iso
         File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                 "agentcd"));
         if (!agentCdFile.exists()) {
