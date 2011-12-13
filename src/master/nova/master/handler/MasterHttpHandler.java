@@ -155,7 +155,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             + "Memory Size<input type=\"text\" name=\"memory_size"
                             + (i + 1)
                             + "\">KB<br>"
-                            + "Appliance<input type=\"text\" name=\"appliance"
+                            + "Appliance<input type=\"text\" name=\"appliance_list"
                             + (i + 1)
                             + "\"><br>"
                             + "Pnode Id<input type=\"text\" name=\"pnode_id"
@@ -191,16 +191,24 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     Integer.parseInt(queryMap.get("pnode_id"
                                             + String.valueOf(i + 1))), i),
                             null, null, null);
-                    /*
-                     * System.out .println(queryMap.get("vnode_image" +
-                     * String.valueOf(i + 1)) + "~~~~~~" +
-                     * queryMap.get("vnode_name" + String.valueOf(i + 1)) +
-                     * "~~~~~~" + Integer.parseInt(queryMap.get("cpu_count" +
-                     * String.valueOf(i + 1))) + "~~~~~~" +
-                     * Integer.parseInt(queryMap .get("memory_size" +
-                     * String.valueOf(i + 1))) + "~~~~~~" +
-                     * queryMap.get("appliance_list" + String.valueOf(i + 1)));
-                     */
+
+                    System.out
+                            .println(queryMap.get("vnode_image"
+                                    + String.valueOf(i + 1))
+                                    + "~~~~~~"
+                                    + queryMap.get("vnode_name"
+                                            + String.valueOf(i + 1))
+                                    + "~~~~~~"
+                                    + Integer.parseInt(queryMap.get("cpu_count"
+                                            + String.valueOf(i + 1)))
+                                    + "~~~~~~"
+                                    + Integer.parseInt(queryMap
+                                            .get("memory_size"
+                                                    + String.valueOf(i + 1)))
+                                    + "~~~~~~"
+                                    + queryMap.get("appliance_list"
+                                            + String.valueOf(i + 1)));
+
                 }
             } else if (act.equals("delete_pnode")) {
                 new DeletePnodeHandler().handleMessage(new DeletePnodeMessage(

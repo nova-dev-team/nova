@@ -121,7 +121,8 @@ public class NovaAgent extends SimpleServer {
         }
 
         NovaAgent.getInstance().loadAppliances();
-        AgentFrame.getInstance().autoStart(); // start download ui
+        if (Utils.isWindows())
+            AgentFrame.getInstance().autoStart(); // start download ui
         return chnl;
     }
 
@@ -321,13 +322,11 @@ public class NovaAgent extends SimpleServer {
 
         // Install appliances when startup
         if (args.length != 0) {
-            // start install these apps
-            new Thread(new ApplianceFirstInstall(args)).start();
             // check if all apps is installed
             new CheckApplianceFirstInstalledDaemon(args).start();
-            logger.info("in first");
+            // start install these apps
+            new Thread(new ApplianceFirstInstall(args)).start();
         }
-        logger.info("out");
         // add a shutdown hook, so a Ctrl-C or kill signal will be handled
         // gracefully
         Runtime.getRuntime().addShutdownHook(new Thread() {

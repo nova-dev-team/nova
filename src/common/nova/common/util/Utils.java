@@ -395,6 +395,40 @@ public class Utils {
     }
 
     /**
+     * copy file
+     */
+    public static void copyOneFile(String srcFile, String dstFile) {
+
+        FileInputStream fin = null;
+        FileOutputStream fout = null;
+        try {
+            fin = new FileInputStream(srcFile);
+        } catch (FileNotFoundException e) {
+            logger.error("file " + srcFile + " not found ", e);
+            return;
+        }
+
+        try {
+            fout = new FileOutputStream(new File(dstFile));
+        } catch (FileNotFoundException e) {
+            logger.error("file " + srcFile + " not found ", e);
+        }
+        int c;
+        byte[] b = new byte[1024 * 5];
+        try {
+            while ((c = fin.read(b)) != -1) {
+                fout.write(b, 0, c);
+            }
+            fin.close();
+            fout.flush();
+            fout.close();
+        } catch (IOException e) {
+            logger.error("copy file error", e);
+        }
+
+    }
+
+    /**
      * copy folder
      */
     public static void copy(String srcFile, String dstFile) {
@@ -502,6 +536,9 @@ public class Utils {
         }
     }
 
+    /**
+     * copy folder with ignore sub-folders
+     */
     public static void copyWithIgnoreFolder(String srcFile, String dstFile,
             String[] ignoreList) {
         File in = new File(srcFile);
@@ -590,6 +627,21 @@ public class Utils {
             logger.error("del folder " + folderPath + " error", e);
         }
 
+    }
+
+    public static boolean isWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        return os.indexOf("win") >= 0;
+    }
+
+    public static boolean isUnix() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.indexOf("mac") >= 0 || os.indexOf("nix") >= 0
+                || os.indexOf("nux") >= 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

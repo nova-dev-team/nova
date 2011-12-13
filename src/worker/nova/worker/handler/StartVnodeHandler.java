@@ -51,6 +51,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
     @Override
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
+
         final String virtService;
         if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
             virtService = "qemu:///system";
@@ -104,7 +105,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 if (NovaStorage.getInstance().getFtpServer() == null) {
                     NovaStorage.getInstance().startFtpServer();
                 }
-                System.out.println(Conf.getString("worker.software.save_path"));
                 try {
                     FtpClient fc = FtpUtils.connect(
                             Conf.getString("storage.ftp.bind_host"),
@@ -114,7 +114,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     fc.cd("img");
                     FtpUtils.downloadFile(fc, Utils.pathJoin(stdImgFile),
                             Utils.pathJoin(Utils.NOVA_HOME, "run", stdImgFile));
-                    System.out.println("download file " + stdImgFile);
                     fc.closeServer();
                 } catch (NumberFormatException e1) {
                     log.error("port format error!", e1);
@@ -224,9 +223,11 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         if (NovaWorker.getInstance().getAppStatus()
                                 .containsKey(appName) == false) {
                             try {
-                                if (NovaStorage.getInstance().getFtpServer() == null) {
-                                    NovaStorage.getInstance().startFtpServer();
-                                }
+                                // if (NovaStorage.getInstance().getFtpServer()
+                                // == null) {
+                                // //
+                                // NovaStorage.getInstance().startFtpServer();
+                                // }
                                 FtpClient fc = FtpUtils
                                         .connect(
                                                 Conf.getString("storage.ftp.bind_host"),
@@ -240,8 +241,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                         "appliances", appName)); // first
                                                                  // install
                                                                  // appliances
-                                System.out.println("download file " + appName);
                                 fc.closeServer();
+                                log.info("Download " + appName + " complete.");
                             } catch (NumberFormatException e1) {
                                 log.error("port format error!", e1);
                                 return;
@@ -306,7 +307,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         "data"), Utils.pathJoin(
                         agentProgramFile.getAbsolutePath(), "data"), ingoreList);
 
-                Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "VERSION"),
+                Utils.copyOneFile(Utils.pathJoin(Utils.NOVA_HOME, "VERSION"),
                         Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                                 "VERSION"));
 
@@ -322,7 +323,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         + Utils.pathJoin(Utils.NOVA_HOME, "run", msg.getName(),
                                 "agentcd", "agent-cd.iso") + " "
                         + Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares");
-                System.out.println(cmd);
+
                 try {
                     p = Runtime.getRuntime().exec(cmd);
                     StreamGobbler errorGobbler = new StreamGobbler(
@@ -343,15 +344,12 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     return;
                 }
             }
-
             // create domain and show some info
             if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
                 msg.setEmulatorPath("/usr/bin/kvm");
                 synchronized (NovaWorker.getInstance().getConnLock()) {
                     try {
-                        System.out.println();
-                        System.out.println(Kvm.emitDomain(msg.getHashMap()));
-                        System.out.println();
+
                         Domain testDomain = NovaWorker
                                 .getInstance()
                                 .getConn(virtService, false)

@@ -1,7 +1,6 @@
 package nova.agent.daemons;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 import nova.agent.NovaAgent;
 import nova.agent.appliance.Appliance;
@@ -51,12 +50,10 @@ public class CheckApplianceFirstInstalledDaemon extends SimpleDaemon {
 
     @Override
     protected void workOneRound() {
-        ConcurrentHashMap<String, Appliance> appliancesMaster = NovaAgent
-                .getInstance().getAppliances();
         boolean flag = true;
         for (String appName : appsInstalled) {
-            if (!appliancesMaster.get(appName).getStatus()
-                    .equals(Appliance.Status.INSTALLED)) {
+            if (!NovaAgent.getInstance().getAppliances().get(appName)
+                    .getStatus().equals(Appliance.Status.INSTALLED)) {
                 flag = false;
                 break;
             }
