@@ -7,6 +7,7 @@ import nova.common.service.SimpleProxy;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.worker.api.messages.InstallApplianceMessage;
 import nova.worker.api.messages.MigrateVnodeMessage;
+import nova.worker.api.messages.ObtainSshKeysMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
@@ -128,6 +129,10 @@ public class WorkerProxy extends SimpleProxy {
 
     public void sendMigrateVnode(String vnodeUuid, SimpleAddress migrateToAddr) {
         super.sendRequest(new MigrateVnodeMessage(vnodeUuid, migrateToAddr));
+    }
+
+    public void sendObtainSshKeys(String vClusterName, String vmName) {
+        super.sendRequest(new ObtainSshKeysMessage(vClusterName, vmName));
     }
 
 }

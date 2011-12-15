@@ -319,14 +319,6 @@ public class NovaAgent extends SimpleServer {
     }
 
     public static void main(String[] args) {
-
-        // Install appliances when startup
-        if (args.length != 0) {
-            // check if all apps is installed
-            new CheckApplianceFirstInstalledDaemon(args).start();
-            // start install these apps
-            new Thread(new ApplianceFirstInstall(args)).start();
-        }
         // add a shutdown hook, so a Ctrl-C or kill signal will be handled
         // gracefully
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -341,5 +333,13 @@ public class NovaAgent extends SimpleServer {
             }
         });
         NovaAgent.getInstance().start();
+
+        // Install appliances when startup
+        if (args.length != 0) {
+            // check if all apps is installed
+            new CheckApplianceFirstInstalledDaemon(args).start();
+            // start install these apps
+            new Thread(new ApplianceFirstInstall(args)).start();
+        }
     }
 }

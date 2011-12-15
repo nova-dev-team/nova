@@ -1,7 +1,5 @@
 package nova.agent.appliance;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import nova.agent.NovaAgent;
 
 /**
@@ -20,21 +18,17 @@ public class ApplianceFirstInstall implements Runnable {
 
     @Override
     public void run() {
-        ConcurrentHashMap<String, Appliance> appliancesMaster = NovaAgent
-                .getInstance().getAppliances();
         for (String appName : appsInstall) {
-            if (appliancesMaster.containsKey(appName)) {
-                Appliance app = appliancesMaster.get(appName);
+            if (NovaAgent.getInstance().getAppliances().containsKey(appName)) {
+                Appliance app = NovaAgent.getInstance().getAppliances()
+                        .get(appName);
                 app.setStatus(Appliance.Status.FIRST_INSTALL);
             } else {
                 Appliance app = new Appliance(appName);
-                appliancesMaster.put(appName, app);
+                NovaAgent.getInstance().getAppliances().put(appName, app);
                 app.setStatus(Appliance.Status.FIRST_INSTALL);
 
             }
         }
-
-        NovaAgent.getInstance().saveAppliances();
-        NovaAgent.getInstance().loadAppliances();
     }
 }

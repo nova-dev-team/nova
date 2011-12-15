@@ -67,8 +67,13 @@ public class CheckApplianceFirstInstalledDaemon extends SimpleDaemon {
             } else if (isUnix()) {
                 try {
                     // eject the iso in linux
-                    String[] cmd = new String[] { "/bin/sh", "-c", "eject" };
-                    Runtime.getRuntime().exec(cmd);
+                    String[] umountCmd = new String[] { "/bin/sh", "-c",
+                            "umount -l /mnt" };
+                    String[] ejectCmd = new String[] { "/bin/sh", "-c", "eject" };
+
+                    Runtime.getRuntime().exec(umountCmd);
+                    Runtime.getRuntime().exec(ejectCmd);
+
                     MasterProxy proxy = NovaAgent.getInstance().getMaster();
                     proxy.sendAppliancesFirstInstalledMessage(new SimpleAddress(
                             Conf.getString("agent.bind_host"), Conf

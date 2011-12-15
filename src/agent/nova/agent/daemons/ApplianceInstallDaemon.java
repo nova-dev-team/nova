@@ -62,6 +62,7 @@ class InstallThread implements Runnable {
         ApplianceInstaller.install(this.app);
         this.app.setStatus(Appliance.Status.INSTALLED);
 
+        log.info("Install " + this.app.getName() + " complete");
         // AgentFrame display after install
         AgentFrame.setInfoDisplayAfterInstall("Install Complete ");
     }

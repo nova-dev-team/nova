@@ -1,5 +1,7 @@
 package nova.master.handler;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -118,18 +120,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                         .get("description")), null, null, null);
             } else if (act.equals("create_vnode")) {
                 int j = 0;
-                new CreateVnodeHandler()
-                        .handleMessage(
-                                new CreateVnodeMessage(queryMap
-                                        .get("vnode_image"), queryMap
-                                        .get("vnode_name"), Integer
+                new CreateVnodeHandler().handleMessage(
+                        new CreateVnodeMessage(queryMap.get("vnode_image"),
+                                queryMap.get("vnode_name"), Integer
                                         .parseInt(queryMap.get("cpu_count")),
-                                        Integer.parseInt(queryMap
-                                                .get("memory_size")), queryMap
-                                                .get("appliance_list"), Integer
-                                                .parseInt(queryMap
-                                                        .get("pnode_ip")), j),
-                                null, null, null);
+                                Integer.parseInt(queryMap.get("memory_size")),
+                                queryMap.get("appliance_list"), Integer
+                                        .parseInt(queryMap.get("pnode_ip")), j,
+                                null), null, null, null);
             } else if (act.equals("create_vcluster")) {
 
                 String vclusterFrame = "<form action=\"create_vcluster_node\" method=\"get\">";
@@ -177,6 +175,94 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null, null);
 
             } else if (act.equals("create_vcluster_node")) {
+                // create ssh key pairs for linux
+                if (Utils.isUnix()) {
+                    try {
+                        for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
+                            File folder = new File(Utils.pathJoin(
+                                    Utils.NOVA_HOME, "data", "ftp_home",
+                                    "ssh_keys", Vcluster.last()
+                                            .getClusterName(), queryMap
+                                            .get("vnode_name"
+                                                    + String.valueOf(i + 1))));
+                            if (!folder.exists())
+                                folder.mkdirs();
+                            String[] cmd = new String[] {
+                                    "/bin/sh",
+                                    "-c",
+                                    "ssh-keygen -t rsa -P ‘’ -f "
+                                            + Utils.pathJoin(
+                                                    Utils.NOVA_HOME,
+                                                    "data",
+                                                    "ftp_home",
+                                                    "ssh_keys",
+                                                    Vcluster.last()
+                                                            .getClusterName(),
+                                                    queryMap.get("vnode_name"
+                                                            + String.valueOf(i + 1)),
+                                                    "id_rsa") };
+                            System.out.println("ssh-keygen -t rsa -P ‘’ -f "
+                                    + Utils.pathJoin(Utils.NOVA_HOME, "data",
+                                            "ftp_home", "ssh_keys", Vcluster
+                                                    .last().getClusterName(),
+                                            queryMap.get("vnode_name"
+                                                    + String.valueOf(i + 1)),
+                                            "id_rsa"));
+
+                            Runtime.getRuntime().exec(cmd);
+                        }
+                        String[] cmd = new String[] {
+                                "/bin/sh",
+                                "-c",
+                                "touch "
+                                        + Utils.pathJoin(Utils.NOVA_HOME,
+                                                "data", "ftp_home", "ssh_keys",
+                                                Vcluster.last()
+                                                        .getClusterName(),
+                                                "authorized_keys") };
+                        Runtime.getRuntime().exec(cmd);
+
+                        for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
+                            String[] catCmd = new String[] {
+                                    "/bin/sh",
+                                    "-c",
+                                    "cat "
+                                            + Utils.pathJoin(
+                                                    Utils.NOVA_HOME,
+                                                    "data",
+                                                    "ftp_home",
+                                                    "ssh_keys",
+                                                    Vcluster.last()
+                                                            .getClusterName(),
+                                                    queryMap.get("vnode_name"
+                                                            + String.valueOf(i + 1)),
+                                                    "id_rsa.pub")
+                                            + " >> "
+                                            + Utils.pathJoin(Utils.NOVA_HOME,
+                                                    "data", "ftp_home",
+                                                    "ssh_keys", Vcluster.last()
+                                                            .getClusterName(),
+                                                    "authorized_keys") };
+
+                            System.out.println("cat "
+                                    + Utils.pathJoin(Utils.NOVA_HOME, "data",
+                                            "ftp_home", "ssh_keys", Vcluster
+                                                    .last().getClusterName(),
+                                            queryMap.get("vnode_name"
+                                                    + String.valueOf(i + 1)),
+                                            "id_rsa.pub")
+                                    + " >> "
+                                    + Utils.pathJoin(Utils.NOVA_HOME, "data",
+                                            "ftp_home", "ssh_keys", Vcluster
+                                                    .last().getClusterName(),
+                                            "authorized_keys"));
+                            Runtime.getRuntime().exec(catCmd);
+                        }
+                    } catch (IOException e1) {
+                        log.error("Can't create ssh pair! ", e1);
+                    }
+                }
+
                 for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
                     new CreateVnodeHandler().handleMessage(
                             new CreateVnodeMessage(queryMap.get("vnode_image"
@@ -189,8 +275,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                             .get("appliance_list"
                                                     + String.valueOf(i + 1)),
                                     Integer.parseInt(queryMap.get("pnode_id"
-                                            + String.valueOf(i + 1))), i),
-                            null, null, null);
+                                            + String.valueOf(i + 1))), i,
+                                    Vcluster.last().getClusterName()), null,
+                            null, null);
 
                     System.out
                             .println(queryMap.get("vnode_image"

@@ -12,6 +12,7 @@ import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 import nova.worker.api.messages.InstallApplianceMessage;
 import nova.worker.api.messages.MigrateVnodeMessage;
+import nova.worker.api.messages.ObtainSshKeysMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
@@ -24,6 +25,7 @@ import nova.worker.daemons.WorkerHeartbeatDaemon;
 import nova.worker.daemons.WorkerPerfInfoDaemon;
 import nova.worker.handler.InstallApplianceHandler;
 import nova.worker.handler.MigrateVnodeHandler;
+import nova.worker.handler.ObtainSshKeysHandler;
 import nova.worker.handler.RevokeImageHandler;
 import nova.worker.handler.StartVnodeHandler;
 import nova.worker.handler.StopVnodeHandler;
@@ -154,6 +156,9 @@ public class NovaWorker extends SimpleServer {
 
         this.registerHandler(MigrateVnodeMessage.class,
                 new MigrateVnodeHandler());
+
+        this.registerHandler(ObtainSshKeysMessage.class,
+                new ObtainSshKeysHandler());
 
         Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
         Conf.setDefaultValue("worker.bind_port", 4000);
