@@ -54,12 +54,10 @@ public class InstallApplianceHandler implements
                             Conf.getInteger("storage.ftp.bind_port"),
                             Conf.getString("storage.ftp.admin.username"),
                             Conf.getString("storage.ftp.admin.password"));
-                    fc.cd("appliances");
-                    FtpUtils.downloadDir(fc, Utils.pathJoin(appName), Utils
-                            .pathJoin(Utils.NOVA_HOME, "run", "softwares",
-                                    appName));
+                    FtpUtils.downloadDir(fc, Utils.pathJoin("appliances",
+                            appName), Utils.pathJoin(Utils.NOVA_HOME, "run",
+                            "softwares", appName));
                     System.out.println("download file " + appName);
-                    fc.closeServer();
                 } catch (NumberFormatException e1) {
                     log.error("port format error!", e1);
                 } catch (IOException e1) {

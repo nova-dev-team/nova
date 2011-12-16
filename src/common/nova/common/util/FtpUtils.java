@@ -107,6 +107,7 @@ public class FtpUtils {
         }
         is.close();
         os.close();
+        System.err.println(remoteFileName + " -> " + localPath);
     }
 
     /**
@@ -144,7 +145,6 @@ public class FtpUtils {
             String localPath, Cancellable cancelFlag) throws IOException {
         if (shouldStop(cancelFlag) == false) {
             String oldCwd = fc.pwd();
-
             fc.cd(remotePath);
             Utils.mkdirs(localPath);
 

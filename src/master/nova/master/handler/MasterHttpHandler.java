@@ -201,15 +201,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                     queryMap.get("vnode_name"
                                                             + String.valueOf(i + 1)),
                                                     "id_rsa") };
-                            System.out.println("ssh-keygen -t rsa -P ‘’ -f "
-                                    + Utils.pathJoin(Utils.NOVA_HOME, "data",
-                                            "ftp_home", "ssh_keys", Vcluster
-                                                    .last().getClusterName(),
-                                            queryMap.get("vnode_name"
-                                                    + String.valueOf(i + 1)),
-                                            "id_rsa"));
 
-                            Runtime.getRuntime().exec(cmd);
+                            Process proc = Runtime.getRuntime().exec(cmd);
+                            try {
+                                if (proc.waitFor() == 0) {
+                                }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                         String[] cmd = new String[] {
                                 "/bin/sh",
@@ -220,7 +219,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                 Vcluster.last()
                                                         .getClusterName(),
                                                 "authorized_keys") };
-                        Runtime.getRuntime().exec(cmd);
+                        Process proc = Runtime.getRuntime().exec(cmd);
+                        try {
+                            if (proc.waitFor() == 0) {
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
                         for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
                             String[] catCmd = new String[] {
@@ -243,20 +248,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                     "ssh_keys", Vcluster.last()
                                                             .getClusterName(),
                                                     "authorized_keys") };
-
-                            System.out.println("cat "
-                                    + Utils.pathJoin(Utils.NOVA_HOME, "data",
-                                            "ftp_home", "ssh_keys", Vcluster
-                                                    .last().getClusterName(),
-                                            queryMap.get("vnode_name"
-                                                    + String.valueOf(i + 1)),
-                                            "id_rsa.pub")
-                                    + " >> "
-                                    + Utils.pathJoin(Utils.NOVA_HOME, "data",
-                                            "ftp_home", "ssh_keys", Vcluster
-                                                    .last().getClusterName(),
-                                            "authorized_keys"));
-                            Runtime.getRuntime().exec(catCmd);
+                            Process proc1 = Runtime.getRuntime().exec(catCmd);
+                            try {
+                                if (proc1.waitFor() == 0) {
+                                }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     } catch (IOException e1) {
                         log.error("Can't create ssh pair! ", e1);

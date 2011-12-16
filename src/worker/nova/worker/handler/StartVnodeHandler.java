@@ -111,10 +111,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             Conf.getInteger("storage.ftp.bind_port"),
                             Conf.getString("storage.ftp.admin.username"),
                             Conf.getString("storage.ftp.admin.password"));
-                    fc.cd("img");
-                    FtpUtils.downloadFile(fc, Utils.pathJoin(stdImgFile),
+                    FtpUtils.downloadFile(fc,
+                            Utils.pathJoin("img", stdImgFile),
                             Utils.pathJoin(Utils.NOVA_HOME, "run", stdImgFile));
-                    fc.closeServer();
                 } catch (NumberFormatException e1) {
                     log.error("port format error!", e1);
                 } catch (IOException e1) {
@@ -211,6 +210,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     os.write("\n".getBytes());
                     os.write(msg.getGateWay().getBytes());
                     os.write("\n".getBytes());
+                    os.write(msg.getName().getBytes());
+                    os.write("\n".getBytes());
                     os.close();
                 } catch (FileNotFoundException e1) {
                     log.error("file not found!", e1);
@@ -234,14 +235,12 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                                 Conf.getInteger("storage.ftp.bind_port"),
                                                 Conf.getString("storage.ftp.admin.username"),
                                                 Conf.getString("storage.ftp.admin.password"));
-                                fc.cd("appliances");
-                                FtpUtils.downloadDir(fc, Utils
-                                        .pathJoin(appName), Utils.pathJoin(
+                                FtpUtils.downloadDir(fc, Utils.pathJoin(
+                                        "appliances", appName), Utils.pathJoin(
                                         Utils.NOVA_HOME, "run", "softwares",
                                         "appliances", appName)); // first
                                                                  // install
                                                                  // appliances
-                                fc.closeServer();
                                 log.info("Download " + appName + " complete.");
                             } catch (NumberFormatException e1) {
                                 log.error("port format error!", e1);

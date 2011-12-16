@@ -30,15 +30,18 @@ public class ObtainSshKeysHandler implements
         try {
             FtpClient fc = FtpUtils
                     .connect(hostIp, ftpPort, userName, password);
-            FtpUtils.downloadDir(fc, "/ssh_keys/" + msg.vClusterName + "/"
-                    + msg.vmName + "/",
+            FtpUtils.downloadDir(fc,
+                    Utils.pathJoin("ssh_keys", msg.vClusterName, msg.vmName),
                     Utils.pathJoin(savePath, "sshkeys", msg.vmName));
+            System.out.println(Utils.pathJoin("ssh_keys", msg.vClusterName,
+                    msg.vmName)
+                    + "-> "
+                    + Utils.pathJoin(savePath, "sshkeys", msg.vmName));
             FtpUtils.downloadFile(fc, "/ssh_keys/" + msg.vClusterName
                     + "/authorized_keys", Utils.pathJoin(savePath, "sshkeys",
                     msg.vmName, "authorized_keys"));
-
+            System.out.println(msg.vClusterName + " -> " + msg.vmName);
             logger.info("Have downloaded ssh keys pairs from server!");
-
         } catch (IOException e1) {
             logger.error("Downloading pictures fail: ", e1);
         }
