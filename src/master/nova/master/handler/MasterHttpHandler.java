@@ -1,7 +1,5 @@
 package nova.master.handler;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -176,89 +174,121 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
             } else if (act.equals("create_vcluster_node")) {
                 // create ssh key pairs for linux
+                // if (Utils.isUnix()) {
+                // try {
+                // for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
+                // File folder = new File(Utils.pathJoin(
+                // Utils.NOVA_HOME, "data", "ftp_home",
+                // "ssh_keys", Vcluster.last()
+                // .getClusterName(), queryMap
+                // .get("vnode_name"
+                // + String.valueOf(i + 1))));
+                // if (!folder.exists())
+                // folder.mkdirs();
+                // String[] cmd = new String[] {
+                // "/bin/sh",
+                // "-c",
+                // "ssh-keygen -t rsa -P ‘’ -f "
+                // + Utils.pathJoin(
+                // Utils.NOVA_HOME,
+                // "data",
+                // "ftp_home",
+                // "ssh_keys",
+                // Vcluster.last()
+                // .getClusterName(),
+                // queryMap.get("vnode_name"
+                // + String.valueOf(i + 1)),
+                // "id_rsa") };
+                //
+                // Process proc = Runtime.getRuntime().exec(cmd);
+                // try {
+                // if (proc.waitFor() == 0) {
+                // }
+                // } catch (InterruptedException e) {
+                // e.printStackTrace();
+                // }
+                // }
+                // String[] cmd = new String[] {
+                // "/bin/sh",
+                // "-c",
+                // "touch "
+                // + Utils.pathJoin(Utils.NOVA_HOME,
+                // "data", "ftp_home", "ssh_keys",
+                // Vcluster.last()
+                // .getClusterName(),
+                // "authorized_keys") };
+                // Process proc = Runtime.getRuntime().exec(cmd);
+                // try {
+                // if (proc.waitFor() == 0) {
+                // }
+                // } catch (InterruptedException e) {
+                // e.printStackTrace();
+                // }
+                //
+                // for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
+                // String[] catCmd = new String[] {
+                // "/bin/sh",
+                // "-c",
+                // "cat "
+                // + Utils.pathJoin(
+                // Utils.NOVA_HOME,
+                // "data",
+                // "ftp_home",
+                // "ssh_keys",
+                // Vcluster.last()
+                // .getClusterName(),
+                // queryMap.get("vnode_name"
+                // + String.valueOf(i + 1)),
+                // "id_rsa.pub")
+                // + " >> "
+                // + Utils.pathJoin(Utils.NOVA_HOME,
+                // "data", "ftp_home",
+                // "ssh_keys", Vcluster.last()
+                // .getClusterName(),
+                // "authorized_keys") };
+                // Process proc1 = Runtime.getRuntime().exec(catCmd);
+                // try {
+                // if (proc1.waitFor() == 0) {
+                // }
+                // } catch (InterruptedException e) {
+                // e.printStackTrace();
+                // }
+                // }
+                // } catch (IOException e1) {
+                // log.error("Can't create ssh pair! ", e1);
+                // }
+                // }
+
                 if (Utils.isUnix()) {
-                    try {
+                    // we don't have to create new ssh key pair
+                    if (Vcluster.last().getClusterSize() <= 10) {
+                        String ftpDir = Utils.pathJoin(Utils.NOVA_HOME, "data",
+                                "ftp_home", "ssh_keys");
+                        Utils.mkdirs(Utils.pathJoin(ftpDir, Vcluster.last()
+                                .getClusterName()));
                         for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
-                            File folder = new File(Utils.pathJoin(
-                                    Utils.NOVA_HOME, "data", "ftp_home",
-                                    "ssh_keys", Vcluster.last()
-                                            .getClusterName(), queryMap
-                                            .get("vnode_name"
-                                                    + String.valueOf(i + 1))));
-                            if (!folder.exists())
-                                folder.mkdirs();
-                            String[] cmd = new String[] {
-                                    "/bin/sh",
-                                    "-c",
-                                    "ssh-keygen -t rsa -P ‘’ -f "
-                                            + Utils.pathJoin(
-                                                    Utils.NOVA_HOME,
-                                                    "data",
-                                                    "ftp_home",
-                                                    "ssh_keys",
-                                                    Vcluster.last()
-                                                            .getClusterName(),
-                                                    queryMap.get("vnode_name"
-                                                            + String.valueOf(i + 1)),
-                                                    "id_rsa") };
-
-                            Process proc = Runtime.getRuntime().exec(cmd);
-                            try {
-                                if (proc.waitFor() == 0) {
-                                }
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            String vmName = queryMap.get("vnode_name"
+                                    + String.valueOf(i + 1));
+                            Utils.mkdirs(Utils.pathJoin(ftpDir, Vcluster.last()
+                                    .getClusterName(), vmName));
+                            String tmpFile = "id_rsa" + (i + 1);
+                            Utils.copyOneFile(Utils.pathJoin(ftpDir, tmpFile),
+                                    Utils.pathJoin(ftpDir, Vcluster.last()
+                                            .getClusterName(), vmName, tmpFile));
+                            String tmpPubFile = "id_rsa" + (i + 1) + ".pub";
+                            Utils.copyOneFile(Utils
+                                    .pathJoin(ftpDir, tmpPubFile), Utils
+                                    .pathJoin(ftpDir, Vcluster.last()
+                                            .getClusterName(), vmName,
+                                            tmpPubFile));
                         }
-                        String[] cmd = new String[] {
-                                "/bin/sh",
-                                "-c",
-                                "touch "
-                                        + Utils.pathJoin(Utils.NOVA_HOME,
-                                                "data", "ftp_home", "ssh_keys",
-                                                Vcluster.last()
-                                                        .getClusterName(),
-                                                "authorized_keys") };
-                        Process proc = Runtime.getRuntime().exec(cmd);
-                        try {
-                            if (proc.waitFor() == 0) {
-                            }
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
-                            String[] catCmd = new String[] {
-                                    "/bin/sh",
-                                    "-c",
-                                    "cat "
-                                            + Utils.pathJoin(
-                                                    Utils.NOVA_HOME,
-                                                    "data",
-                                                    "ftp_home",
-                                                    "ssh_keys",
-                                                    Vcluster.last()
-                                                            .getClusterName(),
-                                                    queryMap.get("vnode_name"
-                                                            + String.valueOf(i + 1)),
-                                                    "id_rsa.pub")
-                                            + " >> "
-                                            + Utils.pathJoin(Utils.NOVA_HOME,
-                                                    "data", "ftp_home",
-                                                    "ssh_keys", Vcluster.last()
-                                                            .getClusterName(),
-                                                    "authorized_keys") };
-                            Process proc1 = Runtime.getRuntime().exec(catCmd);
-                            try {
-                                if (proc1.waitFor() == 0) {
-                                }
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } catch (IOException e1) {
-                        log.error("Can't create ssh pair! ", e1);
+                        Utils.copyOneFile(Utils.pathJoin(ftpDir,
+                                "authorized_keys"), Utils.pathJoin(ftpDir,
+                                Vcluster.last().getClusterName(),
+                                "authorized_keys"));
                     }
+                } else {
+                    // TODO
                 }
 
                 for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {

@@ -40,7 +40,6 @@ public class ObtainSshKeysHandler implements
             FtpUtils.downloadFile(fc, "/ssh_keys/" + msg.vClusterName
                     + "/authorized_keys", Utils.pathJoin(savePath, "sshkeys",
                     msg.vmName, "authorized_keys"));
-            System.out.println(msg.vClusterName + " -> " + msg.vmName);
             logger.info("Have downloaded ssh keys pairs from server!");
         } catch (IOException e1) {
             logger.error("Downloading pictures fail: ", e1);

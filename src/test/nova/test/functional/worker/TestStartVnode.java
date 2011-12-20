@@ -1,7 +1,6 @@
 package nova.test.functional.worker;
 
 import nova.common.service.SimpleAddress;
-import nova.storage.NovaStorage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.handler.StartVnodeHandler;
 
@@ -20,7 +19,8 @@ public class TestStartVnode {
 
     @Test
     public void test() {
-        NovaStorage.getInstance().startFtpServer();
+        // NovaStorage.getInstance().startFtpServer(); //if failed to connect to
+        // ftp then un-note this
         StartVnodeHandler svh = new StartVnodeHandler();
         String[] apps;
         String appList = "demo1,demo2,demo3";
@@ -28,13 +28,13 @@ public class TestStartVnode {
 
         // StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
         // "false", "100288", "1", "small.img", "false");
-        StartVnodeMessage msg = new StartVnodeMessage("kvm", "fedora_vm", null,
-                false, "300000", "1", "fedora.img", false, apps, "10.0.1.100",
+        StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu1", null,
+                false, "300000", "1", "ubuntu.img", false, apps, "10.0.1.100",
                 "255.255.255.0", "10.0.1.254");
 
         // msg.setName("vm");
         // msg.setMemSize("1024000");
-        msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
+        msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aaf");
         msg.setCdImage("agent-cd.iso");
         msg.setRunAgent(true);
 

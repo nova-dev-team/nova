@@ -107,7 +107,6 @@ public class FtpUtils {
         }
         is.close();
         os.close();
-        System.err.println(remoteFileName + " -> " + localPath);
     }
 
     /**

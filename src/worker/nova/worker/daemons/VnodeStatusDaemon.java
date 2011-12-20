@@ -49,10 +49,10 @@ public class VnodeStatusDaemon extends SimpleDaemon {
             try {
                 if (NovaWorker.getInstance().getConn("qemu:///system", false)
                         .numOfDomains() > 0) {
-                    System.out.println("numofdomains\t"
-                            + Integer.toString(NovaWorker.getInstance()
-                                    .getConn("qemu:///system", false)
-                                    .numOfDomains()));
+                    // System.out.println("numofdomains\t"
+                    // + Integer.toString(NovaWorker.getInstance()
+                    // .getConn("qemu:///system", false)
+                    // .numOfDomains()));
                     int[] ids = NovaWorker.getInstance()
                             .getConn("qemu:///system", false).listDomains();
                     for (int i = 0; i < ids.length; i++) {

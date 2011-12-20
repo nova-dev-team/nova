@@ -114,4 +114,13 @@ public class TestAgent {
             System.out.println(app.toString());
         }
     }
+
+    public static void main(String[] args) {
+        int i = 0;
+        String tmpFile = "id_rsa" + (i + 1);
+        String src = "//home//earlycicada//workspace//nova//data//ftp_home//ssh_keys//"
+                + tmpFile;
+        String dst = "//home//earlycicada//workspace//nova//data//ftp_home//id_rsa1";
+        Utils.copyOneFile(src, dst);
+    }
 }
