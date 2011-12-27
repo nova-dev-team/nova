@@ -1,5 +1,10 @@
 package nova.master.handler;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -291,6 +296,52 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     // TODO
                 }
 
+                // Hadoop config
+                for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
+                    if (queryMap.get("appliance_list" + String.valueOf(i + 1))
+                            .contains("hadoop")) {
+
+                        File ipFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                                "run", "params", "clusterInfo.txt"));
+
+                        try {
+                            if (!ipFile.exists()) {
+                                ipFile.createNewFile();
+                            }
+                            OutputStream os = new FileOutputStream(ipFile);
+                            os.write(Vcluster.last().getFristIp().getBytes());
+                            os.write("\n".getBytes());
+                            os.write(Vcluster.last().getClusterSize()
+                                    .toString().getBytes());
+                            os.write("\n".getBytes());
+                            os.close();
+                        } catch (FileNotFoundException e1) {
+                            log.error("file not found!", e1);
+                        } catch (IOException e1) {
+                            log.error("file write fail!", e1);
+                        }
+                        String[] cmd = new String[] {
+                                "/bin/sh",
+                                "-c",
+                                "sh "
+                                        + Utils.pathJoin(Utils.NOVA_HOME,
+                                                "data", "ftp_home",
+                                                "appliances", "hadoop",
+                                                "createConfigFile.sh") };
+                        try {
+                            Process proc = Runtime.getRuntime().exec(cmd);
+                            try {
+                                if (proc.waitFor() == 0) {
+                                }
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        break;
+                    }
+                }
                 for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
                     new CreateVnodeHandler().handleMessage(
                             new CreateVnodeMessage(queryMap.get("vnode_image"

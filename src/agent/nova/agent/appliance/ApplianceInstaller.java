@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 
 import nova.common.util.Conf;
 import nova.common.util.Utils;
+import nova.worker.models.StreamGobbler;
 
 import org.apache.log4j.Logger;
 
@@ -94,9 +95,26 @@ public class ApplianceInstaller {
 
             // Install statement used in linux
         } else if (isUnix()) {
-            Runtime.getRuntime().exec(
-                    "sh " + Utils.pathJoin(folderPath, "autorun.sh"),
-                    new String[0], new File(folderPath));
+            String cmd = "sh " + Utils.pathJoin(folderPath, "autorun.sh");
+            Process p;
+            try {
+                p = Runtime.getRuntime().exec(cmd);
+                StreamGobbler errorGobbler = new StreamGobbler(
+                        p.getErrorStream(), "ERROR");
+                errorGobbler.start();
+                StreamGobbler outGobbler = new StreamGobbler(
+                        p.getInputStream(), "STDOUT");
+                outGobbler.start();
+                try {
+                    if (p.waitFor() != 0) {
+                        logger.info(folderPath + " Install failure!");
+                    }
+                } catch (InterruptedException e1) {
+                    logger.info(folderPath + " Install failure!", e1);
+                }
+            } catch (IOException e1) {
+                logger.info(folderPath + " Install failure!", e1);
+            }
         } else {
             logger.error("Can't find the autorun file for this appliance: "
                     + folderPath);

@@ -20,10 +20,10 @@ public class TestInstallAppliance {
     // If you have three directory demo1 blah at E:\ then assert will be false
     @Test
     public void testFirstInstall() {
-        String[] softList = { "demo1", "demo2", "demo3" };
+        String[] softList = { "demo1", "demo2", "demo3", "hadoop" };
         new Thread(new ApplianceFirstInstall(softList)).start();
         try {
-            Thread.sleep(5000);
+            Thread.sleep(500000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

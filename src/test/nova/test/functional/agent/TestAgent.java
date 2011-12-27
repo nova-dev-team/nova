@@ -13,6 +13,7 @@ import nova.agent.appliance.Appliance;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.NovaMaster;
+import nova.worker.models.StreamGobbler;
 
 import org.junit.Test;
 
@@ -116,11 +117,25 @@ public class TestAgent {
     }
 
     public static void main(String[] args) {
-        int i = 0;
-        String tmpFile = "id_rsa" + (i + 1);
-        String src = "//home//earlycicada//workspace//nova//data//ftp_home//ssh_keys//"
-                + tmpFile;
-        String dst = "//home//earlycicada//workspace//nova//data//ftp_home//id_rsa1";
-        Utils.copyOneFile(src, dst);
+        String cmd = "sh //home//earlycicada//workspace//nova//data//ftp_home//appliances//hadoop//test.sh";
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(cmd);
+            StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(),
+                    "ERROR");
+            errorGobbler.start();
+            StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
+                    "STDOUT");
+            outGobbler.start();
+            try {
+                if (p.waitFor() != 0) {
+                    System.out.println("wrong");
+                }
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
     }
 }
