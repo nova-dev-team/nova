@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
@@ -15,6 +16,7 @@ import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.FtpUtils;
 import nova.common.util.Utils;
+import nova.master.api.MasterProxy;
 import nova.master.models.Vnode;
 import nova.storage.NovaStorage;
 import nova.worker.NovaWorker;
@@ -38,6 +40,7 @@ import sun.net.ftp.FtpClient;
  * @author santa
  * 
  */
+// TODO delete experiment codes between //////////////////// and //////////////
 public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
     /**
@@ -51,6 +54,18 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
     @Override
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
+
+        // ////////////////////////////////////////////////////////////////////
+        String ip = new SimpleAddress(msg.getIpAddr(), 4100).toString();
+
+        // Start vnode begin
+        MasterProxy mp = new MasterProxy(new SimpleAddress(msg.getIpAddr(),
+                4100));
+        mp.connect(new InetSocketAddress(Conf.getString("master.bind_host"),
+                Conf.getInteger("master.bind_port")));
+        mp.sendExpTimeMessage(ip, "startCal", System.currentTimeMillis());
+        mp.sendExpTimeMessage(ip, "startTime", System.currentTimeMillis());
+        // ////////////////////////////////////////////////////////////////////
 
         final String virtService;
         if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
@@ -219,6 +234,38 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     log.error("file write fail!", e1);
                 }
 
+                // write nova.agent.ipaddress.properties file
+                File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                        "conf", "nova.agent.extrainfo.properties"));
+                if (!ipAddrFile.exists()) {
+                    try {
+                        ipAddrFile.createNewFile();
+                    } catch (IOException e1) {
+                        log.error(
+                                "create nova.agent.extrainfo.properties file fail!",
+                                e1);
+                    }
+                }
+
+                try {
+                    PrintWriter outpw = new PrintWriter(new FileWriter(
+                            ipAddrFile));
+                    outpw.println("agent.bind_host=" + msg.getIpAddr());
+                    outpw.println("master.bind_host="
+                            + Conf.getString("master.bind_host"));
+                    outpw.println("master.bind_port="
+                            + Conf.getString("master.bind_port"));
+                    outpw.close();
+                } catch (IOException e1) {
+                    log.error(
+                            "write nova.agent.extrainfo.properties file fail!",
+                            e1);
+                }
+                // ////////////////////////////////////////////////////////////////////
+                mp.sendExpTimeMessage(ip, "configTime",
+                        System.currentTimeMillis());
+                // ////////////////////////////////////////////////////////////////////
+                // start download apps
                 if (msg.getApps() != null) {
                     for (String appName : msg.getApps()) {
                         if (NovaWorker.getInstance().getAppStatus()
@@ -254,35 +301,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         }
                     }
                 }
+                // ////////////////////////////////////////////////////////////////////
+                // finish download apps
+                mp.sendExpTimeMessage(ip, "downloadTime",
+                        System.currentTimeMillis());
+                // ////////////////////////////////////////////////////////////////////
 
-                // write nova.agent.ipaddress.properties file
-                File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                        "conf", "nova.agent.extrainfo.properties"));
-                if (!ipAddrFile.exists()) {
-                    try {
-                        ipAddrFile.createNewFile();
-                    } catch (IOException e1) {
-                        log.error(
-                                "create nova.agent.extrainfo.properties file fail!",
-                                e1);
-                    }
-                }
-
-                try {
-                    PrintWriter outpw = new PrintWriter(new FileWriter(
-                            ipAddrFile));
-                    outpw.println("agent.bind_host=" + msg.getIpAddr());
-                    outpw.println("master.bind_host="
-                            + Conf.getString("master.bind_host"));
-                    outpw.println("master.bind_port="
-                            + Conf.getString("master.bind_port"));
-                    outpw.close();
-                } catch (IOException e1) {
-                    log.error(
-                            "write nova.agent.extrainfo.properties file fail!",
-                            e1);
-                }
-
+                // packiso process start
                 // copy files to Novahome/run/softwares
                 File agentProgramFile = new File(Utils.pathJoin(
                         Utils.NOVA_HOME, "run", "softwares", "run"));
@@ -343,12 +368,18 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     return;
                 }
             }
+            // ////////////////////////////////////////////////////////////////////
+            // packiso finished
+            mp.sendExpTimeMessage(ip, "packIsoTime", System.currentTimeMillis());
+            // ////////////////////////////////////////////////////////////////////
+
             // create domain and show some info
             if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
                 msg.setEmulatorPath("/usr/bin/kvm");
                 synchronized (NovaWorker.getInstance().getConnLock()) {
                     try {
 
+                        // start a vnode
                         Domain testDomain = NovaWorker
                                 .getInstance()
                                 .getConn(virtService, false)

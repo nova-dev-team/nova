@@ -38,6 +38,8 @@ import nova.master.handler.RegisterVdiskHandler;
 import nova.master.handler.VnodeStatusHandler;
 import nova.master.models.Pnode;
 import nova.storage.NovaStorage;
+import nova.test.functional.agent.experiment.ExpTimeHandler;
+import nova.test.functional.agent.experiment.ExpTimeMessage;
 import nova.worker.api.WorkerProxy;
 
 import org.apache.log4j.Logger;
@@ -107,7 +109,12 @@ public class NovaMaster extends SimpleServer {
                 new MasterAgentPerfHandler());
         this.registerHandler(AppliancesFirstInstalledMessage.class,
                 new ApplicancesFirstInstalledHandler());
+        // TODO delete experiment codes between //////////////////// and
+        // //////////////
 
+        // ////////////////////////////////////////////////////
+        this.registerHandler(ExpTimeMessage.class, new ExpTimeHandler());
+        // //////////////////////////////////////////////////
         Conf.setDefaultValue("master.bind_host", "0.0.0.0");
         Conf.setDefaultValue("master.bind_port", 3000);
     }

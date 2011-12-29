@@ -30,6 +30,7 @@ import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vnode;
+import nova.test.functional.agent.experiment.ExpTimeMessage;
 
 /**
  * Proxy for Master node.
@@ -148,4 +149,12 @@ public class MasterProxy extends SimpleProxy {
     public void sendAppliancesFirstInstalledMessage(SimpleAddress simpleAddress) {
         super.sendRequest(new AppliancesFirstInstalledMessage(simpleAddress));
     }
+
+    // TODO delete experiment codes between //////////////////// and
+    // //////////////
+    // //////////////////////////////////////////////////////////////////////////
+    public void sendExpTimeMessage(String ip, String timeType, long curTime) {
+        super.sendRequest(new ExpTimeMessage(ip, timeType, curTime));
+    }
+    // /////////////////////////////////////////////////////////////////////////
 }

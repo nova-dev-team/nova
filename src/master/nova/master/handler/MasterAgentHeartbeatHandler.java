@@ -4,6 +4,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.service.message.AgentHeartbeatMessage;
 import nova.master.models.Vnode;
+import nova.test.functional.agent.experiment.TimeInfo;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -11,7 +12,6 @@ import org.jboss.netty.channel.MessageEvent;
 
 public class MasterAgentHeartbeatHandler implements
         SimpleHandler<AgentHeartbeatMessage> {
-
     /**
      * Log4j logger;
      */
@@ -28,6 +28,18 @@ public class MasterAgentHeartbeatHandler implements
         } else {
             log.info("Got agent heartbeat message from: " + xreply);
         }
+
+        // TODO delete experiment codes between //////////////////// and
+        // //////////////
+        // //////////////////////////////////////////////////////////////
+        if (TimeInfo.getInstance().getvNodesTime()
+                .containsKey(xreply.toString())) {
+            if (TimeInfo.getInstance().getvNodesTime().get(xreply.toString())
+                    .get("startVnodeTime") == 0)
+                TimeInfo.setStartVnodeTime(xreply.toString(),
+                        System.currentTimeMillis());
+        }
+        // ////////////////////////////////////////////////////////////////////
 
         // TODO @zhaoxun possibly update vnode.agentStatus
         // String oldStatus = null;
@@ -68,5 +80,4 @@ public class MasterAgentHeartbeatHandler implements
         //
         // }
     }
-
 }

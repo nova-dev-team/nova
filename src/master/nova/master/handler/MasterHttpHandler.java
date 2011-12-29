@@ -276,11 +276,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + String.valueOf(i + 1));
                             Utils.mkdirs(Utils.pathJoin(ftpDir, Vcluster.last()
                                     .getClusterName(), vmName));
-                            String tmpFile = "id_rsa" + (i + 1);
+                            String tmpFile = "id_rsa";
                             Utils.copyOneFile(Utils.pathJoin(ftpDir, tmpFile),
                                     Utils.pathJoin(ftpDir, Vcluster.last()
                                             .getClusterName(), vmName, tmpFile));
-                            String tmpPubFile = "id_rsa" + (i + 1) + ".pub";
+                            String tmpPubFile = "id_rsa.pub";
                             Utils.copyOneFile(Utils
                                     .pathJoin(ftpDir, tmpPubFile), Utils
                                     .pathJoin(ftpDir, Vcluster.last()

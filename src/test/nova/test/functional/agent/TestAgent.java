@@ -13,7 +13,7 @@ import nova.agent.appliance.Appliance;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.NovaMaster;
-import nova.worker.models.StreamGobbler;
+import nova.test.functional.agent.experiment.TimeInfo;
 
 import org.junit.Test;
 
@@ -117,25 +117,8 @@ public class TestAgent {
     }
 
     public static void main(String[] args) {
-        String cmd = "sh //home//earlycicada//workspace//nova//data//ftp_home//appliances//hadoop//test.sh";
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec(cmd);
-            StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(),
-                    "ERROR");
-            errorGobbler.start();
-            StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
-                    "STDOUT");
-            outGobbler.start();
-            try {
-                if (p.waitFor() != 0) {
-                    System.out.println("wrong");
-                }
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
+        TimeInfo.setVnodeTimeCal("10.0");
+        TimeInfo.setStartTime("10.0", System.currentTimeMillis());
+        TimeInfo.print();
     }
 }
