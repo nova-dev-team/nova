@@ -343,6 +343,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
                 }
                 for (int i = 0; i < Vcluster.last().getClusterSize(); i++) {
+
                     new CreateVnodeHandler().handleMessage(
                             new CreateVnodeMessage(queryMap.get("vnode_image"
                                     + String.valueOf(i + 1)), queryMap

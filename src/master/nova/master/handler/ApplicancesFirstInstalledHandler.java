@@ -22,7 +22,13 @@ public class ApplicancesFirstInstalledHandler implements
         // //////////////////////////////////////////////////////////////////////////
         TimeInfo.setDeployTime(msg.ipAddress, System.currentTimeMillis());
         TimeInfo.setTotalTime(msg.ipAddress, System.currentTimeMillis());
-        TimeInfo.print();
+        String ip = msg.ipAddress.split(":")[0];
+        String vClusterName = TimeInfo.getVClusterNameByIP(ip);
+        // judge if all the nodes of this cluster have completed their deploying
+        // apps operations
+        if ((TimeInfo.getCurrentVClusterSizeByName(vClusterName)) == TimeInfo
+                .getVClusterSizeByName(vClusterName))
+            TimeInfo.writeToFile(vClusterName);
         // ////////////////////////////////////////////////////////////////////////////
         System.err.println(msg.ipAddress + ": applicances first installed!");
     }

@@ -1,9 +1,12 @@
 package nova.test.functional.agent;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import junit.framework.Assert;
@@ -13,7 +16,6 @@ import nova.agent.appliance.Appliance;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.NovaMaster;
-import nova.test.functional.agent.experiment.TimeInfo;
 
 import org.junit.Test;
 
@@ -117,8 +119,22 @@ public class TestAgent {
     }
 
     public static void main(String[] args) {
-        TimeInfo.setVnodeTimeCal("10.0");
-        TimeInfo.setStartTime("10.0", System.currentTimeMillis());
-        TimeInfo.print();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss");
+        Date date = new Date(System.currentTimeMillis());
+        String formatDate = dateFormat.format(date);
+        File testFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                "softwares", "testResult", formatDate + ".txt"));
+        System.out.println(testFile);
+        try {
+            if (!testFile.exists()) {
+                testFile.createNewFile();
+            }
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

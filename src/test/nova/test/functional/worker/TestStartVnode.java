@@ -24,12 +24,12 @@ public class TestStartVnode {
         // ftp then uncomment this
         StartVnodeHandler svh = new StartVnodeHandler();
         String[] apps;
-        String appList = "demo1,demo2,demo3,hadoop";
+        String appList = "demo1,demo2,demo3";
         apps = appList.split(",");
 
         // StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
         // "false", "100288", "1", "small.img", "false");
-        StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu1", null,
+        StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu2", null,
                 false, "300000", "1", "ubuntu.img", false, apps, "10.0.1.100",
                 "255.255.255.0", "10.0.1.254");
 

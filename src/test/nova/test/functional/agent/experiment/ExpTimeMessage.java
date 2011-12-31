@@ -1,5 +1,11 @@
 package nova.test.functional.agent.experiment;
 
+/**
+ * Experiment time consumption message
+ * 
+ * @author gaotao1987@gmail.com
+ * 
+ */
 public class ExpTimeMessage {
     public ExpTimeMessage() {
 

@@ -10,11 +10,19 @@ import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.models.Vcluster;
+import nova.test.functional.agent.experiment.TimeInfo;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
+/**
+ * An class for store time consumption results in an creation process of virtual
+ * cluster
+ * 
+ * @author gaotao@gmail.com
+ * 
+ */
 public class CreateVclusterHandler implements
         SimpleHandler<CreateVclusterMessage> {
     /**
@@ -93,5 +101,12 @@ public class CreateVclusterHandler implements
         vcluster.setClusterSize(msg.vclusterSize);
         vcluster.setFristIp(Utils.integerToIpv4(testIpIval));
         vcluster.save();
+
+        // TODO delete these experiments codes when necessary
+        // /////////////////////////////////////////////////////////
+        // Initialize vClusterRange of TimeInfo
+        TimeInfo.setVClusterInfo(vcluster.getClusterName(),
+                vcluster.getFristIp(), vcluster.getClusterSize());
+        // //////////////////////////////////////////////////////////
     }
 }
