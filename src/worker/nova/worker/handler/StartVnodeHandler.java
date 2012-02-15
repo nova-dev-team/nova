@@ -118,7 +118,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     stdImgFile));
             if (!stdFile.exists()) {
                 if (NovaStorage.getInstance().getFtpServer() == null) {
-                    NovaStorage.getInstance().startFtpServer();
+                    // NovaStorage.getInstance().startFtpServer();
                 }
                 try {
                     FtpClient fc = FtpUtils.connect(
@@ -134,7 +134,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 } catch (IOException e1) {
                     log.error("ftp connection fail!", e1);
                 }
-                NovaStorage.getInstance().shutdown();
+                // NovaStorage.getInstance().shutdown();
             }
             long stdLen = stdFile.length();
             boolean found = false;
