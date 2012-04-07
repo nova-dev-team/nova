@@ -1,0 +1,27 @@
+Nova_home
+	/conf
+		ipAddrFiles
+	/bin
+	/lib
+	/appliances
+		appName*
+	/data
+	/VERSION$
+	/run
+		/vdiskpool
+		/appliances
+		/$WORKERIP_NAME
+			imgFile.img
+			/softwares
+				/params
+				ipconfig.txt
+				/appliances
+					appName*
+				/run
+					/conf
+					/bin
+					/lib
+					/data
+					/VERSION
+			/agentcd
+				agent-cd.iso

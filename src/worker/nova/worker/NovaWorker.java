@@ -1,5 +1,6 @@
 package nova.worker;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 import nova.worker.api.messages.InstallApplianceMessage;
 import nova.worker.api.messages.MigrateVnodeMessage;
@@ -185,6 +187,46 @@ public class NovaWorker extends SimpleServer {
             daemon.start();
         }
         logger.info("All deamons started");
+
+        // @eagle
+        // if sotrage.engine= pnfs,mount pnfs directory
+        if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+            String strPnfsHost = Conf.getString("storage.pnfs.bind_host");
+            File dirFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
+            if (!dirFile.exists())
+                Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
+            String[] strExecs = {
+                    "modprobe nfs_layout_nfsv41_files",
+                    "mount -t nfs4 -o minorversion=1 " + strPnfsHost
+                            + ":/Nova_home "
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+            try {
+                for (String cmd : strExecs) {
+                    Process p = Runtime.getRuntime().exec(cmd);
+                    StreamGobbler errorGobbler = new StreamGobbler(
+                            p.getErrorStream(), "ERROR");
+                    errorGobbler.start();
+                    StreamGobbler outGobbler = new StreamGobbler(
+                            p.getInputStream(), "STDOUT");
+                    outGobbler.start();
+                    try {
+                        if (p.waitFor() != 0) {
+                            logger.error("mount pnfs folder returned abnormal value!");
+                        }
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        logger.error("mount pnfs folder process terminated!", e);
+                    }
+                }
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                logger.error("mount pnfs folder cmd error!", e);
+            }
+        }
+
         return chnl;
     }
 
@@ -208,6 +250,17 @@ public class NovaWorker extends SimpleServer {
         logger.info("All deamons stopped");
         super.shutdown();
         // TODO @shayf more cleanup work
+
+        // @eagle
+        // umount pnfs folder
+        try {
+            Runtime.getRuntime().exec(
+                    "umount " + Utils.pathJoin(Utils.NOVA_HOME, "run"));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            logger.error("umount pnfs folder failed!", e);
+        }
 
         NovaWorker.instance = null;
     }

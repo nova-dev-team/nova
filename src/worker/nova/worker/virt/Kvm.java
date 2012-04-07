@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import nova.common.util.Conf;
 import nova.common.util.Utils;
+import nova.worker.NovaWorker;
 
 import org.apache.log4j.Logger;
 
@@ -34,14 +35,25 @@ public class Kvm {
     public static String emitDomain(HashMap<String, Object> params) {
         String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
                 "kvm-domain-template.xml");
+        String strWorkerIP = NovaWorker.getInstance().getAddr().getIp();
         if ((params.get("hdaImage") != null)
                 && !params.get("hdaImage").toString().equals("")) {
             params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
                     params.get("name").toString(), params.get("hdaImage")
                             .toString()));
+            if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+                params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        strWorkerIP + "_" + params.get("name").toString(),
+                        params.get("hdaImage").toString()));
+            }
         } else {
             params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
                     params.get("name").toString(), "linux.img"));
+            if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+                params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        strWorkerIP + "_" + params.get("name").toString(),
+                        "linux.img"));
+            }
         }
 
         if ((params.get("cdImage") != null)
@@ -56,10 +68,16 @@ public class Kvm {
             // agent cdImage put in NOVA_HOME/run/agentcd
             params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
                     params.get("name").toString(), "agentcd", "agent-cd.iso"));
+            if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+                params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        strWorkerIP + "_" + params.get("name").toString(),
+                        "agentcd", "agent-cd.iso"));
+            }
             params.put("determinCdrom", "<disk type='file' device='cdrom'>"
                     + "\n    <source file='"
                     + params.get("cdromPath").toString() + "'/>"
-                    + "\n    <target dev='hdc'/>"// + "\n    <boot order='2'/>"
+                    + "\n    <target dev='hdc'/>"// +
+                                                 // "\n    <boot order='2'/>"
 
                     + "\n  </disk>");
         } else if ((params.get("cdImage") != null)
