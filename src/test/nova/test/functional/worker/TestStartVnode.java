@@ -1,7 +1,6 @@
 package nova.test.functional.worker;
 
 import nova.common.service.SimpleAddress;
-import nova.storage.NovaStorage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.handler.StartVnodeHandler;
 
@@ -18,9 +17,13 @@ import org.junit.Test;
  */
 public class TestStartVnode {
 
+    public static void main(String[] args) {
+        test();
+    }
+
     @Test
-    public void test() {
-        NovaStorage.getInstance().startFtpServer(); // if failed to connect
+    public static void test() {
+        // NovaStorage.getInstance().startFtpServer(); // if failed to connect
         // to
         // ftp then uncomment this
         StartVnodeHandler svh = new StartVnodeHandler();
@@ -30,9 +33,9 @@ public class TestStartVnode {
 
         // StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
         // "false", "100288", "1", "small.img", "false");
-        StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu_tmp",
-                null, false, "300000", "1", "ubuntu.img", false, apps,
-                "10.0.1.100", "255.255.255.0", "10.0.1.254");
+        StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux", null,
+                false, "300000", "1", "linux.img", false, apps, "10.0.1.100",
+                "255.255.255.0", "10.0.1.254");
 
         // msg.setName("vm");
         // msg.setMemSize("1024000");

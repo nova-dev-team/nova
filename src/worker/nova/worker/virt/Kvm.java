@@ -43,7 +43,8 @@ public class Kvm {
                             .toString()));
             if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
                 params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
-                        strWorkerIP + "_" + params.get("name").toString(),
+                        "run", strWorkerIP + "_"
+                                + params.get("name").toString(),
                         params.get("hdaImage").toString()));
             }
         } else {
@@ -51,8 +52,8 @@ public class Kvm {
                     params.get("name").toString(), "linux.img"));
             if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
                 params.put("sourceFile", Utils.pathJoin(Utils.NOVA_HOME, "run",
-                        strWorkerIP + "_" + params.get("name").toString(),
-                        "linux.img"));
+                        "run", strWorkerIP + "_"
+                                + params.get("name").toString(), "linux.img"));
             }
         }
 
@@ -70,8 +71,9 @@ public class Kvm {
                     params.get("name").toString(), "agentcd", "agent-cd.iso"));
             if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
                 params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
-                        strWorkerIP + "_" + params.get("name").toString(),
-                        "agentcd", "agent-cd.iso"));
+                        "run", strWorkerIP + "_"
+                                + params.get("name").toString(), "agentcd",
+                        "agent-cd.iso"));
             }
             params.put("determinCdrom", "<disk type='file' device='cdrom'>"
                     + "\n    <source file='"
@@ -85,6 +87,12 @@ public class Kvm {
             // cdImage put in NOVA_HOME/run
             params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
                     params.get("cdImage").toString()));
+            if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+                params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        "run", strWorkerIP + "_"
+                                + params.get("name").toString(),
+                        params.get("cdImage").toString()));
+            }
             params.put("determinCdrom", "<disk type='file' device='cdrom'>"
                     + "\n    <source file='"
                     + params.get("cdromPath").toString() + "'/>"

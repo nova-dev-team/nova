@@ -196,10 +196,12 @@ public class NovaWorker extends SimpleServer {
             if (!dirFile.exists())
                 Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
             String[] strExecs = {
-                    "modprobe nfs_layout_nfsv41_files",
-                    "mount -t nfs4 -o minorversion=1 " + strPnfsHost
-                            + ":/Nova_home "
-                            + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+            // "modprobe nfs_layout_nfsv41_files",
+            // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
+            // + ":/Nova_home "
+            // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
+            "mount -t nfs " + strPnfsHost + ":/export/Nova_home"
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run") };
             try {
                 for (String cmd : strExecs) {
                     Process p = Runtime.getRuntime().exec(cmd);

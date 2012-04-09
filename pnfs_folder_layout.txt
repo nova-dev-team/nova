@@ -1,4 +1,4 @@
-Nova_home
+Nova_home/run
 	/conf
 		ipAddrFiles
 	/bin
@@ -8,13 +8,14 @@ Nova_home
 	/data
 	/VERSION$
 	/run
+		stdFile
 		/vdiskpool
-		/appliances
+			stdFile.pool.i
 		/$WORKERIP_NAME
 			imgFile.img
 			/softwares
 				/params
-				ipconfig.txt
+					ipconfig.txt
 				/appliances
 					appName*
 				/run
@@ -22,6 +23,6 @@ Nova_home
 					/bin
 					/lib
 					/data
-					/VERSION
+					VERSION
 			/agentcd
 				agent-cd.iso

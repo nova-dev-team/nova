@@ -385,6 +385,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
             } else if (Conf.getString("storage.engine")
                     .equalsIgnoreCase("pnfs")) {
+                stdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        "run", stdImgFile));
                 if (stdFile.exists() == false) {
                     log.error("std Img not found in pnfs server!");
                     return;
@@ -394,19 +396,20 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 boolean found = false;
                 for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
                     File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", "vdiskpool",
-                            stdImgFile + ".pool." + Integer.toString(i)));
+                            "run", "run", "vdiskpool", stdImgFile + ".pool."
+                                    + Integer.toString(i)));
                     if (srcFile.exists() && (srcFile.length() == stdLen)) {
                         System.out.println("file " + stdImgFile + ".pool."
                                 + Integer.toString(i) + "exists!");
-                        File foder = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                                "run", strWorkerIP + "_" + msg.getName()));
+                        File foder = new File(
+                                Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                                        strWorkerIP + "_" + msg.getName()));
                         if (!foder.exists()) {
                             foder.mkdirs();
                         }
                         File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                                "run", strWorkerIP + "_" + msg.getName(),
-                                stdImgFile));
+                                "run", "run",
+                                strWorkerIP + "_" + msg.getName(), stdImgFile));
                         srcFile.renameTo(dstFile);
                         found = true;
                         break;
@@ -418,7 +421,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 if (!found) {
                     // copy img files
                     File foder = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", strWorkerIP + "_" + msg.getName()));
+                            "run", "run", strWorkerIP + "_" + msg.getName()));
                     if (!foder.exists()) {
                         foder.mkdirs();
                     } else {
@@ -427,14 +430,16 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 + msg.getName() + " has been used!");
                     }
                     File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-                            strWorkerIP + "_" + msg.getName(), stdImgFile));
+                            "run", strWorkerIP + "_" + msg.getName(),
+                            stdImgFile));
                     if (file.exists() == false) {
                         try {
                             System.out.println("copying file");
                             String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                                    "run", stdImgFile);
+                                    "run", "run", stdImgFile);
                             String destUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                                    "run", strWorkerIP + "_" + msg.getName(),
+                                    "run", "run",
+                                    strWorkerIP + "_" + msg.getName(),
                                     stdImgFile);
                             File sourceFile = new File(sourceUrl);
                             if (sourceFile.isFile()) {
@@ -458,19 +463,19 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 }
                 if (msg.getRunAgent()) {
                     File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", strWorkerIP + "_" + msg.getName(),
+                            "run", "run", strWorkerIP + "_" + msg.getName(),
                             "softwares"));
                     if (!pathFile.exists()) {
                         Utils.mkdirs(pathFile.getAbsolutePath());
                     }
                     File paramsFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", strWorkerIP + "_" + msg.getName(),
+                            "run", "run", strWorkerIP + "_" + msg.getName(),
                             "softwares", "params"));
                     if (!paramsFile.exists()) {
                         Utils.mkdirs(paramsFile.getAbsolutePath());
                     }
                     File ipFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", strWorkerIP + "_" + msg.getName(),
+                            "run", "run", strWorkerIP + "_" + msg.getName(),
                             "softwares", "params", "ipconfig.txt"));
 
                     try {
@@ -526,19 +531,28 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     // ////////////////////////////////////////////////////////////////////
                     // prepare apps
                     if (msg.getApps() != null) {
+                        File folderApp = new File(Utils.pathJoin(
+                                Utils.NOVA_HOME, "run", "run", strWorkerIP
+                                        + "_" + msg.getName(), "softwares",
+                                "appliances"));
+                        if (folderApp.exists() == false)
+                            folderApp.mkdirs();
                         for (String appName : msg.getApps()) {
                             File appFile = new File(Utils.pathJoin(
-                                    Utils.NOVA_HOME, "run", strWorkerIP + "_"
-                                            + msg.getName(), "softwares",
+                                    Utils.NOVA_HOME, "run", "run", strWorkerIP
+                                            + "_" + msg.getName(), "softwares",
                                     "appliances", appName));
+
                             if (appFile.exists() == false) {
                                 File sourceFile = new File(Utils.pathJoin(
-                                        Utils.NOVA_HOME, "appliances", appName));
+                                        Utils.NOVA_HOME, "run", "appliances",
+                                        appName));
                                 if (sourceFile.isDirectory())
                                     Utils.copy(Utils.pathJoin(Utils.NOVA_HOME,
-                                            "appliances", appName), Utils
-                                            .pathJoin(
+                                            "run", "appliances", appName),
+                                            Utils.pathJoin(
                                                     Utils.NOVA_HOME,
+                                                    "run",
                                                     "run",
                                                     strWorkerIP + "_"
                                                             + msg.getName(),
@@ -546,11 +560,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                                     appName));
                                 else
                                     Utils.copyOneFile(Utils.pathJoin(
-                                            Utils.NOVA_HOME, "appliances",
-                                            appName), Utils.pathJoin(
-                                            Utils.NOVA_HOME, "run", strWorkerIP
-                                                    + "_" + msg.getName(),
-                                            "softwares", "appliances", appName));
+                                            Utils.NOVA_HOME, "run",
+                                            "appliances", appName), Utils
+                                            .pathJoin(Utils.NOVA_HOME, "run",
+                                                    "run", strWorkerIP + "_"
+                                                            + msg.getName(),
+                                                    "softwares", "appliances",
+                                                    appName));
                             }
                         }
                     }
@@ -558,9 +574,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     // packiso process start
                     // copy files to Novahome/run/$WORKERIP_NAME/softwares
                     File agentProgramFile = new File(Utils.pathJoin(
-                            Utils.NOVA_HOME, "run",
-                            strWorkerIP + "_" + msg.getName(), "softwares",
-                            "run"));
+                            Utils.NOVA_HOME, "run", "run", strWorkerIP + "_"
+                                    + msg.getName(), "softwares", "run"));
                     if (!agentProgramFile.exists()) {
                         Utils.mkdirs(agentProgramFile.getAbsolutePath());
                     }
@@ -569,44 +584,43 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     // "conf"),
                     // Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                     // "conf"), ignoreList);
-                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "conf"), Utils
-                            .pathJoin(agentProgramFile.getAbsolutePath(),
+                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "run", "conf"),
+                            Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                                     "conf"));
-                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "bin"),
+                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "run", "bin"),
                             Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                                     "bin"));
-                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "lib"),
+                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "run", "lib"),
                             Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                                     "lib"));
 
                     // copy without ftp_home folder
                     String[] ingoreList = { "ftp_home" };
                     Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
-                            "data"), Utils.pathJoin(
+                            "run", "data"), Utils.pathJoin(
                             agentProgramFile.getAbsolutePath(), "data"),
                             ingoreList);
 
-                    Utils.copyOneFile(Utils
-                            .pathJoin(Utils.NOVA_HOME, "VERSION"), Utils
-                            .pathJoin(agentProgramFile.getAbsolutePath(),
-                                    "VERSION"));
+                    Utils.copyOneFile(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                            "VERSION"), Utils.pathJoin(
+                            agentProgramFile.getAbsolutePath(), "VERSION"));
 
                     // pack iso files
-                    File agentCdFile = new File(
-                            Utils.pathJoin(Utils.NOVA_HOME, "run", strWorkerIP
-                                    + "_" + msg.getName(), "agentcd"));
+                    File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                            "run", "run", strWorkerIP + "_" + msg.getName(),
+                            "agentcd"));
                     if (!agentCdFile.exists()) {
                         Utils.mkdirs(agentCdFile.getAbsolutePath());
                     }
                     System.out.println("packing iso");
                     Process p;
                     String cmd = "mkisofs -J -T -R -V cdrom -o "
-                            + Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                    strWorkerIP + "_ " + msg.getName(),
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                                    strWorkerIP + "_" + msg.getName(),
                                     "agentcd", "agent-cd.iso")
                             + " "
-                            + Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                    strWorkerIP + "_ " + msg.getName(),
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                                    strWorkerIP + "_" + msg.getName(),
                                     "softwares");
 
                     try {

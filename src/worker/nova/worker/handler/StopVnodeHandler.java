@@ -80,18 +80,16 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
                     if (tmp != null && tmp.endsWith("") == false)
                         stdImgFile = tmp;
                     File stdFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", stdImgFile));
+                            "run", "run", stdImgFile));
                     long stdLen = stdFile.length();
                     File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", name, stdImgFile));
+                            "run", "run", name, stdImgFile));
                     if (srcFile.length() == stdLen) {
                         synchronized (NovaWorker.getInstance().getConnLock()) {
                             for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
                                 File dstFile = new File(Utils.pathJoin(
-                                        Utils.NOVA_HOME,
-                                        "run",
-                                        "vdiskpool",
-                                        stdImgFile + ".pool."
+                                        Utils.NOVA_HOME, "run", "run",
+                                        "vdiskpool", stdImgFile + ".pool."
                                                 + Integer.toString(i)));
                                 if (dstFile.exists() == false) {
                                     srcFile.renameTo(dstFile);
@@ -102,8 +100,9 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
                 }
 
                 System.out.println("delete path = "
-                        + Utils.pathJoin(Utils.NOVA_HOME, "run", name));
-                Utils.delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", name));
+                        + Utils.pathJoin(Utils.NOVA_HOME, "run", "run", name));
+                Utils.delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                        name));
             } else {
                 dom.suspend();
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
