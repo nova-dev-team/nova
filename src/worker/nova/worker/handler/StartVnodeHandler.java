@@ -140,42 +140,44 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 }
                 long stdLen = stdFile.length();
                 boolean found = false;
-                for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
-                    File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", "vdiskpool",
-                            stdImgFile + ".pool." + Integer.toString(i)));
-                    if (srcFile.exists() && (srcFile.length() == stdLen)) {
-                        System.out.println("file " + stdImgFile + ".pool."
-                                + Integer.toString(i) + "exists!");
-                        File foder = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                                "run", msg.getName()));
+                File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        msg.getName()));
+                if (!foder.exists()) {
+                    foder.mkdirs();
+                }
+                File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        msg.getName(), stdImgFile));
+                if (dstFile.exists() == false || dstFile.length() != stdLen) {
+                    for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
+                        File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                                "run", "vdiskpool", stdImgFile + ".pool."
+                                        + Integer.toString(i)));
+                        if (srcFile.exists() && (srcFile.length() == stdLen)) {
+                            System.out.println("file " + stdImgFile + ".pool."
+                                    + Integer.toString(i) + "exists!");
+
+                            srcFile.renameTo(dstFile);
+                            found = true;
+                            break;
+                        } else {
+                            System.out.println("file " + stdImgFile + ".pool."
+                                    + Integer.toString(i) + "not exist!");
+                        }
+                    }
+                    if (!found) {
+                        // copy img files
+                        foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                                msg.getName()));
                         if (!foder.exists()) {
                             foder.mkdirs();
+                        } else {
+                            // TODO @whoever rename or stop or what?
+                            log.error("vm name " + msg.getName()
+                                    + " has been used!");
                         }
-                        File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                        File file = new File(Utils.pathJoin(Utils.NOVA_HOME,
                                 "run", msg.getName(), stdImgFile));
-                        srcFile.renameTo(dstFile);
-                        found = true;
-                        break;
-                    } else {
-                        System.out.println("file " + stdImgFile + ".pool."
-                                + Integer.toString(i) + "not exist!");
-                    }
-                }
-                if (!found) {
-                    // copy img files
-                    File foder = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", msg.getName()));
-                    if (!foder.exists()) {
-                        foder.mkdirs();
-                    } else {
-                        // TODO @whoever rename or stop or what?
-                        log.error("vm name " + msg.getName()
-                                + " has been used!");
-                    }
-                    File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-                            msg.getName(), stdImgFile));
-                    if (file.exists() == false) {
+                        // if (file.exists() == false) {
                         try {
                             System.out.println("copying file");
                             String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
@@ -200,6 +202,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         } catch (IOException ex) {
                             log.error("copy image fail", ex);
                         }
+                        // }
                     }
                 }
 
