@@ -666,7 +666,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 .getConn(virtService, false)
                                 .domainCreateLinux(
                                         Kvm.emitDomain(msg.getHashMap()), 0);
-
                         if (testDomain != null) {
                             VnodeStatusDaemon
                                     .putStatus(UUID.fromString(testDomain
@@ -681,6 +680,12 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         System.out.println("Domain:" + testDomain.getName()
                                 + " id " + testDomain.getID() + " running "
                                 + testDomain.getOSType());
+                        System.out.println("Domian UUID:"
+                                + testDomain.getUUIDString()
+                                + " "
+                                + "vncport:"
+                                + Utils.WORKER_VNC_MAP.get(testDomain
+                                        .getUUIDString()));
                         // Domain testDomain = conn.domainLookupByName("test");
                         // System.out.println("xml desc\n" +
                         // testDomain.getXMLDesc(0));

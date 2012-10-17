@@ -20,7 +20,7 @@
   </disk>
   ${determinCdrom}
   ${determinNetwork}
-  <graphics type='vnc' port='-1' listen='0.0.0.0'/>
+  <graphics type='vnc' port='${vncport}' listen='0.0.0.0'/>
   ${determinVnc}
 </devices>
 </domain>

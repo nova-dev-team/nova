@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.util.HashMap;
 
 import nova.common.util.Conf;
@@ -24,6 +25,23 @@ public class Kvm {
      * Log4j logger.
      */
     static Logger log = Logger.getLogger(Kvm.class);
+
+    public static int getFreePort() {
+        ServerSocket s = null;
+        int MINPORT = 5901;
+        int MAXPORT = 6900;
+        for (; MINPORT < MAXPORT; MINPORT++) {
+            try {
+                s = new ServerSocket(MINPORT);
+                s.close();
+                return MINPORT;
+            } catch (IOException e) {
+                continue;
+            }
+        }
+        return -1;
+
+    }
 
     /**
      * Emit libvirt domain definitions.
@@ -153,7 +171,11 @@ public class Kvm {
         // + params.get("macAddress").toString() + "'/>"
         // + "</interface>");
         // }
-
+        String strVNCPort = String.valueOf(getFreePort());
+        String ss = params.get("uuid").toString();
+        System.out.println(ss);
+        Utils.WORKER_VNC_MAP.put(params.get("uuid").toString(), strVNCPort);
+        params.put("vncport", strVNCPort);
         if (fixVncMousePointer.equals("true")) {
             params.put("inputType", "tablet");
             params.put("bus", "usb");
@@ -166,8 +188,18 @@ public class Kvm {
 
         String rt = Utils.expandTemplateFile(templateFpath, params);
         // write nova.agent.ipaddress.properties file
-        File confFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", params
-                .get("name").toString(), "conf.xml"));
+        File confFile = null;
+        if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+            params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
+                    "run", strWorkerIP + "_" + params.get("name").toString(),
+                    "agentcd", "agent-cd.iso"));
+            confFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                    strWorkerIP + "_" + params.get("name").toString(),
+                    "conf.xml"));
+        } else {
+            confFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", params
+                    .get("name").toString(), "conf.xml"));
+        }
         if (!confFile.exists()) {
             try {
                 confFile.createNewFile();

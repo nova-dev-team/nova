@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -34,6 +35,8 @@ public class Utils {
      * The home for nova.
      */
     public static final String NOVA_HOME;
+
+    public static HashMap<String, String> WORKER_VNC_MAP = new HashMap<String, String>();
 
     /*
      * Static constructor to determine NOVA_HOME.

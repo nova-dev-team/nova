@@ -33,13 +33,13 @@ public class TestStartVnode {
 
         // StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
         // "false", "100288", "1", "small.img", "false");
-        StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux", null,
-                false, "300000", "1", "linux.img", false, apps, "10.0.1.100",
-                "255.255.255.0", "10.0.1.254");
+        StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux2", null,
+                false, "300000", "1", "linux.img", false, apps,
+                "192.168.122.1", "255.255.255.0", "192.168.122.1");
 
         // msg.setName("vm");
         // msg.setMemSize("1024000");
-        msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aaf");
+        msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aab");
         msg.setCdImage("agent-cd.iso");
         msg.setRunAgent(true);
 
