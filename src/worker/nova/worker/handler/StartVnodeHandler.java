@@ -456,61 +456,56 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 // + Integer.toString(i) + "not exist!");
                 // }
                 // }
-                if (!found) {
-                    // copy img files
-                    File foder = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", "run", strWorkerIP + "_" + msg.getName()));
-                    if (!foder.exists()) {
-                        foder.mkdirs();
-                    } else {
-                        // TODO @whoever rename or stop or what?
-                        log.error("vm name " + strWorkerIP + "_"
-                                + msg.getName() + " has been used!");
-                    }
-                    File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-                            "run", strWorkerIP + "_" + msg.getName(),
-                            stdImgFile));
-                    if (file.exists() == false) {
-                        // create incremental images of source image
-                        Process createNFSIncrmtlImgs;
-                        String cmdofincrtlnfs = "qemu-img create -b "
-                                + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                                        stdImgFile)
-                                + " -f qcow2 "
-                                + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                                        strWorkerIP + "_" + msg.getName(),
-                                        stdImgFile);
-                        System.out
-                                .println("pNFS___________________________________________________________________-: "
-                                        + cmdofincrtlnfs);
 
+                // copy img files
+                File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        "run", strWorkerIP + "_" + msg.getName()));
+                if (!foder.exists()) {
+                    foder.mkdirs();
+                } else {
+                    // TODO @whoever rename or stop or what?
+                    log.error("vm name " + strWorkerIP + "_" + msg.getName()
+                            + " has been used!");
+                }
+                File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                        "run", strWorkerIP + "_" + msg.getName(), stdImgFile));
+                if (file.exists() == false) {
+                    // create incremental images of source image
+                    Process createNFSIncrmtlImgs;
+                    String cmdofincrtlnfs = "qemu-img create -b "
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                                    stdImgFile)
+                            + " -f qcow2 "
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                                    strWorkerIP + "_" + msg.getName(),
+                                    stdImgFile);
+                    System.out
+                            .println("pNFS___________________________________________________________________-: "
+                                    + cmdofincrtlnfs);
+
+                    try {
+                        createNFSIncrmtlImgs = Runtime.getRuntime().exec(
+                                cmdofincrtlnfs);
+                        StreamGobbler errorGobbler = new StreamGobbler(
+                                createNFSIncrmtlImgs.getErrorStream(), "ERROR");
+                        errorGobbler.start();
+                        StreamGobbler outGobbler = new StreamGobbler(
+                                createNFSIncrmtlImgs.getInputStream(), "STDOUT");
+                        outGobbler.start();
                         try {
-                            createNFSIncrmtlImgs = Runtime.getRuntime().exec(
-                                    cmdofincrtlnfs);
-                            StreamGobbler errorGobbler = new StreamGobbler(
-                                    createNFSIncrmtlImgs.getErrorStream(),
-                                    "ERROR");
-                            errorGobbler.start();
-                            StreamGobbler outGobbler = new StreamGobbler(
-                                    createNFSIncrmtlImgs.getInputStream(),
-                                    "STDOUT");
-                            outGobbler.start();
-                            try {
-                                if (createNFSIncrmtlImgs.waitFor() != 0) {
-                                    log.error("create NFS incremental image returned abnormal value!");
-                                }
-                            } catch (InterruptedException e1) {
-                                log.error(
-                                        "create NFS incremental image process terminated",
-                                        e1);
+                            if (createNFSIncrmtlImgs.waitFor() != 0) {
+                                log.error("create NFS incremental image returned abnormal value!");
                             }
-                        } catch (IOException e1) {
+                        } catch (InterruptedException e1) {
                             log.error(
-                                    "exec create NFS incremental image cmd error!",
+                                    "create NFS incremental image process terminated",
                                     e1);
-                            return;
                         }
-
+                    } catch (IOException e1) {
+                        log.error(
+                                "exec create NFS incremental image cmd error!",
+                                e1);
+                        return;
                     }
                     // if (file.exists() == false) {
                     // try {

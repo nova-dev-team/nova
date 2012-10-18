@@ -9,8 +9,6 @@ Nova_home/run
 	/VERSION$
 	/run
 		stdFile
-		/vdiskpool
-			stdFile.pool.i
 		/$WORKERIP_NAME
 			imgFile.img
 			/softwares
