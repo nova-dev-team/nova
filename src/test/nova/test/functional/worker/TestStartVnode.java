@@ -27,15 +27,15 @@ public class TestStartVnode {
         // to
         // ftp then uncomment this
         StartVnodeHandler svh = new StartVnodeHandler();
-        String[] apps;
-        String appList = "demo1,demo2,demo3";
-        apps = appList.split(",");
+        String[] apps = null;
+        // String appList = "demo1,demo2,demo3";
+        // apps = appList.split(",");
 
         // StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
         // "false", "100288", "1", "small.img", "false");
-        StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux2", null,
-                false, "300000", "1", "linux.img", false, apps,
-                "192.168.122.1", "255.255.255.0", "192.168.122.1");
+        StartVnodeMessage msg = new StartVnodeMessage("kvm", "xp6", null,
+                false, "300000", "1", "xp.img", false, apps, "10.0.1.100",
+                "255.255.255.0", "10.0.1.254");
 
         // msg.setName("vm");
         // msg.setMemSize("1024000");

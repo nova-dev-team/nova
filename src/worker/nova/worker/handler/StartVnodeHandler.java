@@ -1,7 +1,6 @@
 package nova.worker.handler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -21,7 +20,6 @@ import nova.master.models.Vnode;
 import nova.storage.NovaStorage;
 import nova.worker.NovaWorker;
 import nova.worker.api.messages.StartVnodeMessage;
-import nova.worker.daemons.VdiskPoolDaemon;
 import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.models.StreamGobbler;
 import nova.worker.virt.Kvm;
@@ -138,7 +136,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     }
                     // NovaStorage.getInstance().shutdown();
                 }
-                long stdLen = stdFile.length();
+                // long stdLen = stdFile.length();
                 boolean found = false;
                 File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                         msg.getName()));
@@ -147,65 +145,101 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 }
                 File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                         msg.getName(), stdImgFile));
-                if (dstFile.exists() == false || dstFile.length() != stdLen) {
-                    for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
-                        File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                                "run", "vdiskpool", stdImgFile + ".pool."
-                                        + Integer.toString(i)));
-                        if (srcFile.exists() && (srcFile.length() == stdLen)) {
-                            System.out.println("file " + stdImgFile + ".pool."
-                                    + Integer.toString(i) + "exists!");
+                // if (dstFile.exists() == false || dstFile.length() != stdLen)
+                // {
+                // for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
+                // File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                // "run", "vdiskpool", stdImgFile + ".pool."
+                // + Integer.toString(i)));
+                // if (srcFile.exists() && (srcFile.length() == stdLen)) {
+                // System.out.println("file " + stdImgFile + ".pool."
+                // + Integer.toString(i) + "exists!");
+                //
+                // srcFile.renameTo(dstFile);
+                // found = true;
+                // break;
+                // } else {
+                // System.out.println("file " + stdImgFile + ".pool."
+                // + Integer.toString(i) + "not exist!");
+                // }
+                // }
+                // if (!found) {
+                // // copy img files
+                // foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                // msg.getName()));
+                // if (!foder.exists()) {
+                // foder.mkdirs();
+                // } else {
+                // // TODO @whoever rename or stop or what?
+                // log.error("vm name " + msg.getName()
+                // + " has been used!");
+                // }
+                // File file = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                // "run", msg.getName(), stdImgFile));
+                // // if (file.exists() == false) {
+                // try {
+                // System.out.println("copying file");
+                // String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
+                // "run", stdImgFile);
+                // String destUrl = Utils.pathJoin(Utils.NOVA_HOME,
+                // "run", msg.getName(), stdImgFile);
+                // File sourceFile = new File(sourceUrl);
+                // if (sourceFile.isFile()) {
+                // FileInputStream input = new FileInputStream(
+                // sourceFile);
+                // FileOutputStream output = new FileOutputStream(
+                // destUrl);
+                // byte[] b = new byte[1024 * 5];
+                // int len;
+                // while ((len = input.read(b)) != -1) {
+                // output.write(b, 0, len);
+                // }
+                // output.flush();
+                // output.close();
+                // input.close();
+                // }
+                // } catch (IOException ex) {
+                // log.error("copy image fail", ex);
+                // }
+                // // }
+                // }
+                // }
+                if (dstFile.exists() == false) {
+                    // create incremental images of source image
+                    System.out.println("Source image is " + msg.getHdaImage());
+                    Process createIncrmtlImgs;
+                    String cmd = "qemu-img create -b "
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run", stdImgFile)
+                            + " -f qcow2 "
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run",
+                                    msg.getName(), stdImgFile);
+                    System.out
+                            .println("ftp____________________________________________________________________: "
+                                    + cmd);
 
-                            srcFile.renameTo(dstFile);
-                            found = true;
-                            break;
-                        } else {
-                            System.out.println("file " + stdImgFile + ".pool."
-                                    + Integer.toString(i) + "not exist!");
-                        }
-                    }
-                    if (!found) {
-                        // copy img files
-                        foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                msg.getName()));
-                        if (!foder.exists()) {
-                            foder.mkdirs();
-                        } else {
-                            // TODO @whoever rename or stop or what?
-                            log.error("vm name " + msg.getName()
-                                    + " has been used!");
-                        }
-                        File file = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                                "run", msg.getName(), stdImgFile));
-                        // if (file.exists() == false) {
+                    try {
+                        createIncrmtlImgs = Runtime.getRuntime().exec(cmd);
+                        StreamGobbler errorGobbler = new StreamGobbler(
+                                createIncrmtlImgs.getErrorStream(), "ERROR");
+                        errorGobbler.start();
+                        StreamGobbler outGobbler = new StreamGobbler(
+                                createIncrmtlImgs.getInputStream(), "STDOUT");
+                        outGobbler.start();
                         try {
-                            System.out.println("copying file");
-                            String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                                    "run", stdImgFile);
-                            String destUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                                    "run", msg.getName(), stdImgFile);
-                            File sourceFile = new File(sourceUrl);
-                            if (sourceFile.isFile()) {
-                                FileInputStream input = new FileInputStream(
-                                        sourceFile);
-                                FileOutputStream output = new FileOutputStream(
-                                        destUrl);
-                                byte[] b = new byte[1024 * 5];
-                                int len;
-                                while ((len = input.read(b)) != -1) {
-                                    output.write(b, 0, len);
-                                }
-                                output.flush();
-                                output.close();
-                                input.close();
+                            if (createIncrmtlImgs.waitFor() != 0) {
+                                log.error("create incremental image returned abnormal value!");
                             }
-                        } catch (IOException ex) {
-                            log.error("copy image fail", ex);
+                        } catch (InterruptedException e1) {
+                            log.error(
+                                    "create incremental image process terminated",
+                                    e1);
                         }
-                        // }
+                    } catch (IOException e1) {
+                        log.error("exec create incremental image cmd error!",
+                                e1);
+                        return;
                     }
                 }
-
                 if (msg.getRunAgent()) {
                     File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
                             "run", "softwares"));
@@ -395,32 +429,33 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     return;
                 }
                 String strWorkerIP = NovaWorker.getInstance().getAddr().getIp();
-                long stdLen = stdFile.length();
+                System.out.println(strWorkerIP);
+                // long stdLen = stdFile.length();
                 boolean found = false;
-                for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
-                    File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", "run", "vdiskpool", stdImgFile + ".pool."
-                                    + Integer.toString(i)));
-                    if (srcFile.exists() && (srcFile.length() == stdLen)) {
-                        System.out.println("file " + stdImgFile + ".pool."
-                                + Integer.toString(i) + "exists!");
-                        File foder = new File(
-                                Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                                        strWorkerIP + "_" + msg.getName()));
-                        if (!foder.exists()) {
-                            foder.mkdirs();
-                        }
-                        File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
-                                "run", "run",
-                                strWorkerIP + "_" + msg.getName(), stdImgFile));
-                        srcFile.renameTo(dstFile);
-                        found = true;
-                        break;
-                    } else {
-                        System.out.println("file " + stdImgFile + ".pool."
-                                + Integer.toString(i) + "not exist!");
-                    }
-                }
+                // for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
+                // File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                // "run", "run", "vdiskpool", stdImgFile + ".pool."
+                // + Integer.toString(i)));
+                // if (srcFile.exists() && (srcFile.length() == stdLen)) {
+                // System.out.println("file " + stdImgFile + ".pool."
+                // + Integer.toString(i) + "exists!");
+                // File foder = new File(
+                // Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                // strWorkerIP + "_" + msg.getName()));
+                // if (!foder.exists()) {
+                // foder.mkdirs();
+                // }
+                // File dstFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                // "run", "run",
+                // strWorkerIP + "_" + msg.getName(), stdImgFile));
+                // srcFile.renameTo(dstFile);
+                // found = true;
+                // break;
+                // } else {
+                // System.out.println("file " + stdImgFile + ".pool."
+                // + Integer.toString(i) + "not exist!");
+                // }
+                // }
                 if (!found) {
                     // copy img files
                     File foder = new File(Utils.pathJoin(Utils.NOVA_HOME,
@@ -436,33 +471,75 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             "run", strWorkerIP + "_" + msg.getName(),
                             stdImgFile));
                     if (file.exists() == false) {
+                        // create incremental images of source image
+                        Process createNFSIncrmtlImgs;
+                        String cmdofincrtlnfs = "qemu-img create -b "
+                                + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                                        stdImgFile)
+                                + " -f qcow2 "
+                                + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                                        strWorkerIP + "_" + msg.getName(),
+                                        stdImgFile);
+                        System.out
+                                .println("pNFS___________________________________________________________________-: "
+                                        + cmdofincrtlnfs);
+
                         try {
-                            System.out.println("copying file");
-                            String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                                    "run", "run", stdImgFile);
-                            String destUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                                    "run", "run",
-                                    strWorkerIP + "_" + msg.getName(),
-                                    stdImgFile);
-                            File sourceFile = new File(sourceUrl);
-                            if (sourceFile.isFile()) {
-                                FileInputStream input = new FileInputStream(
-                                        sourceFile);
-                                FileOutputStream output = new FileOutputStream(
-                                        destUrl);
-                                byte[] b = new byte[1024 * 5];
-                                int len;
-                                while ((len = input.read(b)) != -1) {
-                                    output.write(b, 0, len);
+                            createNFSIncrmtlImgs = Runtime.getRuntime().exec(
+                                    cmdofincrtlnfs);
+                            StreamGobbler errorGobbler = new StreamGobbler(
+                                    createNFSIncrmtlImgs.getErrorStream(),
+                                    "ERROR");
+                            errorGobbler.start();
+                            StreamGobbler outGobbler = new StreamGobbler(
+                                    createNFSIncrmtlImgs.getInputStream(),
+                                    "STDOUT");
+                            outGobbler.start();
+                            try {
+                                if (createNFSIncrmtlImgs.waitFor() != 0) {
+                                    log.error("create NFS incremental image returned abnormal value!");
                                 }
-                                output.flush();
-                                output.close();
-                                input.close();
+                            } catch (InterruptedException e1) {
+                                log.error(
+                                        "create NFS incremental image process terminated",
+                                        e1);
                             }
-                        } catch (IOException ex) {
-                            log.error("copy image fail", ex);
+                        } catch (IOException e1) {
+                            log.error(
+                                    "exec create NFS incremental image cmd error!",
+                                    e1);
+                            return;
                         }
+
                     }
+                    // if (file.exists() == false) {
+                    // try {
+                    // System.out.println("copying file");
+                    // String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
+                    // "run", "run", stdImgFile);
+                    // String destUrl = Utils.pathJoin(Utils.NOVA_HOME,
+                    // "run", "run",
+                    // strWorkerIP + "_" + msg.getName(),
+                    // stdImgFile);
+                    // File sourceFile = new File(sourceUrl);
+                    // if (sourceFile.isFile()) {
+                    // FileInputStream input = new FileInputStream(
+                    // sourceFile);
+                    // FileOutputStream output = new FileOutputStream(
+                    // destUrl);
+                    // byte[] b = new byte[1024 * 5];
+                    // int len;
+                    // while ((len = input.read(b)) != -1) {
+                    // output.write(b, 0, len);
+                    // }
+                    // output.flush();
+                    // output.close();
+                    // input.close();
+                    // }
+                    // } catch (IOException ex) {
+                    // log.error("copy image fail", ex);
+                    // }
+                    // }
                 }
                 if (msg.getRunAgent()) {
                     File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
