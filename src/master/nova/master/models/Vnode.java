@@ -167,6 +167,7 @@ public class Vnode extends DbObject {
     String statusCode;
 
     private String uuid;
+
     private Integer vclusterId;
 
     private String agentStatus;

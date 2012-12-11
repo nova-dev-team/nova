@@ -22,6 +22,7 @@ import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.api.messages.MasterInstallApplianceMessage;
 import nova.master.api.messages.MasterMigrateCompleteMessage;
 import nova.master.api.messages.MasterMigrateVnodeMessage;
+import nova.master.api.messages.PnodeCreateVnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
@@ -148,6 +149,11 @@ public class MasterProxy extends SimpleProxy {
 
     public void sendAppliancesFirstInstalledMessage(SimpleAddress simpleAddress) {
         super.sendRequest(new AppliancesFirstInstalledMessage(simpleAddress));
+    }
+
+    public void sendPnodeCreateVnodeMessage(int PnodeId, int VnodeId,
+            String uuid) {
+        super.sendRequest(new PnodeCreateVnodeMessage(PnodeId, VnodeId, uuid));
     }
 
     // TODO delete experiment codes between //////////////////// and
