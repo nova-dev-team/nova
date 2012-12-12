@@ -151,9 +151,10 @@ public class MasterProxy extends SimpleProxy {
         super.sendRequest(new AppliancesFirstInstalledMessage(simpleAddress));
     }
 
-    public void sendPnodeCreateVnodeMessage(int PnodeId, int VnodeId,
-            String uuid) {
-        super.sendRequest(new PnodeCreateVnodeMessage(PnodeId, VnodeId, uuid));
+    public void sendPnodeCreateVnodeMessage(String PnodeIP, int VnodeId,
+            String uuid, int VnodePort) {
+        super.sendRequest(new PnodeCreateVnodeMessage(PnodeIP, VnodeId, uuid,
+                VnodePort));
     }
 
     // TODO delete experiment codes between //////////////////// and

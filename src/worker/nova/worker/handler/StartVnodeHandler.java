@@ -758,6 +758,11 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 + "vncport:"
                                 + Utils.WORKER_VNC_MAP.get(testDomain
                                         .getUUIDString()));
+                        mp.sendPnodeCreateVnodeMessage(NovaWorker.getInstance()
+                                .getAddr().getIp(), testDomain.getID(),
+                                testDomain.getUUIDString(),
+                                Integer.parseInt(Utils.WORKER_VNC_MAP
+                                        .get(testDomain.getUUIDString())));
                         // Domain testDomain = conn.domainLookupByName("test");
                         // System.out.println("xml desc\n" +
                         // testDomain.getXMLDesc(0));
