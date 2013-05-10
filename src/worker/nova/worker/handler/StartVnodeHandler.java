@@ -137,7 +137,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     // NovaStorage.getInstance().shutdown();
                 }
                 // long stdLen = stdFile.length();
-                boolean found = false;
+                // boolean found = false;
                 File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                         msg.getName()));
                 if (!foder.exists()) {
@@ -431,7 +431,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 String strWorkerIP = NovaWorker.getInstance().getAddr().getIp();
                 System.out.println(strWorkerIP);
                 // long stdLen = stdFile.length();
-                boolean found = false;
+                // boolean found = false;
                 // for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
                 // File srcFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
                 // "run", "run", "vdiskpool", stdImgFile + ".pool."

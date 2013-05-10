@@ -54,7 +54,7 @@ public class Server extends Thread {
                     SysLog.warning(" ransfer Server : " + route.toString()
                             + "  Incoming:" + sock.getInetAddress());
                     sock.setSoTimeout(0);
-                    connCounter++;
+                    // connCounter++;
                     Transfer myt = new Transfer(sock, route);
                     connectionQueue.add(myt);
                 } else {
@@ -118,6 +118,6 @@ public class Server extends Thread {
     private ServerSocket myServer = null;
     private boolean isStop = false;
     private Vector<Transfer> connectionQueue = null;
-    private int connCounter = 0;
+    // private int connCounter = 0;
     private Route route = null;
 }
