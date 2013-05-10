@@ -8,10 +8,7 @@ import com.google.gson.Gson;
  * @author gaotao1987@gmail.com
  * 
  */
-// import org.hyperic.sigar.Mem;
-// import org.hyperic.sigar.Sigar;
-// import org.hyperic.sigar.SigarException;
-// import org.hyperic.sigar.Swap;
+
 public class MemoryInfo {
 
     public long totalMemorySize = 0;
@@ -24,10 +21,23 @@ public class MemoryInfo {
         Gson gson = new Gson();
         return gson.toJson(this);
     }
+
     // private Mem mem;
     // private Swap swap;
     // private Sigar sigar = new Sigar();
 
+    // public static void main(String args[]) {
+    //
+    // try {
+    // MemoryInfo meminfo = new MemoryInfo();
+    // System.out.println(meminfo.freeMemorySize);
+    // } catch (SigarException e) {
+    // // TODO Auto-generated catch block
+    // e.printStackTrace();
+    // }
+    //
+    // }
+    //
     // private Long format(long value) // KB
     // {
     // return new Long(value / 1024);

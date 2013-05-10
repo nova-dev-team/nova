@@ -36,11 +36,13 @@ public class PerfMon {
              * 100 as the standard
              */
             cpu.combinedTime = sigar.getCpuPerc().getCombined() * 100;
-
             org.hyperic.sigar.CpuInfo[] infoList = sigar.getCpuInfoList();
             cpu.mhz = infoList[0].getMhz();
             cpu.nCpu = infoList.length;
             cpu.model = infoList[0].getModel();
+            cpu.dIdleTime = sigar.getCpuPerc().getIdle();
+            cpu.dSysTime = sigar.getCpuPerc().getSys();
+            cpu.dUserTime = sigar.getCpuPerc().getUser();
         } catch (SigarException e) {
             logger.error("Can't get cpu information!", e);
         }

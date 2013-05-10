@@ -14,7 +14,6 @@
 	<classpathentry kind="lib" path="lib/gson-1.6.jar" sourcepath="lib/gson-1.6-sources.jar"/>
 	<classpathentry kind="lib" path="lib/json_simple-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="lib/sigar.jar"/>
 	<classpathentry kind="lib" path="lib/jrobin-1.5.11.jar"/>
 	<classpathentry kind="lib" path="lib/pivot-charts-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/pivot-core-2.0.jar"/>
@@ -41,5 +40,6 @@
 	<classpathentry kind="lib" path="lib/stringtree-2.0.9.jar"/>
 	<classpathentry kind="lib" path="lib/jna.jar"/>
 	<classpathentry kind="lib" path="lib/libvirt-0.4.7.jar"/>
+	<classpathentry kind="lib" path="lib/sigar/sigar.jar"/>
 	<classpathentry kind="output" path="data/eclipse_build"/>
 </classpath>
