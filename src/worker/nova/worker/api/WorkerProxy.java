@@ -59,11 +59,11 @@ public class WorkerProxy extends SimpleProxy {
     public void sendStartVnode(String hyperVisor, String name,
             SimpleAddress vAddr, String memSize, String cpuCount,
             String hdaImage, boolean runAgent, String apps[], String ipAddr,
-            String subnetMask, String gateWay) {
+            String subnetMask, String gateWay, String vnodeID) {
         // 4th param false means wakeuponly = false
         super.sendRequest(new StartVnodeMessage(hyperVisor, name, vAddr, false,
                 memSize, cpuCount, hdaImage, runAgent, apps, ipAddr,
-                subnetMask, gateWay));
+                subnetMask, gateWay, vnodeID));
     }
 
     public void sendWakeupVnode(String hyperVisor, boolean runAgent,

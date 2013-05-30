@@ -100,23 +100,21 @@ public class Kvm {
                                                  // "\n    <boot order='2'/>"
 
                     + "\n  </disk>");
-        } else if ((params.get("cdImage") != null)
-                && (!params.get("cdImage").toString().equals(""))) {
-            // cdImage put in NOVA_HOME/run
-            params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
-                    params.get("cdImage").toString()));
-            if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
-                params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run",
-                        "run", strWorkerIP + "_"
-                                + params.get("name").toString(),
-                        params.get("cdImage").toString()));
-            }
-            params.put("determinCdrom", "<disk type='file' device='cdrom'>"
-                    + "\n    <source file='"
-                    + params.get("cdromPath").toString() + "'/>"
-                    + "\n    <target dev='hdc'/>" + "\n    <readonly/>"
-                    + "\n  </disk>");
-        } else {
+        }
+        /*
+         * else if ((params.get("cdImage") != null) &&
+         * (!params.get("cdImage").toString().equals(""))) { // cdImage put in
+         * NOVA_HOME/run params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME,
+         * "run", params.get("cdImage").toString())); if
+         * (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+         * params.put("cdromPath", Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+         * strWorkerIP + "_" + params.get("name").toString(),
+         * params.get("cdImage").toString())); } params.put("determinCdrom",
+         * "<disk type='file' device='cdrom'>" + "\n    <source file='" +
+         * params.get("cdromPath").toString() + "'/>" +
+         * "\n    <target dev='hdc'/>" + "\n    <readonly/>" + "\n  </disk>"); }
+         */
+        else {
             params.put("determinCdrom", "");
         }
 
