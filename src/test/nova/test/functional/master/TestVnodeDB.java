@@ -3,6 +3,7 @@ package nova.test.functional.master;
 import junit.framework.TestCase;
 import nova.common.service.SimpleAddress;
 import nova.common.util.Utils;
+import nova.master.models.Pnode;
 import nova.master.models.Vnode;
 
 import org.junit.Test;
@@ -11,9 +12,10 @@ public class TestVnodeDB extends TestCase {
 
     @Test
     public void testSave() {
-        SimpleAddress addr = new SimpleAddress("0.0.0.0", 2222);
+        //SimpleAddress addr = new SimpleAddress("0.0.0.0", 2222);
         Vnode vnode = new Vnode();
-        vnode.setAddr(addr);
+        vnode.setIp("0.0.0.0");
+        vnode.setPort(2222);
         vnode.setName("vm1");
         vnode.setCdrom("lalalalalalalala");
         vnode.setStatus(Vnode.Status.RUNNING);
@@ -22,12 +24,19 @@ public class TestVnodeDB extends TestCase {
 
         vnode.save();
 
-        Vnode vnodeRead = Vnode.findById(vnode.getId());
+        Vnode vnodeRead = Vnode.findById(1);
         System.out.println(vnodeRead);
 
-        Vnode.delete(vnodeRead);
+        //Vnode.delete(vnodeRead);
     }
 
+    @Test
+    public void testGetAllVnode() {
+        for (Vnode vnode : Vnode.all()) {
+            System.out.println(vnode);
+        }
+    }
+    
     @Test
     public void testToString() {
         SimpleAddress addr = new SimpleAddress("0.0.0.0", 2222);

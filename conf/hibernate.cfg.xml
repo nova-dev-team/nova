@@ -20,5 +20,6 @@
 		<mapping resource="schema/Vcluster.hbm.xml" />
 		<mapping resource="schema/Vdisk.hbm.xml" />
 		<mapping resource="schema/Migration.hbm.xml" />
+		<mapping resource="schema/Users.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

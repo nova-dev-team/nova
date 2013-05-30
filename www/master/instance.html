@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Nova Instance</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/docs.css" rel="stylesheet">
+  <script src="js/jquery-2.0.0.js"></script>
+  <script src="js/bootstrap-modal.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+</head>
+  
+<body>
+<!---------------------- Page Header  ------------------------------->
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+    </div>
+  </div>
+  
+  <div class="container">
+
+    <div class="page-header">
+        <h1>
+            <em> Nova Master </em>
+            <small> - Java Version v0.3.1</small>
+        </h1>  
+    </div>
+    <!-- page-header -->
+    
+    <div class="row ">
+      <div class="span4 offset8">
+        <div class="pull-right">
+    	<i class="icon-user"></i>&nbsp;<a>User: <strong>${username}</strong>&nbsp;&nbsp;</a>
+    	<i class="icon-flag"></i>&nbsp;<a>Privilege: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
+    	</div>
+      </div>
+    </div>
+    <!-- row -->
+    
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Nova</a>
+          
+          <ul class="nav nav-pills">
+            <li class=""><a href="overview">Overview</a></li>
+            <li class="active"><a href="instance">Instances</a></li>
+            <li class=""><a href="machine">Machines</a></li>
+            <li class=""><a href="volume">Volumes</a></li>
+            <li class=""><a href="image">Image&Snapshot</a></li>
+            <li class=""><a href="monitor">Monitor</a></li>
+            <li class=""><a href="account">Account</a></li>
+          </ul>
+          
+          <form class="navbar-search pull-left" action="">
+            <input type="text" class="search-query span2" placeholder="Search">
+          </form>
+          
+          <ul class="nav pull-right">
+          	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;Logout</a></li>
+          </ul>
+          
+        </div>
+      </div>
+    </div>
+    <!-- navbar -->
+
+    <!---------------------- Instance ------------------------------->
+	<br>
+    <legend> Instances
+	    <div class="pull-right">
+	       <a data-toggle="modal" class="btn btn-primary" href="#LaunchInstance_Modal"> Launch Instance </a>
+	       <a class="btn btn-success" href="instance"> Refresh </a>
+	    </div>
+    </legend>
+    
+    <!-- Launch Instance modal(Hide) -->
+	  <div id="LaunchInstance_Modal" class="modal hide fade">
+	    <div class="modal-header">
+	      <a class="close" data-dismiss="modal" >&times;</a>
+	      <h3>Launch a new instance</h3>
+	    </div>
+	    
+	    <form action="add_vnode" method="post" class="form-horizontal well">
+	        <div class="modal-body">
+	            <div class="control-group">	
+					<label class="control-label">Instance Name:</label>
+					<div class="controls">
+						<input class="span2" size="16" type="text" name="vnode_name">
+					</div>
+				</div>
+				<div class="control-group">	
+					<label class="control-label">Memery Size:</label>
+					<div class="controls">
+						<input class="span2" size="16" type="text" name="vnode_memsize">
+					</div>
+				</div>
+				<div class="control-group">	
+					<label class="control-label">CPU Num:</label>
+					<div class="controls">
+						<select class="span2" name="vnode_cpucount">
+			                <option>1</option>
+			                <option>2</option>
+			                <option>3</option>
+			                <option>4</option>
+			                <option>5</option>
+			                <option>6</option>
+			                <option>7</option>
+			                <option>8</option>
+			             </select>
+					</div>
+				</div>
+				<div class="control-group">	
+					<label class="control-label">OS Image:</label>
+					<div class="controls">
+						<select class="span2" name="vnode_disk">
+							${vdisk_list}
+			             </select>
+					</div>
+				</div>
+				<div class="control-group">	
+					<label class="control-label">Worker Machine:</label>
+					<div class="controls">
+						<select class="span2" name="vnode_pnodeId">
+			                ${pnode_list}
+			             </select>
+					</div>
+				</div>
+				<div class="control-group">	
+					<label class="control-label">Software List:</label>
+					<div class="controls">
+						  <label class="checkbox inline">
+			                <input type="checkbox" name="vnode_soft_word" value="true"> Word
+			              </label>
+			              <label class="checkbox inline">
+			                <input type="checkbox" name="vnode_soft_hadoop" value="true"> Hadoop
+			              </label>
+			              <label class="checkbox inline">
+			                <input type="checkbox" name="vnode_soft_vim" value="true"> Vim
+			              </label>
+					</div>
+				</div>
+				
+	        </div>
+	        <div class="modal-footer">
+	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+	      		<button type="submit" class="btn btn-primary" >Create</button>
+	    	</div>
+	    </form>
+	  </div>
+	  <!-- Launch Instance modal -->
+    
+	<table class="table table-striped table-hover">  
+		<thead>
+			<tr>
+			<th>Id</th>
+			<th>Instance Name</th>
+			<th>Ip Address</th>
+			<th>Boot Device</th>
+			<th>Memery Size</th>
+			<th>Virtual Cluster Id</th>
+			<th>Physical Machine Id</th>
+			<th>Status</th> 
+			<th>Action</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			${vnode_show}
+		</tbody>
+		
+	</table>
+	
+	<!--
+    <!---------------------- Cluster ------------------------------->
+	<br>
+    <legend> Clusters
+	    <div class="pull-right">
+	       <a data-toggle="modal" href="#AddCluster_Modal" class="btn btn-primary"> Create Cluster </a>
+	       <a class="btn btn-success" href="instance"> Refresh </a>
+	    </div>
+    </legend>
+    
+    <!-- Add Cluster modal(Hide) -->
+	  <div id="AddCluster_Modal" class="modal hide fade">
+	    <div class="modal-header">
+	      <a class="close" data-dismiss="modal" >&times;</a>
+	      <h3>Add a new cluster</h3>
+	    </div>
+	    
+	    <form action="add_cluster" method="post" class="form-horizontal well">
+	        <div class="modal-body">
+	        	<div class="control-group">	
+					<label class="control-label">Cluster Name:</label>
+					<div class="controls">
+						<input class="span2" size="16" type="text" name="vcluster_name">
+					</div>
+				</div>
+		     
+				<div class="control-group">	
+					<label class="control-label">Cluster Size:</label>
+					<div class="controls">
+						<input class="span2" size="16" type="text" name="vcluster_size">
+					</div>
+				</div>
+	        </div>
+	        <div class="modal-footer">
+	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+	      		<button type="submit" class="btn btn-primary" >Create</button>
+	    	</div>
+	    </form>
+	  </div>
+	  <!-- AddWorker_Modal -->
+
+    <hr>
+    
+	<table class="table table-striped table-hover">  
+		<thead>
+			<tr>
+			<th>Id</th>
+			<th>Cluster Name</th>
+			<th>First Ip</th>
+			<th>Cluster Size</th>
+			<th>sshPublicKey</th>
+			<th>sshPrivateKey</th>
+			<th>osUsername</th> 
+			<th>Action</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			${vcluster_show}
+		</tbody>
+		
+	</table>
+   
+    <!---------------------- Page Footer  ------------------------------->
+	<footer class="footer">
+  	  <hr>
+	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">回到顶端</a></p>
+      <p> This is the "master" module of Nova System. </p>
+      <p> Copyright @2013 by <a>hestream</a> in Nova development team.</p>
+    </footer>
+    <!-- footer -->
+
+  </div>
+  <!-- container --> 
+
+</body>
+</html>

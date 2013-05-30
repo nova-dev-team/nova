@@ -1,131 +1,150 @@
-<html>
-<head><title>Nova master</title></head>
-<body>
-<h3><font color="#FF0000">${content}<br></font></h3>
+<!DOCTYPE html>
+<html lang="en">
 
-
-<h4><font color="#33CC00">Info of Pnode<br></font></h4>
-${pnode_info}<br>
-
-<form action="delete_pnode" method="get">
-	Pnode Id<input type="text" name="pnode_id">
-	<input type="submit" value="Delete pnode">
-</form>
-
-<h4><font color="#33CC00">Info of Vnode<br></font></h4>
-${vnode_info}<br>
-
-<form action="delete_vnode" method="get">
-	Vnode Id<input type="text" name="vnode_id">
-	<input type="submit" value="Delete vnode">
-</form>
-
-<h4><font color="#33CC00">Info of Vcluster<br></font></h4>
-${vcluster_info}<br>
-
-<form action="delete_vcluster" method="get">
-	Vcluster Id<input type="text" name="vcluster_id">
-	<input type="submit" value="Delete vcluster">
-</form>
-
-<h4><font color="#33CC00">Info of Vdisk<br></font></h4>
-${vdisk_info}<br>
-
-<form action="unregister_vdisk" method="get">
-	Vdisk Id<input type="text" name="vdisk_id">
-	<input type="submit" value="Unregister vdisk">
-</form>
-
-<h4><font color="#33CC00">Info of Appliance<br></font></h4>
-${appliance_info}<br>
-
-<form action="unregister_appliance" method="get">
-	<input type="text" name="appliance_id">
-	<input type="submit" value="Unregister app">
-</form>
-
-
-
-
-
-
-
-<h3><font color="#FF0000">Worker machines<br></font></h3>
-<form action="add_pnode" method="get">
-	Pnode Ip<input type="text" name="pnode_ip">
-	VM Capacity<input type="text" name="vm_capacity">
-	<input type="submit" value="Add new pnode">
-</form>
-
-<h3><font color="#FF0000">Vdisk images<br></font></h3>
-<form action="register_vdisk" method="get">
-	Display name<input type="text" name="display_name">
-	File name<input type="text" name="file_name">
+<head>
+  <meta charset="utf-8">
+  <title>Nova master</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/docs.css" rel="stylesheet">
+  <script src="js/jquery-2.0.0.js"></script>
+  <script src="js/bootstrap-modal.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+  <script language="javascript">
+	function check_login()
+	{
+    	if(form_login.username.value=="")
+		{
+    		alert("用户名不能为空!");
+  			form_login.username.focus();
+  			return false;
+		}
+   		if(form_login.password.value=="")
+		{
+    		alert("密码不能为空");
+  			form_login.password.focus();
+  			return false;
+		}
+	}
 	
-	Image type
-	<select name="image_type" >
-    	<option value="qcow2">qcow2
-   	 	<option value="img">img
-    	<option value="other">other
- 	</select>
-	
-	OS family
-	<select name="os_family" >
-    	<option value="linux">linux
-   	 	<option value="windows">windows
-    	<option value="other">other
- 	</select><br>
-	
-	OS name<input type="text" name="os_name">
-	Description<input type="text" name="description"><br>
-	<input type="submit" value="Register vdisk">
-</form>
-
-<h3><font color="#FF0000">Appliance packages<br></font></h3>
-<form action="register_appliance" method="get">
-	Display name<input type="text" name="display_name">
-	File name<input type="text" name="file_name">
+	function check_register()
+	{
+    	if(form_register.username.value=="")
+		{
+    		alert("注册用户名不能为空!");
+  			form_register.username.focus();
+  			return false;
+		}
 		
-	OS family
-	<select name="os_family" >
-    	<option value="linux">linux
-   	 	<option value="windows">windows
-    	<option value="other">other
- 	</select><br>
-	
-	Description<input type="text" name="description"><br>
-	<input type="submit" value="Register appliance">
-</form>
-
-<h3><font color="#FF0000">Create vcluster<br></font></h3>
-<form action="create_vcluster" method="get">
-	Cluster Name<input type="text" name="vcluster_name">
-	Cluster Size<input type="text" name="vcluster_size">
-	<input type="submit" value="Create vcluster">
-</form>
-
-<h3><font color="#FF0000">Install appliance<br></font></h3>
-<form action="install_app" method="get">
-	Vnode Id<input type="text" name="vnode_id">
-	App Name<input type="text" name="app_name">
-	<input type="submit" value="Install app">
-</form>
-
-
-<h3><font color="#FF0000">Migration<br></font></h3>
-<form action="migrate" method="get">
-	Vnode Id<input type="text" name="vnode_id">
-	Migrate From<input type="text" name="migrate_from">
-	Migrate To<input type="text" name="migrate_to">
-	<input type="submit" value="Migrate">
-</form>
-
-
-${vcluster_frame}<br>
-
-
-
-${act}<br>
-
+		if(form_register.email.value=="")
+		{
+    		alert("注册邮箱不能为空!");
+  			form_register.username.focus();
+  			return false;
+		} 
+		
+   		if(form_register.password.value=="")
+		{
+    		alert("密码不能为空");
+  			form_register.password.focus();
+  			return false;
+		}
+		
+		if(form_register.password_confirm.value=="")
+		{
+    		alert("确认密码不能为空");
+  			form_register.password_confirm.focus();
+  			return false;
+		}
+		
+		if(form_register.password.value != form_register.password_confirm.value)
+		{
+		    alert("密码与确认密码不相符");
+		    form_register.password_confirm.focus();
+  			return false;
+		}
+	}
+  </script>
+  
+</head>
+  
+<body style="background:#FFFFFF;background-image:url(img/background.jpg);background-repeat:repeat-x">
+  <div class="container" style="margin-top:300px">  
+    <form id="form_login" action="login" method="post" onsubmit="return check_login();" class="well" style="width:380px;margin:0px auto;">
+      <h3 align="center"> Nova System </h3>
+		<label><i class="icon-user"></i>&nbsp;&nbsp;Username:</label>
+		  <input type="text" name="username" style="height:30px" class="span4" />
+		<label><i class="icon-lock"></i>&nbsp;&nbsp;Password：</label>
+		  <input type="password" name="password" style="height:30px" class="span4" />
+		 
+		<div align="center">
+		  <br>
+		  <button type="submit" class="btn btn-primary btn-large">Login</button>
+		</div>
+    </form>
+    <br><br><br><br>
+    <div align="center">
+        <a data-toggle="modal" class="btn btn-success btn-large" href="#LaunchInstance_Modal"> User Register </a>
+    </div>
+    
+    <!-- Launch Instance modal(Hide) -->
+	  <div id="LaunchInstance_Modal" class="modal hide fade">
+	    <div class="modal-header">
+	      <a class="close" data-dismiss="modal" >&times;</a>
+	      <h3>New User Register</h3>
+	    </div>
+	    
+	    <form id="form_register" action="user_register" method="post" class="form-horizontal" onsubmit="return check_register();">
+	        <div class="modal-body">
+	            <div class="control-group">
+			        <label class="control-label" for="focusedInput">Username:</label>
+			           <div class="controls">
+			             <div class="input-prepend">
+					       <span class="add-on"><i class="icon-user"></i></span>
+					       <input type="text" name="username" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+				
+				<div class="control-group">
+			        <label class="control-label" for="focusedInput"> Email:</label>
+			           <div class="controls">
+			             <div class="input-prepend">
+			               <span class="add-on"><i class="icon-envelope"></i></span>
+					       <input type="text" name="email" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+				<div class="control-group">	
+					<label class="control-label" for="focusedInput"> Password:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="password" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+			    <div class="control-group">	
+					<label class="control-label" for="focusedInput"> Password Confirm:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="password_confirm" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+				
+	        </div>
+	        
+	        <div class="modal-footer">
+	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+	      		<button type="submit" class="btn btn-primary" >Register</button>
+	    	</div>
+	    </form>
+	  </div>
+	  <!-- Launch Instance modal -->
+  </div>
 </body>
 </html>

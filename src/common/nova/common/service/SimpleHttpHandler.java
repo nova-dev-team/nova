@@ -31,10 +31,11 @@ public abstract class SimpleHttpHandler implements
         String replyText = renderResult(req);
         HttpResponse rep = new DefaultHttpResponse(req.getProtocolVersion(),
                 HttpResponseStatus.OK);
-        HttpHeaders.setContentLength(rep, replyText.length());
+        HttpHeaders.setContentLength(rep, replyText.getBytes().length);
 
         ChannelBuffer buffer = HeapChannelBufferFactory.getInstance()
-                .getBuffer(replyText.length());
+                .getBuffer(replyText.getBytes().length);
+        
         buffer.writeBytes(replyText.getBytes());
         rep.setContent(buffer);
 

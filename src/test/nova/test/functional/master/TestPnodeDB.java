@@ -22,7 +22,7 @@ public class TestPnodeDB {
         System.out.println(pnodeLoad);
         Assert.assertEquals(pnode, pnodeLoad);
 
-        Pnode.delete(pnodeLoad);
+        //Pnode.delete(pnodeLoad);
     }
 
     @Test

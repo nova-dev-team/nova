@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Nova master</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/docs.css" rel="stylesheet">
+</head>
+  
+<body>
+
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+    </div>
+  </div>
+  
+
+  <div class="container">
+
+    <div class="page-header">	
+        <h1>
+            <em> Nova Master </em>
+            <small> - Java Version v0.3.1</small>
+        </h1>  
+    </div>
+    <!-- page-header -->
+    
+    <div class="row ">
+      <div class="span3 offset9">
+        <div class="pull-right">
+    	<i class="icon-user"></i>&nbsp;<a>User: <strong>${username}</strong>&nbsp;&nbsp;</a>
+    	<i class="icon-flag"></i>&nbsp;<a>Privilege: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
+    	</div>
+      </div>
+    </div>
+    <!-- row -->
+    
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Nova</a>
+          <ul class="nav nav-pills">
+            <li class=""><a href="overview">Overview</a></li>
+            <li class=""><a href="users">users</a></li>
+            <li class="active"><a href="system_ctl">System</a></li>
+            <li class=""><a href="monitor">Monitor</a></li>
+            <li class=""><a href="migration">Migration</a></li>
+            <li class=""><a href="workspace">Workspace</a></li>
+            <li class=""><a href="wizard">Wizard</a></li>
+            <li class=""><a href="account">My Account</a></li>
+          </ul>
+          
+          <form class="navbar-search pull-left" action="">
+            <input type="text" class="search-query span2" placeholder="Search">
+          </form>
+          
+          <ul class="nav pull-right">
+          	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;Logout</a></li>
+          </ul>
+          
+        </div>
+      </div>
+    </div>
+    <!-- navbar -->
+    
+    <div class="tabbable tabs-left">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#lA" data-toggle="tab">vcluster</a></li>
+          <li><a href="#lB" data-toggle="tab">pnode</a></li>
+          <li><a href="#lC" data-toggle="tab">vnode</a></li>
+          <li><a href="#lC" data-toggle="tab">vdisk</a></li>
+          <li><a href="#lC" data-toggle="tab">Appliance</a></li>
+      </ul>
+      
+      <div class="tab-content">
+        <!-------------------    Vcluster  ---------------------->
+	    <table class="table">
+	    <tr>
+		  <h4><font color="#33CC00">Info of Vcluster</font></h4>
+	    </tr>
+	     [{Vcluster @ cluster_name='112', id='1',cluster_size='3', first_ip='10.0.1.90'}]
+	    </table>
+	  
+		<form action="delete_vcluster" method="get" class="well form-search">
+			<label class="control-label">Vcluster Id </label	>
+			<input class="input-medium search-query" type="text">
+			<button class="btn btn-info" type="submit"> Delete Vcluster</button>
+		</form>
+      </div>
+    </div>
+    
+    <!-------------------    Pnode  ---------------------->
+    <table class="table">
+	<tr>
+	  <h4><font color="#33CC00">Info of Pnode</font></h4>
+	</tr>
+		[]
+	</table>
+	  
+	<form action="delete_pnode" method="get" class="well form-search">
+		<label class="control-label">Pnode Id </label	>
+		<input class="input-medium search-query" type="text">
+		<button class="btn btn-info" type="submit"> Delete Pnode </button>
+	</form>
+	
+	
+	<!-------------------    Vnode  ---------------------->
+	<table class="table">
+	<tr>
+		<h4><font color="#33CC00">Info of Vnode</font></h4>
+	</tr>
+		[{Vnode @ 10.0.1.90:4000, vid='1', name='ubuntu1', pnode_id='1', cpu_count='1', memory_size='512000', uuid = ''}]
+	</table>
+	
+	<form action="delete_vnode" method="get" class="well form-search">
+		<label class="control-label">Vnode Id </label>
+		<input class="input-medium search-query" type="text">
+		<button class="btn btn-info" type="submit"> Delete Vnode </button>
+	</form>
+	
+	
+
+    <!-------------------    Vdisk  ---------------------->
+	<table class="table">
+	<tr>
+		<h4><font color="#33CC00">Info of Vdisk</font></h4>
+	</tr>
+	
+	</table>
+	
+	<form action="delete_vdisk" method="get" class="well form-search">
+		<label class="control-label">Vdisk Id</label	>
+		<input class="input-medium search-query" type="text">
+		<button class="btn btn-info" type="submit"> Unregister Vdisk</button>
+	</form>
+	
+	<!-------------------    Appliance  ---------------------->
+	<table class="table">
+	<tr>
+		<h4><font color="#33CC00">Info of Appliance</font></h4>
+	</tr>
+	
+	</table>
+	
+	<form action="unregister_appliance" method="get" class="well form-search">
+		<label class="control-label">Vdisk Id</label	>
+		<input class="input-medium search-query" type="text">
+		<button class="btn btn-info" type="submit"> Unregister App</button>
+	</form>
+
+
+
+<h3><font color="#FF0000">Worker machines<br></font></h3>
+<form action="add_pnode" method="get">
+	Pnode Ip<input type="text" name="pnode_ip">
+	VM Capacity<input type="text" name="vm_capacity">
+	<input type="submit" value="Add new pnode">
+</form>
+
+<h3><font color="#FF0000">Vdisk images<br></font></h3>
+<form action="register_vdisk" method="get">
+	Display name<input type="text" name="display_name">
+	File name<input type="text" name="file_name">
+	
+	Image type
+	<select name="image_type" >
+    	<option value="qcow2">qcow2
+   	 	<option value="img">img
+    	<option value="other">other
+ 	</select>
+	
+	OS family
+	<select name="os_family" >
+    	<option value="linux">linux
+   	 	<option value="windows">windows
+    	<option value="other">other
+ 	</select><br>
+	
+	OS name<input type="text" name="os_name">
+	Description<input type="text" name="description"><br>
+	<input type="submit" value="Register vdisk">
+</form>
+
+<h3><font color="#FF0000">Appliance packages<br></font></h3>
+<form action="register_appliance" method="get">
+	Display name<input type="text" name="display_name">
+	File name<input type="text" name="file_name">
+		
+	OS family
+	<select name="os_family" >
+    	<option value="linux">linux
+   	 	<option value="windows">windows
+    	<option value="other">other
+ 	</select><br>
+	
+	Description<input type="text" name="description"><br>
+	<input type="submit" value="Register appliance">
+</form>
+
+<h3><font color="#FF0000">Create vcluster<br></font></h3>
+<form action="create_vcluster" method="get">
+	Cluster Name<input type="text" name="vcluster_name">
+	Cluster Size<input type="text" name="vcluster_size">
+	<input type="submit" value="Create vcluster">
+</form>
+
+<h3><font color="#FF0000">Install appliance<br></font></h3>
+<form action="install_app" method="get">
+	Vnode Id<input type="text" name="vnode_id">
+	App Name<input type="text" name="app_name">
+	<input type="submit" value="Install app">
+</form>
+
+
+<h3><font color="#FF0000">Migration<br></font></h3>
+<form action="migrate" method="get">
+	Vnode Id<input type="text" name="vnode_id">
+	Migrate From<input type="text" name="migrate_from">
+	Migrate To<input type="text" name="migrate_to">
+	<input type="submit" value="Migrate">
+</form>
+
+
+<footer class="footer">
+  	  <hr>
+	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">回到顶端</a></p>
+      <p> This is the "master" module of Nova System. </p>
+      <p> Copyright @2013 by <a>hestream</a> in Nova development team.</p>
+    </footer>
+    <!-- footer -->
+
+  </div>
+  <!-- container --> 
+
+</body>
+</html>

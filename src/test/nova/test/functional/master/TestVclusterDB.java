@@ -2,6 +2,7 @@ package nova.test.functional.master;
 
 import junit.framework.TestCase;
 import nova.master.models.Vcluster;
+import nova.master.models.Vnode;
 
 import org.junit.Test;
 
@@ -25,7 +26,14 @@ public class TestVclusterDB extends TestCase {
 
         System.out.println(vclusterRead);
 
-        Vcluster.delete(vclusterRead);
+        //Vcluster.delete(vclusterRead);
 
+    }
+    
+    @Test
+    public void testGetAllVnode() {
+        for (Vcluster vcluster : Vcluster.all()) {
+            System.out.println(vcluster);
+        }
     }
 }
