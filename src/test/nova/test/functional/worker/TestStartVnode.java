@@ -33,7 +33,7 @@ public class TestStartVnode {
 
         // StartVnodeMessage msg = new StartVnodeMessage("kvm", "vm", null,
         // "false", "100288", "1", "small.img", "false");
-        StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux1", null,
+        StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux10", null,
                 false, "300000", "1", "linux.img", false, apps, "10.0.1.100",
                 "255.255.255.0", "10.0.1.254");
 

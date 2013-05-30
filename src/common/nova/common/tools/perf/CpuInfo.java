@@ -10,7 +10,7 @@ import com.google.gson.Gson;
  */
 public class CpuInfo {
 
-    public double combinedTime = 0;
+    public double combinedTime = 0.0;
     public int mhz = 0;
     public int nCpu = 0;
     public double dUserTime = 0.0;

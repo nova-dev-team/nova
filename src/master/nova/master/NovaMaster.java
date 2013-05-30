@@ -17,6 +17,7 @@ import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.AppliancesFirstInstalledMessage;
 import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
+import nova.master.api.messages.PnodeCreateVnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
@@ -32,6 +33,7 @@ import nova.master.handler.MasterHttpHandler;
 import nova.master.handler.MasterPnodeHeartbeatHandler;
 import nova.master.handler.MasterPnodePerfHandler;
 import nova.master.handler.MasterVnodeHeartbeatHandler;
+import nova.master.handler.PnodeCreateVnodeHandler;
 import nova.master.handler.PnodeStatusHandler;
 import nova.master.handler.RegisterApplianceHandler;
 import nova.master.handler.RegisterVdiskHandler;
@@ -107,8 +109,12 @@ public class NovaMaster extends SimpleServer {
 
         this.registerHandler(AgentPerfMessage.class,
                 new MasterAgentPerfHandler());
+
         this.registerHandler(AppliancesFirstInstalledMessage.class,
                 new ApplicancesFirstInstalledHandler());
+
+        this.registerHandler(PnodeCreateVnodeMessage.class,
+                new PnodeCreateVnodeHandler());
         // TODO delete experiment codes between //////////////////// and
         // //////////////
 

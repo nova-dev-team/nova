@@ -53,6 +53,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
 
+        msg.setUuid(UUID.randomUUID().toString());
+        msg.setRunAgent(true);
         // ////////////////////////////////////////////////////////////////////
         String ip = new SimpleAddress(msg.getIpAddr(), 4100).toString();
 
@@ -478,7 +480,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             + " -f qcow2 "
                             + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
                                     strWorkerIP + "_" + msg.getName(),
-                                    stdImgFile);
+                                    stdImgFile + " 20G");
                     System.out
                             .println("pNFS___________________________________________________________________-: "
                                     + cmdofincrtlnfs);
@@ -718,6 +720,29 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         return;
                     }
                 }
+                String cmd = Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                        strWorkerIP + "_" + msg.getName());
+                cmd = "chmod -R 777 " + cmd;
+                Process p;
+                try {
+                    p = Runtime.getRuntime().exec(cmd);
+                    StreamGobbler errorGobbler = new StreamGobbler(
+                            p.getErrorStream(), "ERROR");
+                    errorGobbler.start();
+                    StreamGobbler outGobbler = new StreamGobbler(
+                            p.getInputStream(), "STDOUT");
+                    outGobbler.start();
+                    try {
+                        if (p.waitFor() != 0) {
+                            log.error("chmod returned abnormal value!");
+                        }
+                    } catch (InterruptedException e1) {
+                        log.error("chmod process terminated", e1);
+                    }
+                } catch (IOException e1) {
+                    log.error("chmod cmd error!", e1);
+                    return;
+                }
 
             }
 
@@ -733,11 +758,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     try {
 
                         // start a vnode
-                        Domain testDomain = NovaWorker
-                                .getInstance()
+                        String tt = Kvm.emitDomain(msg.getHashMap());
+                        Domain testDomain = NovaWorker.getInstance()
                                 .getConn(virtService, false)
-                                .domainCreateLinux(
-                                        Kvm.emitDomain(msg.getHashMap()), 0);
+                                .domainCreateLinux(tt, 0);
                         if (testDomain != null) {
                             VnodeStatusDaemon
                                     .putStatus(UUID.fromString(testDomain

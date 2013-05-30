@@ -109,6 +109,7 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
     protected final void sendRequest(Object req) {
         Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req,
                 this.replyAddr);
+        // System.out.println(packet.xtype);
         String message = gson.toJson(packet) + "\r\n";
         if (message.length() > SimpleServer.MAX_PACKET_SIZE) {
             throw new MessageTooLongException();

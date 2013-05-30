@@ -9,7 +9,6 @@ import nova.common.service.SimpleProxy;
 import nova.common.service.message.AgentHeartbeatMessage;
 import nova.common.service.message.AgentPerfMessage;
 import nova.common.service.message.PnodeHeartbeatMessage;
-import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
@@ -68,7 +67,7 @@ public class MasterProxy extends SimpleProxy {
      * Send a monitor info to master node.
      */
     public void sendPnodeMonitorInfo() {
-        super.sendRequest(new PnodePerfMessage());
+        // super.sendRequest(new PnodePerfMessage());
     }
 
     public void sendVnodeMonitorInfo() {

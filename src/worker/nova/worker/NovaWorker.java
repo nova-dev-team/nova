@@ -162,8 +162,8 @@ public class NovaWorker extends SimpleServer {
         this.registerHandler(ObtainSshKeysMessage.class,
                 new ObtainSshKeysHandler());
 
-        Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
-        Conf.setDefaultValue("worker.bind_port", 4000);
+        // Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
+        // Conf.setDefaultValue("worker.bind_port", 4000);
 
         conn = null;
 
@@ -200,7 +200,7 @@ public class NovaWorker extends SimpleServer {
             // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
             // + ":/Nova_home "
             // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
-            "mount -t nfs " + strPnfsHost + ":/export/Nova_home"
+            "mount -t nfs " + strPnfsHost + ":/export/Nova_home "
                     + Utils.pathJoin(Utils.NOVA_HOME, "run") };
             try {
                 for (String cmd : strExecs) {
