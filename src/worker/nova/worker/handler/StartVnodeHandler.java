@@ -52,9 +52,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
     @Override
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
-
+        String retVnodeID = msg.getUuid();
         msg.setUuid(UUID.randomUUID().toString());
-        msg.setRunAgent(true);
+        msg.setRunAgent(false);
         // ////////////////////////////////////////////////////////////////////
         String ip = new SimpleAddress(msg.getIpAddr(), 4100).toString();
 
@@ -784,7 +784,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                         .getUUIDString()));
                         mp.sendPnodeCreateVnodeMessage(NovaWorker.getInstance()
                                 .getAddr().getIp(), testDomain.getID(),
-                                testDomain.getUUIDString(),
+                                retVnodeID,
                                 Integer.parseInt(Utils.WORKER_VNC_MAP
                                         .get(testDomain.getUUIDString())));
                         // Domain testDomain = conn.domainLookupByName("test");

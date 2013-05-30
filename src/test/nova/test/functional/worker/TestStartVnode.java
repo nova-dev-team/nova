@@ -35,13 +35,13 @@ public class TestStartVnode {
         // "false", "100288", "1", "small.img", "false");
         StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux10", null,
                 false, "300000", "1", "linux.img", false, apps, "10.0.1.100",
-                "255.255.255.0", "10.0.1.254");
+                "255.255.255.0", "10.0.1.254", "1111");
 
         // msg.setName("vm");
         // msg.setMemSize("1024000");
         msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aab");
         msg.setCdImage("agent-cd.iso");
-        msg.setRunAgent(true);
+        msg.setRunAgent(false);
 
         ChannelHandlerContext ctx = null;
         MessageEvent e = null;

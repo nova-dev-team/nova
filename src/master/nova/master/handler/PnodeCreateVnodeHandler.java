@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
+import nova.common.util.Utils;
 import nova.master.api.MasterVNCPM;
 import nova.master.api.messages.PnodeCreateVnodeMessage;
 
@@ -43,6 +44,8 @@ public class PnodeCreateVnodeHandler implements
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         String masterIP = Conf.getString("master.bind_host");
         int masterPort = getFreePort();
-        MasterVNCPM.addService(masterIP, 5901, msg.PnodeIP, msg.VnodePort);
+        MasterVNCPM
+                .addService(masterIP, masterPort, msg.PnodeIP, msg.VnodePort);
+        Utils.MASTER_VNC_MAP.put(msg.uuid, String.valueOf(masterPort));
     }
 }

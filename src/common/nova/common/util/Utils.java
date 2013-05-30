@@ -37,6 +37,7 @@ public class Utils {
     public static final String NOVA_HOME;
 
     public static HashMap<String, String> WORKER_VNC_MAP = new HashMap<String, String>();
+    public static HashMap<String, String> MASTER_VNC_MAP = new HashMap<String, String>();
 
     /*
      * Static constructor to determine NOVA_HOME.

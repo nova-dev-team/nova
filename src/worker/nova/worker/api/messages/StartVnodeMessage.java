@@ -19,7 +19,7 @@ public class StartVnodeMessage {
     public StartVnodeMessage(String hyperVisor, String name,
             SimpleAddress vAddr, boolean wakeupOnly, String memSize,
             String cpuCount, String hdaImage, boolean runAgent, String apps[],
-            String ipAddr, String subnetMask, String gateWay) {
+            String ipAddr, String subnetMask, String gateWay, String vnodeID) {
         super();
         this.hyperVisor = hyperVisor;
         this.name = name;
@@ -33,6 +33,7 @@ public class StartVnodeMessage {
         this.ipAddr = ipAddr;
         this.subnetMask = subnetMask;
         this.gateWay = gateWay;
+        this.uuid = vnodeID;
     }
 
     public StartVnodeMessage(String hyperVisor, boolean wakeupOnly,
