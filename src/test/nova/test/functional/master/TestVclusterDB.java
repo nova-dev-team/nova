@@ -2,7 +2,6 @@ package nova.test.functional.master;
 
 import junit.framework.TestCase;
 import nova.master.models.Vcluster;
-import nova.master.models.Vnode;
 
 import org.junit.Test;
 
@@ -11,14 +10,14 @@ public class TestVclusterDB extends TestCase {
     @Test
     public void testSave() {
         Vcluster vcluster = new Vcluster();
-        vcluster.setClusterName("cluster123");
-        vcluster.setClusterSize(7);
+        vcluster.setClusterName("Professor A's Cluster");
+        vcluster.setClusterSize(100);
         vcluster.setFristIp("10.0.0.1");
-        vcluster.setOsUsername("zhaoxun");
-        vcluster.setOsPassword("liquid");
+        vcluster.setOsUsername("Professor A");
+        vcluster.setOsPassword("os");
         vcluster.setSshPrivateKey("sshprivatekey");
         vcluster.setSshPublicKey("sshpublickey");
-        vcluster.setUserId(123);
+        vcluster.setUserId(2013054856);
 
         vcluster.save();
 
@@ -26,10 +25,10 @@ public class TestVclusterDB extends TestCase {
 
         System.out.println(vclusterRead);
 
-        //Vcluster.delete(vclusterRead);
+        // Vcluster.delete(vclusterRead);
 
     }
-    
+
     @Test
     public void testGetAllVnode() {
         for (Vcluster vcluster : Vcluster.all()) {

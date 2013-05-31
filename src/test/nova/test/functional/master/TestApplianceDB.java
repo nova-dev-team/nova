@@ -10,9 +10,9 @@ public class TestApplianceDB extends TestCase {
     @Test
     public void testSave() {
         Appliance soft = new Appliance();
-        soft.setFileName("blah");
-        soft.setDisplayName("haha");
-        soft.setDescription("blahlalalal");
+        soft.setFileName("Eclipse");
+        soft.setDisplayName("Eclips");
+        soft.setDescription("Extensible Tool Platform and Java IDE");
         soft.setOsFamily("win7,Ubuntu");
 
         soft.save();

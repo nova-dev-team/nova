@@ -7,47 +7,45 @@ import nova.master.models.Users;
 import org.junit.Test;
 
 public class TestUsersDB {
-	
-	@Test
+
+    @Test
     public void testSave() {
-		Users user = new Users();
-		user.setName("hechuan");
-		user.setEmail("hechuan1215@gmail.com");
-		user.setPassword("123456");
-		user.setPrivilege("root");
-		user.setActivated("1");
-		
-		user.save();
-		
-		System.out.println(Users.last().toString());
-		
-	}
-	
-	@Test
-	public void testShowAll() {
-		List<Users> allusers = Users.all();
-		for(Users user : allusers) {
-			System.out.println(user.toString());
-		}
-	}
-	
-	@Test
-	public void testfind() {
-		Users us = Users.findById(1);
-		System.out.println(us.toString());
-		
-		Users usr = Users.findByName("hechuan");
-		System.out.println(usr.toString());
-	}
-	
-	@Test
-	public void testDelete() {
-		//Users ur = Users.findById(5);
-		System.out.println(Users.last().toString());
-		Users.delete(Users.last());
-		System.out.println("delete done!");
-	}
-	
-	
+        Users user = new Users();
+        user.setName("Professor");
+        user.setEmail("hechuan1215@gmail.com");
+        user.setPassword("123456");
+        user.setPrivilege("root");
+        user.setActivated("1");
+
+        user.save();
+
+        System.out.println(Users.last().toString());
+
+    }
+
+    @Test
+    public void testShowAll() {
+        List<Users> allusers = Users.all();
+        for (Users user : allusers) {
+            System.out.println(user.toString());
+        }
+    }
+
+    @Test
+    public void testfind() {
+        Users us = Users.findById(1);
+        System.out.println(us.toString());
+
+        Users usr = Users.findByName("hechuan");
+        System.out.println(usr.toString());
+    }
+
+    @Test
+    public void testDelete() {
+        // Users ur = Users.findById(5);
+        System.out.println(Users.last().toString());
+        Users.delete(Users.last());
+        System.out.println("delete done!");
+    }
 
 }

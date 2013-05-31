@@ -11,18 +11,18 @@ public class TestPnodeDB {
     @Test
     public void testSave() {
         Pnode pnode = new Pnode();
-        pnode.setHostname("blah");
-        pnode.setIp("127.0.0.3");
-        pnode.setMacAddress("mac_addr");
-        pnode.setPort(1234);
-        pnode.setStatus(Status.ADD_PENDING);
+        pnode.setHostname("eagle's PC");
+        pnode.setIp("166.111.131.155");
+        pnode.setMacAddress("a2:d5:45:5f:53:ad");
+        pnode.setPort(4000);
+        pnode.setStatus(Status.RUNNING);
 
         pnode.save();
         Pnode pnodeLoad = Pnode.findById(pnode.getId());
         System.out.println(pnodeLoad);
         Assert.assertEquals(pnode, pnodeLoad);
 
-        //Pnode.delete(pnodeLoad);
+        // Pnode.delete(pnodeLoad);
     }
 
     @Test

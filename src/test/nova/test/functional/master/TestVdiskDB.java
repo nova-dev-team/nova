@@ -1,7 +1,6 @@
 package nova.test.functional.master;
 
 import junit.framework.TestCase;
-import nova.master.models.Vcluster;
 import nova.master.models.Vdisk;
 
 import org.junit.Test;
@@ -12,12 +11,12 @@ public class TestVdiskDB extends TestCase {
     public void testSave() {
         Vdisk vdisk = new Vdisk();
         vdisk.setFileName("linux");
-        vdisk.setDisplayName("haha");
+        vdisk.setDisplayName("Ubuntu 11.04");
         vdisk.setDiskFormat("img");
         vdisk.setOsFamily("linux");
-        vdisk.setDescription("lalalala");
-        vdisk.setOsName("Ubuntu 10");
-        vdisk.setSoftList("blahblah");
+        vdisk.setDescription("Ubuntu 11.04 Image");
+        vdisk.setOsName("Ubuntu 11.04");
+        vdisk.setSoftList("Vim,Eclipse,JDC");
 
         vdisk.save();
 
@@ -30,10 +29,10 @@ public class TestVdiskDB extends TestCase {
                 + vdiskRead.getOsName() + "\nSoftList: "
                 + vdiskRead.getSoftList() + "\n\n");
 
-        //Vdisk.delete(vdiskRead);
+        // Vdisk.delete(vdiskRead);
 
     }
-    
+
     @Test
     public void testGetAllVdisk() {
         for (Vdisk vdisk : Vdisk.all()) {

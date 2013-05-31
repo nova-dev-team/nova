@@ -4,7 +4,6 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
 /**
@@ -46,22 +45,14 @@ public class Server extends Thread {
         }
         SysLog.info("Transfer Server : " + route.toString() + " created OK");
         while (!isStop) {
-            String clientIP = "";
+
             try {
                 Socket sock = myServer.accept();
-                clientIP = sock.getInetAddress().getHostAddress();
-                if (checkIP(route, clientIP)) {
-                    SysLog.warning(" ransfer Server : " + route.toString()
-                            + "  Incoming:" + sock.getInetAddress());
-                    sock.setSoTimeout(0);
-                    // connCounter++;
-                    Transfer myt = new Transfer(sock, route);
-                    connectionQueue.add(myt);
-                } else {
-                    SysLog.warning(" ransfer Server : " + route.toString()
-                            + "  Refuse :" + sock.getInetAddress());
-                    closeSocket(sock);
-                }
+
+                sock.setSoTimeout(0);
+                // connCounter++;
+                Transfer myt = new Transfer(sock, route);
+                connectionQueue.add(myt);
 
             } catch (Exception ef) {
                 SysLog.severe(" Transfer Server : " + route.toString()
@@ -70,48 +61,10 @@ public class Server extends Thread {
         }
     }
 
-    private static boolean checkIP(Route route, String inIP) {
-        String[] inI = string2StringArray(inIP, ".");
-        String[] list = string2StringArray(route.AllowClient, ".");
-        if (inI.length != list.length) {
-            SysLog.severe(" Transfer Server Error Cfg AllowClient : "
-                    + route.toString());
-            return false;
-        }
-        for (int i = 0; i < inI.length; i++) {
-            if ((!inI[i].equals(list[i])) && !(list[i].equals("*"))) {
-                System.out.println(": " + inI[i] + " :" + list[i]);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static final String[] string2StringArray(String srcString,
-            String separator) {
-        int index = 0;
-        String[] temp;
-        StringTokenizer st = new StringTokenizer(srcString, separator);
-        temp = new String[st.countTokens()];
-        while (st.hasMoreTokens()) {
-            temp[index] = st.nextToken().trim();
-            index++;
-        }
-        return temp;
-    }
-
     private void closeServerSocket() {
         try {
             this.myServer.close();
         } catch (Exception ef) {
-        }
-    }
-
-    private void closeSocket(Socket s) {
-        try {
-            s.close();
-        } catch (Exception ef) {
-
         }
     }
 
