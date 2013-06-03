@@ -31,11 +31,18 @@ public abstract class SimpleHttpHandler implements
         String replyText = renderResult(req);
         HttpResponse rep = new DefaultHttpResponse(req.getProtocolVersion(),
                 HttpResponseStatus.OK);
+
+        // set cookie
+        // CookieEncoder encoder = new CookieEncoder(true);
+        // encoder.addCookie("name", MasterHttpHandler.login_user.getName());
+        // String encoderCookie = encoder.encode();
+        // rep.setHeader(HttpHeaders.Names.SET_COOKIE, encoderCookie);
+
         HttpHeaders.setContentLength(rep, replyText.getBytes().length);
 
         ChannelBuffer buffer = HeapChannelBufferFactory.getInstance()
                 .getBuffer(replyText.getBytes().length);
-        
+
         buffer.writeBytes(replyText.getBytes());
         rep.setContent(buffer);
 

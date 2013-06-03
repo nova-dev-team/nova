@@ -78,6 +78,12 @@ public class MasterHttpHandler extends SimpleHttpHandler {
         String reqUri = req.getUri();
         System.out.println("Request uri is: " + reqUri);
 
+        // String CookieMeg = req.getHeader("Cookie");
+        // Set<Cookie> cookies = new CookieDecoder().decode(CookieMeg);
+        // for (Cookie cok : cookies) {
+        // System.out.println("Cookie message is " + cok);
+        // }
+
         if (reqUri.contains("css") || reqUri.contains("img")
                 || reqUri.contains("js") || reqUri.contains("jar")) {
 
@@ -367,6 +373,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "'> Delete Cluster</a></li>"
                                 + "</ul></div></td></tr>";
                     }
+
                     values.put("vcluster_show", vcluster_show);
                     if (vcluster_show == "") {
                         values.put("vcluster_show", "None Cluster!");
@@ -466,7 +473,28 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 // --------------------------- http request from volume page
                 // --------------------------
-                else if (act.equals("volume")) {
+                else if (act.equals("volume") || act.equals("add_vdisk")
+                        || act.equals("delete_vdisk")) {
+
+                    if (act.equals("add_vdisk")) {
+                        new RegisterVdiskHandler().handleMessage(
+                                new RegisterVdiskMessage(queryMap
+                                        .get("vdisk_displayname"), queryMap
+                                        .get("vdisk_filename"), queryMap
+                                        .get("vdisk_disktype"), queryMap
+                                        .get("vdisk_osfamily"), queryMap
+                                        .get("vdisk_osname"), queryMap
+                                        .get("vdisk_descrption")), null, null,
+                                null);
+                    }
+
+                    else if (act.equals("delete_vdisk")) {
+                        new UnregisterVdiskHandler().handleMessage(
+                                new UnregisterVdiskMessage(Integer
+                                        .parseInt(queryMap.get("vdisk_id"))),
+                                null, null, null);
+                    }
+
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                             "volume.html");
 
