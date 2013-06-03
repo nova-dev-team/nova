@@ -6,6 +6,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
+import nova.master.api.messages.CreateVclusterMessage;
 import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
@@ -27,6 +28,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
     public void handleMessage(CreateVnodeMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
+        new CreateVclusterHandler().handleMessage(new CreateVclusterMessage(
+                msg.vmName, 1), null, null, null);
         // TODO Auto-generated method stub
         Vcluster vcluster = new Vcluster();
         for (Vcluster vc : Vcluster.all()) {
