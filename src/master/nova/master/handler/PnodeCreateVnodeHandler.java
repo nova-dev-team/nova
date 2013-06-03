@@ -56,7 +56,7 @@ public class PnodeCreateVnodeHandler implements
 
     private void portMP(String srcIP, int srcPort, String dstIP, int dstPort,
             long vnodeid) {
-        String strcmd = "ssh -CNfg -L " + srcPort + ":" + srcIP + ":" + dstPort
+        String strcmd = "ssh -CNfg -L " + srcPort + ":localhost:" + dstPort
                 + " root@" + dstIP;
         try {
 
