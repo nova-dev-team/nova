@@ -24,7 +24,7 @@ public class MasterVnodeHeartbeatHandler implements
         if (xreply == null) {
             log.warn("Got a vnode heartbeat message, but the reply address is null!");
         } else {
-            log.info("Got vnode heartbeat message from: " + xreply);
+            // log.info("Got vnode heartbeat message from: " + xreply);
         }
 
         // TODO @zhaoxun possibly update vnode
@@ -32,8 +32,8 @@ public class MasterVnodeHeartbeatHandler implements
         Vnode vnode = Vnode.findByIp(xreply.ip);
         if (vnode != null) {
             vnode.setStatus(Vnode.Status.RUNNING);
-            log.info("Update status of vnode @ " + vnode.getAddr() + " to "
-                    + vnode.getStatus());
+            // log.info("Update status of vnode @ " + vnode.getAddr() + " to "
+            // + vnode.getStatus());
             vnode.save();
         } else {
             log.error("Vnode with host " + xreply.ip + " not found!");

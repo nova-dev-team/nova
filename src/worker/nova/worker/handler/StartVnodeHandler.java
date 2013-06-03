@@ -52,7 +52,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
     @Override
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
-        String retVnodeID = msg.getUuid();
+        long retVnodeID = Long.parseLong(msg.getUuid());
         msg.setUuid(UUID.randomUUID().toString());
         msg.setRunAgent(false);
         // ////////////////////////////////////////////////////////////////////
@@ -783,10 +783,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 + Utils.WORKER_VNC_MAP.get(testDomain
                                         .getUUIDString()));
                         mp.sendPnodeCreateVnodeMessage(NovaWorker.getInstance()
-                                .getAddr().getIp(), testDomain.getID(),
-                                retVnodeID,
-                                Integer.parseInt(Utils.WORKER_VNC_MAP
-                                        .get(testDomain.getUUIDString())));
+                                .getAddr().getIp(), retVnodeID, Integer
+                                .parseInt(Utils.WORKER_VNC_MAP.get(testDomain
+                                        .getUUIDString())));
                         // Domain testDomain = conn.domainLookupByName("test");
                         // System.out.println("xml desc\n" +
                         // testDomain.getXMLDesc(0));
