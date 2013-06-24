@@ -19,7 +19,7 @@ public class TestJrobin {
         long startTime = Util.getTime();
         long endTime = startTime + 86400;
 
-        File tmpDir = new File(Utils.pathJoin(Utils.NOVA_HOME, "data", "tmp"));
+        File tmpDir = new File("tmp");
         tmpDir.mkdirs();
 
         String rootPath = Utils.pathJoin(tmpDir.getPath(), "demo_flow.rrd");
@@ -87,6 +87,7 @@ public class TestJrobin {
             }
             buffer.append("\n");
         }
+        System.out.println(buffer);
 
     }
 }

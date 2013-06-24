@@ -143,6 +143,9 @@ public class RRDTools {
             FetchRequest request = rrd.createFetchRequest("AVERAGE", timeStart,
                     timeEnd);
             FetchData fetchData = request.fetchData();
+            System.out
+                    .println("......ColunCount:" + fetchData.getColumnCount());
+            System.out.println(".......RowCount" + fetchData.getRowCount());
 
             return fetchData.getValues();
         } catch (Exception e) {

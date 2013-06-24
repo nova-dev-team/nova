@@ -1,7 +1,9 @@
 package nova.common.tools.perf;
 
 import org.apache.log4j.Logger;
+import org.hyperic.sigar.CpuPerc;
 import org.hyperic.sigar.FileSystem;
+import org.hyperic.sigar.Mem;
 import org.hyperic.sigar.NetInterfaceConfig;
 import org.hyperic.sigar.NetInterfaceStat;
 import org.hyperic.sigar.Sigar;
@@ -35,14 +37,15 @@ public class PerfMon {
             /**
              * 100 as the standard
              */
-            cpu.combinedTime = sigar.getCpuPerc().getCombined() * 100;
+            CpuPerc cpc = sigar.getCpuPerc();
+            cpu.combinedTime = cpc.getCombined() * 100;
             org.hyperic.sigar.CpuInfo[] infoList = sigar.getCpuInfoList();
             cpu.mhz = infoList[0].getMhz();
             cpu.nCpu = infoList.length;
             cpu.model = infoList[0].getModel();
-            cpu.dIdleTime = sigar.getCpuPerc().getIdle();
-            cpu.dSysTime = sigar.getCpuPerc().getSys();
-            cpu.dUserTime = sigar.getCpuPerc().getUser();
+            cpu.dIdleTime = cpc.getIdle();
+            cpu.dSysTime = cpc.getSys();
+            cpu.dUserTime = cpc.getUser();
         } catch (SigarException e) {
             logger.error("Can't get cpu information!", e);
         }
@@ -59,10 +62,11 @@ public class PerfMon {
     public static MemoryInfo getMemoryInfo() {
         MemoryInfo mem = new MemoryInfo();
         try {
-            mem.freeMemorySize = sigar.getMem().getActualFree();
-            mem.usedMemorySize = sigar.getMem().getActualUsed();
-            mem.totalMemorySize = sigar.getMem().getTotal();
-            mem.ramSize = sigar.getMem().getRam();
+            Mem smm = sigar.getMem();
+            mem.freeMemorySize = smm.getActualFree();
+            mem.usedMemorySize = smm.getActualUsed();
+            mem.totalMemorySize = smm.getTotal();
+            mem.ramSize = smm.getRam();
         } catch (SigarException e) {
             logger.error("Can't get memory information!", e);
         }

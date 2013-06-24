@@ -39,6 +39,10 @@ public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
             int rrdLength = 5000;
 
             File file = new File(rrdPath);
+            File folder = new File("build");
+            if (folder.exists() == false) {
+                folder.mkdirs();
+            }
             if (file.exists() == false) {
                 RRDTools.CreateMonitorInfoRRD(rrdPath, timeInterval, rrdLength);
                 logger.info(xreply.ip + ": RRD file is created!");
@@ -47,6 +51,14 @@ public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
                 RrdDb rrdDb = new RrdDb(rrdPath);
                 RRDTools.addMonitorInfoInRRD(rrdDb,
                         msg.getGeneralMonitorInfo(), Util.getTime());
+                RRDTools.plotCpuGraph("build/cpu.png", Util.getTime() - 86400,
+                        Util.getTime(), rrdPath);
+                RRDTools.plotMemoryGraph("build/mem.png",
+                        Util.getTime() - 86400, Util.getTime(), rrdPath);
+                RRDTools.plotDiskGraph("build/disk.png",
+                        Util.getTime() - 86400, Util.getTime(), rrdPath);
+                double[][] date = RRDTools.fetchRRDData(rrdPath,
+                        Util.getTime() - 10000, Util.getTime());
                 rrdDb.close();
             } catch (IOException ex) {
                 logger.error("Error updating RRD", ex);
@@ -57,5 +69,4 @@ public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
             logger.info("Got GeneralMonitorInfo from " + xreply);
         }
     }
-
 }

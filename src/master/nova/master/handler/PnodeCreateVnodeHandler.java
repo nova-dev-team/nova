@@ -58,7 +58,6 @@ public class PnodeCreateVnodeHandler implements
             long vnodeid) {
         String strcmd = "ssh -o StrictHostKeyChecking=no -CNfg -L " + srcPort
                 + ":localhost:" + dstPort + " root@" + dstIP;
-        System.out.println("............before ssh map..............");
         try {
 
             Process p = Runtime.getRuntime().exec(strcmd);
