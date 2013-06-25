@@ -32,18 +32,17 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
         try {
             // Todo @shayf synchronized (NovaWorker.getInstance().connLock)
             // blabla
-            dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
-                    true);
+            // dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
+            // true);
             // add by eagle
-            dconn = new Connect("qemu+ssh://" + msg.migrateToUserName + ":"
-                    + msg.migrateToPasswd + "@" + msg.migrateToAddr.getIp()
-                    + ":" + msg.migrateToAddr.getPort() + "/system");
+            dconn = new Connect("qemu+ssh://root@" + msg.migrateToAddr.getIp()
+                    + "/system");
             // eagle--end
 
             // TODO @shayf
-            Domain srcDomain = NovaWorker.getInstance()
-                    .getConn("qemu:///system", false)
-                    .domainLookupByUUIDString(msg.vnodeUuid);
+            Connect sconn = NovaWorker.getInstance().getConn("qemu:///system",
+                    false);
+            Domain srcDomain = sconn.domainLookupByUUIDString(msg.vnodeUuid);
             long flag = 0;
             String uri = null;
             srcDomain.migrate(dconn, flag, srcDomain.getName(), uri, bandWidth);

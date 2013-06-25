@@ -143,6 +143,12 @@ public class RRDTools {
             FetchRequest request = rrd.createFetchRequest("AVERAGE", timeStart,
                     timeEnd);
             FetchData fetchData = request.fetchData();
+            String[] names = fetchData.getDsNames();
+            double[] test = fetchData.getValues("freeMemorySize");
+            long[] ts = fetchData.getTimestamps();
+            for (String name : names) {
+                System.out.println(name);
+            }
             System.out
                     .println("......ColunCount:" + fetchData.getColumnCount());
             System.out.println(".......RowCount" + fetchData.getRowCount());
