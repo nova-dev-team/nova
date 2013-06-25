@@ -105,8 +105,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 bis.close();
 
-                HttpResponse rep = new DefaultHttpResponse(req
-                        .getProtocolVersion(), HttpResponseStatus.OK);
+                HttpResponse rep = new DefaultHttpResponse(
+                        req.getProtocolVersion(), HttpResponseStatus.OK);
                 HttpHeaders.setContentLength(rep, buffer.readableBytes());
 
                 rep.setContent(buffer.readBytes(buffer.readableBytes()));
@@ -198,8 +198,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             islogin = true;
                             login_user = ur;
                             values.put("username", login_user.getName());
-                            values.put("userprivilege", login_user
-                                    .getPrivilege());
+                            values.put("userprivilege",
+                                    login_user.getPrivilege());
                         } else {
                             String ret = "<p>The username or the password is error</p>"
                                     + "<p>please return to input again!</p>";
@@ -254,7 +254,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 else if (act.equals("instance") || act.equals("add_vnode")
                         || act.equals("delete_vnode")
                         || act.equals("add_cluster")
-                        || act.equals("delete_cluster")) {
+                        || act.equals("delete_cluster")
+                        || act.equals("migration")) {
 
                     if (act.equals("add_vnode")) {
                         new CreateVnodeHandler()
@@ -279,6 +280,20 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null, null, null);
                     }
 
+                    else if (act.equals("migration")) {
+                        Vnode migrate_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("mig_vnid")));
+
+                        new MasterMigrateVnodeHandler().handleMessage(
+                                new MasterMigrateVnodeMessage(migrate_vnode
+                                        .getId(),
+                                        migrate_vnode.getPmachineId(), Long
+                                                .parseLong(queryMap.get(
+                                                        "vnode_migrateto")
+                                                        .split("-")[0])), null,
+                                null, null);
+                    }
+
                     else if (act.equals("add_cluster")) {
                         new CreateVclusterHandler().handleMessage(
                                 new CreateVclusterMessage(queryMap
@@ -290,10 +305,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     else if (act.equals("delete_cluster")) {
                         new DeleteVclusterHandler()
-                                .handleMessage(new DeleteVclusterMessage(
-                                        Integer.parseInt(queryMap
-                                                .get("vcluster_id"))), null,
-                                        null, null);
+                                .handleMessage(
+                                        new DeleteVclusterMessage(Integer
+                                                .parseInt(queryMap
+                                                        .get("vcluster_id"))),
+                                        null, null, null);
                     }
 
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
@@ -323,9 +339,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                 + "<ul class='dropdown-menu'> "
                                 + "<li><a href='vncview?vnode_id="
-                                + vnode.getId() + "'>View</a></li>"
-                                + "<li><a href='migration?vnode_id="
-                                + vnode.getId() + "'>Migration</a></li>"
+                                + vnode.getId()
+                                + "'>View</a></li>"
+                                + "<li><a href='#Migration_Modal' onclick='migration_process("
+                                + vnode.getId() + ")" + "'>Migration</a></li>"
                                 + "<li><a href='wakeup_vnode?vnode_id="
                                 + vnode.getId() + "'>Wakeup</a></li>"
                                 + "<li><a href='pause_vnode?vnode_id="
@@ -409,8 +426,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                             "vncview.html");
 
-                    values.put("vnc_port", Utils.MASTER_VNC_MAP.get(queryMap
-                            .get("vnode_id")));
+                    values.put("vnc_port",
+                            Utils.MASTER_VNC_MAP.get(queryMap.get("vnode_id")));
 
                 }
 
@@ -542,8 +559,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 }
 
                 else if (act.equals("add_pnode")) {
-                    new AddPnodeHandler().handleMessage(new AddPnodeMessage(
-                            new SimpleAddress(queryMap.get("pnode_ip"), Conf
+                    new AddPnodeHandler().handleMessage(
+                            new AddPnodeMessage(new SimpleAddress(queryMap
+                                    .get("pnode_ip"), Conf
                                     .getInteger("worker.bind_port"))), null,
                             null, null);
                 }
@@ -667,9 +685,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 OutputStream os = new FileOutputStream(ipFile);
                                 os.write("10.0.1.90".getBytes());
                                 os.write("\n".getBytes());
-                                os
-                                        .write(String.valueOf(clusterSize)
-                                                .getBytes());
+                                os.write(String.valueOf(clusterSize).getBytes());
                                 os.write("\n".getBytes());
                                 os.close();
                             } catch (FileNotFoundException e1) {
@@ -899,33 +915,18 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         new CreateVnodeHandler()
                                 .handleMessage(
                                         new CreateVnodeMessage(
-                                                queryMap
-                                                        .get("vnode_image"
-                                                                + String
-                                                                        .valueOf(i + 1)),
-                                                queryMap
-                                                        .get("vnode_name"
-                                                                + String
-                                                                        .valueOf(i + 1)),
-                                                Integer
-                                                        .parseInt(queryMap
-                                                                .get("cpu_count"
-                                                                        + String
-                                                                                .valueOf(i + 1))),
-                                                Integer
-                                                        .parseInt(queryMap
-                                                                .get("memory_size"
-                                                                        + String
-                                                                                .valueOf(i + 1))),
-                                                queryMap
-                                                        .get("appliance_list"
-                                                                + String
-                                                                        .valueOf(i + 1)),
-                                                Integer
-                                                        .parseInt(queryMap
-                                                                .get("pnode_id"
-                                                                        + String
-                                                                                .valueOf(i + 1))),
+                                                queryMap.get("vnode_image"
+                                                        + String.valueOf(i + 1)),
+                                                queryMap.get("vnode_name"
+                                                        + String.valueOf(i + 1)),
+                                                Integer.parseInt(queryMap.get("cpu_count"
+                                                        + String.valueOf(i + 1))),
+                                                Integer.parseInt(queryMap.get("memory_size"
+                                                        + String.valueOf(i + 1))),
+                                                queryMap.get("appliance_list"
+                                                        + String.valueOf(i + 1)),
+                                                Integer.parseInt(queryMap.get("pnode_id"
+                                                        + String.valueOf(i + 1))),
                                                 i, Vcluster.last()
                                                         .getClusterName()),
                                         null, null, null);
