@@ -47,8 +47,6 @@ public class PnodeCreateVnodeHandler implements
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         String masterIP = Conf.getString("master.bind_host");
         int masterPort = getFreePort();
-        // MasterVNCPM.addService(masterIP, masterPort, msg.PnodeIP,
-        // msg.VnodePort);
         portMP(masterIP, masterPort, msg.PnodeIP, msg.VnodePort, msg.VnodeId);
         Utils.MASTER_VNC_MAP.put(String.valueOf(msg.VnodeId),
                 String.valueOf(masterPort));

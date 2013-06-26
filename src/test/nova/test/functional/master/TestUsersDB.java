@@ -11,7 +11,7 @@ public class TestUsersDB {
     @Test
     public void testSave() {
         Users user = new Users();
-        user.setName("Professor");
+        user.setName("root");
         user.setEmail("hechuan1215@gmail.com");
         user.setPassword("123456");
         user.setPrivilege("root");
