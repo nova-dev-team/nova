@@ -202,6 +202,7 @@ public class NovaWorker extends SimpleServer {
             // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
             "mount -t nfs " + strPnfsHost + ":/export/Nova_home "
                     + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+            System.out.println(strExecs[0]);
             try {
                 for (String cmd : strExecs) {
                     Process p = Runtime.getRuntime().exec(cmd);
