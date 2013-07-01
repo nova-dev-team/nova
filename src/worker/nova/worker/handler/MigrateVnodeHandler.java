@@ -1,7 +1,10 @@
 package nova.worker.handler;
 
+import java.net.InetSocketAddress;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Conf;
 import nova.master.api.MasterProxy;
 import nova.worker.NovaWorker;
 import nova.worker.api.messages.MigrateVnodeMessage;
@@ -36,7 +39,11 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             // dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
             // true);
             // add by eagle
-            MasterProxy master = NovaWorker.getInstance().getMaster();
+            MasterProxy master = new MasterProxy(new SimpleAddress(
+                    Conf.getString("worker.bind_host"), 4101));
+            master.connect(new InetSocketAddress(Conf
+                    .getString("master.bind_host"), Conf
+                    .getInteger("master.bind_port")));
 
             dconn = new Connect("qemu+ssh://" + msg.migrateToAddr.getIp()
                     + "/system");

@@ -2,6 +2,7 @@ package nova.common.util;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
 import java.io.IOException;
 
 import nova.common.tools.perf.GeneralMonitorInfo;
@@ -53,34 +54,34 @@ public class RRDTools {
              * Attributes of this RRD
              */
             rrdDef.addDatasource("combinedTime", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("mhz", DsTypes.DT_GAUGE, timeInterval * 2, 0,
-                    Double.NaN);
+                    Double.MAX_VALUE);
             rrdDef.addDatasource("nCpu", DsTypes.DT_GAUGE, timeInterval * 2, 0,
-                    Double.NaN);
+                    Double.MAX_VALUE);
 
             rrdDef.addDatasource("freeMemorySize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("usedMemorySize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("totalMemorySize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("ramSize", DsTypes.DT_GAUGE, timeInterval * 2,
-                    0, Double.NaN);
+                    0, Double.MAX_VALUE);
 
             rrdDef.addDatasource("freeDiskSize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("usedDiskSize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("totalDiskSize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
 
             rrdDef.addDatasource("bandWidth", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("downSpeed", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.NaN);
+                    timeInterval * 2, 0, Double.MAX_VALUE);
             rrdDef.addDatasource("upSpeed", DsTypes.DT_GAUGE, timeInterval * 2,
-                    0, Double.NaN);
+                    0, Double.MAX_VALUE);
 
             /**
              * RRD parameters
@@ -143,16 +144,6 @@ public class RRDTools {
             FetchRequest request = rrd.createFetchRequest("AVERAGE", timeStart,
                     timeEnd);
             FetchData fetchData = request.fetchData();
-            String[] names = fetchData.getDsNames();
-            double[] test = fetchData.getValues("freeMemorySize");
-            long[] ts = fetchData.getTimestamps();
-            for (String name : names) {
-                System.out.println(name);
-            }
-            System.out
-                    .println("......ColunCount:" + fetchData.getColumnCount());
-            System.out.println(".......RowCount" + fetchData.getRowCount());
-
             return fetchData.getValues();
         } catch (Exception e) {
             logger.error("Failed to fetch data from RRD file", e);
@@ -402,5 +393,46 @@ public class RRDTools {
         } catch (RrdException e) {
             logger.error("Error plotting RRD graph", e);
         }
+    }
+
+    public static double[][] getMonitorInfo(int pnodeid) {
+        double[][] info = null;
+        String rddfile = "build/" + pnodeid + ".rrd";
+        File file = new File(rddfile);
+        if (file.exists() == false)
+            return info;
+        FetchData fetchData = null;
+        try {
+            /**
+             * open the file
+             */
+            RrdDb rrd = new RrdDb(rddfile);
+
+            /**
+             * create fetch request using the database reference
+             */
+            FetchRequest request = rrd.createFetchRequest("AVERAGE",
+                    Util.getTime() - 100, Util.getTime());
+            fetchData = request.fetchData();
+            info = new double[4][fetchData.getColumnCount()];
+        } catch (Exception e) {
+            logger.error("Failed to fetch data from RRD file", e);
+            return info;
+        }
+
+        double[][] data = fetchData.getValues();
+        int index = 3;
+        for (int i = data[0].length - 1; i >= 0; i--) {
+            if (Double.isNaN(data[0][i]))
+                continue;
+            else {
+                for (int j = 0; j < info[0].length; j++)
+                    info[index][j] = data[j][i];
+                index--;
+                if (index < 0)
+                    break;
+            }
+        }
+        return info;
     }
 }

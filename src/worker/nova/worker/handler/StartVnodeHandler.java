@@ -800,7 +800,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             } else {
                 log.error("so such type hypervisor " + msg.getHyperVisor());
             }
-        }
 
+        }
     }
 }
