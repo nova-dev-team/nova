@@ -21,7 +21,7 @@ import org.libvirt.LibvirtException;
  */
 public class VnodeStatusDaemon extends SimpleDaemon {
 
-    public static final long VNODE_STATUS_INTERVAL = 3000;
+    public static final long VNODE_STATUS_INTERVAL = 5000;
 
     public VnodeStatusDaemon() {
         super(VNODE_STATUS_INTERVAL);

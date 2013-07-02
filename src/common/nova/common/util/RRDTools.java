@@ -54,34 +54,34 @@ public class RRDTools {
              * Attributes of this RRD
              */
             rrdDef.addDatasource("combinedTime", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
-            rrdDef.addDatasource("mhz", DsTypes.DT_GAUGE, timeInterval * 2, 0,
-                    Double.MAX_VALUE);
-            rrdDef.addDatasource("nCpu", DsTypes.DT_GAUGE, timeInterval * 2, 0,
-                    Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
+            rrdDef.addDatasource("mhz", DsTypes.DT_GAUGE, timeInterval * 2,
+                    Double.NaN, Double.NaN);
+            rrdDef.addDatasource("nCpu", DsTypes.DT_GAUGE, timeInterval * 2,
+                    Double.NaN, Double.NaN);
 
             rrdDef.addDatasource("freeMemorySize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
             rrdDef.addDatasource("usedMemorySize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
             rrdDef.addDatasource("totalMemorySize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
             rrdDef.addDatasource("ramSize", DsTypes.DT_GAUGE, timeInterval * 2,
-                    0, Double.MAX_VALUE);
+                    Double.NaN, Double.NaN);
 
             rrdDef.addDatasource("freeDiskSize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
             rrdDef.addDatasource("usedDiskSize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
             rrdDef.addDatasource("totalDiskSize", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
 
             rrdDef.addDatasource("bandWidth", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
             rrdDef.addDatasource("downSpeed", DsTypes.DT_GAUGE,
-                    timeInterval * 2, 0, Double.MAX_VALUE);
+                    timeInterval * 2, Double.NaN, Double.NaN);
             rrdDef.addDatasource("upSpeed", DsTypes.DT_GAUGE, timeInterval * 2,
-                    0, Double.MAX_VALUE);
+                    Double.NaN, Double.NaN);
 
             /**
              * RRD parameters
@@ -165,9 +165,6 @@ public class RRDTools {
             long timeStamp) {
         Sample sample;
         try {
-            // String rootPath = "build/demo_flow.rrd";
-            // rrdDb = new RrdDb(rootPath);
-
             sample = rrdDb.createSample(timeStamp);
             sample.setValue("combinedTime", msg.cpuInfo.combinedTime);
             sample.setValue("mhz", msg.cpuInfo.mhz);
@@ -188,7 +185,7 @@ public class RRDTools {
 
             sample.update();
 
-            // rrdDb.close();
+            rrdDb.close();
         } catch (IOException e) {
             logger.error("Error inserting new value", e);
         } catch (RrdException e) {
@@ -412,16 +409,16 @@ public class RRDTools {
              * create fetch request using the database reference
              */
             FetchRequest request = rrd.createFetchRequest("AVERAGE",
-                    Util.getTime() - 100, Util.getTime());
+                    Util.getTime() - 5 * 101, Util.getTime() + 10);
             fetchData = request.fetchData();
-            info = new double[4][fetchData.getColumnCount()];
+            info = new double[100][fetchData.getColumnCount()];
         } catch (Exception e) {
             logger.error("Failed to fetch data from RRD file", e);
             return info;
         }
 
         double[][] data = fetchData.getValues();
-        int index = 3;
+        int index = 100 - 1;
         for (int i = data[0].length - 1; i >= 0; i--) {
             if (Double.isNaN(data[0][i]))
                 continue;
