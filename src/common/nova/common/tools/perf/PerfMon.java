@@ -127,9 +127,9 @@ public class PerfMon {
                 logger.error("Thread interrupted", e);
             }
 
-            netstat = sigar.getNetInterfaceStat(config.getName());
-            net.downSpeed = netstat.getRxBytes() - net.downSpeed;
-            net.upSpeed = netstat.getTxBytes() - net.upSpeed;
+            // netstat = sigar.getNetInterfaceStat(config.getName());
+            // net.downSpeed = netstat.getRxBytes() - net.downSpeed;
+            // net.upSpeed = netstat.getTxBytes() - net.upSpeed;
         } catch (SigarException e) {
             logger.error("Can't get net information!", e);
         }

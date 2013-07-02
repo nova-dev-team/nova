@@ -167,7 +167,7 @@ public class RRDTools {
 
         try {
             sample = rrdDb.createSample(timeStamp);
-            sample.setValue("combinedTime", 100 * msg.cpuInfo.combinedTime);
+            sample.setValue("combinedTime", msg.cpuInfo.combinedTime);
             sample.setValue("mhz", msg.cpuInfo.mhz);
             sample.setValue("nCpu", msg.cpuInfo.nCpu);
 
@@ -175,14 +175,16 @@ public class RRDTools {
                     / msg.memInfo.totalMemorySize);
             sample.setValue("usedMemorySize", 100 * msg.memInfo.usedMemorySize
                     / msg.memInfo.totalMemorySize);
-            sample.setValue("totalMemorySize", msg.memInfo.totalMemorySize);
+            sample.setValue("totalMemorySize",
+                    msg.memInfo.totalMemorySize / 1000000);
             sample.setValue("ramSize", msg.memInfo.ramSize);
 
             sample.setValue("freeDiskSize", 100 * msg.diskInfo.freeDiskSize
                     / msg.diskInfo.totalDiskSize);
             sample.setValue("usedDiskSize", 100 * msg.diskInfo.usedDiskSize
                     / msg.diskInfo.totalDiskSize);
-            sample.setValue("totalDiskSize", msg.diskInfo.totalDiskSize);
+            sample.setValue("totalDiskSize",
+                    msg.diskInfo.totalDiskSize / 1000000000);
 
             sample.setValue("bandWidth", msg.netInfo.bandWidth);
             sample.setValue("downSpeed", 100 * msg.netInfo.downSpeed
