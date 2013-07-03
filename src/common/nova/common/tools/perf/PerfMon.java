@@ -145,8 +145,9 @@ public class PerfMon {
             if (config.getName().indexOf("eth") < 0) {
                 for (String iface : ifaces) {
                     netstat = sigar.getNetInterfaceStat(iface);
-                    if (netstat.getRxBytes() > 100 && iface.indexOf("eth") > 0) {
+                    if (netstat.getRxBytes() > 100 && iface.indexOf("eth") >= 0) {
                         configname = iface;
+                        break;
                     }
                 }
             }
