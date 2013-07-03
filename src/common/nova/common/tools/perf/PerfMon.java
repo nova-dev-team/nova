@@ -1,5 +1,10 @@
 package nova.common.tools.perf;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import org.apache.log4j.Logger;
 import org.hyperic.sigar.CpuPerc;
 import org.hyperic.sigar.FileSystem;
@@ -23,6 +28,7 @@ public class PerfMon {
     static Logger logger = Logger.getLogger(PerfMon.class);
 
     private static Sigar sigar = new Sigar();
+    public static String strBandwidth;
     private static SigarProxy proxy = SigarProxyCache.newInstance(sigar);
 
     /**
@@ -111,7 +117,7 @@ public class PerfMon {
      * @return {@link NetInfo}
      */
     public static NetInfo getNetInfo() {
-        NetInfo net = new NetInfo();
+        final NetInfo net = new NetInfo();
 
         try {
             NetInterfaceConfig config = sigar.getNetInterfaceConfig(null);
@@ -127,9 +133,100 @@ public class PerfMon {
                 logger.error("Thread interrupted", e);
             }
 
-            // netstat = sigar.getNetInterfaceStat(config.getName());
-            // net.downSpeed = netstat.getRxBytes() - net.downSpeed;
-            // net.upSpeed = netstat.getTxBytes() - net.upSpeed;
+            netstat = sigar.getNetInterfaceStat(config.getName());
+            net.downSpeed = netstat.getRxBytes() - net.downSpeed;
+            net.upSpeed = netstat.getTxBytes() - net.upSpeed;
+
+            // if get bandwidth failed, use "ethtool"
+            if (net.bandWidth <= 0) {
+                PerfMon.strBandwidth = "-1";
+                String strcmd = "ethtool " + config.getName();
+                try {
+
+                    Process p = Runtime.getRuntime().exec(strcmd);
+                    final InputStream is = p.getInputStream();
+                    Thread getbw = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // TODO Auto-generated method stub
+                            String line, result = "";
+                            BufferedReader br = new BufferedReader(
+                                    new InputStreamReader(is));
+                            try {
+                                while ((line = br.readLine()) != null) {
+
+                                    if (line.indexOf("Speed:") >= 0) {
+                                        result = line;
+                                        break;
+                                    }
+                                }
+
+                                PerfMon.strBandwidth = result.substring(result
+                                        .indexOf("Speed:") + 6);
+                                if (strBandwidth.compareTo("-1") != 0) {
+                                    if (strBandwidth.indexOf("Gb/s") >= 0) {
+                                        net.bandWidth = Integer
+                                                .valueOf(strBandwidth
+                                                        .substring(
+                                                                0,
+                                                                strBandwidth
+                                                                        .indexOf("Gb/s"))
+                                                        .trim())
+                                                * 1000 * 1000 * 1000 / 8;
+                                    }
+                                    if (strBandwidth.indexOf("Mb/s") >= 0) {
+                                        net.bandWidth = Integer
+                                                .valueOf(strBandwidth
+                                                        .substring(
+                                                                0,
+                                                                strBandwidth
+                                                                        .indexOf("Mb/s"))
+                                                        .trim()) * 1000 * 1000 / 8;
+                                    }
+                                    if (strBandwidth.indexOf("Kb/s") >= 0) {
+                                        net.bandWidth = Integer
+                                                .valueOf(strBandwidth
+                                                        .substring(
+                                                                0,
+                                                                strBandwidth
+                                                                        .indexOf("Kb/s"))
+                                                        .trim()) * 1000 / 8;
+                                    }
+
+                                }
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    getbw.start();
+
+                    try {
+                        if (p.waitFor() != 0) {
+                            logger.error("use ethtool " + config.getName()
+                                    + " get bandwidth return abnormal value!");
+                        }
+                        try {
+                            getbw.join();
+                        } catch (InterruptedException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        logger.error("use ethtool get bandwidth terminated!", e);
+                    }
+
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    logger.error("use ethtool get bandwidth cmd error!", e);
+
+                }
+
+            }
         } catch (SigarException e) {
             logger.error("Can't get net information!", e);
         }
@@ -186,6 +283,9 @@ public class PerfMon {
             @Override
             public void run() {
                 cMonitor.netInfo = PerfMon.getNetInfo();
+                System.out.println(cMonitor.netInfo.bandWidth);
+                System.out.println(cMonitor.netInfo.downSpeed);
+                System.out.println(cMonitor.netInfo.upSpeed);
             }
         });
         t2.start();
