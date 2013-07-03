@@ -15,6 +15,7 @@ import java.util.Map;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
 import nova.common.util.Conf;
+import nova.common.util.RRDTools;
 import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.AddUserMessage;
@@ -49,6 +50,7 @@ import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jrobin.core.Util;
 
 /**
  * Master's handler for http requests.
@@ -295,6 +297,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     else if (act.equals("add_cluster")) {
+
                         new CreateVclusterHandler().handleMessage(
                                 new CreateVclusterMessage(queryMap
                                         .get("vcluster_name"),
@@ -342,7 +345,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + vnode.getId()
                                 + "'>View</a></li>"
                                 + "<li><a href='#Migration_Modal' onclick='migration_process("
-                                + vnode.getId() + ")" + "'>Migration</a></li>"
+                                + vnode.getId() + ")" + "'>Migrate</a></li>"
                                 + "<li><a href='wakeup_vnode?vnode_id="
                                 + vnode.getId() + "'>Wakeup</a></li>"
                                 + "<li><a href='pause_vnode?vnode_id="
@@ -439,8 +442,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     if (act.equals("add_pnode")) {
                         new AddPnodeHandler().handleMessage(
                                 new AddPnodeMessage(new SimpleAddress(queryMap
-                                        .get("pnode_ip"), 4000), queryMap
-                                        .get("pnode_name")), null, null, null);
+                                        .get("pnode_ip"), 4000)), null, null,
+                                null);
                     }
 
                     else if (act.equals("delete_pnode")) {
@@ -474,7 +477,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                 + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                 + "<ul class='dropdown-menu'> "
-                                + "<li><a href='view_pnode?pnode_id="
+                                + "<li><a href='monitor?pnode_id="
                                 + pnode.getId()
                                 + "'>View Machine Status</a></li>"
                                 + "<li class='divider'>"
@@ -549,8 +552,114 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 }
 
                 else if (act.equals("monitor")) {
+
+                    String pnode_monitor_show = "";
+                    String pnode_id_list = "";
+
+                    if (queryMap == null) {
+                        // show all the pnode monitor info
+                        for (Pnode pnd : Pnode.all()) {
+                            pnode_monitor_show += "<div class='row'><div class='span12'><h3>Worker "
+                                    + pnd.getId()
+                                    + "<small>"
+                                    + "  - Ip Address: "
+                                    + pnd.getIp()
+                                    + ";</small>"
+                                    + "<small>"
+                                    + "&nbsp;&nbsp;&nbsp;&nbsp;Status: "
+                                    + pnd.getStatus()
+                                    + ";</small></h3> <ul class='thumbnails'><li class='span3'>"
+                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + pnd.getId()
+                                    + "_1" // id_1 presents cpu info
+                                    + "' class='plotpic'> </div></a></li>"
+                                    + "<li class='span3'>"
+                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + pnd.getId()
+                                    + "_4" // id_4 presents memery info
+                                    + "' class='plotpic'> </div></a></li>"
+                                    + "<li class='span3'>"
+                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + pnd.getId()
+                                    + "_7" // id_7 presents disk info
+                                    + "' class='plotpic'> </div></a></li>"
+                                    + "<li class='span3'>"
+                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + pnd.getId()
+                                    + "_10" // id_10 presents network info
+                                    + "' class='plotpic'> </div></a></li></ul></div></div>";
+
+                            pnode_id_list += pnd.getId() + ";";
+                        }
+
+                    } else if (queryMap.containsKey("pnode_id")) {
+                        // show one pnode monitor info
+
+                        Pnode pnd = Pnode.findById(Integer.parseInt(queryMap
+                                .get("pnode_id")));
+                        pnode_monitor_show += "<div class='row'><div class='span12'><h3>Worker "
+                                + pnd.getId()
+                                + "<small>"
+                                + "  - Ip Address: "
+                                + pnd.getIp()
+                                + "</small></h3> <ul class='thumbnails'><li class='span3'>"
+                                + "<a class='thumbnail'><div id='Monitor"
+                                + pnd.getId()
+                                + "_1" // id_1 presents cpu info
+                                + "' class='plotpic'> </div></a></li>"
+                                + "<li class='span3'>"
+                                + "<a class='thumbnail'><div id='Monitor"
+                                + pnd.getId()
+                                + "_4" // id_4 presents memery info
+                                + "' class='plotpic'> </div></a></li>"
+                                + "<li class='span3'>"
+                                + "<a class='thumbnail'><div id='Monitor"
+                                + pnd.getId()
+                                + "_7" // id_7 presents disk info
+                                + "' class='plotpic'> </div></a></li>"
+                                + "<li class='span3'>"
+                                + "<a class='thumbnail'><div id='Monitor"
+                                + pnd.getId()
+                                + "_10" // id_10 presents network info
+                                + "' class='plotpic'> </div></a></li></ul></div></div>";
+
+                        pnode_id_list += pnd.getId() + ";";
+                    }
+
+                    pnode_id_list = pnode_id_list.substring(0,
+                            pnode_id_list.length() - 1);
+                    values.put("pnode_monitor_show", pnode_monitor_show);
+                    values.put("pnode_id_list", pnode_id_list);
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                             "monitor.html");
+                }
+
+                else if (act.equals("getMonitorData")) {
+                    double[][] monitor_data;
+
+                    monitor_data = RRDTools.getMonitorInfo(Integer
+                            .parseInt(queryMap.get("pnode_id")));
+
+                    String ret = "";
+
+                    if (monitor_data != null) {
+                        for (int i = 0; i < monitor_data.length; i++) {
+                            for (int j = 0; j < monitor_data[i].length; j++) {
+                                if (j < monitor_data[i].length - 1) {
+                                    ret += Util
+                                            .formatDouble(monitor_data[i][j]) + ',';
+                                } else {
+                                    ret += Util
+                                            .formatDouble(monitor_data[i][j]) + ';';
+                                }
+                            }
+                        }
+                    }
+
+                    if (ret.length() != 0)
+                        ret = ret.substring(0, ret.length() - 1);
+
+                    return ret;
                 }
 
                 else if (act.equals("account")) {

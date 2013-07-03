@@ -10,11 +10,51 @@
   <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
-  <script>
+  
+  <script language="javascript">
   	function migration_process(vnode_id)
   	{
   		$("#Migration_Modal").modal('show');
   		document.getElementById("migvn").value=vnode_id;
+  	}
+  	
+  	function create_cluster()
+  	{
+  	 
+  		if(vcluster.vcluster_name.value=="")
+  		{
+  			alert("Your cluster name can not be null");
+  			vcluster.vcluster_name.focus();
+  			return false;
+  		}
+  		else if(vcluster.vcluster_size.value=="")
+  		{
+  			alert("Your cluster size can not be null");
+  			vcluster.vcluster_name.focus();
+  			return false;
+  		}
+  		else {
+  			var cluster_name=vcluster.vcluster_name.value;
+  			var cluster_size=vcluster.vcluster_size.value;
+  			$("#AddCluster_Modal").modal('hide');
+  			$("#AddCluster_Instance").modal('show');
+  			document.getElementById("add_instances").innerHTML="<table>";
+  			for(var i=1;i<=vcluster.vcluster_size.value;i++)
+  			{
+  				document.getElementById("add_instances").innerHTML+="<tr><td>" + i + ". Instance Name:" +
+  					"<input class='span1' type='text' name='vinstance_name"+ i + "'>&nbsp;&nbsp;Memery Size:" +
+  					"<input class='span1' type='text' name='vinstance_Memsize"+ i + "'>&nbsp;&nbsp;CPU Num:" + 
+  					"<select class='span1' name='vinstance_Cpunum"+ i + "'><option value='1'>1</option><option value='2'>2</option>" +
+  					"<option value='3'>3</option><option value='4'>4</option></select> &nbsp;&nbsp;&nbsp;&nbsp;Os Image:" +
+  					"<select class='span1' name='vinstance_Osimage"+ i + "'> ${vdisk_list} </select> &nbsp;&nbsp;Applications:" + 
+  					"<input class='span2' type='text' name='vinstance_Apps"+ i + "'></td></tr></br></br>";
+  			}
+  			document.getElementById("add_instances").innerHTML+="</table>" +
+  			"<input type='hidden' name='vcluster_name' value="+ cluster_name + " />" + 
+  			"<input type='hidden' name='vcluster_size' value="+ cluster_size + " />";
+  			
+  			return false;
+  		}
   	}
   </script>
 </head>
@@ -225,9 +265,9 @@
 	      <h3>Add a new cluster</h3>
 	    </div>
 	    
-	    <form action="add_cluster" method="post" class="form-horizontal well">
+	    <form id="vcluster" action="add_cluster" method="post" class="form-horizontal well">
 	        <div class="modal-body">
-	        	<div class="control-group">	
+	        	<div class="control-group">
 					<label class="control-label">Cluster Name:</label>
 					<div class="controls">
 						<input class="span2" size="16" type="text" name="vcluster_name">
@@ -243,11 +283,30 @@
 	        </div>
 	        <div class="modal-footer">
 	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
-	      		<button type="submit" class="btn btn-primary" >Create</button>
+	      		<a class="btn btn-primary" onclick="create_cluster()">Next Step</a>
 	    	</div>
 	    </form>
 	  </div>
-	  <!-- AddWorker_Modal -->
+	  <!-- AddCluster_Modal -->
+	  
+	  
+	  <!-- Add Cluster Instances -->
+	  <div id="AddCluster_Instance" class="modal hide fade">
+	    <div class="modal-header">
+	      <a class="close" data-dismiss="modal" >&times;</a>
+	      <h3>Add Instances In Cluster</h3>
+	    </div>
+	    
+	    <form action="add_cluster" method="post" class="form-horizontal well">
+	        <div id="add_instances" class="modal-body">
+	        	
+	        </div>
+	        <div class="modal-footer">
+	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+	      		<button type="submit" class="btn btn-primary">Create</button>
+	    	</div>
+	    </form>
+	  </div>
     
 	<table class="table table-striped table-hover">  
 		<thead>

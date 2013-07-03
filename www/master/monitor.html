@@ -3,12 +3,108 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Nova Images</title>
+  <title>Nova Monitor</title>
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="css/bootstrap-responsive.css" rel="stylesheet">
   <link href="css/docs.css" rel="stylesheet">
-  <script src="js/bootstrap-modal.js"></script>
-  <script src="js/bootstrap-dropdown.js"></script>
+  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
+  <script src="js/jquery-2.0.0.js"></script>
+  <script src="js/jquery.flot.js"></script>
+  <script type="text/javascript">
+  	
+  	$(function() {
+  		var pnode_list = "${pnode_id_list}";
+  		var pnode_id = pnode_list.split(";");
+  		
+		var data;	
+		var plot = [];
+		for(var i=0; i!= 10000; i++)
+		{
+			plot[i] = [];
+		}
+		var updateInterval = 300;
+		
+		function getData(pnd_id,index) {
+			
+			data = getRemoteData(pnd_id);
+	
+			var res = [];
+			for (var i = 0; i < data.length; ++i) {
+				res.push([i, data[i][index]]);
+			}
+	
+			return res;
+		}
+		
+		for(var pid=0; pid<pnode_id.length; pid++)
+  		{	
+  			for(var index=1;index <= 12; index++) {
+  				if(index%3 == 1) {
+					plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + index, [ getData(pnode_id[pid], index-1) ], {
+						series: {
+							shadowSize: 0	// Drawing is faster without shadows
+						},
+						yaxis: {
+							min: 0,
+							max: 100
+						},
+						xaxis: {
+							show: false
+						},
+					});
+				}
+			}
+		}
+		
+		updateMonitor();
+		
+		function updateMonitor() {
+			for(var pid=0; pid<pnode_id.length; pid++)
+  			{
+  				 for(var index=1;index <= 12; index++) {
+  				 	if(index%3 == 1) {
+	  				 	plot[pnode_id[pid]][index].setData([getData(pnode_id[pid], index-1)]);
+	  				 	plot[pnode_id[pid]][index].draw();
+  				 	}
+  				 }
+  			}
+  			
+  			setTimeout(updateMonitor(), updateInterval);
+		}
+		
+		function getRemoteData(pnd_id) {
+  		
+	  		var xmlHttp;
+	  		var monitor_data = [];
+	  		for(var i=0; i!=13; i++)
+	  		{
+	  			monitor_data[i] = [];
+	  		}
+	  		  		  		
+	  		if(window.XMLHttpRequest)
+	  		{   //code for IE7+, Firefox, Chrome, Opera, Safari
+	  			xmlHttp = new XMLHttpRequest();
+	  		}
+	  		else
+	  		{   //code for IE6, IE5
+	  			xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+	  		}
+	  		  		  		
+	  		xmlHttp.open("GET","/getMonitorData?pnode_id=" + pnd_id,false);
+	  		xmlHttp.send();
+	  		var tempdata = xmlHttp.responseText;
+			var history_data = tempdata.split(";");
+			for(var i=0;i!=history_data.length;i++) 
+			{
+				monitor_data[i] = history_data[i].split(",");
+			}
+	  		
+	  		return monitor_data;
+	  	}
+		
+	});
+
+	</script>
 </head>
   
 <body>
@@ -68,77 +164,14 @@
     <!-- navbar -->
     
     <!---------------------- Worker Monitor  ---------------------------->
-    <section id="thumbnails">
-	  <div class="page-header">
-	    <h1>Worker Monitor <small>Show CPU, memery, disk and network infomation</small></h1>
+    <br>
+	<legend>Worker Monitor <small>Show CPU, memery, disk and network infomation</small>
+	  <div class="pull-right">
+	     <a href="monitor" class="btn btn-primary"> Show All Workers</a>
 	  </div>
+	</legend>
 	
-	  <div class="row">
-	    <div class="span12">
-	      <h2>Worker1</h2>
-	      <p>
-		    Worker1 ip address: 192.168.0.100
-	      </p>
-	      <ul class="thumbnails">
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	      </ul>
-	    </div>
-	  </div>
-	  <!-- row -->
-	  
-	  <div class="row">
-	    <div class="span12">
-	      <h2>Worker2</h2>
-	      <p>
-		    Worker2 ip address: 192.168.0.200
-	      </p>
-	      <ul class="thumbnails">
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	        <li class="span3">
-	          <a href="#" class="thumbnail">
-	            <img src="http://placehold.it/260x180" alt="">
-	          </a>
-	        </li>
-	      </ul>
-	    </div>
-	  </div>
-	  <!-- row -->
-	  
-	  </setion>
-    
+	${pnode_monitor_show}
    
     <!---------------------- Page Footer  ------------------------------->
 	<footer class="footer">

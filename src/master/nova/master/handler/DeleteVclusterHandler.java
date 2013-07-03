@@ -38,21 +38,21 @@ public class DeleteVclusterHandler implements
                     WorkerProxy wp = new WorkerProxy(new SimpleAddress(
                             Conf.getString("master.bind_host"),
                             Conf.getInteger("master.bind_port")));
-                    wp.connect(new InetSocketAddress(Pnode.findById(msg.id)
-                            .getIp(), Pnode.findById(msg.id).getPort()));
+                    wp.connect(new InetSocketAddress(Pnode.findById(
+                            vnode.getPmachineId()).getIp(), Pnode.findById(
+                            vnode.getPmachineId()).getPort()));
                     wp.sendStopVnode("kvm", vnode.getUuid());
                     log.info("Delete vnode: " + vnode.getName());
                     Vnode.delete(vnode);
                 } else {
-                    log.info("Vnode @ id: " + String.valueOf(msg.id)
-                            + "not exists.");
+                    log.info("Vnode" + (i + 1) + "@ Vcluster id: "
+                            + String.valueOf(msg.id) + "not exists.");
                 }
-                log.info("Delete vcluster: " + vcluster.getClusterName());
-                Vcluster.delete(vcluster);
             }
+            log.info("Delete vcluster: " + vcluster.getClusterName());
+            Vcluster.delete(vcluster);
         } else {
             log.info("Vcluster @ id: " + String.valueOf(msg.id) + "not exists.");
         }
-
     }
 }
