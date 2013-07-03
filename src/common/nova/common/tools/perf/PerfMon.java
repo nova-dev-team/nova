@@ -117,6 +117,7 @@ public class PerfMon {
      * @return {@link NetInfo}
      */
     public static NetInfo getNetInfo() {
+
         final NetInfo net = new NetInfo();
 
         try {
@@ -126,21 +127,33 @@ public class PerfMon {
             net.bandWidth = netstat.getSpeed();
             net.downSpeed = netstat.getRxBytes();
             net.upSpeed = netstat.getTxBytes();
-
+            long start = System.currentTimeMillis();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 logger.error("Thread interrupted", e);
             }
-
+            long end = System.currentTimeMillis();
             netstat = sigar.getNetInterfaceStat(config.getName());
-            net.downSpeed = netstat.getRxBytes() - net.downSpeed;
-            net.upSpeed = netstat.getTxBytes() - net.upSpeed;
+            net.downSpeed = (netstat.getRxBytes() - net.downSpeed) * 8
+                    / (end - start) * 1000;
+            net.upSpeed = (netstat.getTxBytes() - net.upSpeed) * 8
+                    / (end - start) * 1000;
 
+            String[] ifaces = sigar.getNetInterfaceList();
+            String configname = "";
+            if (config.getName().indexOf("eth") < 0) {
+                for (String iface : ifaces) {
+                    netstat = sigar.getNetInterfaceStat(iface);
+                    if (netstat.getRxBytes() > 100 && iface.indexOf("eth") > 0) {
+                        configname = iface;
+                    }
+                }
+            }
             // if get bandwidth failed, use "ethtool"
             if (net.bandWidth <= 0) {
                 PerfMon.strBandwidth = "-1";
-                String strcmd = "ethtool " + config.getName();
+                String strcmd = "ethtool " + configname;
                 try {
 
                     Process p = Runtime.getRuntime().exec(strcmd);
@@ -171,8 +184,7 @@ public class PerfMon {
                                                                 0,
                                                                 strBandwidth
                                                                         .indexOf("Gb/s"))
-                                                        .trim())
-                                                * 1000 * 1000 * 1000 / 8;
+                                                        .trim()) * 1000 * 1000 * 1000;
                                     }
                                     if (strBandwidth.indexOf("Mb/s") >= 0) {
                                         net.bandWidth = Integer
@@ -181,7 +193,7 @@ public class PerfMon {
                                                                 0,
                                                                 strBandwidth
                                                                         .indexOf("Mb/s"))
-                                                        .trim()) * 1000 * 1000 / 8;
+                                                        .trim()) * 1000 * 1000;
                                     }
                                     if (strBandwidth.indexOf("Kb/s") >= 0) {
                                         net.bandWidth = Integer
@@ -190,7 +202,7 @@ public class PerfMon {
                                                                 0,
                                                                 strBandwidth
                                                                         .indexOf("Kb/s"))
-                                                        .trim()) * 1000 / 8;
+                                                        .trim()) * 1000;
                                     }
 
                                 }
@@ -283,9 +295,6 @@ public class PerfMon {
             @Override
             public void run() {
                 cMonitor.netInfo = PerfMon.getNetInfo();
-                System.out.println(cMonitor.netInfo.bandWidth);
-                System.out.println(cMonitor.netInfo.downSpeed);
-                System.out.println(cMonitor.netInfo.upSpeed);
             }
         });
         t2.start();

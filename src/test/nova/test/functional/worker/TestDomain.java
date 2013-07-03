@@ -1,5 +1,6 @@
 package nova.test.functional.worker;
 
+import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.common.tools.perf.PerfMon;
 
 import org.junit.Test;
@@ -15,7 +16,8 @@ public class TestDomain {
         // // TODO Auto-generated catch block
         // e.printStackTrace();
         // }
-        PerfMon.getGeneralMonitorInfo();
+        GeneralMonitorInfo info = PerfMon.getGeneralMonitorInfo();
+        System.out.println("......" + info.netInfo.bandWidth);
 
     }
 }
