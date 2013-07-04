@@ -143,7 +143,7 @@ public class PerfMon {
                     / (end - start) * 1000;
 
             String[] ifaces = sigar.getNetInterfaceList();
-            String configname = "";
+            String configname = config.getName();
             if (config.getName().indexOf("eth") < 0) {
                 for (String iface : ifaces) {
                     netstat = sigar.getNetInterfaceStat(iface);
