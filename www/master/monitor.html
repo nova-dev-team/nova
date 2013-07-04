@@ -7,7 +7,6 @@
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="css/bootstrap-responsive.css" rel="stylesheet">
   <link href="css/docs.css" rel="stylesheet">
-  <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="../../excanvas.min.js"></script><![endif]-->
   <script src="js/jquery-2.0.0.js"></script>
   <script src="js/jquery.flot.js"></script>
   <script type="text/javascript">
@@ -22,7 +21,7 @@
 		{
 			plot[i] = [];
 		}
-		var updateInterval = 300;
+		var updateInterval = 5000;
 		
 		function getData(pnd_id,index) {
 			
@@ -36,40 +35,62 @@
 			return res;
 		}
 		
+		var show_item = 4;
+		var show_line = [1,4,8,12,13];
+		var show_label = ["CPU","Memory","Disk","Download", "Upload"]
+		
 		for(var pid=0; pid<pnode_id.length; pid++)
   		{	
-  			for(var index=1;index <= 12; index++) {
-  				if(index%3 == 1) {
-					plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + index, [ getData(pnode_id[pid], index-1) ], {
+  			for(var index=0;index < show_item; index++) {
+  				if(index < (show_item-1)) {  // plot one line in the item of cpu,memory,disk
+					plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + (index + 1), 
+							[ {label: show_label[index] + " Usage", data: getData(pnode_id[pid], show_line[index]-1)} ], {
 						series: {
-							shadowSize: 0	// Drawing is faster without shadows
+							shadowSize: 0,	// Drawing is faster without shadows
 						},
 						yaxis: {
 							min: 0,
 							max: 100
 						},
 						xaxis: {
-							show: false
+							show: true
 						},
+						grid: {
+							backgroundColor: { colors: [ "#fff", "#eee" ] }
+						}
+					});
+				} else { // plot two line in the item of network
+					plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + (index + 1), 
+							[ {label: show_label[index] + " Speed", data: getData(pnode_id[pid], show_line[index]-1)},
+							  {label: show_label[index+1] + " Speed", data: getData(pnode_id[pid], show_line[index+1]-1)} ], {
+						series: {
+							shadowSize: 0,	// Drawing is faster without shadows
+						},
+						yaxis: {
+							min: 0,
+							max: 100
+						},
+						xaxis: {
+							show: true
+						},
+						grid: {
+							backgroundColor: { colors: [ "#fff", "#eee" ] }
+						}
 					});
 				}
 			}
 		}
 		
-		updateMonitor();
+		setInterval(function(){updateMonitor()}, updateInterval);
 		
 		function updateMonitor() {
 			for(var pid=0; pid<pnode_id.length; pid++)
   			{
-  				 for(var index=1;index <= 12; index++) {
-  				 	if(index%3 == 1) {
-	  				 	plot[pnode_id[pid]][index].setData([getData(pnode_id[pid], index-1)]);
-	  				 	plot[pnode_id[pid]][index].draw();
-  				 	}
+  				 for(var index=0;index<show_line.length; index++) {
+  				 	plot[pnode_id[pid]][index].setData([getData(pnode_id[pid], show_line[index]-1)]);
+  				 	plot[pnode_id[pid]][index].draw();
   				 }
   			}
-  			
-  			setTimeout(updateMonitor(), updateInterval);
 		}
 		
 		function getRemoteData(pnd_id) {

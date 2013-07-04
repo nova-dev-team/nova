@@ -36,7 +36,7 @@ public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
             String rrdPath = "build/" + pnode.getId() + ".rrd";
 
             int timeInterval = 5;
-            int rrdLength = 5000;
+            int rrdLength = 50000;
 
             File file = new File(rrdPath);
             File folder = new File("build");

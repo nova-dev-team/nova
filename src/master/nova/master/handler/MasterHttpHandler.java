@@ -556,9 +556,15 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     String pnode_monitor_show = "";
                     String pnode_id_list = "";
 
+                    double[][] monitor_data;
+
                     if (queryMap == null) {
                         // show all the pnode monitor info
                         for (Pnode pnd : Pnode.all()) {
+
+                            monitor_data = RRDTools.getMonitorInfo((int) pnd
+                                    .getId());
+
                             pnode_monitor_show += "<div class='row'><div class='span12'><h3>Worker "
                                     + pnd.getId()
                                     + "<small>"
@@ -569,24 +575,34 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "&nbsp;&nbsp;&nbsp;&nbsp;Status: "
                                     + pnd.getStatus()
                                     + ";</small></h3> <ul class='thumbnails'><li class='span3'>"
-                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + "<a class='thumbnail'><p>CPU INFO: "
+                                    + (int) monitor_data[monitor_data.length - 1][2]
+                                    + " cpus; "
+                                    + monitor_data[monitor_data.length - 1][1]
+                                    + " mhz;</p><div id='Monitor"
                                     + pnd.getId()
                                     + "_1" // id_1 presents cpu info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
-                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + "<a class='thumbnail'><p>Memory INFO: total memory "
+                                    + monitor_data[monitor_data.length - 1][5]
+                                    + " MB;</p><div id='Monitor"
                                     + pnd.getId()
-                                    + "_4" // id_4 presents memery info
+                                    + "_2" // id_2 presents memery info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
-                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + "<a class='thumbnail'><p>Disk INFO: total disk "
+                                    + monitor_data[monitor_data.length - 1][9]
+                                    + " GB;</p><div id='Monitor"
                                     + pnd.getId()
-                                    + "_7" // id_7 presents disk info
+                                    + "_3" // id_3 presents disk info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
-                                    + "<a class='thumbnail'><div id='Monitor"
+                                    + "<a class='thumbnail'><p>Network INFO: bandwidth "
+                                    + monitor_data[monitor_data.length - 1][10]
+                                    + " bps;</p><div id='Monitor"
                                     + pnd.getId()
-                                    + "_10" // id_10 presents network info
+                                    + "_4" // id_4 presents network info
                                     + "' class='plotpic'> </div></a></li></ul></div></div>";
 
                             pnode_id_list += pnd.getId() + ";";
@@ -597,30 +613,48 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                         Pnode pnd = Pnode.findById(Integer.parseInt(queryMap
                                 .get("pnode_id")));
+
+                        monitor_data = RRDTools.getMonitorInfo((int) pnd
+                                .getId());
+
                         pnode_monitor_show += "<div class='row'><div class='span12'><h3>Worker "
                                 + pnd.getId()
                                 + "<small>"
                                 + "  - Ip Address: "
                                 + pnd.getIp()
-                                + "</small></h3> <ul class='thumbnails'><li class='span3'>"
-                                + "<a class='thumbnail'><div id='Monitor"
+                                + ";</small>"
+                                + "<small>"
+                                + "&nbsp;&nbsp;&nbsp;&nbsp;Status: "
+                                + pnd.getStatus()
+                                + ";</small></h3> <ul class='thumbnails'><li class='span3'>"
+                                + "<a class='thumbnail'><p>CPU INFO: "
+                                + (int) monitor_data[monitor_data.length - 1][2]
+                                + " cpus; "
+                                + monitor_data[monitor_data.length - 1][1]
+                                + " mhz;</p><div id='Monitor"
                                 + pnd.getId()
                                 + "_1" // id_1 presents cpu info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
-                                + "<a class='thumbnail'><div id='Monitor"
+                                + "<a class='thumbnail'><p>Memory INFO: total memory "
+                                + monitor_data[monitor_data.length - 1][5]
+                                + " MB;</p><div id='Monitor"
                                 + pnd.getId()
-                                + "_4" // id_4 presents memery info
+                                + "_2" // id_2 presents memery info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
-                                + "<a class='thumbnail'><div id='Monitor"
+                                + "<a class='thumbnail'><p>Disk INFO: total disk "
+                                + monitor_data[monitor_data.length - 1][9]
+                                + " GB;</p><div id='Monitor"
                                 + pnd.getId()
-                                + "_7" // id_7 presents disk info
+                                + "_3" // id_3 presents disk info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
-                                + "<a class='thumbnail'><div id='Monitor"
+                                + "<a class='thumbnail'><p>Network INFO: bandwidth "
+                                + monitor_data[monitor_data.length - 1][10]
+                                + " bps;</p><div id='Monitor"
                                 + pnd.getId()
-                                + "_10" // id_10 presents network info
+                                + "_4" // id_4 presents network info
                                 + "' class='plotpic'> </div></a></li></ul></div></div>";
 
                         pnode_id_list += pnd.getId() + ";";

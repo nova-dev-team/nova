@@ -418,7 +418,7 @@ public class RRDTools {
              * create fetch request using the database reference
              */
             FetchRequest request = rrd.createFetchRequest("AVERAGE",
-                    Util.getTime() - 5 * 101, Util.getTime() + 10);
+                    Util.getTime() - 5 * 110, Util.getTime() + 10);
             fetchData = request.fetchData();
             info = new double[100][fetchData.getColumnCount()];
         } catch (Exception e) {
