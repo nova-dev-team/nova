@@ -175,22 +175,20 @@ public class RRDTools {
                     / msg.memInfo.totalMemorySize);
             sample.setValue("usedMemorySize", 100 * msg.memInfo.usedMemorySize
                     / msg.memInfo.totalMemorySize);
-            sample.setValue("totalMemorySize",
-                    msg.memInfo.totalMemorySize / 1000000);
-            sample.setValue("ramSize", msg.memInfo.ramSize);
+            sample.setValue("totalMemorySize", msg.memInfo.totalMemorySize);// MB
+            sample.setValue("ramSize", msg.memInfo.ramSize);// MB
 
             sample.setValue("freeDiskSize", 100 * msg.diskInfo.freeDiskSize
                     / msg.diskInfo.totalDiskSize);
             sample.setValue("usedDiskSize", 100 * msg.diskInfo.usedDiskSize
                     / msg.diskInfo.totalDiskSize);
-            sample.setValue("totalDiskSize",
-                    msg.diskInfo.totalDiskSize / 1000000000);
+            sample.setValue("totalDiskSize", msg.diskInfo.totalDiskSize);// GB
 
             sample.setValue("bandWidth", msg.netInfo.bandWidth);
             sample.setValue("downSpeed", 100 * msg.netInfo.downSpeed
                     / msg.netInfo.bandWidth);
             sample.setValue("upSpeed", 100 * msg.netInfo.upSpeed
-                    / msg.netInfo.bandWidth);
+                    / msg.netInfo.bandWidth / 1024 / 1024);// mbps
 
             sample.update();
 

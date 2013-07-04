@@ -60,7 +60,7 @@ public class PerfMon {
     }
 
     /**
-     * Memory information. Memory size in B, RAM in MB
+     * Memory information. Memory size in MB, RAM in MB
      * 
      * @return {@link MemoryInfo}
      */
@@ -69,9 +69,9 @@ public class PerfMon {
         MemoryInfo mem = new MemoryInfo();
         try {
             Mem smm = sigar.getMem();
-            mem.freeMemorySize = smm.getActualFree();
-            mem.usedMemorySize = smm.getActualUsed();
-            mem.totalMemorySize = smm.getTotal();
+            mem.freeMemorySize = smm.getActualFree() / 1024 / 1024;
+            mem.usedMemorySize = smm.getActualUsed() / 1024 / 1024;
+            mem.totalMemorySize = smm.getTotal() / 1024 / 1024;
             mem.ramSize = smm.getRam();
         } catch (SigarException e) {
             logger.error("Can't get memory information!", e);
@@ -90,19 +90,21 @@ public class PerfMon {
         try {
             FileSystem[] fs = proxy.getFileSystemList();
             for (int i = 0; i < fs.length; i++) {
-                disk.totalDiskSize += sigar.getFileSystemUsage(
-                        fs[i].getDirName()).getTotal();
-                disk.usedDiskSize += sigar.getFileSystemUsage(
-                        fs[i].getDirName()).getUsed();
-                disk.freeDiskSize += sigar.getFileSystemUsage(
-                        fs[i].getDirName()).getFree();
+                if (fs[i].getType() == FileSystem.TYPE_LOCAL_DISK) {
+                    disk.totalDiskSize += sigar.getFileSystemUsage(
+                            fs[i].getDirName()).getTotal();
+                    disk.usedDiskSize += sigar.getFileSystemUsage(
+                            fs[i].getDirName()).getUsed();
+                    disk.freeDiskSize += sigar.getFileSystemUsage(
+                            fs[i].getDirName()).getFree();
+                }
             }
             /**
-             * Disk size in b
+             * Disk size in GB
              */
-            disk.totalDiskSize *= 1000;
-            disk.usedDiskSize *= 1000;
-            disk.freeDiskSize *= 1000;
+            disk.totalDiskSize /= (1024 * 1024);
+            disk.usedDiskSize /= (1024 * 1024);
+            disk.freeDiskSize /= (1024 * 1024);
 
         } catch (SigarException e) {
             logger.error("Can't get disk information!", e);
@@ -112,7 +114,7 @@ public class PerfMon {
 
     /**
      * Net information. BandWidth, down speed and up speed of net information;
-     * Speed in B/s
+     * Speed in b/s
      * 
      * @return {@link NetInfo}
      */
@@ -185,7 +187,7 @@ public class PerfMon {
                                                                 0,
                                                                 strBandwidth
                                                                         .indexOf("Gb/s"))
-                                                        .trim()) * 1000 * 1000 * 1000;
+                                                        .trim()) * 1024 * 1024 * 1024;
                                     }
                                     if (strBandwidth.indexOf("Mb/s") >= 0) {
                                         net.bandWidth = Integer
@@ -194,7 +196,7 @@ public class PerfMon {
                                                                 0,
                                                                 strBandwidth
                                                                         .indexOf("Mb/s"))
-                                                        .trim()) * 1000 * 1000;
+                                                        .trim()) * 1024 * 1024;
                                     }
                                     if (strBandwidth.indexOf("Kb/s") >= 0) {
                                         net.bandWidth = Integer
@@ -203,7 +205,7 @@ public class PerfMon {
                                                                 0,
                                                                 strBandwidth
                                                                         .indexOf("Kb/s"))
-                                                        .trim()) * 1000;
+                                                        .trim()) * 1024;
                                     }
 
                                 }
