@@ -6,7 +6,7 @@ public class TestJrobinFechData extends Thread {
 
     public void run() {
         while (true) {
-            double[][] test = RRDTools.getMonitorInfo(1);
+            double[][] test = RRDTools.getMonitorInfo(3);
             System.out
                     .println(".....................................................");
             for (int i = 0; i < test.length; i++) {

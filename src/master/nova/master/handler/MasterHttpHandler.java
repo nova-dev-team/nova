@@ -575,32 +575,32 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "&nbsp;&nbsp;&nbsp;&nbsp;Status: "
                                     + pnd.getStatus()
                                     + ";</small></h3> <ul class='thumbnails'><li class='span3'>"
-                                    + "<a class='thumbnail'><p>CPU INFO: "
+                                    + "<a class='thumbnail'><p>CPU Info: "
                                     + (int) monitor_data[monitor_data.length - 1][2]
-                                    + " cpus; "
+                                    + " Cores, "
                                     + monitor_data[monitor_data.length - 1][1]
-                                    + " mhz;</p><div id='Monitor"
+                                    + " Mhz</p><div id='Monitor"
                                     + pnd.getId()
                                     + "_1" // id_1 presents cpu info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
-                                    + "<a class='thumbnail'><p>Memory INFO: total memory "
+                                    + "<a class='thumbnail'><p>Memory Info: Total Memory "
                                     + monitor_data[monitor_data.length - 1][5]
-                                    + " MB;</p><div id='Monitor"
+                                    + " MB</p><div id='Monitor"
                                     + pnd.getId()
                                     + "_2" // id_2 presents memery info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
-                                    + "<a class='thumbnail'><p>Disk INFO: total disk "
+                                    + "<a class='thumbnail'><p>Disk Info: Total Disk "
                                     + monitor_data[monitor_data.length - 1][9]
-                                    + " GB;</p><div id='Monitor"
+                                    + " GB</p><div id='Monitor"
                                     + pnd.getId()
                                     + "_3" // id_3 presents disk info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
-                                    + "<a class='thumbnail'><p>Network INFO: bandwidth "
+                                    + "<a class='thumbnail'><p>Network Info: Bandwidth "
                                     + monitor_data[monitor_data.length - 1][10]
-                                    + " bps;</p><div id='Monitor"
+                                    + " Mbps</p><div id='Monitor"
                                     + pnd.getId()
                                     + "_4" // id_4 presents network info
                                     + "' class='plotpic'> </div></a></li></ul></div></div>";
@@ -627,32 +627,32 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "&nbsp;&nbsp;&nbsp;&nbsp;Status: "
                                 + pnd.getStatus()
                                 + ";</small></h3> <ul class='thumbnails'><li class='span3'>"
-                                + "<a class='thumbnail'><p>CPU INFO: "
+                                + "<a class='thumbnail'><p>CPU Info: "
                                 + (int) monitor_data[monitor_data.length - 1][2]
-                                + " cpus; "
+                                + " Cores, "
                                 + monitor_data[monitor_data.length - 1][1]
-                                + " mhz;</p><div id='Monitor"
+                                + " Mhz</p><div id='Monitor"
                                 + pnd.getId()
                                 + "_1" // id_1 presents cpu info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
-                                + "<a class='thumbnail'><p>Memory INFO: total memory "
+                                + "<a class='thumbnail'><p>Memory Info: Total Memory "
                                 + monitor_data[monitor_data.length - 1][5]
-                                + " MB;</p><div id='Monitor"
+                                + " MB</p><div id='Monitor"
                                 + pnd.getId()
                                 + "_2" // id_2 presents memery info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
-                                + "<a class='thumbnail'><p>Disk INFO: total disk "
+                                + "<a class='thumbnail'><p>Disk Info: Total Disk "
                                 + monitor_data[monitor_data.length - 1][9]
-                                + " GB;</p><div id='Monitor"
+                                + " GB</p><div id='Monitor"
                                 + pnd.getId()
                                 + "_3" // id_3 presents disk info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
-                                + "<a class='thumbnail'><p>Network INFO: bandwidth "
+                                + "<a class='thumbnail'><p>Network Info: Bandwidth "
                                 + monitor_data[monitor_data.length - 1][10]
-                                + " bps;</p><div id='Monitor"
+                                + " Mbps</p><div id='Monitor"
                                 + pnd.getId()
                                 + "_4" // id_4 presents network info
                                 + "' class='plotpic'> </div></a></li></ul></div></div>";

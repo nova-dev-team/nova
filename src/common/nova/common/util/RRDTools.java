@@ -184,11 +184,11 @@ public class RRDTools {
                     / msg.diskInfo.totalDiskSize);
             sample.setValue("totalDiskSize", msg.diskInfo.totalDiskSize);// GB
 
-            sample.setValue("bandWidth", msg.netInfo.bandWidth);
+            sample.setValue("bandWidth", msg.netInfo.bandWidth / 1024 / 1024);// mbps
             sample.setValue("downSpeed", 100 * msg.netInfo.downSpeed
                     / msg.netInfo.bandWidth);
             sample.setValue("upSpeed", 100 * msg.netInfo.upSpeed
-                    / msg.netInfo.bandWidth / 1024 / 1024);// mbps
+                    / msg.netInfo.bandWidth);
 
             sample.update();
 
