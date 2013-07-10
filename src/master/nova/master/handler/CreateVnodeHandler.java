@@ -28,13 +28,17 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
     public void handleMessage(CreateVnodeMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
-        new CreateVclusterHandler().handleMessage(new CreateVclusterMessage(
-                msg.vmName, 1), null, null, null);
+        if (msg.is_one) {
+            new CreateVclusterHandler().handleMessage(
+                    new CreateVclusterMessage(msg.vmName, 1), null, null, null);
+        }
+
         // TODO Auto-generated method stub
         Vcluster vcluster = new Vcluster();
         for (Vcluster vc : Vcluster.all()) {
             vcluster = vc;
         }
+
         SimpleAddress vAddr = new SimpleAddress(Utils.integerToIpv4((Utils
                 .ipv4ToInteger(vcluster.getFristIp()) + msg.ipOffset)),
                 Conf.getInteger("worker.bind_port"));

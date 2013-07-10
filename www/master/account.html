@@ -7,6 +7,7 @@
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="css/bootstrap-responsive.css" rel="stylesheet">
   <link href="css/docs.css" rel="stylesheet">
+  <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
 </head>
@@ -48,7 +49,6 @@
             <li class=""><a href="overview">Overview</a></li>
             <li class=""><a href="instance">Instances</a></li>
             <li class=""><a href="machine">Machines</a></li>
-            <li class=""><a href="volume">Volumes</a></li>
             <li class=""><a href="image">Image&Snapshot</a></li>
             <li class=""><a href="monitor">Monitor</a></li>
             <li class="active"><a href="account">Account</a></li>
@@ -78,49 +78,90 @@
           <br>
 		    <legend>Nova Users
 		        <div class="pull-right">
-			       <a class="btn btn-primary" href="#"> Add User</a>
+			       <a data-toggle="modal" class="btn btn-primary" href="#AddUser_Modal"> Add User </a>
 			    </div>
 		    </legend>
 		    
 			<table class="table table-striped table-hover">  
 				<thead>
 					<tr>
-					<th>#</th>
+					<th>Id</th>
 					<th>User Name</th>
 					<th>Email</th>
 					<th>Password</th>
 					<th>Privilege</th>
-					<th>activated</th>
+					<th>Activated</th>
 					<th>Action</th>
 					</tr>
 				</thead>
 				
 				<tbody>
-					<tr>
-					<th>1</th>
-					<td>aaa</td>
-					<td>aaa</td>
-					<td>aaa</td>
-					<td>aaa</td>
-					<td>aaa</td>
-					<td><a class="btn btn-danger" href="#"> User Deleted </a></td>
-					</tr>
-					
-					<tr>
-					<th>2</th>
-					<td>bbb</td>
-					<td>bbb</td>
-					<td>bbb</td>
-					<td>bbb</td>
-					<td>bbb</td>
-					<td><a class="btn btn-danger" href="#"> User Deleted </a></td>
-					</tr>
-		
+					${user_show}		
 				</tbody>
 				
 			</table>
       </div>
     </div>
+    
+    
+    <!-- Add users modal(Hide) -->
+	  <div id="AddUser_Modal" class="modal hide fade">
+	    <div class="modal-header">
+	      <a class="close" data-dismiss="modal" >&times;</a>
+	      <h3>Add New User</h3>
+	    </div>
+	    
+	    <form id="form_register" action="add_user" method="post" class="form-horizontal">
+	        <div class="modal-body">
+	            <div class="control-group">
+			        <label class="control-label" for="focusedInput">Username:</label>
+			           <div class="controls">
+			             <div class="input-prepend">
+					       <span class="add-on"><i class="icon-user"></i></span>
+					       <input type="text" name="username" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+				
+				<div class="control-group">
+			        <label class="control-label" for="focusedInput"> Email:</label>
+			           <div class="controls">
+			             <div class="input-prepend">
+			               <span class="add-on"><i class="icon-envelope"></i></span>
+					       <input type="text" name="email" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+				<div class="control-group">	
+					<label class="control-label" for="focusedInput"> Password:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="password" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+			    <div class="control-group">	
+					<label class="control-label" for="focusedInput"> Password Confirm:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="password_confirm" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+				
+	        </div>
+	        
+	        <div class="modal-footer">
+	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+	      		<button type="submit" class="btn btn-primary" >Add</button>
+	    	</div>
+	    </form>
+	  </div>
+	  <!-- Add users modal -->
     
 
 

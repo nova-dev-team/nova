@@ -15,18 +15,17 @@ public class AddPnodeMessage {
         this.pAddr = pAddr;
         // System.out.println(pAddr.toString());
     }
-    
-    public AddPnodeMessage(SimpleAddress pAddr, String vmname) {
+
+    public AddPnodeMessage(SimpleAddress pAddr, int vmcapacity) {
         this.pAddr = pAddr;
-        this.vmName = vmname;
-        
+        this.vmCapacity = vmcapacity;
     }
 
     /**
      * The {@link SimpleAddress}.
      */
     public SimpleAddress pAddr;
-    
-    public String vmName = null;
+
+    public int vmCapacity = 0;
 
 }

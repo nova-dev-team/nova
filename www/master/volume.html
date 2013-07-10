@@ -72,7 +72,7 @@
 	<br>
     <legend>System Volumes
 	    <div class="pull-right">
-	       <a data-toggle="modal" href="#CreateVolume_Modal" class="btn btn-primary"> Create Volume</a>
+	       <a data-toggle="modal" href="#CreateVolume_Modal" class="btn btn-primary"> Create Volume </a>
 	       <a class="btn btn-success" href="volume"> Refresh </a>
 	    </div>
     </legend>
@@ -86,50 +86,30 @@
 	    
 	    <form action="add_vdisk" method="post" class="form-horizontal well">
 	        <div class="modal-body">
-	        	<div class="control-group">	
-					<label class="control-label">Volume Display Name:</label>
+				<div class="control-group">
+					<label class="control-label">Volume Name:</label>
 					<div class="controls">
-						<input class="span2" size="16" type="text" name="vdisk_displayname">
+						<input class="span2" size="16" type="text" name="volume_name">
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label">Volume Disk Name:</label>
+					<label class="control-label">Volume Size:</label>
 					<div class="controls">
-						<input class="span2" size="16" type="text" name="vdisk_filename">
+						<div class="input-append">
+						<input class="span2" size="16" type="text" name="volume_size"><span class="add-on">GB</span>
+						</div>
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label">Volume Disk Type:</label>
+					<label class="control-label">Attach to:</label>
 					<div class="controls">
-						<input class="span2" size="16" type="text" name="vdisk_disktype">
+						<input class="span2" size="16" type="text" name="volume_attachto">
 					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">Os Family:</label>
-					<div class="controls">
-						<select class="span2" name="vdisk_osfamily">
-			                <option>Linux</option>
-			                <option>Windows</option>
-			                <option>MacOS</option>
-			             </select>
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label">Os Name:</label>
-					<div class="controls">
-						<input class="span2" size="16" type="text" name="vdisk_osname">
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="fileInput">Upload</label>
-			            <div class="controls">
-			              <input class="input-file" id="fileInput" type="file">
-			            </div>
 				</div>
 				<div class="control-group">	
 					<label class="control-label">Volume Description:</label>
 					<div class="controls">
-              			<textarea class="input-xlarge" id="textarea" rows="3" name="vdisk_descrption"></textarea>
+              			<textarea class="input-xlarge" id="textarea" rows="3" name="Volume_descrption"></textarea>
             		</div>
 				</div>
 	        </div>

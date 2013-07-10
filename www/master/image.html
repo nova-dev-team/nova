@@ -7,6 +7,7 @@
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="css/bootstrap-responsive.css" rel="stylesheet">
   <link href="css/docs.css" rel="stylesheet">
+  <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
 </head>
@@ -48,7 +49,6 @@
             <li class=""><a href="overview">Overview</a></li>
             <li class=""><a href="instance">Instances</a></li>
             <li class=""><a href="machine">Machines</a></li>
-            <li class=""><a href="volume">Volumes</a></li>
             <li class="active"><a href="image">Image&Snapshot</a></li>
             <li class=""><a href="monitor">Monitor</a></li>
             <li class=""><a href="account">Account</a></li>
@@ -72,32 +72,64 @@
     <legend>System Images
 	    <div class="pull-right">
 	       <a data-toggle="modal" href="#AddImage_Modal" class="btn btn-primary"> Create Image </a>
+	       <a class="btn btn-success" href="image"> Refresh </a>
 	    </div>
     </legend>
-	<br>
 	
 	<!-- Add Image modal(Hide) -->
 	  <div id="AddImage_Modal" class="modal hide fade">
 	    <div class="modal-header">
 	      <a class="close" data-dismiss="modal" >&times;</a>
-	      <h3>Create a new image</h3>
+	      <h3>Register a new image</h3>
 	    </div>
 	    
 	    <form action="add_vdisk" method="post" class="form-horizontal well">
 	        <div class="modal-body">
-	        	<div class="control-group">	
-					<label class="control-label">Image Name:</label>
+	        	<div class="control-group">
+					<label class="control-label">Image Display Name:</label>
 					<div class="controls">
-						<input class="span2" size="16" type="text" name="vdisk_name">
+						<input class="span2" size="16" type="text" name="vdisk_displayname">
 					</div>
 				</div>
-		      	<div class="control-group">
-					<label class="control-label">Worker IP Address:</label>
+				<div class="control-group">
+					<label class="control-label">Image Name:</label>
 					<div class="controls">
-					<div class="input-append">
-					<input class="span2" size="16" type="text" name="pnode_ip"><span class="add-on">IP Addr</span>
+						<input class="span2" size="16" type="text" name="vdisk_filename">
 					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Image Type:</label>
+					<div class="controls">
+						<input class="span2" size="16" type="text" name="vdisk_disktype">
 					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Os Family:</label>
+					<div class="controls">
+						<select class="span2" name="vdisk_osfamily">
+			                <option>Linux</option>
+			                <option>Windows</option>
+			                <option>MacOS</option>
+			             </select>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label">Os Name:</label>
+					<div class="controls">
+						<input class="span2" size="16" type="text" name="vdisk_osname">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="fileInput">Upload</label>
+			            <div class="controls">
+			              <input class="input-file" id="fileInput" type="file" name="vdisk_imgPath">
+			            </div>
+				</div>
+				<div class="control-group">	
+					<label class="control-label">Image Description:</label>
+					<div class="controls">
+              			<textarea class="input-xlarge" id="textarea" rows="3" name="vdisk_descrption"></textarea>
+            		</div>
 				</div>
 	        </div>
 	        <div class="modal-footer">
@@ -106,33 +138,24 @@
 	    	</div>
 	    </form>
 	  </div>
-	  <!-- AddWorker_Modal -->
+	  <!-- AddImage_Modal -->
+	  
     
 	<table class="table table-striped table-hover">  
 		<thead>
 			<tr>
-			<th>#</th>
+			<th>Id</th>
 			<th>Image Name</th>
+			<th>Source Image</th>
+			<th>Os Family</th>
+			<th>Os Version</td>
 			<th>Description</th>
-			<th>Format</th>
-			<th>Status</th>
-			<th>Software List</th>
 			<th>Action</th>
 			</tr>
 		</thead>
 		
 		<tbody>
-			<tr>
-			<th>1</th>
-			<td>Ubuntu 11.04.img</td>
-			<td>Ubuntu 11.04 Image</td>
-			<td>qcow2</td>
-			<td>good</td>
-			<td>Vim,Eclipse,JDC</td>
-			<td><a class="btn btn-info" href="#"> Run </a></td>
-			</tr>
-			
-
+			${vdisk_show}
 		</tbody>
 		
 	</table>
@@ -144,8 +167,8 @@
 	<table class="table table-striped table-hover">  
 		<thead>
 			<tr>
-			<th>#</th>
-			<th>Instance ID</th>
+			<th>Id</th>
+			<th>Instance Id</th>
 			<th>Description</th>
 			<th>Status</th>
 			<th>Owner</th>
@@ -162,33 +185,9 @@
 			<td>good</td>
 			<td>John</td>
 			<td>2013-05-23 13:52:13</td>
-			<td><a class="btn btn-info" href="#"> Run </a></td>
+			<td><a class="btn btn-info" href="#"> Snapshot </a></td>
 			</tr>			
 			
-		</tbody>
-		
-	</table>
-	
-	<!---------------------- Volume Snapshot ------------------------------->
-	<br>
-    <legend>Volume Snapshot</legend>
-    
-	<table class="table table-striped table-hover">  
-		<thead>
-			<tr>
-			<th>#</th>
-			<th>Image Name</th>
-			<th>Description</th>
-			<th>Format</th>
-			<th>Status</th>
-			<th>Volume Name</th>
-			<th>Action</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			
-
 		</tbody>
 		
 	</table>

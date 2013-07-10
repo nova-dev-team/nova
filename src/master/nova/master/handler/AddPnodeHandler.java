@@ -25,6 +25,7 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
             // new pnode
             pnode = new Pnode();
             pnode.setAddr(msg.pAddr);
+            pnode.setVmCapacity(msg.vmCapacity);
             pnode.setStatus(Pnode.Status.ADD_PENDING);
             pnode.save();
             log.info("Added new pnode: " + pnode.getAddr());
