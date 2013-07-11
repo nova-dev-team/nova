@@ -22,7 +22,6 @@ import nova.master.api.messages.DeleteUserMessage;
 import nova.master.api.messages.DeleteVclusterMessage;
 import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.api.messages.MasterMigrateVnodeMessage;
-import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Appliance;
 import nova.master.models.Pnode;
@@ -513,17 +512,19 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 else if (act.equals("image") || act.equals("add_vdisk")
                         || act.equals("delete_vdisk")) {
 
+                    /*
+                     * if (act.equals("add_vdisk")) { new
+                     * RegisterVdiskHandler().handleMessage( new
+                     * RegisterVdiskMessage(queryMap .get("vdisk_displayname"),
+                     * queryMap .get("vdisk_filename"), queryMap
+                     * .get("vdisk_disktype"), queryMap .get("vdisk_osfamily"),
+                     * queryMap .get("vdisk_osname"), queryMap
+                     * .get("vdisk_imgPath"), queryMap
+                     * .get("vdisk_descrption")), null, null, null); }
+                     */
+
                     if (act.equals("add_vdisk")) {
-                        new RegisterVdiskHandler().handleMessage(
-                                new RegisterVdiskMessage(queryMap
-                                        .get("vdisk_displayname"), queryMap
-                                        .get("vdisk_filename"), queryMap
-                                        .get("vdisk_disktype"), queryMap
-                                        .get("vdisk_osfamily"), queryMap
-                                        .get("vdisk_osname"), queryMap
-                                        .get("vdisk_imgPath"), queryMap
-                                        .get("vdisk_descrption")), null, null,
-                                null);
+                        System.out.println("yes right");
                     }
 
                     else if (act.equals("delete_vdisk")) {

@@ -10,6 +10,53 @@
   <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
+  <script src="js/ajaxfileupload.js"></script>
+  <script type="text/javascript">
+  
+	function ajaxFileUpload()
+	 {
+	 	var data = {};
+	 	data["vdisk_displayname"] = registerdisk.vdisk_displayname.value;
+	 	data["vdisk_filename"] = registerdisk.vdisk_filename.value;
+	 	data["vdisk_disktype"] = registerdisk.vdisk_disktype.value;
+	 	data["vdisk_osfamily"] = registerdisk.vdisk_osfamily.value;
+	 	data["vdisk_osname"] = registerdisk.vdisk_osname.value;
+	 	//data["vdisk_descrption"] = registerdisk.vdisk_descrption.value;
+	    
+	    $.ajaxFileUpload
+	    (
+	        {
+	            url:'add_vdisk',//用于文件上传的服务器端请求地址
+	            secureuri:false,//一般设置为false
+	            data: data,
+	            fileElementId:'fileinput',//文件上传空间的id属性
+	            dataType: 'json',//返回值类型 一般设置为json
+	            success: function (data, status)  //服务器成功响应处理函数
+	            {
+	                alert(data.message);//从服务器返回的json中取出message中的数据,其中message为在struts2中action中定义的成员变量
+	                
+	                if(typeof(data.error) != 'undefined')
+	                {
+	                    if(data.error != '')
+	                    {
+	                        alert(data.error);
+	                    }else
+	                    {
+	                        alert(data.message);
+	                    }
+	                }
+	            },
+	            error: function (data, status, e)//服务器响应失败处理函数
+	            {
+	                alert(e);
+	            }
+	        }
+	    )
+	    
+	    return false;
+	
+	 }
+  </script>
 </head>
   
 <body>
@@ -83,7 +130,7 @@
 	      <h3>Register a new image</h3>
 	    </div>
 	    
-	    <form action="add_vdisk" method="post" class="form-horizontal well">
+	    <form id="registerdisk" action="add_vdisk" method="post" class="form-horizontal well">
 	        <div class="modal-body">
 	        	<div class="control-group">
 					<label class="control-label">Image Display Name:</label>
@@ -134,7 +181,8 @@
 	        </div>
 	        <div class="modal-footer">
 	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
-	      		<button type="submit" class="btn btn-primary" >Create</button>
+	      		<!-- <button type="submit" class="btn btn-primary">Create</button> -->
+	      		<a class="btn btn-primary" onclick="ajaxFileUpload()">Create</a>
 	    	</div>
 	    </form>
 	  </div>

@@ -10,6 +10,93 @@
   <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
+  <script type="text/javascript">
+  	
+  	function userctl()
+  	{
+  		document.getElementById("userctl").className="active";
+  		document.getElementById("passctl").className="";
+  		document.getElementById("user_module").style.display="block";
+  		document.getElementById("pass_module").style.display="none";                                                                                                                                                                                                                                                                                                                                                                                                                               
+  	}
+  	
+  	function passctl()
+  	{
+  		document.getElementById("userctl").className="";
+  		document.getElementById("passctl").className="active";
+  		document.getElementById("user_module").style.display="none";
+  		document.getElementById("pass_module").style.display="block";                                                                                                                                                                                                                                                                                                                                                                                                                            
+  	}
+  	
+  	function check_adduser()
+	{
+    	if(form_register.username.value=="")
+		{
+    		alert("用户名不能为空!");
+  			form_register.username.focus();
+  			return false;
+		}
+		
+		if(form_register.email.value=="")
+		{
+    		alert("邮箱不能为空!");
+  			form_register.username.focus();
+  			return false;
+		} 
+		
+   		if(form_register.password.value=="")
+		{
+    		alert("密码不能为空");
+  			form_register.password.focus();
+  			return false;
+		}
+		
+		if(form_register.password_confirm.value=="")
+		{
+    		alert("确认密码不能为空");
+  			form_register.password_confirm.focus();
+  			return false;
+		}
+		
+		if(form_register.password.value != form_register.password_confirm.value)
+		{
+		    alert("密码与确认密码不相符");
+		    form_register.password_confirm.focus();
+  			return false;
+		}
+	}
+	
+	function check_passmodify()
+	{
+		if(pass_modify.oldpass.value=="")
+		{
+    		alert("旧密码不能为空");
+  			pass_modify.oldpass.focus();
+  			return false;
+		}
+		
+		if(pass_modify.newpass.value=="")
+		{
+    		alert("新密码不能为空");
+  			pass_modify.newpass.focus();
+  			return false;
+		}
+		
+  		if(pass_modify.newpass_confirm.value=="")
+		{
+    		alert("确认新密码不能为空");
+  			pass_modify.newpass_confirm.focus();
+  			return false;
+		}
+		
+		if(pass_modify.newpass.value != pass_modify.newpass_confirm.value)
+		{
+		    alert("新密码与确认密码不相符");
+		    pass_modify.newpass_confirm.focus();
+  			return false;
+		}
+  	}
+  </script>
 </head>
   
 <body>
@@ -67,14 +154,14 @@
     </div>
     <!-- navbar -->
     
-    <!---------------------- Account Management  ------------------------------->
+    <!---------------------- Account Management module ------------------------------->
     <div class="tabbable tabs-left">
       <ul class="nav nav-tabs">
-        <li class="active"><a href="#lA" data-toggle="tab">User Management</a></li>
-        <li><a href="#lB" data-toggle="tab">Modify Password</a></li>
+        <li class="active" id="userctl"><a data-toggle="tab" onclick="userctl()">User Management</a></li>
+        <li class="" id="passctl"><a data-toggle="tab" onclick="passctl()">Modify Password</a></li>
       </ul>
-      
-      <div class="tab-content">
+       
+      <div id="user_module" class="tab-content" style="">
           <br>
 		    <legend>Nova Users
 		        <div class="pull-right">
@@ -101,6 +188,54 @@
 				
 			</table>
       </div>
+    
+    
+    <!----------------------  Modify password module------------------------------->
+	  <div id="pass_module" class="tab-content" style="display:none">
+          <br>
+		    <legend>Modify Password
+		    </legend>
+		    
+		    <form id="pass_modify" action="pass_modify" method="post" class="form-horizontal" onsubmit="return check_passmodify();">
+		        
+	            <div class="control-group">
+			        <label class="control-label" for="focusedInput">Old Password:</label>
+			           <div class="controls">
+			             <div class="input-prepend">
+					       <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="oldpass" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+				
+				<div class="control-group">	
+					<label class="control-label" for="focusedInput"> New Password:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="newpass" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+			    <div class="control-group">	
+					<label class="control-label" for="focusedInput"> New Password Confirm:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="newpass_confirm" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+			    <div align="center" class="span6">
+			    	<button type="submit" class="btn btn-primary">Modify</button>
+			    	<a class="btn btn-success" href="account"> Refresh </a>
+			    </div>
+			    
+			</form>
+    </div>
+    
     </div>
     
     
@@ -111,7 +246,7 @@
 	      <h3>Add New User</h3>
 	    </div>
 	    
-	    <form id="form_register" action="add_user" method="post" class="form-horizontal">
+	    <form id="form_register" action="add_user" method="post" class="form-horizontal" onsubmit="return check_adduser();">
 	        <div class="modal-body">
 	            <div class="control-group">
 			        <label class="control-label" for="focusedInput">Username:</label>
@@ -162,9 +297,8 @@
 	    </form>
 	  </div>
 	  <!-- Add users modal -->
-    
-
-
+	  
+	  
     <!---------------------- Page Footer  ------------------------------->
 	<footer class="footer">
   	  <hr>
