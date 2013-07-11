@@ -28,7 +28,7 @@ public class NovaStorage extends SimpleServer {
      * Constructor made private for singleton pattern.
      */
     private NovaStorage() {
-        Conf.setDefaultValue("storage.engine", "ftp");
+        // Conf.setDefaultValue("storage.engine", "ftp");
         Conf.setDefaultValue("storage.ftp.bind_host", "0.0.0.0");
         Conf.setDefaultValue("storage.ftp.bind_port", 8021);
         Conf.setDefaultValue("storage.ftp.home", "data/ftp_home");
