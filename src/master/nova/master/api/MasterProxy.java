@@ -82,7 +82,7 @@ public class MasterProxy extends SimpleProxy {
     public void sendCreateVnode(String vmImage, String vmName, int cpuCount,
             int memorySize, String applianceList, int pnodeId, int ipOffset) {
         super.sendRequest(new CreateVnodeMessage(vmImage, vmName, cpuCount,
-                memorySize, applianceList, pnodeId, ipOffset, null));
+                memorySize, applianceList, pnodeId, ipOffset, null, true));
     }
 
     public void sendCreateVcluster(String vclusterName, int vclusterSize) {
@@ -90,9 +90,10 @@ public class MasterProxy extends SimpleProxy {
     }
 
     public void SendRegisterVdisk(String displayName, String fileName,
-            String imageType, String osFamily, String osName, String description) {
+            String imageType, String osFamily, String osName, String imgPath,
+            String description) {
         super.sendRequest(new RegisterVdiskMessage(displayName, fileName,
-                imageType, osFamily, osName, description));
+                imageType, osFamily, osName, imgPath, description));
     }
 
     public void SendRegisterAppliance(String displayName, String fileName,
