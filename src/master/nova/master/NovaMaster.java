@@ -1,5 +1,7 @@
 package nova.master;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
@@ -13,6 +15,7 @@ import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.AppliancesFirstInstalledMessage;
 import nova.master.api.messages.CreateVclusterMessage;
@@ -45,6 +48,7 @@ import nova.storage.NovaStorage;
 import nova.test.functional.agent.experiment.ExpTimeHandler;
 import nova.test.functional.agent.experiment.ExpTimeMessage;
 import nova.worker.api.WorkerProxy;
+import nova.worker.models.StreamGobbler;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
@@ -146,9 +150,50 @@ public class NovaMaster extends SimpleServer {
         for (SimpleDaemon daemon : this.daemons) {
             daemon.start();
         }
+
         logger.info("All deamons started");
 
         // start FTP Server added by gaotao
+        if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
+            String strPnfsHost = Conf.getString("storage.pnfs.bind_host");
+            File dirFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
+            if (!dirFile.exists())
+                Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
+            String[] strExecs = {
+            // "modprobe nfs_layout_nfsv41_files",
+            // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
+            // + ":/Nova_home "
+            // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
+            "mount -t nfs " + strPnfsHost + ":/export/Nova_home "
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+            System.out.println(strExecs[0]);
+            try {
+                for (String cmd : strExecs) {
+                    Process p = Runtime.getRuntime().exec(cmd);
+                    StreamGobbler errorGobbler = new StreamGobbler(
+                            p.getErrorStream(), "ERROR");
+                    errorGobbler.start();
+                    StreamGobbler outGobbler = new StreamGobbler(
+                            p.getInputStream(), "STDOUT");
+                    outGobbler.start();
+                    try {
+                        if (p.waitFor() != 0) {
+                            logger.error("mount pnfs folder returned abnormal value!");
+                        }
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                        logger.error("mount pnfs folder process terminated!", e);
+                    }
+                }
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                logger.error("mount pnfs folder cmd error!", e);
+            }
+        }
+        // else
         NovaStorage.getInstance().startFtpServer();
         return chnl;
     }

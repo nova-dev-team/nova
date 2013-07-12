@@ -1,7 +1,10 @@
 package nova.master.handler;
 
+import java.io.File;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Utils;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.models.Vdisk;
 
@@ -33,11 +36,21 @@ public class RegisterVdiskHandler implements
             vdisk.setDescription(msg.description);
             vdisk.save();
             log.info("Registered new vdisk: " + vdisk.getFileName());
+
+            String strdstfolder = Utils.pathJoin(Utils.NOVA_HOME, "run", "run");
+            String strdstimg = strdstfolder + msg.fileName;
+            String srcimg = Utils.pathJoin(Utils.NOVA_HOME, "data/ftp_home",
+                    msg.fileName);
+            File dstFile = new File(strdstimg);
+            File srcFile = new File(srcimg);
+            if (dstFile.isFile() && dstFile.exists() == false
+                    && srcFile.exists()) {
+                Utils.copyOneFile(srcimg, strdstimg);
+            }
         } else {
             // the vdisk exists
             log.info("Vdisk @" + vdisk.getFileName() + " already registered");
         }
 
     }
-
 }
