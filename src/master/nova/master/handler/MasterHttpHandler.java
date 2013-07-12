@@ -58,9 +58,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
      */
     Logger log = Logger.getLogger(MasterHttpHandler.class);
 
-    public static boolean islogin = false;
+    public static String remote_ipaddr = null;
 
-    public static Users login_user = new Users();
+    public static HashMap<String, Boolean> session_ip_islogin = new HashMap<String, Boolean>();
+
+    public static HashMap<String, Users> session_ip_loginuser = new HashMap<String, Users>();
 
     /**
      * Handle a request message, render result pages.
@@ -69,6 +71,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
     public void handleMessage(DefaultHttpRequest req,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         log.info("New HTTP request from " + e.getChannel().getRemoteAddress());
+
+        remote_ipaddr = e.getChannel().getRemoteAddress().toString().split(":")[0];
+        if (session_ip_islogin == null
+                || !session_ip_islogin.containsKey(remote_ipaddr)) {
+            session_ip_islogin.put(remote_ipaddr, false);
+            session_ip_loginuser.put(remote_ipaddr, null);
+        }
 
         String reqUri = req.getUri();
         System.out.println("Request uri is: " + reqUri);
@@ -166,21 +175,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
         Map<String, String> queryMap = null;
         queryMap = getQueryMap(query);
 
-        // 初始化系统html显示变量
-        values.put("user_total", 4);
-        values.put("root_user_total", 1);
-        values.put("admin_user_total", 1);
-        values.put("normal_user_total", 1);
-        values.put("not_activated_user_total", 0);
-        values.put("pmachine_total", 0);
-        values.put("working_pmachine_toal", 0);
-        values.put("failed_pmachine_total", 0);
-        values.put("retired_pmachine_total", 0);
-        values.put("vcluster_num", 0);
-        values.put("vmachine_num", 0);
-
         // 如果没有登录
-        if (!islogin) {
+        if (!session_ip_islogin.get(remote_ipaddr)) {
             if (act != null) {
                 if (act.equals("login")) {
                     if (queryMap != null) {
@@ -190,11 +186,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         if (ur != null && user_passwd.equals(ur.getPassword())) {
                             fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                     "master", "overview.html");
-                            islogin = true;
-                            login_user = ur;
-                            values.put("username", login_user.getName());
-                            values.put("userprivilege",
-                                    login_user.getPrivilege());
+                            session_ip_islogin.put(remote_ipaddr, true);
+                            session_ip_loginuser.put(remote_ipaddr, ur);
+                            values.put("username",
+                                    session_ip_loginuser.get(remote_ipaddr)
+                                            .getName());
+                            values.put("userprivilege", session_ip_loginuser
+                                    .get(remote_ipaddr).getPrivilege());
                         } else {
                             String ret = "<p>The username or the password is error</p>"
                                     + "<p>please return to input again!</p>";
@@ -228,17 +226,22 @@ public class MasterHttpHandler extends SimpleHttpHandler {
         else {
             fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                     "overview.html");
-            values.put("username", login_user.getName());
-            values.put("userprivilege", login_user.getPrivilege());
+            values.put("username", session_ip_loginuser.get(remote_ipaddr)
+                    .getName());
+            values.put("userprivilege", session_ip_loginuser.get(remote_ipaddr)
+                    .getPrivilege());
 
+            // ------------------------------------------------------------
+            // ------------------------ act begin -------------------------
+            // ------------------------------------------------------------
             if (act != null) {
 
                 // ----------------------------- http request of logout
                 // ------------------------------
 
                 if (act.equals("logout")) {
-                    islogin = false;
-                    login_user = null;
+                    session_ip_islogin.put(remote_ipaddr, false);
+                    session_ip_loginuser.put(remote_ipaddr, null);
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                             "index.html");
                 }
@@ -715,7 +718,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from account page
                 // --------------------------
                 else if (act.equals("account") || act.equals("add_user")
-                        || act.equals("delete_user")) {
+                        || act.equals("delete_user")
+                        || act.equals("pass_modify")) {
 
                     if (act.equals("add_user")) {
                         new AddUserHandler().handleMessage(new AddUserMessage(
@@ -729,6 +733,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         new DeleteUserHandler().handleMessage(
                                 new DeleteUserMessage(Integer.parseInt(queryMap
                                         .get("user_id"))), null, null, null);
+                    }
+
+                    else if (act.equals("pass_modify")) {
+
                     }
 
                     // list all users
@@ -762,6 +770,65 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 }
             }
         }
+
+        // ----------------- 初始化overview html显示变量 --------------------
+        int user_total = 0;
+        int root_user_total = 0;
+        int normal_user_total = 0;
+        int not_activated_user_total = 0;
+
+        for (Users user : Users.all()) { // *********** users var **********
+            user_total++;
+
+            if (user.getPrivilege().equals("root")) {
+                root_user_total++;
+            } else if (user.getPrivilege().equals("normal")) {
+                normal_user_total++;
+            }
+
+            if (user.getActivated().equals("0")) {
+                not_activated_user_total++;
+            }
+        }
+
+        values.put("user_total", user_total);
+        values.put("root_user_total", root_user_total);
+        values.put("normal_user_total", normal_user_total);
+        values.put("not_activated_user_total", not_activated_user_total);
+
+        int pmachine_total = 0;
+        int working_pmachine_toal = 0;
+        int failed_pmachine_total = 0;
+        int retired_pmachine_total = 0;
+        for (Pnode pnode : Pnode.all()) { // ************* pmachine var
+                                          // **********
+            pmachine_total++;
+            if (pnode.getStatusCode().equals("RUNNING")) {
+                working_pmachine_toal++;
+            } else if (pnode.getStatusCode().equals("CONNECT_FAILURE")) {
+                failed_pmachine_total++;
+            } else if (pnode.getStatusCode().equals("RETIRED")) {
+                retired_pmachine_total++;
+            }
+        }
+        values.put("pmachine_total", pmachine_total);
+        values.put("working_pmachine_toal", working_pmachine_toal);
+        values.put("failed_pmachine_total", failed_pmachine_total);
+        values.put("retired_pmachine_total", retired_pmachine_total);
+
+        int vcluter_num = 0;
+        for (Vcluster vcluster : Vcluster.all()) { // *********** vcluster
+                                                   // var **********
+            vcluter_num++;
+        }
+        values.put("vcluster_num", vcluter_num);
+
+        int vmachine_num = 0;
+        for (Vnode vnode : Vnode.all()) { // *********** vnode var
+                                          // **********
+            vmachine_num++;
+        }
+        values.put("vmachine_num", vmachine_num);
 
         return Utils.expandTemplateFile(fpath, values);
     }
