@@ -1,6 +1,8 @@
 package nova.common.service;
 
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 
 /**
  * Address info of a component.
@@ -77,4 +79,18 @@ public class SimpleAddress {
         return new InetSocketAddress(this.ip, this.port);
     }
 
+    public InetAddress getInetAddress() {
+        String[] ips = ip.split(".");
+        byte[] bs = new byte[] { (byte) (int) Integer.valueOf(ips[0]),
+                (byte) (int) Integer.valueOf(ips[1]),
+                (byte) (int) Integer.valueOf(ips[2]),
+                (byte) (int) Integer.valueOf(ips[3]) };
+        try {
+            return InetAddress.getByAddress(bs);
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
