@@ -49,6 +49,9 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
              * pnode.setMacAddress(sb.toString().toUpperCase());
              */
             getPnodeInfo(msg.pAddr, pnode);
+            if (pnode.getMacAddress() == null
+                    || pnode.getMacAddress().indexOf("--") >= 0)
+                pnode.setMacAddress(getLocalMac());
             pnode.save();
             log.info("Added new pnode: " + pnode.getAddr());
         } else {
@@ -143,5 +146,64 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
             log.error("get mac address:" + addr.ip + " cmd error!", e);
 
         }
+    }
+
+    private String getLocalMac() {
+        final SimpleAddress add = new SimpleAddress("127.0.0.1", 345);
+        String strcmd = "ifconfig ";
+        try {
+
+            Process p = Runtime.getRuntime().exec(strcmd);
+            final InputStream is = p.getInputStream();
+
+            Thread getmac = new Thread(new Runnable() {
+                public void run() {
+                    String line, result = "-1";
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(is));
+                    try {
+                        while ((line = br.readLine()) != null) {
+                            result = line;
+                            if (result.indexOf("HWaddr") > 0
+                                    && result.indexOf("virbr") != -1) {
+                                add.ip = result.substring(
+                                        result.indexOf("HWaddr") + 7).trim();
+
+                            }
+                        }
+
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            });
+            getmac.start();
+
+            try {
+                if (p.waitFor() != 0) {
+                    log.error("get local mac address return abnormal value!");
+                }
+                try {
+                    getmac.join();
+                } catch (InterruptedException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                log.error("get local mac address terminated!", e);
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            log.error("get local mac address cmd error!", e);
+
+        }
+
+        return add.ip;
+
     }
 }

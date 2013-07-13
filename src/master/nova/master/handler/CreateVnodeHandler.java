@@ -93,6 +93,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         if (Utils.isUnix()) {
             wp.sendObtainSshKeys(msg.vClusterName, msg.vmName);
         }
+
         wp.sendStartVnode("kvm", msg.vmName, vAddr,
                 String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
                 msg.vmImage, true, apps, ipAddr, subnetMask, gateWay,

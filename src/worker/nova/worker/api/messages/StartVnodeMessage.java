@@ -37,12 +37,12 @@ public class StartVnodeMessage {
     }
 
     public StartVnodeMessage(String hyperVisor, boolean wakeupOnly,
-            boolean runAgent, SimpleAddress vAddr) {
+            boolean runAgent, String uuid) {
         super();
         this.wakeupOnly = wakeupOnly;
         this.hyperVisor = hyperVisor;
         this.runAgent = runAgent;
-        this.vAddr = vAddr;
+        this.uuid = uuid;
     }
 
     /**
@@ -51,7 +51,8 @@ public class StartVnodeMessage {
     boolean wakeupOnly;
     String hyperVisor;
     String name;
-    String uuid;
+    String uuid;// when creating vnode this means vnodeid,when resuming this
+                // means uuid
     String memSize;
     String cpuCount;
     String arch;

@@ -11,6 +11,11 @@ public class StopVnodeMessage {
     String hyperVisor;
     String uuid;
     boolean suspendOnly;
+    String pnodid;
+
+    public String getPnodeid() {
+        return pnodid;
+    }
 
     public boolean isSuspendOnly() {
         return suspendOnly;
@@ -39,13 +44,16 @@ public class StopVnodeMessage {
     public StopVnodeMessage() {
     }
 
-    public StopVnodeMessage(String hyperVisor, String uuid) {
+    public StopVnodeMessage(String pnodeid, String hyperVisor, String uuid) {
         this.hyperVisor = hyperVisor;
         this.uuid = uuid;
         this.suspendOnly = false;
+        this.pnodid = pnodeid;
     }
 
-    public StopVnodeMessage(String hyperVisor, String uuid, boolean suspendOnly) {
+    public StopVnodeMessage(String pnodeid, String hyperVisor, String uuid,
+            boolean suspendOnly) {
+        this.pnodid = pnodeid;
         this.hyperVisor = hyperVisor;
         this.uuid = uuid;
         this.suspendOnly = suspendOnly;

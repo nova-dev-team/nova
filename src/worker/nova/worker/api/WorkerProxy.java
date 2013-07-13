@@ -66,11 +66,10 @@ public class WorkerProxy extends SimpleProxy {
                 subnetMask, gateWay, vnodeID));
     }
 
-    public void sendWakeupVnode(String hyperVisor, boolean runAgent,
-            SimpleAddress vAddr) {
+    public void sendWakeupVnode(String hyperVisor, boolean runAgent, String uuid) {
         // 4th param false means wakeuponly = true
         super.sendRequest(new StartVnodeMessage(hyperVisor, true, runAgent,
-                vAddr));
+                uuid));
     }
 
     /**
@@ -83,22 +82,10 @@ public class WorkerProxy extends SimpleProxy {
      * @param uuid
      *            uuid of vm to shut down
      */
-    public void sendStopVnode(String hyperVisor, String uuid) {
-        super.sendRequest(new StopVnodeMessage(hyperVisor, uuid, false));
-    }
-
-    /**
-     * suspend vm message
-     * 
-     * author shayf
-     * 
-     * @param hyperVisor
-     *            hypervisor type, use "kvm" or "xen" ignore case
-     * @param uuid
-     *            uuid of vm to suspend
-     */
-    public void sendSuspendVnode(String hyperVisor, String uuid) {
-        super.sendRequest(new StopVnodeMessage(hyperVisor, uuid, true));
+    public void sendStopVnode(String hyperVisor, String uuid,
+            boolean suspendonly) {
+        super.sendRequest(new StopVnodeMessage("-1", hyperVisor, uuid,
+                suspendonly));
     }
 
     /**

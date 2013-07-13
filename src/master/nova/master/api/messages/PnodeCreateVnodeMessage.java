@@ -12,14 +12,16 @@ public class PnodeCreateVnodeMessage {
 
     }
 
-    public PnodeCreateVnodeMessage(String PnodeIP, long VnodeId, int VnodePort) {
+    public PnodeCreateVnodeMessage(String PnodeIP, long VnodeId, int VnodePort,
+            String uuid) {
         this.PnodeIP = PnodeIP;
         this.VnodeId = VnodeId;
         this.VnodePort = VnodePort;
-
+        this.vnodeuuid = uuid;
     }
 
     public String PnodeIP;
+    public String vnodeuuid;
 
     public long VnodeId;
 

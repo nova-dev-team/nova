@@ -41,7 +41,7 @@ public class DeleteVclusterHandler implements
                     wp.connect(new InetSocketAddress(Pnode.findById(
                             vnode.getPmachineId()).getIp(), Pnode.findById(
                             vnode.getPmachineId()).getPort()));
-                    wp.sendStopVnode("kvm", vnode.getUuid());
+                    wp.sendStopVnode("kvm", vnode.getUuid(), false);
                     log.info("Delete vnode: " + vnode.getName());
                     Vnode.delete(vnode);
                 } else {

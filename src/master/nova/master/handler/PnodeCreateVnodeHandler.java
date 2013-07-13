@@ -11,6 +11,7 @@ import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.messages.PnodeCreateVnodeMessage;
+import nova.master.models.Vnode;
 import nova.worker.models.StreamGobbler;
 
 import org.apache.log4j.Logger;
@@ -50,6 +51,9 @@ public class PnodeCreateVnodeHandler implements
         portMP(masterIP, masterPort, msg.PnodeIP, msg.VnodePort, msg.VnodeId);
         Utils.MASTER_VNC_MAP.put(String.valueOf(msg.VnodeId),
                 String.valueOf(masterPort));
+        Vnode vnode = Vnode.findById(msg.VnodeId);
+        vnode.setUuid(msg.vnodeuuid);
+        vnode.save();
     }
 
     private void portMP(String srcIP, int srcPort, String dstIP, int dstPort,
