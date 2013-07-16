@@ -35,7 +35,6 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
         if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
             virtService = "qemu:///system";
         } else if (msg.getHyperVisor().equalsIgnoreCase("vstaros")) {
-            // TODO @shayf get correct xen service address
             virtService = "vstaros:///system";
         } else {
             virtService = "some xen";
@@ -54,7 +53,6 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
                 log.error("cannot connect and close domain " + msg.getUuid());
                 return;
             }
-            String name = dom.getName();
 
             if (!msg.isSuspendOnly()) {
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
@@ -65,34 +63,6 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
                 NovaWorker.getInstance().getVnodeIP()
                         .remove(UUID.fromString(msg.getUuid()));
 
-                // @eagle
-                // move img back to vdiskpool
-                /*
-                 * if
-                 * (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
-                 * 
-                 * // if use pnfs,the directory of each vm should be //
-                 * $WORKERIP_$VMNAME name =
-                 * NovaWorker.getInstance().getAddr().getIp() + "_" + name;
-                 * String stdImgFile = "small.img"; String tmp =
-                 * Vnode.findByUuid(msg.getUuid()).getCdrom(); if (tmp != null
-                 * && tmp.endsWith("") == false) stdImgFile = tmp; File stdFile
-                 * = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                 * stdImgFile)); long stdLen = stdFile.length(); File srcFile =
-                 * new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run", name,
-                 * stdImgFile)); if (srcFile.length() == stdLen) { synchronized
-                 * (NovaWorker.getInstance().getConnLock()) { for (int i =
-                 * VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) { File dstFile =
-                 * new File(Utils.pathJoin( Utils.NOVA_HOME, "run", "run",
-                 * "vdiskpool", stdImgFile + ".pool." + Integer.toString(i)));
-                 * if (dstFile.exists() == false) { srcFile.renameTo(dstFile); }
-                 * } } } }
-                 * 
-                 * System.out.println("delete path = " +
-                 * Utils.pathJoin(Utils.NOVA_HOME, "run", "run", name));
-                 * Utils.delAllFile(Utils.pathJoin(Utils.NOVA_HOME, "run",
-                 * "run", name));
-                 */
             } else {
                 dom.suspend();
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),

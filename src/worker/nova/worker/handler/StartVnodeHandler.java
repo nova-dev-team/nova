@@ -69,7 +69,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
         if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
             virtService = "qemu:///system";
         } else if (msg.getHyperVisor().equalsIgnoreCase("vstaros")) {
-            // TODO @shayf get correct xen service address
             virtService = "vstaros:///system";
         } else {
             virtService = "some xen";
@@ -90,7 +89,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         testDomain.resume();
                     }
 
-                    // NovaWorker.getInstance().closeConnectToKvm();
                 } catch (LibvirtException ex) {
                     log.error("Domain with UUID='" + msg.getUuid()
                             + "' can't be found!", ex);
@@ -100,24 +98,20 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             msg.setUuid(UUID.randomUUID().toString());
             msg.setRunAgent(false);
             if ((msg.getMemSize() != null) && (!msg.getMemSize().equals(""))) {
-                if (Integer.parseInt(msg.getMemSize()) <= 0)
-                    msg.setMemSize("524288");
-            } else {
-                msg.setMemSize("524288");
+                msg.setMemSize("512000");
             }
 
             if ((msg.getCpuCount() != null) && (!msg.getCpuCount().equals(""))) {
-                // TODO @shayf get actual cpu nums
                 if ((Integer.parseInt(msg.getCpuCount()) <= 0)
                         || (Integer.parseInt(msg.getCpuCount()) >= 10))
                     msg.setCpuCount("1");
-            } else
+            }
 
-            if ((msg.getArch() == null) || msg.getArch().equals("")) {
+            if ((msg.getArch() == null)
+                    || msg.getArch().trim().equalsIgnoreCase("")) {
                 msg.setArch("i686");
             }
 
-            // mv img files from vdiskpool
             String stdImgFile = "small.img";
             if ((msg.getHdaImage() != null) && (!msg.getHdaImage().equals(""))) {
                 stdImgFile = msg.getHdaImage();
@@ -146,8 +140,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     }
                     // NovaStorage.getInstance().shutdown();
                 }
-                // long stdLen = stdFile.length();
-                // boolean found = false;
                 File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                         msg.getName()));
                 if (!foder.exists()) {
@@ -224,7 +216,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             + Utils.pathJoin(Utils.NOVA_HOME, "run",
                                     msg.getName(), stdImgFile);
                     System.out
-                            .println("__________________________________________________________________: "
+                            .println("Ftp______________________________________________________________: "
                                     + cmd);
 
                     try {
