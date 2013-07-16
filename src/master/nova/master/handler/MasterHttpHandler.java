@@ -265,10 +265,15 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                         .get("vnode_cpucount")),
                                                 Integer.parseInt(queryMap
                                                         .get("vnode_memsize")),
-                                                null, Integer.parseInt(queryMap
-                                                        .get("vnode_pnodeId")
-                                                        .split("-")[0]), 0,
-                                                null, true), null, null, null);
+                                                null,
+                                                Integer.parseInt(queryMap.get(
+                                                        "vnode_pnodeId").split(
+                                                        "-")[0]),
+                                                0,
+                                                null,
+                                                true,
+                                                queryMap.get("vnode_hypervisor")),
+                                        null, null, null);
                     }
 
                     else if (act.equals("delete_vnode")) {
