@@ -346,8 +346,6 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "</td><td>"
                                 + vnode.getIp()
                                 + "</td><td>"
-                                + vnode.getBootDevice()
-                                + "</td><td>"
                                 + vnode.getMemorySize()
                                 + "</td><td>"
                                 + vnode.getVclusterId()
@@ -448,6 +446,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     values.put("vnc_port",
                             Utils.MASTER_VNC_MAP.get(queryMap.get("vnode_id")));
+
+                    values.put("vnc_userid", queryMap.get("vnode_id"));
+
+                    values.put(
+                            "vnc_username",
+                            Vnode.findById(
+                                    Integer.parseInt(queryMap.get("vnode_id")))
+                                    .getName());
 
                 }
 

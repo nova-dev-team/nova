@@ -39,6 +39,7 @@ public class RegisterVdiskHandler implements
 
             String strdstfolder = Utils.pathJoin(Utils.NOVA_HOME, "run", "run");
             String strdstimg = strdstfolder + msg.fileName;
+            // todo:eagle copy disk
             String srcimg = Utils.pathJoin(Utils.NOVA_HOME, "data/ftp_home",
                     msg.fileName);
             File dstFile = new File(strdstimg);

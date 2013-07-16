@@ -48,6 +48,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         Vnode vnode = new Vnode();
         vnode.setAddr(vAddr);
         vnode.setPmachineId(pid);
+        vnode.setVclusterId((int) vcluster.getId());
         vnode.setName(msg.vmName);
         vnode.setCpuCount(msg.cpuCount);
         vnode.setMemorySize(msg.memorySize);

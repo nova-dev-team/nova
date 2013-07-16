@@ -72,6 +72,9 @@ storage.ftp.admin.password=liquid
 #pnfs host
 storage.pnfs.bind_host=10.0.1.233
 
+#pnfs root
+storage.pnfs.root=/kyds/export/Nova_home
+
 #########################
 # vnode conifg section #
 #########################

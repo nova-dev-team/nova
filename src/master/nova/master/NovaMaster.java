@@ -155,7 +155,9 @@ public class NovaMaster extends SimpleServer {
 
         // start FTP Server added by gaotao
         if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
-            String strPnfsHost = Conf.getString("storage.pnfs.bind_host");
+            String strPnfsHost = Conf.getString("storage.pnfs.bind_host")
+                    .trim();
+            String strpnfsRoot = Conf.getString("storage.pnfs.root").trim();
             File dirFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run"));
             if (!dirFile.exists())
                 Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
@@ -164,7 +166,7 @@ public class NovaMaster extends SimpleServer {
             // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
             // + ":/Nova_home "
             // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
-            "mount -t nfs " + strPnfsHost + ":/export/Nova_home "
+            "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
                     + Utils.pathJoin(Utils.NOVA_HOME, "run") };
             System.out.println(strExecs[0]);
             try {
@@ -192,9 +194,8 @@ public class NovaMaster extends SimpleServer {
                 e.printStackTrace();
                 logger.error("mount pnfs folder cmd error!", e);
             }
-        }
-        // else
-        NovaStorage.getInstance().startFtpServer();
+        } else
+            NovaStorage.getInstance().startFtpServer();
         return chnl;
     }
 

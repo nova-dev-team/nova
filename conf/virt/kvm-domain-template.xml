@@ -4,7 +4,7 @@
 <memory>${memSize}</memory>
 <vcpu>${cpuCount}</vcpu>
 <os>
-  <type arch='${arch}' machine='pc-0.12'>hvm</type>
+  <type arch='${arch}'>hvm</type>
   <boot dev='${bootDevice}'/>
 </os>
 <features>
