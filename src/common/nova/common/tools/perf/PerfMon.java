@@ -176,38 +176,39 @@ public class PerfMon {
                                         break;
                                     }
                                 }
+                                if (result.equalsIgnoreCase("") == false) {
+                                    PerfMon.strBandwidth = result
+                                            .substring(result.indexOf("Speed:") + 6);
+                                    if (strBandwidth.compareTo("-1") != 0) {
+                                        if (strBandwidth.indexOf("Gb/s") >= 0) {
+                                            net.bandWidth = Integer
+                                                    .valueOf(strBandwidth
+                                                            .substring(
+                                                                    0,
+                                                                    strBandwidth
+                                                                            .indexOf("Gb/s"))
+                                                            .trim()) * 1024 * 1024 * 1024;
+                                        }
+                                        if (strBandwidth.indexOf("Mb/s") >= 0) {
+                                            net.bandWidth = Integer
+                                                    .valueOf(strBandwidth
+                                                            .substring(
+                                                                    0,
+                                                                    strBandwidth
+                                                                            .indexOf("Mb/s"))
+                                                            .trim()) * 1024 * 1024;
+                                        }
+                                        if (strBandwidth.indexOf("Kb/s") >= 0) {
+                                            net.bandWidth = Integer
+                                                    .valueOf(strBandwidth
+                                                            .substring(
+                                                                    0,
+                                                                    strBandwidth
+                                                                            .indexOf("Kb/s"))
+                                                            .trim()) * 1024;
+                                        }
 
-                                PerfMon.strBandwidth = result.substring(result
-                                        .indexOf("Speed:") + 6);
-                                if (strBandwidth.compareTo("-1") != 0) {
-                                    if (strBandwidth.indexOf("Gb/s") >= 0) {
-                                        net.bandWidth = Integer
-                                                .valueOf(strBandwidth
-                                                        .substring(
-                                                                0,
-                                                                strBandwidth
-                                                                        .indexOf("Gb/s"))
-                                                        .trim()) * 1024 * 1024 * 1024;
                                     }
-                                    if (strBandwidth.indexOf("Mb/s") >= 0) {
-                                        net.bandWidth = Integer
-                                                .valueOf(strBandwidth
-                                                        .substring(
-                                                                0,
-                                                                strBandwidth
-                                                                        .indexOf("Mb/s"))
-                                                        .trim()) * 1024 * 1024;
-                                    }
-                                    if (strBandwidth.indexOf("Kb/s") >= 0) {
-                                        net.bandWidth = Integer
-                                                .valueOf(strBandwidth
-                                                        .substring(
-                                                                0,
-                                                                strBandwidth
-                                                                        .indexOf("Kb/s"))
-                                                        .trim()) * 1024;
-                                    }
-
                                 }
                             } catch (IOException e) {
                                 // TODO Auto-generated catch block
