@@ -356,6 +356,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "</td><td>"
                                 + vnode.getMemorySize()
                                 + "</td><td>"
+                                + vnode.getHypervisor()
+                                + "</td><td>"
                                 + vnode.getVclusterId()
                                 + "</td><td>"
                                 + vnode.getPmachineId()
