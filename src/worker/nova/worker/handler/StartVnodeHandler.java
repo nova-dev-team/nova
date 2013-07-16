@@ -78,10 +78,18 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
         if (msg.getWakeupOnly()) {
             synchronized (NovaWorker.getInstance().getConnLock()) {
                 try {
-                    Domain testDomain = NovaWorker.getInstance()
-                            .getConn("qemu:///system", false)
-                            .domainLookupByUUIDString(msg.getUuid());
-                    testDomain.resume();
+                    if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
+                        Domain testDomain = NovaWorker.getInstance()
+                                .getConn("qemu:///system", false)
+                                .domainLookupByUUIDString(msg.getUuid());
+                        testDomain.resume();
+                    } else if (msg.getHyperVisor().equalsIgnoreCase("vstaros")) {
+                        Domain testDomain = NovaWorker.getInstance()
+                                .getConn("vstaros:///system", false)
+                                .domainLookupByUUIDString(msg.getUuid());
+                        testDomain.resume();
+                    }
+
                     // NovaWorker.getInstance().closeConnectToKvm();
                 } catch (LibvirtException ex) {
                     log.error("Domain with UUID='" + msg.getUuid()
@@ -103,9 +111,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 if ((Integer.parseInt(msg.getCpuCount()) <= 0)
                         || (Integer.parseInt(msg.getCpuCount()) >= 10))
                     msg.setCpuCount("1");
-            } else {
-                msg.setCpuCount("1");
-            }
+            } else
 
             if ((msg.getArch() == null) || msg.getArch().equals("")) {
                 msg.setArch("i686");
@@ -218,7 +224,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             + Utils.pathJoin(Utils.NOVA_HOME, "run",
                                     msg.getName(), stdImgFile);
                     System.out
-                            .println("ftp____________________________________________________________________: "
+                            .println("__________________________________________________________________: "
                                     + cmd);
 
                     try {
@@ -433,7 +439,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     return;
                 }
                 String strWorkerIP = NovaWorker.getInstance().getAddr().getIp();
-                System.out.println(strWorkerIP);
                 // long stdLen = stdFile.length();
                 // boolean found = false;
                 // for (int i = VdiskPoolDaemon.getPOOL_SIZE(); i >= 1; i--) {
@@ -511,34 +516,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 e1);
                         return;
                     }
-                    // if (file.exists() == false) {
-                    // try {
-                    // System.out.println("copying file");
-                    // String sourceUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                    // "run", "run", stdImgFile);
-                    // String destUrl = Utils.pathJoin(Utils.NOVA_HOME,
-                    // "run", "run",
-                    // strWorkerIP + "_" + msg.getName(),
-                    // stdImgFile);
-                    // File sourceFile = new File(sourceUrl);
-                    // if (sourceFile.isFile()) {
-                    // FileInputStream input = new FileInputStream(
-                    // sourceFile);
-                    // FileOutputStream output = new FileOutputStream(
-                    // destUrl);
-                    // byte[] b = new byte[1024 * 5];
-                    // int len;
-                    // while ((len = input.read(b)) != -1) {
-                    // output.write(b, 0, len);
-                    // }
-                    // output.flush();
-                    // output.close();
-                    // input.close();
-                    // }
-                    // } catch (IOException ex) {
-                    // log.error("copy image fail", ex);
-                    // }
-                    // }
                 }
                 if (msg.getRunAgent()) {
                     File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
@@ -754,54 +731,47 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             // ////////////////////////////////////////////////////////////////////
 
             // create domain and show some info
-            if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
-                msg.setEmulatorPath("/usr/bin/kvm");
-                synchronized (NovaWorker.getInstance().getConnLock()) {
-                    try {
 
-                        // start a vnode
-                        String tt = Kvm.emitDomain(msg.getHashMap());
-                        Domain testDomain = NovaWorker.getInstance()
-                                .getConn(virtService, false)
-                                .domainCreateLinux(tt, 0);
-                        if (testDomain != null) {
-                            VnodeStatusDaemon
-                                    .putStatus(UUID.fromString(testDomain
-                                            .getUUIDString()),
-                                            Vnode.Status.PREPARING);
-                            NovaWorker
-                                    .getInstance()
-                                    .getVnodeIP()
-                                    .put(UUID.fromString(testDomain
-                                            .getUUIDString()), msg.getIpAddr());
-                        }
-                        System.out.println("Domain:" + testDomain.getName()
-                                + " id " + testDomain.getID() + " running "
-                                + testDomain.getOSType());
-                        System.out.println("Domian UUID:"
-                                + testDomain.getUUIDString()
-                                + " "
-                                + "vncport:"
-                                + Utils.WORKER_VNC_MAP.get(testDomain
-                                        .getUUIDString()));
-                        mp.sendPnodeCreateVnodeMessage(NovaWorker.getInstance()
-                                .getAddr().getIp(), retVnodeID, Integer
-                                .parseInt(Utils.WORKER_VNC_MAP.get(testDomain
-                                        .getUUIDString())), testDomain
-                                .getUUIDString());
-                        // Domain testDomain = conn.domainLookupByName("test");
-                        // System.out.println("xml desc\n" +
-                        // testDomain.getXMLDesc(0));
-                        // NovaWorker.getInstance().closeConnectToKvm();
-                    } catch (LibvirtException ex) {
-                        log.error("Create domain failed", ex);
+            synchronized (NovaWorker.getInstance().getConnLock()) {
+                try {
+
+                    // start a vnode
+                    String tt = Kvm.emitDomain(msg.getHashMap());
+                    Domain testDomain = NovaWorker.getInstance()
+                            .getConn(virtService, false)
+                            .domainCreateLinux(tt, 0);
+                    if (testDomain != null) {
+                        VnodeStatusDaemon.putStatus(
+                                UUID.fromString(testDomain.getUUIDString()),
+                                Vnode.Status.PREPARING);
+                        NovaWorker
+                                .getInstance()
+                                .getVnodeIP()
+                                .put(UUID
+                                        .fromString(testDomain.getUUIDString()),
+                                        msg.getIpAddr());
                     }
+                    System.out.println("Domain:" + testDomain.getName()
+                            + " id " + testDomain.getID() + " running "
+                            + testDomain.getOSType());
+                    System.out.println("Domian UUID:"
+                            + testDomain.getUUIDString()
+                            + " "
+                            + "vncport:"
+                            + Utils.WORKER_VNC_MAP.get(testDomain
+                                    .getUUIDString()));
+                    mp.sendPnodeCreateVnodeMessage(NovaWorker.getInstance()
+                            .getAddr().getIp(), retVnodeID, Integer
+                            .parseInt(Utils.WORKER_VNC_MAP.get(testDomain
+                                    .getUUIDString())), testDomain
+                            .getUUIDString());
+                    // Domain testDomain = conn.domainLookupByName("test");
+                    // System.out.println("xml desc\n" +
+                    // testDomain.getXMLDesc(0));
+                    // NovaWorker.getInstance().closeConnectToKvm();
+                } catch (LibvirtException ex) {
+                    log.error("Create domain failed", ex);
                 }
-            } else if (msg.getHyperVisor().equalsIgnoreCase("xen")) {
-                // TODO @shayf add xen process
-                log.error("xen not supported yet");
-            } else {
-                log.error("so such type hypervisor " + msg.getHyperVisor());
             }
 
         }

@@ -102,6 +102,51 @@ public class VnodeStatusDaemon extends SimpleDaemon {
                         // NovaWorker.getInstance().closeConnectToKvm();
                     }
                 }
+                if (NovaWorker.getInstance()
+                        .getConn("vstaros:///system", false).numOfDomains() > 0) {
+                    int[] ids = NovaWorker.getInstance()
+                            .getConn("vstaros:///system", false).listDomains();
+                    for (int i = 0; i < ids.length; i++) {
+                        Domain dom = NovaWorker.getInstance()
+                                .getConn("vstaros:///system", false)
+                                .domainLookupByID(ids[i]);
+                        if (dom != null) {
+                            UUID uu = UUID.fromString(dom.getUUIDString());
+                            String info = dom.getInfo().state.toString();
+                            Vnode.Status vs = null;
+                            if (info.equalsIgnoreCase("VIR_DOMAIN_BLOCKED")) {
+                                // the domain is blocked on resource
+                                vs = Vnode.Status.PAUSED;
+                            } else if (info
+                                    .equalsIgnoreCase("VIR_DOMAIN_CRASHED")) {
+                                // the domain is crashed
+                                vs = Vnode.Status.CONNECT_FAILURE;
+                            } else if (info
+                                    .equalsIgnoreCase("VIR_DOMAIN_NOSTATE")) {
+                                // the domain has no state
+                                vs = Vnode.Status.UNKNOWN;
+                            } else if (info
+                                    .equalsIgnoreCase("VIR_DOMAIN_PAUSED")) {
+                                // the domain is paused by user
+                                vs = Vnode.Status.PAUSED;
+                            } else if (info
+                                    .equalsIgnoreCase("VIR_DOMAIN_RUNNING")) {
+                                // the domain is running
+                                vs = Vnode.Status.RUNNING;
+                            } else if (info
+                                    .equalsIgnoreCase("VIR_DOMAIN_SHUTDOWN")) {
+                                // the domain is being shut down
+                                vs = Vnode.Status.SHUTTING_DOWN;
+                            } else if (info
+                                    .equalsIgnoreCase("VIR_DOMAIN_SHUTOFF")) {
+                                // the domain is shut off
+                                vs = Vnode.Status.SHUT_OFF;
+                            }
+                            allStatus.put(uu, vs);
+                        }
+                        // NovaWorker.getInstance().closeConnectToKvm();
+                    }
+                }
                 // NovaWorker.getInstance().closeConnectToKvm();
 
             } catch (LibvirtException e) {

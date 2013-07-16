@@ -162,16 +162,7 @@ public class NovaWorker extends SimpleServer {
         this.registerHandler(ObtainSshKeysMessage.class,
                 new ObtainSshKeysHandler());
 
-        // Conf.setDefaultValue("worker.bind_host", "0.0.0.0");
-        // Conf.setDefaultValue("worker.bind_port", 4000);
-
         conn = null;
-
-        // try {
-        // conn = new Connect("qemu:///system", true);
-        // } catch (LibvirtException e) {
-        // logger.error("libvirt connection fail!", e);
-        // }
 
     }
 

@@ -62,8 +62,33 @@ public class WorkerQueryVnodeInfoMessageHandler implements
                                 vs = Vnode.Status.SHUT_OFF;
                             }
                         } else {
-                            // vs remains null
-                            log.error("no such uuid exists");
+                            dom = NovaWorker.getInstance()
+                                    .getConn("vstaros:///system", false)
+                                    .domainLookupByUUID(msg.getUuid());
+                            if (dom != null) {
+                                String info = dom.getInfo().state.toString();
+                                if (info.equalsIgnoreCase("VIR_DOMAIN_BLOCKED")) {
+                                    vs = Vnode.Status.PAUSED;
+                                } else if (info
+                                        .equalsIgnoreCase("VIR_DOMAIN_CRASHED")) {
+                                    vs = Vnode.Status.CONNECT_FAILURE;
+                                } else if (info
+                                        .equalsIgnoreCase("VIR_DOMAIN_NOSTATE")) {
+                                    vs = Vnode.Status.UNKNOWN;
+                                } else if (info
+                                        .equalsIgnoreCase("VIR_DOMAIN_PAUSED")) {
+                                    vs = Vnode.Status.PAUSED;
+                                } else if (info
+                                        .equalsIgnoreCase("VIR_DOMAIN_RUNNING")) {
+                                    vs = Vnode.Status.RUNNING;
+                                } else if (info
+                                        .equalsIgnoreCase("VIR_DOMAIN_SHUTDOWN")) {
+                                    vs = Vnode.Status.SHUTTING_DOWN;
+                                } else if (info
+                                        .equalsIgnoreCase("VIR_DOMAIN_SHUTOFF")) {
+                                    vs = Vnode.Status.SHUT_OFF;
+                                }
+                            }
                         }
                         // NovaWorker.getInstance().closeConnectToKvm();
                     } catch (LibvirtException e1) {

@@ -15,7 +15,6 @@ import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.ApplianceInfoMessage;
 import nova.master.api.messages.AppliancesFirstInstalledMessage;
 import nova.master.api.messages.CreateVclusterMessage;
-import nova.master.api.messages.CreateVnodeMessage;
 import nova.master.api.messages.DeletePnodeMessage;
 import nova.master.api.messages.DeleteVclusterMessage;
 import nova.master.api.messages.DeleteVnodeMessage;
@@ -79,12 +78,13 @@ public class MasterProxy extends SimpleProxy {
         super.sendRequest(new AddPnodeMessage(pAddr));
     }
 
-    public void sendCreateVnode(String vmImage, String vmName, int cpuCount,
-            int memorySize, String applianceList, int pnodeId, int ipOffset) {
-        super.sendRequest(new CreateVnodeMessage(vmImage, vmName, cpuCount,
-                memorySize, applianceList, pnodeId, ipOffset, null, true));
-    }
-
+    /*
+     * public void sendCreateVnode(String vmImage, String vmName, int cpuCount,
+     * int memorySize, String applianceList, int pnodeId, int ipOffset, String
+     * hypervisor) { super.sendRequest(new CreateVnodeMessage(vmImage, vmName,
+     * cpuCount, memorySize, applianceList, pnodeId, ipOffset, null, true,
+     * hypervisor)); }
+     */
     public void sendCreateVcluster(String vclusterName, int vclusterSize) {
         super.sendRequest(new CreateVclusterMessage(vclusterName, vclusterSize));
     }
