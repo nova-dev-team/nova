@@ -324,7 +324,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                     "vinstance_pnodeId" + i)
                                                     .split("-")[0]), i,
                                             queryMap.get("vcluster_name" + i),
-                                            false), null, null, null);
+                                            false, queryMap
+                                                    .get("vinstance_hypervisor"
+                                                            + i)), null, null,
+                                    null);
                         }
                     }
 
@@ -688,8 +691,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         pnode_id_list += pnd.getId() + ";";
                     }
 
-                    pnode_id_list = pnode_id_list.substring(0,
-                            pnode_id_list.length() - 1);
+                    if (!pnode_id_list.equals("")) {
+                        pnode_id_list = pnode_id_list.substring(0,
+                                pnode_id_list.length() - 1);
+                    }
+
                     values.put("pnode_monitor_show", pnode_monitor_show);
                     values.put("pnode_id_list", pnode_id_list);
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",

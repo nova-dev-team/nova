@@ -45,8 +45,10 @@
   					"<input class='span1' type='text' name='vinstance_name"+ i + "'>&nbsp;&nbsp;&nbsp;&nbsp;Memery Size: " +
   					"<input class='span1' type='text' name='vinstance_memsize"+ i + "'><br>&nbsp;&nbsp;&nbsp;&nbsp;CPU Num: " + 
   					"<select class='span1' name='vinstance_cpucount"+ i + "'><option value='1'>1</option><option value='2'>2</option>" +
-  					"<option value='3'>3</option><option value='4'>4</option></select> &nbsp;&nbsp;&nbsp;&nbsp;Os Image: " +
-  					"<select class='span2' name='vinstance_disk"+ i + "'> ${vdisk_list} </select> <br>&nbsp;&nbsp;&nbsp;&nbsp;Worker: " + 
+  					"<option value='3'>3</option><option value='4'>4</option></select> &nbsp;&nbsp;&nbsp;&nbsp;Hypervisor: " +
+  					"<select class='span1' name='vinstance_hypervisor"+ i + "'><option value='kvm'>kvm</option>" + 
+  					"<option value='vstaros'>vstaros</option></select><br>&nbsp;&nbsp;&nbsp;&nbsp;Os Image: " +
+  					"<select class='span2' name='vinstance_disk"+ i + "'> ${vdisk_list} </select> &nbsp;&nbsp;&nbsp;&nbsp;Worker: " + 
   					"<select class='span1' name='vinstance_pnodeId"+ i + "'> ${pnode_list} </select> &nbsp;&nbsp;&nbsp;&nbsp;Applications: " + 
   					"<input class='span2' type='text' name='vinstance_Apps"+ i + "'></td></tr></br></br>";
   			}
