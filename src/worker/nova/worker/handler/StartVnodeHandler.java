@@ -68,9 +68,11 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
         final String virtService;
         if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
             virtService = "qemu:///system";
-        } else {
+        } else if (msg.getHyperVisor().equalsIgnoreCase("vstaros")) {
             // TODO @shayf get correct xen service address
-            virtService = "some xen address";
+            virtService = "vstaros:///system";
+        } else {
+            virtService = "some xen";
         }
 
         if (msg.getWakeupOnly()) {

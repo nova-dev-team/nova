@@ -55,6 +55,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         vnode.setSoftList(msg.applianceList);
         vnode.setCdrom(msg.vmImage);
         vnode.setStatus(Vnode.Status.PREPARING);
+        vnode.setHypervisor(msg.hypervisor);
         System.out
                 .println("======================================================================================================");
         vnode.save();
@@ -86,8 +87,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         String subnetMask = Conf.getString("vnode.subnet_mask");
         String gateWay = Conf.getString("vnode.gateway_ip");
 
-        System.out.println("kvm " + msg.vmName + " " + vAddr + " "
-                + String.valueOf(msg.memorySize) + " "
+        System.out.println(msg.hypervisor + " " + msg.vmName + " " + vAddr
+                + " " + String.valueOf(msg.memorySize) + " "
                 + String.valueOf(msg.cpuCount) + " " + msg.vmImage + " " + true
                 + " " + apps + " " + ipAddr + " " + subnetMask + " " + gateWay);
         // copy a ssh pair
@@ -95,7 +96,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
             wp.sendObtainSshKeys(msg.vClusterName, msg.vmName);
         }
 
-        wp.sendStartVnode("kvm", msg.vmName, vAddr,
+        wp.sendStartVnode(msg.hypervisor, msg.vmName, vAddr,
                 String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
                 msg.vmImage, true, apps, ipAddr, subnetMask, gateWay,
                 String.valueOf(vnode.getId()));
