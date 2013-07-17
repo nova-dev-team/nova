@@ -730,11 +730,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     // start a vnode
                     String tt = Kvm.emitDomain(msg.getHashMap());
                     System.out.println(tt);
+                    System.out.println(virtService);
+
                     Domain testDomain = NovaWorker.getInstance()
-                            .getConn(virtService, false)
-                            .domainCreateLinux(tt, 0);
+                            .getConn(virtService, false).domainDefineXML(tt);
 
                     if (testDomain != null) {
+                        testDomain.create();
                         VnodeStatusDaemon.putStatus(
                                 UUID.fromString(testDomain.getUUIDString()),
                                 Vnode.Status.PREPARING);

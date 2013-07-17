@@ -62,12 +62,12 @@ public class NovaWorker extends SimpleServer {
             new VdiskPoolDaemon(), new PnodeStatusDaemon() };
 
     private Connect conn;
+    private Connect kvm_conn;
+    private Connect vs_conn;
 
     public Connect getConn(String virtService, boolean b)
             throws LibvirtException {
-        if (conn == null) {
-            connectToKvm(virtService, b);
-        }
+        connectToKvm(virtService, b);
         return conn;
     }
 
@@ -77,9 +77,21 @@ public class NovaWorker extends SimpleServer {
 
     private void connectToKvm(String virtService, boolean b)
             throws LibvirtException {
-        if (conn == null) {
-            conn = new Connect(virtService, b);
+        if (virtService.indexOf("qemu") >= 0) {
+            if (kvm_conn == null) {
+                kvm_conn = new Connect(virtService, b);
+                System.out.println("..........new connect qemu");
+            }
+            conn = kvm_conn;
         }
+        if (virtService.indexOf("vstaros") >= 0) {
+            if (vs_conn == null) {
+                vs_conn = new Connect(virtService, b);
+                System.out.println("..........new connect vs");
+            }
+            conn = vs_conn;
+        }
+
     }
 
     public void closeConnToKvm() throws LibvirtException {
