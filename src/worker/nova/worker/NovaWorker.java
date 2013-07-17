@@ -61,9 +61,9 @@ public class NovaWorker extends SimpleServer {
             new WorkerPerfInfoDaemon(), new VnodeStatusDaemon(),
             new VdiskPoolDaemon(), new PnodeStatusDaemon() };
 
-    private Connect conn;
-    private Connect kvm_conn;
-    private Connect vs_conn;
+    private Connect conn = null;
+    private Connect kvm_conn = null;
+    private Connect vs_conn = null;
 
     public Connect getConn(String virtService, boolean b)
             throws LibvirtException {
