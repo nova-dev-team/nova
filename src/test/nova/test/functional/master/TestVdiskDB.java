@@ -20,6 +20,17 @@ public class TestVdiskDB extends TestCase {
 
         vdisk.save();
 
+        vdisk = new Vdisk();
+        vdisk.setFileName("xp");
+        vdisk.setDisplayName("xp");
+        vdisk.setDiskFormat("img");
+        vdisk.setOsFamily("windows");
+        vdisk.setDescription("XP Image");
+        vdisk.setOsName("XP");
+        vdisk.setSoftList("Vim,Eclipse,JDC");
+
+        vdisk.save();
+
         Vdisk vdiskRead = Vdisk.findById(vdisk.getId());
         System.out.print("\n\nFileName: " + vdiskRead.getFileName()
                 + "\nDisplayName: " + vdiskRead.getDisplayName()

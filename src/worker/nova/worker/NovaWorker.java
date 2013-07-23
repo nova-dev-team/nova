@@ -64,10 +64,17 @@ public class NovaWorker extends SimpleServer {
     private Connect conn = null;
     private Connect kvm_conn = null;
     private Connect vs_conn = null;
+    private Connect xen_conn = null;
 
     public Connect getConn(String virtService, boolean b)
             throws LibvirtException {
-        connectToKvm(virtService, b);
+        String hyper = Conf.getString("hypervisor.engine").trim();
+        if (hyper.indexOf("kvm") >= 0)
+            connectToKvm(virtService, b);
+        if (hyper.indexOf("vstaros") >= 0)
+            connectToVstaros(virtService, b);
+        if (hyper.indexOf("xen") >= 0)
+            connectToXen(virtService, b);
         return conn;
     }
 
@@ -84,6 +91,24 @@ public class NovaWorker extends SimpleServer {
             }
             conn = kvm_conn;
         }
+
+    }
+
+    private void connectToXen(String virtService, boolean b)
+            throws LibvirtException {
+        if (virtService.indexOf("xen") >= 0) {
+            if (xen_conn == null) {
+                xen_conn = new Connect(virtService, b);
+                System.out.println("..........new connect xen");
+            }
+            conn = xen_conn;
+        }
+
+    }
+
+    private void connectToVstaros(String virtService, boolean b)
+            throws LibvirtException {
+
         if (virtService.indexOf("vstaros") >= 0) {
             if (vs_conn == null) {
                 vs_conn = new Connect(virtService, b);
@@ -95,8 +120,20 @@ public class NovaWorker extends SimpleServer {
     }
 
     public void closeConnToKvm() throws LibvirtException {
-        if (conn != null) {
-            conn.close();
+        if (kvm_conn != null) {
+            kvm_conn.close();
+        }
+    }
+
+    public void closeConnToVstaros() throws LibvirtException {
+        if (vs_conn != null) {
+            vs_conn.close();
+        }
+    }
+
+    public void closeConnToXen() throws LibvirtException {
+        if (xen_conn != null) {
+            xen_conn.close();
         }
     }
 

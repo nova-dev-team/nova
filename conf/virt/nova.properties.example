@@ -44,6 +44,11 @@ fix_vnc_mouse_pointer=true
 
 
 ##########################
+# hypervisor conifg section #
+##########################
+hypervisor.engine=kvm,vstaros
+
+##########################
 # storage conifg section #
 ##########################
 
