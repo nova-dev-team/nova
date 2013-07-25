@@ -728,12 +728,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 try {
 
                     // start a vnode
-                    String tt = Kvm.emitDomain(msg.getHashMap());
-                    System.out.println(tt);
+                    String xmlDes = Kvm.emitDomain(msg.getHashMap());
+                    System.out.println(xmlDes);
                     System.out.println(virtService);
 
                     Domain testDomain = NovaWorker.getInstance()
-                            .getConn(virtService, false).domainDefineXML(tt);
+                            .getConn(virtService, false)
+                            .domainDefineXML(xmlDes);
 
                     if (testDomain != null) {
                         testDomain.create();
@@ -761,10 +762,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             .parseInt(Utils.WORKER_VNC_MAP.get(testDomain
                                     .getUUIDString())), testDomain
                             .getUUIDString());
-                    // Domain testDomain = conn.domainLookupByName("test");
-                    // System.out.println("xml desc\n" +
-                    // testDomain.getXMLDesc(0));
-                    // NovaWorker.getInstance().closeConnectToKvm();
                 } catch (LibvirtException ex) {
                     log.error("Create domain failed", ex);
                 }
