@@ -53,6 +53,7 @@ public class NovaWorker extends SimpleServer {
 
     SimpleAddress addr = new SimpleAddress(Conf.getString("worker.bind_host"),
             Conf.getInteger("worker.bind_port"));
+    public static SimpleAddress masteraddr = null;
 
     /**
      * All background working daemons for worker node.

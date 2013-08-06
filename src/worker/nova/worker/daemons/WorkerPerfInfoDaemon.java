@@ -26,7 +26,12 @@ public class WorkerPerfInfoDaemon extends SimpleDaemon {
         if (this.isStopping() == false) {
             MasterProxy master = NovaWorker.getInstance().getMaster();
             if (master != null) {
-                master.sendPnodeMonitorInfo();
+                if (master.isConnected() == false
+                        && NovaWorker.masteraddr != null) {
+                    NovaWorker.getInstance().registerMaster(
+                            NovaWorker.masteraddr);
+                }
+                NovaWorker.getInstance().getMaster().sendPnodeMonitorInfo();
             }
         }
     }

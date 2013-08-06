@@ -106,6 +106,10 @@ public abstract class SimpleProxy extends SimpleChannelHandler {
         this.factory.releaseExternalResources();
     }
 
+    public boolean isConnected() {
+        return this.channel.getChannel().isConnected();
+    }
+
     protected final void sendRequest(Object req) {
         Xpacket packet = Xpacket.createPacket(req.getClass().getName(), req,
                 this.replyAddr);

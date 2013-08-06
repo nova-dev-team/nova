@@ -17,8 +17,14 @@ public class PnodeStatusDaemon extends SimpleDaemon {
     protected void workOneRound() {
         MasterProxy master = NovaWorker.getInstance().getMaster();
         if (master != null) {
-            master.sendPnodeStatus(NovaWorker.getInstance().getAddr(),
-                    Pnode.Status.RUNNING);
+            if (master.isConnected() == false && NovaWorker.masteraddr != null) {
+                NovaWorker.getInstance().registerMaster(NovaWorker.masteraddr);
+            }
+            NovaWorker
+                    .getInstance()
+                    .getMaster()
+                    .sendPnodeStatus(NovaWorker.getInstance().getAddr(),
+                            Pnode.Status.RUNNING);
         }
     }
 

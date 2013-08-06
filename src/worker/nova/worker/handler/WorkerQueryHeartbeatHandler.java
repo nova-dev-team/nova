@@ -14,7 +14,9 @@ public class WorkerQueryHeartbeatHandler implements
     @Override
     public void handleMessage(QueryHeartbeatMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-        if (NovaWorker.getInstance().getMaster() == null) {
+        NovaWorker.masteraddr = xreply;
+        if (NovaWorker.getInstance().getMaster() == null
+                || NovaWorker.getInstance().getMaster().isConnected() == false) {
             NovaWorker.getInstance().registerMaster(xreply);
         }
         NovaWorker.getInstance().getMaster().sendPnodeHeartbeat();

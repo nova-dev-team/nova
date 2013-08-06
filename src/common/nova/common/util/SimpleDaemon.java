@@ -1,5 +1,7 @@
 package nova.common.util;
 
+import java.nio.channels.ClosedChannelException;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -85,6 +87,8 @@ public abstract class SimpleDaemon extends Thread {
      * interval. This function MUST return in limited time! And your
      * implementation should check the result of isStopping(), and return as
      * soon as it gives a "true" result.
+     * 
+     * @throws ClosedChannelException
      */
     abstract protected void workOneRound();
 
