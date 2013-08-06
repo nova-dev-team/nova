@@ -29,7 +29,6 @@ public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
     @Override
     public void handleMessage(PnodePerfMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
-        // TODO @zhaoxun get pair of uuid/rrdPath from database
 
         Pnode pnode = Pnode.findByIp(xreply.ip);
         if (pnode != null) {
