@@ -97,7 +97,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
         } else {
             msg.setUuid(UUID.randomUUID().toString());
             msg.setRunAgent(false);
-            if ((msg.getMemSize() != null) && (!msg.getMemSize().equals(""))) {
+            if ((msg.getMemSize() == null)
+                    || (msg.getMemSize().trim().equals(""))) {
                 msg.setMemSize("512000");
             }
 
