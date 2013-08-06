@@ -228,7 +228,8 @@ public class NovaMaster extends SimpleServer {
     }
 
     public WorkerProxy getWorkerProxy(final SimpleAddress pAddr) {
-        if (workerProxyPool.get(pAddr) == null) {
+        if (workerProxyPool.get(pAddr) == null
+                || workerProxyPool.get(pAddr).isConnected() == false) {
             WorkerProxy wp = new WorkerProxy(this.addr) {
 
                 @Override
@@ -251,6 +252,7 @@ public class NovaMaster extends SimpleServer {
             wp.connect(new InetSocketAddress(pAddr.getIp(), pAddr.getPort()));
             workerProxyPool.put(pAddr, wp);
         }
+
         return workerProxyPool.get(pAddr);
     }
 
