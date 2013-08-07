@@ -24,7 +24,6 @@ docs/
 payload/
 run/
 *.rrd
-*.png
 *.db
 *.log
 data/
