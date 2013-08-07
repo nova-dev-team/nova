@@ -110,7 +110,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
             if ((msg.getArch() == null)
                     || msg.getArch().trim().equalsIgnoreCase("")) {
-                msg.setArch("i686");
+                msg.setArch("x86_64");
             }
 
             String stdImgFile = "small.img";
@@ -480,7 +480,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             + " -f qcow2 "
                             + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
                                     strWorkerIP + "_" + msg.getName(),
-                                    stdImgFile + " 20G");
+                                    stdImgFile + " 100G");
                     System.out
                             .println("pNFS___________________________________________________________________-: "
                                     + cmdofincrtlnfs);

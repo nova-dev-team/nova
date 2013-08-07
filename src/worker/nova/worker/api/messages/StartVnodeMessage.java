@@ -34,6 +34,7 @@ public class StartVnodeMessage {
         this.subnetMask = subnetMask;
         this.gateWay = gateWay;
         this.uuid = vnodeID;
+        this.arch = "x86_64";
     }
 
     public StartVnodeMessage(String hyperVisor, boolean wakeupOnly,

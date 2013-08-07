@@ -2,7 +2,6 @@ package nova.master.handler;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
-import nova.common.util.Conf;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Vnode;
 
@@ -24,9 +23,11 @@ public class VnodeStatusHandler implements SimpleHandler<VnodeStatusMessage> {
         // @zhaoxun Save update into database
         Vnode vnode = Vnode.findByIp(msg.vnodeIp);
         if (vnode == null) {
-            vnode = new Vnode();
-            vnode.setAddr(new SimpleAddress(msg.vnodeIp, Conf
-                    .getInteger("worker.bind_port")));
+            return;
+            /*
+             * vnode = new Vnode(); vnode.setAddr(new SimpleAddress(msg.vnodeIp,
+             * Conf .getInteger("worker.bind_port")));
+             */
         }
         vnode.setUuid(msg.uuid);
         vnode.setStatus(msg.status);

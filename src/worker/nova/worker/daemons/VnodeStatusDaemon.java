@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 import nova.master.models.Vnode;
@@ -46,19 +47,16 @@ public class VnodeStatusDaemon extends SimpleDaemon {
     protected void workOneRound() {
         // TODO @shayf report actual vnodes status to master
         synchronized (NovaWorker.getInstance().getConnLock()) {
+            String hyper = Conf.getString("hypervisor.engine").trim();
             try {
-                if (NovaWorker.getInstance().getConn("qemu:///system", false)
-                        .numOfDomains() > 0) {
-                    // System.out.println("numofdomains\t"
-                    // + Integer.toString(NovaWorker.getInstance()
-                    // .getConn("qemu:///system", false)
-                    // .numOfDomains()));
-                    int[] ids = NovaWorker.getInstance()
-                            .getConn("qemu:///system", false).listDomains();
-                    for (int i = 0; i < ids.length; i++) {
+                if (hyper.indexOf("kvm") >= 0) {
+                    String[] strs = NovaWorker.getInstance()
+                            .getConn("qemu:///system", false)
+                            .listDefinedDomains();
+                    for (int i = 0; i < strs.length; i++) {
                         Domain dom = NovaWorker.getInstance()
                                 .getConn("qemu:///system", false)
-                                .domainLookupByID(ids[i]);
+                                .domainLookupByName(strs[i]);
                         if (dom != null) {
                             UUID uu = UUID.fromString(dom.getUUIDString());
                             String info = dom.getInfo().state.toString();
@@ -102,14 +100,14 @@ public class VnodeStatusDaemon extends SimpleDaemon {
                         // NovaWorker.getInstance().closeConnectToKvm();
                     }
                 }
-                if (NovaWorker.getInstance()
-                        .getConn("vstaros:///system", false).numOfDomains() > 0) {
-                    int[] ids = NovaWorker.getInstance()
-                            .getConn("vstaros:///system", false).listDomains();
-                    for (int i = 0; i < ids.length; i++) {
+                if (hyper.indexOf("vstaros") >= 0) {
+                    String[] strs = NovaWorker.getInstance()
+                            .getConn("vstaros:///system", false)
+                            .listDefinedDomains();
+                    for (int i = 0; i < strs.length; i++) {
                         Domain dom = NovaWorker.getInstance()
                                 .getConn("vstaros:///system", false)
-                                .domainLookupByID(ids[i]);
+                                .domainLookupByName(strs[i]);
                         if (dom != null) {
                             UUID uu = UUID.fromString(dom.getUUIDString());
                             String info = dom.getInfo().state.toString();
