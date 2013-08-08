@@ -149,7 +149,7 @@ public class Vnode extends DbObject {
     private String migrateTo;
 
     private String name;
-    private Integer pnodeId;
+    Integer pnodeId;
     /**
      * If the vnode is in a pool, this is set to the pool.
      */

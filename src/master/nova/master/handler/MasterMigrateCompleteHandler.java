@@ -138,7 +138,7 @@ public class MasterMigrateCompleteHandler implements
                 String.valueOf(masterPort));
         vnode.setStatus(Vnode.Status.RUNNING);
         Pnode dstpnode = Pnode.findByIp(msg.dstPnodeIP);
-        vnode.setPmachineId(dstpnode.getPnodeId());
+        vnode.setPmachineId((int) dstpnode.getId());
         vnode.save();
     }
 
