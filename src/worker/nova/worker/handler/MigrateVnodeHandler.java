@@ -38,6 +38,11 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 
             dconn = new Connect("qemu+ssh://" + msg.migrateToAddr.getIp()
                     + "/system");
+            if (dconn.isConnected() == false) {
+                log.error("connect to dst " + msg.migrateToAddr.getIp()
+                        + " qemu failed!");
+                return;
+            }
             // eagle--end
 
             // TODO @shayf

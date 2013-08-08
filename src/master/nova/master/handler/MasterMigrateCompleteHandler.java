@@ -11,6 +11,7 @@ import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.messages.MasterMigrateCompleteMessage;
+import nova.master.models.Pnode;
 import nova.master.models.Vnode;
 import nova.worker.models.StreamGobbler;
 
@@ -129,9 +130,6 @@ public class MasterMigrateCompleteHandler implements
         // TODO Auto-generated method stub
 
         Vnode vnode = Vnode.findByUuid(msg.migrateUuid);
-        // Migration migration = Migration.findVnodeId(vnode.getId());
-        // Migration.delete(migration);
-        // ???
         String masterIP = Conf.getString("master.bind_host");
         int masterPort = getFreePort();
         portMP(masterIP, masterPort, msg.dstPnodeIP,
@@ -139,6 +137,8 @@ public class MasterMigrateCompleteHandler implements
         Utils.MASTER_VNC_MAP.put(String.valueOf(vnode.getId()),
                 String.valueOf(masterPort));
         vnode.setStatus(Vnode.Status.RUNNING);
+        Pnode dstpnode = Pnode.findByIp(msg.dstPnodeIP);
+        vnode.setPmachineId(dstpnode.getPnodeId());
         vnode.save();
     }
 
