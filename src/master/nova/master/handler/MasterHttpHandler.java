@@ -24,6 +24,7 @@ import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.api.messages.MasterMigrateVnodeMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.ResumeVnodeMessage;
+import nova.master.api.messages.StartVnodeMessage;
 import nova.master.api.messages.StopVnodeMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Appliance;
@@ -256,7 +257,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         || act.equals("delete_vnode")
                         || act.equals("add_cluster")
                         || act.equals("delete_cluster")
-                        || act.equals("migration")) {
+                        || act.equals("migration") || act.equals("pause_vnode")
+                        || act.equals("shutdown_vnode")
+                        || act.equals("wakeup_vnode")
+                        || act.equals("start_vnode")) {
 
                     if (act.equals("add_vnode")) {
                         new CreateVnodeHandler()
@@ -277,17 +281,26 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                 true,
                                                 queryMap.get("vnode_hypervisor")),
                                         null, null, null);
-                    }
-
-                    else if (act.equals("wakeup_vnode")) {
+                    } else if (act.equals("start_vnode")) {
 
                         Vnode start_vnode = Vnode.findById(Long
                                 .parseLong(queryMap.get("vnode_id")));
 
+                        new StartVnodeHandler().handleMessage(
+                                new StartVnodeMessage(start_vnode.getUuid()),
+                                null, null, null);
+
+                    }
+
+                    else if (act.equals("wakeup_vnode")) {
+
+                        Vnode wakeup_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
+
                         new ResumeVnodeHandler().handleMessage(
-                                new ResumeVnodeMessage(start_vnode
-                                        .getPmachineId(), start_vnode.getId(),
-                                        start_vnode.getHypervisor()), null,
+                                new ResumeVnodeMessage(wakeup_vnode
+                                        .getPmachineId(), wakeup_vnode.getId(),
+                                        wakeup_vnode.getHypervisor()), null,
                                 null, null);
 
                     }
@@ -412,6 +425,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "<li><a href='#Migration_Modal' onclick='migration_process("
                                 + vnode.getId() + ")" + "'>Migrate</a></li>"
                                 + "<li><a href='start_vnode?vnode_id="
+                                + vnode.getId() + "'>Start</a></li>"
+                                + "<li><a href='wakeup_vnode?vnode_id="
                                 + vnode.getId() + "'>Wakeup</a></li>"
                                 + "<li><a href='pause_vnode?vnode_id="
                                 + vnode.getId() + "'>Pause</a></li>"

@@ -1,11 +1,7 @@
 package nova.worker.handler;
 
-import java.net.InetSocketAddress;
-
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
-import nova.common.util.Conf;
-import nova.master.api.MasterProxy;
 import nova.worker.NovaWorker;
 import nova.worker.api.messages.MigrateVnodeMessage;
 
@@ -34,16 +30,11 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
         // TODO @shayf finish migration
         Connect dconn = null;
         try {
-            // Todo @shayf synchronized (NovaWorker.getInstance().connLock)
-            // blabla
-            // dconn = new Connect("qemu+ssh://username:passwd@ip:port/system",
-            // true);
-            // add by eagle
-            MasterProxy master = new MasterProxy(new SimpleAddress(
-                    Conf.getString("worker.bind_host"), 4101));
-            master.connect(new InetSocketAddress(Conf
-                    .getString("master.bind_host"), Conf
-                    .getInteger("master.bind_port")));
+            NovaWorker.masteraddr = xreply;
+            if (NovaWorker.getInstance().getMaster() == null
+                    || NovaWorker.getInstance().getMaster().isConnected() == false) {
+                NovaWorker.getInstance().registerMaster(xreply);
+            }
 
             dconn = new Connect("qemu+ssh://" + msg.migrateToAddr.getIp()
                     + "/system");
@@ -60,10 +51,11 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             String strXML = dstDomain.getXMLDesc(0);
             int vncpos = strXML.indexOf("graphics type='vnc' port='");
             String strPort = strXML.substring(vncpos + 26, vncpos + 30);
-            if (master != null) {
-                master.sendMigrateComplete(msg.vnodeUuid,
-                        msg.migrateToAddr.getIp(), strPort);
-            }
+            NovaWorker
+                    .getInstance()
+                    .getMaster()
+                    .sendMigrateComplete(msg.vnodeUuid,
+                            msg.migrateToAddr.getIp(), strPort);
             System.out.println(strPort);
         } catch (LibvirtException e1) {
             log.error("migrate error, maybe caused by libvirt ", e1);
