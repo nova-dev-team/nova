@@ -33,7 +33,8 @@ public class DeleteVnodeHandler implements SimpleHandler<DeleteVnodeMessage> {
             wp.connect(new InetSocketAddress(Pnode.findById(
                     vnode.getPmachineId()).getIp(), Pnode.findById(
                     vnode.getPmachineId()).getPort()));
-            wp.sendStopVnode("kvm", vnode.getUuid(), false);
+            wp.sendStopVnode(vnode.getHypervisor(), vnode.getUuid(), false,
+                    true);
             log.info("Delete vnode: " + vnode.getName());
             Vnode.delete(vnode);
         } else {

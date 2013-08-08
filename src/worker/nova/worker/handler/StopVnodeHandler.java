@@ -58,10 +58,14 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                         Vnode.Status.SHUTTING_DOWN);
                 dom.destroy();
-                VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
-                        Vnode.Status.SHUT_OFF);
-                NovaWorker.getInstance().getVnodeIP()
-                        .remove(UUID.fromString(msg.getUuid()));
+                if (msg.delvm)
+                    dom.undefine();
+                else {
+                    VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
+                            Vnode.Status.SHUT_OFF);
+                    NovaWorker.getInstance().getVnodeIP()
+                            .remove(UUID.fromString(msg.getUuid()));
+                }
 
             } else {
                 dom.suspend();

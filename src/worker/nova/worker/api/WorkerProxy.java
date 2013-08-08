@@ -88,9 +88,9 @@ public class WorkerProxy extends SimpleProxy {
      *            uuid of vm to shut down
      */
     public void sendStopVnode(String hyperVisor, String uuid,
-            boolean suspendonly) {
+            boolean suspendonly, boolean delvm) {
         super.sendRequest(new StopVnodeMessage("-1", hyperVisor, uuid,
-                suspendonly));
+                suspendonly, delvm));
     }
 
     /**

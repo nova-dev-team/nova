@@ -32,6 +32,6 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
         Pnode pnode = Pnode.findById(Integer.parseInt(msg.pnodid));
         wp.connect(new InetSocketAddress(pnode.getIp(), Conf
                 .getInteger("worker.bind_port")));
-        wp.sendStopVnode(msg.hyperVisor, msg.uuid, msg.suspendOnly);
+        wp.sendStopVnode(msg.hyperVisor, msg.uuid, msg.suspendOnly, false);
     }
 }
