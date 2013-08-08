@@ -23,6 +23,8 @@ import nova.master.api.messages.DeleteVclusterMessage;
 import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.api.messages.MasterMigrateVnodeMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
+import nova.master.api.messages.ResumeVnodeMessage;
+import nova.master.api.messages.StopVnodeMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Appliance;
 import nova.master.models.Pnode;
@@ -277,6 +279,43 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                         null, null, null);
                     }
 
+                    else if (act.equals("wakeup_vnode")) {
+
+                        Vnode start_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
+
+                        new ResumeVnodeHandler().handleMessage(
+                                new ResumeVnodeMessage(start_vnode
+                                        .getPmachineId(), start_vnode.getId(),
+                                        start_vnode.getHypervisor()), null,
+                                null, null);
+
+                    }
+
+                    else if (act.equals("pause_vnode")) {
+                        Vnode shutdown_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
+
+                        new StopVnodeHandler().handleMessage(
+                                new StopVnodeMessage(shutdown_vnode
+                                        .getHypervisor(), shutdown_vnode
+                                        .getId(), true, shutdown_vnode
+                                        .getPmachineId().toString()), null,
+                                null, null);
+                    }
+
+                    else if (act.equals("shutdown_vnode")) {
+                        Vnode shutdown_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
+
+                        new StopVnodeHandler().handleMessage(
+                                new StopVnodeMessage(shutdown_vnode
+                                        .getHypervisor(), shutdown_vnode
+                                        .getId(), false, shutdown_vnode
+                                        .getPmachineId().toString()), null,
+                                null, null);
+                    }
+
                     else if (act.equals("delete_vnode")) {
                         new DeleteVnodeHandler().handleMessage(
                                 new DeleteVnodeMessage(Integer
@@ -372,7 +411,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + "'>View</a></li>"
                                 + "<li><a href='#Migration_Modal' onclick='migration_process("
                                 + vnode.getId() + ")" + "'>Migrate</a></li>"
-                                + "<li><a href='wakeup_vnode?vnode_id="
+                                + "<li><a href='start_vnode?vnode_id="
                                 + vnode.getId() + "'>Wakeup</a></li>"
                                 + "<li><a href='pause_vnode?vnode_id="
                                 + vnode.getId() + "'>Pause</a></li>"
