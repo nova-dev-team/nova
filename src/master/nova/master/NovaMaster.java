@@ -27,6 +27,7 @@ import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
+import nova.master.daemons.RemoveEmptyVClusterDaemon;
 import nova.master.handler.AddPnodeHandler;
 import nova.master.handler.ApplicancesFirstInstalledHandler;
 import nova.master.handler.CreateVclusterHandler;
@@ -70,7 +71,8 @@ public class NovaMaster extends SimpleServer {
     /**
      * All background working daemons for master node.
      */
-    SimpleDaemon daemons[] = { new PnodeCheckerDaemon() };
+    SimpleDaemon daemons[] = { new PnodeCheckerDaemon(),
+            new RemoveEmptyVClusterDaemon() };
 
     HashMap<SimpleAddress, WorkerProxy> workerProxyPool = new HashMap<SimpleAddress, WorkerProxy>();
 

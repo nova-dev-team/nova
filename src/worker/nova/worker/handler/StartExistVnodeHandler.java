@@ -1,7 +1,5 @@
 package nova.worker.handler;
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
@@ -21,23 +19,6 @@ import org.libvirt.LibvirtException;
 public class StartExistVnodeHandler implements
         SimpleHandler<StartExistVnodeMessage> {
     Logger log = Logger.getLogger(StartVnodeHandler.class);
-
-    public static int getFreePort() {
-        ServerSocket s = null;
-        int MINPORT = 5901;
-        int MAXPORT = 6900;
-        for (; MINPORT < MAXPORT; MINPORT++) {
-            try {
-                s = new ServerSocket(MINPORT);
-                s.close();
-                return MINPORT;
-            } catch (IOException e) {
-                continue;
-            }
-        }
-        return -1;
-
-    }
 
     @Override
     public void handleMessage(StartExistVnodeMessage msg,
@@ -72,7 +53,7 @@ public class StartExistVnodeHandler implements
             }
             String xml = dom.getXMLDesc(0);
             dom.undefine();
-            int vncport = getFreePort();
+            int vncport = Utils.getFreePort();
             String prexml = xml.substring(0, xml.indexOf("type='vnc' port="))
                     + "type='vnc' port='";
             String talxml = xml

@@ -5,6 +5,7 @@ import java.util.List;
 import nova.common.util.SimpleDaemon;
 import nova.master.NovaMaster;
 import nova.master.models.Pnode;
+import nova.master.models.Vnode;
 import nova.worker.api.WorkerProxy;
 
 import org.apache.log4j.Logger;
@@ -21,6 +22,10 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
      * Log4j logger.
      */
     Logger logger = Logger.getLogger(PnodeCheckerDaemon.class);
+
+    public PnodeCheckerDaemon() {
+        super(2000);
+    }
 
     /**
      * do work, one round
@@ -62,7 +67,21 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
 
                 // connection failure could not be detected here, but will be
                 // dected in worker proxy's exceptionCaught() handler.
-                wp.sendRequestHeartbeat();
+                if (wp.isConnected())
+                    wp.sendRequestHeartbeat();
+                else {
+                    pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
+                    pnode.updateLastReqTime();
+                    pnode.save();
+
+                    List<Vnode> allvnodes = Vnode.all();
+                    for (Vnode vnode : allvnodes) {
+                        if (vnode.getPmachineId() == pnode.getId()) {
+                            vnode.setStatus(Vnode.Status.CONNECT_FAILURE);
+                            vnode.save();
+                        }
+                    }
+                }
 
             } catch (Exception e) {
                 logger.error("Error on pnode " + pnode, e);
