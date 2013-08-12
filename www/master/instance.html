@@ -12,6 +12,7 @@
   <script src="js/bootstrap-dropdown.js"></script>
   
   <script language="javascript">
+         
   	function migration_process(vnode_id)
   	{
   		$("#Migration_Modal").modal('show');
@@ -184,6 +185,7 @@
 					<div class="controls">
 						<select class="span2" name="vnode_pnodeId">
 			                ${pnode_list}
+			                <option>auto</option>
 			             </select>
 					</div>
 				</div>
@@ -351,6 +353,8 @@
 
   </div>
   <!-- container --> 
+  
+  <script> ${create_instance_error} </script>
 
 </body>
 </html>

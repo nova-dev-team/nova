@@ -264,25 +264,58 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         || act.equals("start_vnode")) {
 
                     if (act.equals("add_vnode")) {
-                        new CreateVnodeHandler()
-                                .handleMessage(
-                                        new CreateVnodeMessage(
-                                                queryMap.get("vnode_disk"),
-                                                queryMap.get("vnode_name"),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_cpucount")),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_memsize")),
-                                                null,
-                                                Integer.parseInt(queryMap.get(
-                                                        "vnode_pnodeId").split(
-                                                        "-")[0]),
-                                                0,
-                                                null,
-                                                true,
-                                                queryMap.get("vnode_hypervisor")),
-                                        null, null, null);
-                    } else if (act.equals("start_vnode")) {
+
+                        String pnode_id = queryMap.get("vnode_pnodeId");
+
+                        // pnode choose a detail pnode or auto
+                        if (pnode_id.equals("auto")) {
+                            ChooseBestPnodeHandler handler = new ChooseBestPnodeHandler();
+                            handler.handleMessage(null, null, null, null);
+                            if (handler.pnodeid != -1) {
+                                pnode_id = String.valueOf(handler.pnodeid);
+                                new CreateVnodeHandler()
+                                        .handleMessage(
+                                                new CreateVnodeMessage(
+                                                        queryMap.get("vnode_disk"),
+                                                        queryMap.get("vnode_name"),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_cpucount")),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_memsize")),
+                                                        null,
+                                                        Integer.parseInt(pnode_id),
+                                                        0,
+                                                        null,
+                                                        true,
+                                                        queryMap.get("vnode_hypervisor")),
+                                                null, null, null);
+                            }
+
+                            else {
+                                String create_instance_error = "alert('Please add physic machine first!')";
+                                values.put("create_instance_error",
+                                        create_instance_error);
+                            }
+                        } else {
+                            pnode_id = queryMap.get("vnode_pnodeId").split("-")[0];
+
+                            new CreateVnodeHandler().handleMessage(
+                                    new CreateVnodeMessage(queryMap
+                                            .get("vnode_disk"), queryMap
+                                            .get("vnode_name"), Integer
+                                            .parseInt(queryMap
+                                                    .get("vnode_cpucount")),
+                                            Integer.parseInt(queryMap
+                                                    .get("vnode_memsize")),
+                                            null, Integer.parseInt(pnode_id),
+                                            0, null, true, queryMap
+                                                    .get("vnode_hypervisor")),
+                                    null, null, null);
+                        }
+
+                    }
+
+                    else if (act.equals("start_vnode")) {
 
                         Vnode start_vnode = Vnode.findById(Long
                                 .parseLong(queryMap.get("vnode_id")));
