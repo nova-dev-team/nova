@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.util.HashMap;
 
 import nova.common.util.Conf;
@@ -25,23 +24,6 @@ public class Kvm {
      * Log4j logger.
      */
     static Logger log = Logger.getLogger(Kvm.class);
-
-    public static int getFreePort() {
-        ServerSocket s = null;
-        int MINPORT = 5901;
-        int MAXPORT = 6900;
-        for (; MINPORT < MAXPORT; MINPORT++) {
-            try {
-                s = new ServerSocket(MINPORT);
-                s.close();
-                return MINPORT;
-            } catch (IOException e) {
-                continue;
-            }
-        }
-        return -1;
-
-    }
 
     /**
      * Emit libvirt domain definitions.
@@ -169,7 +151,7 @@ public class Kvm {
         // + params.get("macAddress").toString() + "'/>"
         // + "</interface>");
         // }
-        String strVNCPort = String.valueOf(getFreePort());
+        String strVNCPort = String.valueOf(Utils.getFreePort());
         String ss = params.get("uuid").toString();
         System.out.println(ss);
         Utils.WORKER_VNC_MAP.put(params.get("uuid").toString(), strVNCPort);

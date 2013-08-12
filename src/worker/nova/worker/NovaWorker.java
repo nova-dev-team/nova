@@ -18,6 +18,7 @@ import nova.worker.api.messages.ObtainSshKeysMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
+import nova.worker.api.messages.StartExistVnodeMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.api.messages.StopVnodeMessage;
 import nova.worker.daemons.VdiskPoolDaemon;
@@ -28,6 +29,7 @@ import nova.worker.handler.InstallApplianceHandler;
 import nova.worker.handler.MigrateVnodeHandler;
 import nova.worker.handler.ObtainSshKeysHandler;
 import nova.worker.handler.RevokeImageHandler;
+import nova.worker.handler.StartExistVnodeHandler;
 import nova.worker.handler.StartVnodeHandler;
 import nova.worker.handler.StopVnodeHandler;
 import nova.worker.handler.WorkerHttpHandler;
@@ -210,6 +212,9 @@ public class NovaWorker extends SimpleServer {
 
         this.registerHandler(ObtainSshKeysMessage.class,
                 new ObtainSshKeysHandler());
+
+        this.registerHandler(StartExistVnodeMessage.class,
+                new StartExistVnodeHandler());
 
         conn = null;
 

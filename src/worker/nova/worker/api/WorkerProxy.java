@@ -11,6 +11,7 @@ import nova.worker.api.messages.ObtainSshKeysMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
+import nova.worker.api.messages.StartExistVnodeMessage;
 import nova.worker.api.messages.StartVnodeMessage;
 import nova.worker.api.messages.StopVnodeMessage;
 
@@ -66,6 +67,10 @@ public class WorkerProxy extends SimpleProxy {
                 subnetMask, gateWay, vnodeID));
     }
 
+    public void sendStartExistVnode(String hyperVisor, String uuid, long vnodeid) {
+        super.sendRequest(new StartExistVnodeMessage(hyperVisor, uuid, vnodeid));
+    }
+
     public void sendWakeupVnode(String hyperVisor, boolean runAgent, String uuid) {
         // 4th param false means wakeuponly = true
         super.sendRequest(new StartVnodeMessage(hyperVisor, true, runAgent,
@@ -83,9 +88,9 @@ public class WorkerProxy extends SimpleProxy {
      *            uuid of vm to shut down
      */
     public void sendStopVnode(String hyperVisor, String uuid,
-            boolean suspendonly) {
+            boolean suspendonly, boolean delvm) {
         super.sendRequest(new StopVnodeMessage("-1", hyperVisor, uuid,
-                suspendonly));
+                suspendonly, delvm));
     }
 
     /**

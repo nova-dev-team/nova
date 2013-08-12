@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.InetSocketAddress;
 import java.util.UUID;
 
 import nova.common.service.SimpleAddress;
@@ -15,7 +14,6 @@ import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.FtpUtils;
 import nova.common.util.Utils;
-import nova.master.api.MasterProxy;
 import nova.master.models.Vnode;
 import nova.storage.NovaStorage;
 import nova.worker.NovaWorker;
@@ -52,17 +50,15 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
     @Override
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
-        long retVnodeID = Long.parseLong(msg.getUuid());
+        long retVnodeID = 0;
         // ////////////////////////////////////////////////////////////////////
-        String ip = new SimpleAddress(msg.getIpAddr(), 4100).toString();
+        NovaWorker.masteraddr = xreply;
+        if (NovaWorker.getInstance().getMaster() == null
+                || NovaWorker.getInstance().getMaster().isConnected() == false) {
+            NovaWorker.getInstance().registerMaster(xreply);
+        }
 
         // Start vnode begin
-        MasterProxy mp = new MasterProxy(new SimpleAddress(msg.getIpAddr(),
-                4100));
-        mp.connect(new InetSocketAddress(Conf.getString("master.bind_host"),
-                Conf.getInteger("master.bind_port")));
-        mp.sendExpTimeMessage(ip, "startCal", System.currentTimeMillis());
-        mp.sendExpTimeMessage(ip, "startTime", System.currentTimeMillis());
         // ////////////////////////////////////////////////////////////////////
 
         final String virtService;
@@ -95,6 +91,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 }
             }
         } else {
+            retVnodeID = Long.parseLong(msg.getUuid());
             msg.setUuid(UUID.randomUUID().toString());
             msg.setRunAgent(false);
             if ((msg.getMemSize() == null)
@@ -112,7 +109,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     || msg.getArch().trim().equalsIgnoreCase("")) {
                 msg.setArch("x86_64");
             }
-
             String stdImgFile = "small.img";
             if ((msg.getHdaImage() != null) && (!msg.getHdaImage().equals(""))) {
                 stdImgFile = msg.getHdaImage();
@@ -293,11 +289,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     try {
                         PrintWriter outpw = new PrintWriter(new FileWriter(
                                 ipAddrFile));
-                        outpw.println("agent.bind_host=" + msg.getIpAddr());
-                        outpw.println("master.bind_host="
-                                + Conf.getString("master.bind_host"));
-                        outpw.println("master.bind_port="
-                                + Conf.getString("master.bind_port"));
+                        outpw.println("agent.bind_host="
+                                + Conf.getString("worker.bind_host"));
+                        outpw.println("master.bind_host=" + msg.getIpAddr());
+                        outpw.println("master.bind_port=3000");
                         outpw.close();
                     } catch (IOException e1) {
                         log.error(
@@ -305,8 +300,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 e1);
                     }
                     // ////////////////////////////////////////////////////////////////////
-                    mp.sendExpTimeMessage(ip, "configTime",
-                            System.currentTimeMillis());
                     // ////////////////////////////////////////////////////////////////////
                     // start download apps
                     if (msg.getApps() != null) {
@@ -347,11 +340,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             }
                         }
                     }
-                    // ////////////////////////////////////////////////////////////////////
-                    // finish download apps
-                    mp.sendExpTimeMessage(ip, "downloadTime",
-                            System.currentTimeMillis());
-                    // ////////////////////////////////////////////////////////////////////
 
                     // packiso process start
                     // copy files to Novahome/run/softwares
@@ -464,10 +452,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         "run", strWorkerIP + "_" + msg.getName()));
                 if (!foder.exists()) {
                     foder.mkdirs();
-                } else {
-                    // TODO @whoever rename or stop or what?
-                    log.error("vm name " + strWorkerIP + "_" + msg.getName()
-                            + " has been used!");
                 }
                 File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                         "run", strWorkerIP + "_" + msg.getName(), stdImgFile));
@@ -574,10 +558,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 "write nova.agent.extrainfo.properties file fail!",
                                 e1);
                     }
-                    // ////////////////////////////////////////////////////////////////////
-                    mp.sendExpTimeMessage(ip, "configTime",
-                            System.currentTimeMillis());
-                    // ////////////////////////////////////////////////////////////////////
                     // prepare apps
                     if (msg.getApps() != null) {
                         File folderApp = new File(Utils.pathJoin(
@@ -718,11 +698,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
             }
 
-            // ////////////////////////////////////////////////////////////////////
-            // packiso finished
-            mp.sendExpTimeMessage(ip, "packIsoTime", System.currentTimeMillis());
-            // ////////////////////////////////////////////////////////////////////
-
             // create domain and show some info
 
             synchronized (NovaWorker.getInstance().getConnLock()) {
@@ -758,11 +733,15 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             + "vncport:"
                             + Utils.WORKER_VNC_MAP.get(testDomain
                                     .getUUIDString()));
-                    mp.sendPnodeCreateVnodeMessage(NovaWorker.getInstance()
-                            .getAddr().getIp(), retVnodeID, Integer
-                            .parseInt(Utils.WORKER_VNC_MAP.get(testDomain
-                                    .getUUIDString())), testDomain
-                            .getUUIDString());
+                    NovaWorker
+                            .getInstance()
+                            .getMaster()
+                            .sendPnodeCreateVnodeMessage(
+                                    NovaWorker.getInstance().getAddr().getIp(),
+                                    retVnodeID,
+                                    Integer.parseInt(Utils.WORKER_VNC_MAP
+                                            .get(testDomain.getUUIDString())),
+                                    testDomain.getUUIDString());
                 } catch (LibvirtException ex) {
                     log.error("Create domain failed", ex);
                 }

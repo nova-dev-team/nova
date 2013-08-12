@@ -35,19 +35,7 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
             pnode.setStatus(Pnode.Status.ADD_PENDING);
 
             pnode.setHostname(msg.pAddr.getInetSocketAddress().getHostName());
-            /*
-             * byte[] mac = null; try { mac = NetworkInterface.getByInetAddress(
-             * msg.pAddr.getInetAddress()).getHardwareAddress(); } catch
-             * (SocketException e1) { // TODO Auto-generated catch block
-             * e1.printStackTrace(); } StringBuffer sb = new StringBuffer(); for
-             * (int i = 0; i < mac.length; i++) { if (i != 0) sb.append("-");
-             * String s = Integer.toHexString(mac[i] & 0xFF);
-             * sb.append(s.length() == 1 ? 0 + s : s);
-             * 
-             * }
-             * 
-             * pnode.setMacAddress(sb.toString().toUpperCase());
-             */
+
             getPnodeInfo(msg.pAddr, pnode);
             if (pnode.getMacAddress() == null
                     || pnode.getMacAddress().indexOf("--") >= 0)

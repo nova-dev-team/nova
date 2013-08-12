@@ -1,16 +1,13 @@
 package nova.master.handler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.master.api.messages.MasterMigrateCompleteMessage;
+import nova.master.models.Pnode;
 import nova.master.models.Vnode;
 import nova.worker.models.StreamGobbler;
 
@@ -25,23 +22,6 @@ public class MasterMigrateCompleteHandler implements
      * Log4j logger.
      */
     Logger logger = Logger.getLogger(MasterMigrateCompleteMessage.class);
-
-    public static int getFreePort() {
-        ServerSocket s = null;
-        int MINPORT = 5901;
-        int MAXPORT = 6900;
-        for (; MINPORT < MAXPORT; MINPORT++) {
-            try {
-                s = new ServerSocket(MINPORT);
-                s.close();
-                return MINPORT;
-            } catch (IOException e) {
-                continue;
-            }
-        }
-        return -1;
-
-    }
 
     private void portMP(String srcIP, int srcPort, String dstIP, int dstPort,
             long vnodeid) {
@@ -76,69 +56,21 @@ public class MasterMigrateCompleteHandler implements
         }
     }
 
-    private void delMP(int port) {
-        String strcmd = "lsof -i:" + port;
-        try {
-
-            Process p = Runtime.getRuntime().exec(strcmd);
-            final InputStream is = p.getInputStream();
-
-            new Thread() {
-                public void run() {
-                    String line, result = "";
-                    BufferedReader br = new BufferedReader(
-                            new InputStreamReader(is));
-                    try {
-                        while ((line = br.readLine()) != null) {
-
-                            result = line;
-                        }
-                        String pid = result.split("[\\t \\n]+")[1];
-                        String killcmd = "kill -9 " + pid;
-                        Runtime.getRuntime().exec(killcmd);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-
-            try {
-                if (p.waitFor() != 0) {
-                    logger.error("del port map:" + port
-                            + " return abnormal value!");
-                }
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                logger.error("del port map:" + port + " terminated!", e);
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            logger.error("del port map:" + port + " cmd error!", e);
-
-        }
-
-    }
-
     @Override
     public void handleMessage(MasterMigrateCompleteMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         // TODO Auto-generated method stub
 
         Vnode vnode = Vnode.findByUuid(msg.migrateUuid);
-        // Migration migration = Migration.findVnodeId(vnode.getId());
-        // Migration.delete(migration);
-        // ???
         String masterIP = Conf.getString("master.bind_host");
-        int masterPort = getFreePort();
+        int masterPort = Utils.getFreePort();
         portMP(masterIP, masterPort, msg.dstPnodeIP,
                 Integer.valueOf(msg.dstVNCPort), vnode.getId());
         Utils.MASTER_VNC_MAP.put(String.valueOf(vnode.getId()),
                 String.valueOf(masterPort));
         vnode.setStatus(Vnode.Status.RUNNING);
+        Pnode dstpnode = Pnode.findByIp(msg.dstPnodeIP);
+        vnode.setPmachineId((int) dstpnode.getId());
         vnode.save();
     }
 

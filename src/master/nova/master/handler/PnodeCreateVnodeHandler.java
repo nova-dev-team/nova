@@ -1,10 +1,6 @@
 package nova.master.handler;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
@@ -26,28 +22,11 @@ public class PnodeCreateVnodeHandler implements
      */
     Logger logger = Logger.getLogger(PnodeCreateVnodeMessage.class);
 
-    public static int getFreePort() {
-        ServerSocket s = null;
-        int MINPORT = 5901;
-        int MAXPORT = 6900;
-        for (; MINPORT < MAXPORT; MINPORT++) {
-            try {
-                s = new ServerSocket(MINPORT);
-                s.close();
-                return MINPORT;
-            } catch (IOException e) {
-                continue;
-            }
-        }
-        return -1;
-
-    }
-
     @Override
     public void handleMessage(PnodeCreateVnodeMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         String masterIP = Conf.getString("master.bind_host");
-        int masterPort = getFreePort();
+        int masterPort = Utils.getFreePort();
         portMP(masterIP, masterPort, msg.PnodeIP, msg.VnodePort, msg.VnodeId);
         Utils.MASTER_VNC_MAP.put(String.valueOf(msg.VnodeId),
                 String.valueOf(masterPort));
@@ -89,50 +68,4 @@ public class PnodeCreateVnodeHandler implements
         }
     }
 
-    private void delMP(int port) {
-        String strcmd = "lsof -i:" + port;
-        try {
-
-            Process p = Runtime.getRuntime().exec(strcmd);
-            final InputStream is = p.getInputStream();
-
-            new Thread() {
-                public void run() {
-                    String line, result = "";
-                    BufferedReader br = new BufferedReader(
-                            new InputStreamReader(is));
-                    try {
-                        while ((line = br.readLine()) != null) {
-
-                            result = line;
-                        }
-                        String pid = result.split("[\\t \\n]+")[1];
-                        String killcmd = "kill -9 " + pid;
-                        Runtime.getRuntime().exec(killcmd);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-
-            try {
-                if (p.waitFor() != 0) {
-                    logger.error("del port map:" + port
-                            + " return abnormal value!");
-                }
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                logger.error("del port map:" + port + " terminated!", e);
-            }
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            logger.error("del port map:" + port + " cmd error!", e);
-
-        }
-
-    }
 }
