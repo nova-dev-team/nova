@@ -58,8 +58,6 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
                     continue;
                 }
 
-                pnode.updateLastReqTime();
-
                 logger.debug("pinging pnode: " + pnode + ", its status="
                         + pnode.getStatus());
                 WorkerProxy wp = NovaMaster.getInstance().getWorkerProxy(
@@ -71,7 +69,6 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
                     wp.sendRequestHeartbeat();
                 else {
                     pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
-                    pnode.updateLastReqTime();
                     pnode.save();
 
                     List<Vnode> allvnodes = Vnode.all();
