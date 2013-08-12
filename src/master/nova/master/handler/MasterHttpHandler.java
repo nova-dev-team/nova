@@ -22,6 +22,7 @@ import nova.master.api.messages.DeleteUserMessage;
 import nova.master.api.messages.DeleteVclusterMessage;
 import nova.master.api.messages.DeleteVnodeMessage;
 import nova.master.api.messages.MasterMigrateVnodeMessage;
+import nova.master.api.messages.ModifyUserPassMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.ResumeVnodeMessage;
 import nova.master.api.messages.StopVnodeMessage;
@@ -791,7 +792,16 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     else if (act.equals("pass_modify")) {
-
+                        Users user = session_ip_loginuser.get(remote_ipaddr);
+                        if (user.getPassword().equals(queryMap.get("oldpass"))) {
+                            new ModifyUserPassHandler().handleMessage(
+                                    new ModifyUserPassMessage(user.getId(),
+                                            queryMap.get("newpass")), null,
+                                    null, null);
+                        } else {
+                            String pass_error = "alert('Old Password Wrong!')";
+                            values.put("pass_error", pass_error);
+                        }
                     }
 
                     // list all users
