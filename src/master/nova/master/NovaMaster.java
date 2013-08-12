@@ -303,7 +303,6 @@ public class NovaMaster extends SimpleServer {
             }
 
         });
-        // TimeInfo.setVClusterInfo("test", "10.0.1.100", 1);
         NovaMaster.getInstance().start();
     }
 }
