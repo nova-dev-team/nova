@@ -55,7 +55,7 @@ public class Pnode extends DbObject {
      * If lastAckTime is not updated in this interval, the node will be
      * considered as down.
      */
-    public static final long HEARTBEAT_TIMEOUT = 1000;
+    public static final long HEARTBEAT_TIMEOUT = 5000;
 
     private static DbManager manager = null;
 
