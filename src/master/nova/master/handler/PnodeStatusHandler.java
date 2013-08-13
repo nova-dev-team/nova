@@ -29,7 +29,6 @@ public class PnodeStatusHandler implements SimpleHandler<PnodeStatusMessage> {
         pnode.setStatus(msg.status);
         // log.info("Update status of pnode @ " + pnode.getAddr() + " to "
         // + pnode.getStatus());
-        pnode.updateLastReqTime();
         pnode.save();
 
     }

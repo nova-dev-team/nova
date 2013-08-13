@@ -274,4 +274,8 @@ public class Pnode extends DbObject {
     public void updateLastReqTime() {
         this.lastReqTime = new Date();
     }
+
+    public void updateLastAckTime() {
+        this.lastAckTime = new Date();
+    }
 }
