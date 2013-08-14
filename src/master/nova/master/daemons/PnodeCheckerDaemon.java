@@ -41,12 +41,6 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
                     return;
                 }
 
-                if (pnode.getStatus() == Pnode.Status.CONNECT_FAILURE) {
-                    // skip failed machines
-                    // TODO @santa still need to contact failed machines
-                    // continue;
-                }
-
                 // ping pnode if necessary
                 if (pnode.getStatus() == Pnode.Status.RUNNING
                         && pnode.isHeartbeatTimeout() == false) {
@@ -58,8 +52,6 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
                     continue;
                 }
 
-                pnode.updateLastReqTime();
-
                 logger.debug("pinging pnode: " + pnode + ", its status="
                         + pnode.getStatus());
                 WorkerProxy wp = NovaMaster.getInstance().getWorkerProxy(
@@ -67,11 +59,11 @@ public class PnodeCheckerDaemon extends SimpleDaemon {
 
                 // connection failure could not be detected here, but will be
                 // dected in worker proxy's exceptionCaught() handler.
-                if (wp.isConnected())
+                if (wp.isConnected()) {
                     wp.sendRequestHeartbeat();
-                else {
-                    pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
                     pnode.updateLastReqTime();
+                } else {
+                    pnode.setStatus(Pnode.Status.CONNECT_FAILURE);
                     pnode.save();
 
                     List<Vnode> allvnodes = Vnode.all();

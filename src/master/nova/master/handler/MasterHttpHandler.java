@@ -304,25 +304,42 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             }
 
                             else {
-                                String create_instance_error = "alert('Please add physic machine first!')";
+                                String create_instance_error = "alert('No available Physical Machine Found!')";
                                 values.put("create_instance_error",
                                         create_instance_error);
                             }
                         } else {
                             pnode_id = queryMap.get("vnode_pnodeId").split("-")[0];
+                            Pnode pnode = Pnode.findById(Integer
+                                    .parseInt(pnode_id));
+                            if (pnode.getStatus() != Pnode.Status.RUNNING) {
+                                String create_instance_error = "alert('Cannot connect to the selected Physical Machine!')";
+                                values.put("create_instance_error",
+                                        create_instance_error);
+                            } else if (pnode.getVmCapacity() <= pnode
+                                    .getCurrentVMNum()) {
+                                String create_instance_error = "alert('The selected Physical Machine cannot hosted any more VMs!')";
+                                values.put("create_instance_error",
+                                        create_instance_error);
+                            } else {
 
-                            new CreateVnodeHandler().handleMessage(
-                                    new CreateVnodeMessage(queryMap
-                                            .get("vnode_disk"), queryMap
-                                            .get("vnode_name"), Integer
-                                            .parseInt(queryMap
-                                                    .get("vnode_cpucount")),
-                                            Integer.parseInt(queryMap
-                                                    .get("vnode_memsize")),
-                                            null, Integer.parseInt(pnode_id),
-                                            0, null, true, queryMap
-                                                    .get("vnode_hypervisor")),
-                                    null, null, null);
+                                new CreateVnodeHandler()
+                                        .handleMessage(
+                                                new CreateVnodeMessage(
+                                                        queryMap.get("vnode_disk"),
+                                                        queryMap.get("vnode_name"),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_cpucount")),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_memsize")),
+                                                        null,
+                                                        Integer.parseInt(pnode_id),
+                                                        0,
+                                                        null,
+                                                        true,
+                                                        queryMap.get("vnode_hypervisor")),
+                                                null, null, null);
+                            }
                         }
 
                     }
@@ -385,15 +402,34 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     else if (act.equals("migration")) {
                         Vnode migrate_vnode = Vnode.findById(Long
                                 .parseLong(queryMap.get("mig_vnid")));
-
-                        new MasterMigrateVnodeHandler().handleMessage(
-                                new MasterMigrateVnodeMessage(migrate_vnode
-                                        .getId(),
-                                        migrate_vnode.getPmachineId(), Long
-                                                .parseLong(queryMap.get(
-                                                        "vnode_migrateto")
-                                                        .split("-")[0])), null,
-                                null, null);
+                        long migration_to = Long.parseLong(queryMap.get(
+                                "vnode_migrateto").split("-")[0]);
+                        if (migration_to == migrate_vnode.getPmachineId()) {
+                            String migration_error = "alert('The Destination and Source Physical Machines are the same!')";
+                            values.put("migration_error", migration_error);
+                        } else {
+                            Pnode to_pnode = Pnode.findById(migration_to);
+                            if (to_pnode == null) {
+                                String migration_error = "alert('Cannot find the Destination Physical Machine!')";
+                                values.put("migration_error", migration_error);
+                            } else if (to_pnode.getStatus() != Pnode.Status.RUNNING) {
+                                String migration_error = "alert('Cannot connect to the Destination Physical Machine!')";
+                                values.put("migration_error", migration_error);
+                            } else if (to_pnode.getCurrentVMNum() >= to_pnode
+                                    .getVmCapacity()) {
+                                String migration_error = "alert('The Destination Physical Machine cannot hosted any more VM!')";
+                                values.put("migration_error", migration_error);
+                            } else {
+                                new MasterMigrateVnodeHandler()
+                                        .handleMessage(
+                                                new MasterMigrateVnodeMessage(
+                                                        migrate_vnode.getId(),
+                                                        migrate_vnode
+                                                                .getPmachineId(),
+                                                        migration_to), null,
+                                                null, null);
+                            }
+                        }
                     }
 
                     else if (act.equals("add_cluster")) {

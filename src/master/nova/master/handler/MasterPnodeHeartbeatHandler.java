@@ -33,6 +33,7 @@ public class MasterPnodeHeartbeatHandler implements
             pnode.setStatus(Pnode.Status.RUNNING);
             // log.info("Update status of pnode @ " + pnode.getAddr() + " to "
             // + pnode.getStatus());
+            pnode.updateLastAckTime();
             pnode.save();
         } else {
             log.error("Pnode with host " + xreply.ip + " not found!");

@@ -55,7 +55,7 @@ public class Pnode extends DbObject {
      * If lastAckTime is not updated in this interval, the node will be
      * considered as down.
      */
-    public static final long HEARTBEAT_TIMEOUT = 5000;
+    public static final long HEARTBEAT_TIMEOUT = 10000;
 
     private static DbManager manager = null;
 
@@ -250,6 +250,16 @@ public class Pnode extends DbObject {
         this.vmCapacity = vmCapacity;
     }
 
+    public int getCurrentVMNum() {
+        List<Vnode> vms = Vnode.all();
+        int count = 0;
+        for (Vnode vnode : vms) {
+            if (vnode.getPmachineId() == this.id)
+                count++;
+        }
+        return count;
+    }
+
     /**
      * Override string present.
      */
@@ -263,5 +273,9 @@ public class Pnode extends DbObject {
 
     public void updateLastReqTime() {
         this.lastReqTime = new Date();
+    }
+
+    public void updateLastAckTime() {
+        this.lastAckTime = new Date();
     }
 }
