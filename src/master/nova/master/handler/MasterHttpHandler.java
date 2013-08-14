@@ -215,7 +215,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 else if (act.equals("user_register")) {
                     new AddUserHandler().handleMessage(new AddUserMessage(
                             queryMap.get("username"), queryMap.get("email"),
-                            queryMap.get("password"), "normal", "true"), null,
+                            queryMap.get("password"), queryMap.get("privilege"), "true"), null,
                             null, null);
 
                     String ret = "<html><head><meta http-equiv='refresh' content='3,;url=login'></head>"
@@ -231,11 +231,23 @@ public class MasterHttpHandler extends SimpleHttpHandler {
         else {
             fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                     "overview.html");
+
+            String userprivilege = session_ip_loginuser.get(remote_ipaddr)
+                    .getPrivilege();
             values.put("username", session_ip_loginuser.get(remote_ipaddr)
                     .getName());
-            values.put("userprivilege", session_ip_loginuser.get(remote_ipaddr)
-                    .getPrivilege());
+            values.put("userprivilege", userprivilege);
+            
+            if(userprivilege.equals("admin")) {
+                
+            } 
+            
+            else if (userprivilege.equals("normal") {
+                
+            }
 
+            else if(userprivilege.equals("root")) {
+                
             // ------------------------------------------------------------
             // ------------------------ act begin -------------------------
             // ------------------------------------------------------------
@@ -942,6 +954,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
             vmachine_num++;
         }
         values.put("vmachine_num", vmachine_num);
+        }
 
         return Utils.expandTemplateFile(fpath, values);
     }
