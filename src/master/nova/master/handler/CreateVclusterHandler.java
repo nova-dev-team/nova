@@ -37,14 +37,10 @@ public class CreateVclusterHandler implements
         // to modify
 
         List<Integer> usedIpSegments = new ArrayList<Integer>();
-        // System.out.println("111");
         int gatewayIpIval = Utils.ipv4ToInteger(Conf
                 .getString("vnode.gateway_ip"));
-        // System.out.println("222");
         usedIpSegments.add(gatewayIpIval);
         usedIpSegments.add(gatewayIpIval);
-
-        // System.out.println("10.0.2.255     " + gatewayIpIval);
 
         for (Vcluster vcluster : Vcluster.all()) {
             usedIpSegments.add(Utils.ipv4ToInteger(vcluster.getFristIp()));
@@ -59,8 +55,6 @@ public class CreateVclusterHandler implements
                 .getString("vnode.last_usable_ip"));
 
         int testIpIval = firstUsableIpIval;
-
-        // System.out.println("10.0.2.0     " + testIpIval);
 
         while (testIpIval + msg.vclusterSize - 1 < lastUsableIpIval) {
             int testLastIpIval = testIpIval + msg.vclusterSize - 1;
@@ -90,11 +84,6 @@ public class CreateVclusterHandler implements
         if (testIpIval + msg.vclusterSize - 1 >= lastUsableIpIval) {
             log.info("There is not enough Ip address available for VMs.");
         }
-
-        // System.out.println(msg.vclusterName);
-        // System.out.println(msg.vclusterSize);
-        // System.out.println(testIpIval);
-        // System.out.println(IntegerToIpv4(testIpIval));
 
         Vcluster vcluster = new Vcluster();
         vcluster.setClusterName(msg.vclusterName);
