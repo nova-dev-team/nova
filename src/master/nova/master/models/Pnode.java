@@ -55,14 +55,14 @@ public class Pnode extends DbObject {
      * If lastAckTime is not updated in this interval, the node will be
      * considered as down.
      */
-    public static final long HEARTBEAT_TIMEOUT = 10000;
+    public static final long HEARTBEAT_TIMEOUT = 2000;
 
     private static DbManager manager = null;
 
     /**
      * Interval between each ping messages.
      */
-    public static final long PING_INTERVAL = 1000;
+    public static final long PING_INTERVAL = 2000;
 
     public static List<Pnode> all() {
         List<Pnode> all = new ArrayList<Pnode>();

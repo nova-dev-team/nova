@@ -58,8 +58,6 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         vnode.setStatus(Vnode.Status.PREPARING);
         vnode.setHypervisor(msg.hypervisor);
         vnode.setUserId(msg.user_id);
-        System.out
-                .println("======================================================================================================");
         vnode.save();
         log.info("Created new vnode: " + vnode.getIp());
 
@@ -69,15 +67,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
                 Conf.getString("master.bind_host"),
                 Conf.getInteger("master.bind_port")));
 
-        // @ zhaoxun to do...
         wp.connect(new InetSocketAddress(pnode.getIp(), Conf
                 .getInteger("worker.bind_port")));
-        /*
-         * System.out.println("kvm" + vAddr + "true" +
-         * String.valueOf(msg.memorySize) + String.valueOf(msg.cpuCount) +
-         * msg.vmImage + "false");
-         */
-        // TODO @zhaoxun pass the correct params
         String[] apps;
         if (msg.applianceList != null && !msg.applianceList.equals("")) {
             apps = msg.applianceList.split("%2C");
