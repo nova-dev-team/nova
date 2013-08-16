@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Nova Instance</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/docs.css" rel="stylesheet">
+  <script src="js/jquery-2.0.0.js"></script>
+  <script src="js/bootstrap-modal.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+</head>
+  
+<body>
+<!---------------------- Page Header  ------------------------------->
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+    </div>
+  </div>
+  
+  <div class="container">
+
+    <div class="page-header">
+        <h1>
+            <em> Nova Master </em>
+            <small> - Java Version v0.3.1</small>
+        </h1>  
+    </div>
+    <!-- page-header -->
+    
+    <div class="row ">
+      <div class="span4 offset8">
+        <div class="pull-right">
+    	<i class="icon-user"></i>&nbsp;<a>User: <strong>${username}</strong>&nbsp;&nbsp;</a>
+    	<i class="icon-flag"></i>&nbsp;<a>Privilege: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
+    	</div>
+      </div>
+    </div>
+    <!-- row -->
+    
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Nova</a>
+          
+          <ul class="nav nav-pills">
+            <li class=""><a href="overview">Overview</a></li>
+            <li class="active"><a href="instance">Instances</a></li>
+          </ul>
+          
+          <form class="navbar-search pull-left" action="">
+            <input type="text" class="search-query span2" placeholder="Search">
+          </form>
+          
+          <ul class="nav pull-right">
+          	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;Logout</a></li>
+          </ul>
+          
+        </div>
+      </div>
+    </div>
+    <!-- navbar -->
+
+    <!---------------------- Instance ------------------------------->
+	<br>
+    <legend> Instances
+	    <div class="pull-right">
+	       <a class="btn btn-success" href="instance"> Refresh </a>
+	    </div>
+    </legend>
+    
+	<table class="table table-striped table-hover">  
+		<thead>
+			<tr>
+			<th>Id</th>
+			<th>Instance Name</th>
+			<th>Ip Address</th>
+			<th>Memery Size</th>
+			<th>Hypervisor</th>
+			<th>Virtual Cluster Id</th>
+			<th>Physical Machine Id</th>
+			<th>Status</th> 
+			<th>Action</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			${vnode_show}
+		</tbody>
+		
+	</table>
+	
+	<!--
+    <!---------------------- Cluster ------------------------------->
+	<br>
+    <legend> Clusters
+	    <div class="pull-right">
+	       <a class="btn btn-success" href="instance"> Refresh </a>
+	    </div>
+    </legend>
+    
+	<table class="table table-striped table-hover">  
+		<thead>
+			<tr>
+			<th>Id</th>
+			<th>Cluster Name</th>
+			<th>First Ip</th>
+			<th>Cluster Size</th>
+			<th>sshPublicKey</th>
+			<th>sshPrivateKey</th>
+			<th>osUsername</th> 
+			<th>Action</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			${vcluster_show}
+		</tbody>
+		
+	</table>
+   
+    <!---------------------- Page Footer  ------------------------------->
+	<footer class="footer">
+  	  <hr>
+	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">Back To Top</a></p>
+      <p> This is the "master" module of Nova System. </p>
+      <p> Copyright @2013 by <a>hestream</a> in Nova development team.</p>
+    </footer>
+    <!-- footer -->
+
+  </div>
+  <!-- container --> 
+  
+  <script> ${create_instance_error} ${migration_error}</script>
+
+</body>
+</html>
