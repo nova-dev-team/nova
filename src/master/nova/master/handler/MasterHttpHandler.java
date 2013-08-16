@@ -457,38 +457,72 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     else if (act.equals("add_cluster")
                             && !userprivilege.equals("normal")) {
 
-                        new CreateVclusterHandler().handleMessage(
-                                new CreateVclusterMessage(queryMap
-                                        .get("vcluster_name"),
-                                        Integer.parseInt(queryMap
-                                                .get("vcluster_size")),
-                                        session_ip_loginuser.get(remote_ipaddr)
-                                                .getId()), null, null, null);
-
                         int v_size = Integer.parseInt(queryMap
                                 .get("vcluster_size"));
 
-                        for (int i = 0; i != v_size; i++) {
-                            new CreateVnodeHandler().handleMessage(
-                                    new CreateVnodeMessage(queryMap
-                                            .get("vinstance_disk" + i),
-                                            queryMap.get("vinstance_name" + i),
-                                            Integer.parseInt(queryMap
-                                                    .get("vinstance_cpucount"
-                                                            + i)),
-                                            Integer.parseInt(queryMap
-                                                    .get("vinstance_memsize"
-                                                            + i)), null,
-                                            Integer.parseInt(queryMap.get(
-                                                    "vinstance_pnodeId" + i)
-                                                    .split("-")[0]), i,
-                                            queryMap.get("vcluster_name" + i),
-                                            false, queryMap
-                                                    .get("vinstance_hypervisor"
-                                                            + i),
+                        HashMap<Long, Integer> hm = new HashMap<Long, Integer>();
+                        for (Pnode pn : Pnode.all()) {
+                            hm.put(pn.getId(), 0);
+                        }
+                        for (int i = 0; i < v_size; i++) {
+                            long pid = Integer.parseInt(queryMap.get(
+                                    "vinstance_pnodeId" + i).split("-")[0]);
+                            hm.put(pid, hm.get(pid) + 1);
+                        }
+                        boolean enoughcapacity = true;
+                        for (int i = 0; i < v_size; i++) {
+                            long pid = Integer.parseInt(queryMap.get(
+                                    "vinstance_pnodeId" + i).split("-")[0]);
+                            Pnode pnode = Pnode.findById(pid);
+                            if (pnode.getCurrentVMNum() + hm.get(pid) > pnode
+                                    .getVmCapacity()) {
+                                String createvcluster_error = "alert('The Destination Physical Machine cannot hosted any more VM!')";
+                                values.put("createvcluster_error",
+                                        createvcluster_error);
+                                enoughcapacity = false;
+                                break;
+                            }
+                        }
+                        if (enoughcapacity) {
+                            new CreateVclusterHandler().handleMessage(
+                                    new CreateVclusterMessage(queryMap
+                                            .get("vcluster_name"), Integer
+                                            .parseInt(queryMap
+                                                    .get("vcluster_size")),
                                             session_ip_loginuser.get(
                                                     remote_ipaddr).getId()),
                                     null, null, null);
+
+                            for (int i = 0; i != v_size; i++) {
+                                new CreateVnodeHandler()
+                                        .handleMessage(
+                                                new CreateVnodeMessage(
+                                                        queryMap.get("vinstance_disk"
+                                                                + i),
+                                                        queryMap.get("vinstance_name"
+                                                                + i),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vinstance_cpucount"
+                                                                        + i)),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vinstance_memsize"
+                                                                        + i)),
+                                                        null,
+                                                        Integer.parseInt(queryMap
+                                                                .get("vinstance_pnodeId"
+                                                                        + i)
+                                                                .split("-")[0]),
+                                                        i,
+                                                        queryMap.get("vcluster_name"
+                                                                + i),
+                                                        false,
+                                                        queryMap.get("vinstance_hypervisor"
+                                                                + i),
+                                                        session_ip_loginuser
+                                                                .get(remote_ipaddr)
+                                                                .getId()),
+                                                null, null, null);
+                            }
                         }
                     }
 

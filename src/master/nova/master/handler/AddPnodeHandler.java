@@ -153,7 +153,7 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
                         while ((line = br.readLine()) != null) {
                             result = line;
                             if (result.indexOf("HWaddr") > 0
-                                    && result.indexOf("virbr") != -1) {
+                                    && result.indexOf("virbr") < 0) {
                                 add.ip = result.substring(
                                         result.indexOf("HWaddr") + 7).trim();
 

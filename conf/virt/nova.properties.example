@@ -35,7 +35,7 @@ worker.gateway=10.0.1.254
 vm_network_interface=eth0
 
 # network bridge for worker
-vm_network_bridge=br0
+vm_network_bridge=virbr0
 
 # vnc mouse pointer for worker
 fix_vnc_mouse_pointer=true
@@ -94,4 +94,9 @@ vnode.first_usable_ip=10.0.1.90
 
 #vnode last usable ip
 vnode.last_usable_ip=10.0.1.100
+
+##########################
+# hypervisor conifg section #
+##########################
+hypervisor.engine=kvm
 
