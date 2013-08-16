@@ -492,13 +492,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         if (enoughcapacity) {
                             new CreateVclusterHandler().handleMessage(
                                     new CreateVclusterMessage(queryMap
-                                            .get("vcluster_name"), Integer
-                                            .parseInt(queryMap
-                                                    .get("vcluster_size")),
+                                            .get("vcluster_name"), v_size,
                                             session_ip_loginuser.get(
                                                     remote_ipaddr).getId()),
                                     null, null, null);
-
                             for (int i = 0; i != v_size; i++) {
                                 String pnodeid_str = queryMap
                                         .get("vinstance_pnodeId" + i);
@@ -541,6 +538,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                         + i) + "!')";
                                         values.put("create_instance_error",
                                                 create_instance_error);
+                                        v_size = i;
                                         break;
                                     }
                                 } else {
@@ -572,6 +570,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                     null, null, null);
                                 }
                             }
+
                         }
                     }
 

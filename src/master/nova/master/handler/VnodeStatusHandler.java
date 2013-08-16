@@ -20,7 +20,6 @@ public class VnodeStatusHandler implements SimpleHandler<VnodeStatusMessage> {
     public void handleMessage(VnodeStatusMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
-        // @zhaoxun Save update into database
         Vnode vnode = Vnode.findByUuid(msg.uuid);
         if (vnode == null) {
             return;

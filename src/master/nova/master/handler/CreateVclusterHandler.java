@@ -30,6 +30,8 @@ public class CreateVclusterHandler implements
      */
     Logger log = Logger.getLogger(CreateVclusterMessage.class);
 
+    public int vclusterid = 0;
+
     @Override
     public void handleMessage(CreateVclusterMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
@@ -91,7 +93,6 @@ public class CreateVclusterHandler implements
         vcluster.setFristIp(Utils.integerToIpv4(testIpIval));
         vcluster.setUserId(msg.userId);
         vcluster.save();
-
         // TODO delete these experiments codes when necessary
         // /////////////////////////////////////////////////////////
         // Initialize vClusterRange of TimeInfo
