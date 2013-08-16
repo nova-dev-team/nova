@@ -30,7 +30,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 
         if (msg.is_one) {
             new CreateVclusterHandler().handleMessage(
-                    new CreateVclusterMessage(msg.vmName, 1), null, null, null);
+                    new CreateVclusterMessage(msg.vmName, 1, msg.user_id),
+                    null, null, null);
         }
 
         // TODO Auto-generated method stub
@@ -56,6 +57,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         vnode.setCdrom(msg.vmImage);
         vnode.setStatus(Vnode.Status.PREPARING);
         vnode.setHypervisor(msg.hypervisor);
+        vnode.setUserId(msg.user_id);
         System.out
                 .println("======================================================================================================");
         vnode.save();

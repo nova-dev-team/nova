@@ -48,10 +48,15 @@ public class Users extends DbObject {
         return (Users) getManager().findBy("name", name);
     }
 
+    public static Users findByEmail(String email) {
+        return (Users) getManager().findBy("email", email);
+    }
+
     public static DbManager getManager() {
         if (manager == null) {
             DbSpec spec = new DbSpec();
             spec.addIndex("name");
+            spec.addIndex("email");
             manager = DbManager.forClass(Users.class, spec);
         }
 

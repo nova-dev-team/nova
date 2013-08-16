@@ -87,6 +87,16 @@ public class Vnode extends DbObject {
         return all;
     }
 
+    public static List<Vnode> getVnodeByUserId(long user_id) {
+        List<Vnode> searchvnode = new ArrayList<Vnode>();
+        for (DbObject obj : getManager().all()) {
+            if (((Vnode) obj).getUserId() == user_id) {
+                searchvnode.add((Vnode) obj);
+            }
+        }
+        return searchvnode;
+    }
+
     public static void delete(Vnode vnode) {
         getManager().delete(vnode);
     }
@@ -172,6 +182,8 @@ public class Vnode extends DbObject {
 
     private String agentStatus;
 
+    private Long userId;
+
     /** The VNC port for the VM. */
     private Integer vncPort;
 
@@ -184,7 +196,7 @@ public class Vnode extends DbObject {
             Integer memorySize, String hda, String cdrom, String arch,
             String ip, Integer vclusterId, Integer pmachineId,
             Vnode.Status status, Integer vncPort, String hypervisor,
-            String migrateFrom, String migrateTo, String schedTo) {
+            String migrateFrom, String migrateTo, String schedTo, Long userId) {
         this.setName(name);
         this.setUuid(uuid);
         this.setCpuCount(cpuCount);
@@ -202,6 +214,7 @@ public class Vnode extends DbObject {
         this.setMigrateFrom(migrateFrom);
         this.setMigrateTo(migrateTo);
         this.setSchedTo(schedTo);
+        this.setUserId(userId);
     }
 
     public SimpleAddress getAddr() {
@@ -284,6 +297,10 @@ public class Vnode extends DbObject {
 
     public Integer getVclusterId() {
         return vclusterId;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public Integer getVncPort() {
@@ -374,6 +391,10 @@ public class Vnode extends DbObject {
 
     public void setVclusterId(Integer vclusterId) {
         this.vclusterId = vclusterId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public void setVncPort(Integer vncPort) {

@@ -100,6 +100,7 @@ public class CreateVclusterHandler implements
         vcluster.setClusterName(msg.vclusterName);
         vcluster.setClusterSize(msg.vclusterSize);
         vcluster.setFristIp(Utils.integerToIpv4(testIpIval));
+        vcluster.setUserId(msg.userId);
         vcluster.save();
 
         // TODO delete these experiments codes when necessary

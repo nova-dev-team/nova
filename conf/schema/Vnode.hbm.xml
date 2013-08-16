@@ -41,6 +41,8 @@
 		<property name="agentStatus" column="agent_status" type="string"></property>
 		
 		<property name="schedTo" column="sched_to" type="string"></property>
+		
+		<property name="userId" column="user_id" type="long"></property>
 
 	</class>
 </hibernate-mapping>

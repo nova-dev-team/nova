@@ -24,6 +24,16 @@ public class Vcluster extends DbObject {
         return all;
     }
 
+    public static List<Vcluster> getVclusterByUserId(long user_id) {
+        List<Vcluster> searchvcluster = new ArrayList<Vcluster>();
+        for (DbObject obj : getManager().all()) {
+            if (((Vcluster) obj).getUserId() == user_id) {
+                searchvcluster.add((Vcluster) obj);
+            }
+        }
+        return searchvcluster;
+    }
+
     public static Vcluster last() {
         Vcluster last = new Vcluster();
         for (DbObject obj : getManager().all()) {
@@ -76,7 +86,7 @@ public class Vcluster extends DbObject {
     private String sshPublicKey;
 
     /** the owner's id */
-    private Integer userId;
+    private long userId;
 
     /** default constructor */
     public Vcluster() {
@@ -84,7 +94,7 @@ public class Vcluster extends DbObject {
 
     /** full constructor */
     public Vcluster(String clusterName, String fristIp, Integer clusterSize,
-            Integer userId, String sshPublicKey, String sshPrivateKey,
+            long userId, String sshPublicKey, String sshPrivateKey,
             String osUsername, String osPassword) {
         this.clusterName = clusterName;
         this.fristIp = fristIp;
@@ -156,7 +166,7 @@ public class Vcluster extends DbObject {
      * @hibernate.property column="user_id"
      * 
      */
-    public Integer getUserId() {
+    public long getUserId() {
         return this.userId;
     }
 
@@ -192,7 +202,7 @@ public class Vcluster extends DbObject {
         this.sshPublicKey = sshPublicKey;
     }
 
-    public void setUserId(Integer userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

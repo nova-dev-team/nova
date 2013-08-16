@@ -6,7 +6,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import nova.common.service.SimpleAddress;
@@ -30,6 +32,7 @@ import nova.master.api.messages.StopVnodeMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Appliance;
 import nova.master.models.Pnode;
+import nova.master.models.UserRelations;
 import nova.master.models.Users;
 import nova.master.models.Vcluster;
 import nova.master.models.Vdisk;
@@ -191,6 +194,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         if (ur != null && user_passwd.equals(ur.getPassword())) {
                             fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                     "master", "overview.html");
+                            if (ur.getPrivilege().equals("normal")) {
+                                fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                        "master", "overview1.html");
+                            }
                             session_ip_islogin.put(remote_ipaddr, true);
                             session_ip_loginuser.put(remote_ipaddr, ur);
                             values.put("username",
@@ -213,15 +220,25 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 }
 
                 else if (act.equals("user_register")) {
-                    new AddUserHandler().handleMessage(new AddUserMessage(
-                            queryMap.get("username"), queryMap.get("email"),
-                            queryMap.get("password"), queryMap.get("privilege"), "true"), null,
-                            null, null);
+                    if (Users.findByName(queryMap.get("username")) != null) {
+                        String adduser_error = "The User Name has exist! Please change another username.";
+                        return adduser_error;
+                    } else if (Users.findByEmail(queryMap.get("email")) != null) {
+                        String adduser_error = "The Email Address has exist! please change another email address";
+                        return adduser_error;
+                    } else {
+                        new AddUserHandler().handleMessage(
+                                new AddUserMessage(queryMap.get("username"),
+                                        queryMap.get("email"), queryMap
+                                                .get("password"), queryMap
+                                                .get("privilege"), "true", 0),
+                                null, null, null);
 
-                    String ret = "<html><head><meta http-equiv='refresh' content='3,;url=login'></head>"
-                            + "<body><p>Register success! Waiting to jump to main login page ...</p></body></html>";
+                        String ret = "<html><head><meta http-equiv='refresh' content='3,;url=login'></head>"
+                                + "<body><p>Register success! Waiting to jump to main login page ...</p></body></html>";
 
-                    return ret;
+                        return ret;
+                    }
 
                 }
             }
@@ -237,17 +254,12 @@ public class MasterHttpHandler extends SimpleHttpHandler {
             values.put("username", session_ip_loginuser.get(remote_ipaddr)
                     .getName());
             values.put("userprivilege", userprivilege);
-            
-            if(userprivilege.equals("admin")) {
-                
-            } 
-            
-            else if (userprivilege.equals("normal") {
-                
+
+            if (userprivilege.equals("normal")) {
+                fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
+                        "overview1.html");
             }
 
-            else if(userprivilege.equals("root")) {
-                
             // ------------------------------------------------------------
             // ------------------------ act begin -------------------------
             // ------------------------------------------------------------
@@ -259,11 +271,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 if (act.equals("logout")) {
                     session_ip_islogin.put(remote_ipaddr, false);
                     session_ip_loginuser.put(remote_ipaddr, null);
+
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                             "index.html");
                 }
 
-                // --------------------------- http request from Intance page
+                // --------------------------- http request from Intance
+                // page
                 // --------------------------
 
                 else if (act.equals("instance") || act.equals("add_vnode")
@@ -275,7 +289,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         || act.equals("wakeup_vnode")
                         || act.equals("start_vnode")) {
 
-                    if (act.equals("add_vnode")) {
+                    if (act.equals("add_vnode")
+                            && !userprivilege.equals("normal")) {
 
                         String pnode_id = queryMap.get("vnode_pnodeId");
 
@@ -299,7 +314,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                         0,
                                                         null,
                                                         true,
-                                                        queryMap.get("vnode_hypervisor")),
+                                                        queryMap.get("vnode_hypervisor"),
+                                                        session_ip_loginuser
+                                                                .get(remote_ipaddr)
+                                                                .getId()),
                                                 null, null, null);
                             }
 
@@ -337,7 +355,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                         0,
                                                         null,
                                                         true,
-                                                        queryMap.get("vnode_hypervisor")),
+                                                        queryMap.get("vnode_hypervisor"),
+                                                        session_ip_loginuser
+                                                                .get(remote_ipaddr)
+                                                                .getId()),
                                                 null, null, null);
                             }
                         }
@@ -392,7 +413,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null, null);
                     }
 
-                    else if (act.equals("delete_vnode")) {
+                    else if (act.equals("delete_vnode")
+                            && !userprivilege.equals("normal")) {
                         new DeleteVnodeHandler().handleMessage(
                                 new DeleteVnodeMessage(Integer
                                         .parseInt(queryMap.get("vnode_id"))),
@@ -432,14 +454,16 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         }
                     }
 
-                    else if (act.equals("add_cluster")) {
+                    else if (act.equals("add_cluster")
+                            && !userprivilege.equals("normal")) {
 
                         new CreateVclusterHandler().handleMessage(
                                 new CreateVclusterMessage(queryMap
                                         .get("vcluster_name"),
                                         Integer.parseInt(queryMap
-                                                .get("vcluster_size"))), null,
-                                null, null);
+                                                .get("vcluster_size")),
+                                        session_ip_loginuser.get(remote_ipaddr)
+                                                .getId()), null, null, null);
 
                         int v_size = Integer.parseInt(queryMap
                                 .get("vcluster_size"));
@@ -461,12 +485,15 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                             queryMap.get("vcluster_name" + i),
                                             false, queryMap
                                                     .get("vinstance_hypervisor"
-                                                            + i)), null, null,
-                                    null);
+                                                            + i),
+                                            session_ip_loginuser.get(
+                                                    remote_ipaddr).getId()),
+                                    null, null, null);
                         }
                     }
 
-                    else if (act.equals("delete_cluster")) {
+                    else if (act.equals("delete_cluster")
+                            && !userprivilege.equals("normal")) {
                         new DeleteVclusterHandler()
                                 .handleMessage(
                                         new DeleteVclusterMessage(Integer
@@ -475,49 +502,208 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                         null, null, null);
                     }
 
-                    fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                            "instance.html");
-
                     // show all vnode
                     String vnode_show = "";
-                    for (Vnode vnode : Vnode.all()) {
-                        vnode_show = vnode_show
-                                + "<tr><td>"
-                                + vnode.getId()
-                                + "</td><td>"
-                                + vnode.getName()
-                                + "</td><td>"
-                                + vnode.getIp()
-                                + "</td><td>"
-                                + vnode.getMemorySize()
-                                + "</td><td>"
-                                + vnode.getHypervisor()
-                                + "</td><td>"
-                                + vnode.getVclusterId()
-                                + "</td><td>"
-                                + vnode.getPmachineId()
-                                + "</td><td>"
-                                + vnode.getStatus()
-                                + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
-                                + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
-                                + "<ul class='dropdown-menu'> "
-                                + "<li><a href='vncview?vnode_id="
-                                + vnode.getId()
-                                + "'>View</a></li>"
-                                + "<li><a href='#Migration_Modal' onclick='migration_process("
-                                + vnode.getId() + ")" + "'>Migrate</a></li>"
-                                + "<li><a href='start_vnode?vnode_id="
-                                + vnode.getId() + "'>Start</a></li>"
-                                + "<li><a href='wakeup_vnode?vnode_id="
-                                + vnode.getId() + "'>Wakeup</a></li>"
-                                + "<li><a href='pause_vnode?vnode_id="
-                                + vnode.getId() + "'>Pause</a></li>"
-                                + "<li><a href='shutdown_vnode?vnode_id="
-                                + vnode.getId() + "'> Shutdown </a></li>"
-                                + "<li class='divider'>"
-                                + "<li><a href='delete_vnode?vnode_id="
-                                + vnode.getId() + "'>Delete</a></li>"
-                                + "</ul></div></td></tr>";
+
+                    // show all vcluster
+                    String vcluster_show = "";
+
+                    // ------------- root and admin user's vnode
+                    // show-------------
+                    if (!userprivilege.equals("normal")) {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "instance.html");
+
+                        // list vnodes
+                        List<Vnode> searchvnode = new ArrayList<Vnode>();
+                        if (userprivilege.equals("root")) {
+                            searchvnode = Vnode.all();
+                        } else if (userprivilege.equals("admin")) {
+                            searchvnode = Vnode
+                                    .getVnodeByUserId(session_ip_loginuser.get(
+                                            remote_ipaddr).getId());
+                        }
+                        for (Vnode vnode : searchvnode) {
+                            vnode_show = vnode_show
+                                    + "<tr><td>"
+                                    + vnode.getId()
+                                    + "</td><td>"
+                                    + vnode.getName()
+                                    + "</td><td>"
+                                    + vnode.getIp()
+                                    + "</td><td>"
+                                    + vnode.getMemorySize()
+                                    + "</td><td>"
+                                    + vnode.getHypervisor()
+                                    + "</td><td>"
+                                    + vnode.getVclusterId()
+                                    + "</td><td>"
+                                    + vnode.getPmachineId()
+                                    + "</td><td>"
+                                    + vnode.getStatus()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='vncview?vnode_id="
+                                    + vnode.getId()
+                                    + "'>View</a></li>"
+                                    + "<li><a href='#Migration_Modal' onclick='migration_process("
+                                    + vnode.getId() + ")"
+                                    + "'>Migrate</a></li>"
+                                    + "<li><a href='start_vnode?vnode_id="
+                                    + vnode.getId() + "'>Start</a></li>"
+                                    + "<li><a href='wakeup_vnode?vnode_id="
+                                    + vnode.getId() + "'>Wakeup</a></li>"
+                                    + "<li><a href='pause_vnode?vnode_id="
+                                    + vnode.getId() + "'>Pause</a></li>"
+                                    + "<li><a href='shutdown_vnode?vnode_id="
+                                    + vnode.getId() + "'> Shutdown </a></li>"
+                                    + "<li class='divider'>"
+                                    + "<li><a href='delete_vnode?vnode_id="
+                                    + vnode.getId() + "'>Delete</a></li>"
+                                    + "</ul></div></td></tr>";
+                        }
+
+                        // list vclusters
+                        List<Vcluster> searchvcluster = new ArrayList<Vcluster>();
+                        if (userprivilege.equals("root")) {
+                            searchvcluster = Vcluster.all();
+                        } else if (userprivilege.equals("admin")) {
+                            searchvcluster = Vcluster
+                                    .getVclusterByUserId(session_ip_loginuser
+                                            .get(remote_ipaddr).getId());
+                        }
+                        for (Vcluster vcluster : searchvcluster) {
+                            vcluster_show = vcluster_show
+                                    + "<tr><td>"
+                                    + vcluster.getId()
+                                    + "</td><td>"
+                                    + vcluster.getClusterName()
+                                    + "</td><td>"
+                                    + vcluster.getFristIp()
+                                    + "</td><td>"
+                                    + vcluster.getClusterSize()
+                                    + "</td><td>"
+                                    + vcluster.getSshPublicKey()
+                                    + "</td><td>"
+                                    + vcluster.getSshPrivateKey()
+                                    + "</td><td>"
+                                    + vcluster.getOsUsername()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='view_cluster?vcluster_id="
+                                    + vcluster.getId()
+                                    + "'>View Instances</a></li>"
+                                    + "<li class='divider'>"
+                                    + "<li><a href='delete_cluster?vcluster_id="
+                                    + vcluster.getId()
+                                    + "'> Delete Cluster</a></li>"
+                                    + "</ul></div></td></tr>";
+                        }
+
+                        // list all vdisk
+                        String vdisk_list = "";
+                        for (Vdisk vdisk : Vdisk.all()) {
+                            vdisk_list = vdisk_list + "<option>"
+                                    + vdisk.getFileName() + "."
+                                    + vdisk.getDiskFormat() + "</option>";
+                        }
+                        values.put("vdisk_list", vdisk_list);
+
+                        // list all pnode
+                        String pnode_list = "";
+                        for (Pnode pnode : Pnode.all()) {
+                            pnode_list = pnode_list + "<option>"
+                                    + pnode.getId() + "-" + pnode.getIp()
+                                    + "</option>";
+                        }
+                        values.put("pnode_list", pnode_list);
+
+                        // list all appliance
+                        String appliance_list = "";
+                        for (Appliance app : Appliance.all()) {
+
+                        }
+                        values.put("appliance_list", appliance_list);
+
+                    }
+
+                    else { // ------------ normal user's vnode show -----------
+
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "instance1.html");
+
+                        UserRelations ur = UserRelations
+                                .findByNormalId(session_ip_loginuser.get(
+                                        remote_ipaddr).getId());
+
+                        for (Vnode vnode : Vnode.getVnodeByUserId(ur
+                                .getAdminUserId())) {
+                            vnode_show = vnode_show
+                                    + "<tr><td>"
+                                    + vnode.getId()
+                                    + "</td><td>"
+                                    + vnode.getName()
+                                    + "</td><td>"
+                                    + vnode.getIp()
+                                    + "</td><td>"
+                                    + vnode.getMemorySize()
+                                    + "</td><td>"
+                                    + vnode.getHypervisor()
+                                    + "</td><td>"
+                                    + vnode.getVclusterId()
+                                    + "</td><td>"
+                                    + vnode.getPmachineId()
+                                    + "</td><td>"
+                                    + vnode.getStatus()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='vncview?vnode_id="
+                                    + vnode.getId() + "'>View</a></li>"
+                                    + "<li><a href='start_vnode?vnode_id="
+                                    + vnode.getId() + "'>Start</a></li>"
+                                    + "<li><a href='wakeup_vnode?vnode_id="
+                                    + vnode.getId() + "'>Wakeup</a></li>"
+                                    + "<li><a href='pause_vnode?vnode_id="
+                                    + vnode.getId() + "'>Pause</a></li>"
+                                    + "<li><a href='shutdown_vnode?vnode_id="
+                                    + vnode.getId() + "'> Shutdown </a></li>"
+                                    + "<li class='divider'>"
+                                    + "</ul></div></td></tr>";
+                        }
+
+                        for (Vcluster vcluster : Vcluster
+                                .getVclusterByUserId(ur.getAdminUserId())) {
+                            vcluster_show = vcluster_show
+                                    + "<tr><td>"
+                                    + vcluster.getId()
+                                    + "</td><td>"
+                                    + vcluster.getClusterName()
+                                    + "</td><td>"
+                                    + vcluster.getFristIp()
+                                    + "</td><td>"
+                                    + vcluster.getClusterSize()
+                                    + "</td><td>"
+                                    + vcluster.getSshPublicKey()
+                                    + "</td><td>"
+                                    + vcluster.getSshPrivateKey()
+                                    + "</td><td>"
+                                    + vcluster.getOsUsername()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='view_cluster?vcluster_id="
+                                    + vcluster.getId()
+                                    + "'>View Instances</a></li>"
+                                    + "<li class='divider'>"
+                                    + "<li><a href='delete_cluster?vcluster_id="
+                                    + vcluster.getId()
+                                    + "'> Delete Cluster</a></li>"
+                                    + "</ul></div></td></tr>";
+                        }
+
                     }
 
                     values.put("vnode_show", vnode_show);
@@ -525,65 +711,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         values.put("vnode_show", "None Instance!");
                     }
 
-                    // show all vcluster
-                    String vcluster_show = "";
-                    for (Vcluster vcluster : Vcluster.all()) {
-                        vcluster_show = vcluster_show
-                                + "<tr><td>"
-                                + vcluster.getId()
-                                + "</td><td>"
-                                + vcluster.getClusterName()
-                                + "</td><td>"
-                                + vcluster.getFristIp()
-                                + "</td><td>"
-                                + vcluster.getClusterSize()
-                                + "</td><td>"
-                                + vcluster.getSshPublicKey()
-                                + "</td><td>"
-                                + vcluster.getSshPrivateKey()
-                                + "</td><td>"
-                                + vcluster.getOsUsername()
-                                + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
-                                + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
-                                + "<ul class='dropdown-menu'> "
-                                + "<li><a href='view_cluster?vcluster_id="
-                                + vcluster.getId()
-                                + "'>View Instances</a></li>"
-                                + "<li class='divider'>"
-                                + "<li><a href='delete_cluster?vcluster_id="
-                                + vcluster.getId()
-                                + "'> Delete Cluster</a></li>"
-                                + "</ul></div></td></tr>";
-                    }
-
                     values.put("vcluster_show", vcluster_show);
                     if (vcluster_show == "") {
                         values.put("vcluster_show", "None Cluster!");
                     }
 
-                    // list all vdisk
-                    String vdisk_list = "";
-                    for (Vdisk vdisk : Vdisk.all()) {
-                        vdisk_list = vdisk_list + "<option>"
-                                + vdisk.getFileName() + "."
-                                + vdisk.getDiskFormat() + "</option>";
-                    }
-                    values.put("vdisk_list", vdisk_list);
-
-                    // list all pnode
-                    String pnode_list = "";
-                    for (Pnode pnode : Pnode.all()) {
-                        pnode_list = pnode_list + "<option>" + pnode.getId()
-                                + "-" + pnode.getIp() + "</option>";
-                    }
-                    values.put("pnode_list", pnode_list);
-
-                    // list all appliance
-                    String appliance_list = "";
-                    for (Appliance app : Appliance.all()) {
-
-                    }
-                    values.put("appliance_list", appliance_list);
                 }
 
                 else if (act.equals("vncview")) {
@@ -604,12 +736,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 }
 
-                // --------------------------- http request from machine page
+                // --------------------------- http request from machine
+                // page
                 // --------------------------
-                else if (act.equals("machine") || act.equals("add_pnode")
+                else if (!userprivilege.equals("normal")
+                        && act.equals("machine") || act.equals("add_pnode")
                         || act.equals("delete_pnode")) {
 
-                    if (act.equals("add_pnode")) {
+                    if (userprivilege.equals("root") && act.equals("add_pnode")) {
                         new AddPnodeHandler().handleMessage(
                                 new AddPnodeMessage(new SimpleAddress(queryMap
                                         .get("pnode_ip"), 4000), Integer
@@ -618,45 +752,76 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null, null, null);
                     }
 
-                    else if (act.equals("delete_pnode")) {
+                    else if (userprivilege.equals("root")
+                            && act.equals("delete_pnode")) {
                         new DeletePnodeHandler().handleMessage(
                                 new DeletePnodeMessage(Integer
                                         .parseInt(queryMap.get("pnode_id"))),
                                 null, null, null);
                     }
 
-                    fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                            "machine.html");
-
                     // show all pnode
                     String pnode_show = "";
-                    for (Pnode pnode : Pnode.all()) {
-                        pnode_show = pnode_show
-                                + "<tr><td>"
-                                + pnode.getId()
-                                + "</td><td>"
-                                + pnode.getIp()
-                                + "</td><td>"
-                                + pnode.getPort()
-                                + "</td><td>"
-                                + pnode.getHostname()
-                                + "</td><td>"
-                                + pnode.getMacAddress()
-                                + "</td><td>"
-                                + pnode.getVmCapacity()
-                                + "</td><td>"
-                                + pnode.getStatus()
-                                + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
-                                + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
-                                + "<ul class='dropdown-menu'> "
-                                + "<li><a href='monitor?pnode_id="
-                                + pnode.getId()
-                                + "'>View Machine Status</a></li>"
-                                + "<li class='divider'>"
-                                + "<li><a href='delete_pnode?pnode_id="
-                                + pnode.getId() + "'> Delete Machine</a></li>"
-                                + "</ul></div></td></tr>";
+                    if (userprivilege.equals("root")) {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "machine.html");
+                        for (Pnode pnode : Pnode.all()) {
+                            pnode_show = pnode_show
+                                    + "<tr><td>"
+                                    + pnode.getId()
+                                    + "</td><td>"
+                                    + pnode.getIp()
+                                    + "</td><td>"
+                                    + pnode.getPort()
+                                    + "</td><td>"
+                                    + pnode.getHostname()
+                                    + "</td><td>"
+                                    + pnode.getMacAddress()
+                                    + "</td><td>"
+                                    + pnode.getVmCapacity()
+                                    + "</td><td>"
+                                    + pnode.getStatus()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='monitor?pnode_id="
+                                    + pnode.getId()
+                                    + "'>View Machine Status</a></li>"
+                                    + "<li class='divider'>"
+                                    + "<li><a href='delete_pnode?pnode_id="
+                                    + pnode.getId()
+                                    + "'> Delete Machine</a></li>"
+                                    + "</ul></div></td></tr>";
+                        }
+                    } else {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "machine1.html");
+                        for (Pnode pnode : Pnode.all()) {
+                            pnode_show = pnode_show
+                                    + "<tr><td>"
+                                    + pnode.getId()
+                                    + "</td><td>"
+                                    + pnode.getIp()
+                                    + "</td><td>"
+                                    + pnode.getPort()
+                                    + "</td><td>"
+                                    + pnode.getHostname()
+                                    + "</td><td>"
+                                    + pnode.getMacAddress()
+                                    + "</td><td>"
+                                    + pnode.getVmCapacity()
+                                    + "</td><td>"
+                                    + pnode.getStatus()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='monitor?pnode_id="
+                                    + pnode.getId()
+                                    + "'>View Machine Status</a></li>"
+                                    + "</ul></div></td></tr>";
+                        }
                     }
+
                     values.put("pnode_show", pnode_show);
                     if (pnode_show == "") {
                         values.put("pnode_show", "None worker!");
@@ -665,10 +830,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 // --------------------------- http request from image page
                 // --------------------------
-                else if (act.equals("image") || act.equals("add_vdisk")
+                else if (!userprivilege.equals("normal") && act.equals("image")
+                        || act.equals("add_vdisk")
                         || act.equals("delete_vdisk")) {
 
-                    if (act.equals("add_vdisk")) {
+                    if (userprivilege.equals("root") && act.equals("add_vdisk")) {
                         new RegisterVdiskHandler().handleMessage(
                                 new RegisterVdiskMessage(queryMap
                                         .get("vdisk_displayname"), queryMap
@@ -679,45 +845,77 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                         .get("vdisk_imgPath"), queryMap
                                         .get("vdisk_descrption")), null, null,
                                 null);
-                    } else if (act.equals("delete_vdisk")) {
+                    }
+
+                    else if (userprivilege.equals("root")
+                            && act.equals("delete_vdisk")) {
                         new UnregisterVdiskHandler().handleMessage(
                                 new UnregisterVdiskMessage(Integer
                                         .parseInt(queryMap.get("vdisk_id"))),
                                 null, null, null);
                     }
 
-                    fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                            "image.html");
-
                     // list all vdisk
                     String vdisk_show = "";
-                    for (Vdisk vdisk : Vdisk.all()) {
-                        vdisk_show = vdisk_show
-                                + "<tr><td>"
-                                + vdisk.getId()
-                                + "</td><td>"
-                                + vdisk.getDisplayName()
-                                + "</td><td>"
-                                + vdisk.getFileName()
-                                + "."
-                                + vdisk.getDiskFormat()
-                                + "</td><td>"
-                                + vdisk.getOsFamily()
-                                + "</td><td>"
-                                + vdisk.getOsName()
-                                + "</td><td>"
-                                + vdisk.getDescription()
-                                + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
-                                + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
-                                + "<ul class='dropdown-menu'> "
-                                + "<li><a href='delete_vdisk?vdisk_id="
-                                + vdisk.getId() + "'> Delete Image</a></li>"
-                                + "</ul></div></td></tr>";
+                    if (userprivilege.equals("root")) {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "image.html");
+                        for (Vdisk vdisk : Vdisk.all()) {
+                            vdisk_show = vdisk_show
+                                    + "<tr><td>"
+                                    + vdisk.getId()
+                                    + "</td><td>"
+                                    + vdisk.getDisplayName()
+                                    + "</td><td>"
+                                    + vdisk.getFileName()
+                                    + "."
+                                    + vdisk.getDiskFormat()
+                                    + "</td><td>"
+                                    + vdisk.getOsFamily()
+                                    + "</td><td>"
+                                    + vdisk.getOsName()
+                                    + "</td><td>"
+                                    + vdisk.getDescription()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='delete_vdisk?vdisk_id="
+                                    + vdisk.getId()
+                                    + "'> Delete Image</a></li>"
+                                    + "</ul></div></td></tr>";
+                        }
+                    } else {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "image1.html");
+                        for (Vdisk vdisk : Vdisk.all()) {
+                            vdisk_show = vdisk_show
+                                    + "<tr><td>"
+                                    + vdisk.getId()
+                                    + "</td><td>"
+                                    + vdisk.getDisplayName()
+                                    + "</td><td>"
+                                    + vdisk.getFileName()
+                                    + "."
+                                    + vdisk.getDiskFormat()
+                                    + "</td><td>"
+                                    + vdisk.getOsFamily()
+                                    + "</td><td>"
+                                    + vdisk.getOsName()
+                                    + "</td><td>"
+                                    + vdisk.getDescription()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "</ul></div></td></tr>";
+                        }
                     }
                     values.put("vdisk_show", vdisk_show);
                 }
 
-                else if (act.equals("monitor")) {
+                // --------------------------- http request to show monitor info
+                // --------------------------
+                else if (!userprivilege.equals("normal")
+                        && act.equals("monitor")) {
 
                     String pnode_monitor_show = "";
                     String pnode_id_list = "";
@@ -837,9 +1035,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             "monitor.html");
                 }
 
-                // --------------------------- http request from monitor page
+                // --------------------------- http request from monitor
+                // page
                 // --------------------------
-                else if (act.equals("getMonitorData")) {
+                else if (!userprivilege.equals("normal")
+                        && act.equals("getMonitorData")) {
                     double[][] monitor_data;
 
                     monitor_data = RRDTools.getMonitorInfo(Integer
@@ -867,18 +1067,51 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     return ret;
                 }
 
-                // --------------------------- http request from account page
+                // --------------------------- http request from account
+                // page
                 // --------------------------
-                else if (act.equals("account") || act.equals("add_user")
+                else if (!userprivilege.equals("normal")
+                        && act.equals("account") || act.equals("add_user")
                         || act.equals("delete_user")
                         || act.equals("pass_modify")) {
 
-                    if (act.equals("add_user")) {
-                        new AddUserHandler().handleMessage(new AddUserMessage(
-                                queryMap.get("username"),
-                                queryMap.get("email"),
-                                queryMap.get("password"), "normal", "true"),
-                                null, null, null);
+                    if (userprivilege.equals("root") && act.equals("add_user")) {
+                        if (Users.findByName(queryMap.get("username")) != null) {
+                            String adduser_error = "alert('The User Name has exist!')";
+                            values.put("adduser_error", adduser_error);
+                        } else if (Users.findByEmail(queryMap.get("email")) != null) {
+                            String adduser_error = "alert('The Email Address has exist!')";
+                            values.put("adduser_error", adduser_error);
+                        } else {
+                            new AddUserHandler().handleMessage(
+                                    new AddUserMessage(
+                                            queryMap.get("username"), queryMap
+                                                    .get("email"), queryMap
+                                                    .get("password"), "admin",
+                                            "true", session_ip_loginuser.get(
+                                                    remote_ipaddr).getId()),
+                                    null, null, null);
+                        }
+                    }
+
+                    else if (userprivilege.equals("admin")
+                            && act.equals("add_user")) {
+                        if (Users.findByName(queryMap.get("username")) != null) {
+                            String adduser_error = "alert('The User Name has exist!')";
+                            values.put("adduser_error", adduser_error);
+                        } else if (Users.findByEmail(queryMap.get("email")) != null) {
+                            String adduser_error = "alert('The Email Address has exist!')";
+                            values.put("adduser_error", adduser_error);
+                        } else {
+                            new AddUserHandler().handleMessage(
+                                    new AddUserMessage(
+                                            queryMap.get("username"), queryMap
+                                                    .get("email"), queryMap
+                                                    .get("password"), "normal",
+                                            "true", session_ip_loginuser.get(
+                                                    remote_ipaddr).getId()),
+                                    null, null, null);
+                        }
                     }
 
                     else if (act.equals("delete_user")) {
@@ -902,26 +1135,41 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     // list all users
                     String user_show = "";
-                    for (Users user : Users.all()) {
-                        user_show = user_show
-                                + "<tr><td>"
-                                + user.getId()
-                                + "</td><td>"
-                                + user.getName()
-                                + "</td><td>"
-                                + user.getEmail()
-                                + "</td><td>"
-                                + user.getPassword()
-                                + "</td><td>"
-                                + user.getPrivilege()
-                                + "</td><td>"
-                                + user.getActivated()
-                                + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
-                                + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
-                                + "<ul class='dropdown-menu'> "
-                                + "<li><a href='delete_user?user_id="
-                                + user.getId() + "'> Delete</a></li>"
-                                + "</ul></div></td></tr>";
+                    List<Users> users = new ArrayList<Users>();
+                    if (userprivilege.equals("root")) {
+                        users = Users.all();
+                    } else if (userprivilege.equals("admin")) {
+                        for (UserRelations urre : UserRelations
+                                .getByAdminUserId(session_ip_loginuser.get(
+                                        remote_ipaddr).getId())) {
+                            users.add(Users.findById(urre.getNormalUserId()));
+                        }
+                    }
+
+                    if (users == null) {
+                        user_show = "None normal users";
+                    } else {
+                        for (Users user : users) {
+                            user_show = user_show
+                                    + "<tr><td>"
+                                    + user.getId()
+                                    + "</td><td>"
+                                    + user.getName()
+                                    + "</td><td>"
+                                    + user.getEmail()
+                                    + "</td><td>"
+                                    + user.getPassword()
+                                    + "</td><td>"
+                                    + user.getPrivilege()
+                                    + "</td><td>"
+                                    + user.getActivated()
+                                    + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                    + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                    + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='delete_user?user_id="
+                                    + user.getId() + "'> Delete</a></li>"
+                                    + "</ul></div></td></tr>";
+                        }
                     }
 
                     values.put("user_show", user_show);
@@ -932,64 +1180,72 @@ public class MasterHttpHandler extends SimpleHttpHandler {
             }
         }
 
-        // ----------------- 初始化overview html显示变量 --------------------
-        int user_total = 0;
-        int root_user_total = 0;
-        int normal_user_total = 0;
-        int not_activated_user_total = 0;
+        // 如果登录
+        if (session_ip_islogin.get(remote_ipaddr)) {
+            // ----------------- 初始化overview html显示变量 --------------------
+            int user_total = 0;
+            int root_user_total = 0;
+            int normal_user_total = 0;
+            int not_activated_user_total = 0;
 
-        for (Users user : Users.all()) { // *********** users var **********
-            user_total++;
+            for (Users user : Users.all()) { // *********** users var **********
+                user_total++;
 
-            if (user.getPrivilege().equals("root")) {
-                root_user_total++;
-            } else if (user.getPrivilege().equals("normal")) {
-                normal_user_total++;
+                if (user.getPrivilege().equals("root")) {
+                    root_user_total++;
+                } else if (user.getPrivilege().equals("normal")) {
+                    normal_user_total++;
+                }
+
+                if (user.getActivated().equals("0")) {
+                    not_activated_user_total++;
+                }
             }
 
-            if (user.getActivated().equals("0")) {
-                not_activated_user_total++;
+            if (session_ip_loginuser.get(remote_ipaddr).getPrivilege()
+                    .equals("root")) {
+                values.put("user_total", user_total);
+                values.put("root_user_total", root_user_total);
+                values.put("normal_user_total", normal_user_total);
+                values.put("not_activated_user_total", not_activated_user_total);
+            } else {
+                values.put("hide_head", "<!--");
+                values.put("hide_tail", "-->");
             }
-        }
 
-        values.put("user_total", user_total);
-        values.put("root_user_total", root_user_total);
-        values.put("normal_user_total", normal_user_total);
-        values.put("not_activated_user_total", not_activated_user_total);
-
-        int pmachine_total = 0;
-        int working_pmachine_toal = 0;
-        int failed_pmachine_total = 0;
-        int retired_pmachine_total = 0;
-        for (Pnode pnode : Pnode.all()) { // ************* pmachine var
-                                          // **********
-            pmachine_total++;
-            if (pnode.getStatusCode().equals("RUNNING")) {
-                working_pmachine_toal++;
-            } else if (pnode.getStatusCode().equals("CONNECT_FAILURE")) {
-                failed_pmachine_total++;
-            } else if (pnode.getStatusCode().equals("RETIRED")) {
-                retired_pmachine_total++;
+            int pmachine_total = 0;
+            int working_pmachine_toal = 0;
+            int failed_pmachine_total = 0;
+            int retired_pmachine_total = 0;
+            for (Pnode pnode : Pnode.all()) { // ************* pmachine var
+                                              // **********
+                pmachine_total++;
+                if (pnode.getStatusCode().equals("RUNNING")) {
+                    working_pmachine_toal++;
+                } else if (pnode.getStatusCode().equals("CONNECT_FAILURE")) {
+                    failed_pmachine_total++;
+                } else if (pnode.getStatusCode().equals("RETIRED")) {
+                    retired_pmachine_total++;
+                }
             }
-        }
-        values.put("pmachine_total", pmachine_total);
-        values.put("working_pmachine_toal", working_pmachine_toal);
-        values.put("failed_pmachine_total", failed_pmachine_total);
-        values.put("retired_pmachine_total", retired_pmachine_total);
+            values.put("pmachine_total", pmachine_total);
+            values.put("working_pmachine_toal", working_pmachine_toal);
+            values.put("failed_pmachine_total", failed_pmachine_total);
+            values.put("retired_pmachine_total", retired_pmachine_total);
 
-        int vcluter_num = 0;
-        for (Vcluster vcluster : Vcluster.all()) { // *********** vcluster
-                                                   // var **********
-            vcluter_num++;
-        }
-        values.put("vcluster_num", vcluter_num);
+            int vcluter_num = 0;
+            for (Vcluster vcluster : Vcluster.all()) { // *********** vcluster
+                                                       // var **********
+                vcluter_num++;
+            }
+            values.put("vcluster_num", vcluter_num);
 
-        int vmachine_num = 0;
-        for (Vnode vnode : Vnode.all()) { // *********** vnode var
-                                          // **********
-            vmachine_num++;
-        }
-        values.put("vmachine_num", vmachine_num);
+            int vmachine_num = 0;
+            for (Vnode vnode : Vnode.all()) { // *********** vnode var
+                                              // **********
+                vmachine_num++;
+            }
+            values.put("vmachine_num", vmachine_num);
         }
 
         return Utils.expandTemplateFile(fpath, values);

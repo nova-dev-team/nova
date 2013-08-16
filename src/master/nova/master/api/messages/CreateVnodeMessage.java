@@ -7,7 +7,7 @@ public class CreateVnodeMessage {
 
     public CreateVnodeMessage(String vmImage, String vmName, int cpuCount,
             int memorySize, String applianceList, int pnodeId, int ipOffset,
-            String vClusterName, boolean is_one, String hypervior) {
+            String vClusterName, boolean is_one, String hypervior, long user_id) {
         this.vmImage = vmImage;
         this.vmName = vmName;
         this.cpuCount = cpuCount;
@@ -18,11 +18,13 @@ public class CreateVnodeMessage {
         this.vClusterName = vClusterName;
         this.is_one = is_one;
         this.hypervisor = hypervior;
+        this.user_id = user_id;
     }
 
     public String vmImage, vmName, applianceList, vClusterName, hypervisor;
     public int cpuCount, memorySize;
     public int pnodeId, ipOffset;
     public boolean is_one;
+    public long user_id;
 
 }
