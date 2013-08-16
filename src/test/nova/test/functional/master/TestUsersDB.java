@@ -33,7 +33,7 @@ public class TestUsersDB {
 
     @Test
     public void testfind() {
-        Users us = Users.findById(1);
+        Users us = Users.findById(9);
         System.out.println(us.toString());
 
         Users usr = Users.findByName("hechuan");

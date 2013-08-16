@@ -20,16 +20,19 @@ public class AddUserHandler implements SimpleHandler<AddUserMessage> {
     @Override
     public void handleMessage(AddUserMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
+        String email = msg.user_email;
+        email = email.replace("%40", "@");
         Users user = Users.findByName(msg.user_name);
         if (user == null) {
             if (msg.create_userid == 0 || msg.user_privilege.equals("admin")) {
-                Users ur = new Users(msg.user_name, msg.user_email,
-                        msg.user_password, msg.user_privilege, msg.user_actived);
+                Users ur = new Users(msg.user_name, email, msg.user_password,
+                        msg.user_privilege, msg.user_actived);
                 ur.save();
                 log.info("Added new admin user: " + ur.getName());
             } else if (msg.user_privilege.equals("normal")) {
-                Users ur = new Users(msg.user_name, msg.user_email,
-                        msg.user_password, msg.user_privilege, msg.user_actived);
+                Users ur = new Users(msg.user_name, email, msg.user_password,
+                        msg.user_privilege, msg.user_actived);
+
                 ur.save();
                 ur = Users.findByName(msg.user_name);
                 UserRelations urre = new UserRelations(ur.getId(),

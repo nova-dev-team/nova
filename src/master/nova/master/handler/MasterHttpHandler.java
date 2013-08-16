@@ -234,7 +234,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                 .get("privilege"), "true", 0),
                                 null, null, null);
 
-                        String ret = "<html><head><meta http-equiv='refresh' content='3,;url=login'></head>"
+                        String ret = "<html><head><meta http-equiv='refresh' content='3;url=login'></head>"
                                 + "<body><p>Register success! Waiting to jump to main login page ...</p></body></html>";
 
                         return ret;
