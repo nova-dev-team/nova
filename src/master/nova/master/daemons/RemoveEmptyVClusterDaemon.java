@@ -18,19 +18,20 @@ public class RemoveEmptyVClusterDaemon extends SimpleDaemon {
         // TODO Auto-generated method stub
         List<Vcluster> allvcls = Vcluster.all();
         for (Vcluster vcl : allvcls) {
-            boolean isempty = true;
+            int size = 0;
             for (int i = 0; i < vcl.getClusterSize(); i++) {
                 Vnode vnode = Vnode.findByIp(Utils.integerToIpv4(Utils
                         .ipv4ToInteger(vcl.getFristIp()) + i));
                 if (vnode != null) {
-                    isempty = false;
-                    break;
+                    size++;
                 }
             }
-            if (isempty == true) {
+            if (size == 0) {
                 Vcluster.delete(vcl);
+            } else {
+                vcl.setClusterSize(size);
+                vcl.save();
             }
-
         }
     }
 }
