@@ -24,6 +24,7 @@ public class DeleteUserHandler implements SimpleHandler<DeleteUserMessage> {
         if (user.getPrivilege().equals("admin")) {
             for (UserRelations urre : UserRelations.getByAdminUserId(msg.id)) {
                 UserRelations.delete(urre);
+                Users.delete(Users.findById(urre.getNormalUserId()));
             }
         } else if (user.getPrivilege().equals("normal")) {
             UserRelations.delete(UserRelations.findByNormalId(msg.id));
