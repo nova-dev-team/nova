@@ -69,8 +69,8 @@ public class PerfMon {
         MemoryInfo mem = new MemoryInfo();
         try {
             Mem smm = sigar.getMem();
-            mem.freeMemorySize = smm.getActualFree() / 1024 / 1024;
-            mem.usedMemorySize = smm.getActualUsed() / 1024 / 1024;
+            mem.freeMemorySize = smm.getFree() / 1024 / 1024;
+            mem.usedMemorySize = smm.getUsed() / 1024 / 1024;
             mem.totalMemorySize = smm.getTotal() / 1024 / 1024;
             mem.ramSize = smm.getRam();
         } catch (SigarException e) {

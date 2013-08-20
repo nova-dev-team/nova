@@ -25,7 +25,6 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
     @Override
     public void handleMessage(AddPnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
-        System.out.println("333");
         Pnode pnode = Pnode.findByIp(msg.pAddr.getIp());
         if (pnode == null) {
             // new pnode
@@ -33,8 +32,7 @@ public class AddPnodeHandler implements SimpleHandler<AddPnodeMessage> {
             pnode.setAddr(msg.pAddr);
             pnode.setVmCapacity(msg.vmCapacity);
             pnode.setStatus(Pnode.Status.ADD_PENDING);
-
-            pnode.setHostname(msg.pAddr.getInetSocketAddress().getHostName());
+            pnode.setHostname(msg.pAddr.getInetAddress().getHostName());
 
             getPnodeInfo(msg.pAddr, pnode);
             if (pnode.getMacAddress() == null

@@ -80,7 +80,8 @@ public class SimpleAddress {
     }
 
     public InetAddress getInetAddress() {
-        String[] ips = ip.split(".");
+        System.out.println(ip);
+        String[] ips = ip.split("\\.");
         byte[] bs = new byte[] { (byte) (int) Integer.valueOf(ips[0]),
                 (byte) (int) Integer.valueOf(ips[1]),
                 (byte) (int) Integer.valueOf(ips[2]),
