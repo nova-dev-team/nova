@@ -8,6 +8,9 @@
   <script language="javascript">
 	function check()
 	{
+
+		var email_regex = /[a-z0-9_]+@[a-z0-9]+\.[a-z]+/i;
+
     	if(form_register.username.value=="")
 		{
     		alert("注册用户名不能为空!");
@@ -40,7 +43,16 @@
 		    form_register.password_confirm.focus();
   			return false;
 		}
-		    
+
+		
+
+		if(!email_regex.test(form_register.email.value))
+		{
+			alert("Email格式不符");
+			form_register.email.focus();
+			return false;
+		}    
+
 	}
   </script>
 </head>

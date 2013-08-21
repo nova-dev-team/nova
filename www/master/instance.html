@@ -12,7 +12,19 @@
   <script src="js/bootstrap-dropdown.js"></script>
   
   <script language="javascript">
-         
+
+    function check_input()
+    {
+    	var number_regex=/[0-9]{5,}/;
+
+    	if(!number_regex.test(launch_instance.vnode_memsize.value))
+    		{
+    			alert("Memory must be number and it should be greater than 10000Kb");
+    			launch_instance.vnode_memsize.focus();
+  				return false;
+    		}
+    }    
+
   	function migration_process(vnode_id)
   	{
   		$("#Migration_Modal").modal('show');
@@ -134,7 +146,7 @@
 	      <h3>Launch a new instance</h3>
 	    </div>
 	    
-	    <form action="add_vnode" method="post" class="form-horizontal well">
+	    <form id="launch_instance" action="add_vnode" method="post" class="form-horizontal well" onsubmit="return check_input()">
 	        <div class="modal-body">
 	            <div class="control-group">	
 					<label class="control-label">Instance Name:</label>
@@ -143,7 +155,7 @@
 					</div>
 				</div>
 				<div class="control-group">	
-					<label class="control-label">Memery Size:</label>
+					<label class="control-label">Memery Size(Kb):</label>
 					<div class="controls">
 						<input class="span2" size="16" type="text" name="vnode_memsize">
 					</div>

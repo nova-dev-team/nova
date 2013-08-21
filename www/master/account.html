@@ -30,6 +30,8 @@
   	
   	function check_adduser()
 	{
+		var email_regex = /[a-z0-9_]+@[a-z0-9]+\.[a-z]+/i;
+
     	if(form_register.username.value=="")
 		{
     		alert("用户名不能为空!");
@@ -64,6 +66,14 @@
 		    form_register.password_confirm.focus();
   			return false;
 		}
+
+		if(!email_regex.test(form_register.email.value))
+		{
+			alert("Email格式不符");
+			form_register.email.focus();
+			return false;
+		}
+
 	}
 	
 	function check_passmodify()
@@ -94,6 +104,13 @@
 		    alert("新密码与确认密码不相符");
 		    pass_modify.newpass_confirm.focus();
   			return false;
+		}
+
+		if(pass_modify.newpass.value == pass_modify.oldpass.value)
+		{
+			alert("新旧密码相同！");
+			pass_modify.newpass.focus();
+			return false;
 		}
   	}
   </script>
