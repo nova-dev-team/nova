@@ -29,6 +29,7 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
                 Conf.getString("master.bind_host"),
                 Conf.getInteger("master.bind_port")));
 
+        log.info("...");
         Pnode pnode = Pnode.findById(Integer.parseInt(msg.pnodid));
         wp.connect(new InetSocketAddress(pnode.getIp(), Conf
                 .getInteger("worker.bind_port")));
