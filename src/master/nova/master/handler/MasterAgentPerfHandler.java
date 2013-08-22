@@ -29,9 +29,11 @@ public class MasterAgentPerfHandler implements SimpleHandler<AgentPerfMessage> {
     @Override
     public void handleMessage(AgentPerfMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
-        System.out.println("Got GeneralMonitorInfo from " + xreply);
+        System.out.println("Got AgentGeneralMonitorInfo from " + xreply);
         // TODO @zhaoxun get pair of uuid/rrdPath from database
         Vnode vnode = Vnode.findByIp(xreply.ip);
+        if (vnode == null)
+            vnode = Vnode.findByUuid(msg.vnodeuuid);
         if (vnode != null) {
             String rrdPath = "build/" + vnode.getUuid() + ".rrd";
 

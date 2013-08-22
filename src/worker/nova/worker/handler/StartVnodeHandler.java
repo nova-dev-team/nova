@@ -93,7 +93,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
         } else {
             retVnodeID = Long.parseLong(msg.getUuid());
             msg.setUuid(UUID.randomUUID().toString());
-            msg.setRunAgent(false);
+            msg.setRunAgent(true);
             if ((msg.getMemSize() == null)
                     || (msg.getMemSize().trim().equals(""))) {
                 msg.setMemSize("512000");
@@ -549,9 +549,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                 ipAddrFile));
                         outpw.println("agent.bind_host=" + msg.getIpAddr());
                         outpw.println("master.bind_host="
-                                + Conf.getString("master.bind_host"));
+                                + NovaWorker.masteraddr.ip);
                         outpw.println("master.bind_port="
-                                + Conf.getString("master.bind_port"));
+                                + NovaWorker.masteraddr.port);
+                        outpw.println("vnode.uuid=" + msg.getUuid());
                         outpw.close();
                     } catch (IOException e1) {
                         log.error(
@@ -613,8 +614,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     // "conf"),
                     // Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                     // "conf"), ignoreList);
-                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "run", "conf"),
-                            Utils.pathJoin(agentProgramFile.getAbsolutePath(),
+                    Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "conf"), Utils
+                            .pathJoin(agentProgramFile.getAbsolutePath(),
                                     "conf"));
                     Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "run", "bin"),
                             Utils.pathJoin(agentProgramFile.getAbsolutePath(),
