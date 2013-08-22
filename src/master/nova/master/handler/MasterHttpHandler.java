@@ -1147,6 +1147,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         }
                     }
                     values.put("vdisk_show", vdisk_show);
+
+                    // list all pnode
+                    String pnode_list = "";
+                    for (Pnode pnode : Pnode.all()) {
+                        pnode_list = pnode_list + "<option>" + pnode.getId()
+                                + "-" + pnode.getIp() + "</option>";
+                    }
+                    values.put("pnode_list", pnode_list);
                 }
 
                 // --------------------------- http request to show monitor info
