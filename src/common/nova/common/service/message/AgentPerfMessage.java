@@ -2,6 +2,7 @@ package nova.common.service.message;
 
 import nova.common.tools.perf.GeneralMonitorInfo;
 import nova.common.tools.perf.PerfMon;
+import nova.common.util.Conf;
 
 /**
  * General monitor information message contains some. Use
@@ -11,6 +12,12 @@ import nova.common.tools.perf.PerfMon;
  * 
  */
 public class AgentPerfMessage {
+
+    public String vnodeuuid;
+
+    public AgentPerfMessage() {
+        this.vnodeuuid = Conf.getString("vnode.uuid");
+    }
 
     private GeneralMonitorInfo monitorInfo = PerfMon.getGeneralMonitorInfo();
 
