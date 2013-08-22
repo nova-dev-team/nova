@@ -24,12 +24,8 @@ public class AddUserHandler implements SimpleHandler<AddUserMessage> {
         email = email.replace("%40", "@");
         Users user = Users.findByName(msg.user_name);
         if (user == null) {
-            if (msg.create_userid == 0 || msg.user_privilege.equals("admin")) {
-                Users ur = new Users(msg.user_name, email, msg.user_password,
-                        msg.user_privilege, msg.user_actived);
-                ur.save();
-                log.info("Added new admin user: " + ur.getName());
-            } else if (msg.user_privilege.equals("normal")) {
+            if (msg.create_userid != 0
+                    && msg.user_privilege.equals(Users.user_type.Normal)) {
                 Users ur = new Users(msg.user_name, email, msg.user_password,
                         msg.user_privilege, msg.user_actived);
 
@@ -39,6 +35,13 @@ public class AddUserHandler implements SimpleHandler<AddUserMessage> {
                         msg.create_userid);
                 urre.save();
                 log.info("Added new normal user: " + ur.getName());
+            }
+
+            else { // register or create root, enterprise, individual user
+                Users ur = new Users(msg.user_name, email, msg.user_password,
+                        msg.user_privilege, msg.user_actived);
+                ur.save();
+                log.info("Added new user: " + ur.getName());
             }
         } else {
             log.info("The user already exist");
