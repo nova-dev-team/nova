@@ -717,14 +717,26 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             vcluster_script_in_instance = vcluster_script_in_instance
                                     + "document.getElementById('lid_"
                                     + vcluster.getClusterName()
-                                    + "').className=''; "
+                                    + "').className=';'; "
                                     + "document.getElementById('col_"
                                     + vcluster.getClusterName()
-                                    + "').style.display='none'";
+                                    + "').style.display='none';";
+
                             vcluster_script = vcluster_script
-                                    + "function cluster_"
-                                    + vcluster.getId()
-                                    + "(){"
+                                    + "function cluster_" + vcluster.getId()
+                                    + "(){";
+                            // disable all the 'active' and 'block' cluster
+                            for (Vcluster vcluster0 : searchvcluster) {
+                                if (vcluster0 != vcluster)
+                                    vcluster_script = vcluster_script
+                                            + "document.getElementById('lid_"
+                                            + vcluster0.getClusterName()
+                                            + "').className = ';';"
+                                            + "document.getElementById('col_"
+                                            + vcluster0.getClusterName()
+                                            + "').style.display='none';";
+                            }
+                            vcluster_script = vcluster_script
                                     + "document.getElementById('all_instance').className='';"
                                     + "document.getElementById('view_instance').style.display='none';"
                                     + "document.getElementById('lid_"
@@ -732,7 +744,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "').className='active';"
                                     + "document.getElementById('col_"
                                     + vcluster.getClusterName()
-                                    + "').style.display='block';}";
+                                    + "').style.display='block';}\n";
 
                             vcluster_indiv = vcluster_indiv
                                     + "<div id='col_"
@@ -746,7 +758,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "<th>Ip Address</th><th>Memery Size</th>"
                                     + "<th>Hypervisor</th><th>Virtual Cluster Id</th>"
                                     + "<th>Physical Machine Id</th><th>Status</th>"
-                                    + "<th>Action</th></tr></thead>";
+                                    + "<th>Action</th></tr></thead><tbody>";
                             for (Vnode vnode : searchvnode) {
                                 if (vnode.getVclusterId() == vcluster.getId()) {
                                     vcluster_indiv = vcluster_indiv
@@ -766,7 +778,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                             + vnode.getPmachineId()
                                             + "</td><td>"
                                             + vnode.getStatus()
-                                            + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                            + "</td><td>\n<div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                             + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                             + "<ul class='dropdown-menu'> "
                                             + "<li><a href='vncview?vnode_id="
@@ -792,10 +804,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                             + "<li><a href='delete_vnode?vnode_id="
                                             + vnode.getId()
                                             + "'>Delete</a></li>"
-                                            + "</ul></div></td></tr>";
+                                            + "</ul></div>\n</td></tr>";
                                 }
                             }
-                            vcluster_indiv = vcluster_indiv + "</div>";
+                            vcluster_indiv = vcluster_indiv
+                                    + "</tbody></table></div>\n";
 
                         }
 
