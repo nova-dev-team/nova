@@ -41,8 +41,8 @@ else:
 my_abs_path = os.path.abspath(__file__)
 
 bin_dir = os.path.dirname(my_abs_path)
-nova_home = os.path.abspath(os.path.join(bin_dir, ".."))
 
+nova_home = os.path.abspath(os.path.join(bin_dir, ".."))
 # search for VERSION file
 nova_ver = None
 cur_dir = nova_home
@@ -98,6 +98,11 @@ for fn in os.listdir(lib_dir):
 
 class_path = merge_path(class_path, "bin/nova-%s.jar" % nova_ver)
 
+# set LD_LIBRARY_PATH
+
+os.system('echo $LD_LIBRARY_PATH')
+ld_library_path = os.path.join(nova_home,'lib/sigar')
+os.environ["LD_LIBRARY_PATH"]=merge_path(ld_library_path,os.environ["LD_LIBRARY_PATH"])
 
 # create dirs if necessary
 for dir_name in ["log", "run"]:

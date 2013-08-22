@@ -376,11 +376,10 @@ public class Utils {
      * @param ipv4
      * @return intIp
      */
-    public static int ipv4ToInteger(String ipv4) {
+    public static long ipv4ToInteger(String ipv4) {
         String[] params = ipv4.split("\\.");
-        return ((Integer.parseInt(params[0]) * 256 + Integer
-                .parseInt(params[1])) * 256 + Integer.parseInt(params[2]))
-                * 256 + Integer.parseInt(params[3]);
+        return ((Long.parseLong(params[0]) * 256 + Long.parseLong(params[1])) * 256 + Long
+                .parseLong(params[2])) * 256 + Long.parseLong(params[3]);
     }
 
     /**
@@ -389,8 +388,8 @@ public class Utils {
      * @param intIp
      * @return ipv4
      */
-    public static String integerToIpv4(int intIp) {
-        int[] params = new int[4];
+    public static String integerToIpv4(long intIp) {
+        long[] params = new long[4];
         for (int i = 3; i > -1; i--) {
             params[i] = intIp % 256;
             intIp = intIp / 256;

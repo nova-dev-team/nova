@@ -30,7 +30,6 @@ public class MasterAgentPerfHandler implements SimpleHandler<AgentPerfMessage> {
     public void handleMessage(AgentPerfMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
         System.out.println("Got AgentGeneralMonitorInfo from " + xreply);
-        // TODO @zhaoxun get pair of uuid/rrdPath from database
         Vnode vnode = Vnode.findByIp(xreply.ip);
         if (vnode == null)
             vnode = Vnode.findByUuid(msg.vnodeuuid);
@@ -38,7 +37,7 @@ public class MasterAgentPerfHandler implements SimpleHandler<AgentPerfMessage> {
             String rrdPath = "build/" + vnode.getUuid() + ".rrd";
 
             int timeInterval = 5;
-            int rrdLength = 5000;
+            int rrdLength = 50000;
 
             File file = new File(rrdPath);
             if (file.exists() == false) {
@@ -56,7 +55,6 @@ public class MasterAgentPerfHandler implements SimpleHandler<AgentPerfMessage> {
                 logger.error("Error updating RRD", ex);
             }
 
-            logger.info("Got GeneralMonitorInfo from " + xreply);
         }
     }
 

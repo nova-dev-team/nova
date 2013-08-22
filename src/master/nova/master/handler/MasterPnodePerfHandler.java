@@ -57,7 +57,6 @@ public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
                 logger.error("Error updating RRD", ex);
             }
 
-            logger.info("Got GeneralMonitorInfo from " + xreply);
         }
     }
 }

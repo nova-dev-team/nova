@@ -67,6 +67,8 @@ public class NovaAgent extends SimpleServer {
      */
     private static NovaAgent instance = null;
 
+    public static SimpleAddress masteraddr = null;
+
     SimpleAddress addr = new SimpleAddress(Conf.getString("agent.bind_host"),
             Conf.getInteger("agent.bind_port"));
 
@@ -104,6 +106,8 @@ public class NovaAgent extends SimpleServer {
 
         SimpleAddress masterAddress = new SimpleAddress(
                 Conf.getString("master.bind_host"),
+                Conf.getInteger("master.bind_port"));
+        masteraddr = new SimpleAddress(Conf.getString("master.bind_host"),
                 Conf.getInteger("master.bind_port"));
         registerMaster(masterAddress);
     }

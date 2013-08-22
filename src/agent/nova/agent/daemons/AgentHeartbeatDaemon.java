@@ -22,9 +22,12 @@ public class AgentHeartbeatDaemon extends SimpleDaemon {
 
     @Override
     protected void workOneRound() {
-        MasterProxy proxy = NovaAgent.getInstance().getMaster();
-        if (proxy != null) {
-            proxy.sendAgentHeartbeat();
+        MasterProxy master = NovaAgent.getInstance().getMaster();
+        if (master != null) {
+            if (master.isConnected() == false) {
+                NovaAgent.getInstance().registerMaster(NovaAgent.masteraddr);
+            }
+            NovaAgent.getInstance().getMaster().sendAgentHeartbeat();
         }
     }
 

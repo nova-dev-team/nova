@@ -38,8 +38,8 @@ public class CreateVclusterHandler implements
         // TODO Auto-generated method stub
         // to modify
 
-        List<Integer> usedIpSegments = new ArrayList<Integer>();
-        int gatewayIpIval = Utils.ipv4ToInteger(Conf
+        List<Long> usedIpSegments = new ArrayList<Long>();
+        long gatewayIpIval = Utils.ipv4ToInteger(Conf
                 .getString("vnode.gateway_ip"));
         usedIpSegments.add(gatewayIpIval);
         usedIpSegments.add(gatewayIpIval);
@@ -51,15 +51,15 @@ public class CreateVclusterHandler implements
         }
         Collections.sort(usedIpSegments);
 
-        int firstUsableIpIval = Utils.ipv4ToInteger(Conf
+        long firstUsableIpIval = Utils.ipv4ToInteger(Conf
                 .getString("vnode.first_usable_ip"));
-        int lastUsableIpIval = Utils.ipv4ToInteger(Conf
+        long lastUsableIpIval = Utils.ipv4ToInteger(Conf
                 .getString("vnode.last_usable_ip"));
 
-        int testIpIval = firstUsableIpIval;
+        long testIpIval = firstUsableIpIval;
 
         while (testIpIval + msg.vclusterSize - 1 < lastUsableIpIval) {
-            int testLastIpIval = testIpIval + msg.vclusterSize - 1;
+            long testLastIpIval = testIpIval + msg.vclusterSize - 1;
             boolean usable = true;
             for (int i = 0; i < usedIpSegments.size(); i = i + 2) {
                 if (testLastIpIval < usedIpSegments.get(i)
