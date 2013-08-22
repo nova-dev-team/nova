@@ -934,7 +934,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------
                 else if (!userprivilege.equals("Normal") && act.equals("image")
                         || act.equals("add_vdisk")
-                        || act.equals("delete_vdisk")) {
+                        || act.equals("delete_vdisk")
+                        || act.equals("showlaunch")) {
 
                     if (userprivilege.equals("Root") && act.equals("add_vdisk")) {
                         new RegisterVdiskHandler().handleMessage(
@@ -955,6 +956,23 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 new UnregisterVdiskMessage(Integer
                                         .parseInt(queryMap.get("vdisk_id"))),
                                 null, null, null);
+                    }
+
+                    else if (userprivilege.equals("Root")
+                            && act.equals("showlaunch")) {
+                        String vdisk_launch = Vdisk.findById(
+                                Integer.parseInt(queryMap.get("vdisk_id")))
+                                .getFileName()
+                                + "."
+                                + Vdisk.findById(
+                                        Integer.parseInt(queryMap
+                                                .get("vdisk_id")))
+                                        .getDiskFormat();
+
+                        String launch_module_show = "$('#LaunchInstance_Modal').modal('show');";
+
+                        values.put("vdisk_launch", vdisk_launch);
+                        values.put("launch_module_show", launch_module_show);
                     }
 
                     // list all vdisk
@@ -981,6 +999,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                     + "<ul class='dropdown-menu'> "
+                                    + "<li><a data-toggle='modal' href='showlaunch?vdisk_id="
+                                    + vdisk.getId()
+                                    + "'> Launch Instance </a></li>"
+                                    + "<li class='divider'>"
                                     + "<li><a href='delete_vdisk?vdisk_id="
                                     + vdisk.getId()
                                     + "'> Delete Image</a></li>"
@@ -1338,7 +1360,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
             // ----------------- 初始化overview html显示变量 --------------------
             int user_total = 0;
             int root_user_total = 0;
-            int normal_user_total = 0;
+            int enterprise_user_total = 0;
+            int individual_user_total = 0;
             int not_activated_user_total = 0;
 
             for (Users user : Users.all()) { // *********** users var **********
@@ -1346,8 +1369,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 if (user.getPrivilege().equals("Root")) {
                     root_user_total++;
+                } else if (user.getPrivilege().equals("Enterprise")) {
+                    enterprise_user_total++;
                 } else if (user.getPrivilege().equals("Normal")) {
-                    normal_user_total++;
+                    individual_user_total++;
                 }
 
                 if (user.getActivated().equals("0")) {
@@ -1359,7 +1384,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     .equals("Root")) {
                 values.put("user_total", user_total);
                 values.put("root_user_total", root_user_total);
-                values.put("normal_user_total", normal_user_total);
+                values.put("enterprise_user_total", enterprise_user_total);
+                values.put("individual_user_total", individual_user_total);
                 values.put("not_activated_user_total", not_activated_user_total);
             } else {
                 values.put("hide_head", "<!--");
