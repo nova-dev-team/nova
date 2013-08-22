@@ -13,6 +13,17 @@
   
   <script language="javascript">
 
+	function instance_view()
+  	{
+  		document.getElementById("all_instance").className="active";
+
+  		document.getElementById("view_instance").style.display="block";
+
+  		${vcluster_script_in_instance}               	                                                                                                                                                                                                                                                                                                                                                                                                             
+  	}
+
+  	${vcluster_script}
+
     function check_input()
     {
     	var number_regex=/[0-9]{5,}/;
@@ -77,7 +88,7 @@
 </head>
   
 <body>
-<!---------------------- Page Header  ------------------------------->
+<!---------------------- Page Header  -------------------------------->
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
     </div>
@@ -130,7 +141,13 @@
     </div>
     <!-- navbar -->
 
-    <!---------------------- Instance ------------------------------->
+    <!---------------------- Instance -------------------------------->
+    <div class="tabbable tabs-left">
+      <ul class="nav nav-tabs">
+        <li class="active" id="all_instance"><a data-toggle="tab" onclick="instance_view()" href="#">All Instances</a></li>
+        ${vcluster_list}
+      </ul>
+      <div class="tab-content" id="view_instance">
 	<br>
     <legend> Instances
 	    <div class="pull-right">
@@ -155,11 +172,9 @@
 					</div>
 				</div>
 				<div class="control-group">	
-					<label class="control-label">Memery Size:</label>
+					<label class="control-label">Memery Size(Kb):</label>
 					<div class="controls">
-					<div class="input-append">
-						<input class="span2" size="16" type="text" name="vnode_memsize"><span class="add-on">KB</span>
-					</div>
+						<input class="span2" size="16" type="text" name="vnode_memsize">
 					</div>
 				</div>
 				<div class="control-group">	
@@ -275,9 +290,9 @@
 		</tbody>
 		
 	</table>
-	
 	<!--
-    <!---------------------- Cluster ------------------------------->
+    <!---------------------- Cluster ------------------------------>
+    <div>
 	<br>
     <legend> Clusters
 	    <div class="pull-right">
@@ -287,6 +302,7 @@
     </legend>
     
     <!-- Add Cluster modal(Hide) -->
+    <div>
 	  <div id="AddCluster_Modal" class="modal hide fade">
 	    <div class="modal-header">
 	      <a class="close" data-dismiss="modal" >&times;</a>
@@ -315,6 +331,7 @@
 	    	</div>
 	    </form>
 	  </div>
+	</div>
 	  <!-- AddCluster_Modal -->
 	  
 	  
@@ -348,26 +365,34 @@
 			<th>osUsername</th> 
 			<th>Action</th>
 			</tr>
-		</thead>
-		
+		</thead>	
 		<tbody>
 			${vcluster_show}
 		</tbody>
 		
 	</table>
-   
-    <!---------------------- Page Footer  ------------------------------->
+    </div>
+</div>
+
+<!-----------Clusters Individually view---------------->
+${vcluster_indiv}
+
+</div>
+ 
+
+
+
+    <!---------------------- Page Footer  -------------------------------->
 	<footer class="footer">
   	  <hr>
 	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">Back To Top</a></p>
       <p> This is the "master" module of Nova System. </p>
       <p> Copyright @2013 by <a>hestream</a> in Nova development team.</p>
     </footer>
+    </div>
     <!-- footer -->
-
-  </div>
   <!-- container --> 
-  
+
   <script> ${create_instance_error} ${migration_error} ${createvcluster_error}</script>
 
 </body>

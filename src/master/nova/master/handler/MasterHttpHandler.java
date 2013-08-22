@@ -609,6 +609,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     // show all vcluster
                     String vcluster_show = "";
+                    String vcluster_list = "";
+                    String vcluster_indiv = "";
+                    String vcluster_script_in_instance = "";
+                    String vcluster_script = "";
 
                     // ------------- root and admin user's vnode
                     // show-------------
@@ -702,6 +706,110 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + vcluster.getId()
                                     + "'> Delete Cluster</a></li>"
                                     + "</ul></div></td></tr>";
+                            vcluster_list = vcluster_list
+                                    + "<li class='' id='lid_"
+                                    + vcluster.getClusterName()
+                                    + "'><a data-toggle='tab' onclick='cluster_"
+                                    + vcluster.getId() + "()' href='#'>"
+                                    + "Cluster: " + vcluster.getClusterName()
+                                    + "</a></li>";
+
+                            vcluster_script_in_instance = vcluster_script_in_instance
+                                    + "document.getElementById('lid_"
+                                    + vcluster.getClusterName()
+                                    + "').className=';'; "
+                                    + "document.getElementById('col_"
+                                    + vcluster.getClusterName()
+                                    + "').style.display='none';";
+
+                            vcluster_script = vcluster_script
+                                    + "function cluster_" + vcluster.getId()
+                                    + "(){";
+                            // disable all the 'active' and 'block' cluster
+                            for (Vcluster vcluster0 : searchvcluster) {
+                                if (vcluster0 != vcluster)
+                                    vcluster_script = vcluster_script
+                                            + "document.getElementById('lid_"
+                                            + vcluster0.getClusterName()
+                                            + "').className = ';';"
+                                            + "document.getElementById('col_"
+                                            + vcluster0.getClusterName()
+                                            + "').style.display='none';";
+                            }
+                            vcluster_script = vcluster_script
+                                    + "document.getElementById('all_instance').className='';"
+                                    + "document.getElementById('view_instance').style.display='none';"
+                                    + "document.getElementById('lid_"
+                                    + vcluster.getClusterName()
+                                    + "').className='active';"
+                                    + "document.getElementById('col_"
+                                    + vcluster.getClusterName()
+                                    + "').style.display='block';}\n";
+
+                            vcluster_indiv = vcluster_indiv
+                                    + "<div id='col_"
+                                    + vcluster.getClusterName()
+                                    + "' class='tab-content' style='display:none'>"
+                                    + "<legend>"
+                                    + vcluster.getClusterName()
+                                    + "\'s Instances"
+                                    + "</legend>"
+                                    + "<table class='table table-striped table-hover'><thead><tr><th>Id</th><th>Instance Name</th>"
+                                    + "<th>Ip Address</th><th>Memery Size</th>"
+                                    + "<th>Hypervisor</th><th>Virtual Cluster Id</th>"
+                                    + "<th>Physical Machine Id</th><th>Status</th>"
+                                    + "<th>Action</th></tr></thead><tbody>";
+                            for (Vnode vnode : searchvnode) {
+                                if (vnode.getVclusterId() == vcluster.getId()) {
+                                    vcluster_indiv = vcluster_indiv
+                                            + "<tr><td>"
+                                            + vnode.getId()
+                                            + "</td><td>"
+                                            + vnode.getName()
+                                            + "</td><td>"
+                                            + vnode.getIp()
+                                            + "</td><td>"
+                                            + vnode.getMemorySize()
+                                            + "</td><td>"
+                                            + vnode.getHypervisor()
+                                            + "</td><td>"
+                                            + vnode.getVclusterId()
+                                            + "</td><td>"
+                                            + vnode.getPmachineId()
+                                            + "</td><td>"
+                                            + vnode.getStatus()
+                                            + "</td><td>\n<div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
+                                            + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
+                                            + "<ul class='dropdown-menu'> "
+                                            + "<li><a href='vncview?vnode_id="
+                                            + vnode.getId()
+                                            + "'>View</a></li>"
+                                            + "<li><a href='#Migration_Modal' onclick='migration_process("
+                                            + vnode.getId()
+                                            + ")"
+                                            + "'>Migrate</a></li>"
+                                            + "<li><a href='start_vnode?vnode_id="
+                                            + vnode.getId()
+                                            + "'>Start</a></li>"
+                                            + "<li><a href='wakeup_vnode?vnode_id="
+                                            + vnode.getId()
+                                            + "'>Wakeup</a></li>"
+                                            + "<li><a href='pause_vnode?vnode_id="
+                                            + vnode.getId()
+                                            + "'>Pause</a></li>"
+                                            + "<li><a href='shutdown_vnode?vnode_id="
+                                            + vnode.getId()
+                                            + "'> Shutdown </a></li>"
+                                            + "<li class='divider'>"
+                                            + "<li><a href='delete_vnode?vnode_id="
+                                            + vnode.getId()
+                                            + "'>Delete</a></li>"
+                                            + "</ul></div>\n</td></tr>";
+                                }
+                            }
+                            vcluster_indiv = vcluster_indiv
+                                    + "</tbody></table></div>\n";
+
                         }
 
                         // list all vdisk
@@ -809,6 +917,12 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     values.put("vnode_show", vnode_show);
+                    values.put("vcluster_list", vcluster_list);
+                    values.put("vcluster_script_in_instance",
+                            vcluster_script_in_instance);
+                    values.put("vcluster_script", vcluster_script);
+                    values.put("vcluster_indiv", vcluster_indiv);
+
                     if (vnode_show == "") {
                         values.put("vnode_show", "None Instance!");
                     }
@@ -1034,6 +1148,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         }
                     }
                     values.put("vdisk_show", vdisk_show);
+
+                    // list all pnode
+                    String pnode_list = "";
+                    for (Pnode pnode : Pnode.all()) {
+                        pnode_list = pnode_list + "<option>" + pnode.getId()
+                                + "-" + pnode.getIp() + "</option>";
+                    }
+                    values.put("pnode_list", pnode_list);
                 }
 
                 // --------------------------- http request to show monitor info
