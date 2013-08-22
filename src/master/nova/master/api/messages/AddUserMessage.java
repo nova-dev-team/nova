@@ -1,5 +1,7 @@
 package nova.master.api.messages;
 
+import nova.master.models.Users;
+
 public class AddUserMessage {
 
     public AddUserMessage() {
@@ -7,8 +9,8 @@ public class AddUserMessage {
     }
 
     public AddUserMessage(String user_name, String user_email,
-            String user_password, String user_privilege, String user_actived,
-            long create_userid) {
+            String user_password, Users.user_type user_privilege,
+            String user_actived, long create_userid) {
 
         this.user_name = user_name;
         this.user_email = user_email;
@@ -25,7 +27,7 @@ public class AddUserMessage {
 
     public String user_password;
 
-    public String user_privilege;
+    public Users.user_type user_privilege;
 
     public String user_actived;
 

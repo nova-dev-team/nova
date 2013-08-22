@@ -17,6 +17,11 @@ public class Users extends DbObject {
     /**
      * @anthor: hestream
      */
+
+    public static enum user_type {
+        Root, Enterprise, Individual, Normal
+    }
+
     private static DbManager manager = null;
 
     public static List<Users> all() {
@@ -94,13 +99,13 @@ public class Users extends DbObject {
     }
 
     /** full constructor */
-    public Users(String name, String email, String password, String privilege,
-            String activated) {
+    public Users(String name, String email, String password,
+            user_type privilege, String activated) {
 
         this.name = name;
         this.email = email;
         this.password = password;
-        this.privilege = privilege;
+        this.privilege = privilege.toString();
         this.activated = activated;
 
     }
@@ -138,11 +143,15 @@ public class Users extends DbObject {
     }
 
     public void setPrivilege(String privilege) {
-        this.privilege = privilege;
+        this.privilege = privilege.toString();
     }
 
     public void setActivated(String activated) {
         this.activated = activated;
+    }
+
+    public void setUsertype(user_type ut) {
+        this.privilege = ut.toString();
     }
 
     /**

@@ -15,6 +15,7 @@ import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
 import nova.common.util.RRDTools;
 import nova.common.util.Utils;
+import nova.master.api.messages.ActiveUserMessage;
 import nova.master.api.messages.AddPnodeMessage;
 import nova.master.api.messages.AddUserMessage;
 import nova.master.api.messages.CreateVclusterMessage;
@@ -28,6 +29,7 @@ import nova.master.api.messages.ModifyUserPassMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.ResumeVnodeMessage;
 import nova.master.api.messages.StartVnodeMessage;
+import nova.master.api.messages.StopUserMessage;
 import nova.master.api.messages.StopVnodeMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
 import nova.master.models.Appliance;
@@ -191,10 +193,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         String user_name = queryMap.get("username");
                         String user_passwd = queryMap.get("password");
                         Users ur = Users.findByName(user_name);
-                        if (ur != null && user_passwd.equals(ur.getPassword())) {
+                        if (ur != null && user_passwd.equals(ur.getPassword())
+                                && ur.getActivated().equals("true")) {
                             fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                     "master", "overview.html");
-                            if (ur.getPrivilege().equals("normal")) {
+                            if (ur.getPrivilege().equals("Normal")) {
                                 fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                         "master", "overview1.html");
                             }
@@ -227,17 +230,34 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         String adduser_error = "The Email Address has exist! please change another email address";
                         return adduser_error;
                     } else {
-                        new AddUserHandler().handleMessage(
-                                new AddUserMessage(queryMap.get("username"),
-                                        queryMap.get("email"), queryMap
-                                                .get("password"), queryMap
-                                                .get("privilege"), "true", 0),
-                                null, null, null);
+                        String register_privilege = queryMap.get("privilege");
+                        Users.user_type usertype = null;
 
-                        String ret = "<html><head><meta http-equiv='refresh' content='3;url=login'></head>"
-                                + "<body><p>Register success! Waiting to jump to main login page ...</p></body></html>";
+                        if (register_privilege.equals("Root")
+                                || register_privilege.equals("Individual")
+                                || register_privilege.equals("Enterprise")) {
+                            if (register_privilege.equals("Root")) {
+                                usertype = Users.user_type.Root;
+                            } else if (register_privilege.equals("Enterprise")) {
+                                usertype = Users.user_type.Enterprise;
+                            } else if (register_privilege.equals("Individual")) {
+                                usertype = Users.user_type.Individual;
+                            }
 
-                        return ret;
+                            new AddUserHandler().handleMessage(
+                                    new AddUserMessage(
+                                            queryMap.get("username"), queryMap
+                                                    .get("email"), queryMap
+                                                    .get("password"), usertype,
+                                            "true", 0), null, null, null);
+
+                            String ret = "<html><head><meta http-equiv='refresh' content='3;url=login'></head>"
+                                    + "<body><p>Register success! Waiting to jump to main login page ...</p></body></html>";
+
+                            return ret;
+                        } else {
+                            return "<html>Wrong User Type!</html>";
+                        }
                     }
 
                 }
@@ -255,7 +275,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     .getName());
             values.put("userprivilege", userprivilege);
 
-            if (userprivilege.equals("normal")) {
+            if (userprivilege.equals("Normal")) {
                 fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                         "overview1.html");
             }
@@ -290,7 +310,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         || act.equals("start_vnode")) {
 
                     if (act.equals("add_vnode")
-                            && !userprivilege.equals("normal")) {
+                            && !userprivilege.equals("Normal")) {
 
                         String pnode_id = queryMap.get("vnode_pnodeId");
 
@@ -414,7 +434,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     else if (act.equals("delete_vnode")
-                            && !userprivilege.equals("normal")) {
+                            && !userprivilege.equals("Normal")) {
                         new DeleteVnodeHandler().handleMessage(
                                 new DeleteVnodeMessage(Integer
                                         .parseInt(queryMap.get("vnode_id"))),
@@ -455,7 +475,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     else if (act.equals("add_cluster")
-                            && !userprivilege.equals("normal")) {
+                            && !userprivilege.equals("Normal")) {
 
                         int v_size = Integer.parseInt(queryMap
                                 .get("vcluster_size"));
@@ -575,7 +595,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     else if (act.equals("delete_cluster")
-                            && !userprivilege.equals("normal")) {
+                            && !userprivilege.equals("Normal")) {
                         new DeleteVclusterHandler()
                                 .handleMessage(
                                         new DeleteVclusterMessage(Integer
@@ -592,15 +612,15 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     // ------------- root and admin user's vnode
                     // show-------------
-                    if (!userprivilege.equals("normal")) {
+                    if (!userprivilege.equals("Normal")) {
                         fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                 "master", "instance.html");
 
                         // list vnodes
                         List<Vnode> searchvnode = new ArrayList<Vnode>();
-                        if (userprivilege.equals("root")) {
+                        if (userprivilege.equals("Root")) {
                             searchvnode = Vnode.all();
-                        } else if (userprivilege.equals("admin")) {
+                        } else {
                             searchvnode = Vnode
                                     .getVnodeByUserId(session_ip_loginuser.get(
                                             remote_ipaddr).getId());
@@ -648,9 +668,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                         // list vclusters
                         List<Vcluster> searchvcluster = new ArrayList<Vcluster>();
-                        if (userprivilege.equals("root")) {
+                        if (userprivilege.equals("Root")) {
                             searchvcluster = Vcluster.all();
-                        } else if (userprivilege.equals("admin")) {
+                        } else {
                             searchvcluster = Vcluster
                                     .getVclusterByUserId(session_ip_loginuser
                                             .get(remote_ipaddr).getId());
@@ -711,7 +731,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     }
 
-                    else { // ------------ normal user's vnode show -----------
+                    else { // ------------ Normal user's vnode show -----------
 
                         fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                 "master", "instance1.html");
@@ -821,11 +841,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from machine
                 // page
                 // --------------------------
-                else if (!userprivilege.equals("normal")
+                else if (!userprivilege.equals("Normal")
                         && act.equals("machine") || act.equals("add_pnode")
                         || act.equals("delete_pnode")) {
 
-                    if (userprivilege.equals("root") && act.equals("add_pnode")) {
+                    if (userprivilege.equals("Root") && act.equals("add_pnode")) {
                         new AddPnodeHandler().handleMessage(
                                 new AddPnodeMessage(new SimpleAddress(queryMap
                                         .get("pnode_ip"), 4000), Integer
@@ -834,7 +854,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null, null, null);
                     }
 
-                    else if (userprivilege.equals("root")
+                    else if (userprivilege.equals("Root")
                             && act.equals("delete_pnode")) {
                         new DeletePnodeHandler().handleMessage(
                                 new DeletePnodeMessage(Integer
@@ -844,7 +864,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     // show all pnode
                     String pnode_show = "";
-                    if (userprivilege.equals("root")) {
+                    if (userprivilege.equals("Root")) {
                         fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                 "master", "machine.html");
                         for (Pnode pnode : Pnode.all()) {
@@ -912,11 +932,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 // --------------------------- http request from image page
                 // --------------------------
-                else if (!userprivilege.equals("normal") && act.equals("image")
+                else if (!userprivilege.equals("Normal") && act.equals("image")
                         || act.equals("add_vdisk")
                         || act.equals("delete_vdisk")) {
 
-                    if (userprivilege.equals("root") && act.equals("add_vdisk")) {
+                    if (userprivilege.equals("Root") && act.equals("add_vdisk")) {
                         new RegisterVdiskHandler().handleMessage(
                                 new RegisterVdiskMessage(queryMap
                                         .get("vdisk_displayname"), queryMap
@@ -929,7 +949,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null);
                     }
 
-                    else if (userprivilege.equals("root")
+                    else if (userprivilege.equals("Root")
                             && act.equals("delete_vdisk")) {
                         new UnregisterVdiskHandler().handleMessage(
                                 new UnregisterVdiskMessage(Integer
@@ -939,7 +959,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     // list all vdisk
                     String vdisk_show = "";
-                    if (userprivilege.equals("root")) {
+                    if (userprivilege.equals("Root")) {
                         fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                 "master", "image.html");
                         for (Vdisk vdisk : Vdisk.all()) {
@@ -996,7 +1016,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 // --------------------------- http request to show monitor info
                 // --------------------------
-                else if (!userprivilege.equals("normal")
+                else if (!userprivilege.equals("Normal")
                         && act.equals("monitor")) {
 
                     String pnode_monitor_show = "";
@@ -1120,7 +1140,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from monitor
                 // page
                 // --------------------------
-                else if (!userprivilege.equals("normal")
+                else if (!userprivilege.equals("Normal")
                         && act.equals("getMonitorData")) {
                     double[][] monitor_data;
 
@@ -1152,12 +1172,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from account
                 // page
                 // --------------------------
-                else if (!userprivilege.equals("normal")
+                else if (!userprivilege.equals("Normal")
                         && act.equals("account") || act.equals("add_user")
+                        || act.equals("stop_user") || act.equals("active_user")
                         || act.equals("delete_user")
                         || act.equals("pass_modify")) {
 
-                    if (userprivilege.equals("root") && act.equals("add_user")) {
+                    if (userprivilege.equals("Root") && act.equals("add_user")) {
                         if (Users.findByName(queryMap.get("username")) != null) {
                             String adduser_error = "alert('The User Name has exist!')";
                             values.put("adduser_error", adduser_error);
@@ -1165,18 +1186,37 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             String adduser_error = "alert('The Email Address has exist!')";
                             values.put("adduser_error", adduser_error);
                         } else {
-                            new AddUserHandler().handleMessage(
-                                    new AddUserMessage(
-                                            queryMap.get("username"), queryMap
-                                                    .get("email"), queryMap
-                                                    .get("password"), "admin",
-                                            "true", session_ip_loginuser.get(
-                                                    remote_ipaddr).getId()),
-                                    null, null, null);
+                            String adduser_privilege = queryMap
+                                    .get("privilege");
+                            Users.user_type usertype = null;
+
+                            if (adduser_privilege.equals("Root")
+                                    || adduser_privilege.equals("Individual")
+                                    || adduser_privilege.equals("Enterprise")) {
+                                if (adduser_privilege.equals("Root")) {
+                                    usertype = Users.user_type.Root;
+                                } else if (adduser_privilege
+                                        .equals("Enterprise")) {
+                                    usertype = Users.user_type.Enterprise;
+                                } else if (adduser_privilege
+                                        .equals("Individual")) {
+                                    usertype = Users.user_type.Individual;
+                                }
+
+                                new AddUserHandler().handleMessage(
+                                        new AddUserMessage(queryMap
+                                                .get("username"), queryMap
+                                                .get("email"), queryMap
+                                                .get("password"), usertype,
+                                                "true", session_ip_loginuser
+                                                        .get(remote_ipaddr)
+                                                        .getId()), null, null,
+                                        null);
+                            }
                         }
                     }
 
-                    else if (userprivilege.equals("admin")
+                    else if (userprivilege.equals("Enterprise")
                             && act.equals("add_user")) {
                         if (Users.findByName(queryMap.get("username")) != null) {
                             String adduser_error = "alert('The User Name has exist!')";
@@ -1189,11 +1229,25 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     new AddUserMessage(
                                             queryMap.get("username"), queryMap
                                                     .get("email"), queryMap
-                                                    .get("password"), "normal",
-                                            "true", session_ip_loginuser.get(
+                                                    .get("password"),
+                                            Users.user_type.Normal, "true",
+                                            session_ip_loginuser.get(
                                                     remote_ipaddr).getId()),
                                     null, null, null);
                         }
+                    }
+
+                    else if (act.equals("active_user")) {
+                        new ActiveUserHandler().handleMessage(
+                                new ActiveUserMessage(Integer.parseInt(queryMap
+                                        .get("user_id"))), null, null, null);
+
+                    }
+
+                    else if (act.equals("stop_user")) {
+                        new StopUserHandler().handleMessage(
+                                new StopUserMessage(Integer.parseInt(queryMap
+                                        .get("user_id"))), null, null, null);
                     }
 
                     else if (act.equals("delete_user")) {
@@ -1218,9 +1272,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     // list all users
                     String user_show = "";
                     List<Users> users = new ArrayList<Users>();
-                    if (userprivilege.equals("root")) {
+                    if (userprivilege.equals("Root")) {
                         users = Users.all();
-                    } else if (userprivilege.equals("admin")) {
+                    } else if (userprivilege.equals("Enterprise")) {
                         for (UserRelations urre : UserRelations
                                 .getByAdminUserId(session_ip_loginuser.get(
                                         remote_ipaddr).getId())) {
@@ -1228,7 +1282,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         }
                     }
 
-                    if (users == null) {
+                    if (userprivilege.equals("Individual")) {
+                        user_show = "Individual user has no users control right";
+                        String hide_head = "<!--";
+                        String hide_tail = "-->";
+                        values.put("user_hide_head", hide_head);
+                        values.put("user_hide_tail", hide_tail);
+                    } else if (users == null) {
                         user_show = "None normal users";
                     } else {
                         for (Users user : users) {
@@ -1248,6 +1308,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                     + "<ul class='dropdown-menu'> "
+                                    + "<li><a href='active_user?user_id="
+                                    + user.getId() + "'> Active </a></li>"
+                                    + "<li><a href='stop_user?user_id="
+                                    + user.getId() + "'> Stop </a></li>"
                                     + "<li><a href='delete_user?user_id="
                                     + user.getId() + "'> Delete</a></li>"
                                     + "</ul></div></td></tr>";
@@ -1255,6 +1319,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     values.put("user_show", user_show);
+
+                    if (userprivilege.equals("Root")) {
+                        values.put("user_type_op",
+                                "<option>Root</option><option>Enterprise</option><option>Individual</option>");
+                    } else if (userprivilege.equals("Enterprise")) {
+                        values.put("user_type_op", "<option>Normal</option>");
+                    }
 
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                             "account.html");
@@ -1273,9 +1344,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
             for (Users user : Users.all()) { // *********** users var **********
                 user_total++;
 
-                if (user.getPrivilege().equals("root")) {
+                if (user.getPrivilege().equals("Root")) {
                     root_user_total++;
-                } else if (user.getPrivilege().equals("normal")) {
+                } else if (user.getPrivilege().equals("Normal")) {
                     normal_user_total++;
                 }
 
@@ -1285,7 +1356,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
             }
 
             if (session_ip_loginuser.get(remote_ipaddr).getPrivilege()
-                    .equals("root")) {
+                    .equals("Root")) {
                 values.put("user_total", user_total);
                 values.put("root_user_total", root_user_total);
                 values.put("normal_user_total", normal_user_total);
