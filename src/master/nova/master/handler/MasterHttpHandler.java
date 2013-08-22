@@ -725,7 +725,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         // list all appliance
                         String appliance_list = "";
                         for (Appliance app : Appliance.all()) {
-
+                            app.toString();
                         }
                         values.put("appliance_list", appliance_list);
 
@@ -1388,14 +1388,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
             int vcluter_num = 0;
             for (Vcluster vcluster : Vcluster.all()) { // *********** vcluster
-                                                       // var **********
+                vcluster.toString(); // var **********
                 vcluter_num++;
             }
             values.put("vcluster_num", vcluter_num);
 
             int vmachine_num = 0;
             for (Vnode vnode : Vnode.all()) { // *********** vnode var
-                                              // **********
+                vnode.toString(); // **********
                 vmachine_num++;
             }
             values.put("vmachine_num", vmachine_num);
