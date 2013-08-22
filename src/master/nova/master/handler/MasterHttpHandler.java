@@ -711,7 +711,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + vcluster.getClusterName()
                                     + "'><a data-toggle='tab' onclick='cluster_"
                                     + vcluster.getId() + "()' href='#'>"
-                                    + vcluster.getClusterName() + "</a></li>";
+                                    + "Cluster: " + vcluster.getClusterName()
+                                    + "</a></li>";
 
                             vcluster_script_in_instance = vcluster_script_in_instance
                                     + "document.getElementById('lid_"
