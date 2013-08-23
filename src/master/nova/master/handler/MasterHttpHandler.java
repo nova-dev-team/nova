@@ -698,9 +698,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                     + "<ul class='dropdown-menu'> "
-                                    + "<li><a href='view_cluster?vcluster_id="
+                                    + "<li><a href='#' onclick='cluster_"
                                     + vcluster.getId()
-                                    + "'>View Instances</a></li>"
+                                    + "()'>View Instances</a></li>"
                                     + "<li class='divider'>"
                                     + "<li><a href='delete_cluster?vcluster_id="
                                     + vcluster.getId()
@@ -904,9 +904,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                     + "<ul class='dropdown-menu'> "
-                                    + "<li><a href='view_cluster?vcluster_id="
+                                    + "<li><a href='#' onClick='cluster_"
                                     + vcluster.getId()
-                                    + "'>View Instances</a></li>"
+                                    + "()'>View Instances</a></li>"
                                     + "<li class='divider'>"
                                     + "<li><a href='delete_cluster?vcluster_id="
                                     + vcluster.getId()

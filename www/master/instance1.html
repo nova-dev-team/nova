@@ -10,10 +10,22 @@
   <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
+  <script language="javascript">
+  function instance_view()
+    {
+      document.getElementById("all_instance").className="active";
+
+      document.getElementById("view_instance").style.display="block";
+
+      ${vcluster_script_in_instance}                                                                                                                                                                                                                                                                                                                                                                                                                             
+    }
+
+    ${vcluster_script}
+    </script>
 </head>
   
 <body>
-<!---------------------- Page Header  ------------------------------->
+<!---------------------- Page Header  -------------------------------->
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
     </div>
@@ -62,7 +74,13 @@
     </div>
     <!-- navbar -->
 
-    <!---------------------- Instance ------------------------------->
+    <!---------------------- Instance -------------------------------->
+     <div class="tabbable tabs-left">
+      <ul class="nav nav-tabs">
+        <li class="active" id="all_instance"><a data-toggle="tab" onclick="instance_view()" href="#">All Instances</a></li>
+        ${vcluster_list}
+      </ul>
+      <div class="tab-content" id="view_instance">
 	<br>
     <legend> Instances
 	    <div class="pull-right">
@@ -92,7 +110,7 @@
 	</table>
 	
 	<!--
-    <!---------------------- Cluster ------------------------------->
+    <!---------------------- Cluster -------------------------------->
 	<br>
     <legend> Clusters
 	    <div class="pull-right">
@@ -119,8 +137,13 @@
 		</tbody>
 		
 	</table>
-   
-    <!---------------------- Page Footer  ------------------------------->
+
+</div>
+   <!-----------Clusters Individually view---------------->
+${vcluster_indiv}
+
+</div>
+    <!---------------------- Page Footer  -------------------------------->
 	<footer class="footer">
   	  <hr>
 	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">Back To Top</a></p>
