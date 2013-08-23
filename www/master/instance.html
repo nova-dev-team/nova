@@ -36,6 +36,8 @@
     		}
     }    
 
+  
+
 
   	function migration_process(vnode_id)
   	{
@@ -43,6 +45,23 @@
   		document.getElementById("migvn").value=vnode_id;
   	}
   	
+  	function check_input_vcluster()
+  	{
+  		var number_regex=/[0-9]{5,}/;
+  		var size = Number(vcluster.vcluster_size.value);
+
+  		for(var i=0;i<size;i++)
+  		{
+  			var x = document.getElementsByName("vinstance_memsize0");
+  			if(!number_regex.test(x[0].value))
+  			{
+  				alert("Memory should be greater than 10000Kb!");
+  				return false;
+  			}
+  		}
+
+  	}
+
   	function create_cluster()
   	{
   	 
@@ -76,7 +95,7 @@
   			for(var i=0;i<vcluster.vcluster_size.value;i++)
   			{
   				document.getElementById("add_instances").innerHTML+="<tr><td>" + (i+1) + ". Instance Name: " +
-  					"<input class='span1' type='text' name='vinstance_name"+ i + "'>&nbsp;&nbsp;&nbsp;&nbsp;Memery Size: " +
+  					"<input class='span1' type='text' name='vinstance_name"+ i + "'>&nbsp;&nbsp;&nbsp;&nbsp;Memery Size(Kb): " +
   					"<input class='span1' type='text' name='vinstance_memsize"+ i + "'><br>&nbsp;&nbsp;&nbsp;&nbsp;CPU Num: " + 
   					"<select class='span1' name='vinstance_cpucount"+ i + "'><option value='1'>1</option><option value='2'>2</option>" +
   					"<option value='3'>3</option><option value='4'>4</option></select> &nbsp;&nbsp;&nbsp;&nbsp;Hypervisor: " +
@@ -352,7 +371,7 @@
 	      <h3>Add Instances In Cluster</h3>
 	    </div>
 	    
-	    <form action="add_cluster" method="post" class="form-horizontal well" >
+	    <form id="add_cluster_step2" action="add_cluster" method="post" class="form-horizontal well" onsubmit="return check_input_vcluster()">
 	        <div id="add_instances" class="modal-body">
 	        	
 	        </div>
