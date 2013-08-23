@@ -24,7 +24,7 @@
 
   	${vcluster_script}
 
-    function check_input()
+    function check_input_vnode()
     {
     	var number_regex=/[0-9]{5,}/;
 
@@ -36,6 +36,7 @@
     		}
     }    
 
+
   	function migration_process(vnode_id)
   	{
   		$("#Migration_Modal").modal('show');
@@ -45,7 +46,16 @@
   	function create_cluster()
   	{
   	 
-  		if(vcluster.vcluster_name.value=="")
+  		 var number_regex=/[0-9]+/;
+
+    	if(!number_regex.test(vcluster.vcluster_size.value))
+    		{
+    			alert("Size must be integers");
+    			vcluster.vcluster_size.focus();
+  				return false;
+    		}
+
+  		else if(vcluster.vcluster_name.value=="")
   		{
   			alert("Your cluster name can not be null");
   			vcluster.vcluster_name.focus();
@@ -163,7 +173,7 @@
 	      <h3>Launch a new instance</h3>
 	    </div>
 	    
-	    <form id="launch_instance" action="add_vnode" method="post" class="form-horizontal well" onsubmit="return check_input()">
+	    <form id="launch_instance" action="add_vnode" method="post" class="form-horizontal well" onsubmit="return check_input_vnode()">
 	        <div class="modal-body">
 	            <div class="control-group">	
 					<label class="control-label">Instance Name:</label>
@@ -342,7 +352,7 @@
 	      <h3>Add Instances In Cluster</h3>
 	    </div>
 	    
-	    <form action="add_cluster" method="post" class="form-horizontal well">
+	    <form action="add_cluster" method="post" class="form-horizontal well" >
 	        <div id="add_instances" class="modal-body">
 	        	
 	        </div>
