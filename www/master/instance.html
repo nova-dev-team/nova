@@ -52,7 +52,7 @@
 
   		for(var i=0;i<size;i++)
   		{
-  			var x = document.getElementsByName("vinstance_memsize0");
+  			var x = document.getElementsByName("vinstance_memsize"+String(i));
   			if(!number_regex.test(x[0].value))
   			{
   				alert("Memory should be greater than 10000Kb!");
