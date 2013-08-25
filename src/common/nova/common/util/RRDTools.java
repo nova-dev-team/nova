@@ -439,4 +439,45 @@ public class RRDTools {
         }
         return info;
     }
+
+    public static double[][] getVnodeMonitorInfo(String vnodeuuid) {
+        double[][] info = null;
+        String rddfile = "build/" + vnodeuuid + ".rrd";
+        File file = new File(rddfile);
+        if (file.exists() == false)
+            return info;
+        FetchData fetchData = null;
+        try {
+            /**
+             * open the file
+             */
+            RrdDb rrd = new RrdDb(rddfile);
+
+            /**
+             * create fetch request using the database reference
+             */
+            FetchRequest request = rrd.createFetchRequest("AVERAGE",
+                    Util.getTime() - 5 * 110, Util.getTime() + 10);
+            fetchData = request.fetchData();
+            info = new double[100][fetchData.getColumnCount()];
+        } catch (Exception e) {
+            logger.error("Failed to fetch data from RRD file", e);
+            return info;
+        }
+
+        double[][] data = fetchData.getValues();
+        int index = 100 - 1;
+        for (int i = data[0].length - 1; i >= 0; i--) {
+            if (Double.isNaN(data[0][i]))
+                continue;
+            else {
+                for (int j = 0; j < info[0].length; j++)
+                    info[index][j] = data[j][i];
+                index--;
+                if (index < 0)
+                    break;
+            }
+        }
+        return info;
+    }
 }
