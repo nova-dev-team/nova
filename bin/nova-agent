@@ -1,0 +1,11 @@
+#! /bin/sh
+mkdir /media/cdrom
+mount -t iso9660 /dev/sr0 /media/cdrom
+rm -rf /Nova
+mkdir /Nova
+cp -R /media/cdrom/* /Nova
+cd /Nova/run/bin
+chmod +x *.sh
+sh /Nova/run/bin/agent_svr.sh
+#cd /media/cdrom/run/bin
+#sh /media/cdrom/run/bin/agent_svr.sh

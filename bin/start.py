@@ -100,9 +100,10 @@ class_path = merge_path(class_path, "bin/nova-%s.jar" % nova_ver)
 
 # set LD_LIBRARY_PATH
 
+nova_home = os.path.abspath(os.path.join(bin_dir, ".."))
 os.system('echo $LD_LIBRARY_PATH')
 ld_library_path = os.path.join(nova_home,'lib/sigar')
-os.environ["LD_LIBRARY_PATH"]=merge_path(ld_library_path,os.environ["LD_LIBRARY_PATH"])
+os.environ["LD_LIBRARY_PATH"]=ld_library_path
 
 # create dirs if necessary
 for dir_name in ["log", "run"]:

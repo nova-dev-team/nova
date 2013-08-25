@@ -548,7 +548,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         PrintWriter outpw = new PrintWriter(new FileWriter(
                                 ipAddrFile));
                         outpw.println("agent.bind_host=" + msg.getIpAddr());
-                        outpw.println("agent.bind_host=4100");
+                        outpw.println("agent.bind_port=4100");
                         outpw.println("master.bind_host="
                                 + NovaWorker.masteraddr.ip);
                         outpw.println("master.bind_port="

@@ -1,0 +1,4 @@
+1.install java,ethtool
+2.copy nova-agent to /etc/init.d
+3.add /etc/init.d/nova-agent to /etc/rc.local
+4.link /bin/sh to bash: dpkg-reconfigure dash
