@@ -299,8 +299,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from Intance
                 // page
                 // --------------------------
-
-                else if (act.equals("instance") || act.equals("add_vnode")
+                else if (act.equals("faq")) {
+                    fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
+                            "faq.html");
+                } else if (act.equals("instance") || act.equals("add_vnode")
                         || act.equals("delete_vnode")
                         || act.equals("add_cluster")
                         || act.equals("delete_cluster")
