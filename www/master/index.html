@@ -77,13 +77,13 @@
 </head>
   
 <body style="background:#FFFFFF;background-image:url(img/background.jpg);background-repeat:repeat-x">
-  <div class="container" style="margin-top:200px">  
-    <form id="form_login" action="login" method="post" onsubmit="return check_login();" class="well" style="width:380px;margin:0px auto;">
+  <div class="container span4" style="margin-top:40px;">  
+    <form id="form_login" action="login" method="post" onsubmit="return check_login();" class="well" style="width:260px;margin:0px auto;">
       <h3 align="center"> Nova System </h3>
 		<label><i class="icon-user"></i>&nbsp;&nbsp;Username:</label>
-		  <input type="text" name="username" style="height:30px" class="span4" />
+		  <input type="text" name="username" style="height:30px" class="span3" />
 		<label><i class="icon-lock"></i>&nbsp;&nbsp;Password：</label>
-		  <input type="password" name="password" style="height:30px" class="span4" />
+		  <input type="password" name="password" style="height:30px" class="span3" />
 		 
 		<div align="center">
 		  <br>
@@ -91,15 +91,65 @@
 		</div>
     </form>
     <br><br><br><br>
-    <div align="center">
-        <a data-toggle="modal" class="btn btn-success btn-large" href="#UserRegister_Modal"> User Register </a>
-    </div>
+
+</div>
     
+	<!--jquery code -->
+	<!-- Note: Keep the structure in HTTP-->
+    <script>
+    	$(document).ready(function(){
+    		$("#register_link").click(function(){
+    			$("#UserRegister_Modal").siblings().hide();
+    			$("#UserRegister_Modal").toggle("slow");
+
+
+    		});
+    		$("#about_link").click(function(){
+    			$("#aboutus").siblings().hide();
+    			$("#aboutus").toggle("slow");
+    		});
+    		$("#faq_link").click(function(){
+    			$("#faq").siblings().hide();
+    			$("#faq").toggle("slow");
+    		})
+    		$(".close2").click(function(){
+    			$(this).parent().parent().hide("slow");
+    		});
+    		$(".close3").click(function(){
+    			$(this).parent().parent().parent().hide("slow");
+    		});
+    	})
+    </script>
+    <!-- link layer -->
+    <div class="container span2" style="margin-top:100px">
+    	<div align="center">
+        	<!-- <a data-toggle="modal" class="btn btn-success btn-large" href="#" id="register"> User Register </a> --!>
+        	<h2> << Login </h2>
+        	<br/>
+			<div id="about_link"><h3> About Us >></h3></div>
+			<div id="register_link"><h3>Register >></h3></div>
+			<br/>
+			<div id="faq_link"><h3>F.A.Q  >></h3></div> 
+    	</div>
+	</div>
+	<!-- content layer -->
+    <div class="container span7" style="margin-top:40px;">
+    	<!-- About Modal (SHOW) -->
+    	<div id="aboutus" class="well">
+    		<h3>Notice</h3>
+    		Please note that you should deploy freenx, nxclient, x11vnc, vncviewer on the worker machine first!
+    		<h4>What is Nova</h4>
+    		<p>Nova is a system. Everyone likes that.</p>
+    		<h4>How to contact us?</h4>
+    		<p> Email to xxx.com</p>
+    	</div>
+    	<!-- About Modal end -->
     <!-- User Register modal(Hide) -->
-	  <div id="UserRegister_Modal" class="modal hide fade">
+
+	  <div id="UserRegister_Modal" class="well" style="display:none">
 	    <div class="modal-header">
-	      <a class="close" data-dismiss="modal" >&times;</a>
-	      <h3>New User Register</h3>
+	      <a class="close close2" data-dismiss="modal">&times;</a>
+	      <h3>New User</h3>
 	    </div>
 	    
 	    <form id="form_register" action="user_register" method="post" class="form-horizontal" onsubmit="return check_register();">
@@ -161,12 +211,21 @@
 	        </div>
 	        
 	        <div class="modal-footer">
-	      		<a href="#" class="btn" data-dismiss="modal">Cancel</a>
+	      		<a href="#" class="btn close3" data-dismiss="modal">Cancel</a>
 	      		<button type="submit" class="btn btn-primary" >Register</button>
 	    	</div>
 	    </form>
 	  </div>
 	  <!-- User Register modal -->
+	  <!-- F.A.Q (hide)-->
+	  <div id="faq" class="well" style="display:none">
+	  	<h3>Please Read First</h3>
+	  	<p>This is the bulletin</p>
+	  	<br/><br/>
+	  	<li>Question: xxxxxx <li>
+	  </div>
+	  <!-- F.A.Q  END -->
+
   </div>
 </body>
 </html>

@@ -302,7 +302,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 else if (act.equals("faq")) {
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                             "faq.html");
-                } else if (act.equals("instance") || act.equals("add_vnode")
+                }
+
+                else if (act.equals("instance") || act.equals("add_vnode")
                         || act.equals("delete_vnode")
                         || act.equals("add_cluster")
                         || act.equals("delete_cluster")
@@ -937,10 +939,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 }
 
                 else if (act.equals("vncview")) {
-
+                    // TODO start the client software.
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                            "vncview.html");
-
+                            "nxapplet.html");
+                    String sitepath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                            "master");
+                    System.out.println(sitepath);
+                    values.put("site_path", sitepath);
                     values.put("vnc_port",
                             Utils.MASTER_VNC_MAP.get(queryMap.get("vnode_id")));
 
@@ -950,7 +955,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             "vnc_username",
                             Vnode.findById(
                                     Integer.parseInt(queryMap.get("vnode_id")))
-                                    .getName());
+                                    .getName());// this is the instance name!!!
 
                 }
 
