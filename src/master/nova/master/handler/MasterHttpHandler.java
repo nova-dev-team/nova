@@ -199,7 +199,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     "master", "overview.html");
                             if (ur.getPrivilege().equals("Normal")) {
                                 fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
-                                        "master", "overview1.html");
+                                        "master", "overview_normal.html");
+                            } else if (!ur.getPrivilege().equals("Root")) {
+                                fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                        "master", "overview_unroot.html");
                             }
                             session_ip_islogin.put(remote_ipaddr, true);
                             session_ip_loginuser.put(remote_ipaddr, ur);
@@ -277,7 +280,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
             if (userprivilege.equals("Normal")) {
                 fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                        "overview1.html");
+                        "overview_normal.html");
+            } else if (!userprivilege.equals("Root")) {
+                fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
+                        "overview_unroot.html");
             }
 
             // ------------------------------------------------------------
@@ -445,7 +451,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null, null, null);
                     }
 
-                    else if (act.equals("migration")) {
+                    else if (act.equals("migration")
+                            && userprivilege.equals("Root")) {
                         Vnode migrate_vnode = Vnode.findById(Long
                                 .parseLong(queryMap.get("mig_vnid")));
                         long migration_to = Long.parseLong(queryMap.get(
@@ -623,6 +630,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     if (!userprivilege.equals("Normal")) {
                         fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                 "master", "instance.html");
+
+                        if (!userprivilege.equals("Root")) {
+                            fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                    "master", "instance_unroot.html");
+                        }
 
                         // list vnodes
                         List<Vnode> searchvnode = new ArrayList<Vnode>();
@@ -846,7 +858,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     else { // ------------ Normal user's vnode show -----------
 
                         fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
-                                "master", "instance1.html");
+                                "master", "instance_normal.html");
 
                         UserRelations ur = UserRelations
                                 .findByNormalId(session_ip_loginuser.get(
@@ -912,9 +924,6 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + vcluster.getId()
                                     + "()'>View Instances</a></li>"
                                     + "<li class='divider'>"
-                                    + "<li><a href='delete_cluster?vcluster_id="
-                                    + vcluster.getId()
-                                    + "'> Delete Cluster</a></li>"
                                     + "</ul></div></td></tr>";
                         }
 
@@ -962,8 +971,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from machine
                 // page
                 // --------------------------
-                else if (!userprivilege.equals("Normal")
-                        && act.equals("machine") || act.equals("add_pnode")
+                else if (userprivilege.equals("Root") && act.equals("machine")
+                        || act.equals("add_pnode")
                         || act.equals("delete_pnode")) {
 
                     if (userprivilege.equals("Root") && act.equals("add_pnode")) {
@@ -1079,7 +1088,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 null, null, null);
                     }
 
-                    else if (userprivilege.equals("Root")
+                    else if (!userprivilege.equals("Normal")
                             && act.equals("showlaunch")) {
                         String vdisk_launch = Vdisk.findById(
                                 Integer.parseInt(queryMap.get("vdisk_id")))
@@ -1131,7 +1140,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         }
                     } else {
                         fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
-                                "master", "image1.html");
+                                "master", "image_unroot.html");
                         for (Vdisk vdisk : Vdisk.all()) {
                             vdisk_show = vdisk_show
                                     + "<tr><td>"
@@ -1151,6 +1160,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                     + "<ul class='dropdown-menu'> "
+                                    + "<li><a data-toggle='modal' href='showlaunch?vdisk_id="
+                                    + vdisk.getId()
+                                    + "'> Launch Instance </a></li>"
+                                    + "<li class='divider'>"
                                     + "</ul></div></td></tr>";
                         }
                     }
@@ -1167,8 +1180,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 // --------------------------- http request to show monitor info
                 // --------------------------
-                else if (!userprivilege.equals("Normal")
-                        && act.equals("monitor")) {
+                else if (userprivilege.equals("Root") && act.equals("monitor")) {
 
                     String pnode_monitor_show = "";
                     String pnode_id_list = "";
@@ -1291,7 +1303,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from monitor
                 // page
                 // --------------------------
-                else if (!userprivilege.equals("Normal")
+                else if (userprivilege.equals("Root")
                         && act.equals("getMonitorData")) {
                     double[][] monitor_data;
 
@@ -1478,8 +1490,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         values.put("user_type_op", "<option>Normal</option>");
                     }
 
-                    fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                            "account.html");
+                    if (userprivilege.equals("Root")) {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "account.html");
+                    } else {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "account_unroot.html");
+                    }
                 }
             }
         }

@@ -3,18 +3,17 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Nova Images</title>
+  <title>Nova master</title>
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="css/bootstrap-responsive.css" rel="stylesheet">
   <link href="css/docs.css" rel="stylesheet">
-  <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
 </head>
   
 <body>
 <!---------------------- Page Header  ------------------------------->
-<div class="navbar navbar-fixed-top">
+  <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
     </div>
   </div>
@@ -22,7 +21,7 @@
 
   <div class="container">
 
-    <div class="page-header">
+    <div class="page-header">	
         <h1>
             <em> Nova Master </em>
             <small> - Java Version v0.3.1</small>
@@ -44,13 +43,10 @@
       <div class="navbar-inner">
         <div class="container">
           <a class="brand" href="#">Nova</a>
-          
           <ul class="nav nav-pills">
-            <li class=""><a href="overview">Overview</a></li>
+            <li class="active"><a href="overview">Overview</a></li>
             <li class=""><a href="instance">Instances</a></li>
-            <li class=""><a href="machine">Machines</a></li>
-            <li class="active"><a href="image">Images</a></li>
-            <li class=""><a href="monitor">Monitor</a></li>
+            <li class=""><a href="image">Images</a></li>
             <li class=""><a href="account">Account</a></li>
           </ul>
           
@@ -67,36 +63,22 @@
     </div>
     <!-- navbar -->
     
-    <!---------------------- System Images  ------------------------------->
-    <br>
-    <legend>System Images
-	    <div class="pull-right">
-	       <a class="btn btn-success" href="image"> Refresh </a>
-	    </div>
-    </legend>
-	  
-    
-	<table class="table table-striped table-hover">  
-		<thead>
-			<tr>
-			<th>Id</th>
-			<th>Image Name</th>
-			<th>Source Image</th>
-			<th>Os Family</th>
-			<th>Os Version</td>
-			<th>Description</th>
-			<th>Action</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			${vdisk_show}
-		</tbody>
-		
-	</table>
-   
+    <!---------------------- Page Content  ------------------------------->
+    <div class="row">
+      <div class="span12">
+        
+	        <legend><h2>Nova System Overview:</h2></legend>
+	        <h3>Instances:</h3>
+	        <p>${vcluster_num} vclusters, ${vmachine_num} vmachines in total</p>
+	        <h3>Storage server</h3>
+	        <p>Storage server is up and running.</p>
+	    
+      </div>
+    </div>
+    <!-- row -->
+  
     <!---------------------- Page Footer  ------------------------------->
-	<footer class="footer">
+    <footer class="footer">
   	  <hr>
 	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">Back To Top</a></p>
       <p> This is the "master" module of Nova System. </p>
