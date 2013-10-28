@@ -187,6 +187,37 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
         // 如果没有登录
         if (!session_ip_islogin.get(remote_ipaddr)) {
+            String[] questions = new String[100];
+            String[] answers = new String[100];
+            String faq = "";
+            int count = 0;
+            /*
+             * List questions and answers. Please copy 2 lines below to add new
+             * questions and answers.
+             */
+            // question 1
+            questions[count] = "NOVA-Master是什么？";
+            answers[count++] = "NOVA-Master是一个便于您管理、使用虚拟机的一套系统。";
+            // question 2
+            questions[count] = "怎样开始我的NOVA之旅？";
+            answers[count++] = "首先您需要一个账号，在首页里面点击Register即可。填写好相关信息，点击注册即可成功。然后在登录框里面输入您刚注册的账户密码即可开始使用NOVA-Master系统。";
+            // question 3
+            questions[count] = "怎样创建一个虚拟机？";
+            answers[count++] = "登录后选择Instance页面，在页面右上角选择Launch Instance按钮会得到一个对话框。如果没有这个按钮，说明您的权限不足。打开对话框后请输入虚拟机的相关参数，以及被挂载的物理机。输入完毕后即成功创建了虚拟机。稍等20秒后刷新，虚拟机状态会从PREPARING变为RUNNING。";
+            // question 4
+            questions[count] = "怎样使用我的虚拟机？";
+            answers[count++] = "在虚拟机右边有Action按钮，里面有各种功能，请按您的需求点击。若想操作虚拟机，请点击View栏，即可打开。";
+            // question 5
+            questions[count] = "想正常使用NOVA-Master，我需要安装什么吗？";
+            answers[count++] = "是的。首先您的浏览器需要支持JAVA-APPLET。其次您需要安装Nomachine，这个会在初次登入View页面时提示并自动安装的。";
+
+            // questions end
+            for (int i = 0; i < count; i++) {
+                faq = faq + "<h4>" + questions[i] + "</h4>" + "<p>"
+                        + answers[i] + "</p>";
+            }
+            values.put("faq_content", faq);
+
             if (act != null) {
                 if (act.equals("login")) {
                     if (queryMap != null) {
