@@ -1,14 +1,10 @@
 package nova.worker.handler;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.UUID;
@@ -755,185 +751,105 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     log.error("Create domain failed", ex);
                 }
             }
-
-            /**
-             * @xiaohan
+            /*
              * 
+             * //@xiaohan int displayPort = 0;
              * 
+             * String nxvncPath = null;
              * 
+             * try { Process getVncPort; String cmd = "virsh vncdisplay " +
+             * msg.getName(); getVncPort = Runtime.getRuntime().exec(cmd);
+             * System.out.println("HAVEYOURHAVEYOUR           " + cmd);
+             * 
+             * try { if (getVncPort.waitFor() != 0) {
+             * log.error("virsh vncdisplay " + msg.getName() +
+             * "returned abnormal value!"); } BufferedReader brVncPort = new
+             * BufferedReader( new
+             * InputStreamReader(getVncPort.getInputStream())); // 2. grab the
+             * output System.out.println("???"); String tempbr =
+             * brVncPort.readLine(); System.out.println(tempbr); displayPort =
+             * Integer.parseInt(tempbr.split(":")[1]) + 5900;
+             * 
+             * } catch (InterruptedException e1) {
+             * log.error("virsh process terminated", e1); } } catch (IOException
+             * e1) { log.error("virsh cmd error!", e1); return; }
+             * 
+             * // TODO create nxvnc-?
+             * 
+             * try { String name = "nxvnc-" + displayPort + ".sh"; nxvncPath =
+             * Utils.pathJoin(Utils.NOVA_HOME, "script", name); String
+             * examplePath = Utils.pathJoin(Utils.NOVA_HOME, "script",
+             * "nxvnc-example.sh"); File f = new File(nxvncPath); if
+             * (f.exists()) { f.delete(); } f.createNewFile();
+             * 
+             * String c = null; String content = ""; BufferedReader br0 = new
+             * BufferedReader(new FileReader( examplePath)); while ((c =
+             * br0.readLine()) != null) { System.out.println(c); if
+             * (c.equals("VNC_PORT=5904")) c = "VNC_PORT=" + displayPort;
+             * content = content + c + "\n"; }
+             * 
+             * FileWriter fw = new FileWriter(nxvncPath, true); BufferedWriter
+             * bw = new BufferedWriter(fw); // bw.newLine(); bw.write(content);
+             * bw.close(); fw.close();
+             * 
+             * } catch (Exception efile) { log.error("Writing nxvnc" +
+             * displayPort + ".sh failed!"); } try { String name = msg.getName()
+             * + ".nxs"; String filepath = Utils.pathJoin(Utils.NOVA_HOME,
+             * "www", "master", "plugin", "session", name); String examplePath =
+             * Utils.pathJoin(Utils.NOVA_HOME, "script",
+             * "instance-example.nxs"); File f = new File(filepath); if
+             * (f.exists()) { f.delete(); } f.createNewFile();// overwrite or
+             * create
+             * 
+             * BufferedReader br0 = new BufferedReader(new FileReader(
+             * examplePath)); String c = null; String content = "";
+             * 
+             * while ((c = br0.readLine()) != null) { if
+             * (c.equals("<option key=\"Command line\" value=\"/usr/bin/nxvnc\" />"
+             * )) c = "<option key=\"Command line\" value=\"" + nxvncPath +
+             * "\" />"; else if (c
+             * .equals("<option key=\"Server host\" value=\"192.168.0.117\" />"
+             * )) c = "<option key=\"Server host\" value=\"" +
+             * NovaWorker.getInstance().getAddr().getIp() + "\" />"; else if
+             * (c.equals("<option key=\"Public Key\" " +
+             * "value=\"-----BEGIN DSA PRIVATE KEY-----")) { String keyPath =
+             * Utils .pathJoin("/var", "lib", "nxserver", "home", ".ssh",
+             * "client.id_dsa.key"); content = content + c + "\n";
+             * BufferedReader bfkey = new BufferedReader( new
+             * FileReader(keyPath)); bfkey.readLine();// drop the first line for
+             * (int i = 0; i < 11; i++) // 11 lines in total { c =
+             * bfkey.readLine(); content = content + c + "\n"; br0.readLine();//
+             * drop br0 11 lines } c = ""; } content = content + c + "\n"; }
+             * FileWriter fw = new FileWriter(filepath, true); BufferedWriter bw
+             * = new BufferedWriter(fw); // bw.newLine(); bw.write(content);
+             * bw.close(); fw.close(); // osw.close(); // finish writing nxs
+             * file. } catch (Exception efile) { efile.printStackTrace(); }
+             * String tcmd = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
+             * "plugin", "session", msg.getName() + ".nxs"); tcmd =
+             * "chmod -R 755 " + tcmd; Process cp; try { cp =
+             * Runtime.getRuntime().exec(tcmd); StreamGobbler errorGobbler = new
+             * StreamGobbler( cp.getErrorStream(), "ERROR");
+             * errorGobbler.start(); StreamGobbler outGobbler = new
+             * StreamGobbler( cp.getInputStream(), "STDOUT");
+             * outGobbler.start(); try { if (cp.waitFor() != 0) {
+             * log.error("chmod returned abnormal value!"); } } catch
+             * (InterruptedException e1) { log.error("chmod process terminated",
+             * e1); } } catch (IOException e1) { log.error("chmod cmd error!",
+             * e1); return; }
+             * 
+             * String nxvncAuthorCmd = Utils.pathJoin(Utils.NOVA_HOME, "script",
+             * "nxvnc-" + displayPort + ".sh"); nxvncAuthorCmd = "chmod -R 755 "
+             * + nxvncAuthorCmd; Process nAp; try { nAp =
+             * Runtime.getRuntime().exec(nxvncAuthorCmd); StreamGobbler
+             * errorGobbler = new StreamGobbler( nAp.getErrorStream(), "ERROR");
+             * errorGobbler.start(); StreamGobbler outGobbler = new
+             * StreamGobbler( nAp.getInputStream(), "STDOUT");
+             * outGobbler.start(); try { if (nAp.waitFor() != 0) {
+             * log.error("chmod returned abnormal value!"); } } catch
+             * (InterruptedException e1) { log.error("chmod process terminated",
+             * e1); } } catch (IOException e1) { log.error("chmod cmd error!",
+             * e1); return; }
              */
-            int displayPort = 0;
-
-            String nxvncPath = null;
-
-            try {
-                Process getVncPort;
-                String cmd = "virsh vncdisplay " + msg.getName();
-                getVncPort = Runtime.getRuntime().exec(cmd);
-                System.out.println("HAVEYOURHAVEYOUR           " + cmd);
-                /*
-                 * StreamGobbler errorGobbler = new StreamGobbler(
-                 * getVncPort.getErrorStream(), "ERROR"); errorGobbler.start();
-                 * StreamGobbler outGobbler = new StreamGobbler(
-                 * getVncPort.getInputStream(), "STDOUT"); outGobbler.start();
-                 */
-                try {
-                    if (getVncPort.waitFor() != 0) {
-                        log.error("virsh vncdisplay " + msg.getName()
-                                + "returned abnormal value!");
-                    }
-                    BufferedReader brVncPort = new BufferedReader(
-                            new InputStreamReader(getVncPort.getInputStream()));
-                    // 2. grab the output
-                    System.out.println("???");
-                    String tempbr = brVncPort.readLine();
-                    System.out.println(tempbr);
-                    displayPort = Integer.parseInt(tempbr.split(":")[1]) + 5900;
-
-                } catch (InterruptedException e1) {
-                    log.error("virsh process terminated", e1);
-                }
-            } catch (IOException e1) {
-                log.error("virsh cmd error!", e1);
-                return;
-            }
-
-            // TODO create nxvnc-?
-
-            try {
-                String name = "nxvnc-" + displayPort + ".sh";
-                nxvncPath = Utils.pathJoin(Utils.NOVA_HOME, "script", name);
-                String examplePath = Utils.pathJoin(Utils.NOVA_HOME, "script",
-                        "nxvnc-example.sh");
-                File f = new File(nxvncPath);
-                if (f.exists()) {
-                    f.delete();
-                }
-                f.createNewFile();
-
-                String c = null;
-                String content = "";
-                BufferedReader br0 = new BufferedReader(new FileReader(
-                        examplePath));
-                while ((c = br0.readLine()) != null) {
-                    System.out.println(c);
-                    if (c.equals("VNC_PORT=5904"))
-                        c = "VNC_PORT=" + displayPort;
-                    content = content + c + "\n";
-                }
-
-                FileWriter fw = new FileWriter(nxvncPath, true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                // bw.newLine();
-                bw.write(content);
-                bw.close();
-                fw.close();
-
-            } catch (Exception efile) {
-                log.error("Writing nxvnc" + displayPort + ".sh failed!");
-            }
-            try {
-                String name = msg.getName() + ".nxs";
-                String filepath = Utils.pathJoin(Utils.NOVA_HOME, "www",
-                        "master", "plugin", "session", name);
-                String examplePath = Utils.pathJoin(Utils.NOVA_HOME, "script",
-                        "instance-example.nxs");
-                File f = new File(filepath);
-                if (f.exists()) {
-                    f.delete();
-                }
-                f.createNewFile();// overwrite or create
-
-                BufferedReader br0 = new BufferedReader(new FileReader(
-                        examplePath));
-                String c = null;
-                String content = "";
-
-                while ((c = br0.readLine()) != null) {
-                    if (c.equals("<option key=\"Command line\" value=\"/usr/bin/nxvnc\" />"))
-                        c = "<option key=\"Command line\" value=\"" + nxvncPath
-                                + "\" />";
-                    else if (c
-                            .equals("<option key=\"Server host\" value=\"192.168.0.117\" />"))
-                        c = "<option key=\"Server host\" value=\""
-                                + NovaWorker.getInstance().getAddr().getIp()
-                                + "\" />";
-                    else if (c.equals("<option key=\"Public Key\" "
-                            + "value=\"-----BEGIN DSA PRIVATE KEY-----")) {
-                        String keyPath = Utils
-                                .pathJoin("/var", "lib", "nxserver", "home",
-                                        ".ssh", "client.id_dsa.key");
-                        content = content + c + "\n";
-                        BufferedReader bfkey = new BufferedReader(
-                                new FileReader(keyPath));
-                        bfkey.readLine();// drop the first line
-                        for (int i = 0; i < 11; i++) // 11 lines in total
-                        {
-                            c = bfkey.readLine();
-                            content = content + c + "\n";
-                            br0.readLine();// drop br0 11 lines
-                        }
-                        c = "";
-                    }
-                    content = content + c + "\n";
-                }
-                FileWriter fw = new FileWriter(filepath, true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                // bw.newLine();
-                bw.write(content);
-                bw.close();
-                fw.close();
-                // osw.close(); // finish writing nxs file.
-            } catch (Exception efile) {
-                efile.printStackTrace();
-            }
-            String tcmd = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                    "plugin", "session", msg.getName() + ".nxs");
-            tcmd = "chmod -R 755 " + tcmd;
-            Process cp;
-            try {
-                cp = Runtime.getRuntime().exec(tcmd);
-                StreamGobbler errorGobbler = new StreamGobbler(
-                        cp.getErrorStream(), "ERROR");
-                errorGobbler.start();
-                StreamGobbler outGobbler = new StreamGobbler(
-                        cp.getInputStream(), "STDOUT");
-                outGobbler.start();
-                try {
-                    if (cp.waitFor() != 0) {
-                        log.error("chmod returned abnormal value!");
-                    }
-                } catch (InterruptedException e1) {
-                    log.error("chmod process terminated", e1);
-                }
-            } catch (IOException e1) {
-                log.error("chmod cmd error!", e1);
-                return;
-            }
-
-            String nxvncAuthorCmd = Utils.pathJoin(Utils.NOVA_HOME, "script",
-                    "nxvnc-" + displayPort + ".sh");
-            nxvncAuthorCmd = "chmod -R 755 " + nxvncAuthorCmd;
-            Process nAp;
-            try {
-                nAp = Runtime.getRuntime().exec(nxvncAuthorCmd);
-                StreamGobbler errorGobbler = new StreamGobbler(
-                        nAp.getErrorStream(), "ERROR");
-                errorGobbler.start();
-                StreamGobbler outGobbler = new StreamGobbler(
-                        nAp.getInputStream(), "STDOUT");
-                outGobbler.start();
-                try {
-                    if (nAp.waitFor() != 0) {
-                        log.error("chmod returned abnormal value!");
-                    }
-                } catch (InterruptedException e1) {
-                    log.error("chmod process terminated", e1);
-                }
-            } catch (IOException e1) {
-                log.error("chmod cmd error!", e1);
-                return;
-            }
         }
 
     }

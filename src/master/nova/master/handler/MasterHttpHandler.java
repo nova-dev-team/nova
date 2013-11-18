@@ -981,7 +981,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 else if (act.equals("vncview")) {
                     // TODO start the client software.
                     fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                            "nxapplet.html");
+                            "vncview.html");
                     String sitepath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                             "master");
                     System.out.println(sitepath);

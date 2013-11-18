@@ -15,7 +15,7 @@ public class TestUsersDB {
         user.setEmail("hechuan1215@gmail.com");
         user.setPassword("123456");
         user.setPrivilege("Root");
-        user.setActivated("1");
+        user.setActivated("true");
 
         user.save();
 
