@@ -42,6 +42,7 @@ public class Utils {
     public static HashMap<String, String> WORKER_VNC_MAP = new HashMap<String, String>();
     public static HashMap<String, String> MASTER_VNC_MAP = new HashMap<String, String>();
 
+    public static int delMPEmptycount;
     /*
      * Static constructor to determine NOVA_HOME.
      */
@@ -652,8 +653,8 @@ public class Utils {
 
     public static int getFreePort() {
         ServerSocket s = null;
-        int MINPORT = 5901;
-        int MAXPORT = 6900;
+        int MINPORT = 5960;
+        int MAXPORT = 6990;
         for (; MINPORT < MAXPORT; MINPORT++) {
             try {
                 s = new ServerSocket(MINPORT);
@@ -684,9 +685,12 @@ public class Utils {
 
                             result = line;
                         }
-                        String pid = result.split("[\\t \\n]+")[1];
-                        String killcmd = "kill -9 " + pid;
-                        Runtime.getRuntime().exec(killcmd);
+                        String[] strs = result.split("[\\t \\n]+");
+                        if (strs.length >= 2 && strs[0].equalsIgnoreCase("ssh")) {
+                            String pid = strs[1];
+                            String killcmd = "kill -9 " + pid;
+                            Runtime.getRuntime().exec(killcmd);
+                        }
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -695,10 +699,8 @@ public class Utils {
             }.start();
 
             try {
-                if (p.waitFor() != 0) {
-                    logger.error("del port map:" + port
-                            + " return abnormal value!");
-                }
+                if (p.waitFor() != 0)
+                    delMPEmptycount++;
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

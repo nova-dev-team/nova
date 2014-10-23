@@ -218,6 +218,12 @@ public class NovaMaster extends SimpleServer {
                 logger.error("Error joining thread " + daemon.getName(), e);
             }
         }
+        Utils.delMPEmptycount = 0;
+        for (int i = 5960; i <= 6960; i++) {
+            Utils.delMP(i);
+            if (Utils.delMPEmptycount >= 30)
+                break;
+        }
         logger.info("All deamons stopped");
         super.shutdown();
         this.addr = null;

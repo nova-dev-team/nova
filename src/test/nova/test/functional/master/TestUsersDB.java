@@ -12,7 +12,7 @@ public class TestUsersDB {
     public void testSave() {
         Users user = new Users();
         user.setName("root");
-        user.setEmail("hechuan1215@gmail.com");
+        user.setEmail("wbeaglewatcher@gmail.com");
         user.setPassword("123456");
         user.setPrivilege("Root");
         user.setActivated("true");

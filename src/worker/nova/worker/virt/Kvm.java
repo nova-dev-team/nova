@@ -151,11 +151,6 @@ public class Kvm {
         // + params.get("macAddress").toString() + "'/>"
         // + "</interface>");
         // }
-        String strVNCPort = String.valueOf(Utils.getFreePort());
-        String ss = params.get("uuid").toString();
-        System.out.println(ss);
-        Utils.WORKER_VNC_MAP.put(params.get("uuid").toString(), strVNCPort);
-        params.put("vncport", strVNCPort);
         if (fixVncMousePointer.equals("true")) {
             params.put("inputType", "tablet");
             params.put("bus", "usb");
@@ -165,8 +160,11 @@ public class Kvm {
         } else {
             params.put("determinVnc", "");
         }
-
-        String rt = Utils.expandTemplateFile(templateFpath, params);
+        String strVNCPort = String.valueOf(Utils.getFreePort());
+        String ss = params.get("uuid").toString();
+        System.out.println(ss);
+        Utils.WORKER_VNC_MAP.put(params.get("uuid").toString(), strVNCPort);
+        params.put("vncport", strVNCPort);
         // write nova.agent.ipaddress.properties file
         File confFile = null;
         if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
@@ -187,6 +185,7 @@ public class Kvm {
                 log.error("create conf.xml fail!", e1);
             }
         }
+        String rt = Utils.expandTemplateFile(templateFpath, params);
 
         try {
             PrintWriter outpw = new PrintWriter(new FileWriter(confFile));
