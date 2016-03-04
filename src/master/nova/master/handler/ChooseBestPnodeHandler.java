@@ -10,6 +10,7 @@ import nova.master.models.Pnode;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
+//author: @Herb
 public class ChooseBestPnodeHandler implements
         SimpleHandler<ChooseBestPnodeMessage> {
 

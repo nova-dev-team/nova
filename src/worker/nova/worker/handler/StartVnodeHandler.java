@@ -29,6 +29,7 @@ import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
 import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpProtocolException;
 
 /**
  * Handler for "start new vnode" request.
@@ -46,11 +47,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
     /**
      * Handle "start new vnode" request.
+     * 
+     * @throws FtpProtocolException
      */
 
     @Override
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
-            MessageEvent e, SimpleAddress xreply) {
+            MessageEvent e, SimpleAddress xreply) throws FtpProtocolException {
         long retVnodeID = 0;
         // ////////////////////////////////////////////////////////////////////
         NovaWorker.masteraddr = xreply;
@@ -365,14 +368,43 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "lib"),
                             Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                                     "lib"));
+                    // @Herbert
+                    System.out.println("HHHIIIA" + msg.getIsvim());
+                    if (msg.getIsvim() == 0) {
+                        // copy without ftp_home folder install vim
+                        String[] ingoreList = { "ftp_home", "hadoop-0.20.2",
+                                "WPS" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "data"), Utils.pathJoin(
+                                agentProgramFile.getAbsolutePath(), "data"),
+                                ingoreList);
+                    }
+                    if (msg.getIsvim() == 1) {
+                        // install hadoop
+                        String[] ingoreList = { "ftp_home", "vim73", "WPS" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "data"), Utils.pathJoin(
+                                agentProgramFile.getAbsolutePath(), "data"),
+                                ingoreList);
+                    }
+                    if (msg.getIsvim() == 2) {
+                        // install WPS
+                        String[] ingoreList = { "ftp_home", "vim73",
+                                "hadoop-0.20.2" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "data"), Utils.pathJoin(
+                                agentProgramFile.getAbsolutePath(), "data"),
+                                ingoreList);
+                    }
 
-                    // copy without ftp_home folder
-                    String[] ingoreList = { "ftp_home" };
-                    Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
-                            "data"), Utils.pathJoin(
-                            agentProgramFile.getAbsolutePath(), "data"),
-                            ingoreList);
-
+                    else {
+                        String[] ingoreList = { "ftp_home", "vim73",
+                                "hadoop-0.20.2", "WPS" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "data"), Utils.pathJoin(
+                                agentProgramFile.getAbsolutePath(), "data"),
+                                ingoreList);
+                    }
                     Utils.copyOneFile(Utils
                             .pathJoin(Utils.NOVA_HOME, "VERSION"), Utils
                             .pathJoin(agentProgramFile.getAbsolutePath(),
@@ -533,6 +565,36 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     } catch (IOException e1) {
                         log.error("file write fail!", e1);
                     }
+                    // Herbert
+                    // For generating the network interfaces configuration file.
+                    File inFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                            "run", "run", strWorkerIP + "_" + msg.getName(),
+                            "softwares", "params", "interfaces"));
+
+                    try {
+                        if (!inFile.exists()) {
+                            inFile.createNewFile();
+                        }
+                        OutputStream os = new FileOutputStream(inFile);
+                        os.write("auto eth0".getBytes());
+                        os.write("\n".getBytes());
+                        os.write("iface eth0 inet static".getBytes());
+                        os.write("\n".getBytes());
+                        os.write("address ".getBytes());
+                        os.write(msg.getIpAddr().getBytes());
+                        os.write("\n".getBytes());
+                        os.write("netmask ".getBytes());
+                        os.write("255.255.255.0".getBytes());
+                        os.write("\n".getBytes());
+                        os.write("gateway ".getBytes());
+                        os.write("192.168.122.1".getBytes());
+                        os.write("\n".getBytes());
+                        os.close();
+                    } catch (FileNotFoundException e1) {
+                        log.error("file not found!", e1);
+                    } catch (IOException e1) {
+                        log.error("file write fail!", e1);
+                    }
 
                     // write nova.agent.ipaddress.properties file
                     File ipAddrFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
@@ -627,14 +689,58 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "run", "lib"),
                             Utils.pathJoin(agentProgramFile.getAbsolutePath(),
                                     "lib"));
-
+                    // modified by Herbert for auto-installment of softwares
+                    /*
+                     * Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "vim73"),
+                     * Utils .pathJoin(agentProgramFile.getAbsolutePath(),
+                     * "data"));
+                     */
                     // copy without ftp_home folder
-                    String[] ingoreList = { "ftp_home" };
-                    Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
-                            "run", "data"), Utils.pathJoin(
-                            agentProgramFile.getAbsolutePath(), "data"),
-                            ingoreList);
+                    /*
+                     * String[] ingoreList = { "ftp_home", "vim73" };
+                     * Utils.copyWithIgnoreFolder
+                     * (Utils.pathJoin(Utils.NOVA_HOME, "run", "data"),
+                     * Utils.pathJoin( agentProgramFile.getAbsolutePath(),
+                     * "data"), ingoreList);
+                     */
 
+                    // @Herbert
+                    System.out.println("HHHIIIB" + msg.getIsvim());
+                    if (msg.getIsvim() == 0) {
+                        // copy without ftp_home folder install vim
+                        System.out.println("install vim");
+                        String[] ingoreList = { "ftp_home", "hadoop-0.20.2",
+                                "WPS" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "run", "data"), Utils
+                                .pathJoin(agentProgramFile.getAbsolutePath(),
+                                        "data"), ingoreList);
+                    } else if (msg.getIsvim() == 1) {
+                        // install hadoop
+                        System.out.println("install hadoop");
+                        String[] ingoreList = { "ftp_home", "vim73", "WPS" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "run", "data"), Utils
+                                .pathJoin(agentProgramFile.getAbsolutePath(),
+                                        "data"), ingoreList);
+                    } else if (msg.getIsvim() == 2) {
+                        // install WPS
+                        System.out.println("install WPS");
+                        String[] ingoreList = { "ftp_home", "vim73",
+                                "hadoop-0.20.2" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "run", "data"), Utils
+                                .pathJoin(agentProgramFile.getAbsolutePath(),
+                                        "data"), ingoreList);
+                    } else {
+                        System.out.println("install nothing");
+                        String[] ingoreList = { "ftp_home", "vim73",
+                                "hadoop-0.20.2", "WPS" };
+                        Utils.copyWithIgnoreFolder(Utils.pathJoin(
+                                Utils.NOVA_HOME, "run", "data"), Utils
+                                .pathJoin(agentProgramFile.getAbsolutePath(),
+                                        "data"), ingoreList);
+                    }
                     Utils.copyOneFile(Utils.pathJoin(Utils.NOVA_HOME, "run",
                             "VERSION"), Utils.pathJoin(
                             agentProgramFile.getAbsolutePath(), "VERSION"));
