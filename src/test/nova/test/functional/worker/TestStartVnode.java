@@ -8,6 +8,8 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.junit.Test;
 
+import sun.net.ftp.FtpProtocolException;
+
 /**
  * test for add vnode, run in linux, qemu required, remember to kill the
  * vmachine after running
@@ -35,7 +37,7 @@ public class TestStartVnode {
         // "false", "100288", "1", "small.img", "false");
         StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux10", null,
                 false, "300000", "1", "linux.img", false, apps, "10.0.1.100",
-                "255.255.255.0", "10.0.1.254", "1111");
+                "255.255.255.0", "10.0.1.254", "1111", 0);
 
         // msg.setName("vm");
         // msg.setMemSize("1024000");
@@ -46,7 +48,12 @@ public class TestStartVnode {
         ChannelHandlerContext ctx = null;
         MessageEvent e = null;
         SimpleAddress xreply = null;
-        svh.handleMessage(msg, ctx, e, xreply);
+        try {
+            svh.handleMessage(msg, ctx, e, xreply);
+        } catch (FtpProtocolException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
         // StartVnodeMessage msg2 = new StartVnodeMessage("KVM", "vm2", null,
         // "false", "100288", "1", "small.img", "false");

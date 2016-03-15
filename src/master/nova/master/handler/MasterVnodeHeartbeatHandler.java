@@ -22,7 +22,7 @@ public class MasterVnodeHeartbeatHandler implements
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
         if (xreply == null) {
-            log.warn("Got a vnode heartbeat message, but the reply address is null!");
+            log.warn("Got a vnode heartbeat message not in agent class, but the reply address is null!");
         } else {
             // log.info("Got vnode heartbeat message from: " + xreply);
         }

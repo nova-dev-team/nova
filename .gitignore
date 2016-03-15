@@ -28,3 +28,9 @@ run/
 *.log
 data/
 project
+Nova_Master.jar
+Nova_Worker.jar
+Nova_Agent.jar
+Nova_Master_lib/
+Nova_Worker_lib/
+Nova_Agent_lib/

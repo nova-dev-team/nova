@@ -20,7 +20,7 @@ public class TestForSyfOnly {
         String apps[] = { "demo_appliance" };
         StartVnodeMessage msg = new StartVnodeMessage("kvm", "ubuntu_vm", null,
                 false, "300000", "1", "ubuntu.img", false, apps,
-                "192.168.0.200", "255.255.255.0", "192.168.0.1", "1111");
+                "192.168.0.200", "255.255.255.0", "192.168.0.1", "1111", 0);
         // msg.setName("vm");
 
         msg.setUuid("0f7c794b-2e17-45ef-3c55-ece004e76aef");
@@ -50,5 +50,4 @@ public class TestForSyfOnly {
         // String[] ignore = { "shit1", "shit2" };
         // Utils.copyWithIgnore("fuck1", "fuck2", ignore);
     }
-
 }

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Nova master</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/docs.css" rel="stylesheet">
+  <script src="js/jquery-2.0.0.js"></script>
+  <script src="js/bootstrap-modal.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+  <script language="javascript">
+	function check_login()
+	{
+    	if(form_login.username.value=="")
+		{
+    		alert("用户名不能为空!");
+  			form_login.username.focus();
+  			return false;
+		}
+   		if(form_login.password.value=="")
+		{
+    		alert("密码不能为空");
+  			form_login.password.focus();
+  			return false;
+		}
+	}
+	
+	function check_register()
+	{
+		var email_regex = /[a-z0-9_]+@[a-z0-9]+\.[a-z]+/i;
+
+    	if(form_register.username.value=="")
+		{
+    		alert("注册用户名不能为空!");
+  			form_register.username.focus();
+  			return false;
+		}
+		
+		if(form_register.email.value=="")
+		{
+    		alert("注册邮箱不能为空!");
+  			form_register.username.focus();
+  			return false;
+		} 
+		
+   		if(form_register.password.value=="")
+		{
+    		alert("密码不能为空");
+  			form_register.password.focus();
+  			return false;
+		}
+		
+		if(form_register.password_confirm.value=="")
+		{
+    		alert("确认密码不能为空");
+  			form_register.password_confirm.focus();
+  			return false;
+		}
+		
+		if(form_register.password.value != form_register.password_confirm.value)
+		{
+		    alert("密码与确认密码不相符");
+		    form_register.password_confirm.focus();
+  			return false;
+		}
+		if(!email_regex.test(form_register.email.value))
+		{
+			alert("Email格式不符");
+			form_register.email.focus();
+			return false;
+		}    
+	}
+  </script>
+  
+</head>
+  
+<body style="background:#FFFFFF;background-image:url(img/background.jpg);background-repeat:repeat-x">
+  <div class="container span4" style="margin-top:40px;"> 
+   <div class="ext"><a href="indexen.html">English Version</a></div> 
+    <form id="form_login" action="login" method="post" onsubmit="return check_login();" class="well" style="width:260px;margin:0px auto;">
+      <h3 align="center"> Nova System </h3>
+		<label><i class="icon-user"></i>&nbsp;&nbsp;Username:</label>
+		  <input type="text" name="username" style="height:30px" class="span3" />
+		<label><i class="icon-lock"></i>&nbsp;&nbsp;Password：</label>
+		  <input type="password" name="password" style="height:30px" class="span3" />
+		 
+		<div align="center">
+		  <br>
+		  <button type="submit" class="btn btn-primary btn-large">Login</button>
+		</div>
+    </form>
+    <br><br><br><br>
+
+</div>
+    
+	<!--jquery code -->
+	<!-- Note: Keep the structure in HTTP-->
+    <script>
+    	$(document).ready(function(){
+    		$("#register_link").click(function(){
+    			$("#UserRegister_Modal").siblings().hide();
+    			$("#UserRegister_Modal").toggle("slow");
+
+
+    		});
+    		$("#about_link").click(function(){
+    			$("#aboutus").siblings().hide();
+    			$("#aboutus").toggle("slow");
+    		});
+    		$("#faq_link").click(function(){
+    			$("#faq").siblings().hide();
+    			$("#faq").toggle("slow");
+    		})
+    		$(".close2").click(function(){
+    			$(this).parent().parent().hide("slow");
+    		});
+    		$(".close3").click(function(){
+    			$(this).parent().parent().parent().hide("slow");
+    		});
+    	})
+    </script>
+    <!-- link layer -->
+    <div class="container span2" style="margin-top:100px">
+    	<div align="center">
+        	<!-- <a data-toggle="modal" class="btn btn-success btn-large" href="#" id="register"> User Register </a> --!>
+        	<h2> << Login </h2>
+        	<br/>
+			<div id="about_link"><h3> About Us >></h3></div>
+			<div id="register_link"><h3>Register >></h3></div>
+			<br/>
+			<div id="faq_link"><h3>F.A.Q  >></h3></div> 
+    	</div>
+	</div>
+	<!-- content layer -->
+    <div class="container span7" style="margin-top:40px;">
+    	<!-- About Modal (SHOW) -->
+    	<div id="aboutus" class="well">
+    		<h3>Notice</h3>
+    		Please note that you should deploy freenx, nxclient, x11vnc, vncviewer on the worker machine first!
+    		<h4>What is Nova</h4>
+    		<p>Nova is a system. Everyone likes that.</p>
+    		<h4>Ver 1.0</h4>
+    		<p>2013.10.1</p>
+    		<p>The Nova comes out!</p>
+    	</div>
+    	<!-- About Modal end -->
+    <!-- User Register modal(Hide) -->
+
+	  <div id="UserRegister_Modal" class="well" style="display:none">
+	    <div class="modal-header">
+	      <a class="close close2" data-dismiss="modal">&times;</a>
+	      <h3>New User</h3>
+	    </div>
+	    
+	    <form id="form_register" action="user_register" method="post" class="form-horizontal" onsubmit="return check_register();">
+	        <div class="modal-body">
+	            <div class="control-group">
+			        <label class="control-label" for="focusedInput">Username:</label>
+			           <div class="controls">
+			             <div class="input-prepend">
+					       <span class="add-on"><i class="icon-user"></i></span>
+					       <input type="text" name="username" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+				
+				<div class="control-group">
+			        <label class="control-label" for="focusedInput"> Email:</label>
+			           <div class="controls">
+			             <div class="input-prepend">
+			               <span class="add-on"><i class="icon-envelope"></i></span>
+					       <input type="text" name="email" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+			    <div class="control-group">
+			        <label class="control-label" for="focusedInput"> User Type:</label>
+			           <div class="controls">
+			           <div class="input-prepend">
+			            <span class="add-on"><i class="icon-flag"></i></span>
+			            <select class="span3" name="privilege">
+			                <!--<option>Root</option>-->
+			                <option>Enterprise</option>
+			                <option>Individual</option>
+			             </select>
+			           </div>
+					   </div>
+			    </div>
+			    
+				<div class="control-group">	
+					<label class="control-label" for="focusedInput"> Password:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="password" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+			    
+			    <div class="control-group">	
+					<label class="control-label" for="focusedInput"> Password Confirm:</label>
+					   <div class="controls">
+					     <div class="input-prepend">
+			               <span class="add-on"><i class="icon-lock"></i></span>
+					       <input type="password" name="password_confirm" style="height:20px" class="span3" />
+					     </div>
+					   </div>
+			    </div>
+				
+	        </div>
+	        
+	        <div class="modal-footer">
+	      		<a href="#" class="btn close3" data-dismiss="modal">Cancel</a>
+	      		<button type="submit" class="btn btn-primary" >Register</button>
+	    	</div>
+	    </form>
+	  </div>
+	  <!-- User Register modal -->
+	  <!-- F.A.Q (hide)-->
+	  <div id="faq" class="well" style="display:none">
+	  	<h3>F. A. Q</h3>
+	  	<br/>
+	  	${faq_content}
+	  </div>
+	  <!-- F.A.Q  END -->
+
+  </div>
+</body>
+</html>

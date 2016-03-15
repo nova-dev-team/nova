@@ -20,6 +20,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 
 import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpProtocolException;
 
 /**
  * handler to prepare softwares
@@ -37,7 +38,8 @@ public class InstallApplianceHandler implements
 
     @Override
     public void handleMessage(InstallApplianceMessage msg,
-            ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
+            ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply)
+            throws FtpProtocolException {
         File pathfile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                 "softwares"));
         if (!pathfile.exists()) {

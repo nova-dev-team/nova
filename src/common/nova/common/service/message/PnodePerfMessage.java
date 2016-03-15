@@ -15,6 +15,8 @@ public class PnodePerfMessage {
     private GeneralMonitorInfo monitorInfo = PerfMon.getGeneralMonitorInfo();
 
     public GeneralMonitorInfo getGeneralMonitorInfo() {
+        // System.out.println("Worker Pnode monitor: "
+        // + this.monitorInfo.memInfo.totalMemorySize);
         return this.monitorInfo;
     }
 

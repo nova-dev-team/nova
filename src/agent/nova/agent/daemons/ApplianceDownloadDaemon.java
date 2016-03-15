@@ -9,6 +9,8 @@ import nova.common.util.SimpleDaemon;
 
 import org.apache.log4j.Logger;
 
+import sun.net.ftp.FtpProtocolException;
+
 /**
  * Daemon deal with downloading softwares
  * 
@@ -35,7 +37,13 @@ public class ApplianceDownloadDaemon extends SimpleDaemon {
 
                     app.setStatus(Appliance.Status.DOWNLOADING);
 
-                    NovaAgent.getInstance().getApplianceFetcher().fetch(app);
+                    try {
+                        NovaAgent.getInstance().getApplianceFetcher()
+                                .fetch(app);
+                    } catch (FtpProtocolException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
 
                     if (app.getStatus().equals(Appliance.Status.DOWNLOADING)) {
                         app.setStatus(Appliance.Status.INSTALL_PENDING);

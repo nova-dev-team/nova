@@ -11,6 +11,7 @@ import nova.common.util.Utils;
 import org.apache.log4j.Logger;
 
 import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpProtocolException;
 
 /**
  * Fetch appliances through ftp
@@ -38,7 +39,8 @@ public class FtpApplianceFetcher extends ApplianceFetcher implements
     }
 
     @Override
-    public synchronized void fetch(Appliance app) throws IOException {
+    public synchronized void fetch(Appliance app) throws IOException,
+            FtpProtocolException {
         this.applianceName = app.getName();
         FtpClient fc = FtpUtils.connect(hostIp, ftpPort, userName, password);
         FtpUtils.downloadDir(fc, "/appliances/" + app.getName(),
@@ -49,7 +51,7 @@ public class FtpApplianceFetcher extends ApplianceFetcher implements
             Utils.rmdir(Utils.pathJoin(this.savePath, app.getName()));
         }
         try {
-            fc.closeServer();
+            fc.close();
         } catch (IOException e) {
             e.printStackTrace();
             logger.error("Failed to close connection to FTP server", e);

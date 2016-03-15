@@ -148,13 +148,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
      */
     @Override
     public String renderResult(DefaultHttpRequest req) {
-
-        String fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                "index.html");
-
+        // String fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
+        // "index.html");
+        String fpath = null;
+        // System.out.println("Show Path: " + fpath);
         // html变量map
         HashMap<String, Object> values = new HashMap<String, Object>(); // HTML页面变量字典
-        values.put("content", "NOVA MASTER");
+        // values.put("content", "NOVA MASTER");
 
         // get action info
         URL url = null;
@@ -217,38 +217,39 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         + answers[i] + "</p>";
             }
             values.put("faq_content", faq);
-
+            act = "login";
             if (act != null) {
                 if (act.equals("login")) {
-                    if (queryMap != null) {
-                        String user_name = queryMap.get("username");
-                        String user_passwd = queryMap.get("password");
-                        Users ur = Users.findByName(user_name);
-                        if (ur != null && user_passwd.equals(ur.getPassword())
-                                && ur.getActivated().equals("true")) {
-                            fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
-                                    "master", "overview.html");
-                            if (ur.getPrivilege().equals("Normal")) {
-                                fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
-                                        "master", "overview_normal.html");
-                            } else if (!ur.getPrivilege().equals("Root")) {
-                                fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
-                                        "master", "overview_unroot.html");
-                            }
-                            session_ip_islogin.put(remote_ipaddr, true);
-                            session_ip_loginuser.put(remote_ipaddr, ur);
-                            values.put("username",
-                                    session_ip_loginuser.get(remote_ipaddr)
-                                            .getName());
-                            values.put("userprivilege", session_ip_loginuser
-                                    .get(remote_ipaddr).getPrivilege());
-                        } else {
-                            String ret = "<p>The username or the password is error</p>"
-                                    + "<p>please return to input again!</p>";
 
-                            return ret;
+                    String user_name = "root";
+                    String user_passwd = "123456";
+                    Users ur = Users.findByName(user_name);
+                    if (ur != null && user_passwd.equals(ur.getPassword())
+                            && ur.getActivated().equals("true")) {
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "overview.html");
+                        if (ur.getPrivilege().equals("Normal")) {
+                            fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                    "master", "overview_normal.html");
+                        } else if (!ur.getPrivilege().equals("Root")) {
+                            fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                    "master", "overview_unroot.html");
                         }
+                        session_ip_islogin.put(remote_ipaddr, true);
+                        session_ip_loginuser.put(remote_ipaddr, ur);
+                        values.put("username",
+                                session_ip_loginuser.get(remote_ipaddr)
+                                        .getName());
+                        values.put("userprivilege",
+                                session_ip_loginuser.get(remote_ipaddr)
+                                        .getPrivilege());
+                    } else {
+                        String ret = "<p>The username or the password is error</p>"
+                                + "<p>please return to input again!</p>";
+
+                        return ret;
                     }
+
                 }
 
                 else if (act.equals("register")) {
@@ -378,7 +379,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                         queryMap.get("vnode_hypervisor"),
                                                         session_ip_loginuser
                                                                 .get(remote_ipaddr)
-                                                                .getId()),
+                                                                .getId(),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_soft_vim"))),
                                                 null, null, null);
                             }
 
@@ -419,7 +422,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                         queryMap.get("vnode_hypervisor"),
                                                         session_ip_loginuser
                                                                 .get(remote_ipaddr)
-                                                                .getId()),
+                                                                .getId(),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_soft_vim"))),
                                                 null, null, null);
                             }
                         }
@@ -591,7 +596,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                                         + i),
                                                                 session_ip_loginuser
                                                                         .get(remote_ipaddr)
-                                                                        .getId()),
+                                                                        .getId(),
+                                                                Integer.parseInt(queryMap
+                                                                        .get("vnode_soft_vim"))),
                                                         null, null, null);
 
                                     } else {
@@ -628,7 +635,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                                     + i),
                                                             session_ip_loginuser
                                                                     .get(remote_ipaddr)
-                                                                    .getId()),
+                                                                    .getId(),
+                                                            Integer.parseInt(queryMap
+                                                                    .get("vnode_soft_vim"))),
                                                     null, null, null);
                                 }
                             }

@@ -80,8 +80,9 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         String subnetMask = Conf.getString("vnode.subnet_mask");
         String gateWay = Conf.getString("vnode.gateway_ip");
 
-        System.out.println(msg.hypervisor + " " + msg.vmName + " " + vAddr
-                + " " + String.valueOf(msg.memorySize) + " "
+        System.out.println("GGGGG" + msg.isvim + " " + msg.hypervisor + " "
+                + msg.vmName + " " + vAddr + " "
+                + String.valueOf(msg.memorySize) + " "
                 + String.valueOf(msg.cpuCount) + " " + msg.vmImage + " " + true
                 + " " + apps + " " + ipAddr + " " + subnetMask + " " + gateWay);
         // copy a ssh pair
@@ -92,7 +93,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         wp.sendStartVnode(msg.hypervisor, msg.vmName, vAddr,
                 String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
                 msg.vmImage, true, apps, ipAddr, subnetMask, gateWay,
-                String.valueOf(vnode.getId()));
+                String.valueOf(vnode.getId()), msg.isvim);
 
     }
 }

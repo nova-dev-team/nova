@@ -8,6 +8,8 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.junit.Test;
 
+import sun.net.ftp.FtpProtocolException;
+
 public class TestInstallApplianceHandler {
 
     @Test
@@ -19,6 +21,11 @@ public class TestInstallApplianceHandler {
         ChannelHandlerContext ctx = null;
         MessageEvent e = null;
         SimpleAddress xreply = null;
-        iah.handleMessage(iam, ctx, e, xreply);
+        try {
+            iah.handleMessage(iam, ctx, e, xreply);
+        } catch (FtpProtocolException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 }

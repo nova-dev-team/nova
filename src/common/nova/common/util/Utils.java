@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -189,7 +188,7 @@ public class Utils {
         if (normSb.length() == 0) {
             normSb.append(".");
         }
-
+        // System.out.println("Sb: " + sb);
         return normSb.toString();
     }
 
@@ -355,16 +354,22 @@ public class Utils {
             Map<String, Object> values) {
         String template = null;
         try {
-            BufferedReader br = new BufferedReader(new FileReader(new File(
-                    fpath)));
+            InputStream isr = new FileInputStream(new File(fpath));
             StringBuffer sb = new StringBuffer();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-                sb.append('\n');
+
+            int size = 0;
+            byte[] bytes = new byte[4096];
+            while ((size = isr.read(bytes)) > 0) {
+                // System.out.println("BR: " + br);
+                String str = new String(bytes, 0, size, "UTF-8");
+
+                sb.append(str);
+
             }
             template = sb.toString();
-            br.close();
+
+            isr.close();
+
         } catch (IOException e) {
             logger.error("Failed to read '" + fpath + "'", e);
         }

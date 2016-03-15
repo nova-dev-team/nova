@@ -30,7 +30,10 @@ import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.json.simple.JSONValue;
 
+import sun.net.ftp.FtpProtocolException;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 /**
  * A simple netty powered server.
@@ -128,7 +131,12 @@ public class SimpleServer extends SimpleChannelHandler {
             throw new HandlerNotFoundException(
                     DefaultHttpRequest.class.getName());
         }
-        handler.handleMessage(req, ctx, e, null);
+        try {
+            handler.handleMessage(req, ctx, e, null);
+        } catch (FtpProtocolException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -146,9 +154,17 @@ public class SimpleServer extends SimpleChannelHandler {
                 SimpleAddress xreply = gson
                         .fromJson(gson.toJson(jsonMsg.get("xreply")),
                                 SimpleAddress.class);
-                handler.handleMessage(gson.fromJson(
-                        gson.toJson(jsonMsg.get("xvalue")), klass), ctx, e,
-                        xreply);
+                try {
+                    handler.handleMessage(gson.fromJson(
+                            gson.toJson(jsonMsg.get("xvalue")), klass), ctx, e,
+                            xreply);
+                } catch (JsonSyntaxException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } catch (FtpProtocolException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
             }
         } catch (ClassNotFoundException ex) {
             log.error("Error parsing json message", ex);

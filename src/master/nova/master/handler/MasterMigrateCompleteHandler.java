@@ -2,6 +2,10 @@ package nova.master.handler;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
@@ -11,12 +15,8 @@ import nova.master.models.Pnode;
 import nova.master.models.Vnode;
 import nova.worker.models.StreamGobbler;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-
-public class MasterMigrateCompleteHandler implements
-        SimpleHandler<MasterMigrateCompleteMessage> {
+public class MasterMigrateCompleteHandler
+        implements SimpleHandler<MasterMigrateCompleteMessage> {
 
     /**
      * Log4j logger.
@@ -44,8 +44,9 @@ public class MasterMigrateCompleteHandler implements
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                logger.error("add port map for " + vnodeid
-                        + " process terminated!", e);
+                logger.error(
+                        "add port map for " + vnodeid + " process terminated!",
+                        e);
 
             }
 
@@ -68,6 +69,7 @@ public class MasterMigrateCompleteHandler implements
                 Integer.valueOf(msg.dstVNCPort), vnode.getId());
         Utils.MASTER_VNC_MAP.put(String.valueOf(vnode.getId()),
                 String.valueOf(masterPort));
+        logger.info("set vnode status to running! ");
         vnode.setStatus(Vnode.Status.RUNNING);
         Pnode dstpnode = Pnode.findByIp(msg.dstPnodeIP);
         vnode.setPmachineId((int) dstpnode.getId());

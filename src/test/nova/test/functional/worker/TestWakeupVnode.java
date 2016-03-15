@@ -8,6 +8,8 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.junit.Test;
 
+import sun.net.ftp.FtpProtocolException;
+
 /**
  * test for suspend vnode
  * 
@@ -23,7 +25,12 @@ public class TestWakeupVnode {
         ChannelHandlerContext ctx = null;
         MessageEvent e = null;
         SimpleAddress xreply = null;
-        svh.handleMessage(msg, ctx, e, xreply);
+        try {
+            svh.handleMessage(msg, ctx, e, xreply);
+        } catch (FtpProtocolException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 
 }

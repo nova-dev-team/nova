@@ -19,7 +19,8 @@ public class StartVnodeMessage {
     public StartVnodeMessage(String hyperVisor, String name,
             SimpleAddress vAddr, boolean wakeupOnly, String memSize,
             String cpuCount, String hdaImage, boolean runAgent, String apps[],
-            String ipAddr, String subnetMask, String gateWay, String vnodeID) {
+            String ipAddr, String subnetMask, String gateWay, String vnodeID,
+            int isvim) {
         super();
         this.hyperVisor = hyperVisor;
         this.name = name;
@@ -35,6 +36,7 @@ public class StartVnodeMessage {
         this.gateWay = gateWay;
         this.uuid = vnodeID;
         this.arch = "x86_64";
+        this.isvim = isvim;
     }
 
     public StartVnodeMessage(String hyperVisor, boolean wakeupOnly,
@@ -52,7 +54,7 @@ public class StartVnodeMessage {
     boolean wakeupOnly;
     String hyperVisor;
     String name;
-    String uuid;// when creating vnode this means vnodeid,when resuming this
+    String uuid;// when creating vnode this means vnodeid, when resuming this
                 // means uuid
     String memSize;
     String cpuCount;
@@ -77,6 +79,7 @@ public class StartVnodeMessage {
     String ipAddr;
     String subnetMask;
     String gateWay;
+    int isvim;
 
     public String getIpAddr() {
         return ipAddr;
@@ -294,6 +297,14 @@ public class StartVnodeMessage {
         this.runAgent = runAgent;
     }
 
+    public int getIsvim() {
+        return isvim;
+    }
+
+    public void setIsvim(int isvim) {
+        this.isvim = isvim;
+    }
+
     public HashMap<String, Object> getHashMap() {
         HashMap<String, Object> values = new HashMap<String, Object>();
         values.put("determinCdrom", determinCdrom);
@@ -316,6 +327,7 @@ public class StartVnodeMessage {
         values.put("sourceNetwork", sourceNetwork);
         values.put("inputType", inputType);
         values.put("sourceFile", sourceFile);
+        values.put("isvim", isvim);
         return values;
     }
 

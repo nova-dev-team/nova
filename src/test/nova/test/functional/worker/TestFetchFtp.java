@@ -9,6 +9,8 @@ import nova.storage.NovaStorage;
 
 import org.junit.Test;
 
+import sun.net.ftp.FtpProtocolException;
+
 public class TestFetchFtp {
     @Test
     public void testFetchFtp() {
@@ -21,7 +23,12 @@ public class TestFetchFtp {
             Appliance app = new Appliance("picture");
             NovaAgent.getInstance().getAppliances().put("picture", app);
             // app.setStatus(Status.CANCELLED);
-            fp.fetch(app);
+            try {
+                fp.fetch(app);
+            } catch (FtpProtocolException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
-import nova.common.service.message.AgentPerfMessage;
+import nova.common.service.message.AgentHeartbeatMessage;
 import nova.common.util.RRDTools;
 import nova.master.models.Vnode;
 
@@ -22,15 +22,17 @@ import org.jrobin.core.Util;
  * @author gaotao1987@gmail.com
  * 
  */
-public class MasterAgentPerfHandler implements SimpleHandler<AgentPerfMessage> {
+public class MasterAgentPerfHandler implements
+        SimpleHandler<AgentHeartbeatMessage> {
 
     Logger logger = Logger.getLogger(MasterAgentPerfHandler.class);
 
     @Override
-    public void handleMessage(AgentPerfMessage msg, ChannelHandlerContext ctx,
-            MessageEvent e, SimpleAddress xreply) {
+    public void handleMessage(AgentHeartbeatMessage msg,
+            ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         System.out.println("Got AgentGeneralMonitorInfo from " + xreply);
-        Vnode vnode = Vnode.findByIp(xreply.ip);
+        System.out.println("AgentPerfMessage msg: " + msg.vnodeuuid);
+        Vnode vnode = Vnode.findByIp("192.168.7.159");
         if (vnode == null)
             vnode = Vnode.findByUuid(msg.vnodeuuid);
         if (vnode != null) {

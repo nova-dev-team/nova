@@ -20,7 +20,7 @@ public class MasterPnodeHeartbeatHandler implements
     @Override
     public void handleMessage(PnodeHeartbeatMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-
+        // System.out.println("Pnode Heartbeat");
         if (xreply == null) {
             log.warn("Got a pnode heartbeat message, but the reply address is null!");
         } else {
@@ -28,11 +28,12 @@ public class MasterPnodeHeartbeatHandler implements
         }
 
         // TODO @zhaoxun possibly update vnode
+
         Pnode pnode = Pnode.findByIp(xreply.ip);
         if (pnode != null) {
             pnode.setStatus(Pnode.Status.RUNNING);
-            // log.info("Update status of pnode @ " + pnode.getAddr() + " to "
-            // + pnode.getStatus());
+            log.info("Update status of pnode @ " + pnode.getAddr() + " to "
+                    + pnode.getStatus());
             pnode.updateLastAckTime();
             pnode.save();
         } else {
@@ -40,5 +41,4 @@ public class MasterPnodeHeartbeatHandler implements
         }
 
     }
-
 }

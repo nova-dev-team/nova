@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Nova master</title>
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link href="css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/docs.css" rel="stylesheet">
+  <script src="js/bootstrap-modal.js"></script>
+  <script src="js/bootstrap-dropdown.js"></script>
+</head>
+  
+<body>
+<!---------------------- Page Header  -------------------------------->
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+    </div>
+  </div>
+  
+
+  <div class="container">
+
+    <div class="page-header">	
+        <h1>
+            <em> Nova Master </em>
+           
+        </h1>  
+    </div>
+    <!-- page-header -->
+    
+    <div class="row ">
+      <div class="span4 offset8">
+        <div class="pull-right">
+    	<i class="icon-user"></i>&nbsp;<a>用户: <strong>${username}</strong>&nbsp;&nbsp;</a>
+    	<i class="icon-flag"></i>&nbsp;<a>权限: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
+    	</div>
+      </div>
+    </div>
+    <!-- row -->
+    
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#">Nova</a>
+          <ul class="nav nav-pills">
+            <li class="active"><a href="overview">概况</a></li>
+            <li class=""><a href="instance">实例</a></li>
+            <li class=""><a href="machine">物理机</a></li>
+            <li class=""><a href="image">镜像</a></li>
+            <li class=""><a href="monitor">监视器</a></li>
+            <li class=""><a href="account">用户</a></li>
+          </ul>
+          
+          <form class="navbar-search pull-left" action="">
+            <input type="text" class="search-query span2" placeholder="搜索">
+          </form>
+          
+          <ul class="nav pull-right">
+          	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;退出</a></li>
+          </ul>
+          
+        </div>
+      </div>
+    </div>
+    <!-- navbar -->
+    
+    <!---------------------- Page Content  -------------------------------->
+    <div class="row">
+        
+	        <legend><h2>Nova系统概况:</h2></legend>
+	        ${hide_head}
+	        <h3>用户:</h3>
+	        <p> 总计：${user_total} ,管理员： ${root_user_total} ,
+	        	企业用户：${enterprise_user_total} , 个人用户：${individual_user_total} ,
+	        	未活动：${not_activated_user_total}  </p>
+	        ${hide_tail}
+	        <h3>物理机:</h3>is working, 工作中：运行故障：${failed_pmachine_total}
+	        	, 退休：${retired_pmachine_total}  </p>
+	        <h3>实例:</h3>
+	        <p>${vcluster_num}个虚拟机集群, ${vmachine_num}个虚拟机</p>
+	        <h3>存储服务器</h3>
+	        <p>存储服务器运行正常！</p>
+	    
+    
+    </div>
+    <!-- row -->
+  
+    <!---------------------- Page Footer  -------------------------------->
+    <footer class="footer">
+  	  <hr>
+	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">返回顶部p</a></p>
+      <p>  Nova系统. </p>
+      <p>  @2013-2014 Nova开发小组 版权所有.</p>
+    </footer>
+    <!-- footer -->
+
+</div>
+  <!-- container --> 
+
+</body>
+</html>

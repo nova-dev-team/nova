@@ -1,14 +1,21 @@
 package nova.master.handler;
 
+import java.io.File;
+import java.io.IOException;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.service.message.AgentHeartbeatMessage;
+import nova.common.util.RRDTools;
 import nova.master.models.Vnode;
 import nova.test.functional.agent.experiment.TimeInfo;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
+import org.jrobin.core.RrdDb;
+import org.jrobin.core.RrdException;
+import org.jrobin.core.Util;
 
 public class MasterAgentHeartbeatHandler implements
         SimpleHandler<AgentHeartbeatMessage> {
@@ -44,14 +51,40 @@ public class MasterAgentHeartbeatHandler implements
         // TODO @zhaoxun possibly update vnode.agentStatus
         // String oldStatus = null;
         // String newStatus = null;
-        Vnode vnode = Vnode.findByIp(xreply.ip);
+        Vnode vnode = Vnode.findByUuid(msg.vnodeuuid);
+        System.out.println("Message Get: " + msg.vnodeuuid);
         if (vnode != null) {
             // oldStatus = vnode.getAgentStatus();
-            vnode.setAgentStatus("on");
+            System.out.println("Always Wrong!!!Why");
+            // vnode.setAgentStatus("on");
             // newStatus = vnode.getAgentStatus();
-            log.info("Update status of agent @ " + vnode.getAddr() + " to "
-                    + vnode.getAgentStatus());
+            // log.info("Update status of agent @ " + vnode.getAddr() + " to "
+            // + vnode.getAgentStatus());
+
+            System.out.println("Go inside");
+            String rrdPath = "build/" + vnode.getUuid() + ".rrd";
+
+            int timeInterval = 5;
+            int rrdLength = 50000;
+
+            File file = new File(rrdPath);
+            Logger logger = Logger.getLogger(MasterAgentPerfHandler.class);
+            if (file.exists() == false) {
+                RRDTools.CreateMonitorInfoRRD(rrdPath, timeInterval, rrdLength);
+                logger.info(xreply.ip + ": RRD file is created!");
+            }
+            try {
+                RrdDb rrdDb = new RrdDb(rrdPath);
+                RRDTools.addMonitorInfoInRRD(rrdDb,
+                        msg.getGeneralMonitorInfo(), Util.getTime());
+                rrdDb.close();
+            } catch (IOException ex) {
+                logger.error("Error updating RRD", ex);
+            } catch (RrdException ex) {
+                logger.error("Error updating RRD", ex);
+            }
             vnode.save();
+
         } else {
             log.error("Vnode with host " + xreply.ip + " not found!");
         }

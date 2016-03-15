@@ -4,12 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
-import sun.net.TelnetInputStream;
 import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpProtocolException;
 
 /**
  * Helper functions for ftp connection.
@@ -38,13 +39,14 @@ public class FtpUtils {
      * @return An {@link sun.net.ftp.FtpClient} object.
      * @throws IOException
      *             If connection fails.
+     * @throws FtpProtocolException
      */
     public static FtpClient connect(String host, int port, String username,
-            String password) throws IOException {
+            String password) throws IOException, FtpProtocolException {
         try {
-            FtpClient fc = new FtpClient(host, port);
-            fc.openServer(host, port);
-            fc.login(username, password);
+            FtpClient fc = FtpClient.create(host);
+            // fc.openServer(host, port);
+            fc.login(username, null, password);
 
             return fc;
         } catch (IOException e) {
@@ -65,8 +67,10 @@ public class FtpUtils {
      * @return An {@link sun.net.ftp.FtpClient} object.
      * @throws IOException
      *             If connection fails.
+     * @throws FtpProtocolException
      */
-    public static FtpClient connect(String host, int port) throws IOException {
+    public static FtpClient connect(String host, int port) throws IOException,
+            FtpProtocolException {
         return FtpUtils.connect(host, port, "anonymous",
                 "nova-develop@googlegroups.com");
     }
@@ -85,17 +89,18 @@ public class FtpUtils {
      *            A cancel flag to indicate whether need to quit downloading.
      * @throws IOException
      *             If connection failed.
+     * @throws FtpProtocolException
      */
     private static void downloadFileInCwd(FtpClient fClient,
             String remoteFileName, String localPath, Cancellable cancelFlag)
-            throws IOException {
-        fClient.binary();
-        TelnetInputStream is = fClient.get(remoteFileName);
+            throws IOException, FtpProtocolException {
+        fClient.setBinaryType();
 
         File localFile = new File(localPath);
 
         Utils.mkdirs(localFile.getParentFile().getAbsolutePath());
         FileOutputStream os = new FileOutputStream(localFile);
+        InputStream is = fClient.getFileStream(remoteFileName);
         final int bufSize = 32 * 1024;
         byte[] bytes = new byte[bufSize];
         int c = -1;
@@ -124,31 +129,37 @@ public class FtpUtils {
      *            A cancel flag to indicate whether need to quit downloading.
      * @throws IOException
      *             If connection failed.
+     * @throws FtpProtocolException
      */
     public static void downloadFile(FtpClient fClient, String remotePath,
-            String localPath, Cancellable cancelFlag) throws IOException {
+            String localPath, Cancellable cancelFlag) throws IOException,
+            FtpProtocolException {
         String[] splt = Utils.pathSplit(remotePath);
-        String oldCwd = fClient.pwd();
-        fClient.cd(splt[0]);
+        String oldCwd = fClient.getWorkingDirectory();
+        fClient.changeDirectory(splt[0]);
         FtpUtils.downloadFileInCwd(fClient, splt[1], localPath, cancelFlag);
         // get back to old working dir
-        fClient.cd(oldCwd);
+        fClient.changeDirectory(oldCwd);
     }
 
     public static void downloadFile(FtpClient fClient, String remotePath,
-            String localPath) throws IOException {
+            String localPath) throws IOException, FtpProtocolException {
         FtpUtils.downloadFile(fClient, remotePath, localPath, null);
     }
 
     public static void downloadDir(FtpClient fc, String remotePath,
-            String localPath, Cancellable cancelFlag) throws IOException {
+            String localPath, Cancellable cancelFlag) throws IOException,
+            FtpProtocolException {
         if (shouldStop(cancelFlag) == false) {
-            String oldCwd = fc.pwd();
-            fc.cd(remotePath);
+
+            // String oldCwd = fc.pwd();
+            String oldCwd = fc.getWorkingDirectory();
+            // fc.cd(remotePath);
+            fc.changeDirectory(remotePath);
             Utils.mkdirs(localPath);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(
-                    fc.list()));
+                    (InputStream) fc.listFiles(remotePath)));
 
             String ftpEntry = null;
             while ((ftpEntry = br.readLine()) != null
@@ -165,7 +176,7 @@ public class FtpUtils {
             }
             br.close();
 
-            fc.cd(oldCwd);
+            fc.changeDirectory(oldCwd);
         }
     }
 
@@ -177,7 +188,7 @@ public class FtpUtils {
     }
 
     public static void downloadDir(FtpClient fc, String remotePath,
-            String localPath) throws IOException {
+            String localPath) throws IOException, FtpProtocolException {
         FtpUtils.downloadDir(fc, remotePath, localPath, null);
     }
 

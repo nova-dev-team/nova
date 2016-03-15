@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.jboss.netty.channel.Channel;
 
 import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpProtocolException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -314,6 +315,9 @@ public class NovaAgent extends SimpleServer {
 
                 } catch (IOException e) {
                     logger.error("Downloading pictures fail: ", e);
+                } catch (FtpProtocolException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
 
             }

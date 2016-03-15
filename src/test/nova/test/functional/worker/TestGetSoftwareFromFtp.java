@@ -10,10 +10,11 @@ import nova.storage.NovaStorage;
 import org.junit.Test;
 
 import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpProtocolException;
 
 public class TestGetSoftwareFromFtp {
     @Test
-    public void test() {
+    public void test() throws FtpProtocolException {
         String software = "demo_appliance";
         if (NovaStorage.getInstance().getFtpServer() == null) {
             NovaStorage.getInstance().startFtpServer();
@@ -25,11 +26,11 @@ public class TestGetSoftwareFromFtp {
                     Conf.getInteger("storage.ftp.bind_port"),
                     Conf.getString("storage.ftp.admin.username"),
                     Conf.getString("storage.ftp.admin.password"));
-            fc.cd("appliances");
+            fc.changeDirectory("appliances");
             FtpUtils.downloadDir(fc, Utils.pathJoin(software), Utils.pathJoin(
                     Utils.NOVA_HOME, "run", "softwares", software));
             System.out.println("download file " + software);
-            fc.closeServer();
+            fc.close();
         } catch (NumberFormatException e1) {
         } catch (IOException e1) {
         }

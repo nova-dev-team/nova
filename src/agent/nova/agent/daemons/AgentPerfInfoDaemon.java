@@ -27,7 +27,8 @@ public class AgentPerfInfoDaemon extends SimpleDaemon {
             if (master.isConnected() == false) {
                 NovaAgent.getInstance().registerMaster(NovaAgent.masteraddr);
             }
-            NovaAgent.getInstance().getMaster().sendPnodeMonitorInfo();
+            System.out.println("AgentPerfInfoDaemon");
+            NovaAgent.getInstance().getMaster().sendVnodeMonitorInfo();
         }
     }
 }

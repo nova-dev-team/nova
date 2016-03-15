@@ -4,13 +4,22 @@
 <head>
   <meta charset="utf-8">
   <title>Nova Instance</title>
-  <link href="css/bootstrap.css" rel="stylesheet">
+   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="css/bootstrap-responsive.css" rel="stylesheet">
   <link href="css/docs.css" rel="stylesheet">
   <script src="js/jquery-2.0.0.js"></script>
   <script src="js/bootstrap-modal.js"></script>
   <script src="js/bootstrap-dropdown.js"></script>
-  
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+   
+    <link href="css/bootstrap-switch.css" rel="stylesheet">
+    
+    
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/highlight.js"></script>
+    <script src="js/bootstrap-switch.js"></script>
+    <script src="js/main.js"></script>             
   <script language="javascript">
 
 	function instance_view()
@@ -181,7 +190,16 @@
     <legend> Instances
 	    <div class="pull-right">
 	       <a data-toggle="modal" class="btn btn-primary" href="#LaunchInstance_Modal"> Launch Instance </a>
-	       <a class="btn btn-success" href="instance"> Refresh </a>
+	       <a class="btn btn-success" href="instance"> Refresh </a>	       
+	    <p>
+      <input id="switch-state" type="checkbox" checked>
+          </p>
+
+</div>
+	
+</div>
+
+			
 	    </div>
     </legend>
     
@@ -251,14 +269,12 @@
 					<label class="control-label">Software List:</label>
 					<div class="controls">
 						  <label class="checkbox inline">
-			                <input type="checkbox" name="vnode_soft_word" value="true"> Word
+			                <input type="radio" name="vnode_soft_vim" value="0"> Word
 			              </label>
 			              <label class="checkbox inline">
-			                <input type="checkbox" name="vnode_soft_hadoop" value="true"> Hadoop
+			                <input type="radio" name="vnode_soft_vim" value="1"> VIM
 			              </label>
-			              <label class="checkbox inline">
-			                <input type="checkbox" name="vnode_soft_vim" value="true"> Vim
-			              </label>
+			             
 					</div>
 				</div>
 				

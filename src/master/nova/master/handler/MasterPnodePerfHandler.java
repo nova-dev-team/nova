@@ -29,7 +29,7 @@ public class MasterPnodePerfHandler implements SimpleHandler<PnodePerfMessage> {
     @Override
     public void handleMessage(PnodePerfMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) {
-
+        // System.out.println("Pnode perform message");
         Pnode pnode = Pnode.findByIp(xreply.ip);
         if (pnode != null) {
             String rrdPath = "build/" + pnode.getId() + ".rrd";

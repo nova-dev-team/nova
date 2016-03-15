@@ -28,6 +28,7 @@ public class AgentHeartbeatDaemon extends SimpleDaemon {
                 NovaAgent.getInstance().registerMaster(NovaAgent.masteraddr);
             }
             NovaAgent.getInstance().getMaster().sendAgentHeartbeat();
+            System.out.println("AgentHeartBeatDaemon");
         }
     }
 

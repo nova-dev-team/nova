@@ -12,11 +12,12 @@ import nova.storage.NovaStorage;
 import org.junit.Test;
 
 import sun.net.ftp.FtpClient;
+import sun.net.ftp.FtpProtocolException;
 
 public class TestFtpUtils {
 
     @Test
-    public void testDownloadFile() {
+    public void testDownloadFile() throws FtpProtocolException {
         NovaStorage.getInstance().startFtpServer();
 
         try {
@@ -27,21 +28,21 @@ public class TestFtpUtils {
                     Utils.pathJoin("appliances", "demo_appliance", "demo.py"),
                     Utils.pathJoin(Utils.NOVA_HOME, "build", "demo.py-1"));
 
-            fc.cd("appliances");
+            fc.changeDirectory("appliances");
 
             FtpUtils.downloadFile(fc,
                     Utils.pathJoin("demo_appliance", "demo.py"),
                     Utils.pathJoin(Utils.NOVA_HOME, "build", "demo.py-2"));
 
-            Assert.assertEquals(fc.pwd(), "/appliances");
+            Assert.assertEquals(fc.getWorkingDirectory(), "/appliances");
 
             FtpUtils.downloadFile(fc, Utils.pathJoin(File.separator,
                     "appliances", "demo_appliance", "demo.py"), Utils.pathJoin(
                     Utils.NOVA_HOME, "build", "demo.py-3"));
 
-            Assert.assertEquals(fc.pwd(), "/appliances");
+            Assert.assertEquals(fc.getWorkingDirectory(), "/appliances");
 
-            fc.closeServer();
+            fc.close();
         } catch (NumberFormatException e) {
             e.printStackTrace();
             Assert.fail();
@@ -53,7 +54,7 @@ public class TestFtpUtils {
     }
 
     @Test
-    public void testDownloadDir() {
+    public void testDownloadDir() throws FtpProtocolException {
         NovaStorage.getInstance().startFtpServer();
 
         try {
@@ -63,20 +64,20 @@ public class TestFtpUtils {
             FtpUtils.downloadDir(fc, "appliances/demo_appliance",
                     Utils.pathJoin(Utils.NOVA_HOME, "build", "ftp_test/1"));
 
-            fc.cd("appliances");
+            fc.changeDirectory("appliances");
 
             FtpUtils.downloadDir(fc, "demo_appliance", Utils.pathJoin(
                     Utils.NOVA_HOME, "build",
                     "ftp_test/2/create_folder/real_data"));
 
-            Assert.assertEquals(fc.pwd(), "/appliances");
+            Assert.assertEquals(fc.getWorkingDirectory(), "/appliances");
 
             FtpUtils.downloadDir(fc, "/appliances/",
                     Utils.pathJoin(Utils.NOVA_HOME, "build", "ftp_test/3"));
 
-            Assert.assertEquals(fc.pwd(), "/appliances");
+            Assert.assertEquals(fc.getWorkingDirectory(), "/appliances");
 
-            fc.closeServer();
+            fc.close();
         } catch (NumberFormatException e) {
             e.printStackTrace();
             Assert.fail();
