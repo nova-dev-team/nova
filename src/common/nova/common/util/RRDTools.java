@@ -5,8 +5,6 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 
-import nova.common.tools.perf.GeneralMonitorInfo;
-
 import org.apache.log4j.Logger;
 import org.jrobin.core.DsTypes;
 import org.jrobin.core.FetchData;
@@ -18,6 +16,8 @@ import org.jrobin.core.Sample;
 import org.jrobin.core.Util;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
+
+import nova.common.tools.perf.GeneralMonitorInfo;
 
 /**
  * Utilization of jrobin
@@ -185,10 +185,10 @@ public class RRDTools {
             sample.setValue("totalDiskSize", msg.diskInfo.totalDiskSize);// GB
 
             sample.setValue("bandWidth", msg.netInfo.bandWidth / 1024 / 1024);// mbps
-            sample.setValue("downSpeed", 100 * msg.netInfo.downSpeed
-                    / msg.netInfo.bandWidth);
-            sample.setValue("upSpeed", 100 * msg.netInfo.upSpeed
-                    / msg.netInfo.bandWidth);
+            sample.setValue("downSpeed",
+                    100 * msg.netInfo.downSpeed / msg.netInfo.bandWidth);
+            sample.setValue("upSpeed",
+                    100 * msg.netInfo.upSpeed / msg.netInfo.bandWidth);
 
             sample.update();
 
@@ -438,6 +438,81 @@ public class RRDTools {
             }
         }
         return info;
+    }
+
+    /**
+     * Get the latest monitor information of a certain Pnode
+     * 
+     * @author Tianyu Chen
+     * @param pnodeid
+     * @return
+     */
+    public static double[] getLatestMonitorInfo(int pnodeid) {
+        // debug
+        logger.info("Entering getLatestMonitorInfo");
+
+        String rddfile = "build/" + pnodeid + ".rrd";
+        File file = new File(rddfile);
+        if (file.exists() == false)
+            return null;
+        FetchData fetchData = null;
+        try {
+            // open the rrd database
+            RrdDb rrd = new RrdDb(rddfile);
+
+            // construct fetch request
+            // we use function AVERAGE and default resolution here
+            long now = Util.getTime();
+            FetchRequest request = rrd.createFetchRequest("AVERAGE", now - 100,
+                    now);
+            fetchData = request.fetchData();
+        } catch (Exception e) {
+            logger.error("Failed to fetch data from RRD file", e);
+            return null;
+        }
+
+        // get values and timestamps
+        // smaller timestamp - lower index
+        double[][] data = fetchData.getValues();
+        long[] timestamps = fetchData.getTimestamps();
+        double[] info = new double[data.length];
+
+        // !!! DIRTY HACK WARNING !!!
+        assert (data[0].length == timestamps.length);
+        assert (data.length == 13);
+
+        // fetch the latest performance information that is not NaN
+        for (int i = data[0].length; i >= 0; i--) {
+            if (!Double.isNaN(data[0][i])) {
+                for (int j = 0; j < info.length; j++) {
+                    info[j] = data[j][i];
+                }
+                // debug
+                logger.info("Fetching perf info at timestamp " + timestamps[i]);
+                break;
+            }
+        }
+
+        return info;
+    }
+
+    /**
+     * Get the latest monitor information of a certain virtual machine
+     * 
+     * @author Tianyu Chen
+     * @param vnodeuuid
+     * @return
+     */
+    public static double[] getLatestVnodeMonitorInfo(String vnodeuuid) {
+        // debug
+        logger.info("Entering getLatestVnodeMonitorInfo");
+
+        /**
+         * TBD
+         */
+
+        // comment this
+        return null;
     }
 
     public static double[][] getVnodeMonitorInfo(String vnodeuuid) {

@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+
 import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
@@ -14,6 +20,7 @@ import nova.common.service.message.PnodeHeartbeatMessage;
 import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.common.util.Conf;
+import nova.common.util.RRDTools;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
@@ -51,12 +58,6 @@ import nova.test.functional.agent.experiment.ExpTimeMessage;
 import nova.worker.api.WorkerProxy;
 import nova.worker.models.StreamGobbler;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-
 /**
  * Master node of Nova system.
  * 
@@ -71,6 +72,7 @@ public class NovaMaster extends SimpleServer {
     /**
      * All background working daemons for master node.
      */
+    // remove automanager daemon for now
     SimpleDaemon daemons[] = { new PnodeCheckerDaemon(),
             new RemoveEmptyVClusterDaemon() };
 
@@ -97,7 +99,8 @@ public class NovaMaster extends SimpleServer {
 
         this.registerHandler(AddPnodeMessage.class, new AddPnodeHandler());
 
-        this.registerHandler(CreateVnodeMessage.class, new CreateVnodeHandler());
+        this.registerHandler(CreateVnodeMessage.class,
+                new CreateVnodeHandler());
 
         this.registerHandler(CreateVclusterMessage.class,
                 new CreateVclusterHandler());
@@ -108,9 +111,11 @@ public class NovaMaster extends SimpleServer {
         this.registerHandler(RegisterApplianceMessage.class,
                 new RegisterApplianceHandler());
 
-        this.registerHandler(PnodeStatusMessage.class, new PnodeStatusHandler());
+        this.registerHandler(PnodeStatusMessage.class,
+                new PnodeStatusHandler());
 
-        this.registerHandler(VnodeStatusMessage.class, new VnodeStatusHandler());
+        this.registerHandler(VnodeStatusMessage.class,
+                new VnodeStatusHandler());
 
         this.registerHandler(PnodePerfMessage.class,
                 new MasterPnodePerfHandler());
@@ -164,12 +169,12 @@ public class NovaMaster extends SimpleServer {
             if (!dirFile.exists())
                 Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
             String[] strExecs = {
-            // "modprobe nfs_layout_nfsv41_files",
-            // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
-            // + ":/Nova_home "
-            // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
-            "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
-                    + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+                    // "modprobe nfs_layout_nfsv41_files",
+                    // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
+                    // + ":/Nova_home "
+                    // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
+                    "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run") };
             System.out.println(strExecs[0]);
             try {
                 for (String cmd : strExecs) {
@@ -182,12 +187,14 @@ public class NovaMaster extends SimpleServer {
                     outGobbler.start();
                     try {
                         if (p.waitFor() != 0) {
-                            logger.error("mount pnfs folder returned abnormal value!");
+                            logger.error(
+                                    "mount pnfs folder returned abnormal value!");
                         }
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
-                        logger.error("mount pnfs folder process terminated!", e);
+                        logger.error("mount pnfs folder process terminated!",
+                                e);
                     }
                 }
 
@@ -250,8 +257,8 @@ public class NovaMaster extends SimpleServer {
                                 + pnode.getAddr() + " to " + pnode.getStatus());
                         pnode.save();
                     } else {
-                        logger.error("Pnode with host " + pAddr.ip
-                                + " not found!");
+                        logger.error(
+                                "Pnode with host " + pAddr.ip + " not found!");
                     }
                     super.exceptionCaught(ctx, e);
                 }
@@ -309,6 +316,19 @@ public class NovaMaster extends SimpleServer {
             }
 
         });
+        logger.info("Nova Master Starting...");
+        // try out the rrd tools
+        // double[][] monitor_data = null;
+        // monitor_data = RRDTools.getMonitorInfo(1);
+        // logger.info("Monitor data length - Pnode 1 " + monitor_data.length +
+        // " "
+        // + monitor_data[0].length + " "
+        // + monitor_data[monitor_data.length - 1].length);
+        // logger.info("CPU combined time of Pnode 1 - "
+        // + monitor_data[monitor_data.length - 1][0]);
+        RRDTools.getLatestMonitorInfo(1);
+        RRDTools.getLatestMonitorInfo(2);
+        RRDTools.getLatestMonitorInfo(3);
         NovaMaster.getInstance().start();
     }
 }
