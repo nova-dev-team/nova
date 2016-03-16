@@ -1,5 +1,7 @@
 package nova.master.daemons;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -48,6 +50,21 @@ public class LoadBalancingDaemon extends SimpleDaemon {
                 * ((1.0 / (1.0 - netIn)) + (1.0 / (1.0 - netOut)));
     }
 
+    protected double calculateShiftValue(double cpu, double mem, double netIn,
+            double netOut, double memSize) {
+        // use the highest single value and memory size to determine
+        double highest = Collections
+                .max(Arrays.asList(cpu, mem, netIn, netOut));
+        return highest / memSize;
+    }
+
+    protected Vnode selectVnodeFromHotspot(Pnode hotspot) {
+        /**
+         * TBD
+         */
+        return null;
+    }
+
     /**
      * work one round.
      */
@@ -57,13 +74,15 @@ public class LoadBalancingDaemon extends SimpleDaemon {
         // 1.1 find out the running physical nodes and their ids
         List<Pnode> pnodes = Pnode.all();
         // 1.2 collecting CPU / MEM / NETWORK IO performance data in percentile
-        // 0.cpu 1.mhz 2.ncpu 3.free mem 4.used mem 5.total mem 6.ram size
-        // 7.free disk 8.used disk 9.total disk 10.bandwidth 11.down 12.up
         Pnode hotspot = null;
-        double hotspotSpotValue = 0;
+        double hotspotSpotValue = -1.0;
         for (Pnode pnd : pnodes) {
             logger.info(
                     String.format("Pnode %d says aye! ", (int) pnd.getId()));
+            /**
+             * 0.cpu 1.mhz 2.ncpu 3.free mem 4.used mem 5.total mem 6.ram size
+             * 7.free disk 8.used disk 9.total disk 10.bandwidth 11.down 12.up
+             */
             double perf[] = RRDTools.getLatestMonitorInfo((int) pnd.getId());
             double cpuLoad = perf[0] / 100.0, memLoad = perf[4] / perf[5],
                     netInLoad = perf[11] / perf[10],
@@ -100,6 +119,32 @@ public class LoadBalancingDaemon extends SimpleDaemon {
                 "Well, pnode %d is a hot spot. There are %d vnodes on it. ",
                 (int) hotspot.getId(), vmCnt));
         List<Vnode> vnodes = hotspot.getVnodes();
+        if (vnodes.isEmpty()) {
+            // throw exception if the hot spot is not due to high payload on
+            // virtual machines
+            throw new NoVnodeOnHotspotException();
+        }
+
+        Vnode migrant;
+        double maxShiftValue = -1.0;
+        for (Vnode vnd : vnodes) {
+            /**
+             * 0.cpu 1.mhz 2.ncpu 3.free mem 4.used mem 5.total mem 6.ram size
+             * 7.free disk 8.used disk 9.total disk 10.bandwidth 11.down 12.up
+             */
+            double perf[] = RRDTools.getLatestVnodeMonitorInfo(vnd.getUuid());
+            double cpuLoad = perf[0] / 100.0, memLoad = perf[4] / perf[5],
+                    netInLoad = perf[11] / perf[10],
+                    netOutLoad = perf[12] / perf[10], memSize = perf[4];
+            // !!! there may be some issues with the memory size !!!
+            double shiftValue = calculateShiftValue(cpuLoad, memLoad, netInLoad,
+                    netOutLoad, memSize);
+            // choose the virtual machine with the largest shift value
+            if (shiftValue > maxShiftValue) {
+                migrant = vnd;
+                maxShiftValue = shiftValue;
+            }
+        }
 
         // 3. find the destination
 
