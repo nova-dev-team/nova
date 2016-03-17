@@ -17,7 +17,10 @@ public class PerfData {
     private double netInLoad;
     private double netOutLoad;
     private double memSize;
+    private double freeMem;
     private double bandWidth;
+    private double netIn;
+    private double netOut;
 
     public PerfData(double perf[]) {
         this.cpuLoad = perf[0] / 100.0;
@@ -25,7 +28,10 @@ public class PerfData {
         this.netInLoad = perf[11] / perf[10];
         this.netOutLoad = perf[12] / perf[10];
         this.memSize = perf[5];
+        this.freeMem = perf[3];
         this.bandWidth = perf[10];
+        this.netIn = perf[11];
+        this.netOut = perf[12];
     }
 
     public double getCpuLoad() {
@@ -48,7 +54,19 @@ public class PerfData {
         return memSize;
     }
 
+    public double getFreeMemSize() {
+        return freeMem;
+    }
+
     public double getBandWidth() {
         return bandWidth;
+    }
+
+    public double getNetIn() {
+        return netIn;
+    }
+
+    public double getNetOut() {
+        return netOut;
     }
 }

@@ -158,19 +158,39 @@ public class LoadBalancingDaemon extends SimpleDaemon {
 
         List<Pnode> pnodes = Pnode.all();
         Pnode destination = null;
-        double maxSpotValue = -1.0;
-        double migrPerf[] = RRDTools
-                .getLatestVnodeMonitorInfo(migrant.getUuid());
+        double minSpotValue = -1.0;
+        PerfData migrantPerf = new PerfData(
+                RRDTools.getLatestVnodeMonitorInfo(migrant.getUuid()));
 
-        for (Pnode pnd : pnodes) {
-            double destPerf[] = RRDTools
-                    .getLatestMonitorInfo((int) pnd.getId());
+        for (Pnode dest : pnodes) {
+            PerfData destPerf = new PerfData(
+                    RRDTools.getLatestMonitorInfo((int) dest.getId()));
+
+            boolean cpuAvailable = destPerf.getCpuLoad() < (1
+                    - migrantPerf.getCpuLoad() / dest.getCurrentVMNum());
+            boolean memAvailable = destPerf.getFreeMemSize() >= migrantPerf
+                    .getMemSize();
+            boolean netIoAvailable = ((destPerf.getBandWidth()
+                    - destPerf.getNetIn()) >= migrantPerf.getBandWidth())
+                    && ((destPerf.getBandWidth()
+                            - destPerf.getNetOut()) >= migrantPerf
+                                    .getBandWidth());
+            if (cpuAvailable && memAvailable && netIoAvailable) {
+                if (destination == null) {
+                    destination = dest;
+                    minSpotValue = calculateSpotValue(destPerf);
+                } else {
+                    double thisPnodeSpotValue = calculateSpotValue(destPerf);
+                    if (thisPnodeSpotValue < minSpotValue) {
+                        destination = dest;
+                        minSpotValue = thisPnodeSpotValue;
+                    }
+                }
+            }
         }
 
-        /**
-         * TBD
-         */
-        return null;
+        // return null if no available destinations
+        return destination;
     }
 
     /**
@@ -182,7 +202,7 @@ public class LoadBalancingDaemon extends SimpleDaemon {
         Pnode hotspot = this.selectPnodeHotspot();
 
         // 2. choose the best vm on the physical node
-        // 2.1 if there is no hot spot, return.
+        // 2.1 if there is no hot spot, better luck next time!
         if (hotspot == null) {
             logger.info("Well, no hotspot detected. ");
             return;
@@ -195,7 +215,16 @@ public class LoadBalancingDaemon extends SimpleDaemon {
         }
 
         // 3. find the destination
+        Pnode destination = this.selectPnodeDestination(migrant);
+        // better luck next time!
+        if (destination == null) {
+            logger.info("Ah... no available destination found! ");
+            return;
+        }
 
         // 4. migrate
+        /**
+         * TBD
+         */
     }
 }
