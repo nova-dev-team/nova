@@ -31,11 +31,18 @@ public class LoadBalancingDaemon extends SimpleDaemon {
      * "hot spot".
      */
     double spotThreshold;
+    /**
+     * the energy saving threshold. if the spot values of all pnodes are below
+     * this threshold, the entire system will enter a "power-saving" state.
+     */
+    double powerSavingThreshold;
 
-    public LoadBalancingDaemon(double setSpotThreshold) {
-        // wait 120s for next round
-        super(120000);
+    public LoadBalancingDaemon(double setSpotThreshold,
+            double setPowerSavingThreshold) {
+        // wait 180s (3 min) for next round
+        super(180000);
         this.spotThreshold = setSpotThreshold;
+        this.powerSavingThreshold = setPowerSavingThreshold;
     }
 
     /**
@@ -75,12 +82,11 @@ public class LoadBalancingDaemon extends SimpleDaemon {
     /**
      * select hot spot physical machine
      * 
+     * @param pnodes
      * @return
      */
-    protected Pnode selectPnodeHotspot() {
-        // 1.1 find out the running physical nodes and their ids
-        List<Pnode> pnodes = Pnode.all();
-        // 1.2 collecting CPU / MEM / NETWORK IO performance data
+    protected Pnode selectPnodeHotspot(List<Pnode> pnodes) {
+        // collecting CPU / MEM / NETWORK IO performance data
         Pnode hotspot = null;
         double hotspotSpotValue = -1.0;
         for (Pnode pnd : pnodes) {
@@ -150,7 +156,14 @@ public class LoadBalancingDaemon extends SimpleDaemon {
         return migrant;
     }
 
-    protected Pnode selectPnodeDestination(Vnode migrant) {
+    /**
+     * selecting virtual machine migration deestination.
+     * 
+     * @param migrant
+     * @param pnodes
+     * @return
+     */
+    protected Pnode selectPnodeDestination(Vnode migrant, List<Pnode> pnodes) {
         /**
          * three qualifications of destination physical machine:
          * 
@@ -159,7 +172,6 @@ public class LoadBalancingDaemon extends SimpleDaemon {
          * by migrant
          */
 
-        List<Pnode> pnodes = Pnode.all();
         Pnode destination = null;
         double minSpotValue = -1.0;
         PerfData migrantPerf = new PerfData(
@@ -197,39 +209,70 @@ public class LoadBalancingDaemon extends SimpleDaemon {
     }
 
     /**
+     * method to decide whether it should enter the "power saving mode" .
+     * 
+     * @param pnodes
+     * @return
+     */
+    protected boolean enterPowerSavingMode(List<Pnode> pnodes) {
+        boolean ret = true;
+        for (Pnode pnd : pnodes) {
+            PerfData perf = new PerfData(
+                    RRDTools.getLatestPnodeMonitorInfo((int) pnd.getId()));
+
+            if (calculateSpotValue(perf) >= powerSavingThreshold) {
+                ret = false;
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    protected void powerSavingScheduling(List<Pnode> pnodes) {
+        /**
+         * TBD
+         */
+    }
+
+    /**
      * work one round.
      */
     @Override
     protected void workOneRound() {
+        List<Pnode> pnodes = Pnode.all();
         // 1. find the hot spot of physical machines
-        Pnode hotspot = this.selectPnodeHotspot();
+        Pnode hotspot = this.selectPnodeHotspot(pnodes);
 
-        // 2. choose the best vm on the physical node
-        // 2.1 if there is no hot spot, better luck next time! :P
         if (hotspot == null) {
-            logger.info("Well, no hotspot detected. ");
-            return;
-        }
-        // 2.2 if there is a hot spot, select the most "influential" virtual
-        // machine from it.
-        Vnode migrant = this.selectVnodeFromHotspot(hotspot);
-        if (migrant == null) {
-            throw new NullPointerException();
-        }
+            logger.info("No hotspot detected. Entering energy saver...");
+            /**
+             * TBD
+             */
+            if (enterPowerSavingMode(pnodes)) {
+                powerSavingScheduling(pnodes);
+            }
+        } else {
+            logger.info("Hotspot detected! ");
+            // 2. choose the most influential vm on the physical node
+            Vnode migrant = this.selectVnodeFromHotspot(hotspot);
+            if (migrant == null) {
+                throw new NullPointerException();
+            }
 
-        // 3. find the destination
-        Pnode destination = this.selectPnodeDestination(migrant);
-        // better luck next time! :P
-        if (destination == null) {
-            logger.info("Ah... no available destination found! ");
-            return;
-        }
+            // 3. find the best destination
+            Pnode destination = this.selectPnodeDestination(migrant, pnodes);
+            // better luck next time! :P
+            if (destination == null) {
+                logger.info("Ah... no available destination found! ");
+                return;
+            }
 
-        // 4. migrate
-        new MasterMigrateVnodeHandler()
-                .handleMessage(
-                        new MasterMigrateVnodeMessage(migrant.getId(),
-                                hotspot.getId(), destination.getId()),
-                        null, null, null);
+            // 4. migrate
+            new MasterMigrateVnodeHandler().handleMessage(
+                    new MasterMigrateVnodeMessage(migrant.getId(),
+                            hotspot.getId(), destination.getId()),
+                    null, null, null);
+        }
     }
 }
