@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import nova.common.util.PerfData;
 import nova.common.util.RRDTools;
 import nova.common.util.SimpleDaemon;
+import nova.master.api.messages.MasterMigrateVnodeMessage;
+import nova.master.handler.MasterMigrateVnodeHandler;
 import nova.master.models.Pnode;
 import nova.master.models.Vnode;
 
@@ -203,7 +205,7 @@ public class LoadBalancingDaemon extends SimpleDaemon {
         Pnode hotspot = this.selectPnodeHotspot();
 
         // 2. choose the best vm on the physical node
-        // 2.1 if there is no hot spot, better luck next time!
+        // 2.1 if there is no hot spot, better luck next time! :P
         if (hotspot == null) {
             logger.info("Well, no hotspot detected. ");
             return;
@@ -217,15 +219,17 @@ public class LoadBalancingDaemon extends SimpleDaemon {
 
         // 3. find the destination
         Pnode destination = this.selectPnodeDestination(migrant);
-        // better luck next time!
+        // better luck next time! :P
         if (destination == null) {
             logger.info("Ah... no available destination found! ");
             return;
         }
 
         // 4. migrate
-        /**
-         * TBD
-         */
+        new MasterMigrateVnodeHandler()
+                .handleMessage(
+                        new MasterMigrateVnodeMessage(migrant.getId(),
+                                hotspot.getId(), destination.getId()),
+                        null, null, null);
     }
 }
