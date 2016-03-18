@@ -326,9 +326,9 @@ public class NovaMaster extends SimpleServer {
         // + monitor_data[monitor_data.length - 1].length);
         // logger.info("CPU combined time of Pnode 1 - "
         // + monitor_data[monitor_data.length - 1][0]);
-        RRDTools.getLatestMonitorInfo(1);
-        RRDTools.getLatestMonitorInfo(2);
-        RRDTools.getLatestMonitorInfo(3);
+        RRDTools.getLatestPnodeMonitorInfo(1);
+        RRDTools.getLatestPnodeMonitorInfo(2);
+        RRDTools.getLatestPnodeMonitorInfo(3);
         NovaMaster.getInstance().start();
     }
 }

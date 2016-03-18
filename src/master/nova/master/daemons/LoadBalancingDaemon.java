@@ -86,7 +86,8 @@ public class LoadBalancingDaemon extends SimpleDaemon {
                     String.format("Pnode %d says aye! ", (int) pnd.getId()));
 
             int pndId = (int) pnd.getId();
-            PerfData perf = new PerfData(RRDTools.getLatestMonitorInfo(pndId));
+            PerfData perf = new PerfData(
+                    RRDTools.getLatestPnodeMonitorInfo(pndId));
 
             double spotValue = calculateSpotValue(perf);
             /**
@@ -164,7 +165,7 @@ public class LoadBalancingDaemon extends SimpleDaemon {
 
         for (Pnode dest : pnodes) {
             PerfData destPerf = new PerfData(
-                    RRDTools.getLatestMonitorInfo((int) dest.getId()));
+                    RRDTools.getLatestPnodeMonitorInfo((int) dest.getId()));
 
             boolean cpuAvailable = destPerf.getCpuLoad() < (1
                     - migrantPerf.getCpuLoad() / dest.getCurrentVMNum());
