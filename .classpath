@@ -38,8 +38,8 @@
 	<classpathentry kind="lib" path="lib/asm-attrs.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.0.jar"/>
 	<classpathentry kind="lib" path="lib/stringtree-2.0.9.jar"/>
-	<classpathentry kind="lib" path="lib/jna.jar"/>
-	<classpathentry kind="lib" path="lib/libvirt-0.4.7.jar"/>
 	<classpathentry kind="lib" path="lib/sigar/sigar.jar" sourcepath="/Users/eaglewatcher/.m2/repository/org/fusesource/sigar/1.6.4/sigar-1.6.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/libvirt-0.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/jna-4.2.2.jar"/>
 	<classpathentry kind="output" path="data/eclipse_build"/>
 </classpath>
