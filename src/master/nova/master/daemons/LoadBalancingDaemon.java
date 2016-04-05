@@ -1,5 +1,6 @@
 package nova.master.daemons;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -233,6 +234,31 @@ public class LoadBalancingDaemon extends SimpleDaemon {
         /**
          * TBD
          */
+        // 1. find out the max of numbers of vnodes that can be run on a single
+        // pnode
+        // VNODE_NUM = MIN(CPU_CAPACITY, MEM_CAPACITY, NET-IO_CAPACITY)
+        List<Vnode> vnodes = Vnode.all();
+        if (vnodes.isEmpty()) {
+            logger.info("No virtual machine running! ");
+            return;
+        }
+        List<Double> cpu = new ArrayList<Double>();
+        List<Double> mem = new ArrayList<Double>();
+
+        for (Vnode vnd : vnodes) {
+            PerfData perf = new PerfData(
+                    RRDTools.getLatestVnodeMonitorInfo(vnd.getUuid()));
+            cpu.add(perf.getCpuLoad());
+            mem.add(perf.getUsedMemSize());
+        }
+        // !!!TBD!!! get ncpus here!!!
+        int ncpu = 0;
+        // int cpuCapacity = (int) Math.floor((double) ncpu / max
+        // 2. find out how many pnodes are required to operate these vnodes
+        // 3. find out the pnodes with the most vnodes already running and make
+        // them the destinations of migration
+        // 4. migrate
+
     }
 
     /**
