@@ -25,19 +25,19 @@ Developers & Maintainers
 
 [Tianyu Chen](https://github.com/cty12), current maintainer
 
-Santa Zhang, santa1987@gmail.com (Lead developer)
-HUANG Gang, herokuankuan@gmail.com
-ZHAO Xun, zhaoxun0920@126.com
-HOU Qinghua, houqh06@gmail.com
-GAO tao, gaotao1987@gmail.com
-Feng lin, frankvictor@qq.com
+Santa Zhang, santa1987@gmail.com (Lead developer)  
+HUANG Gang, herokuankuan@gmail.com  
+ZHAO Xun, zhaoxun0920@126.com  
+HOU Qinghua, houqh06@gmail.com  
+GAO tao, gaotao1987@gmail.com  
+Feng lin, frankvictor@qq.com  
 
-Santa Zhang, santa1987@gmail.com (Lead developer)
-HUANG Gang, herokuankuan@gmail.com
+Santa Zhang, santa1987@gmail.com (Lead developer)  
+HUANG Gang, herokuankuan@gmail.com  
 
-XIN Jun (Lead developer)
-Santa Zhang, santa1987@gmail.com
-HUANG Gang, herokuankuan@gmail.com
+XIN Jun (Lead developer)  
+Santa Zhang, santa1987@gmail.com  
+HUANG Gang, herokuankuan@gmail.com  
 
 License
 ==========
