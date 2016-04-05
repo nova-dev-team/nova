@@ -20,7 +20,6 @@ import nova.common.service.message.PnodeHeartbeatMessage;
 import nova.common.service.message.PnodePerfMessage;
 import nova.common.service.message.VnodeHeartbeatMessage;
 import nova.common.util.Conf;
-import nova.common.util.RRDTools;
 import nova.common.util.SimpleDaemon;
 import nova.common.util.Utils;
 import nova.master.api.messages.AddPnodeMessage;
@@ -317,18 +316,7 @@ public class NovaMaster extends SimpleServer {
 
         });
         logger.info("Nova Master Starting...");
-        // try out the rrd tools
-        // double[][] monitor_data = null;
-        // monitor_data = RRDTools.getMonitorInfo(1);
-        // logger.info("Monitor data length - Pnode 1 " + monitor_data.length +
-        // " "
-        // + monitor_data[0].length + " "
-        // + monitor_data[monitor_data.length - 1].length);
-        // logger.info("CPU combined time of Pnode 1 - "
-        // + monitor_data[monitor_data.length - 1][0]);
-        RRDTools.getLatestPnodeMonitorInfo(1);
-        RRDTools.getLatestPnodeMonitorInfo(2);
-        RRDTools.getLatestPnodeMonitorInfo(3);
+
         NovaMaster.getInstance().start();
     }
 }
