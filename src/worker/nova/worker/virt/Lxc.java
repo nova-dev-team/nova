@@ -88,7 +88,8 @@ public class Lxc {
         } catch (IOException ioe) {
             logger.error("write conf.xml fail! ", ioe);
         }
-        // TBD delete me
+
+        // return the content of the xml file
         return content;
     }
 }
