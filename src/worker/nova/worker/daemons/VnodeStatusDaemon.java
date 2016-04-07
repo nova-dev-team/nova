@@ -4,15 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.libvirt.Domain;
+import org.libvirt.LibvirtException;
+
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.MasterProxy;
 import nova.master.models.Vnode;
 import nova.worker.NovaWorker;
-
-import org.apache.log4j.Logger;
-import org.libvirt.Domain;
-import org.libvirt.LibvirtException;
 
 /**
  * Daemon thread that reports all current vnodes status to master node.
@@ -23,6 +23,11 @@ import org.libvirt.LibvirtException;
 public class VnodeStatusDaemon extends SimpleDaemon {
 
     public static final long VNODE_STATUS_INTERVAL = 5000;
+
+    /**
+     * fetch virtual machine driver capabilities (in first round)
+     */
+    private String capabilities = null;
 
     public VnodeStatusDaemon() {
         super(VNODE_STATUS_INTERVAL);
@@ -44,11 +49,18 @@ public class VnodeStatusDaemon extends SimpleDaemon {
     }
 
     private void getStatus(String hypervisor) throws LibvirtException {
-        String[] strs = NovaWorker.getInstance()
-                .getConn(hypervisor + ":///system", false).listDefinedDomains();
+        // get libvirt connection URI
+        String virtService = null;
+        if (hypervisor.equals("lxc")) {
+            virtService = "lxc:///";
+        } else {
+            virtService = hypervisor + ":///system";
+        }
+
+        String[] strs = NovaWorker.getInstance().getConn(virtService, false)
+                .listDefinedDomains();
         for (int i = 0; i < strs.length; i++) {
-            Domain dom = NovaWorker.getInstance()
-                    .getConn(hypervisor + ":///system", false)
+            Domain dom = NovaWorker.getInstance().getConn(virtService, false)
                     .domainLookupByName(strs[i]);
             if (dom != null) {
                 UUID uu = UUID.fromString(dom.getUUIDString());
@@ -81,11 +93,10 @@ public class VnodeStatusDaemon extends SimpleDaemon {
             }
         }
 
-        int[] ids = NovaWorker.getInstance()
-                .getConn(hypervisor + ":///system", false).listDomains();
+        int[] ids = NovaWorker.getInstance().getConn(virtService, false)
+                .listDomains();
         for (int i = 0; i < ids.length; i++) {
-            Domain dom = NovaWorker.getInstance()
-                    .getConn(hypervisor + ":///system", false)
+            Domain dom = NovaWorker.getInstance().getConn(virtService, false)
                     .domainLookupByID(ids[i]);
             if (dom != null) {
                 UUID uu = UUID.fromString(dom.getUUIDString());
@@ -122,17 +133,27 @@ public class VnodeStatusDaemon extends SimpleDaemon {
     @Override
     protected void workOneRound() {
         synchronized (NovaWorker.getInstance().getConnLock()) {
-            String hyper = Conf.getString("hypervisor.engine").trim();
+            if (this.capabilities == null) {
+                this.capabilities = Conf.getString("hypervisor.engine").trim();
+                logger.info(
+                        "update hypervisor capabilities: " + this.capabilities);
+            }
             try {
-                if (hyper.indexOf("kvm") >= 0) {
+                // if worker machine is kvm capable
+                if (this.capabilities.indexOf("kvm") >= 0) {
                     getStatus("qemu");
                 }
-                if (hyper.indexOf("vstaros") >= 0) {
+                // if worker machine is vs... capable
+                // i don't know what vs... is, never mind
+                if (this.capabilities.indexOf("vstaros") >= 0) {
                     getStatus("vstaros");
                 }
-
+                // if worker machine is lxc capable
+                if (this.capabilities.indexOf("lxc") >= 0) {
+                    getStatus("lxc");
+                }
             } catch (LibvirtException e) {
-                logger.error("libvirt connection fail", e);
+                logger.error("libvirt driver connection fail", e);
             }
         }
 
@@ -141,8 +162,9 @@ public class VnodeStatusDaemon extends SimpleDaemon {
         if (this.isStopping() == false && master != null) {
             for (UUID uuid : allStatus.keySet()) {
                 Vnode.Status status = allStatus.get(uuid);
-                master.sendVnodeStatus(NovaWorker.getInstance().getVnodeIP()
-                        .get(uuid), uuid.toString(), status);
+                master.sendVnodeStatus(
+                        NovaWorker.getInstance().getVnodeIP().get(uuid),
+                        uuid.toString(), status);
             }
         }
     }
