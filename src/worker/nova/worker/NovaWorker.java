@@ -63,14 +63,24 @@ public class NovaWorker extends SimpleServer {
             new WorkerPerfInfoDaemon(), new VnodeStatusDaemon(),
             new VdiskPoolDaemon() /* , new PnodeStatusDaemon() */ };
 
+    /**
+     * connections
+     */
     private Connect conn = null;
     private Connect kvm_conn = null;
     private Connect vs_conn = null;
     private Connect xen_conn = null;
+    private Connect lxc_conn = null;
+
+    /**
+     * virtual machine capabilities defined in nova.properties
+     */
+    private String capabilities = null;
 
     /**
      * get connection to virtual drivers
      * 
+     * @author Tianyu Chen
      * @param virtService
      *            the name of virtual service, say, kvm or lxc
      * @param b
@@ -81,13 +91,20 @@ public class NovaWorker extends SimpleServer {
      */
     public Connect getConn(String virtService, boolean b)
             throws LibvirtException {
-        String hyper = Conf.getString("hypervisor.engine").trim();
-        if (hyper.indexOf("kvm") >= 0)
-            connectToKvm(virtService, b);
-        if (hyper.indexOf("vstaros") >= 0)
-            connectToVstaros(virtService, b);
-        if (hyper.indexOf("xen") >= 0)
-            connectToXen(virtService, b);
+        if (this.capabilities == null) {
+            this.capabilities = Conf.getString("hypervisor.engine").trim();
+        }
+        // note that the 'virtual service' string begins with the name of one
+        // hypervisor (exclusively)
+        if (virtService.indexOf("qemu") >= 0) {
+            this.connectToKvm(virtService, b);
+        } else if (virtService.indexOf("lxc") >= 0) {
+            this.connectToLxc(virtService, b);
+        } else if (virtService.indexOf("vstaros") >= 0) {
+            this.connectToVstaros(virtService, b);
+        } else if (virtService.indexOf("xen") >= 0) {
+            this.connectToXen(virtService, b);
+        }
         return conn;
     }
 
@@ -97,39 +114,54 @@ public class NovaWorker extends SimpleServer {
 
     private void connectToKvm(String virtService, boolean b)
             throws LibvirtException {
-        if (virtService.indexOf("qemu") >= 0) {
+        if (this.capabilities.indexOf("kvm") >= 0) {
             if (kvm_conn == null) {
+                logger.info("start new kvm connection...now! ");
                 kvm_conn = new Connect(virtService, b);
-                System.out.println("..........new connect qemu");
             }
             conn = kvm_conn;
+        } else {
+            logger.info("unsupported virtualization driver");
         }
-
     }
 
     private void connectToXen(String virtService, boolean b)
             throws LibvirtException {
-        if (virtService.indexOf("xen") >= 0) {
+        if (this.capabilities.indexOf("xen") >= 0) {
             if (xen_conn == null) {
+                logger.info("start new xen connection...now! ");
                 xen_conn = new Connect(virtService, b);
-                System.out.println("..........new connect xen");
             }
             conn = xen_conn;
+        } else {
+            logger.info("unsupported virtualization driver");
         }
-
     }
 
     private void connectToVstaros(String virtService, boolean b)
             throws LibvirtException {
-
-        if (virtService.indexOf("vstaros") >= 0) {
+        if (this.capabilities.indexOf("vstaros") >= 0) {
             if (vs_conn == null) {
+                logger.info("start new vstaros connection...now! ");
                 vs_conn = new Connect(virtService, b);
-                System.out.println("..........new connect vs");
             }
             conn = vs_conn;
+        } else {
+            logger.info("unsupported virtualization driver");
         }
+    }
 
+    private void connectToLxc(String virtService, boolean b)
+            throws LibvirtException {
+        if (this.capabilities.indexOf("lxc") >= 0) {
+            if (lxc_conn == null) {
+                logger.info("start new lxc connection...now! ");
+                lxc_conn = new Connect(virtService, b);
+            }
+            conn = lxc_conn;
+        } else {
+            logger.info("unsupported virtualization driver");
+        }
     }
 
     public void closeConnToKvm() throws LibvirtException {
@@ -147,6 +179,12 @@ public class NovaWorker extends SimpleServer {
     public void closeConnToXen() throws LibvirtException {
         if (xen_conn != null) {
             xen_conn.close();
+        }
+    }
+
+    public void closeConnToLxc() throws LibvirtException {
+        if (lxc_conn != null) {
+            lxc_conn.close();
         }
     }
 
