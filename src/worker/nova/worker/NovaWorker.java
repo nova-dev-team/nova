@@ -5,6 +5,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+import org.libvirt.Connect;
+import org.libvirt.LibvirtException;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
@@ -38,16 +44,10 @@ import nova.worker.handler.WorkerQueryPnodeInfoMessageHandler;
 import nova.worker.handler.WorkerQueryVnodeInfoMessageHandler;
 import nova.worker.models.StreamGobbler;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.libvirt.Connect;
-import org.libvirt.LibvirtException;
-
 /**
  * The worker module of Nova.
  * 
- * @author santa
+ * @author santa, Tianyu Chen
  * 
  */
 public class NovaWorker extends SimpleServer {
@@ -61,13 +61,24 @@ public class NovaWorker extends SimpleServer {
      */
     SimpleDaemon daemons[] = { new WorkerHeartbeatDaemon(),
             new WorkerPerfInfoDaemon(), new VnodeStatusDaemon(),
-            new VdiskPoolDaemon() /* , new PnodeStatusDaemon() */};
+            new VdiskPoolDaemon() /* , new PnodeStatusDaemon() */ };
 
     private Connect conn = null;
     private Connect kvm_conn = null;
     private Connect vs_conn = null;
     private Connect xen_conn = null;
 
+    /**
+     * get connection to virtual drivers
+     * 
+     * @param virtService
+     *            the name of virtual service, say, kvm or lxc
+     * @param b
+     *            whether the connection is 'read only'; refer to libvirt
+     *            javadoc for more information
+     * @return
+     * @throws LibvirtException
+     */
     public Connect getConn(String virtService, boolean b)
             throws LibvirtException {
         String hyper = Conf.getString("hypervisor.engine").trim();
@@ -196,7 +207,8 @@ public class NovaWorker extends SimpleServer {
         this.registerHandler(QueryHeartbeatMessage.class,
                 new WorkerQueryHeartbeatHandler());
 
-        this.registerHandler(RevokeImageMessage.class, new RevokeImageHandler());
+        this.registerHandler(RevokeImageMessage.class,
+                new RevokeImageHandler());
 
         this.registerHandler(QueryPnodeInfoMessage.class,
                 new WorkerQueryPnodeInfoMessageHandler());
@@ -226,6 +238,17 @@ public class NovaWorker extends SimpleServer {
 
     public Channel start() {
         logger.info("Nova worker running @ " + this.addr);
+        // TBD debug info
+        try {
+            // TBD !!!get connection to lxc!!!
+            // print capabilities here
+            logger.info("capabilities: " + NovaWorker.getInstance()
+                    .getConn("lxc:///", false).getCapabilities());
+        } catch (LibvirtException e1) {
+            logger.info("worker failed. ");
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
         Channel chnl = super.bind(this.addr.getInetSocketAddress());
         // start all daemons
         for (SimpleDaemon daemon : this.daemons) {
@@ -243,12 +266,12 @@ public class NovaWorker extends SimpleServer {
             if (!dirFile.exists())
                 Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
             String[] strExecs = {
-            // "modprobe nfs_layout_nfsv41_files",
-            // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
-            // + ":/Nova_home "
-            // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
-            "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
-                    + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+                    // "modprobe nfs_layout_nfsv41_files",
+                    // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
+                    // + ":/Nova_home "
+                    // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
+                    "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
+                            + Utils.pathJoin(Utils.NOVA_HOME, "run") };
             System.out.println(strExecs[0]);
             try {
                 for (String cmd : strExecs) {
@@ -261,12 +284,14 @@ public class NovaWorker extends SimpleServer {
                     outGobbler.start();
                     try {
                         if (p.waitFor() != 0) {
-                            logger.error("mount pnfs folder returned abnormal value!");
+                            logger.error(
+                                    "mount pnfs folder returned abnormal value!");
                         }
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
-                        logger.error("mount pnfs folder process terminated!", e);
+                        logger.error("mount pnfs folder process terminated!",
+                                e);
                     }
                 }
 
@@ -304,8 +329,8 @@ public class NovaWorker extends SimpleServer {
         // @eagle
         // umount pnfs folder
         try {
-            Runtime.getRuntime().exec(
-                    "umount " + Utils.pathJoin(Utils.NOVA_HOME, "run"));
+            Runtime.getRuntime()
+                    .exec("umount " + Utils.pathJoin(Utils.NOVA_HOME, "run"));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -373,27 +398,6 @@ public class NovaWorker extends SimpleServer {
                 }
             }
         });
-        // eagle: del create br0
-        /*
-         * // create br0 String[] createBridgeCmds = { "ifconfig br0 down",
-         * "brctl delbr br0", "brctl addbr br0", "brctl setbridgeprio br0 0",
-         * "brctl addif br0 eth0", "ifconfig eth0 0.0.0.0", "ifconfig br0 " +
-         * Conf.getString("worker.bind_host") + " netmask " +
-         * Conf.getString("worker.mask"), "brctl sethello br0 1",
-         * "brctl setmaxage br0 4", "brctl setfd br0 4", "ifconfig br0 up",
-         * "route add default gw " + Conf.getString("worker.gateway") };
-         * 
-         * Process p; try { for (String cmd : createBridgeCmds) {
-         * System.out.println(cmd); p = Runtime.getRuntime().exec(cmd);
-         * StreamGobbler errorGobbler = new StreamGobbler( p.getErrorStream(),
-         * "ERROR"); errorGobbler.start(); StreamGobbler outGobbler = new
-         * StreamGobbler( p.getInputStream(), "STDOUT"); outGobbler.start(); try
-         * { if (p.waitFor() != 0) {
-         * logger.error("create bridge returned abnormal value!"); } } catch
-         * (InterruptedException e1) { logger.error("create bridge terminated",
-         * e1); } } } catch (IOException e1) {
-         * logger.error("create bridge cmd error!", e1); }
-         */
         NovaWorker.getInstance().start();
     }
 }
