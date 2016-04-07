@@ -57,14 +57,14 @@ elif [ "$1" == "stop" ]; then
     echo "Stopping Nova..."
     stop_nova
     nova_status
-elif [ $1 == "restart" ]; then
+elif [ "$1" == "restart" ]; then
     echo "Restarting..."
     stop_nova
     sleep 2
     nova_status
     start_nova
     nova_status
-elif [ $1 == "status" ]; then
+elif [ "$1" == "status" ]; then
     nova_status
 else
     echo "Usage: $0 [start | stop | restart | status]"
