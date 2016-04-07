@@ -751,12 +751,16 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                                     .get(newDomain.getUUIDString()));
                     // send message to master to finish domain creation
                     // update uuid string in master database
+                    // TBD disable vnc for now (lxc)
+                    String port = Utils.WORKER_VNC_MAP
+                            .get(newDomain.getUUIDString());
+                    if (port == null) {
+                        port = "0";
+                    }
                     NovaWorker.getInstance().getMaster()
                             .sendPnodeCreateVnodeMessage(
                                     NovaWorker.getInstance().getAddr().getIp(),
-                                    retVnodeID,
-                                    Integer.parseInt(Utils.WORKER_VNC_MAP
-                                            .get(newDomain.getUUIDString())),
+                                    retVnodeID, Integer.parseInt(port),
                                     newDomain.getUUIDString(),
                                     msg.getHyperVisor());
                 } catch (LibvirtException ex) {
