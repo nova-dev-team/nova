@@ -725,9 +725,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 }
 
                 try {
-                    // debug info
-                    log.info("capabilities: " + NovaWorker.getInstance()
-                            .getConn(virtService, false).getCapabilities());
                     // create libvirt domain
                     Domain newDomain = NovaWorker.getInstance()
                             .getConn(virtService, false)
