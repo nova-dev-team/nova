@@ -13,7 +13,7 @@ Prerequisite
 
 Storage: NFS / FTP; 
 
-Virtualization: LXC / QEMU-KVM. 
+Virtualization: [LXC](https://linuxcontainers.org/lxc/introduction/) / QEMU-KVM. 
 
 Development
 ============
@@ -27,29 +27,28 @@ Deployment
 
 TBD
 
+Q & A
+=======
+
+TBA
+
 Developers & maintainers
 ==========
 
-#### Active contributors
+#### Active contributors & maintainers
 
 [Tianyu Chen](https://github.com/cty12), lead developer, current maintainer  
 Dongbiao He, current developer and maintainer  
 
 #### Previous contributors
 
-Santa Zhang, santa1987@gmail.com (Lead developer)  
-HUANG Gang, herokuankuan@gmail.com  
-ZHAO Xun, zhaoxun0920@126.com  
-HOU Qinghua, houqh06@gmail.com  
-GAO tao, gaotao1987@gmail.com  
-Feng lin, frankvictor@qq.com  
-
-Santa Zhang, santa1987@gmail.com (Lead developer)  
-HUANG Gang, herokuankuan@gmail.com  
-
-XIN Jun (Lead developer)  
-Santa Zhang, santa1987@gmail.com  
-HUANG Gang, herokuankuan@gmail.com  
+Santa Zhang, santa1987@gmail.com, lead developer, main contributor  
+HUANG Gang, herokuankuan@gmail.com, contributor  
+ZHAO Xun, zhaoxun0920@126.com, contributor  
+HOU Qinghua, houqh06@gmail.com, contributor  
+GAO Tao, gaotao1987@gmail.com, contributor  
+Feng Lin, frankvictor@qq.com, contributor  
+XIN Jun, lead developer, contributor  
 
 License
 ==========
