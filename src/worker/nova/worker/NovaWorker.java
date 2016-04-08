@@ -275,18 +275,9 @@ public class NovaWorker extends SimpleServer {
     }
 
     public Channel start() {
+        // debug
         logger.info("Nova worker running @ " + this.addr);
-        // TBD debug info
-        try {
-            // TBD !!!get connection to lxc!!!
-            // print capabilities here
-            logger.info("capabilities: " + NovaWorker.getInstance()
-                    .getConn("lxc:///", false).getCapabilities());
-        } catch (LibvirtException e1) {
-            logger.info("worker failed. ");
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+
         Channel chnl = super.bind(this.addr.getInetSocketAddress());
         // start all daemons
         for (SimpleDaemon daemon : this.daemons) {
