@@ -60,10 +60,12 @@ public class StartExistVnodeHandler
 
             // temporary hack for lxc container
             // for debug
-            log.info("domain status" + dom.isActive());
+            log.info("domain running status: " + dom.isActive());
             if (msg.hyper.equalsIgnoreCase("lxc")) {
-                log.info("lxc starting...");
+                log.info("lxc restarting...");
                 dom.create();
+                // will not send extra message to master since vnc port is not
+                // updated
                 return;
             }
 

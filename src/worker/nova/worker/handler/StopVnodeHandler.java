@@ -60,9 +60,11 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                         Vnode.Status.SHUTTING_DOWN);
                 dom.destroy();
-                if (msg.delvm)
+                log.info("domain shut down");
+                if (msg.delvm) {
                     dom.undefine();
-                else {
+                    log.info("domain undefined");
+                } else {
                     VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                             Vnode.Status.SHUT_OFF);
                     NovaWorker.getInstance().getVnodeIP()
@@ -71,6 +73,7 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 
             } else {
                 dom.suspend();
+                log.info("domain suspended");
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                         Vnode.Status.PAUSED);
             }
