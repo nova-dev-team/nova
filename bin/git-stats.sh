@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/usr/bin/bash
+
 insert=0
 delete=0
 count=0
@@ -19,4 +20,6 @@ while read line ;do
         count=`expr $count + 1`
     fi
 done < .tmp.count
+
+echo "git base dir: `git rev-parse --show-toplevel`"
 echo $count submissions, $insert insertions, $delete deletions
