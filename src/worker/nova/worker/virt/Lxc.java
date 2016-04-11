@@ -24,6 +24,29 @@ public class Lxc {
      */
     static Logger logger = Logger.getLogger(Lxc.class);
 
+    /**
+     * generate a random mac address with the given head
+     * 
+     * @author Tianyu Chen
+     * @param head
+     * @return generated address
+     */
+    private static String generateMacAddr(String head) {
+        return (head + Integer.toHexString((int) (Math.random() * 256)) + ":"
+                + Integer.toHexString((int) (Math.random() * 256)) + ":"
+                + Integer.toHexString((int) (Math.random() * 256)) + ":"
+                + Integer.toHexString((int) (Math.random() * 256)));
+    }
+
+    /**
+     * generate the libvirt domain xml for a container
+     * 
+     * @author Tianyu Chen
+     * @param params
+     *            the parameters to substitute the fields in the template xml
+     *            file ($NOVA_HOME/conf/virt/lxc-domain-template)
+     * @return the domain xml as a string
+     */
     public static String emitDomain(HashMap<String, Object> params) {
         // get domain xml template path
         String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
@@ -52,6 +75,7 @@ public class Lxc {
              */
         }
 
+        // specify boot device here
         if ((params.get("cdImage") != null)
                 && (!params.get("cdImage").toString().isEmpty())) {
             // if cd rom is not null or empty
@@ -59,6 +83,13 @@ public class Lxc {
         } else {
             params.put("bootDevice", "hd");
         }
+
+        // determine network bridging options
+        // set bridging
+        params.put("interface", "bridge");
+        params.put("bridge", Conf.getString("vm_network_bridge"));
+        // set mac address
+        params.put("macaddr", generateMacAddr("fe:13:"));
 
         // write configuration xml file
         File conf = null;
