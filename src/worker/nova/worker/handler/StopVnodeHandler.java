@@ -26,7 +26,7 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
     /**
      * Log4j logger.
      */
-    Logger log = Logger.getLogger(StartVnodeHandler.class);
+    Logger log = Logger.getLogger(StopVnodeHandler.class);
 
     @Override
     public void handleMessage(StopVnodeMessage msg, ChannelHandlerContext ctx,
@@ -59,9 +59,12 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
             if (!msg.isSuspendOnly()) {
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                         Vnode.Status.SHUTTING_DOWN);
-                dom.destroy();
-                log.info("domain shut down");
-                if (msg.delvm) {
+                // if domain is running, shut it down
+                if (dom.isActive() == 1) {
+                    dom.destroy();
+                    log.info("domain shut down");
+                }
+                if (msg.delvm && (dom.isPersistent() == 1)) {
                     dom.undefine();
                     log.info("domain undefined");
                 } else {
