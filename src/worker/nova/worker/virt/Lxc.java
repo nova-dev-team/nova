@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 
 import nova.common.util.Conf;
 import nova.common.util.Utils;
-import nova.worker.NovaWorker;
 
 /**
  * the Linux container interface
@@ -51,22 +50,13 @@ public class Lxc {
         // get domain xml template path
         String templateFpath = Utils.pathJoin(Utils.NOVA_HOME, "conf", "virt",
                 "lxc-domain-template.xml");
-        String strWorkerIP = NovaWorker.getInstance().getAddr().getIp();
 
         // get image full path
         if ((params.get("hdaImage") != null)
                 && (!params.get("hdaImage").toString().isEmpty())) {
             // if image file name is not null or empty
-            String path = null;
-            if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
-                path = Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                        strWorkerIP + "_" + params.get("name").toString(),
-                        params.get("hdaImage").toString());
-            } else {
-                path = Utils.pathJoin(Utils.NOVA_HOME, "run",
-                        params.get("name").toString(),
-                        params.get("hdaImage").toString());
-            }
+            String path = Utils.pathJoin("/home/vm",
+                    params.get("name").toString(), "rootfs");
             params.put("sourceFile", path);
         } else {
             // what if the image file name is empty?
@@ -92,16 +82,8 @@ public class Lxc {
         params.put("macaddr", generateMacAddr("fe:13:"));
 
         // write configuration xml file
-        File conf = null;
-        // get file path
-        if (Conf.getString("storage.engine").equalsIgnoreCase("pnfs")) {
-            conf = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                    strWorkerIP + "_" + params.get("name").toString(),
-                    "conf.xml"));
-        } else {
-            conf = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-                    params.get("name").toString(), "conf.xml"));
-        }
+        File conf = new File(Utils.pathJoin("/home/vm",
+                params.get("name").toString(), "conf.xml"));
         // create file if not exists
         if (!conf.exists()) {
             try {

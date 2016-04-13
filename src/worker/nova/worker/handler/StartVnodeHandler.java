@@ -310,55 +310,105 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
      *            - the file name of the os image, with extension
      */
     private void pnfsFileTransfer(StartVnodeMessage msg, String stdImgFile) {
-        File stdFile = new File(
-                Utils.pathJoin(Utils.NOVA_HOME, "run", "run", stdImgFile));
+        // for debug
+        log.info("image file: " + stdImgFile);
+        String pnfsBaseDir = Utils.pathJoin(Utils.NOVA_HOME, "run", "run");
+        File stdFile = new File(Utils.pathJoin(pnfsBaseDir, stdImgFile));
         if (stdFile.exists() == false) {
-            log.error("std Img not found in pnfs server!");
+            log.error(
+                    "disk image " + stdFile.getAbsolutePath() + " not found!");
             return;
         }
         String strWorkerIP = NovaWorker.getInstance().getAddr().getIp();
-        // copy img files
-        File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                strWorkerIP + "_" + msg.getName()));
-        if (!foder.exists()) {
-            foder.mkdirs();
-        }
-        File file = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                strWorkerIP + "_" + msg.getName(), stdImgFile));
-        if (file.exists() == false) {
-            // create incremental images of source image
-            Process createNFSIncrmtlImgs;
-            String cmdofincrtlnfs = "qemu-img create -b "
-                    + Utils.pathJoin(Utils.NOVA_HOME, "run", "run", stdImgFile)
-                    + " -f qcow2 "
-                    + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                            strWorkerIP + "_" + msg.getName(),
-                            stdImgFile + " 100G");
-            // System.out.println("pNFS: " + cmdofincrtlnfs);
 
-            try {
-                createNFSIncrmtlImgs = Runtime.getRuntime()
-                        .exec(cmdofincrtlnfs);
-                StreamGobbler errorGobbler = new StreamGobbler(
-                        createNFSIncrmtlImgs.getErrorStream(), "ERROR");
-                errorGobbler.start();
-                StreamGobbler outGobbler = new StreamGobbler(
-                        createNFSIncrmtlImgs.getInputStream(), "STDOUT");
-                outGobbler.start();
-                try {
-                    if (createNFSIncrmtlImgs.waitFor() != 0) {
-                        log.error(
-                                "create NFS incremental image returned abnormal value!");
-                    }
-                } catch (InterruptedException e1) {
-                    log.error("create NFS incremental image process terminated",
-                            e1);
-                }
-            } catch (IOException e1) {
-                log.error("exec create NFS incremental image cmd error!", e1);
-                return;
+        // make the root directory of the guest domain
+        File guestDir = null;
+
+        // copy image file to the guest's directory
+        if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
+            guestDir = new File(Utils.pathJoin(pnfsBaseDir,
+                    strWorkerIP + "_" + msg.getName()));
+            if (!guestDir.exists()) {
+                guestDir.mkdirs();
             }
+            File file = new File(Utils.pathJoin(pnfsBaseDir,
+                    strWorkerIP + "_" + msg.getName(), stdImgFile));
+            if (file.exists() == false) {
+                // create incremental images of source image
+                Process createNFSIncrmtlImgs;
+                String cmdofincrtlnfs = "qemu-img create -b "
+                        + Utils.pathJoin(pnfsBaseDir, stdImgFile) + " -f qcow2 "
+                        + Utils.pathJoin(pnfsBaseDir,
+                                strWorkerIP + "_" + msg.getName(),
+                                stdImgFile + " 100G");
+
+                try {
+                    createNFSIncrmtlImgs = Runtime.getRuntime()
+                            .exec(cmdofincrtlnfs);
+                    StreamGobbler errorGobbler = new StreamGobbler(
+                            createNFSIncrmtlImgs.getErrorStream(), "ERROR");
+                    errorGobbler.start();
+                    StreamGobbler outGobbler = new StreamGobbler(
+                            createNFSIncrmtlImgs.getInputStream(), "STDOUT");
+                    outGobbler.start();
+                    try {
+                        if (createNFSIncrmtlImgs.waitFor() != 0) {
+                            log.error(
+                                    "create NFS incremental image returned abnormal value!");
+                        }
+                    } catch (InterruptedException e1) {
+                        log.error(
+                                "create NFS incremental image process terminated",
+                                e1);
+                    }
+                } catch (IOException e1) {
+                    log.error("exec create NFS incremental image cmd error!",
+                            e1);
+                    return;
+                }
+            }
+        } else if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
+            guestDir = new File(Utils.pathJoin("/home/vm", msg.getName()));
+            if (!guestDir.exists()) {
+                guestDir.mkdirs();
+            }
+            // for debug
+            log.info("guest base directory: " + guestDir.getAbsolutePath());
+
+            File rootfs = new File(
+                    Utils.pathJoin(guestDir.getAbsolutePath(), "rootfs"));
+            if (!rootfs.exists()) {
+                String extractCmd = "tar -xf "
+                        + Utils.pathJoin(pnfsBaseDir, stdImgFile) + " -C "
+                        + guestDir.getAbsolutePath();
+
+                // for debug
+                log.info("extract cmd: " + extractCmd);
+
+                try {
+                    Process extract = Runtime.getRuntime().exec(extractCmd);
+                    try {
+                        if (extract.waitFor() != 0) {
+                            log.error("extract command returns non-zero! ");
+                            return;
+                        }
+                    } catch (InterruptedException ie) {
+                        log.error("extract command terminated unexpectedly! ",
+                                ie);
+                        return;
+                    }
+                } catch (IOException ioe) {
+                    log.error("IO Error when extracting root fs! ", ioe);
+                    return;
+                }
+            }
+        } else {
+            log.info("unsupported vm");
+            return;
         }
+
+        // deploy agent
+        // TBD disable agent for lxc for now!!!
         if (msg.getRunAgent()) {
             File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
                     "run", strWorkerIP + "_" + msg.getName(), "softwares"));
@@ -579,28 +629,32 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 return;
             }
         }
-        String cmd = Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                strWorkerIP + "_" + msg.getName());
-        cmd = "chmod -R 777 " + cmd;
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec(cmd);
-            StreamGobbler errorGobbler = new StreamGobbler(p.getErrorStream(),
-                    "ERROR");
-            errorGobbler.start();
-            StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
-                    "STDOUT");
-            outGobbler.start();
+
+        // modify permissions if hypervisor is kvm
+        if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
+            String cmd = Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
+                    strWorkerIP + "_" + msg.getName());
+            cmd = "chmod -R 777 " + cmd;
+            Process p;
             try {
-                if (p.waitFor() != 0) {
-                    log.error("chmod returned abnormal value!");
+                p = Runtime.getRuntime().exec(cmd);
+                StreamGobbler errorGobbler = new StreamGobbler(
+                        p.getErrorStream(), "ERROR");
+                errorGobbler.start();
+                StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
+                        "STDOUT");
+                outGobbler.start();
+                try {
+                    if (p.waitFor() != 0) {
+                        log.error("chmod returned abnormal value!");
+                    }
+                } catch (InterruptedException e1) {
+                    log.error("chmod process terminated", e1);
                 }
-            } catch (InterruptedException e1) {
-                log.error("chmod process terminated", e1);
+            } catch (IOException e1) {
+                log.error("chmod cmd error!", e1);
+                return;
             }
-        } catch (IOException e1) {
-            log.error("chmod cmd error!", e1);
-            return;
         }
     }
 
@@ -705,10 +759,17 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 // debug info
                 log.info("using nfs as storage protocol");
                 // transfer file here
-                // TBD disable it for now
-                if (!msg.getHyperVisor().equalsIgnoreCase("lxc")) {
-                    this.pnfsFileTransfer(msg, stdImgFile);
+                if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
+                    // TBD disable agent for lxc for now!!!
+                    msg.setRunAgent(false);
                 }
+                this.pnfsFileTransfer(msg, stdImgFile);
+            }
+
+            // TBD !!! for test!!!
+            if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
+                log.info("returns here");
+                return;
             }
 
             // create domain and show some info
@@ -720,8 +781,11 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 String xmlDes = null;
                 if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
                     xmlDes = Kvm.emitDomain(msg.getHashMap());
-                } else {
+                } else if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
                     xmlDes = Lxc.emitDomain(msg.getHashMap());
+                } else {
+                    log.info("unsupported vm! ");
+                    return;
                 }
 
                 try {
