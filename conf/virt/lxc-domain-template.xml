@@ -22,7 +22,7 @@
   <devices>
     <emulator>/usr/libexec/libvirt_lxc</emulator>
     <filesystem type='mount' accessmode='passthrough'>
-      <source dir='/opt/rootfs'/>
+      <source dir='${sourceFile}'/>
       <target dir='/'/>
     </filesystem>
     <interface type='${interface}'>
