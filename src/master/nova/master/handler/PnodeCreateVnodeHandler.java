@@ -2,6 +2,10 @@ package nova.master.handler;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
@@ -10,12 +14,8 @@ import nova.master.api.messages.PnodeCreateVnodeMessage;
 import nova.master.models.Vnode;
 import nova.worker.models.StreamGobbler;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-
-public class PnodeCreateVnodeHandler implements
-        SimpleHandler<PnodeCreateVnodeMessage> {
+public class PnodeCreateVnodeHandler
+        implements SimpleHandler<PnodeCreateVnodeMessage> {
 
     /**
      * Log4j logger.
@@ -25,11 +25,15 @@ public class PnodeCreateVnodeHandler implements
     @Override
     public void handleMessage(PnodeCreateVnodeMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-        String masterIP = Conf.getString("master.bind_host");
-        int masterPort = Utils.getFreePort();
-        portMP(masterIP, masterPort, msg.PnodeIP, msg.VnodePort, msg.VnodeId);
-        Utils.MASTER_VNC_MAP.put(String.valueOf(msg.VnodeId),
-                String.valueOf(masterPort));
+        // TBD disable vnc for now
+        if (!msg.hypervisor.equalsIgnoreCase("lxc")) {
+            String masterIP = Conf.getString("master.bind_host");
+            int masterPort = Utils.getFreePort();
+            portMP(masterIP, masterPort, msg.PnodeIP, msg.VnodePort,
+                    msg.VnodeId);
+            Utils.MASTER_VNC_MAP.put(String.valueOf(msg.VnodeId),
+                    String.valueOf(masterPort));
+        }
         Vnode vnode = Vnode.findById(msg.VnodeId);
         vnode.setUuid(msg.vnodeuuid);
         vnode.save();
@@ -56,8 +60,9 @@ public class PnodeCreateVnodeHandler implements
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                logger.error("add port map for " + vnodeid
-                        + " process terminated!", e);
+                logger.error(
+                        "add port map for " + vnodeid + " process terminated!",
+                        e);
 
             }
 

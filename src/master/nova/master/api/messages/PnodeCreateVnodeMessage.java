@@ -13,15 +13,17 @@ public class PnodeCreateVnodeMessage {
     }
 
     public PnodeCreateVnodeMessage(String PnodeIP, long VnodeId, int VnodePort,
-            String uuid) {
+            String uuid, String hypervisor) {
         this.PnodeIP = PnodeIP;
         this.VnodeId = VnodeId;
         this.VnodePort = VnodePort;
         this.vnodeuuid = uuid;
+        this.hypervisor = hypervisor;
     }
 
     public String PnodeIP;
     public String vnodeuuid;
+    public String hypervisor;
 
     public long VnodeId;
 

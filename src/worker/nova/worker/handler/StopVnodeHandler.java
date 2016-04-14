@@ -2,6 +2,12 @@ package nova.worker.handler;
 
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+import org.libvirt.Domain;
+import org.libvirt.LibvirtException;
+
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.master.models.Vnode;
@@ -9,16 +15,10 @@ import nova.worker.NovaWorker;
 import nova.worker.api.messages.StopVnodeMessage;
 import nova.worker.daemons.VnodeStatusDaemon;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.libvirt.Domain;
-import org.libvirt.LibvirtException;
-
 /**
- * Handler for "stop an existing vnode" request
+ * destroy and undefine a domain on a physical host
  * 
- * @author shayf
+ * @author shayf, Tianyu Chen
  * 
  */
 public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
@@ -26,7 +26,7 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
     /**
      * Log4j logger.
      */
-    Logger log = Logger.getLogger(StartVnodeHandler.class);
+    Logger log = Logger.getLogger(StopVnodeHandler.class);
 
     @Override
     public void handleMessage(StopVnodeMessage msg, ChannelHandlerContext ctx,
@@ -36,6 +36,8 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
             virtService = "qemu:///system";
         } else if (msg.getHyperVisor().equalsIgnoreCase("vstaros")) {
             virtService = "vstaros:///system";
+        } else if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
+            virtService = "lxc:///";
         } else {
             virtService = "some xen";
         }
@@ -57,10 +59,15 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
             if (!msg.isSuspendOnly()) {
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                         Vnode.Status.SHUTTING_DOWN);
-                dom.destroy();
-                if (msg.delvm)
+                // if domain is running, shut it down
+                if (dom.isActive() == 1) {
+                    dom.destroy();
+                    log.info("domain shut down");
+                }
+                if (msg.delvm && (dom.isPersistent() == 1)) {
                     dom.undefine();
-                else {
+                    log.info("domain undefined");
+                } else {
                     VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                             Vnode.Status.SHUT_OFF);
                     NovaWorker.getInstance().getVnodeIP()
@@ -69,12 +76,13 @@ public class StopVnodeHandler implements SimpleHandler<StopVnodeMessage> {
 
             } else {
                 dom.suspend();
+                log.info("domain suspended");
                 VnodeStatusDaemon.putStatus(UUID.fromString(msg.getUuid()),
                         Vnode.Status.PAUSED);
             }
 
         } catch (LibvirtException ex) {
-            log.error("Error closing domain " + msg.getUuid(), ex);
+            log.error("error closing domain " + msg.getUuid(), ex);
         }
     }
 }

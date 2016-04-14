@@ -1,0 +1,37 @@
+<domain type='lxc'>
+  <name>${name}</name>
+  <uuid>${uuid}</uuid>
+  <memory unit='KiB'>${memSize}</memory>
+  <currentMemory unit='KiB'>${memSize}</currentMemory>
+  <vcpu placement='static'>${cpuCount}</vcpu>
+  <resource>
+    <partition>/machine</partition>
+  </resource>
+  <os>
+    <type arch='x86_64'>exe</type>
+    <init>/sbin/init</init>
+  </os>
+  <features>
+    <capabilities policy='allow'>
+    </capabilities>
+  </features>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/libexec/libvirt_lxc</emulator>
+    <filesystem type='mount' accessmode='passthrough'>
+      <source dir='${sourceFile}'/>
+      <target dir='/'/>
+    </filesystem>
+    <interface type='${interface}'>
+      <mac address='${macaddr}'/>
+      <source bridge='${bridge}'/>
+      <link state='up'/>
+    </interface>
+    <console type='pty'>
+      <target type='lxc' port='0'/>
+    </console>
+  </devices>
+</domain>

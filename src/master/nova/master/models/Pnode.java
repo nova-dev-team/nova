@@ -13,7 +13,7 @@ import nova.common.util.Utils;
 /**
  * Model for a physical node.
  * 
- * @author santa
+ * @author santa, Tianyu Chen
  * 
  */
 public class Pnode extends DbObject {
@@ -138,7 +138,8 @@ public class Pnode extends DbObject {
     }
 
     public Pnode(Pnode.Status status, String ip, int port, int pnodeId,
-            String hostname, String uuid, String macAddress, Integer vmCapacity) {
+            String hostname, String uuid, String macAddress,
+            Integer vmCapacity) {
         this.setStatus(Pnode.Status.ADD_PENDING);
         this.ip = ip;
         this.port = port;
@@ -261,14 +262,30 @@ public class Pnode extends DbObject {
     }
 
     /**
+     * get all vnodes on this single physical machine
+     * 
+     * @author Tianyu Chen
+     * @return
+     */
+    public List<Vnode> getVnodes() {
+        List<Vnode> vnodes = Vnode.all(), ret = new ArrayList<Vnode>();
+        for (Vnode vnd : vnodes) {
+            if (vnd.getPmachineId() == this.id) {
+                ret.add(vnd);
+            }
+        }
+        // !!! may return an emtpy list if there is no vnode !!!
+        return ret;
+    }
+
+    /**
      * Override string present.
      */
     @Override
     public String toString() {
-        return Utils
-                .expandTemplate(
-                        "{Pnode @ ${ip}:${port}, pid='${id}',hostname='${hostname}', Status='${statusCode}', uuid='${uuid}'}",
-                        this);
+        return Utils.expandTemplate(
+                "{Pnode @ ${ip}:${port}, pid='${id}',hostname='${hostname}', Status='${statusCode}', uuid='${uuid}'}",
+                this);
     }
 
     public void updateLastReqTime() {

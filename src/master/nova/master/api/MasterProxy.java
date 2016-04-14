@@ -106,13 +106,14 @@ public class MasterProxy extends SimpleProxy {
         super.sendRequest(new PnodeStatusMessage(pAddr, status));
     }
 
-    public void sendVnodeStatus(String vnodeIp, String uuid, Vnode.Status status) {
+    public void sendVnodeStatus(String vnodeIp, String uuid,
+            Vnode.Status status) {
         super.sendRequest(new VnodeStatusMessage(vnodeIp, uuid, status));
     }
 
     public void sendApplianceStatus(Collection<Appliance> appliances) {
-        super.sendRequest(new ApplianceInfoMessage((Appliance[]) appliances
-                .toArray()));
+        super.sendRequest(
+                new ApplianceInfoMessage((Appliance[]) appliances.toArray()));
     }
 
     public void sendDeletePnode(long id) {
@@ -139,9 +140,10 @@ public class MasterProxy extends SimpleProxy {
         super.sendRequest(new MasterInstallApplianceMessage(aid, appNames));
     }
 
-    public void sendMigrateVnode(long vnodeId, long migrateFrom, long migrateTo) {
-        super.sendRequest(new MasterMigrateVnodeMessage(vnodeId, migrateFrom,
-                migrateTo));
+    public void sendMigrateVnode(long vnodeId, long migrateFrom,
+            long migrateTo) {
+        super.sendRequest(
+                new MasterMigrateVnodeMessage(vnodeId, migrateFrom, migrateTo));
     }
 
     public void sendMigrateComplete(String migrateUuid, String strPnodeIP,
@@ -150,14 +152,15 @@ public class MasterProxy extends SimpleProxy {
                 strPnodeIP, strVNCPort));
     }
 
-    public void sendAppliancesFirstInstalledMessage(SimpleAddress simpleAddress) {
+    public void sendAppliancesFirstInstalledMessage(
+            SimpleAddress simpleAddress) {
         super.sendRequest(new AppliancesFirstInstalledMessage(simpleAddress));
     }
 
     public void sendPnodeCreateVnodeMessage(String PnodeIP, long VnodeId,
-            int VnodePort, String vuuid) {
+            int VnodePort, String vuuid, String hypervisor) {
         super.sendRequest(new PnodeCreateVnodeMessage(PnodeIP, VnodeId,
-                VnodePort, vuuid));
+                VnodePort, vuuid, hypervisor));
     }
 
     // TODO delete experiment codes between //////////////////// and
