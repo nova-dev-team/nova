@@ -766,12 +766,6 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 this.pnfsFileTransfer(msg, stdImgFile);
             }
 
-            // TBD !!! for test!!!
-            if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
-                log.info("returns here");
-                return;
-            }
-
             // create domain and show some info
             synchronized (NovaWorker.getInstance().getConnLock()) {
                 // debug info
