@@ -55,7 +55,7 @@ public class Lxc {
         if ((params.get("hdaImage") != null)
                 && (!params.get("hdaImage").toString().isEmpty())) {
             // if image file name is not null or empty
-            String path = Utils.pathJoin("/home/vm",
+            String path = Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
                     params.get("name").toString(), "rootfs");
             params.put("sourceFile", path);
         } else {
@@ -82,7 +82,7 @@ public class Lxc {
         params.put("macaddr", generateMacAddr("fe:13:"));
 
         // write configuration xml file
-        File conf = new File(Utils.pathJoin("/home/vm",
+        File conf = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
                 params.get("name").toString(), "conf.xml"));
         // create file if not exists
         if (!conf.exists()) {

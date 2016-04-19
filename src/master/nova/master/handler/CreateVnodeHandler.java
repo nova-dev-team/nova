@@ -154,8 +154,6 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         // do extraction of root file system
         if (msg.hypervisor.equalsIgnoreCase("lxc")) {
             this.lxcCreateGuestDir(msg.vmName, msg.vmImage);
-            // !!! TBD !!!
-            return;
         }
 
         // send start vnode request (to client)
