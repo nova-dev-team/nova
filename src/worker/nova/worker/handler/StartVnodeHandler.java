@@ -368,40 +368,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 }
             }
         } else if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
-            guestDir = new File(Utils.pathJoin("/home/vm", msg.getName()));
-            if (!guestDir.exists()) {
-                guestDir.mkdirs();
-            }
-            // for debug
-            log.info("guest base directory: " + guestDir.getAbsolutePath());
-
-            File rootfs = new File(
-                    Utils.pathJoin(guestDir.getAbsolutePath(), "rootfs"));
-            if (!rootfs.exists()) {
-                String extractCmd = "tar -xf "
-                        + Utils.pathJoin(pnfsBaseDir, stdImgFile) + " -C "
-                        + guestDir.getAbsolutePath();
-
-                // for debug
-                log.info("extract cmd: " + extractCmd);
-
-                try {
-                    Process extract = Runtime.getRuntime().exec(extractCmd);
-                    try {
-                        if (extract.waitFor() != 0) {
-                            log.error("extract command returns non-zero! ");
-                            return;
-                        }
-                    } catch (InterruptedException ie) {
-                        log.error("extract command terminated unexpectedly! ",
-                                ie);
-                        return;
-                    }
-                } catch (IOException ioe) {
-                    log.error("IO Error when extracting root fs! ", ioe);
-                    return;
-                }
-            }
+            // do nothing
+            log.info("we won't deploy file system here. ");
         } else {
             log.info("unsupported vm");
             return;
@@ -759,11 +727,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 // debug info
                 log.info("using nfs as storage protocol");
                 // transfer file here
-                if (msg.getHyperVisor().equalsIgnoreCase("lxc")) {
-                    // TBD disable agent for lxc for now!!!
-                    msg.setRunAgent(false);
+                // do nothing if lxc
+                if (!msg.getHyperVisor().equalsIgnoreCase("lxc")) {
+                    this.pnfsFileTransfer(msg, stdImgFile);
                 }
-                this.pnfsFileTransfer(msg, stdImgFile);
             }
 
             // create domain and show some info
