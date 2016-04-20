@@ -1,10 +1,5 @@
 package nova.worker.handler;
 
-import nova.common.service.SimpleAddress;
-import nova.common.service.SimpleHandler;
-import nova.worker.NovaWorker;
-import nova.worker.api.messages.MigrateVnodeMessage;
-
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -12,6 +7,17 @@ import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
+import nova.common.service.SimpleAddress;
+import nova.common.service.SimpleHandler;
+import nova.worker.NovaWorker;
+import nova.worker.api.messages.MigrateVnodeMessage;
+
+/**
+ * worker side migration handler
+ * 
+ * @author Tianyu Chen
+ *
+ */
 public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 
     /**
@@ -27,41 +33,61 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
     @Override
     public void handleMessage(MigrateVnodeMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-        // TODO @shayf finish migration
         Connect dconn = null;
         try {
             NovaWorker.masteraddr = xreply;
-            if (NovaWorker.getInstance().getMaster() == null
-                    || NovaWorker.getInstance().getMaster().isConnected() == false) {
+            if (NovaWorker.getInstance().getMaster() == null || NovaWorker
+                    .getInstance().getMaster().isConnected() == false) {
                 NovaWorker.getInstance().registerMaster(xreply);
             }
 
-            dconn = new Connect("qemu+ssh://" + msg.migrateToAddr.getIp()
-                    + "/system");
-            if (dconn.isConnected() == false) {
-                log.error("connect to dst " + msg.migrateToAddr.getIp()
-                        + " qemu failed!");
+            // get connections, these operations are hypervisor dependent
+            String duri, suri;
+            if (msg.hypervisor.equalsIgnoreCase("kvm")) {
+                duri = "qemu+ssh://" + msg.migrateToAddr.getIp() + "/system";
+                suri = "qemu:///system";
+            } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
+                duri = "lxc+ssh://" + msg.migrateToAddr.getIp();
+                suri = "lxc:///";
+            } else {
+                // the hypervisor is not supported
+                log.error("unsupported hypervisor migration! ");
                 return;
             }
-            // eagle--end
 
-            // TODO @shayf
-            Connect sconn = NovaWorker.getInstance().getConn("qemu:///system",
-                    false);
+            // connect to destination (remote) machine
+            dconn = new Connect(duri);
+            if (dconn.isConnected() == false) {
+                log.error("connect to destination failed! ");
+                return;
+            }
+            // connect to source (local) machine
+            Connect sconn = NovaWorker.getInstance().getConn(suri, false);
+
+            // get source domain
             Domain srcDomain = sconn.domainLookupByUUIDString(msg.vnodeUuid);
-            long flag = 0;
-            String uri = null;
-            Domain dstDomain = srcDomain.migrate(dconn, flag,
-                    srcDomain.getName(), uri, bandWidth);
-            String strXML = dstDomain.getXMLDesc(0);
-            int vncpos = strXML.indexOf("graphics type='vnc' port='");
-            String strPort = strXML.substring(vncpos + 26, vncpos + 30);
-            NovaWorker
-                    .getInstance()
-                    .getMaster()
-                    .sendMigrateComplete(msg.vnodeUuid,
-                            msg.migrateToAddr.getIp(), strPort);
-            System.out.println(strPort);
+            log.info("uuid of domain to migrate is " + msg.vnodeUuid);
+
+            if (msg.hypervisor.equalsIgnoreCase("kvm")) {
+                long flag = 0;
+                String uri = null;
+                Domain dstDomain = srcDomain.migrate(dconn, flag,
+                        srcDomain.getName(), uri, bandWidth);
+                String strXML = dstDomain.getXMLDesc(0);
+                int vncpos = strXML.indexOf("graphics type='vnc' port='");
+                String strPort = strXML.substring(vncpos + 26, vncpos + 30);
+                NovaWorker.getInstance().getMaster().sendMigrateComplete(
+                        msg.vnodeUuid, msg.migrateToAddr.getIp(), strPort);
+                log.info("port: " + strPort);
+            } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
+                // do something here
+                // TBD add migration here
+                log.info("this is lxc...quit here! ");
+                return;
+            } else {
+                log.error("unsupported hypervisor migration! ");
+                return;
+            }
         } catch (LibvirtException e1) {
             log.error("migrate error, maybe caused by libvirt ", e1);
         }
