@@ -71,6 +71,7 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             Domain srcDomain = sconn.domainLookupByUUIDString(msg.vnodeUuid);
             log.info("uuid of domain to migrate is " + msg.vnodeUuid);
 
+            String strPort = null;
             if (msg.hypervisor.equalsIgnoreCase("kvm")) {
                 long flag = 0;
                 String uri = null;
@@ -78,9 +79,7 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                         srcDomain.getName(), uri, bandWidth);
                 String strXML = dstDomain.getXMLDesc(0);
                 int vncpos = strXML.indexOf("graphics type='vnc' port='");
-                String strPort = strXML.substring(vncpos + 26, vncpos + 30);
-                NovaWorker.getInstance().getMaster().sendMigrateComplete(
-                        msg.vnodeUuid, msg.migrateToAddr.getIp(), strPort);
+                strPort = strXML.substring(vncpos + 26, vncpos + 30);
                 log.info("port: " + strPort);
             } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
                 // do migration here
@@ -98,6 +97,9 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 log.error("unsupported hypervisor migration! ");
                 return;
             }
+            NovaWorker.getInstance().getMaster().sendMigrateComplete(
+                    msg.vnodeUuid, msg.migrateToAddr.getIp(), strPort,
+                    msg.hypervisor);
         } catch (LibvirtException e1) {
             log.error("migrate error, maybe caused by libvirt ", e1);
         }

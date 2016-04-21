@@ -147,9 +147,9 @@ public class MasterProxy extends SimpleProxy {
     }
 
     public void sendMigrateComplete(String migrateUuid, String strPnodeIP,
-            String strVNCPort) {
+            String strVNCPort, String hypervisor) {
         super.sendRequest(new MasterMigrateCompleteMessage(migrateUuid,
-                strPnodeIP, strVNCPort));
+                strPnodeIP, strVNCPort, hypervisor));
     }
 
     public void sendAppliancesFirstInstalledMessage(
