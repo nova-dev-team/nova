@@ -33,7 +33,6 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
     @Override
     public void handleMessage(MigrateVnodeMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-        Connect dconn = null;
         try {
             NovaWorker.masteraddr = xreply;
             if (NovaWorker.getInstance().getMaster() == null || NovaWorker
@@ -56,13 +55,17 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             }
 
             // connect to destination (remote) machine
-            dconn = new Connect(duri);
-            if (dconn.isConnected() == false) {
-                log.error("connect to destination failed! ");
+            Connect dconn = new Connect(duri);
+            if (!dconn.isConnected()) {
+                log.error("connect to destination failed! migration aborted");
                 return;
             }
             // connect to source (local) machine
             Connect sconn = NovaWorker.getInstance().getConn(suri, false);
+            if (!sconn.isConnected()) {
+                log.error("connect to source failed! migration aborted");
+                return;
+            }
 
             // get source domain
             Domain srcDomain = sconn.domainLookupByUUIDString(msg.vnodeUuid);
@@ -80,10 +83,17 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                         msg.vnodeUuid, msg.migrateToAddr.getIp(), strPort);
                 log.info("port: " + strPort);
             } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
-                // do something here
-                // TBD add migration here
-                log.info("this is lxc...quit here! ");
-                return;
+                // do migration here
+                // get the xml definition of the src domain
+                String xml = srcDomain.getXMLDesc(0);
+                // if domain is active, shut it down first
+                if (srcDomain.isActive() == 1) {
+                    srcDomain.destroy();
+                }
+                // undefine the source domain
+                srcDomain.undefine();
+                Domain dstDomain = dconn.domainDefineXML(xml);
+                dstDomain.create();
             } else {
                 log.error("unsupported hypervisor migration! ");
                 return;
