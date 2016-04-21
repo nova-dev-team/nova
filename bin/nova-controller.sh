@@ -14,6 +14,7 @@ HOSTS_FILE="slaves"
 # Colored output
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
+BOLD=`tput bold`
 RESET=`tput sgr 0`
 
 function start_nova {
@@ -36,16 +37,16 @@ function nova_status {
     cat slaves | while read hostname; do
         err_cnt=`pssh -l root -p 1 -i -t 3 --host "$hostname" "pgrep java" | grep "FAILURE" -c`
         if [ $err_cnt -eq 0 ]; then
-            echo "Java is ${GREEN}running${RESET} on ${hostname}. "
+            echo "Java is ${GREEN}${BOLD}[running]${RESET} on ${hostname}. "
         else
-            echo "Java has ${RED}stopped${RESET} on ${hostname}. "
+            echo "Java has ${RED}${BOLD}[stopped]${RESET} on ${hostname}. "
         fi
     done
     # show master status
     if [ "`pgrep java`" == "" ]; then
-        echo "Java has ${RED}stopped${RESET} on localhost(master). "
+        echo "Java has ${RED}${BOLD}[stopped]${RESET} on localhost(master). "
     else
-        echo "Java is ${GREEN}running${RESET} on localhost(master). "
+        echo "Java is ${GREEN}${BOLD}[running]${RESET} on localhost(master). "
     fi
 }
 
