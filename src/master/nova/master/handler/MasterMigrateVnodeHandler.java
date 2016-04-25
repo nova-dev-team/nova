@@ -40,7 +40,7 @@ public class MasterMigrateVnodeHandler
                 new InetSocketAddress(pnodeFrom.getIp(), pnodeFrom.getPort()));
 
         // send migrate request to worker
-        wp.sendMigrateVnode(vnode.getUuid(), pnodeTo.getAddr(),
+        wp.sendMigrateVnode(vnode.getName(), vnode.getUuid(), pnodeTo.getAddr(),
                 vnode.getHypervisor());
     }
 }

@@ -1,5 +1,10 @@
 package nova.worker.handler;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -9,6 +14,7 @@ import org.libvirt.LibvirtException;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Utils;
 import nova.worker.NovaWorker;
 import nova.worker.api.messages.MigrateVnodeMessage;
 
@@ -29,6 +35,44 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
      * Log4j logger.
      */
     Logger log = Logger.getLogger(MigrateVnodeHandler.class);
+
+    private void checkpointProcessInContainer(String containerName)
+            throws IOException, InterruptedException {
+        // for debug
+        log.info("container name: " + containerName);
+
+        // check dependencies, refuse to checkpoint if requirements are not met
+        Process checkDepd = Runtime.getRuntime().exec("which sshpass");
+        if (checkDepd.waitFor() != 0) {
+            log.error("checkpoint dependency check failed. ");
+            return;
+        }
+
+        // get ip address of the container to migrate
+        String uri = "lxc:///";
+        String[] getIpAddrCmd = new String[3];
+        getIpAddrCmd[0] = Utils.pathJoin(Utils.NOVA_HOME, "nova-vmaddrctl");
+        getIpAddrCmd[1] = containerName;
+        getIpAddrCmd[2] = uri;
+        Process getIpAddr = Runtime.getRuntime().exec(getIpAddrCmd);
+        if (getIpAddr.waitFor() != 0) {
+            log.error("get guest ip addr failed. ");
+            return;
+        }
+        BufferedReader stdOutReader = new BufferedReader(
+                new InputStreamReader(getIpAddr.getInputStream()));
+        String ipAddr = stdOutReader.readLine();
+        if (ipAddr == null) {
+            log.error("null ip addr. ");
+            return;
+        }
+        InetAddressValidator validator = InetAddressValidator.getInstance();
+        if (!validator.isValidInet4Address(ipAddr)) {
+            log.error("invalid ip addr. ");
+            return;
+        }
+        log.info("ip addr of container " + containerName + " is " + ipAddr);
+    }
 
     @Override
     public void handleMessage(MigrateVnodeMessage msg,
@@ -82,6 +126,10 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 strPort = strXML.substring(vncpos + 26, vncpos + 30);
                 log.info("port: " + strPort);
             } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
+                // for debug
+                // !!! TBD !!!
+                log.info("entering debug code...");
+
                 // do migration here
                 // get the xml definition of the src domain
                 String xml = srcDomain.getXMLDesc(0);

@@ -6,8 +6,10 @@ public class MigrateVnodeMessage {
     public MigrateVnodeMessage() {
     }
 
-    public MigrateVnodeMessage(String vnodeUuid, SimpleAddress migrateToAddr,
-            String hypervisor) {
+    public MigrateVnodeMessage(String vnodeName, String vnodeUuid,
+            SimpleAddress migrateToAddr, String hypervisor) {
+        // added by Tianyu
+        this.vnodeName = vnodeName;
         this.vnodeUuid = vnodeUuid;
         this.migrateToAddr = migrateToAddr;
         this.migrateToUserName = "username";
@@ -18,8 +20,11 @@ public class MigrateVnodeMessage {
     }
 
     // add by eagle
-    public MigrateVnodeMessage(String vnodeUuid, SimpleAddress migrateToAddr,
-            String hypervisor, String strUserName, String strPasswd) {
+    public MigrateVnodeMessage(String vnodeName, String vnodeUuid,
+            SimpleAddress migrateToAddr, String hypervisor, String strUserName,
+            String strPasswd) {
+        // added by Tianyu
+        this.vnodeName = vnodeName;
         this.vnodeUuid = vnodeUuid;
         this.migrateToAddr = migrateToAddr;
         this.migrateToUserName = strUserName;
@@ -30,6 +35,7 @@ public class MigrateVnodeMessage {
     }
     // eagle--end
 
+    public String vnodeName;
     public String vnodeUuid;
     public SimpleAddress migrateToAddr;
 

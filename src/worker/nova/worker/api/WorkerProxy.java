@@ -122,10 +122,10 @@ public class WorkerProxy extends SimpleProxy {
         super.sendRequest(new InstallApplianceMessage(appNames));
     }
 
-    public void sendMigrateVnode(String vnodeUuid, SimpleAddress migrateToAddr,
-            String hypervisor) {
-        super.sendRequest(
-                new MigrateVnodeMessage(vnodeUuid, migrateToAddr, hypervisor));
+    public void sendMigrateVnode(String vnodeName, String vnodeUuid,
+            SimpleAddress migrateToAddr, String hypervisor) {
+        super.sendRequest(new MigrateVnodeMessage(vnodeName, vnodeUuid,
+                migrateToAddr, hypervisor));
     }
 
     public void sendObtainSshKeys(String vClusterName, String vmName) {
