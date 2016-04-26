@@ -71,7 +71,26 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             log.error("invalid ip addr. ");
             return;
         }
+        // for debug
         log.info("ip addr of container " + containerName + " is " + ipAddr);
+
+        // login onto the container and replay the command inside the container
+        String passwd = "940715";
+        String user = "root";
+        String replayCmd = "uname -a";
+        String sshReplayCmd = "sshpass -p " + passwd + " ssh " + user + "@"
+                + ipAddr + " " + replayCmd;
+        // for debug
+        log.info("cmd to replay: " + sshReplayCmd);
+        Process replay = Runtime.getRuntime().exec(sshReplayCmd);
+        if (replay.waitFor() != 0) {
+            log.error("replay cmd failed! check ssh and sshpass. ");
+            return;
+        }
+        stdOutReader = new BufferedReader(
+                new InputStreamReader(replay.getInputStream()));
+        String uname = stdOutReader.readLine();
+        log.info("uname is " + uname);
     }
 
     @Override
@@ -129,18 +148,26 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 // for debug
                 // !!! TBD !!!
                 log.info("entering debug code...");
-
-                // do migration here
-                // get the xml definition of the src domain
-                String xml = srcDomain.getXMLDesc(0);
-                // if domain is active, shut it down first
-                if (srcDomain.isActive() == 1) {
-                    srcDomain.destroy();
+                try {
+                    this.checkpointProcessInContainer(msg.vnodeName);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
-                // undefine the source domain
-                srcDomain.undefine();
-                Domain dstDomain = dconn.domainDefineXML(xml);
-                dstDomain.create();
+                return;
+
+                // // do migration here
+                // // get the xml definition of the src domain
+                // String xml = srcDomain.getXMLDesc(0);
+                // // if domain is active, shut it down first
+                // if (srcDomain.isActive() == 1) {
+                // srcDomain.destroy();
+                // }
+                // // undefine the source domain
+                // srcDomain.undefine();
+                // Domain dstDomain = dconn.domainDefineXML(xml);
+                // dstDomain.create();
             } else {
                 log.error("unsupported hypervisor migration! ");
                 return;
