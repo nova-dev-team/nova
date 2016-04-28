@@ -1,0 +1,93 @@
+#!/usr/bin/bash
+# @author Tianyu Chen
+# This script depends on sshpass/ssh on worker machines,
+# and criu (checkpoint-restore in user space) as well as
+# tmux inside the target container (we need tmux to send
+# a serial of key codes when restoring the target process. 
+
+# **EXAMPLE USAGE**
+# lxc-cr-wrapper checkpoint -c this-container -p this-process
+# lxc-cr-wrapper restore -c this-container -p this-process
+
+# We need the name of the process even when restoring it
+# simply because we have to decide whether the restoring
+# is successful. 
+
+# display help prompt and exit with 1
+help_prompt() {
+    echo "Usage: $0 checkpoint|restore [-c container] [-p process]"
+    # exit
+    exit 1
+}
+
+# parse command line arguments
+case $1 in
+    checkpoint | restore)
+        CR=$1
+        shift
+    ;;
+    *)
+        help_prompt
+    ;;
+esac
+
+while [[ $# > 0 ]]; do
+    KEY="$1"
+    case $KEY in
+        -c | --container)
+            # parse container name
+            CONTAINER="$2"
+            shift
+            shift
+        ;;
+        -p | --process)
+            # parse process name
+            PROCESS="$2"
+            shift
+            shift
+        ;;
+        *)
+            # unknown options
+            help_prompt
+        ;;
+    esac
+done
+
+# set default name for container
+if [ "$CONTAINER" == "" ]; then
+    CONTAINER="default-container"
+fi
+# set default name for process to checkpoint
+if [ "$PROCESS" == "" ]; then
+    PROCESS="default-process"
+fi
+
+# for debug
+echo "ARGS: CR=$CR, CONTAINER=$CONTAINER, PROCESS=$PROCESS"
+
+# define some important arguments for C/R here
+IP_ADDR=`./nova-vmaddrctl "$CONTAINER"`
+USER="root"
+PASSWD="940715"
+readonly CRIU_ARGS="--shell-job"
+CR_DIR="/root/checkpoint"
+
+# for debug
+echo "IP_ADDR=$IP_ADDR, CRIU_ARGS=$CRIU_ARGS, PID=$PID"
+
+# do checkpoint (C) or restore (R) here
+if [ "$CR" == "checkpoint" ]; then
+    # get the PID of the process
+    # if there are multiple processes, get the largest PID
+    PID=`sshpass -p $PASSWD ssh $USER@$IP_ADDR "pgrep $PROCESS | head -n 1"`
+    # do checkpoint
+    echo "Checking-point process $PROCESS with PID $PID into $DIR..."
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "criu dump $CRIU_ARGS -t $PID -D $CR_DIR"
+elif [ "$CR" == "restore" ]; then
+    # do restore
+    echo "Restoring process $PROCESS from $DIR..."
+else
+    echo "Internal error! "
+    exit 1
+fi
+
