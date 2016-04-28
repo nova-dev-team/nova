@@ -68,6 +68,6 @@ elif [ "$1" == "restart" ]; then
 elif [ "$1" == "status" ]; then
     nova_status
 else
-    echo "Usage: $0 [start | stop | restart | status]"
+    echo "Usage: $0 start|stop|restart|status"
 fi
 
