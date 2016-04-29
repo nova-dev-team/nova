@@ -71,9 +71,10 @@ USER="root"
 PASSWD="940715"
 readonly CRIU_ARGS="--shell-job"
 CR_DIR="/root/checkpoint"
+TMUX_SESSION="cr_session"
 
 # for debug
-echo "IP_ADDR=$IP_ADDR, CRIU_ARGS=$CRIU_ARGS, PID=$PID"
+echo "IP_ADDR=$IP_ADDR, CRIU_ARGS=$CRIU_ARGS"
 
 # do checkpoint (C) or restore (R) here
 if [ "$CR" == "checkpoint" ]; then
@@ -81,11 +82,21 @@ if [ "$CR" == "checkpoint" ]; then
     # if there are multiple processes, get the largest PID
     PID=`sshpass -p $PASSWD ssh $USER@$IP_ADDR "pgrep $PROCESS | head -n 1"`
     # do checkpoint
-    echo "Checking-point process $PROCESS with PID $PID into $DIR..."
-    sshpass -p $PASSWD ssh $USER@$IP_ADDR "criu dump $CRIU_ARGS -t $PID -D $CR_DIR"
+    echo "Checking-point process $PROCESS with PID $PID into $CR_DIR..."
+    # remove the contents of the c/r directory
+    # dump the process into the c/r directory
+    # list the contents of the new c/r directory
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "rm -rf $CR_DIR/*; criu dump $CRIU_ARGS -t $PID -D $CR_DIR; ls -l $CR_DIR"
 elif [ "$CR" == "restore" ]; then
     # do restore
-    echo "Restoring process $PROCESS from $DIR..."
+    echo "Restoring process $PROCESS from $CR_DIR..."
+    # new tmux session
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "tmux new-session -d -s $TMUX_SESSION; tmux ls"
+    # tmux send keys
+    # do criu restoring here
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "tmux send-keys -t $TMUX_SESSION \"criu restore $CRIU_ARGS -d -D $CR_DIR \" C-m"
+    # remove the temporary session
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "tmux kill-session -t $TMUX_SESSION; tmux ls"
 else
     echo "Internal error! "
     exit 1
