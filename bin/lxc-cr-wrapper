@@ -53,6 +53,11 @@ while [[ $# > 0 ]]; do
     esac
 done
 
+# BASE DIR for NOVA should be defined in bashrc
+if [ "$NOVA_HOME" == "" ]; then
+    echo "nova base dir is not defined. define it in your bashrc"
+    exit 1
+fi
 # set default name for container
 if [ "$CONTAINER" == "" ]; then
     CONTAINER="default-container"
@@ -66,13 +71,18 @@ fi
 echo "ARGS: CR=$CR, CONTAINER=$CONTAINER, PROCESS=$PROCESS"
 
 # define some important arguments for C/R here
-IP_ADDR=`./nova-vmaddrctl "$CONTAINER"`
+IP_ADDR=`$NOVA_HOME/nova-vmaddrctl "$CONTAINER"`
 USER="root"
 PASSWD="940715"
 readonly CRIU_ARGS="--shell-job"
 CR_DIR="/root/checkpoint"
 TMUX_SESSION="cr_session"
 CRIU_INSTANCE="/root/criu"
+
+if [ "$IP_ADDR" == "" ]; then
+    echo "cannot find ip address! quit. "
+    exit 2
+fi
 
 # for debug
 echo "IP_ADDR=$IP_ADDR, CRIU_ARGS=$CRIU_ARGS"
@@ -94,6 +104,11 @@ if [ "$CR" == "checkpoint" ]; then
     # get the PID of the process
     # if there are multiple processes, get the largest PID
     PID=`sshpass -p $PASSWD ssh $USER@$IP_ADDR "pgrep $PROCESS | head -n 1"`
+    # no process running in the container
+    if [ "$PID" == "" ]; then
+        echo "target process not running! check your -p option and retry. "
+        exit 3
+    fi
     # do checkpoint
     echo "Checking-point process $PROCESS with PID $PID into $CR_DIR..."
     # keep tmux session alive
@@ -116,6 +131,6 @@ elif [ "$CR" == "restore" ]; then
     echo "PID=`pgrep $PROCESS`"
 else
     echo "Internal error! "
-    exit 1
+    exit 3
 fi
 
