@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.apache.commons.validator.routines.InetAddressValidator;
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -36,61 +35,83 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
      */
     Logger log = Logger.getLogger(MigrateVnodeHandler.class);
 
-    private void checkpointProcessInContainer(String containerName)
+    /**
+     * checkpoint the target process inside the container on the source machine
+     * 
+     * @param containerName
+     *            the source container
+     * @param processName
+     *            the target process
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void checkpointProcessInContainer(String containerName,
+            String processName) throws IOException, InterruptedException {
+        // for debug
+        log.info("checkpoint! container name: " + containerName
+                + "; process name: " + processName);
+
+        String checkpointStr = Utils.pathJoin(Utils.NOVA_HOME, "lxc-cr-wrapper")
+                + " checkpoint -c " + containerName + " -p " + processName;
+        Process checkpointProcess = Runtime.getRuntime().exec(checkpointStr);
+        if (checkpointProcess.waitFor() != 0) {
+            log.error("checkpoint failed! ");
+            BufferedReader stdOutReader = new BufferedReader(
+                    new InputStreamReader(checkpointProcess.getInputStream()));
+            BufferedReader stdErrReader = new BufferedReader(
+                    new InputStreamReader(checkpointProcess.getErrorStream()));
+            String line;
+            while ((line = stdOutReader.readLine()) != null) {
+                log.info(line);
+            }
+            while ((line = stdErrReader.readLine()) != null) {
+                log.info(line);
+            }
+            return;
+        }
+    }
+
+    /**
+     * restore the target process from the dump files inside container on the
+     * destination machine
+     * 
+     * @param dstIpAddr
+     *            the ip address of the destination machine
+     * @param containerName
+     *            the name of the container that contains the dumped files
+     * @param processName
+     *            the name of the target process, which is considered
+     *            mission-critical
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void restoreProcessInContainer(String dstIpAddr,
+            String containerName, String processName)
             throws IOException, InterruptedException {
         // for debug
-        log.info("container name: " + containerName);
+        log.info("restore! dst ip: " + dstIpAddr + "; container name: "
+                + containerName + "; process name: " + processName);
 
-        // check dependencies, refuse to checkpoint if requirements are not met
-        Process checkDepd = Runtime.getRuntime().exec("which sshpass");
-        if (checkDepd.waitFor() != 0) {
-            log.error("checkpoint dependency check failed. ");
+        String restoreStr = "ssh " + dstIpAddr + " "
+                + Utils.pathJoin(Utils.NOVA_HOME, "lxc-cr-wrapper")
+                + " restore -c " + containerName + " -p " + processName;
+        log.info("cmd: " + restoreStr);
+        Process restoreProcess = Runtime.getRuntime().exec(restoreStr);
+        if (restoreProcess.waitFor() != 0) {
+            log.error("restore failed! ");
+            BufferedReader stdOutReader = new BufferedReader(
+                    new InputStreamReader(restoreProcess.getInputStream()));
+            BufferedReader stdErrReader = new BufferedReader(
+                    new InputStreamReader(restoreProcess.getErrorStream()));
+            String line;
+            while ((line = stdOutReader.readLine()) != null) {
+                log.info(line);
+            }
+            while ((line = stdErrReader.readLine()) != null) {
+                log.info(line);
+            }
             return;
         }
-
-        // get ip address of the container to migrate
-        String uri = "lxc:///";
-        String[] getIpAddrCmd = new String[3];
-        getIpAddrCmd[0] = Utils.pathJoin(Utils.NOVA_HOME, "nova-vmaddrctl");
-        getIpAddrCmd[1] = containerName;
-        getIpAddrCmd[2] = uri;
-        Process getIpAddr = Runtime.getRuntime().exec(getIpAddrCmd);
-        if (getIpAddr.waitFor() != 0) {
-            log.error("get guest ip addr failed. ");
-            return;
-        }
-        BufferedReader stdOutReader = new BufferedReader(
-                new InputStreamReader(getIpAddr.getInputStream()));
-        String ipAddr = stdOutReader.readLine();
-        if (ipAddr == null) {
-            log.error("null ip addr. ");
-            return;
-        }
-        InetAddressValidator validator = InetAddressValidator.getInstance();
-        if (!validator.isValidInet4Address(ipAddr)) {
-            log.error("invalid ip addr. ");
-            return;
-        }
-        // for debug
-        log.info("ip addr of container " + containerName + " is " + ipAddr);
-
-        // login onto the container and replay the command inside the container
-        String passwd = "940715";
-        String user = "root";
-        String replayCmd = "uname -a";
-        String sshReplayCmd = "sshpass -p " + passwd + " ssh " + user + "@"
-                + ipAddr + " " + replayCmd;
-        // for debug
-        log.info("cmd to replay: " + sshReplayCmd);
-        Process replay = Runtime.getRuntime().exec(sshReplayCmd);
-        if (replay.waitFor() != 0) {
-            log.error("replay cmd failed! check ssh and sshpass. ");
-            return;
-        }
-        stdOutReader = new BufferedReader(
-                new InputStreamReader(replay.getInputStream()));
-        String uname = stdOutReader.readLine();
-        log.info("uname is " + uname);
     }
 
     @Override
@@ -145,36 +166,46 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 strPort = strXML.substring(vncpos + 26, vncpos + 30);
                 log.info("port: " + strPort);
             } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
-                // for debug
-                // !!! TBD !!!
-                log.info("entering debug code...");
+                // do snapshot
                 try {
-                    this.checkpointProcessInContainer(msg.vnodeName);
+                    this.checkpointProcessInContainer(msg.vnodeName, "toy.py");
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
-                return;
 
-                // // do migration here
-                // // get the xml definition of the src domain
-                // String xml = srcDomain.getXMLDesc(0);
-                // // if domain is active, shut it down first
-                // if (srcDomain.isActive() == 1) {
-                // srcDomain.destroy();
-                // }
-                // // undefine the source domain
-                // srcDomain.undefine();
-                // Domain dstDomain = dconn.domainDefineXML(xml);
-                // dstDomain.create();
+                // do migration here
+                // get the xml definition of the src domain
+                String xml = srcDomain.getXMLDesc(0);
+                // if domain is active, shut it down first
+                if (srcDomain.isActive() == 1) {
+                    srcDomain.destroy();
+                }
+                // undefine the source domain
+                srcDomain.undefine();
+                Domain dstDomain = dconn.domainDefineXML(xml);
+                // create destination domain
+                dstDomain.create();
+                log.info("dst domain created. ");
+                try {
+                    // sleep for a while...
+                    Thread.sleep(1000);
+                    log.info("restoring process in destination domain... ");
+                    this.restoreProcessInContainer(msg.migrateToAddr.getIp(),
+                            msg.vnodeName, "toy.py");
+                } catch (IOException | InterruptedException e1) {
+                    e1.printStackTrace();
+                }
             } else {
                 log.error("unsupported hypervisor migration! ");
                 return;
             }
+            log.info("send back migration complete message to master! ");
             NovaWorker.getInstance().getMaster().sendMigrateComplete(
                     msg.vnodeUuid, msg.migrateToAddr.getIp(), strPort,
                     msg.hypervisor);
+            log.info("migration completed. check process on destination. ");
         } catch (LibvirtException e1) {
             log.error("migrate error, maybe caused by libvirt ", e1);
         }

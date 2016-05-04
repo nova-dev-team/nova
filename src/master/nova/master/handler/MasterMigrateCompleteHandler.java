@@ -75,6 +75,7 @@ public class MasterMigrateCompleteHandler
         vnode.setStatus(Vnode.Status.RUNNING);
         Pnode dstpnode = Pnode.findByIp(msg.dstPnodeIP);
         vnode.setPmachineId((int) dstpnode.getId());
+        logger.info("update pnode id to " + dstpnode.getId());
         vnode.save();
     }
 
