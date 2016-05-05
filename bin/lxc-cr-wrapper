@@ -15,7 +15,7 @@
 
 # display help prompt and exit with 1
 help_prompt() {
-    echo "Usage: $0 checkpoint|restore [-c container] [-p process]"
+    echo "Usage: $0 checkpoint|restore [-c container] [-p process] [-i ipaddr]"
     # exit
     exit 1
 }
@@ -46,6 +46,12 @@ while [[ $# > 0 ]]; do
             shift
             shift
         ;;
+        -i | --ipaddr)
+            # parse the ip address
+            IP_ADDR="$2"
+            shift
+            shift
+        ;;
         *)
             # unknown options
             help_prompt
@@ -71,7 +77,12 @@ fi
 echo "ARGS: CR=$CR, CONTAINER=$CONTAINER, PROCESS=$PROCESS"
 
 # define some important arguments for C/R here
-IP_ADDR=`$NOVA_HOME/nova-vmaddrctl "$CONTAINER"`
+# use the ip address in the args first
+# if the ip is not provided in the args, check the ARP cache for the ip address
+if [ "$IP_ADDR" == "" ]; then
+    echo "fetching the ip addr of container $CONTAINER from ARP cache..."
+    IP_ADDR=`$NOVA_HOME/nova-vmaddrctl "$CONTAINER"`
+fi
 USER="root"
 PASSWD="940715"
 readonly CRIU_ARGS="--shell-job"
@@ -87,7 +98,27 @@ fi
 # for debug
 echo "IP_ADDR=$IP_ADDR, CRIU_ARGS=$CRIU_ARGS"
 
-# perform criu check
+# check whether the container is alive
+echo "checking the availability of target container..."
+# the max number of loops
+LOOP=6
+for i in `seq 0 $LOOP`; do
+    echo "the $i round. "
+    sshpass -p $PASSWD ssh -o ConnectTimeout=1 $USER@$IP_ADDR "exit"
+    if [ $? -ne 255 ]; then
+        # if not timeout
+        break
+    fi
+    if [ $i -eq $LOOP ]; then
+        # container might be dead or unreachable
+        echo "the container is dead. exit. "
+        exit 4
+    else
+        sleep 1
+    fi
+done
+
+# check criu requirements
 echo "criu checking requirements..."
 sshpass -p $PASSWD ssh $USER@$IP_ADDR "$CRIU_INSTANCE check"
 if [ $? -eq 1 ]; then
