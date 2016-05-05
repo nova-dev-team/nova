@@ -40,7 +40,8 @@ public class MasterMigrateVnodeHandler
                 new InetSocketAddress(pnodeFrom.getIp(), pnodeFrom.getPort()));
 
         // send migrate request to worker
+        // added the hypervisor type and the ip addr by Tianyu
         wp.sendMigrateVnode(vnode.getName(), vnode.getUuid(), pnodeTo.getAddr(),
-                vnode.getHypervisor());
+                vnode.getHypervisor(), vnode.getIp());
     }
 }

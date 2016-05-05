@@ -7,7 +7,7 @@ public class MigrateVnodeMessage {
     }
 
     public MigrateVnodeMessage(String vnodeName, String vnodeUuid,
-            SimpleAddress migrateToAddr, String hypervisor) {
+            SimpleAddress migrateToAddr, String hypervisor, String ipAddr) {
         // added by Tianyu
         this.vnodeName = vnodeName;
         this.vnodeUuid = vnodeUuid;
@@ -17,12 +17,13 @@ public class MigrateVnodeMessage {
 
         // added by Tianyu so as to support migration of multiple hypervisors
         this.hypervisor = hypervisor;
+        this.guestIpAddr = ipAddr;
     }
 
     // add by eagle
     public MigrateVnodeMessage(String vnodeName, String vnodeUuid,
-            SimpleAddress migrateToAddr, String hypervisor, String strUserName,
-            String strPasswd) {
+            SimpleAddress migrateToAddr, String hypervisor, String ipAddr,
+            String strUserName, String strPasswd) {
         // added by Tianyu
         this.vnodeName = vnodeName;
         this.vnodeUuid = vnodeUuid;
@@ -32,6 +33,7 @@ public class MigrateVnodeMessage {
 
         // added by Tianyu so as to support migration of multiple hypervisors
         this.hypervisor = hypervisor;
+        this.guestIpAddr = ipAddr;
     }
     // eagle--end
 
@@ -46,4 +48,5 @@ public class MigrateVnodeMessage {
 
     // the hypervisor field
     public String hypervisor;
+    public String guestIpAddr;
 }

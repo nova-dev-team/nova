@@ -46,13 +46,17 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
      * @throws InterruptedException
      */
     private void checkpointProcessInContainer(String containerName,
-            String processName) throws IOException, InterruptedException {
+            String processName, String ipAddr)
+            throws IOException, InterruptedException {
         // for debug
         log.info("checkpoint! container name: " + containerName
-                + "; process name: " + processName);
+                + "; process name: " + processName + "; ip addr: " + ipAddr);
 
         String checkpointStr = Utils.pathJoin(Utils.NOVA_HOME, "lxc-cr-wrapper")
-                + " checkpoint -c " + containerName + " -p " + processName;
+                + " checkpoint -c " + containerName + " -p " + processName
+                + " -i " + ipAddr;
+        // for debug
+        log.info("cmd: " + checkpointStr);
         Process checkpointProcess = Runtime.getRuntime().exec(checkpointStr);
         if (checkpointProcess.waitFor() != 0) {
             log.error("checkpoint failed! ");
@@ -86,31 +90,36 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
      * @throws InterruptedException
      */
     private void restoreProcessInContainer(String dstIpAddr,
-            String containerName, String processName)
+            String containerName, String processName, String ipAddr)
             throws IOException, InterruptedException {
         // for debug
         log.info("restore! dst ip: " + dstIpAddr + "; container name: "
-                + containerName + "; process name: " + processName);
+                + containerName + "; process name: " + processName
+                + "; ip addr: " + ipAddr);
 
         String restoreStr = "ssh " + dstIpAddr + " "
                 + Utils.pathJoin(Utils.NOVA_HOME, "lxc-cr-wrapper")
-                + " restore -c " + containerName + " -p " + processName;
+                + " restore -c " + containerName + " -p " + processName + " -i "
+                + ipAddr;
+        // for debug
         log.info("cmd: " + restoreStr);
         Process restoreProcess = Runtime.getRuntime().exec(restoreStr);
         if (restoreProcess.waitFor() != 0) {
             log.error("restore failed! ");
-            BufferedReader stdOutReader = new BufferedReader(
-                    new InputStreamReader(restoreProcess.getInputStream()));
-            BufferedReader stdErrReader = new BufferedReader(
-                    new InputStreamReader(restoreProcess.getErrorStream()));
-            String line;
-            while ((line = stdOutReader.readLine()) != null) {
-                log.info(line);
-            }
-            while ((line = stdErrReader.readLine()) != null) {
-                log.info(line);
-            }
-            return;
+        } else {
+            log.info("restore succeeded! ");
+        }
+        // print debug info
+        BufferedReader stdOutReader = new BufferedReader(
+                new InputStreamReader(restoreProcess.getInputStream()));
+        BufferedReader stdErrReader = new BufferedReader(
+                new InputStreamReader(restoreProcess.getErrorStream()));
+        String line;
+        while ((line = stdOutReader.readLine()) != null) {
+            log.info(line);
+        }
+        while ((line = stdErrReader.readLine()) != null) {
+            log.info(line);
         }
     }
 
@@ -168,7 +177,8 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
                 // do snapshot
                 try {
-                    this.checkpointProcessInContainer(msg.vnodeName, "toy.py");
+                    this.checkpointProcessInContainer(msg.vnodeName, "toy.py",
+                            msg.guestIpAddr);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 } catch (InterruptedException e1) {
@@ -189,11 +199,9 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 dstDomain.create();
                 log.info("dst domain created. ");
                 try {
-                    // sleep for a while...
-                    Thread.sleep(1000);
                     log.info("restoring process in destination domain... ");
                     this.restoreProcessInContainer(msg.migrateToAddr.getIp(),
-                            msg.vnodeName, "toy.py");
+                            msg.vnodeName, "toy.py", msg.guestIpAddr);
                 } catch (IOException | InterruptedException e1) {
                     e1.printStackTrace();
                 }
