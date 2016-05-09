@@ -1,15 +1,20 @@
 package nova.worker.daemons;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
 import nova.common.util.Conf;
 import nova.common.util.SimpleDaemon;
+import nova.common.util.Utils;
 import nova.master.api.MasterProxy;
 import nova.master.models.Vnode;
 import nova.worker.NovaWorker;
@@ -130,6 +135,83 @@ public class VnodeStatusDaemon extends SimpleDaemon {
         }
     }
 
+    /**
+     * the method probes the current ip addresses of all defined domains (of a
+     * certain kind of hypervisor) and updates the corresponding hash map.
+     * 
+     * @param hypervisor
+     *            the type of hypervisor used
+     * @throws LibvirtException
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void getIpAddr(String hypervisor)
+            throws LibvirtException, IOException, InterruptedException {
+        // get libvirt connection URI
+        String virtService = null;
+        if (hypervisor.equals("lxc")) {
+            virtService = "lxc:///";
+        } else {
+            virtService = hypervisor + ":///system";
+        }
+
+        // get libvirt driver connection
+        NovaWorker worker = NovaWorker.getInstance();
+        Connect connection = worker.getConn(virtService, false);
+        // defined but inactive domains
+        String[] definedDomains = connection.listDefinedDomains();
+        // active domains
+        int[] activeDomains = connection.listDomains();
+        // iterate through all domains
+        for (String domainName : definedDomains) {
+            // defined but inactive domains
+            Domain dom = connection.domainLookupByName(domainName);
+            // get the uuid of the domain
+            UUID uuid = null;
+            if (dom != null) {
+                uuid = UUID.fromString(dom.getUUIDString());
+            }
+            // get the ip address of the domain
+            String ipAddr = null;
+            String fetchIpAddrCmd = Utils.pathJoin(Utils.NOVA_HOME,
+                    "nova-vmaddrctl") + " " + domainName + " " + virtService;
+            Process fetchIpAddr = Runtime.getRuntime().exec(fetchIpAddrCmd);
+            // if the process called returns successfully
+            if (fetchIpAddr.waitFor() == 0) {
+                BufferedReader stdOutReader = new BufferedReader(
+                        new InputStreamReader(fetchIpAddr.getInputStream()));
+                ipAddr = stdOutReader.readLine();
+            }
+            if (ipAddr != null && uuid != null) {
+                // store the ip address of the doamin into the worker hash map
+                worker.getVnodeIP().put(uuid, ipAddr);
+            }
+        }
+        for (int id : activeDomains) {
+            // active (running) domains
+            Domain dom = connection.domainLookupByID(id);
+            // get the uuid of the domain
+            UUID uuid = null;
+            if (dom != null) {
+                uuid = UUID.fromString(dom.getUUIDString());
+            }
+            // get the ip address of the domain
+            String ipAddr = null;
+            String fetchIpAddrCmd = Utils.pathJoin(Utils.NOVA_HOME,
+                    "nova-vmaddrctl") + " " + dom.getName() + " " + virtService;
+            Process fetchIpAddr = Runtime.getRuntime().exec(fetchIpAddrCmd);
+            // if the process called returns successfully
+            if (fetchIpAddr.waitFor() == 0) {
+                BufferedReader stdOutReader = new BufferedReader(
+                        new InputStreamReader(fetchIpAddr.getInputStream()));
+                ipAddr = stdOutReader.readLine();
+            }
+            if (ipAddr != null && uuid != null) {
+                worker.getVnodeIP().put(uuid, ipAddr);
+            }
+        }
+    }
+
     @Override
     protected void workOneRound() {
         synchronized (NovaWorker.getInstance().getConnLock()) {
@@ -151,9 +233,14 @@ public class VnodeStatusDaemon extends SimpleDaemon {
                 // if worker machine is lxc capable
                 if (this.capabilities.indexOf("lxc") >= 0) {
                     getStatus("lxc");
+                    getIpAddr("lxc");
                 }
             } catch (LibvirtException e) {
                 logger.error("libvirt driver connection fail", e);
+            } catch (IOException e) {
+                logger.error("unexpected io exception", e);
+            } catch (InterruptedException e) {
+                logger.error("unexpected interrupt", e);
             }
         }
 
