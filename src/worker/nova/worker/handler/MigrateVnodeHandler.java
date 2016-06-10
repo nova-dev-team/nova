@@ -13,6 +13,7 @@ import org.libvirt.LibvirtException;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
+import nova.common.util.Conf;
 import nova.common.util.Utils;
 import nova.worker.NovaWorker;
 import nova.worker.api.messages.MigrateVnodeMessage;
@@ -175,10 +176,15 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 strPort = strXML.substring(vncpos + 26, vncpos + 30);
                 log.info("port: " + strPort);
             } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
+                // get the name of the application process in the container
+                String payloadProcessName = Conf
+                        .getString("payload_process.name");
+                log.info("name of the application process is: "
+                        + payloadProcessName);
                 // do snapshot
                 try {
-                    this.checkpointProcessInContainer(msg.vnodeName, "toy.py",
-                            msg.guestIpAddr);
+                    this.checkpointProcessInContainer(msg.vnodeName,
+                            payloadProcessName, msg.guestIpAddr);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 } catch (InterruptedException e1) {
@@ -201,7 +207,7 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 try {
                     log.info("restoring process in destination domain... ");
                     this.restoreProcessInContainer(msg.migrateToAddr.getIp(),
-                            msg.vnodeName, "toy.py", msg.guestIpAddr);
+                            msg.vnodeName, payloadProcessName, msg.guestIpAddr);
                 } catch (IOException | InterruptedException e1) {
                     e1.printStackTrace();
                 }
