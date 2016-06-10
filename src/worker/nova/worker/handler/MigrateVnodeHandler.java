@@ -183,16 +183,23 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 // get the name of the application process in the container
                 String payloadProcessName = Conf
                         .getString("payload_process.name");
-                log.info("name of the application process is: "
-                        + payloadProcessName);
-                // do snapshot
-                try {
-                    this.checkpointProcessInContainer(msg.vnodeName,
-                            payloadProcessName, msg.guestIpAddr);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
+                // get the migration type from configuration file
+                String migrationType = Conf.getString("migration_type");
+                log.info("migration type: " + migrationType);
+                if (migrationType.equals("live")) {
+                    log.info("payload: " + payloadProcessName);
+                }
+                if (migrationType.equals("live")) {
+                    // do snapshot
+                    try {
+                        log.info("checking point process in source domain... ");
+                        this.checkpointProcessInContainer(msg.vnodeName,
+                                payloadProcessName, msg.guestIpAddr);
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
 
                 // do migration here
@@ -208,12 +215,15 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
                 // create destination domain
                 dstDomain.create();
                 log.info("dst domain created. ");
-                try {
-                    log.info("restoring process in destination domain... ");
-                    this.restoreProcessInContainer(msg.migrateToAddr.getIp(),
-                            msg.vnodeName, payloadProcessName, msg.guestIpAddr);
-                } catch (IOException | InterruptedException e1) {
-                    e1.printStackTrace();
+                if (migrationType.equals("live")) {
+                    try {
+                        log.info("restoring process in destination domain... ");
+                        this.restoreProcessInContainer(
+                                msg.migrateToAddr.getIp(), msg.vnodeName,
+                                payloadProcessName, msg.guestIpAddr);
+                    } catch (IOException | InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             } else {
                 log.error("unsupported hypervisor migration! ");
