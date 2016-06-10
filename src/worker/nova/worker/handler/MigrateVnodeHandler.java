@@ -169,8 +169,12 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
             if (msg.hypervisor.equalsIgnoreCase("kvm")) {
                 long flag = 0;
                 String uri = null;
+                log.info(
+                        "entering kvm domain migration. the domain to migrate is "
+                                + srcDomain.getName());
                 Domain dstDomain = srcDomain.migrate(dconn, flag,
                         srcDomain.getName(), uri, bandWidth);
+                log.info("kvm domain migration seems to be completed. ");
                 String strXML = dstDomain.getXMLDesc(0);
                 int vncpos = strXML.indexOf("graphics type='vnc' port='");
                 strPort = strXML.substring(vncpos + 26, vncpos + 30);
