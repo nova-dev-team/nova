@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+# @author Tianyu Chen
+# This script fetches the ip address from the URI and the domain
+# name of the guest vm. 
+
+# parse parameters
+URI=$2
+if [ "${URI}" = "" ]; then
+    # default is lxc
+    URI="lxc://"
+fi
+GUEST=$1
+if [ "${GUEST}" = "" ]; then
+    echo "Usage: $0 [guest name] [hypervisor URI]"
+    exit 1
+fi
+
+# get the xml definition of the guest vm
+XMLDOM=`virsh -c ${URI} dumpxml ${GUEST}`
+# get mac addr
+MAC_ADDR=`grep "mac address" <<< "${XMLDOM}" | sed "s/.*'\(.*\)'.*/\1/g"`
+# get ip addr from arp output
+echo `arp -an | grep ${MAC_ADDR} | sed "s/.*(\(.*\)).*/\1/g"`
+

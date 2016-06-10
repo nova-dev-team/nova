@@ -1,9 +1,8 @@
 package nova.worker.handler;
 
-import nova.common.service.SimpleAddress;
-import nova.common.service.SimpleHandler;
-import nova.worker.NovaWorker;
-import nova.worker.api.messages.MigrateVnodeMessage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -12,6 +11,19 @@ import org.libvirt.Connect;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
+import nova.common.service.SimpleAddress;
+import nova.common.service.SimpleHandler;
+import nova.common.util.Conf;
+import nova.common.util.Utils;
+import nova.worker.NovaWorker;
+import nova.worker.api.messages.MigrateVnodeMessage;
+
+/**
+ * worker side migration handler
+ * 
+ * @author Tianyu Chen
+ *
+ */
 public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
 
     /**
@@ -24,44 +36,194 @@ public class MigrateVnodeHandler implements SimpleHandler<MigrateVnodeMessage> {
      */
     Logger log = Logger.getLogger(MigrateVnodeHandler.class);
 
+    /**
+     * checkpoint the target process inside the container on the source machine
+     * 
+     * @param containerName
+     *            the source container
+     * @param processName
+     *            the target process
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void checkpointProcessInContainer(String containerName,
+            String processName, String ipAddr)
+            throws IOException, InterruptedException {
+        // for debug
+        log.info("checkpoint! container name: " + containerName
+                + "; process name: " + processName + "; ip addr: " + ipAddr);
+
+        String checkpointStr = Utils.pathJoin(Utils.NOVA_HOME, "lxc-cr-wrapper")
+                + " checkpoint -c " + containerName + " -p " + processName
+                + " -i " + ipAddr;
+        // for debug
+        log.info("cmd: " + checkpointStr);
+        Process checkpointProcess = Runtime.getRuntime().exec(checkpointStr);
+        if (checkpointProcess.waitFor() != 0) {
+            log.error("checkpoint failed! ");
+            BufferedReader stdOutReader = new BufferedReader(
+                    new InputStreamReader(checkpointProcess.getInputStream()));
+            BufferedReader stdErrReader = new BufferedReader(
+                    new InputStreamReader(checkpointProcess.getErrorStream()));
+            String line;
+            while ((line = stdOutReader.readLine()) != null) {
+                log.info(line);
+            }
+            while ((line = stdErrReader.readLine()) != null) {
+                log.info(line);
+            }
+            return;
+        }
+    }
+
+    /**
+     * restore the target process from the dump files inside container on the
+     * destination machine
+     * 
+     * @param dstIpAddr
+     *            the ip address of the destination machine
+     * @param containerName
+     *            the name of the container that contains the dumped files
+     * @param processName
+     *            the name of the target process, which is considered
+     *            mission-critical
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void restoreProcessInContainer(String dstIpAddr,
+            String containerName, String processName, String ipAddr)
+            throws IOException, InterruptedException {
+        // for debug
+        log.info("restore! dst ip: " + dstIpAddr + "; container name: "
+                + containerName + "; process name: " + processName
+                + "; ip addr: " + ipAddr);
+
+        String restoreStr = "ssh " + dstIpAddr + " "
+                + Utils.pathJoin(Utils.NOVA_HOME, "lxc-cr-wrapper")
+                + " restore -c " + containerName + " -p " + processName + " -i "
+                + ipAddr;
+        // for debug
+        log.info("cmd: " + restoreStr);
+        Process restoreProcess = Runtime.getRuntime().exec(restoreStr);
+        if (restoreProcess.waitFor() != 0) {
+            log.error("restore failed! ");
+        } else {
+            log.info("restore succeeded! ");
+        }
+        // print debug info
+        BufferedReader stdOutReader = new BufferedReader(
+                new InputStreamReader(restoreProcess.getInputStream()));
+        BufferedReader stdErrReader = new BufferedReader(
+                new InputStreamReader(restoreProcess.getErrorStream()));
+        String line;
+        while ((line = stdOutReader.readLine()) != null) {
+            log.info(line);
+        }
+        while ((line = stdErrReader.readLine()) != null) {
+            log.info(line);
+        }
+    }
+
     @Override
     public void handleMessage(MigrateVnodeMessage msg,
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
-        // TODO @shayf finish migration
-        Connect dconn = null;
         try {
             NovaWorker.masteraddr = xreply;
-            if (NovaWorker.getInstance().getMaster() == null
-                    || NovaWorker.getInstance().getMaster().isConnected() == false) {
+            if (NovaWorker.getInstance().getMaster() == null || NovaWorker
+                    .getInstance().getMaster().isConnected() == false) {
                 NovaWorker.getInstance().registerMaster(xreply);
             }
 
-            dconn = new Connect("qemu+ssh://" + msg.migrateToAddr.getIp()
-                    + "/system");
-            if (dconn.isConnected() == false) {
-                log.error("connect to dst " + msg.migrateToAddr.getIp()
-                        + " qemu failed!");
+            // get connections, these operations are hypervisor dependent
+            String duri, suri;
+            if (msg.hypervisor.equalsIgnoreCase("kvm")) {
+                duri = "qemu+ssh://" + msg.migrateToAddr.getIp() + "/system";
+                suri = "qemu:///system";
+            } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
+                duri = "lxc+ssh://" + msg.migrateToAddr.getIp();
+                suri = "lxc:///";
+            } else {
+                // the hypervisor is not supported
+                log.error("unsupported hypervisor migration! ");
                 return;
             }
-            // eagle--end
 
-            // TODO @shayf
-            Connect sconn = NovaWorker.getInstance().getConn("qemu:///system",
-                    false);
+            // connect to destination (remote) machine
+            Connect dconn = new Connect(duri);
+            if (!dconn.isConnected()) {
+                log.error("connect to destination failed! migration aborted");
+                return;
+            }
+            // connect to source (local) machine
+            Connect sconn = NovaWorker.getInstance().getConn(suri, false);
+            if (!sconn.isConnected()) {
+                log.error("connect to source failed! migration aborted");
+                return;
+            }
+
+            // get source domain
             Domain srcDomain = sconn.domainLookupByUUIDString(msg.vnodeUuid);
-            long flag = 0;
-            String uri = null;
-            Domain dstDomain = srcDomain.migrate(dconn, flag,
-                    srcDomain.getName(), uri, bandWidth);
-            String strXML = dstDomain.getXMLDesc(0);
-            int vncpos = strXML.indexOf("graphics type='vnc' port='");
-            String strPort = strXML.substring(vncpos + 26, vncpos + 30);
-            NovaWorker
-                    .getInstance()
-                    .getMaster()
-                    .sendMigrateComplete(msg.vnodeUuid,
-                            msg.migrateToAddr.getIp(), strPort);
-            System.out.println(strPort);
+            log.info("uuid of domain to migrate is " + msg.vnodeUuid);
+
+            String strPort = null;
+            if (msg.hypervisor.equalsIgnoreCase("kvm")) {
+                long flag = 0;
+                String uri = null;
+                log.info(
+                        "entering kvm domain migration. the domain to migrate is "
+                                + srcDomain.getName());
+                Domain dstDomain = srcDomain.migrate(dconn, flag,
+                        srcDomain.getName(), uri, bandWidth);
+                log.info("kvm domain migration seems to be completed. ");
+                String strXML = dstDomain.getXMLDesc(0);
+                int vncpos = strXML.indexOf("graphics type='vnc' port='");
+                strPort = strXML.substring(vncpos + 26, vncpos + 30);
+                log.info("port: " + strPort);
+            } else if (msg.hypervisor.equalsIgnoreCase("lxc")) {
+                // get the name of the application process in the container
+                String payloadProcessName = Conf
+                        .getString("payload_process.name");
+                log.info("name of the application process is: "
+                        + payloadProcessName);
+                // do snapshot
+                try {
+                    this.checkpointProcessInContainer(msg.vnodeName,
+                            payloadProcessName, msg.guestIpAddr);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+
+                // do migration here
+                // get the xml definition of the src domain
+                String xml = srcDomain.getXMLDesc(0);
+                // if domain is active, shut it down first
+                if (srcDomain.isActive() == 1) {
+                    srcDomain.destroy();
+                }
+                // undefine the source domain
+                srcDomain.undefine();
+                Domain dstDomain = dconn.domainDefineXML(xml);
+                // create destination domain
+                dstDomain.create();
+                log.info("dst domain created. ");
+                try {
+                    log.info("restoring process in destination domain... ");
+                    this.restoreProcessInContainer(msg.migrateToAddr.getIp(),
+                            msg.vnodeName, payloadProcessName, msg.guestIpAddr);
+                } catch (IOException | InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            } else {
+                log.error("unsupported hypervisor migration! ");
+                return;
+            }
+            log.info("send back migration complete message to master! ");
+            NovaWorker.getInstance().getMaster().sendMigrateComplete(
+                    msg.vnodeUuid, msg.migrateToAddr.getIp(), strPort,
+                    msg.hypervisor);
+            log.info("migration completed. check process on destination. ");
         } catch (LibvirtException e1) {
             log.error("migrate error, maybe caused by libvirt ", e1);
         }

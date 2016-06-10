@@ -63,18 +63,21 @@ public class WorkerProxy extends SimpleProxy {
             String subnetMask, String gateWay, String vnodeID, int isvim) {
         // 4th param false means wakeuponly = false
         super.sendRequest(new StartVnodeMessage(hyperVisor, name, vAddr, false,
-                memSize, cpuCount, hdaImage, runAgent, apps, ipAddr,
-                subnetMask, gateWay, vnodeID, isvim));
+                memSize, cpuCount, hdaImage, runAgent, apps, ipAddr, subnetMask,
+                gateWay, vnodeID, isvim));
     }
 
-    public void sendStartExistVnode(String hyperVisor, String uuid, long vnodeid) {
-        super.sendRequest(new StartExistVnodeMessage(hyperVisor, uuid, vnodeid));
+    public void sendStartExistVnode(String hyperVisor, String uuid,
+            long vnodeid) {
+        super.sendRequest(
+                new StartExistVnodeMessage(hyperVisor, uuid, vnodeid));
     }
 
-    public void sendWakeupVnode(String hyperVisor, boolean runAgent, String uuid) {
+    public void sendWakeupVnode(String hyperVisor, boolean runAgent,
+            String uuid) {
         // 4th param false means wakeuponly = true
-        super.sendRequest(new StartVnodeMessage(hyperVisor, true, runAgent,
-                uuid));
+        super.sendRequest(
+                new StartVnodeMessage(hyperVisor, true, runAgent, uuid));
     }
 
     /**
@@ -119,8 +122,10 @@ public class WorkerProxy extends SimpleProxy {
         super.sendRequest(new InstallApplianceMessage(appNames));
     }
 
-    public void sendMigrateVnode(String vnodeUuid, SimpleAddress migrateToAddr) {
-        super.sendRequest(new MigrateVnodeMessage(vnodeUuid, migrateToAddr));
+    public void sendMigrateVnode(String vnodeName, String vnodeUuid,
+            SimpleAddress migrateToAddr, String hypervisor, String ipAddr) {
+        super.sendRequest(new MigrateVnodeMessage(vnodeName, vnodeUuid,
+                migrateToAddr, hypervisor, ipAddr));
     }
 
     public void sendObtainSshKeys(String vClusterName, String vmName) {

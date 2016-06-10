@@ -63,16 +63,19 @@ public class MasterMigrateCompleteHandler
         // TODO Auto-generated method stub
 
         Vnode vnode = Vnode.findByUuid(msg.migrateUuid);
-        String masterIP = Conf.getString("master.bind_host");
-        int masterPort = Utils.getFreePort();
-        portMP(masterIP, masterPort, msg.dstPnodeIP,
-                Integer.valueOf(msg.dstVNCPort), vnode.getId());
-        Utils.MASTER_VNC_MAP.put(String.valueOf(vnode.getId()),
-                String.valueOf(masterPort));
+        if (!msg.hypervisor.equalsIgnoreCase("lxc")) {
+            String masterIP = Conf.getString("master.bind_host");
+            int masterPort = Utils.getFreePort();
+            portMP(masterIP, masterPort, msg.dstPnodeIP,
+                    Integer.valueOf(msg.dstVNCPort), vnode.getId());
+            Utils.MASTER_VNC_MAP.put(String.valueOf(vnode.getId()),
+                    String.valueOf(masterPort));
+        }
         logger.info("set vnode status to running! ");
         vnode.setStatus(Vnode.Status.RUNNING);
         Pnode dstpnode = Pnode.findByIp(msg.dstPnodeIP);
         vnode.setPmachineId((int) dstpnode.getId());
+        logger.info("update pnode id to " + dstpnode.getId());
         vnode.save();
     }
 

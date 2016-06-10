@@ -1,0 +1,167 @@
+#!/usr/bin/bash
+# @author Tianyu Chen
+# This script depends on sshpass/ssh on worker machines,
+# and criu (checkpoint-restore in user space) as well as
+# tmux inside the target container (we need tmux to send
+# a serial of key codes when restoring the target process. 
+
+# **EXAMPLE USAGE**
+# lxc-cr-wrapper checkpoint -c this-container -p this-process
+# lxc-cr-wrapper restore -c this-container -p this-process
+
+# We need the name of the process even when restoring it
+# simply because we have to decide whether the restoring
+# is successful. 
+
+# display help prompt and exit with 1
+help_prompt() {
+    echo "Usage: $0 checkpoint|restore [-c container] [-p process] [-i ipaddr]"
+    # exit
+    exit 1
+}
+
+# parse command line arguments
+case $1 in
+    checkpoint | restore)
+        CR=$1
+        shift
+    ;;
+    *)
+        help_prompt
+    ;;
+esac
+
+while [[ $# > 0 ]]; do
+    KEY="$1"
+    case $KEY in
+        -c | --container)
+            # parse container name
+            CONTAINER="$2"
+            shift
+            shift
+        ;;
+        -p | --process)
+            # parse process name
+            PROCESS="$2"
+            shift
+            shift
+        ;;
+        -i | --ipaddr)
+            # parse the ip address
+            IP_ADDR="$2"
+            shift
+            shift
+        ;;
+        *)
+            # unknown options
+            help_prompt
+        ;;
+    esac
+done
+
+# BASE DIR for NOVA should be defined in bashrc
+if [ "$NOVA_HOME" == "" ]; then
+    echo "nova base dir is not defined. define it in your bashrc"
+    exit 1
+fi
+# set default name for container
+if [ "$CONTAINER" == "" ]; then
+    CONTAINER="default-container"
+fi
+# set default name for process to checkpoint
+if [ "$PROCESS" == "" ]; then
+    PROCESS="default-process"
+fi
+
+# for debug
+echo "ARGS: CR=$CR, CONTAINER=$CONTAINER, PROCESS=$PROCESS"
+
+# define some important arguments for C/R here
+# use the ip address in the args first
+# if the ip is not provided in the args, check the ARP cache for the ip address
+if [ "$IP_ADDR" == "" ]; then
+    echo "fetching the ip addr of container $CONTAINER from ARP cache..."
+    IP_ADDR=`$NOVA_HOME/nova-vmaddrctl "$CONTAINER"`
+fi
+USER="root"
+PASSWD="940715"
+readonly CRIU_ARGS="--shell-job"
+CR_DIR="/root/checkpoint"
+TMUX_SESSION="cr_session"
+CRIU_INSTANCE="/root/criu"
+
+if [ "$IP_ADDR" == "" ]; then
+    echo "cannot find ip address! quit. "
+    exit 2
+fi
+
+# for debug
+echo "IP_ADDR=$IP_ADDR, CRIU_ARGS=$CRIU_ARGS"
+
+# check whether the container is alive
+echo "checking the availability of target container..."
+# the max number of loops
+LOOP=6
+for i in `seq 0 $LOOP`; do
+    echo "the $i round. "
+    sshpass -p $PASSWD ssh -o ConnectTimeout=1 $USER@$IP_ADDR "exit"
+    if [ $? -ne 255 ]; then
+        # if not timeout
+        break
+    fi
+    if [ $i -eq $LOOP ]; then
+        # container might be dead or unreachable
+        echo "the container is dead. exit. "
+        exit 4
+    else
+        sleep 1
+    fi
+done
+
+# check criu requirements
+echo "criu checking requirements..."
+sshpass -p $PASSWD ssh $USER@$IP_ADDR "$CRIU_INSTANCE check"
+if [ $? -eq 1 ]; then
+    # probebly caused by the read only /proc/sys
+    # remount /proc/sys with writability
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "mount -o remount,rw /proc/sys"
+    echo "remounted /proc/sys! "
+else
+    echo "check done! "
+fi
+
+# do checkpoint (C) or restore (R) here
+if [ "$CR" == "checkpoint" ]; then
+    # get the PID of the process
+    # if there are multiple processes, get the largest PID
+    PID=`sshpass -p $PASSWD ssh $USER@$IP_ADDR "pgrep $PROCESS | head -n 1"`
+    # no process running in the container
+    if [ "$PID" == "" ]; then
+        echo "target process not running! check your -p option and retry. "
+        exit 3
+    fi
+    # do checkpoint
+    echo "Checking-point process $PROCESS with PID $PID into $CR_DIR..."
+    # keep tmux session alive
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "tmux new-session -d -s $TMUX_SESSION; tmux ls"
+    # remove the contents of the c/r directory
+    # dump the process into the c/r directory
+    # list the contents of the new c/r directory
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "rm -rf $CR_DIR/*; $CRIU_INSTANCE dump $CRIU_ARGS -t $PID -D $CR_DIR; ls -l $CR_DIR"
+elif [ "$CR" == "restore" ]; then
+    # do restore
+    echo "Restoring process $PROCESS from $CR_DIR..."
+    # keep tmux session alive
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "tmux new-session -d -s $TMUX_SESSION; tmux ls; ls /dev/pts"
+    # tmux send keys
+    # do criu restoring here
+    sshpass -p $PASSWD ssh $USER@$IP_ADDR "tmux send-keys -t $TMUX_SESSION \"$CRIU_INSTANCE restore $CRIU_ARGS -d -D $CR_DIR \" C-m"
+    # wait for criu restoring the process...
+    sleep 1
+    # print PID
+    echo "PID=`pgrep $PROCESS`"
+else
+    echo "Internal error! "
+    exit 3
+fi
+
