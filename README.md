@@ -63,6 +63,10 @@ Q & A
 
 TBA
 
+#### Screenshot
+
+![nova-instance](../../wiki/imgs/nova-instance.png)
+
 Developers & maintainers
 ==========
 
