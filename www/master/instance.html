@@ -4,12 +4,9 @@
 <head>
   <meta charset="utf-8">
   <title>Nova Instance Root</title>
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/bootstrap-responsive.css" rel="stylesheet">
-  <link href="css/docs.css" rel="stylesheet">
-  <script src="js/jquery-2.0.0.js"></script>
-  <script src="js/bootstrap-modal.js"></script>
-  <script src="js/bootstrap-dropdown.js"></script>
+  <link href="css/bootstrap-3.3.6.css" rel="stylesheet">
+  <script src="js/jquery-2.2.4.js"></script>
+  <script src="js/bootstrap-3.3.6.js"></script>
 
   <script language="javascript">
 
@@ -69,23 +66,51 @@
         var cluster_size=vcluster.vcluster_size.value;
         $("#AddCluster_Modal").modal('hide');
         $("#AddCluster_Instance").modal('show');
-        document.getElementById("add_instances").innerHTML="<table>";
+        document.getElementById("add_instances").innerHTML="";
         for(var i=0;i<vcluster.vcluster_size.value;i++) {
-          // ...what the hell is this?
-          document.getElementById("add_instances").innerHTML+="<tr><td>" + (i+1) + ". Instance Name: " +
-            "<input class='span1' type='text' name='vinstance_name"+ i + "'>&nbsp;&nbsp;&nbsp;&nbsp;Memery Size(Kb): " +
-            "<input class='span1' type='text' name='vinstance_memsize"+ i + "'><br>&nbsp;&nbsp;&nbsp;&nbsp;CPU Num: " +
-            "<select class='span1' name='vinstance_cpucount"+ i + "'><option value='1'>1</option><option value='2'>2</option>" +
-            "<option value='3'>3</option><option value='4'>4</option></select> &nbsp;&nbsp;&nbsp;&nbsp;Hypervisor: " +
-            "<select class='span1' name='vinstance_hypervisor"+ i + "'><option value='kvm'>kvm</option>" +
-            "<option value='vstaros'>vstaros</option></select><br>&nbsp;&nbsp;&nbsp;&nbsp;Os Image: " +
-            "<select class='span2' name='vinstance_disk"+ i + "'> ${vdisk_list} </select> &nbsp;&nbsp;&nbsp;&nbsp;Worker: " +
-            "<select class='span1' name='vinstance_pnodeId"+ i + "'> ${pnode_list} <option>auto</option> </select> &nbsp;&nbsp;&nbsp;&nbsp;Applications: " +
-            "<input class='span2' type='text' name='vinstance_Apps"+ i + "'></td></tr></br></br>";
+          if(i !== 0)
+            document.getElementById("add_instances").innerHTML += "<hr>";
+
+          document.getElementById("add_instances").innerHTML+="<h4>Instance " + (i + 1) + "</h4>" +
+            "<div class=\"row\">" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Name:</label>" +
+            "<div class=\"controls\"><input class=\"form-control\" type=\"text\" name=\"vinstance_name" + i + "\"></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Memory size:</label>" +
+            "<div class=\"controls\"><input class=\"form-control\" type=\"text\" name=\"vinstance_memsize" + i + "\"></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">CPU set:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_cpucount" + i + "\">" +
+            "<option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option>" +
+            "</select></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Virtualization:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_hypervisor" + i + "\">" +
+            "<option value='kvm'>kvm</option><option value='lxc'>lxc</option>" +
+            "</select></div></div>" +
+            "</div>" +
+            "</div>" +
+            "<div class=\"row\">" +
+            "<div class=\"col-md-6\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Image:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_disk" + i + "\">${vdisk_list}</select></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Host:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_pnodeId" + i + "\">${pnode_list}</select></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Apps:</label>" +
+            "<div class=\"controls\"><input class=\"form-control\" type=\"text\" name=\"vinstance_Apps" + i + "\"></div></div>" +
+            "</div>" +
+            "</div>";
         }
 
-        document.getElementById("add_instances").innerHTML+="</table>" +
-          "<input type='hidden' name='vcluster_name' value="+ cluster_name + " />" +
+        document.getElementById("add_instances").innerHTML+="<input type='hidden' name='vcluster_name' value="+ cluster_name + " />" +
           "<input type='hidden' name='vcluster_size' value="+ cluster_size + " />";
 
         return false;
@@ -95,55 +120,36 @@
 </head>
 
 <body>
-  <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-    </div>
-  </div>
-
   <!-- container -->
   <div class="container">
     <!-- page header -->
     <div class="page-header">
-      <h1>
-        <em> Nova Master </em>
-        <small> - Java Version v0.3.1</small>
-      </h1>
+      <h1> Tsinghua NOVA <small>- for scalability, redundancy and fault tolerance</small></h1>
     </div>
     <!-- page header -->
 
-    <!-- row -->
-    <div class="row ">
-      <div class="span4 offset8">
-        <div class="pull-right">
-          <i class="icon-user"></i>&nbsp;<a>User: <strong>${username}</strong>&nbsp;&nbsp;</a>
-          <i class="icon-flag"></i>&nbsp;<a>Privilege: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
-        </div>
-      </div>
-    </div>
-    <!-- row -->
-
     <!-- navbar -->
-    <div class="navbar">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">Nova</a>
-          <ul class="nav nav-pills">
-            <li class=""><a href="overview">Overview</a></li>
-            <li class="active"><a href="instance">Instances</a></li>
-            <li class=""><a href="machine">Machines</a></li>
-            <li class=""><a href="image">Images</a></li>
-            <li class=""><a href="monitor">Monitor</a></li>
-            <li class=""><a href="account">Account</a></li>
-          </ul>
+    <div class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <ul class="nav navbar-nav pull-left">
+          <li class=""><a href="overview">Overview</a></li>
+          <li class="active"><a href="instance">Instances</a></li>
+          <li class=""><a href="machine">Machines</a></li>
+          <li class=""><a href="image">Images</a></li>
+          <li class=""><a href="monitor">Monitor</a></li>
+          <li class=""><a href="account">Account</a></li>
+        </ul>
 
-          <form class="navbar-search pull-left" action="">
-            <input type="text" class="search-query span2" placeholder="Search">
-          </form>
-
-          <ul class="nav pull-right">
-            <li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;Logout</a></li>
+        <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">${username}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">privilege: <em>${userprivilege}</em></a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="logout"><strong>Logout</strong></a></li>
           </ul>
-        </div>
+        </li>
+      </ul>
       </div>
     </div>
     <!-- navbar -->
@@ -158,131 +164,155 @@
       </ul>
       <div class="tab-content" id="view_instance">
         <br>
-        <legend> Instances
+        <div>
+          <div class="pull-left">
+            <h3> Instances </h3>
+          </div>
           <div class="pull-right">
             <a data-toggle="modal" class="btn btn-primary" href="#LaunchInstance_Modal"> Launch Instance </a>
             <a class="btn btn-success" href="instance"> Refresh </a>
           </div>
-        </legend>
+        </div>
 
         <!-- launch instance pop-up -->
-        <div id="LaunchInstance_Modal" class="modal hide fade">
-          <div class="modal-header">
-            <a class="close" data-dismiss="modal" >&times;</a>
-            <h3>Launch a new instance</h3>
-          </div>
+        <div id="LaunchInstance_Modal" class="modal fade">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <a class="close" data-dismiss="modal" >&times;</a>
+                <h3>Launch a new instance</h3>
+              </div>
 
-          <form id="launch_instance" action="add_vnode" method="post" class="form-horizontal well" onsubmit="return check_input_vnode()">
-            <div class="modal-body">
-              <div class="control-group">
-                <label class="control-label">Instance Name:</label>
-                <div class="controls">
-                  <input class="span2" size="16" type="text" name="vnode_name">
+              <form id="launch_instance" action="add_vnode" method="post" class="form-horizontal well" onsubmit="return check_input_vnode()">
+                <div class="modal-body">
+                  <div class="control-group">
+                    <label class="control-label">Instance Name:</label>
+                    <div class="controls">
+                      <input class="form-control" size="16" type="text" name="vnode_name">
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Memery Size(Kb):</label>
+                    <div class="controls">
+                      <input class="form-control" size="16" type="text" name="vnode_memsize">
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">CPU Num:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_cpucount">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Hypervisor:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_hypervisor">
+                        <!-- add new hypervisor here -->
+                        <option>kvm</option>
+                        <option>lxc</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">OS Image:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_disk">
+                        ${vdisk_list}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Worker Machine:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_pnodeId">
+                        ${pnode_list}
+                        <option>auto</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Software List:</label>
+                    <div class="controls">
+                      <div class="row">
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_vim" value="0">VIM
+                        </label>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_vim" value="1">Hadoop
+                        </label>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_vim" value="2">WPS
+                        </label>
+                      </div>
+                      </div>
+                      <div class="row">
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_vim" value="3">MPICH
+                        </label>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_vim" value="3">None
+                        </label>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label">Memery Size(Kb):</label>
-                <div class="controls">
-                  <input class="span2" size="16" type="text" name="vnode_memsize">
+                <div class="modal-footer">
+                  <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                  <button type="submit" class="btn btn-primary" >Create</button>
                 </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label">CPU Num:</label>
-                <div class="controls">
-                  <select class="span2" name="vnode_cpucount">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                    <option>6</option>
-                    <option>7</option>
-                    <option>8</option>
-                  </select>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label">Hypervisor:</label>
-                <div class="controls">
-                  <select class="span2" name="vnode_hypervisor">
-                    <!-- add new hypervisor here -->
-                    <option>kvm</option>
-                    <option>lxc</option>
-                    <option>vstaros</option>
-                  </select>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label">OS Image:</label>
-                <div class="controls">
-                  <select class="span2" name="vnode_disk">
-                    ${vdisk_list}
-                  </select>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label">Worker Machine:</label>
-                <div class="controls">
-                  <select class="span2" name="vnode_pnodeId">
-                    ${pnode_list}
-                    <option>auto</option>
-                  </select>
-                </div>
-              </div>
-              <div class="control-group">
-                <label class="control-label">Software List:</label>
-                <div class="controls">
-                  <label class="checkbox inline">
-                    <input type="radio" name="vnode_soft_vim" value="0"> VIM
-                  </label>
-                    <label class="checkbox inline">
-                      <input type="radio" name="vnode_soft_vim" value="1"> Hadoop
-                    </label>
-                    <label class="checkbox inline">
-                      <input type="radio" name="vnode_soft_vim" value="2"> WPS
-                    </label>
-                    <label class="checkbox inline">
-                      <input type="radio" name="vnode_soft_vim" value="3"> MPICH
-                    </label>
-                    <label class="checkbox inline">
-                      <input type="radio" name="vnode_soft_vim" value="3"> None
-                    </label>
-                </div>
-              </div>
+              </form>
             </div>
-            <div class="modal-footer">
-              <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-              <button type="submit" class="btn btn-primary" >Create</button>
-            </div>
-          </form>
+          </div>
         </div>
         <!-- launch instance pop-up -->
 
         <!-- migrate pop-up -->
-        <div id="Migration_Modal" class="modal hide fade">
-          <div class="modal-header">
-            <a class="close" data-dismiss="modal" >&times;</a>
-            <h3>Instance Migration</h3>
-          </div>
-
-          <form action="migration" method="post" class="form-horizontal well">
-            <div class="modal-body">
-              <div class="control-group">
-                <label class="control-label">Migrate to:</label>
-                <div class="controls">
-                  <input id="migvn" type="hidden" name="mig_vnid" value="" />
-                  <select class="span2" name="vnode_migrateto">
-                    ${pnode_list}
-                  </select>
-                </div>
+        <div id="Migration_Modal" class="modal fade">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <a class="close" data-dismiss="modal" >&times;</a>
+                <h3>Migrate instance</h3>
               </div>
-            </div>
 
-            <div class="modal-footer">
-              <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-              <button type="submit" class="btn btn-primary" >Migrate</button>
+              <form action="migration" method="post" class="form-horizontal well">
+                <div class="modal-body">
+                  <div class="control-group">
+                    <label class="control-label">Migrate to:</label>
+                    <div class="controls">
+                      <input id="migvn" type="hidden" name="mig_vnid" value="" />
+                      <select class="form-control" name="vnode_migrateto">
+                        ${pnode_list}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                  <button type="submit" class="btn btn-primary" >Migrate</button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
         <!-- migrate pop-up -->
 
@@ -311,60 +341,71 @@
         <!-- cluster table -->
         <div>
           <br>
-          <legend> Clusters
-            <div class="pull-right">
-              <a data-toggle="modal" href="#AddCluster_Modal" class="btn btn-primary"> Create Cluster </a>
-              <a class="btn btn-success" href="instance"> Refresh </a>
+            <div>
+              <div class="pull-left">
+                <h3> Clusters </h3>
+              </div>
+              <div class="pull-right">
+                <a data-toggle="modal" href="#AddCluster_Modal" class="btn btn-primary"> Create Cluster </a>
+                <a class="btn btn-success" href="instance"> Refresh </a>
+              </div>
             </div>
-          </legend>
 
           <!-- add cluster pop-up -->
           <div>
-            <div id="AddCluster_Modal" class="modal hide fade">
-              <div class="modal-header">
-                <a class="close" data-dismiss="modal" >&times;</a>
-                <h3>Add a new cluster</h3>
+            <div id="AddCluster_Modal" class="modal fade">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <a class="close" data-dismiss="modal" >&times;</a>
+                    <h3>Add a new cluster</h3>
+                  </div>
+
+                  <form id="vcluster" action="add_cluster" method="post" class="form-horizontal well">
+                    <div class="modal-body">
+                      <div class="control-group">
+                        <label class="control-label">Cluster Name:</label>
+                        <div class="controls">
+                          <input class="form-control" size="16" type="text" name="vcluster_name">
+                        </div>
+                      </div>
+
+                      <div class="control-group">
+                        <label class="control-label">Cluster Size:</label>
+                        <div class="controls">
+                          <input class="form-control" size="16" type="text" name="vcluster_size">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                      <a class="btn btn-primary" onclick="create_cluster()">Next Step</a>
+                    </div>
+                  </form>
+                </div>
               </div>
-
-              <form id="vcluster" action="add_cluster" method="post" class="form-horizontal well">
-                <div class="modal-body">
-                  <div class="control-group">
-                    <label class="control-label">Cluster Name:</label>
-                    <div class="controls">
-                      <input class="span2" size="16" type="text" name="vcluster_name">
-                    </div>
-                  </div>
-
-                  <div class="control-group">
-                    <label class="control-label">Cluster Size:</label>
-                    <div class="controls">
-                      <input class="span2" size="16" type="text" name="vcluster_size">
-                    </div>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-                  <a class="btn btn-primary" onclick="create_cluster()">Next Step</a>
-                </div>
-              </form>
             </div>
           </div>
           <!-- add cluster pop-up -->
 
           <!-- add instances pop-up -->
-          <div id="AddCluster_Instance" class="modal hide fade">
-            <div class="modal-header">
-              <a class="close" data-dismiss="modal" >&times;</a>
-              <h3>Add Instances In Cluster</h3>
-            </div>
+          <div id="AddCluster_Instance" class="modal fade">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <a class="close" data-dismiss="modal" >&times;</a>
+                  <h3>Add instances in cluster</h3>
+                </div>
 
-            <form id="add_cluster_step2" action="add_cluster" method="post" class="form-horizontal well" onsubmit="return check_input_vcluster()">
-              <div id="add_instances" class="modal-body"></div>
-              <div class="modal-footer">
-                <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <form id="add_cluster_step2" action="add_cluster" method="post" class="form-horizontal well" onsubmit="return check_input_vcluster()">
+                  <div id="add_instances" class="modal-body"></div>
+                  <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
           <!-- add instance pop-up -->
 
@@ -399,9 +440,8 @@
     <!-- page footer -->
     <footer class="footer">
       <hr>
-      <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">Back To Top</a></p>
-      <p> This is the "master" module of Nova System. </p>
-      <p> Copyright @2013 by <a>hestream</a> in Nova development team.</p>
+      <p><a href="https://github.com/nova-dev-team">Tsinghua NOVA</a>, 2010 - 2016</p>
+      <p>This is a <em>free software</em> distributed under MIT license. </p>
     </footer>
     <!-- page footer -->
   </div>
