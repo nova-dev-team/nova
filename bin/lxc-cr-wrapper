@@ -101,7 +101,7 @@ echo "IP_ADDR=$IP_ADDR, CRIU_ARGS=$CRIU_ARGS"
 # check whether the container is alive
 echo "checking the availability of target container..."
 # the max number of loops
-LOOP=6
+LOOP=20
 for i in `seq 0 $LOOP`; do
     echo "the $i round. "
     sshpass -p $PASSWD ssh -o ConnectTimeout=1 $USER@$IP_ADDR "exit"
