@@ -951,12 +951,20 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     values.put("vcluster_indiv", vcluster_indiv);
 
                     if (vnode_show == "") {
-                        values.put("vnode_show", "None Instance!");
+                        // values.put("vnode_show", "None Instance!");
+                        // add a blank row to the vnode table
+                        values.put("vnode_show",
+                                "<tr><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td>"
+                                        + "<td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>");
                     }
 
                     values.put("vcluster_show", vcluster_show);
                     if (vcluster_show == "") {
-                        values.put("vcluster_show", "None Cluster!");
+                        // values.put("vcluster_show", "None Cluster!");
+                        // add a blank row to the vcluster table
+                        values.put("vcluster_show",
+                                "<tr><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td>"
+                                        + "<td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>");
                     }
 
                 }
