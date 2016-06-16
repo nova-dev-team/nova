@@ -808,8 +808,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             vcluster_indiv = vcluster_indiv + "<div id='col_"
                                     + vcluster.getClusterName()
                                     + "' class='tab-content' style='display:none'>"
-                                    + "<legend>" + vcluster.getClusterName()
-                                    + "\'s Instances" + "</legend>"
+                                    + "<h3>" + vcluster.getClusterName()
+                                    + "\'s Instances" + "</h3>"
                                     + "<table class='table table-striped table-hover'><thead><tr><th>Id</th><th>Instance Name</th>"
                                     + "<th>Ip Address</th><th>Memery Size</th>"
                                     + "<th>Hypervisor</th><th>Virtual Cluster Id</th>"
