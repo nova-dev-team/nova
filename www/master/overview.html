@@ -4,100 +4,143 @@
 <head>
   <meta charset="utf-8">
   <title>Nova master</title>
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/bootstrap-responsive.css" rel="stylesheet">
-  <link href="css/docs.css" rel="stylesheet">
-  <script src="js/bootstrap-modal.js"></script>
-  <script src="js/bootstrap-dropdown.js"></script>
+  <link href="css/bootstrap-3.3.6.css" rel="stylesheet">
+  <script src="js/jquery-2.2.4.js"></script>
+  <script src="js/bootstrap-3.3.6.js"></script>
 </head>
-  
+
 <body>
-<!---------------------- Page Header  -------------------------------->
-  <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-    </div>
-  </div>
-  
-
   <div class="container">
+    <!-- page header -->
+    <div class="page-header">
+      <h1> Tsinghua NOVA <small>- for scalability, redundancy and fault tolerance</small></h1>
+    </div>
+    <!-- page header -->
 
-    <div class="page-header">	
-        <h1>
-            <em> Nova Master </em>
-            <small> - Java Version v0.3.1</small>
-        </h1>  
-    </div>
-    <!-- page-header -->
-    
-    <div class="row ">
-      <div class="span4 offset8">
-        <div class="pull-right">
-    	<i class="icon-user"></i>&nbsp;<a>User: <strong>${username}</strong>&nbsp;&nbsp;</a>
-    	<i class="icon-flag"></i>&nbsp;<a>Privilege: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
-    	</div>
-      </div>
-    </div>
-    <!-- row -->
-    
-    <div class="navbar">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">Nova</a>
-          <ul class="nav nav-pills">
-            <li class="active"><a href="overview">Overview</a></li>
-            <li class=""><a href="instance">Instances</a></li>
-            <li class=""><a href="machine">Machines</a></li>
-            <li class=""><a href="image">Images</a></li>
-            <li class=""><a href="monitor">Monitor</a></li>
-            <li class=""><a href="account">Account</a></li>
+    <!-- navbar -->
+    <div class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <ul class="nav navbar-nav pull-left">
+          <li class="active"><a href="overview">Overview</a></li>
+          <li class=""><a href="instance">Instances</a></li>
+          <li class=""><a href="machine">Machines</a></li>
+          <li class=""><a href="image">Images</a></li>
+          <li class=""><a href="monitor">Monitor</a></li>
+          <li class=""><a href="account">Account</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">${username}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">privilege: <em>${userprivilege}</em></a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="logout"><strong>Logout</strong></a></li>
           </ul>
-          
-          <form class="navbar-search pull-left" action="">
-            <input type="text" class="search-query span2" placeholder="Search">
-          </form>
-          
-          <ul class="nav pull-right">
-          	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;Logout</a></li>
-          </ul>
-          
-        </div>
+        </li>
+      </ul>
       </div>
     </div>
     <!-- navbar -->
-    
-    <!---------------------- Page Content  -------------------------------->
-    <div class="row">
-        
-	        <legend><h2>Nova System Overview:</h2></legend>
-	        ${hide_head}
-	        <h3>Users:</h3>
-	        <p> ${user_total} in total, ${root_user_total} root user,
-	        	${enterprise_user_total} enterprise user, ${individual_user_total} individual user,
-	        	${not_activated_user_total} not activated. </p>
-	        ${hide_tail}
-	        <h3>Pmachines:</h3>
-	        <p> ${pmachine_total} in total, ${working_pmachine_toal} is working, ${failed_pmachine_total}
-	        	has failed, ${retired_pmachine_total} retired. </p>
-	        <h3>Instances:</h3>
-	        <p>${vcluster_num} vclusters, ${vmachine_num} vmachines in total</p>
-	        <h3>Storage server</h3>
-	        <p>Storage server is up and running.</p>
-	    
-    
+
+    <div class="jumbotron">
+      <div class="container">
+        <h2>Welcome to <em>NOVA</em> central dashboard</h2>
+        <hr>
+        <p>Nova is a easy-management system that provides virtualized clusters atop a physical cluster.</p>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="pull-left">
+              <p>Go create vnodes: </p>
+            </div>
+            <div class="pull-right">
+              <p><a class="btn btn-default" href="instance" role="button">Try now</a></p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="pull-left">
+              <p>Fork me on GitHub: </p>
+            </div>
+            <div class="pull-right">
+              <p><a class="btn btn-default" href="https://github.com/nova-dev-team/nova" role="button">Fork</a></p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="pull-left">
+              <p>Read documentations: </p>
+            </div>
+            <div class="pull-right">
+              <p><a class="btn btn-info" href="https://github.com/nova-dev-team/nova/wiki" role="button">Wiki</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- row -->
-  
-    <!---------------------- Page Footer  -------------------------------->
-    <footer class="footer">
-  	  <hr>
-	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">Back To Top</a></p>
-      <p> This is the "master" module of Nova System. </p>
-      <p> Copyright @2013 by <a>hestream</a> in Nova development team.</p>
-    </footer>
-    <!-- footer -->
 
-</div>
-  <!-- container --> 
+    <div class="row">
+      ${hide_head}
+      <!-- the users panel -->
+      <div class="col-md-4">
+        <div class="panel panel-primary">
+          <div class="panel-heading"><h4>Users</h4></div>
+          <div class="panel-body">
+            <p>This section lists all users and their privilege levels in the master database in detail. </p>
+          </div>
 
+          <ul class="list-group">
+            <li class="list-group-item">Total users <span class="badge">${user_total}</span></li>
+            <li class="list-group-item">Root users <span class="badge">${root_user_total}</span></li>
+            <li class="list-group-item">Enterprise users <span class="badge">${enterprise_user_total}</span></li>
+            <li class="list-group-item">Individual users <span class="badge">${individual_user_total}</span></li>
+            <li class="list-group-item">Inactive users <span class="label label-danger">inactive</span><span class="badge">${not_activated_user_total}</span></li>
+          </ul>
+      </div>
+    </div>
+    <!-- the users panel -->
+    ${hide_tail}
+
+    <!-- the physical nodes panel -->
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading"><h4>Physical nodes</h4></div>
+        <div class="panel-body">
+          <p>This section lists the amount of the physical nodes. </p>
+        </div>
+
+        <ul class="list-group">
+          <li class="list-group-item">Total physical nodes <span class="badge">${pmachine_total}</span></li>
+          <li class="list-group-item">Active nodes <span class="label label-success">running</span><span class="badge">${working_pmachine_toal}</span></li>
+          <li class="list-group-item">Failed nodes <span class="label label-danger">failed</span><span class="badge">${failed_pmachine_total}</span></li>
+          <li class="list-group-item">Retired nodes <span class="badge">${retired_pmachine_total}</span></li>
+        </ul>
+      </div>
+    </div>
+    <!-- the physical nodes panel -->
+
+    <!-- the instances panel -->
+    <div class="col-md-4">
+      <div class="panel panel-primary">
+        <div class="panel-heading"><h4>Virtual nodes</h4></div>
+        <div class="panel-body">
+          <p>This section lists the amount of the virtual nodes and clusters. </p>
+        </div>
+
+        <ul class="list-group">
+          <li class="list-group-item">Virtual clusters <span class="badge">${vcluster_num}</span></li>
+          <li class="list-group-item">Virtual nodes <span class="badge">${vmachine_num}</span></li>
+        </ul>
+      </div>
+    </div>
+    <!-- the instances panel -->
+  </div>
+  <div class="alert alert-success" role="alert">The <a href="image" class="alert-link">storage server</a> is up and running! </div>
+
+  <!-- page footer -->
+  <footer class="footer">
+    <hr>
+    <p><a href="https://github.com/nova-dev-team">Tsinghua NOVA dev team</a>, 2010 - 2016</p>
+    <p>This is a <em>free software</em> distributed under MIT license. </p>
+  </footer>
+  <!-- page footer -->
 </body>
 </html>
