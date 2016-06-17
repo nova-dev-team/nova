@@ -51,7 +51,7 @@
         <div class="row">
           <div class="col-md-4">
             <div class="pull-left">
-              <p>Go create vnodes: </p>
+              <p>Create vnodes: </p>
             </div>
             <div class="pull-right">
               <p><a class="btn btn-default" href="instance" role="button">Try now</a></p>
@@ -67,7 +67,7 @@
           </div>
           <div class="col-md-4">
             <div class="pull-left">
-              <p>Read documentations: </p>
+              <p>Documentations: </p>
             </div>
             <div class="pull-right">
               <p><a class="btn btn-info" href="https://github.com/nova-dev-team/nova/wiki" role="button">Wiki</a></p>
@@ -94,53 +94,54 @@
             <li class="list-group-item">Individual users <span class="badge">${individual_user_total}</span></li>
             <li class="list-group-item">Inactive users <span class="label label-danger">inactive</span><span class="badge">${not_activated_user_total}</span></li>
           </ul>
-      </div>
-    </div>
-    <!-- the users panel -->
-    ${hide_tail}
-
-    <!-- the physical nodes panel -->
-    <div class="col-md-4">
-      <div class="panel panel-primary">
-        <div class="panel-heading"><h4>Physical nodes</h4></div>
-        <div class="panel-body">
-          <p>This section lists the amount of the physical nodes. </p>
         </div>
-
-        <ul class="list-group">
-          <li class="list-group-item">Total physical nodes <span class="badge">${pmachine_total}</span></li>
-          <li class="list-group-item">Active nodes <span class="label label-success">running</span><span class="badge">${working_pmachine_toal}</span></li>
-          <li class="list-group-item">Failed nodes <span class="label label-danger">failed</span><span class="badge">${failed_pmachine_total}</span></li>
-          <li class="list-group-item">Retired nodes <span class="badge">${retired_pmachine_total}</span></li>
-        </ul>
       </div>
-    </div>
-    <!-- the physical nodes panel -->
+      <!-- the users panel -->
+      ${hide_tail}
 
-    <!-- the instances panel -->
-    <div class="col-md-4">
-      <div class="panel panel-primary">
-        <div class="panel-heading"><h4>Virtual nodes</h4></div>
-        <div class="panel-body">
-          <p>This section lists the amount of the virtual nodes and clusters. </p>
+      <!-- the physical nodes panel -->
+      <div class="col-md-4">
+        <div class="panel panel-primary">
+          <div class="panel-heading"><h4>Physical nodes</h4></div>
+          <div class="panel-body">
+            <p>This section lists the amount of the physical nodes. </p>
+          </div>
+
+          <ul class="list-group">
+            <li class="list-group-item">Total physical nodes <span class="badge">${pmachine_total}</span></li>
+            <li class="list-group-item">Active nodes <span class="label label-success">running</span><span class="badge">${working_pmachine_toal}</span></li>
+            <li class="list-group-item">Failed nodes <span class="label label-danger">failed</span><span class="badge">${failed_pmachine_total}</span></li>
+            <li class="list-group-item">Retired nodes <span class="badge">${retired_pmachine_total}</span></li>
+          </ul>
         </div>
-
-        <ul class="list-group">
-          <li class="list-group-item">Virtual clusters <span class="badge">${vcluster_num}</span></li>
-          <li class="list-group-item">Virtual nodes <span class="badge">${vmachine_num}</span></li>
-        </ul>
       </div>
+      <!-- the physical nodes panel -->
+
+      <!-- the instances panel -->
+      <div class="col-md-4">
+        <div class="panel panel-primary">
+          <div class="panel-heading"><h4>Virtual nodes</h4></div>
+          <div class="panel-body">
+            <p>This section lists the amount of the virtual nodes and clusters. </p>
+          </div>
+
+          <ul class="list-group">
+            <li class="list-group-item">Virtual clusters <span class="badge">${vcluster_num}</span></li>
+            <li class="list-group-item">Virtual nodes <span class="badge">${vmachine_num}</span></li>
+          </ul>
+        </div>
+      </div>
+      <!-- the instances panel -->
     </div>
-    <!-- the instances panel -->
+    <div class="alert alert-success" role="alert">The <a href="image" class="alert-link">storage server</a> is up and running! </div>
+
+    <!-- page footer -->
+    <footer class="footer">
+      <hr>
+      <p><a href="https://github.com/nova-dev-team">Tsinghua NOVA dev team</a>, 2010 - 2016</p>
+      <p>This is a <em>free software</em> distributed under MIT license. </p>
+    </footer>
+    <!-- page footer -->
   </div>
-  <div class="alert alert-success" role="alert">The <a href="image" class="alert-link">storage server</a> is up and running! </div>
-
-  <!-- page footer -->
-  <footer class="footer">
-    <hr>
-    <p><a href="https://github.com/nova-dev-team">Tsinghua NOVA dev team</a>, 2010 - 2016</p>
-    <p>This is a <em>free software</em> distributed under MIT license. </p>
-  </footer>
-  <!-- page footer -->
 </body>
 </html>
