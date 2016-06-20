@@ -5,8 +5,10 @@
   <meta charset="utf-8">
   <title>Nova Instance Root</title>
   <link href="css/bootstrap-3.3.6.css" rel="stylesheet">
+  <link href="css/bootstrap-switch.css" rel="stylesheet">
   <script src="js/jquery-2.2.4.js"></script>
   <script src="js/bootstrap-3.3.6.js"></script>
+  <script src="js/bootstrap-switch.js"></script>
 
   <script language="javascript">
 
@@ -171,6 +173,7 @@
           <div class="pull-right">
             <a data-toggle="modal" class="btn btn-primary" href="#LaunchInstance_Modal"> Launch Instance </a>
             <a class="btn btn-success" href="instance"> Refresh </a>
+            <input name="load-balancer-toggle" type="checkbox" disabled>
           </div>
         </div>
 
@@ -447,7 +450,7 @@
   </div>
   <!-- container -->
 
+  <script>$("[name='load-balancer-toggle']").bootstrapSwitch();</script>
   <script> ${create_instance_error} ${migration_error} ${createvcluster_error} </script>
-
 </body>
 </html>
