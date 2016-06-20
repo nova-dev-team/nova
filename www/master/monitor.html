@@ -10,131 +10,130 @@
   <script src="js/jquery-2.0.0.js"></script>
   <script src="js/jquery.flot.js"></script>
   <script type="text/javascript">
-  	
-  	$(function() {
-  		var pnode_list = "${pnode_id_list}";
-  		var pnode_id = pnode_list.split(";");
-  		
-		var data;	
-		var plot = [];
-		for(var i=0; i!= 10000; i++)
-		{
-			plot[i] = [];
-		}
-		var updateInterval = 5000;
-		
-		function getData(pnd_id,index) {
-			
-			data = getRemoteData(pnd_id);
-	
-			var res = [];
-			for (var i = 0; i < data.length; ++i) {
-				res.push([i, data[i][index]]);
-			}
-	
-			return res;
-		}
-		
-		var show_item = 4;
-		var show_line = [1,5,9,12,13];
-		var show_label = ["CPU","Memory","Disk","Download", "Upload"]
-		
-		for(var pid=0; pid<pnode_id.length; pid++)
-  		{	
-  			for(var index=0;index < show_item; index++) {
-  				if(index < (show_item-1)) {  // plot one line in the item of cpu,memory,disk
-					plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + (index + 1), 
-							[ {label: show_label[index] + " Usage", data: getData(pnode_id[pid], show_line[index]-1)} ], {
-						series: {
-							shadowSize: 0,	// Drawing is faster without shadows
-						},
-						yaxis: {
-							min: 0,
-							max: 100
-						},
-						xaxis: {
-							show: true
-						},
-						grid: {
-							backgroundColor: { colors: [ "#fff", "#eee" ] }
-						}
-					});
-				} else { // plot two line in the item of network
-					plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + (index + 1), 
-							[ {label: show_label[index] + " Speed", data: getData(pnode_id[pid], show_line[index]-1)},
-							  {label: show_label[index+1] + " Speed", data: getData(pnode_id[pid], show_line[index+1]-1)} ], {
-						series: {
-							shadowSize: 0,	// Drawing is faster without shadows
-						},
-						yaxis: {
-							min: 0,
-							max: 100
-						},
-						xaxis: {
-							show: true
-						},
-						grid: {
-							backgroundColor: { colors: [ "#fff", "#eee" ] }
-						}
-					});
-				}
-			}
-		}
-		
-		setInterval(function(){updateMonitor()}, updateInterval);
-		
-		function updateMonitor() {
-			for(var pid=0; pid<pnode_id.length; pid++)
-  			{
-  				 for(var index=0;index<show_line.length; index++) {
-  				 	plot[pnode_id[pid]][index].setData([getData(pnode_id[pid], show_line[index]-1)]);
-  				 	plot[pnode_id[pid]][index].draw();
-  				 }
-  			}
-		}
-		
-		function getRemoteData(pnd_id) {
-  		
-	  		var xmlHttp;
-	  		var monitor_data = [];
-	  		for(var i=0; i!=13; i++)
-	  		{
-	  			monitor_data[i] = [];
-	  		}
-	  		  		  		
-	  		if(window.XMLHttpRequest)
-	  		{   //code for IE7+, Firefox, Chrome, Opera, Safari
-	  			xmlHttp = new XMLHttpRequest();
-	  		}
-	  		else
-	  		{   //code for IE6, IE5
-	  			xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-	  		}
-	  		  		  		
-	  		xmlHttp.open("GET","/getMonitorData?pnode_id=" + pnd_id,false);
-	  		xmlHttp.send();
-	  		var tempdata = xmlHttp.responseText;
-			var history_data = tempdata.split(";");
-			for(var i=0;i!=history_data.length;i++) 
-			{
-				monitor_data[i] = history_data[i].split(",");
-			}
-	  		
-	  		return monitor_data;
-	  	}
-		
-	});
+  $(function() {
+    var pnode_list = "${pnode_id_list}";
+    var pnode_id = pnode_list.split(";");
+    var data;
+    var plot = [];
+    for (var i = 0; i != 10000; i++) {
+      plot[i] = [];
+    }
+    var updateInterval = 5000;
 
+    function getData(pnd_id, index) {
+      data = getRemoteData(pnd_id);
+      var res = [];
+      for (var i = 0; i < data.length; ++i) {
+        res.push([i, data[i][index]]);
+      }
+
+      return res;
+    }
+
+    var show_item = 4;
+    var show_line = [1, 5, 9, 12, 13];
+    var show_label = ["CPU", "Memory", "Disk", "Download", "Upload"]
+
+    for (var pid = 0; pid < pnode_id.length; pid++) {
+      for (var index = 0; index < show_item; index++) {
+        if (index < (show_item - 1)) { // plot one line in the item of cpu,memory,disk
+          plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + (index + 1), [{
+            label: show_label[index] + " Usage",
+            data: getData(pnode_id[pid], show_line[index] - 1)
+          }], {
+            series: {
+              shadowSize: 0, // Drawing is faster without shadows
+            },
+            yaxis: {
+              min: 0,
+              max: 100
+            },
+            xaxis: {
+              show: true
+            },
+            grid: {
+              backgroundColor: {
+                colors: ["#fff", "#eee"]
+              }
+            }
+          });
+        } else { // plot two line in the item of network
+          plot[pnode_id[pid]][index] = $.plot("#Monitor" + pnode_id[pid] + "_" + (index + 1), [{
+            label: show_label[index] + " Speed",
+            data: getData(pnode_id[pid], show_line[index] - 1)
+          }, {
+            label: show_label[index + 1] + " Speed",
+            data: getData(pnode_id[pid], show_line[index + 1] - 1)
+          }], {
+            series: {
+              shadowSize: 0, // Drawing is faster without shadows
+            },
+            yaxis: {
+              min: 0,
+              max: 100
+            },
+            xaxis: {
+              show: true
+            },
+            grid: {
+              backgroundColor: {
+                colors: ["#fff", "#eee"]
+              }
+            }
+          });
+        }
+      }
+    }
+
+    setInterval(function() {
+      updateMonitor()
+    }, updateInterval);
+
+    function updateMonitor() {
+      for (var pid = 0; pid < pnode_id.length; pid++) {
+        for (var index = 0; index < show_line.length; index++) {
+          plot[pnode_id[pid]][index].setData([getData(pnode_id[pid], show_line[index] - 1)]);
+          plot[pnode_id[pid]][index].draw();
+        }
+      }
+    }
+
+    function getRemoteData(pnd_id) {
+
+      var xmlHttp;
+      var monitor_data = [];
+      for (var i = 0; i != 13; i++) {
+        monitor_data[i] = [];
+      }
+
+      if (window.XMLHttpRequest) { //code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlHttp = new XMLHttpRequest();
+      } else { //code for IE6, IE5
+        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+
+      xmlHttp.open("GET", "/getMonitorData?pnode_id=" + pnd_id, false);
+      xmlHttp.send();
+      var tempdata = xmlHttp.responseText;
+      var history_data = tempdata.split(";");
+      for (var i = 0; i != history_data.length; i++) {
+        monitor_data[i] = history_data[i].split(",");
+      }
+
+      return monitor_data;
+    }
+
+  });
 	</script>
 </head>
-  
+
 <body>
-<!---------------------- Page Header  ------------------------------->
+<!-- page header -->
 <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
     </div>
   </div>
-  
+
 
   <div class="container">
 
@@ -142,10 +141,10 @@
         <h1>
             <em> Nova Master </em>
             <small> - Java Version v0.3.1</small>
-        </h1>  
+        </h1>
     </div>
     <!-- page-header -->
-    
+
     <div class="row ">
       <div class="span4 offset8">
         <div class="pull-right">
@@ -155,12 +154,12 @@
       </div>
     </div>
     <!-- row -->
-    
+
     <div class="navbar">
       <div class="navbar-inner">
         <div class="container">
           <a class="brand" href="#">Nova</a>
-          
+
           <ul class="nav nav-pills">
             <li class=""><a href="overview">Overview</a></li>
             <li class=""><a href="instance">Instances</a></li>
@@ -169,20 +168,20 @@
             <li class="active"><a href="monitor">Monitor</a></li>
             <li class=""><a href="account">Account</a></li>
           </ul>
-          
+
           <form class="navbar-search pull-left" action="">
             <input type="text" class="search-query span2" placeholder="Search">
           </form>
-          
+
           <ul class="nav pull-right">
           	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;Logout</a></li>
           </ul>
-          
+
         </div>
       </div>
     </div>
     <!-- navbar -->
-    
+
     <!---------------------- Worker Monitor  ---------------------------->
     <br>
 	<legend>Worker Monitor <small>Show CPU, memery, disk and network infomation</small>
@@ -190,9 +189,9 @@
 	     <a href="monitor" class="btn btn-primary"> Show All Workers</a>
 	  </div>
 	</legend>
-	
+
 	${pnode_monitor_show}
-   
+
     <!---------------------- Page Footer  ------------------------------->
 	<footer class="footer">
   	  <hr>
@@ -203,7 +202,7 @@
     <!-- footer -->
 
   </div>
-  <!-- container --> 
+  <!-- container -->
 
 </body>
 </html>
