@@ -5,12 +5,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.libvirt.Connect;
-import org.libvirt.LibvirtException;
-
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
 import nova.common.service.message.QueryHeartbeatMessage;
@@ -22,6 +16,7 @@ import nova.worker.api.messages.InstallApplianceMessage;
 import nova.worker.api.messages.MigrateVnodeMessage;
 import nova.worker.api.messages.ObtainSshKeysMessage;
 import nova.worker.api.messages.QueryPnodeInfoMessage;
+import nova.worker.api.messages.QueryVnodeIPMessage;
 import nova.worker.api.messages.QueryVnodeInfoMessage;
 import nova.worker.api.messages.RevokeImageMessage;
 import nova.worker.api.messages.StartExistVnodeMessage;
@@ -34,6 +29,7 @@ import nova.worker.daemons.WorkerPerfInfoDaemon;
 import nova.worker.handler.InstallApplianceHandler;
 import nova.worker.handler.MigrateVnodeHandler;
 import nova.worker.handler.ObtainSshKeysHandler;
+import nova.worker.handler.QueryVnodeIPHandler;
 import nova.worker.handler.RevokeImageHandler;
 import nova.worker.handler.StartExistVnodeHandler;
 import nova.worker.handler.StartVnodeHandler;
@@ -43,6 +39,12 @@ import nova.worker.handler.WorkerQueryHeartbeatHandler;
 import nova.worker.handler.WorkerQueryPnodeInfoMessageHandler;
 import nova.worker.handler.WorkerQueryVnodeInfoMessageHandler;
 import nova.worker.models.StreamGobbler;
+
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+import org.libvirt.Connect;
+import org.libvirt.LibvirtException;
 
 /**
  * The worker module of Nova.
@@ -61,7 +63,7 @@ public class NovaWorker extends SimpleServer {
      */
     SimpleDaemon daemons[] = { new WorkerHeartbeatDaemon(),
             new WorkerPerfInfoDaemon(), new VnodeStatusDaemon(),
-            new VdiskPoolDaemon() /* , new PnodeStatusDaemon() */ };
+            new VdiskPoolDaemon() /* , new PnodeStatusDaemon() */};
 
     /**
      * connections
@@ -245,8 +247,7 @@ public class NovaWorker extends SimpleServer {
         this.registerHandler(QueryHeartbeatMessage.class,
                 new WorkerQueryHeartbeatHandler());
 
-        this.registerHandler(RevokeImageMessage.class,
-                new RevokeImageHandler());
+        this.registerHandler(RevokeImageMessage.class, new RevokeImageHandler());
 
         this.registerHandler(QueryPnodeInfoMessage.class,
                 new WorkerQueryPnodeInfoMessageHandler());
@@ -265,6 +266,8 @@ public class NovaWorker extends SimpleServer {
 
         this.registerHandler(StartExistVnodeMessage.class,
                 new StartExistVnodeHandler());
+        this.registerHandler(QueryVnodeIPMessage.class,
+                new QueryVnodeIPHandler());
 
         conn = null;
 
@@ -295,12 +298,12 @@ public class NovaWorker extends SimpleServer {
             if (!dirFile.exists())
                 Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
             String[] strExecs = {
-                    // "modprobe nfs_layout_nfsv41_files",
-                    // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
-                    // + ":/Nova_home "
-                    // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
-                    "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
-                            + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+            // "modprobe nfs_layout_nfsv41_files",
+            // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
+            // + ":/Nova_home "
+            // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
+            "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run") };
             System.out.println(strExecs[0]);
             try {
                 for (String cmd : strExecs) {
@@ -313,14 +316,12 @@ public class NovaWorker extends SimpleServer {
                     outGobbler.start();
                     try {
                         if (p.waitFor() != 0) {
-                            logger.error(
-                                    "mount pnfs folder returned abnormal value!");
+                            logger.error("mount pnfs folder returned abnormal value!");
                         }
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
-                        logger.error("mount pnfs folder process terminated!",
-                                e);
+                        logger.error("mount pnfs folder process terminated!", e);
                     }
                 }
 
@@ -358,8 +359,8 @@ public class NovaWorker extends SimpleServer {
         // @eagle
         // umount pnfs folder
         try {
-            Runtime.getRuntime()
-                    .exec("umount " + Utils.pathJoin(Utils.NOVA_HOME, "run"));
+            Runtime.getRuntime().exec(
+                    "umount " + Utils.pathJoin(Utils.NOVA_HOME, "run"));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

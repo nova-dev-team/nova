@@ -4,10 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
@@ -18,6 +14,10 @@ import nova.master.models.Pnode;
 import nova.master.models.Vcluster;
 import nova.master.models.Vnode;
 import nova.worker.api.WorkerProxy;
+
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
 
 public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 
@@ -49,11 +49,11 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
             guestDir.mkdirs();
         }
 
-        File rootFs = new File(
-                Utils.pathJoin(guestDir.getAbsolutePath(), "rootfs"));
+        File rootFs = new File(Utils.pathJoin(guestDir.getAbsolutePath(),
+                "rootfs"));
         if (!rootFs.exists()) {
-            String extractCmd = "tar -C " + guestDir.getAbsolutePath() + " -xf "
-                    + Utils.pathJoin(nfsBaseDir, imageFileName);
+            String extractCmd = "tar -C " + guestDir.getAbsolutePath()
+                    + " -xf " + Utils.pathJoin(nfsBaseDir, imageFileName);
             log.info("extract cmd: " + extractCmd);
 
             // extract the root fs tarball into the target directory
@@ -75,8 +75,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
     }
 
     @Override
-    public void handleMessage(CreateVnodeMessage msg, ChannelHandlerContext ctx,
-            MessageEvent e, SimpleAddress xreply) {
+    public void handleMessage(CreateVnodeMessage msg,
+            ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
 
         /**
          * for debug
@@ -87,8 +87,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         // send create vcluster message if only one vnode is to be created
         if (msg.is_one) {
             new CreateVclusterHandler().handleMessage(
-                    new CreateVclusterMessage(msg.vmName, 1, msg.user_id), null,
-                    null, null);
+                    new CreateVclusterMessage(msg.vmName, 1, msg.user_id,
+                            msg.vmName), null, null, null);
         }
 
         // select the cluster of myself
@@ -97,8 +97,8 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
             vcluster = vc;
         }
 
-        SimpleAddress vAddr = new SimpleAddress(Utils.integerToIpv4(
-                (Utils.ipv4ToInteger(vcluster.getFristIp()) + msg.ipOffset)),
+        SimpleAddress vAddr = new SimpleAddress(Utils.integerToIpv4((Utils
+                .ipv4ToInteger(vcluster.getFristIp()) + msg.ipOffset)),
                 Conf.getInteger("worker.bind_port"));
 
         int pid = msg.pnodeId;
@@ -120,12 +120,12 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
 
         Pnode pnode = Pnode.findById(pid);
         log.info("Pnode ip addr: " + pnode.getIp());
-        WorkerProxy wp = new WorkerProxy(
-                new SimpleAddress(Conf.getString("master.bind_host"),
-                        Conf.getInteger("master.bind_port")));
+        WorkerProxy wp = new WorkerProxy(new SimpleAddress(
+                Conf.getString("master.bind_host"),
+                Conf.getInteger("master.bind_port")));
 
-        wp.connect(new InetSocketAddress(pnode.getIp(),
-                Conf.getInteger("worker.bind_port")));
+        wp.connect(new InetSocketAddress(pnode.getIp(), Conf
+                .getInteger("worker.bind_port")));
         String[] apps;
         if (msg.applianceList != null && !msg.applianceList.equals("")) {
             apps = msg.applianceList.split("%2C");
@@ -160,7 +160,7 @@ public class CreateVnodeHandler implements SimpleHandler<CreateVnodeMessage> {
         wp.sendStartVnode(msg.hypervisor, msg.vmName, vAddr,
                 String.valueOf(msg.memorySize), String.valueOf(msg.cpuCount),
                 msg.vmImage, true, apps, ipAddr, subnetMask, gateWay,
-                String.valueOf(vnode.getId()), msg.isvim);
+                String.valueOf(vnode.getId()), msg.isvim, msg.network);
 
     }
 }

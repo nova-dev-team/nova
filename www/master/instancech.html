@@ -3,426 +3,454 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Nova Instance</title>
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/bootstrap-responsive.css" rel="stylesheet">
-  <link href="css/docs.css" rel="stylesheet">
-  <script src="js/jquery-2.0.0.js"></script>
-  <script src="js/bootstrap-modal.js"></script>
-  <script src="js/bootstrap-dropdown.js"></script>
-  
+  <title>Nova Instance Root</title>
+  <link href="css/bootstrap-3.3.6.css" rel="stylesheet">
+  <link href="css/bootstrap-switch.css" rel="stylesheet">
+  <script src="js/jquery-2.2.4.js"></script>
+  <script src="js/bootstrap-3.3.6.js"></script>
+  <script src="js/bootstrap-switch.js"></script>
+
   <script language="javascript">
 
-	function instance_view()
-  	{
-  		document.getElementById("all_instance").className="active";
+    function instance_view() {
+      document.getElementById("all_instance").className="active";
+      document.getElementById("view_instance").style.display="block";
+      ${vcluster_script_in_instance}
+    }
 
-  		document.getElementById("view_instance").style.display="block";
+    ${vcluster_script}
 
-  		${vcluster_script_in_instance}               	                                                                                                                                                                                                                                                                                                                                                                                                             
-  	}
+    function check_input_vnode() {
+      var number_regex=/[0-9]{5,}/;
 
-  	${vcluster_script}
+      if(!number_regex.test(launch_instance.vnode_memsize.value)) {
+        alert("Memory must be number and it should be greater than 10000Kb");
+        launch_instance.vnode_memsize.focus();
+        return false;
+      }
+    }
 
-    function check_input_vnode()
-    {
-    	var number_regex=/[0-9]{5,}/;
+    function migration_process(vnode_id) {
+      $("#Migration_Modal").modal('show');
+      document.getElementById("migvn").value=vnode_id;
+    }
 
-    	if(!number_regex.test(launch_instance.vnode_memsize.value))
-    		{
-    			alert("Memory must be number and it should be greater than 10000Kb");
-    			launch_instance.vnode_memsize.focus();
-  				return false;
-    		}
-    }    
+    function check_input_vcluster() {
+      var number_regex=/[0-9]{5,}/;
+      var size = Number(vcluster.vcluster_size.value);
 
-  
+      for(var i=0;i<size;i++) {
+        var x = document.getElementsByName("vinstance_memsize"+String(i));
+        if(!number_regex.test(x[0].value)) {
+          alert("Memory should be greater than 10000Kb!");
+          return false;
+        }
+      }
+    }
 
+    function create_cluster() {
+      var number_regex=/[0-9]+/;
 
-  	function migration_process(vnode_id)
-  	{
-  		$("#Migration_Modal").modal('show');
-  		document.getElementById("migvn").value=vnode_id;
-  	}
-  	
-  	function check_input_vcluster()
-  	{
-  		var number_regex=/[0-9]{5,}/;
-  		var size = Number(vcluster.vcluster_size.value);
+      if(!number_regex.test(vcluster.vcluster_size.value)) {
+        alert("Size must be integers");
+        vcluster.vcluster_size.focus();
+        return false;
+      } else if(vcluster.vcluster_name.value=="") {
+        alert("Your cluster name can not be null");
+        vcluster.vcluster_name.focus();
+        return false;
+      } else if(vcluster.vcluster_size.value=="") {
+        alert("Your cluster size can not be null");
+        vcluster.vcluster_name.focus();
+        return false;
+      } else {
+        var cluster_name=vcluster.vcluster_name.value;
+        var cluster_size=vcluster.vcluster_size.value;
+        $("#AddCluster_Modal").modal('hide');
+        $("#AddCluster_Instance").modal('show');
+        document.getElementById("add_instances").innerHTML="";
+        for(var i=0;i<vcluster.vcluster_size.value;i++) {
+          if(i !== 0)
+            document.getElementById("add_instances").innerHTML += "<hr>";
 
-  		for(var i=0;i<size;i++)
-  		{
-  			var x = document.getElementsByName("vinstance_memsize"+String(i));
-  			if(!number_regex.test(x[0].value))
-  			{
-  				alert("Memory should be greater than 10000Kb!");
-  				return false;
-  			}
-  		}
+          document.getElementById("add_instances").innerHTML+="<h4>Instance " + (i + 1) + "</h4>" +
+            "<div class=\"row\">" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Name:</label>" +
+            "<div class=\"controls\"><input class=\"form-control\" type=\"text\" name=\"vinstance_name" + i + "\"></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Memory size:</label>" +
+            "<div class=\"controls\"><input class=\"form-control\" type=\"text\" name=\"vinstance_memsize" + i + "\"></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">CPU set:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_cpucount" + i + "\">" +
+            "<option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option>" +
+            "</select></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Virtualization:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_hypervisor" + i + "\">" +
+            "<option value='kvm'>kvm</option><option value='lxc'>lxc</option>" +
+            "</select></div></div>" +
+            "</div>" +
+            "</div>" +
+            "<div class=\"row\">" +
+            "<div class=\"col-md-6\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Image:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_disk" + i + "\">${vdisk_list}</select></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Host:</label>" +
+            "<div class=\"controls\"><select class=\"form-control\" name=\"vinstance_pnodeId" + i + "\">${pnode_list}</select></div></div>" +
+            "</div>" +
+            "<div class=\"col-md-3\">" +
+            "<div class=\"control-group\"><label class=\"control-label\">Apps:</label>" +
+            "<div class=\"controls\"><input class=\"form-control\" type=\"text\" name=\"vinstance_Apps" + i + "\"></div></div>" +
+            "</div>" +
+            "</div>";
+        }
 
-  	}
+        document.getElementById("add_instances").innerHTML+="<input type='hidden' name='vcluster_name' value="+ cluster_name + " />" +
+          "<input type='hidden' name='vcluster_size' value="+ cluster_size + " />";
 
-  	function create_cluster()
-  	{
-  	 
-  		 var number_regex=/[0-9]+/;
-
-    	if(!number_regex.test(vcluster.vcluster_size.value))
-    		{
-    			alert("Size must be integers");
-    			vcluster.vcluster_size.focus();
-  				return false;
-    		}
-
-  		else if(vcluster.vcluster_name.value=="")
-  		{
-  			alert("Your cluster name can not be null");
-  			vcluster.vcluster_name.focus();
-  			return false;
-  		}
-  		else if(vcluster.vcluster_size.value=="")
-  		{
-  			alert("Your cluster size can not be null");
-  			vcluster.vcluster_name.focus();
-  			return false;
-  		}
-  		else {
-  			var cluster_name=vcluster.vcluster_name.value;
-  			var cluster_size=vcluster.vcluster_size.value;
-  			$("#AddCluster_Modal").modal('hide');
-  			$("#AddCluster_Instance").modal('show');
-  			document.getElementById("add_instances").innerHTML="<table>";
-  			for(var i=0;i<vcluster.vcluster_size.value;i++)
-  			{
-  				document.getElementById("add_instances").innerHTML+="<tr><td>" + (i+1) + ". Instance Name: " +
-  					"<input class='span1' type='text' name='vinstance_name"+ i + "'>&nbsp;&nbsp;&nbsp;&nbsp;Memery Size(Kb): " +
-  					"<input class='span1' type='text' name='vinstance_memsize"+ i + "'><br>&nbsp;&nbsp;&nbsp;&nbsp;CPU Num: " + 
-  					"<select class='span1' name='vinstance_cpucount"+ i + "'><option value='1'>1</option><option value='2'>2</option>" +
-  					"<option value='3'>3</option><option value='4'>4</option></select> &nbsp;&nbsp;&nbsp;&nbsp;Hypervisor: " +
-  					"<select class='span1' name='vinstance_hypervisor"+ i + "'><option value='kvm'>kvm</option>" + 
-  					"<option value='vstaros'>vstaros</option></select><br>&nbsp;&nbsp;&nbsp;&nbsp;Os Image: " +
-  					"<select class='span2' name='vinstance_disk"+ i + "'> ${vdisk_list} </select> &nbsp;&nbsp;&nbsp;&nbsp;Worker: " + 
-  					"<select class='span1' name='vinstance_pnodeId"+ i + "'> ${pnode_list} <option>auto</option> </select> &nbsp;&nbsp;&nbsp;&nbsp;Applications: " + 
-  					"<input class='span2' type='text' name='vinstance_Apps"+ i + "'></td></tr></br></br>";
-  			}
-  			
-  			document.getElementById("add_instances").innerHTML+="</table>" +
-  			"<input type='hidden' name='vcluster_name' value="+ cluster_name + " />" + 
-  			"<input type='hidden' name='vcluster_size' value="+ cluster_size + " />";
-  			
-  			return false;
-  		}
-  	}
+        return false;
+      }
+    }
   </script>
 </head>
-  
-<body>
-<!---------------------- Page Header  -------------------------------->
-<div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-    </div>
-  </div>
-  
-  <div class="container">
 
+<body>
+  <!-- container -->
+  <div class="container">
+    <!-- page header -->
     <div class="page-header">
-        <h1>
-            <em> Nova Master </em>
-            
-        </h1>  
+      <h1> Tsinghua NOVA <small>- for scalability, redundancy and fault tolerance</small></h1>
     </div>
-    <!-- page-header -->
-    
-    <div class="row ">
-      <div class="span4 offset8">
-        <div class="pull-right">
-    	<i class="icon-user"></i>&nbsp;<a>用户: <strong>${username}</strong>&nbsp;&nbsp;</a>
-    	<i class="icon-flag"></i>&nbsp;<a>权限: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
-    	</div>
-      </div>
-    </div>
-    <!-- row -->
-    
-    <div class="navbar">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">Nova</a>
-          
-          <ul class="nav nav-pills">
-            <li class=""><a href="overview">概况</a></li>
-            <li class="active"><a href="instance">实例</a></li>
-            <li class=""><a href="machine">物理机</a></li>
-            <li class=""><a href="image">镜像</a></li>
-            <li class=""><a href="monitor">监视器</a></li>
-            <li class=""><a href="account">用户</a></li>
+    <!-- page header -->
+
+    <!-- navbar -->
+    <div class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <ul class="nav navbar-nav pull-left">
+          <li class=""><a href="overview">Overview</a></li>
+          <li class="active"><a href="instance">Instances</a></li>
+          <li class=""><a href="machine">Machines</a></li>
+          <li class=""><a href="image">Images</a></li>
+          <li class=""><a href="monitor">Monitor</a></li>
+          <li class=""><a href="account">Account</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">${username}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">privilege: <em>${userprivilege}</em></a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="logout"><strong>Logout</strong></a></li>
           </ul>
-          
-          <form class="navbar-search pull-left" action="">
-            <input type="text" class="search-query span2" placeholder="搜索">
-          </form>
-          
-          <ul class="nav pull-right">
-          	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;退出</a></li>
-          </ul>
-          
-        </div>
+        </li>
+      </ul>
       </div>
     </div>
     <!-- navbar -->
 
-    <!---------------------- Instance -------------------------------->
+    <!-- instance -->
     <div class="tabbable tabs-left">
       <ul class="nav nav-tabs">
-        <li class="active" id="all_instance"><a data-toggle="tab" onclick="instance_view()" href="#">所有实例</a></li>
+        <li class="active" id="all_instance">
+          <a data-toggle="tab" onclick="instance_view()" href="#">All Instances</a>
+        </li>
         ${vcluster_list}
       </ul>
       <div class="tab-content" id="view_instance">
-	<br>
-    <legend> 实例
-	    <div class="pull-right">
-	       <a data-toggle="modal" class="btn btn-primary" href="#LaunchInstance_Modal"> 创建实例 </a>
-	       <a class="btn btn-success" href="instance"> 刷新 </a>
-	    </div>
-    </legend>
-    
-    <!-- Launch Instance modal(Hide) -->
-	  <div id="LaunchInstance_Modal" class="modal hide fade">
-	    <div class="modal-header">
-	      <a class="close" data-dismiss="modal" >&times;</a>
-	      <h3>创建新实例</h3>
-	    </div>
-	    
-	    <form id="launch_instance" action="add_vnode" method="post" class="form-horizontal well" onsubmit="return check_input_vnode()">
-	        <div class="modal-body">
-	            <div class="control-group">	
-					<label class="control-label">实例名称:</label>
-					<div class="controls">
-						<input class="span2" size="16" type="text" name="vnode_name">
-					</div>
-				</div>
-				<div class="control-group">	
-					<label class="control-label">内存大小(Kb):</label>
-					<div class="controls">
-						<input class="span2" size="16" type="text" name="vnode_memsize">
-					</div>
-				</div>
-				<div class="control-group">	
-					<label class="control-label">CPU数目:</label>
-					<div class="controls">
-						<select class="span2" name="vnode_cpucount">
-			                <option>1</option>
-			                <option>2</option>
-			                <option>3</option>
-			                <option>4</option>
-			                <option>5</option>
-			                <option>6</option>
-			                <option>7</option>
-			                <option>8</option>
-			             </select>
-					</div>
-				</div>
-				<div class="control-group">	
-					<label class="control-label">Hypervisor:</label>
-					<div class="controls">
-						<select class="span2" name="vnode_hypervisor">
-			                <option>kvm</option>
-			                <option>vstaros</option>
-			             </select>
-					</div>
-				</div>
-				<div class="control-group">	
-					<label class="control-label">OS 镜像:</label>
-					<div class="controls">
-						<select class="span2" name="vnode_disk">
-							${vdisk_list}
-			             </select>
-					</div>
-				</div>
-				<div class="control-group">	
-					<label class="control-label">物理机:</label>
-					<div class="controls">
-						<select class="span2" name="vnode_pnodeId">
-			                ${pnode_list}
-			                <option>auto</option>
-			             </select>
-					</div>
-				</div>
-				<div class="control-group">	
-					<label class="control-label">软件列表:</label>
-					<div class="controls">
-						  <label class="checkbox inline">
-			                <input type="checkbox" name="vnode_soft_word" value="true"> Word
-			              </label>
-			              <label class="checkbox inline">
-			                <input type="checkbox" name="vnode_soft_hadoop" value="true"> Hadoop
-			              </label>
-			              <label class="checkbox inline">
-			                <input type="checkbox" name="vnode_soft_vim" value="true"> Vim
-			              </label>
-					</div>
-				</div>
-				
-	        </div>
-	        <div class="modal-footer">
-	      		<a href="#" class="btn" data-dismiss="modal">取消</a>
-	      		<button type="submit" class="btn btn-primary" >创建</button>
-	    	</div>
-	    </form>
-	  </div>
-	  <!-- Launch Instance modal -->
-	  
-	  <!-- Migration modal(Hide) -->
-	  <div id="Migration_Modal" class="modal hide fade">
-	    <div class="modal-header">
-	      <a class="close" data-dismiss="modal" >&times;</a>
-	      <h3>实例迁移</h3>
-	    </div>
-	    
-	    <form action="migration" method="post" class="form-horizontal well">
-	        <div class="modal-body">
-	            <div class="control-group">	
-					<label class="control-label">迁移至:</label>
-					<div class="controls">
-						<input id="migvn" type="hidden" name="mig_vnid" value="" />
-						<select class="span2" name="vnode_migrateto">
-			                ${pnode_list}
-			             </select>
-					</div>
-				</div>
-			</div>
-			
-	        <div class="modal-footer">
-	      		<a href="#" class="btn" data-dismiss="modal">取消</a>
-	      		<button type="submit" class="btn btn-primary" >迁移</button>
-	    	</div>
-	    </form>
-	  </div>
-	  <!-- Migration modal -->
-    
-	<table class="table table-striped table-hover">  
-		<thead>
-			<tr>
-			<th>ID</th>
-			<th>实例名称</th>
-			<th>IP地址</th>
-			<th>内存大小</th>
-			<th>Hypervisor</th>
-			<th>虚拟机集群ID</th>
-			<th>物理机ID</th>
-			<th>状态</th> 
-			<th>操作</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			${vnode_show}
-		</tbody>
-		
-	</table>
-	<!--
-    <!---------------------- Cluster ------------------------------>
-    <div>
-	<br>
-    <legend> Clusters
-	    <div class="pull-right">
-	       <a data-toggle="modal" href="#AddCluster_Modal" class="btn btn-primary"> 创建虚拟机集群 </a>
-	       <a class="btn btn-success" href="instance"> 刷新 </a>
-	    </div>
-    </legend>
-    
-    <!-- Add Cluster modal(Hide) -->
-    <div>
-	  <div id="AddCluster_Modal" class="modal hide fade">
-	    <div class="modal-header">
-	      <a class="close" data-dismiss="modal" >&times;</a>
-	      <h3>创建新虚拟机集群</h3>
-	    </div>
-	    
-	    <form id="vcluster" action="add_cluster" method="post" class="form-horizontal well">
-	        <div class="modal-body">
-	        	<div class="control-group">
-					<label class="control-label">集群名称:</label>
-					<div class="controls">
-						<input class="span2" size="16" type="text" name="vcluster_name">
-					</div>
-				</div>
-		     
-				<div class="control-group">	
-					<label class="control-label">集群规模:</label>
-					<div class="controls">
-						<input class="span2" size="16" type="text" name="vcluster_size">
-					</div>
-				</div>
-	        </div>
-	        <div class="modal-footer">
-	      		<a href="#" class="btn" data-dismiss="modal">取消</a>
-	      		<a class="btn btn-primary" onclick="create_cluster()">下一步</a>
-	    	</div>
-	    </form>
-	  </div>
-	</div>
-	  <!-- AddCluster_Modal -->
-	  
-	  
-	  <!-- Add Cluster Instances -->
-	  <div id="AddCluster_Instance" class="modal hide fade">
-	    <div class="modal-header">
-	      <a class="close" data-dismiss="modal" >&times;</a>
-	      <h3>加入到虚拟机集群</h3>
-	    </div>
-	    
-	    <form id="add_cluster_step2" action="add_cluster" method="post" class="form-horizontal well" onsubmit="return check_input_vcluster()">
-	        <div id="add_instances" class="modal-body">
-	        	
-	        </div>
-	        <div class="modal-footer">
-	      		<a href="#" class="btn" data-dismiss="modal">取消</a>
-	      		<button type="submit" class="btn btn-primary">创建</button>
-	    	</div>
-	    </form>
-	  </div>
-    
-	<table class="table table-striped table-hover">  
-		<thead>
-			<tr>
-			<th>ID</th>
-			<th>集群名称</th>
-			<th>第一个IP地址</th>
-			<th>集群规模</th>
-			<th>ssh公钥</th>
-			<th>ssh私钥</th>
-			<th>OS用户名称</th> 
-			<th>操作</th>
-			</tr>
-		</thead>	
-		<tbody>
-			${vcluster_show}
-		</tbody>
-		
-	</table>
+        <br>
+        <div>
+          <div class="pull-left">
+            <h3> Instances </h3>
+          </div>
+          <div class="pull-right">
+            <a data-toggle="modal" class="btn btn-primary" href="#LaunchInstance_Modal"> Launch Instance </a>
+            <a class="btn btn-success" href="instance"> Refresh </a>
+            <input name="load-balancer-toggle" type="checkbox" data-on-color="success" data-off-color="danger" data-label-text="Scheduler" disabled>
+          </div>
+        </div>
+
+        <!-- launch instance pop-up -->
+        <div id="LaunchInstance_Modal" class="modal fade">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <a class="close" data-dismiss="modal" >&times;</a>
+                <h3>Launch a new instance</h3>
+              </div>
+
+              <form id="launch_instance" action="add_vnode" method="post" class="form-horizontal well" onsubmit="return check_input_vnode()">
+                <div class="modal-body">
+                  <div class="control-group">
+                    <label class="control-label">Instance Name:</label>
+                    <div class="controls">
+                      <input class="form-control" size="16" type="text" name="vnode_name">
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Memery Size(Kb):</label>
+                    <div class="controls">
+                      <input class="form-control" size="16" type="text" name="vnode_memsize">
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">CPU Num:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_cpucount">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Hypervisor:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_hypervisor">
+                        <!-- add new hypervisor here -->
+                        <option>kvm</option>
+                        <option>lxc</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">OS Image:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_disk">
+                        ${vdisk_list}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Worker Machine:</label>
+                    <div class="controls">
+                      <select class="form-control" name="vnode_pnodeId">
+                        ${pnode_list}
+                        <option>auto</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label class="control-label">Software List:</label>
+                    <div class="controls">
+                      <div class="row">
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_vim" value="0">VIM
+                        </label>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_hadoop" value="1">Hadoop
+                        </label>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_wps" value="2">WPS
+                        </label>
+                      </div>
+                      </div>
+                      <div class="row">
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_mpich" value="3">MPICH
+                        </label>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="checkbox">
+                          <input type="radio" name="vnode_soft_none" value="4">None
+                        </label>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                  <button type="submit" class="btn btn-primary" >Create</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- launch instance pop-up -->
+
+        <!-- migrate pop-up -->
+        <div id="Migration_Modal" class="modal fade">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <a class="close" data-dismiss="modal" >&times;</a>
+                <h3>Migrate instance</h3>
+              </div>
+
+              <form action="migration" method="post" class="form-horizontal well">
+                <div class="modal-body">
+                  <div class="control-group">
+                    <label class="control-label">Migrate to:</label>
+                    <div class="controls">
+                      <input id="migvn" type="hidden" name="mig_vnid" value="" />
+                      <select class="form-control" name="vnode_migrateto">
+                        ${pnode_list}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                  <button type="submit" class="btn btn-primary" >Migrate</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- migrate pop-up -->
+
+        <!-- vnode table -->
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Instance Name</th>
+              <th>Ip Address</th>
+              <th>Memery Size</th>
+              <th>Hypervisor</th>
+              <th>Virtual Cluster Id</th>
+              <th>Physical Machine Id</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${vnode_show}
+          </tbody>
+        </table>
+        <!-- vnode table -->
+
+        <!-- cluster table -->
+        <div>
+          <br>
+            <div>
+              <div class="pull-left">
+                <h3> Clusters </h3>
+              </div>
+              <div class="pull-right">
+                <a data-toggle="modal" href="#AddCluster_Modal" class="btn btn-primary"> Create Cluster </a>
+                <a class="btn btn-success" href="instance"> Refresh </a>
+              </div>
+            </div>
+
+          <!-- add cluster pop-up -->
+          <div>
+            <div id="AddCluster_Modal" class="modal fade">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <a class="close" data-dismiss="modal" >&times;</a>
+                    <h3>Add a new cluster</h3>
+                  </div>
+
+                  <form id="vcluster" action="add_cluster" method="post" class="form-horizontal well">
+                    <div class="modal-body">
+                      <div class="control-group">
+                        <label class="control-label">Cluster Name:</label>
+                        <div class="controls">
+                          <input class="form-control" size="16" type="text" name="vcluster_name">
+                        </div>
+                      </div>
+
+                      <div class="control-group">
+                        <label class="control-label">Cluster Size:</label>
+                        <div class="controls">
+                          <input class="form-control" size="16" type="text" name="vcluster_size">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                      <a class="btn btn-primary" onclick="create_cluster()">Next Step</a>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- add cluster pop-up -->
+
+          <!-- add instances pop-up -->
+          <div id="AddCluster_Instance" class="modal fade">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <a class="close" data-dismiss="modal" >&times;</a>
+                  <h3>Add instances in cluster</h3>
+                </div>
+
+                <form id="add_cluster_step2" action="add_cluster" method="post" class="form-horizontal well" onsubmit="return check_input_vcluster()">
+                  <div id="add_instances" class="modal-body"></div>
+                  <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- add instance pop-up -->
+
+          <!-- cluster table view -->
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Cluster Name</th>
+                <th>First Ip</th>
+                <th>Cluster Size</th>
+                <th>sshPublicKey</th>
+                <th>sshPrivateKey</th>
+                <th>osUsername</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${vcluster_show}
+            </tbody>
+          </table>
+          <!-- cluster table view -->
+        </div>
+      </div>
+
+      <!-- clusters individual view -->
+      ${vcluster_indiv}
+      <!-- clusters individual view -->
     </div>
-</div>
+    <!-- instance -->
 
-<!-----------Clusters Individually view---------------->
-${vcluster_indiv}
-
-</div>
- 
-
-
-
-    <!---------------------- Page Footer  -------------------------------->
-	<footer class="footer">
-  	  <hr>
-	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">返回顶部</a></p>
-      <p> Nova系统. </p>
-      <p>  @2013-2014 Nova开发小组 版权所有.</p>
+    <!-- page footer -->
+    <footer class="footer">
+      <hr>
+      <p><a href="https://github.com/nova-dev-team">Tsinghua NOVA dev team</a>, 2010 - 2016</p>
+      <p>This is a <em>free software</em> distributed under MIT license. </p>
     </footer>
-    </div>
-    <!-- footer -->
-  <!-- container --> 
+    <!-- page footer -->
+  </div>
+  <!-- container -->
 
-  <script> ${create_instance_error} ${migration_error} ${createvcluster_error}</script>
-
+  <script>$("[name='load-balancer-toggle']").bootstrapSwitch();</script>
+  <script> ${create_instance_error} ${migration_error} ${createvcluster_error} </script>
 </body>
 </html>

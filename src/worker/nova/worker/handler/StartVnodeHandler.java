@@ -9,12 +9,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.libvirt.Domain;
-import org.libvirt.LibvirtException;
-
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHandler;
 import nova.common.util.Conf;
@@ -28,6 +22,13 @@ import nova.worker.daemons.VnodeStatusDaemon;
 import nova.worker.models.StreamGobbler;
 import nova.worker.virt.Kvm;
 import nova.worker.virt.Lxc;
+
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+import org.libvirt.Domain;
+import org.libvirt.LibvirtException;
+
 import sun.net.ftp.FtpClient;
 import sun.net.ftp.FtpProtocolException;
 
@@ -53,8 +54,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
      *            - the file name of the os image, with extension
      */
     private void ftpFileTransfer(StartVnodeMessage msg, String stdImgFile) {
-        File stdFile = new File(
-                Utils.pathJoin(Utils.NOVA_HOME, "run", stdImgFile));
+        File stdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                stdImgFile));
         if (!stdFile.exists()) {
             if (NovaStorage.getInstance().getFtpServer() == null) {
                 // NovaStorage.getInstance().startFtpServer();
@@ -75,8 +76,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 log.error("ftp protocol exception! ", e);
             }
         }
-        File foder = new File(
-                Utils.pathJoin(Utils.NOVA_HOME, "run", msg.getName()));
+        File foder = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                msg.getName()));
         if (!foder.exists()) {
             foder.mkdirs();
         }
@@ -89,8 +90,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             Process createIncrmtlImgs;
             String cmd = "qemu-img create -b "
                     + Utils.pathJoin(Utils.NOVA_HOME, "run", stdImgFile)
-                    + " -f qcow2 " + Utils.pathJoin(Utils.NOVA_HOME, "run",
-                            msg.getName(), stdImgFile);
+                    + " -f qcow2 "
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run", msg.getName(),
+                            stdImgFile);
             System.out.println("Ftp: " + cmd);
 
             try {
@@ -103,12 +105,10 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 outGobbler.start();
                 try {
                     if (createIncrmtlImgs.waitFor() != 0) {
-                        log.error(
-                                "create incremental image returned abnormal value!");
+                        log.error("create incremental image returned abnormal value!");
                     }
                 } catch (InterruptedException e1) {
-                    log.error("create incremental image process terminated",
-                            e1);
+                    log.error("create incremental image process terminated", e1);
                 }
             } catch (IOException e1) {
                 log.error("exec create incremental image cmd error!", e1);
@@ -117,8 +117,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
         }
 
         if (msg.getRunAgent()) {
-            File pathFile = new File(
-                    Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares"));
+            File pathFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                    "softwares"));
             if (!pathFile.exists()) {
                 Utils.mkdirs(pathFile.getAbsolutePath());
             }
@@ -181,20 +181,18 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     if (NovaWorker.getInstance().getAppStatus()
                             .containsKey(appName) == false) {
                         try {
-                            FtpClient fc = FtpUtils.connect(
-                                    Conf.getString("storage.ftp.bind_host"),
-                                    Conf.getInteger("storage.ftp.bind_port"),
-                                    Conf.getString(
-                                            "storage.ftp.admin.username"),
-                                    Conf.getString(
-                                            "storage.ftp.admin.password"));
-                            FtpUtils.downloadDir(fc,
-                                    Utils.pathJoin("appliances", appName),
-                                    Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                            "softwares", "appliances",
-                                            appName)); // first
-                                                       // install
-                                                       // appliances
+                            FtpClient fc = FtpUtils
+                                    .connect(
+                                            Conf.getString("storage.ftp.bind_host"),
+                                            Conf.getInteger("storage.ftp.bind_port"),
+                                            Conf.getString("storage.ftp.admin.username"),
+                                            Conf.getString("storage.ftp.admin.password"));
+                            FtpUtils.downloadDir(fc, Utils.pathJoin(
+                                    "appliances", appName), Utils.pathJoin(
+                                    Utils.NOVA_HOME, "run", "softwares",
+                                    "appliances", appName)); // first
+                                                             // install
+                                                             // appliances
                             log.info("Download " + appName + " complete.");
                         } catch (NumberFormatException e1) {
                             log.error("port format error!", e1);
@@ -206,16 +204,16 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                             log.error("ftp protocol exception! ", e);
                             return;
                         }
-                        NovaWorker.getInstance().getAppStatus().put(appName,
-                                appName);
+                        NovaWorker.getInstance().getAppStatus()
+                                .put(appName, appName);
                     }
                 }
             }
 
             // packiso process start
             // copy files to Novahome/run/softwares
-            File agentProgramFile = new File(
-                    Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares", "run"));
+            File agentProgramFile = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                    "run", "softwares", "run"));
             if (!agentProgramFile.exists()) {
                 Utils.mkdirs(agentProgramFile.getAbsolutePath());
             }
@@ -230,39 +228,31 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             if (msg.getIsvim() == 0) {
                 // copy without ftp_home folder install vim
                 String[] ingoreList = { "ftp_home", "hadoop-0.20.2", "WPS" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             }
             if (msg.getIsvim() == 1) {
                 // install hadoop
                 String[] ingoreList = { "ftp_home", "vim73", "WPS" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             }
             if (msg.getIsvim() == 2) {
                 // install WPS
                 String[] ingoreList = { "ftp_home", "vim73", "hadoop-0.20.2" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             }
 
             else {
                 String[] ingoreList = { "ftp_home", "vim73", "hadoop-0.20.2",
                         "WPS" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             }
             Utils.copyOneFile(Utils.pathJoin(Utils.NOVA_HOME, "VERSION"), Utils
                     .pathJoin(agentProgramFile.getAbsolutePath(), "VERSION"));
@@ -277,16 +267,16 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             Process p;
             String cmd = "mkisofs -J -T -R -V cdrom -o "
                     + Utils.pathJoin(Utils.NOVA_HOME, "run", msg.getName(),
-                            "agentcd", "agent-cd.iso")
-                    + " " + Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares");
+                            "agentcd", "agent-cd.iso") + " "
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run", "softwares");
 
             try {
                 p = Runtime.getRuntime().exec(cmd);
                 StreamGobbler errorGobbler = new StreamGobbler(
                         p.getErrorStream(), "ERROR");
                 errorGobbler.start();
-                StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
-                        "STDOUT");
+                StreamGobbler outGobbler = new StreamGobbler(
+                        p.getInputStream(), "STDOUT");
                 outGobbler.start();
                 try {
                     if (p.waitFor() != 0) {
@@ -315,8 +305,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
         String pnfsBaseDir = Utils.pathJoin(Utils.NOVA_HOME, "run", "run");
         File stdFile = new File(Utils.pathJoin(pnfsBaseDir, stdImgFile));
         if (stdFile.exists() == false) {
-            log.error(
-                    "disk image " + stdFile.getAbsolutePath() + " not found!");
+            log.error("disk image " + stdFile.getAbsolutePath() + " not found!");
             return;
         }
         String strWorkerIP = NovaWorker.getInstance().getAddr().getIp();
@@ -326,25 +315,26 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
 
         // copy image file to the guest's directory
         if (msg.getHyperVisor().equalsIgnoreCase("kvm")) {
-            guestDir = new File(Utils.pathJoin(pnfsBaseDir,
-                    strWorkerIP + "_" + msg.getName()));
+            guestDir = new File(Utils.pathJoin(pnfsBaseDir, strWorkerIP + "_"
+                    + msg.getName()));
             if (!guestDir.exists()) {
                 guestDir.mkdirs();
             }
-            File file = new File(Utils.pathJoin(pnfsBaseDir,
-                    strWorkerIP + "_" + msg.getName(), stdImgFile));
+            File file = new File(Utils.pathJoin(pnfsBaseDir, strWorkerIP + "_"
+                    + msg.getName(), stdImgFile));
             if (file.exists() == false) {
                 // create incremental images of source image
                 Process createNFSIncrmtlImgs;
                 String cmdofincrtlnfs = "qemu-img create -b "
-                        + Utils.pathJoin(pnfsBaseDir, stdImgFile) + " -f qcow2 "
+                        + Utils.pathJoin(pnfsBaseDir, stdImgFile)
+                        + " -f qcow2 "
                         + Utils.pathJoin(pnfsBaseDir,
-                                strWorkerIP + "_" + msg.getName(),
-                                stdImgFile + " 100G");
+                                strWorkerIP + "_" + msg.getName(), stdImgFile
+                                        + " 100G");
 
                 try {
-                    createNFSIncrmtlImgs = Runtime.getRuntime()
-                            .exec(cmdofincrtlnfs);
+                    createNFSIncrmtlImgs = Runtime.getRuntime().exec(
+                            cmdofincrtlnfs);
                     StreamGobbler errorGobbler = new StreamGobbler(
                             createNFSIncrmtlImgs.getErrorStream(), "ERROR");
                     errorGobbler.start();
@@ -353,8 +343,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                     outGobbler.start();
                     try {
                         if (createNFSIncrmtlImgs.waitFor() != 0) {
-                            log.error(
-                                    "create NFS incremental image returned abnormal value!");
+                            log.error("create NFS incremental image returned abnormal value!");
                         }
                     } catch (InterruptedException e1) {
                         log.error(
@@ -389,9 +378,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             if (!paramsFile.exists()) {
                 Utils.mkdirs(paramsFile.getAbsolutePath());
             }
-            File ipFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                    strWorkerIP + "_" + msg.getName(), "softwares", "params",
-                    "ipconfig.txt"));
+            File ipFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                    "run", strWorkerIP + "_" + msg.getName(), "softwares",
+                    "params", "ipconfig.txt"));
 
             try {
                 if (!ipFile.exists()) {
@@ -414,9 +403,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             }
             // Herbert
             // For generating the network interfaces configuration file.
-            File inFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                    strWorkerIP + "_" + msg.getName(), "softwares", "params",
-                    "interfaces"));
+            File inFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                    "run", strWorkerIP + "_" + msg.getName(), "softwares",
+                    "params", "interfaces"));
 
             try {
                 if (!inFile.exists()) {
@@ -470,9 +459,9 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             }
             // prepare apps
             if (msg.getApps() != null) {
-                File folderApp = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
-                        "run", strWorkerIP + "_" + msg.getName(), "softwares",
-                        "appliances"));
+                File folderApp = new File(Utils.pathJoin(Utils.NOVA_HOME,
+                        "run", "run", strWorkerIP + "_" + msg.getName(),
+                        "softwares", "appliances"));
                 if (folderApp.exists() == false)
                     folderApp.mkdirs();
                 for (String appName : msg.getApps()) {
@@ -484,23 +473,17 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         File sourceFile = new File(Utils.pathJoin(
                                 Utils.NOVA_HOME, "run", "appliances", appName));
                         if (sourceFile.isDirectory())
-                            Utils.copy(
-                                    Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                            "appliances", appName),
-                                    Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                            "run",
-                                            strWorkerIP + "_" + msg.getName(),
-                                            "softwares", "appliances",
-                                            appName));
+                            Utils.copy(Utils.pathJoin(Utils.NOVA_HOME, "run",
+                                    "appliances", appName), Utils.pathJoin(
+                                    Utils.NOVA_HOME, "run", "run", strWorkerIP
+                                            + "_" + msg.getName(), "softwares",
+                                    "appliances", appName));
                         else
-                            Utils.copyOneFile(
-                                    Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                            "appliances", appName),
-                                    Utils.pathJoin(Utils.NOVA_HOME, "run",
-                                            "run",
+                            Utils.copyOneFile(Utils.pathJoin(Utils.NOVA_HOME,
+                                    "run", "appliances", appName), Utils
+                                    .pathJoin(Utils.NOVA_HOME, "run", "run",
                                             strWorkerIP + "_" + msg.getName(),
-                                            "softwares", "appliances",
-                                            appName));
+                                            "softwares", "appliances", appName));
                     }
                 }
             }
@@ -525,42 +508,35 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 // copy without ftp_home folder install vim
                 System.out.println("install vim");
                 String[] ingoreList = { "ftp_home", "hadoop-0.20.2", "WPS" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "run", "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "run", "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             } else if (msg.getIsvim() == 1) {
                 // install hadoop
                 System.out.println("install hadoop");
                 String[] ingoreList = { "ftp_home", "vim73", "WPS" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "run", "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "run", "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             } else if (msg.getIsvim() == 2) {
                 // install WPS
                 System.out.println("install WPS");
                 String[] ingoreList = { "ftp_home", "vim73", "hadoop-0.20.2" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "run", "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "run", "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             } else {
                 System.out.println("install nothing");
                 String[] ingoreList = { "ftp_home", "vim73", "hadoop-0.20.2",
                         "WPS" };
-                Utils.copyWithIgnoreFolder(
-                        Utils.pathJoin(Utils.NOVA_HOME, "run", "data"),
-                        Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                                "data"),
-                        ingoreList);
+                Utils.copyWithIgnoreFolder(Utils.pathJoin(Utils.NOVA_HOME,
+                        "run", "data"), Utils.pathJoin(
+                        agentProgramFile.getAbsolutePath(), "data"), ingoreList);
             }
-            Utils.copyOneFile(Utils.pathJoin(Utils.NOVA_HOME, "run", "VERSION"),
-                    Utils.pathJoin(agentProgramFile.getAbsolutePath(),
-                            "VERSION"));
+            Utils.copyOneFile(
+                    Utils.pathJoin(Utils.NOVA_HOME, "run", "VERSION"), Utils
+                            .pathJoin(agentProgramFile.getAbsolutePath(),
+                                    "VERSION"));
 
             // pack iso files
             File agentCdFile = new File(Utils.pathJoin(Utils.NOVA_HOME, "run",
@@ -571,19 +547,19 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
             System.out.println("packing iso");
             Process p;
             String cmd = "mkisofs -J -T -R -V cdrom -o "
-                    + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                            strWorkerIP + "_" + msg.getName(), "agentcd",
-                            "agent-cd.iso")
-                    + " " + Utils.pathJoin(Utils.NOVA_HOME, "run", "run",
-                            strWorkerIP + "_" + msg.getName(), "softwares");
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run", "run", strWorkerIP
+                            + "_" + msg.getName(), "agentcd", "agent-cd.iso")
+                    + " "
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run", "run", strWorkerIP
+                            + "_" + msg.getName(), "softwares");
 
             try {
                 p = Runtime.getRuntime().exec(cmd);
                 StreamGobbler errorGobbler = new StreamGobbler(
                         p.getErrorStream(), "ERROR");
                 errorGobbler.start();
-                StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
-                        "STDOUT");
+                StreamGobbler outGobbler = new StreamGobbler(
+                        p.getInputStream(), "STDOUT");
                 outGobbler.start();
                 try {
                     if (p.waitFor() != 0) {
@@ -609,8 +585,8 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 StreamGobbler errorGobbler = new StreamGobbler(
                         p.getErrorStream(), "ERROR");
                 errorGobbler.start();
-                StreamGobbler outGobbler = new StreamGobbler(p.getInputStream(),
-                        "STDOUT");
+                StreamGobbler outGobbler = new StreamGobbler(
+                        p.getInputStream(), "STDOUT");
                 outGobbler.start();
                 try {
                     if (p.waitFor() != 0) {
@@ -635,13 +611,13 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
     public void handleMessage(StartVnodeMessage msg, ChannelHandlerContext ctx,
             MessageEvent e, SimpleAddress xreply) throws FtpProtocolException {
         // debug; enter handle message
-        log.info("entering start vnode handler");
+        log.info("entering start vnode handler: " + xreply);
 
         long retVnodeID = 0;
         // register master
         NovaWorker.masteraddr = xreply;
-        if (NovaWorker.getInstance().getMaster() == null || NovaWorker
-                .getInstance().getMaster().isConnected() == false) {
+        if (NovaWorker.getInstance().getMaster() == null
+                || NovaWorker.getInstance().getMaster().isConnected() == false) {
             NovaWorker.getInstance().registerMaster(xreply);
         }
 
@@ -671,8 +647,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         testDomain = NovaWorker.getInstance()
                                 .getConn("qemu:///system", false)
                                 .domainLookupByUUIDString(msg.getUuid());
-                    } else if (msg.getHyperVisor()
-                            .equalsIgnoreCase("vstaros")) {
+                    } else if (msg.getHyperVisor().equalsIgnoreCase("vstaros")) {
                         testDomain = NovaWorker.getInstance()
                                 .getConn("vstaros:///system", false)
                                 .domainLookupByUUIDString(msg.getUuid());
@@ -699,8 +674,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 msg.setMemSize("512000");
             }
 
-            if ((msg.getCpuCount() != null)
-                    && (!msg.getCpuCount().equals(""))) {
+            if ((msg.getCpuCount() != null) && (!msg.getCpuCount().equals(""))) {
                 if ((Integer.parseInt(msg.getCpuCount()) <= 0)
                         || (Integer.parseInt(msg.getCpuCount()) >= 10))
                     msg.setCpuCount("1");
@@ -711,8 +685,7 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                 msg.setArch("x86_64");
             }
             String stdImgFile = "small.img";
-            if ((msg.getHdaImage() != null)
-                    && (!msg.getHdaImage().equals(""))) {
+            if ((msg.getHdaImage() != null) && (!msg.getHdaImage().equals(""))) {
                 stdImgFile = msg.getHdaImage();
             }
 
@@ -761,25 +734,31 @@ public class StartVnodeHandler implements SimpleHandler<StartVnodeMessage> {
                         VnodeStatusDaemon.putStatus(
                                 UUID.fromString(newDomain.getUUIDString()),
                                 Vnode.Status.PREPARING);
-                        NovaWorker.getInstance().getVnodeIP().put(
-                                UUID.fromString(newDomain.getUUIDString()),
-                                msg.getIpAddr());
+                        NovaWorker
+                                .getInstance()
+                                .getVnodeIP()
+                                .put(UUID.fromString(newDomain.getUUIDString()),
+                                        msg.getIpAddr());
                     }
                     // debug info
                     log.info("domain name: " + newDomain.getName() + "; id: "
                             + newDomain.getID());
-                    log.info("uuid: " + newDomain.getUUIDString()
-                            + "; vncport: " + Utils.WORKER_VNC_MAP
-                                    .get(newDomain.getUUIDString()));
+                    log.info("uuid: "
+                            + newDomain.getUUIDString()
+                            + "; vncport: "
+                            + Utils.WORKER_VNC_MAP.get(newDomain
+                                    .getUUIDString()));
                     // send message to master to finish domain creation
                     // update uuid string in master database
                     // TBD disable vnc for now (lxc)
-                    String port = Utils.WORKER_VNC_MAP
-                            .get(newDomain.getUUIDString());
+                    String port = Utils.WORKER_VNC_MAP.get(newDomain
+                            .getUUIDString());
                     if (port == null) {
                         port = "0";
                     }
-                    NovaWorker.getInstance().getMaster()
+                    NovaWorker
+                            .getInstance()
+                            .getMaster()
                             .sendPnodeCreateVnodeMessage(
                                     NovaWorker.getInstance().getAddr().getIp(),
                                     retVnodeID, Integer.parseInt(port),

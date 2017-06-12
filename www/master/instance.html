@@ -73,15 +73,15 @@
         for(var i=0;i<vcluster.vcluster_size.value;i++) {
           // ...what the hell is this?
           document.getElementById("add_instances").innerHTML+="<tr><td>" + (i+1) + ". Instance Name: " +
-            "<input class='span1' type='text' name='vinstance_name"+ i + "'>&nbsp;&nbsp;&nbsp;&nbsp;Memery Size(Kb): " +
-            "<input class='span1' type='text' name='vinstance_memsize"+ i + "'><br>&nbsp;&nbsp;&nbsp;&nbsp;CPU Num: " +
-            "<select class='span1' name='vinstance_cpucount"+ i + "'><option value='1'>1</option><option value='2'>2</option>" +
+            "<input class='span1' type='text' name='vnode_name"+ i + "'>&nbsp;&nbsp;&nbsp;&nbsp;Memery Size(Kb): " +
+            "<input class='span1' type='text' name='vnode_memsize"+ i + "'><br>&nbsp;&nbsp;&nbsp;&nbsp;CPU Num: " +
+            "<select class='span1' name='vnode_cpucount"+ i + "'><option value='1'>1</option><option value='2'>2</option>" +
             "<option value='3'>3</option><option value='4'>4</option></select> &nbsp;&nbsp;&nbsp;&nbsp;Hypervisor: " +
-            "<select class='span1' name='vinstance_hypervisor"+ i + "'><option value='kvm'>kvm</option>" +
+            "<select class='span1' name='vnode_hypervisor"+ i + "'><option value='kvm'>kvm</option>" +
             "<option value='vstaros'>vstaros</option></select><br>&nbsp;&nbsp;&nbsp;&nbsp;Os Image: " +
-            "<select class='span2' name='vinstance_disk"+ i + "'> ${vdisk_list} </select> &nbsp;&nbsp;&nbsp;&nbsp;Worker: " +
-            "<select class='span1' name='vinstance_pnodeId"+ i + "'> ${pnode_list} <option>auto</option> </select> &nbsp;&nbsp;&nbsp;&nbsp;Applications: " +
-            "<input class='span2' type='text' name='vinstance_Apps"+ i + "'></td></tr></br></br>";
+            "<select class='span2' name='vnode_disk"+ i + "'> ${vdisk_list} </select> &nbsp;&nbsp;&nbsp;&nbsp;Worker: " +
+            "<select class='span1' name='vnode_pnodeId"+ i + "'> ${pnode_list} <option>auto</option> </select> &nbsp;&nbsp;&nbsp;&nbsp;Applications: " +
+            "<input class='span2' type='text' name='vnode_soft_vim"+ i + "'></td></tr></br></br>";
         }
 
         document.getElementById("add_instances").innerHTML+="</table>" +

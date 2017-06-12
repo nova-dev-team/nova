@@ -37,7 +37,7 @@ public class TestStartVnode {
         // "false", "100288", "1", "small.img", "false");
         StartVnodeMessage msg = new StartVnodeMessage("kvm", "linux10", null,
                 false, "300000", "1", "linux.img", false, apps, "10.0.1.100",
-                "255.255.255.0", "10.0.1.254", "1111", 0);
+                "255.255.255.0", "10.0.1.254", "1111", 0, 1);
 
         // msg.setName("vm");
         // msg.setMemSize("1024000");

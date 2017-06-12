@@ -11,8 +11,6 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/netty-3.2.4.Final.jar" sourcepath="lib/netty-3.2.4.Final-sources.jar"/>
-	<classpathentry kind="lib" path="lib/gson-1.6.jar" sourcepath="lib/gson-1.6-sources.jar"/>
-	<classpathentry kind="lib" path="lib/json_simple-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="lib/jrobin-1.5.11.jar"/>
 	<classpathentry kind="lib" path="lib/pivot-charts-2.0.jar"/>
@@ -42,5 +40,9 @@
 	<classpathentry kind="lib" path="lib/libvirt-0.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/jna-4.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-validator-1.5.0.jar"/>
+	<classpathentry kind="lib" path="/Users/herb/newNova/nova/lib/gson-2.3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/herb/newNova/nova/lib/commons-io-2.5.jar"/>
+	<classpathentry kind="lib" path="/Users/herb/Documents/Google download/json-20170516.jar"/>
+	<classpathentry kind="lib" path="/Novat/lib/json_simple-1.1.jar"/>
 	<classpathentry kind="output" path="data/eclipse_build"/>
 </classpath>

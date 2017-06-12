@@ -99,9 +99,13 @@ public class Kvm {
         else {
             params.put("determinCdrom", "");
         }
-
-        String vmNetworkInterface = Conf.getString("vm_network_interface");
         String vmNetworkBridge = Conf.getString("vm_network_bridge");
+        String vmNetworkInterface = Conf.getString("vm_network_interface");
+        if (Integer.parseInt(params.get("network").toString()) == 2) {
+            vmNetworkBridge = Conf.getString("vm_network_bridge2");
+        } else {
+            vmNetworkBridge = Conf.getString("vm_network_bridge");
+        }
         String fixVncMousePointer = Conf.getString("fix_vnc_mouse_pointer");
         System.out.println("vmNetworkInterface is "
                 + vmNetworkInterface.equals(""));

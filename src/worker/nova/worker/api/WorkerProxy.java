@@ -60,24 +60,22 @@ public class WorkerProxy extends SimpleProxy {
     public void sendStartVnode(String hyperVisor, String name,
             SimpleAddress vAddr, String memSize, String cpuCount,
             String hdaImage, boolean runAgent, String apps[], String ipAddr,
-            String subnetMask, String gateWay, String vnodeID, int isvim) {
+            String subnetMask, String gateWay, String vnodeID, int isvim,
+            int network) {
         // 4th param false means wakeuponly = false
         super.sendRequest(new StartVnodeMessage(hyperVisor, name, vAddr, false,
-                memSize, cpuCount, hdaImage, runAgent, apps, ipAddr, subnetMask,
-                gateWay, vnodeID, isvim));
+                memSize, cpuCount, hdaImage, runAgent, apps, ipAddr,
+                subnetMask, gateWay, vnodeID, isvim, network));
     }
 
-    public void sendStartExistVnode(String hyperVisor, String uuid,
-            long vnodeid) {
-        super.sendRequest(
-                new StartExistVnodeMessage(hyperVisor, uuid, vnodeid));
+    public void sendStartExistVnode(String hyperVisor, String uuid, long vnodeid) {
+        super.sendRequest(new StartExistVnodeMessage(hyperVisor, uuid, vnodeid));
     }
 
-    public void sendWakeupVnode(String hyperVisor, boolean runAgent,
-            String uuid) {
+    public void sendWakeupVnode(String hyperVisor, boolean runAgent, String uuid) {
         // 4th param false means wakeuponly = true
-        super.sendRequest(
-                new StartVnodeMessage(hyperVisor, true, runAgent, uuid));
+        super.sendRequest(new StartVnodeMessage(hyperVisor, true, runAgent,
+                uuid));
     }
 
     /**

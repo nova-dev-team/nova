@@ -5,12 +5,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-
 import nova.common.db.HibernateUtil;
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleServer;
@@ -31,6 +25,7 @@ import nova.master.api.messages.PnodeCreateVnodeMessage;
 import nova.master.api.messages.PnodeStatusMessage;
 import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
+import nova.master.api.messages.VnodeIPMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.daemons.PnodeCheckerDaemon;
 import nova.master.daemons.RemoveEmptyVClusterDaemon;
@@ -49,6 +44,7 @@ import nova.master.handler.PnodeCreateVnodeHandler;
 import nova.master.handler.PnodeStatusHandler;
 import nova.master.handler.RegisterApplianceHandler;
 import nova.master.handler.RegisterVdiskHandler;
+import nova.master.handler.VnodeIPHandler;
 import nova.master.handler.VnodeStatusHandler;
 import nova.master.models.Pnode;
 import nova.storage.NovaStorage;
@@ -56,6 +52,12 @@ import nova.test.functional.agent.experiment.ExpTimeHandler;
 import nova.test.functional.agent.experiment.ExpTimeMessage;
 import nova.worker.api.WorkerProxy;
 import nova.worker.models.StreamGobbler;
+
+import org.apache.log4j.Logger;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 
 /**
  * Master node of Nova system.
@@ -98,8 +100,7 @@ public class NovaMaster extends SimpleServer {
 
         this.registerHandler(AddPnodeMessage.class, new AddPnodeHandler());
 
-        this.registerHandler(CreateVnodeMessage.class,
-                new CreateVnodeHandler());
+        this.registerHandler(CreateVnodeMessage.class, new CreateVnodeHandler());
 
         this.registerHandler(CreateVclusterMessage.class,
                 new CreateVclusterHandler());
@@ -110,11 +111,11 @@ public class NovaMaster extends SimpleServer {
         this.registerHandler(RegisterApplianceMessage.class,
                 new RegisterApplianceHandler());
 
-        this.registerHandler(PnodeStatusMessage.class,
-                new PnodeStatusHandler());
+        this.registerHandler(PnodeStatusMessage.class, new PnodeStatusHandler());
 
-        this.registerHandler(VnodeStatusMessage.class,
-                new VnodeStatusHandler());
+        this.registerHandler(VnodeStatusMessage.class, new VnodeStatusHandler());
+
+        this.registerHandler(VnodeIPMessage.class, new VnodeIPHandler());
 
         this.registerHandler(PnodePerfMessage.class,
                 new MasterPnodePerfHandler());
@@ -168,12 +169,12 @@ public class NovaMaster extends SimpleServer {
             if (!dirFile.exists())
                 Utils.mkdirs(Utils.pathJoin(Utils.NOVA_HOME, "run"));
             String[] strExecs = {
-                    // "modprobe nfs_layout_nfsv41_files",
-                    // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
-                    // + ":/Nova_home "
-                    // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
-                    "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
-                            + Utils.pathJoin(Utils.NOVA_HOME, "run") };
+            // "modprobe nfs_layout_nfsv41_files",
+            // "mount -t nfs4 -o minorversion=1 " + strPnfsHost
+            // + ":/Nova_home "
+            // + Utils.pathJoin(Utils.NOVA_HOME, "run"),
+            "mount -t nfs " + strPnfsHost + ":" + strpnfsRoot + " "
+                    + Utils.pathJoin(Utils.NOVA_HOME, "run") };
             System.out.println(strExecs[0]);
             try {
                 for (String cmd : strExecs) {
@@ -186,14 +187,12 @@ public class NovaMaster extends SimpleServer {
                     outGobbler.start();
                     try {
                         if (p.waitFor() != 0) {
-                            logger.error(
-                                    "mount pnfs folder returned abnormal value!");
+                            logger.error("mount pnfs folder returned abnormal value!");
                         }
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
-                        logger.error("mount pnfs folder process terminated!",
-                                e);
+                        logger.error("mount pnfs folder process terminated!", e);
                     }
                 }
 
@@ -256,8 +255,8 @@ public class NovaMaster extends SimpleServer {
                                 + pnode.getAddr() + " to " + pnode.getStatus());
                         pnode.save();
                     } else {
-                        logger.error(
-                                "Pnode with host " + pAddr.ip + " not found!");
+                        logger.error("Pnode with host " + pAddr.ip
+                                + " not found!");
                     }
                     super.exceptionCaught(ctx, e);
                 }

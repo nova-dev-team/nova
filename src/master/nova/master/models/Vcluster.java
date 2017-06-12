@@ -88,6 +88,9 @@ public class Vcluster extends DbObject {
     /** the owner's id */
     private long userId;
 
+    /** vnode first name */
+    private String firstname;
+
     /** default constructor */
     public Vcluster() {
     }
@@ -95,7 +98,7 @@ public class Vcluster extends DbObject {
     /** full constructor */
     public Vcluster(String clusterName, String fristIp, Integer clusterSize,
             long userId, String sshPublicKey, String sshPrivateKey,
-            String osUsername, String osPassword) {
+            String osUsername, String osPassword, String firstname) {
         this.clusterName = clusterName;
         this.fristIp = fristIp;
         this.clusterSize = clusterSize;
@@ -104,6 +107,7 @@ public class Vcluster extends DbObject {
         this.sshPrivateKey = sshPrivateKey;
         this.osUsername = osUsername;
         this.osPassword = osPassword;
+        this.firstname = firstname;
     }
 
     /**
@@ -130,6 +134,10 @@ public class Vcluster extends DbObject {
         return this.fristIp;
     }
 
+    public String getFristName() {
+        return this.firstname;
+    }
+
     /**
      * @hibernate.property column="os_password"
      * 
@@ -142,8 +150,9 @@ public class Vcluster extends DbObject {
      * @hibernate.property column="os_username"
      * 
      */
+    // modified by herb
     public String getOsUsername() {
-        return this.osUsername;
+        return this.firstname;
     }
 
     /**
@@ -186,12 +195,17 @@ public class Vcluster extends DbObject {
         this.fristIp = fristIp;
     }
 
+    public void setFristName(String fristname) {
+        this.firstname = fristname;
+    }
+
     public void setOsPassword(String osPassword) {
         this.osPassword = osPassword;
     }
 
-    public void setOsUsername(String osUsername) {
-        this.osUsername = osUsername;
+    // modified by herb
+    public void setOsUsername(String firstname) {
+        this.osUsername = firstname;
     }
 
     public void setSshPrivateKey(String sshPrivateKey) {

@@ -3,11 +3,14 @@ package nova.master.daemons;
 import java.util.List;
 
 import nova.common.util.SimpleDaemon;
-import nova.common.util.Utils;
 import nova.master.models.Vcluster;
 import nova.master.models.Vnode;
 
+import org.apache.log4j.Logger;
+
 public class RemoveEmptyVClusterDaemon extends SimpleDaemon {
+
+    Logger logger = Logger.getLogger(AutoManagerDaemon.class);
 
     public RemoveEmptyVClusterDaemon() {
         super(5000);
@@ -19,9 +22,24 @@ public class RemoveEmptyVClusterDaemon extends SimpleDaemon {
         List<Vcluster> allvcls = Vcluster.all();
         for (Vcluster vcl : allvcls) {
             int size = 0;
-            for (int i = 0; i < vcl.getClusterSize(); i++) {
-                Vnode vnode = Vnode.findByIp(Utils.integerToIpv4(Utils
-                        .ipv4ToInteger(vcl.getFristIp()) + i));
+
+            // modified by Herb i<vcl.getClusterSize();
+            for (int i = 0; i < 8; i++) {
+                String name = vcl.getOsUsername();
+                logger.info("name:  " + name);
+                if (i != 0) {
+                    String name2 = name.substring(0, name.length() - 1);
+                    StringBuffer buf = new StringBuffer();
+                    buf.append("" + name2 + i);
+                    name2 = buf.toString();
+                    if (name.equals(name2))
+                        continue;
+                    else
+                        name = name2;
+                    // logger.info("name:  " + name);
+
+                }
+                Vnode vnode = Vnode.findByName(name);
                 if (vnode != null) {
                     size++;
                 }

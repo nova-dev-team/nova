@@ -4,12 +4,11 @@
 <head>
   <meta charset="utf-8">
   <title>Nova Monitor</title>
-  <link href="css/bootstrap.css" rel="stylesheet">
-  <link href="css/bootstrap-responsive.css" rel="stylesheet">
-  <link href="css/docs.css" rel="stylesheet">
-  <script src="js/jquery-2.0.0.js"></script>
-  <script src="js/jquery.flot.js"></script>
-  <script type="text/javascript">
+ <link href="css/bootstrap-3.3.6.css" rel="stylesheet">
+  <script src="js/jquery-2.2.4.js"></script>
+  <script src="js/bootstrap-3.3.6.js"></script>
+  <script language="javascript">
+
   	
   	$(function() {
   		var pnode_list = "${pnode_id_list}";
@@ -130,80 +129,63 @@
   
 <body>
 <!---------------------- Page Header  ------------------------------->
-<div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-    </div>
-  </div>
-  
-
   <div class="container">
-
-    <div class="page-header">
-        <h1>
-            <em> Nova Master </em>
-            <small> - Java Version v0.3.1</small>
-        </h1>  
+     <div class="page-header">
+      <h1> Tsinghua NOVA <small>- for scalability, redundancy and fault tolerance</small></h1>
     </div>
     <!-- page-header -->
     
-    <div class="row ">
-      <div class="span4 offset8">
-        <div class="pull-right">
-    	<i class="icon-user"></i>&nbsp;<a>User: <strong>${username}</strong>&nbsp;&nbsp;</a>
-    	<i class="icon-flag"></i>&nbsp;<a>Privilege: <strong>${userprivilege}</strong>&nbsp;&nbsp;</a>
-    	</div>
-      </div>
-    </div>
-    <!-- row -->
-    
-    <div class="navbar">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="brand" href="#">Nova</a>
-          
-          <ul class="nav nav-pills">
-            <li class=""><a href="overview">Overview</a></li>
-            <li class=""><a href="instance">Instances</a></li>
-            <li class=""><a href="machine">Machines</a></li>
-            <li class=""><a href="image">Images</a></li>
-            <li class="active"><a href="monitor">Monitor</a></li>
-            <li class=""><a href="account">Account</a></li>
+   <!-- navbar -->
+    <div class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <ul class="nav navbar-nav pull-left">
+          <li class=""><a href="overview">Overview</a></li>
+          <li class=""><a href="instance">Instances</a></li>
+          <li class=""><a href="machine">Machines</a></li>
+          <li class=""><a href="image">Images</a></li>
+          <li class="active"><a href="monitor">Monitor</a></li>
+          <li class=""><a href="account">Account</a></li>
+        </ul>
+
+        <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">${username}<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">privilege: <em>${userprivilege}</em></a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="logout"><strong>Logout</strong></a></li>
           </ul>
-          
-          <form class="navbar-search pull-left" action="">
-            <input type="text" class="search-query span2" placeholder="Search">
-          </form>
-          
-          <ul class="nav pull-right">
-          	<li class=""><a href="logout"><i class="icon-home"></i>&nbsp;&nbsp;Logout</a></li>
-          </ul>
-          
-        </div>
+        </li>
+      </ul>
       </div>
     </div>
     <!-- navbar -->
     
     <!---------------------- Worker Monitor  ---------------------------->
     <br>
-	<legend>Worker Monitor <small>Show CPU, memery, disk and network infomation</small>
-	  <div class="pull-right">
-	     <a href="monitor" class="btn btn-primary"> Show All Workers</a>
-	  </div>
-	</legend>
+	<div>
+      <div class="pull-left">
+        <h3> Worker Monitor </h3>
+      </div>
+       	    <div class="pull-right">
+       	       <a href="monitor" class="btn btn-primary"> Show All Workers</a>
+       	    </div>
+    </div>  
+	
 	
 	${pnode_monitor_show}
    
-    <!---------------------- Page Footer  ------------------------------->
+     <!---------------------- Page Footer  ------------------------------->
 	<footer class="footer">
-  	  <hr>
-	  <p class="pull-right"><i class="icon-arrow-up"></i>&nbsp;<a href="#">Back To Top</a></p>
-      <p> This is the "master" module of Nova System. </p>
-      <p> Copyright @2013 by <a>hestream</a> in Nova development team.</p>
+      <hr>
+      <p><a href="https://github.com/nova-dev-team">Tsinghua NOVA dev team</a>, 2010 - 2016</p>
+      <p>This is a <em>free software</em> distributed under MIT license. </p>
     </footer>
     <!-- footer -->
 
   </div>
   <!-- container --> 
-
+ <script> ${launch_module_show} </script>
 </body>
 </html>
+

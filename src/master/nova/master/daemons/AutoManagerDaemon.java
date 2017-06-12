@@ -3,8 +3,6 @@ package nova.master.daemons;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
-
 import nova.common.util.RRDTools;
 import nova.common.util.SimpleDaemon;
 import nova.master.api.messages.CreateVnodeMessage;
@@ -14,6 +12,8 @@ import nova.master.handler.CreateVnodeHandler;
 import nova.master.handler.MasterMigrateVnodeHandler;
 import nova.master.models.Pnode;
 import nova.master.models.Vnode;
+
+import org.apache.log4j.Logger;
 
 /**
  * Deamon to deal with load balance.
@@ -69,14 +69,12 @@ public class AutoManagerDaemon extends SimpleDaemon {
                 if (handler.pnodeid != -1) {
                     String pnode_id = String.valueOf(handler.pnodeid);
                     String uuname = UUID.randomUUID().toString();
-                    new CreateVnodeHandler()
-                            .handleMessage(
-                                    new CreateVnodeMessage("ubuntu12.046.qcow2",
-                                            uuname, Integer.parseInt("2"),
-                                            Integer.parseInt("512000"), null,
-                                            Integer.parseInt(pnode_id), 0, null,
-                                            true, "kvm", 0, 0),
-                                    null, null, null);
+                    new CreateVnodeHandler().handleMessage(
+                            new CreateVnodeMessage("ubuntu12.046.qcow2",
+                                    uuname, Integer.parseInt("2"), Integer
+                                            .parseInt("512000"), null, Integer
+                                            .parseInt(pnode_id), 0, null, true,
+                                    "kvm", 0, 0, 1), null, null, null);
                     try {
                         sleep(120000);
                     } catch (InterruptedException e) {

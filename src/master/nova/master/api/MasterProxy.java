@@ -26,6 +26,7 @@ import nova.master.api.messages.RegisterApplianceMessage;
 import nova.master.api.messages.RegisterVdiskMessage;
 import nova.master.api.messages.UnregisterApplianceMessage;
 import nova.master.api.messages.UnregisterVdiskMessage;
+import nova.master.api.messages.VnodeIPMessage;
 import nova.master.api.messages.VnodeStatusMessage;
 import nova.master.models.Pnode;
 import nova.master.models.Vnode;
@@ -106,14 +107,18 @@ public class MasterProxy extends SimpleProxy {
         super.sendRequest(new PnodeStatusMessage(pAddr, status));
     }
 
-    public void sendVnodeStatus(String vnodeIp, String uuid,
-            Vnode.Status status) {
+    public void sendVnodeStatus(String vnodeIp, String uuid, Vnode.Status status) {
         super.sendRequest(new VnodeStatusMessage(vnodeIp, uuid, status));
     }
 
+    // add by Herb for Real IP setting
+    public void sendVnodeIP(String vnodeIp, String uuid) {
+        super.sendRequest(new VnodeIPMessage(vnodeIp, uuid));
+    }
+
     public void sendApplianceStatus(Collection<Appliance> appliances) {
-        super.sendRequest(
-                new ApplianceInfoMessage((Appliance[]) appliances.toArray()));
+        super.sendRequest(new ApplianceInfoMessage((Appliance[]) appliances
+                .toArray()));
     }
 
     public void sendDeletePnode(long id) {
@@ -140,10 +145,9 @@ public class MasterProxy extends SimpleProxy {
         super.sendRequest(new MasterInstallApplianceMessage(aid, appNames));
     }
 
-    public void sendMigrateVnode(long vnodeId, long migrateFrom,
-            long migrateTo) {
-        super.sendRequest(
-                new MasterMigrateVnodeMessage(vnodeId, migrateFrom, migrateTo));
+    public void sendMigrateVnode(long vnodeId, long migrateFrom, long migrateTo) {
+        super.sendRequest(new MasterMigrateVnodeMessage(vnodeId, migrateFrom,
+                migrateTo));
     }
 
     public void sendMigrateComplete(String migrateUuid, String strPnodeIP,
@@ -152,8 +156,7 @@ public class MasterProxy extends SimpleProxy {
                 strPnodeIP, strVNCPort, hypervisor));
     }
 
-    public void sendAppliancesFirstInstalledMessage(
-            SimpleAddress simpleAddress) {
+    public void sendAppliancesFirstInstalledMessage(SimpleAddress simpleAddress) {
         super.sendRequest(new AppliancesFirstInstalledMessage(simpleAddress));
     }
 

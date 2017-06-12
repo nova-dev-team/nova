@@ -3,28 +3,16 @@ package nova.master.handler;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.HeapChannelBufferFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jrobin.core.Util;
 
 import nova.common.service.SimpleAddress;
 import nova.common.service.SimpleHttpHandler;
@@ -55,6 +43,21 @@ import nova.master.models.Vcluster;
 import nova.master.models.Vdisk;
 import nova.master.models.Vnode;
 
+import org.apache.log4j.Logger;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.HeapChannelBufferFactory;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
+import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jrobin.core.Util;
+
 /**
  * Master's handler for http requests.
  * 
@@ -78,12 +81,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
      * Handle a request message, render result pages.
      */
     @Override
-    public void handleMessage(DefaultHttpRequest req, ChannelHandlerContext ctx,
-            MessageEvent e, SimpleAddress xreply) {
+    public void handleMessage(DefaultHttpRequest req,
+            ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         log.info("New HTTP request from " + e.getChannel().getRemoteAddress());
 
-        remote_ipaddr = e.getChannel().getRemoteAddress().toString()
-                .split(":")[0];
+        remote_ipaddr = e.getChannel().getRemoteAddress().toString().split(":")[0];
         if (session_ip_islogin == null
                 || !session_ip_islogin.containsKey(remote_ipaddr)) {
             session_ip_islogin.put(remote_ipaddr, false);
@@ -91,7 +93,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
         }
 
         String reqUri = req.getUri();
-        System.out.println("Request uri is: " + reqUri);
+        log.info("Request uri is: " + reqUri);
 
         // String CookieMeg = req.getHeader("Cookie");
         // Set<Cookie> cookies = new CookieDecoder().decode(CookieMeg);
@@ -167,6 +169,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
         }
 
         String act = getAction(url.getFile());
+
+        log.info("Fuck: " + url.getFile());
+
         values.put("act", "act:" + act);
 
         // get query info
@@ -214,8 +219,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
             // questions end
             for (int i = 0; i < count; i++) {
-                faq = faq + "<h4>" + questions[i] + "</h4>" + "<p>" + answers[i]
-                        + "</p>";
+                faq = faq + "<h4>" + questions[i] + "</h4>" + "<p>"
+                        + answers[i] + "</p>";
             }
             values.put("faq_content", faq);
             act = "login";
@@ -227,8 +232,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     Users ur = Users.findByName(user_name);
                     if (ur != null && user_passwd.equals(ur.getPassword())
                             && ur.getActivated().equals("true")) {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "overview.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "overview.html");
                         if (ur.getPrivilege().equals("Normal")) {
                             fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
                                     "master", "overview_normal.html");
@@ -238,10 +243,12 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         }
                         session_ip_islogin.put(remote_ipaddr, true);
                         session_ip_loginuser.put(remote_ipaddr, ur);
-                        values.put("username", session_ip_loginuser
-                                .get(remote_ipaddr).getName());
-                        values.put("userprivilege", session_ip_loginuser
-                                .get(remote_ipaddr).getPrivilege());
+                        values.put("username",
+                                session_ip_loginuser.get(remote_ipaddr)
+                                        .getName());
+                        values.put("userprivilege",
+                                session_ip_loginuser.get(remote_ipaddr)
+                                        .getPrivilege());
                     } else {
                         String ret = "<p>The username or the password is error</p>"
                                 + "<p>please return to input again!</p>";
@@ -260,8 +267,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     if (Users.findByName(queryMap.get("username")) != null) {
                         String adduser_error = "The User Name has exist! Please change another username.";
                         return adduser_error;
-                    } else if (Users
-                            .findByEmail(queryMap.get("email")) != null) {
+                    } else if (Users.findByEmail(queryMap.get("email")) != null) {
                         String adduser_error = "The Email Address has exist! please change another email address";
                         return adduser_error;
                     } else {
@@ -273,20 +279,18 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 || register_privilege.equals("Enterprise")) {
                             if (register_privilege.equals("Root")) {
                                 usertype = Users.user_type.Root;
-                            } else if (register_privilege
-                                    .equals("Enterprise")) {
+                            } else if (register_privilege.equals("Enterprise")) {
                                 usertype = Users.user_type.Enterprise;
-                            } else if (register_privilege
-                                    .equals("Individual")) {
+                            } else if (register_privilege.equals("Individual")) {
                                 usertype = Users.user_type.Individual;
                             }
 
                             new AddUserHandler().handleMessage(
-                                    new AddUserMessage(queryMap.get("username"),
-                                            queryMap.get("email"),
-                                            queryMap.get("password"), usertype,
-                                            "true", 0),
-                                    null, null, null);
+                                    new AddUserMessage(
+                                            queryMap.get("username"), queryMap
+                                                    .get("email"), queryMap
+                                                    .get("password"), usertype,
+                                            "true", 0), null, null, null);
 
                             String ret = "<html><head><meta http-equiv='refresh' content='3;url=login'></head>"
                                     + "<body><p>Register success! Waiting to jump to main login page ...</p></body></html>";
@@ -308,8 +312,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
             String userprivilege = session_ip_loginuser.get(remote_ipaddr)
                     .getPrivilege();
-            values.put("username",
-                    session_ip_loginuser.get(remote_ipaddr).getName());
+            values.put("username", session_ip_loginuser.get(remote_ipaddr)
+                    .getName());
             values.put("userprivilege", userprivilege);
 
             if (userprivilege.equals("Normal")) {
@@ -319,7 +323,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
                         "overview_unroot.html");
             }
-
+            log.info("Ma Hua Teng:  " + act);
             // ------------------------------------------------------------
             // ------------------------ act begin -------------------------
             // ------------------------------------------------------------
@@ -365,25 +369,29 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             handler.handleMessage(null, null, null, null);
                             if (handler.pnodeid != -1) {
                                 pnode_id = String.valueOf(handler.pnodeid);
-                                new CreateVnodeHandler().handleMessage(
-                                        new CreateVnodeMessage(
-                                                queryMap.get("vnode_disk"),
-                                                queryMap.get("vnode_name"),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_cpucount")),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_memsize")),
-                                                null,
-                                                Integer.parseInt(pnode_id), 0,
-                                                null, true,
-                                                queryMap.get(
-                                                        "vnode_hypervisor"),
-                                                session_ip_loginuser
-                                                        .get(remote_ipaddr)
-                                                        .getId(),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_soft_vim"))),
-                                        null, null, null);
+                                new CreateVnodeHandler()
+                                        .handleMessage(
+                                                new CreateVnodeMessage(
+                                                        queryMap.get("vnode_disk"),
+                                                        queryMap.get("vnode_name"),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_cpucount")),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_memsize")),
+                                                        null,
+                                                        Integer.parseInt(pnode_id),
+                                                        0,
+                                                        null,
+                                                        true,
+                                                        queryMap.get("vnode_hypervisor"),
+                                                        session_ip_loginuser
+                                                                .get(remote_ipaddr)
+                                                                .getId(),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_soft_vim")),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_network"))),
+                                                null, null, null);
                             }
 
                             else {
@@ -392,10 +400,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                         create_instance_error);
                             }
                         } else {
-                            pnode_id = queryMap.get("vnode_pnodeId")
-                                    .split("-")[0];
-                            Pnode pnode = Pnode
-                                    .findById(Integer.parseInt(pnode_id));
+                            pnode_id = queryMap.get("vnode_pnodeId").split("-")[0];
+                            Pnode pnode = Pnode.findById(Integer
+                                    .parseInt(pnode_id));
                             if (pnode.getStatus() != Pnode.Status.RUNNING) {
                                 String create_instance_error = "alert('Cannot connect to the selected Physical Machine!')";
                                 values.put("create_instance_error",
@@ -407,25 +414,29 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                         create_instance_error);
                             } else {
 
-                                new CreateVnodeHandler().handleMessage(
-                                        new CreateVnodeMessage(
-                                                queryMap.get("vnode_disk"),
-                                                queryMap.get("vnode_name"),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_cpucount")),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_memsize")),
-                                                null,
-                                                Integer.parseInt(pnode_id), 0,
-                                                null, true,
-                                                queryMap.get(
-                                                        "vnode_hypervisor"),
-                                                session_ip_loginuser
-                                                        .get(remote_ipaddr)
-                                                        .getId(),
-                                                Integer.parseInt(queryMap
-                                                        .get("vnode_soft_vim"))),
-                                        null, null, null);
+                                new CreateVnodeHandler()
+                                        .handleMessage(
+                                                new CreateVnodeMessage(
+                                                        queryMap.get("vnode_disk"),
+                                                        queryMap.get("vnode_name"),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_cpucount")),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_memsize")),
+                                                        null,
+                                                        Integer.parseInt(pnode_id),
+                                                        0,
+                                                        null,
+                                                        true,
+                                                        queryMap.get("vnode_hypervisor"),
+                                                        session_ip_loginuser
+                                                                .get(remote_ipaddr)
+                                                                .getId(),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_soft_vim")),
+                                                        Integer.parseInt(queryMap
+                                                                .get("vnode_network"))),
+                                                null, null, null);
                             }
                         }
 
@@ -433,8 +444,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     else if (act.equals("start_vnode")) {
 
-                        Vnode start_vnode = Vnode.findById(
-                                Long.parseLong(queryMap.get("vnode_id")));
+                        Vnode start_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
 
                         new StartVnodeHandler().handleMessage(
                                 new StartVnodeMessage(start_vnode.getUuid()),
@@ -444,44 +455,39 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     else if (act.equals("wakeup_vnode")) {
 
-                        Vnode wakeup_vnode = Vnode.findById(
-                                Long.parseLong(queryMap.get("vnode_id")));
+                        Vnode wakeup_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
 
                         new ResumeVnodeHandler().handleMessage(
-                                new ResumeVnodeMessage(
-                                        wakeup_vnode.getPmachineId(),
-                                        wakeup_vnode.getId(),
-                                        wakeup_vnode.getHypervisor()),
-                                null, null, null);
+                                new ResumeVnodeMessage(wakeup_vnode
+                                        .getPmachineId(), wakeup_vnode.getId(),
+                                        wakeup_vnode.getHypervisor()), null,
+                                null, null);
 
                     }
 
                     else if (act.equals("pause_vnode")) {
-                        Vnode shutdown_vnode = Vnode.findById(
-                                Long.parseLong(queryMap.get("vnode_id")));
+                        Vnode shutdown_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
 
-                        new StopVnodeHandler()
-                                .handleMessage(
-                                        new StopVnodeMessage(
-                                                shutdown_vnode.getHypervisor(),
-                                                shutdown_vnode.getId(), true,
-                                                shutdown_vnode.getPmachineId()
-                                                        .toString()),
-                                        null, null, null);
+                        new StopVnodeHandler().handleMessage(
+                                new StopVnodeMessage(shutdown_vnode
+                                        .getHypervisor(), shutdown_vnode
+                                        .getId(), true, shutdown_vnode
+                                        .getPmachineId().toString()), null,
+                                null, null);
                     }
 
                     else if (act.equals("shutdown_vnode")) {
-                        Vnode shutdown_vnode = Vnode.findById(
-                                Long.parseLong(queryMap.get("vnode_id")));
+                        Vnode shutdown_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("vnode_id")));
 
-                        new StopVnodeHandler()
-                                .handleMessage(
-                                        new StopVnodeMessage(
-                                                shutdown_vnode.getHypervisor(),
-                                                shutdown_vnode.getId(), false,
-                                                shutdown_vnode.getPmachineId()
-                                                        .toString()),
-                                        null, null, null);
+                        new StopVnodeHandler().handleMessage(
+                                new StopVnodeMessage(shutdown_vnode
+                                        .getHypervisor(), shutdown_vnode
+                                        .getId(), false, shutdown_vnode
+                                        .getPmachineId().toString()), null,
+                                null, null);
                     }
 
                     else if (act.equals("delete_vnode")
@@ -494,10 +500,10 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     else if (act.equals("migration")
                             && userprivilege.equals("Root")) {
-                        Vnode migrate_vnode = Vnode.findById(
-                                Long.parseLong(queryMap.get("mig_vnid")));
-                        long migration_to = Long.parseLong(
-                                queryMap.get("vnode_migrateto").split("-")[0]);
+                        Vnode migrate_vnode = Vnode.findById(Long
+                                .parseLong(queryMap.get("mig_vnid")));
+                        long migration_to = Long.parseLong(queryMap.get(
+                                "vnode_migrateto").split("-")[0]);
                         if (migration_to == migrate_vnode.getPmachineId()) {
                             String migration_error = "alert('The Destination and Source Physical Machines are the same!')";
                             values.put("migration_error", migration_error);
@@ -506,8 +512,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             if (to_pnode == null) {
                                 String migration_error = "alert('Cannot find the Destination Physical Machine!')";
                                 values.put("migration_error", migration_error);
-                            } else if (to_pnode
-                                    .getStatus() != Pnode.Status.RUNNING) {
+                            } else if (to_pnode.getStatus() != Pnode.Status.RUNNING) {
                                 String migration_error = "alert('Cannot connect to the Destination Physical Machine!')";
                                 values.put("migration_error", migration_error);
                             } else if (to_pnode.getCurrentVMNum() >= to_pnode
@@ -521,41 +526,100 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                                         migrate_vnode.getId(),
                                                         migrate_vnode
                                                                 .getPmachineId(),
-                                                        migration_to),
-                                                null, null, null);
+                                                        migration_to), null,
+                                                null, null);
                             }
                         }
                     }
+                    // && !userprivilege.equals("Normal")
+                    else if (act.equals("add_cluster")) {
 
-                    else if (act.equals("add_cluster")
-                            && !userprivilege.equals("Normal")) {
-
-                        int v_size = Integer
-                                .parseInt(queryMap.get("vcluster_size"));
-
+                        int v_size = Integer.parseInt(queryMap
+                                .get("vcluster_size"));
+                        log.info("Obtain v_size " + v_size);
                         HashMap<Long, Integer> hm = new HashMap<Long, Integer>();
                         for (Pnode pn : Pnode.all()) {
                             hm.put(pn.getId(), 0);
                         }
+                        String vcluster_name = queryMap.get("vcluster_name");
+
+                        File file2 = new File("/home/export/Nova_home/data",
+                                "Nova_Cluster.txt");
+                        try {
+                            if (!file2.exists()) {
+                                file2.createNewFile();
+                            }
+                        } catch (IOException e) {
+
+                            e.printStackTrace();
+                        }
+                        PrintStream ps2 = null;
+                        FileOutputStream wc2 = null;
+                        try {
+                            wc2 = new FileOutputStream(file2);
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                        ps2 = new PrintStream(wc2);
+
+                        try {
+                            ps2.println(vcluster_name);
+
+                            ps2.close();
+                            wc2.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        File file = new File("/home/export/Nova_home/data",
+                                vcluster_name);
+                        try {
+                            file.createNewFile();
+                        } catch (IOException e) {
+
+                            e.printStackTrace();
+                        }
+                        PrintStream ps = null;
+                        FileOutputStream wc = null;
+                        try {
+                            wc = new FileOutputStream(file);
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                        ps = new PrintStream(wc);
+
+                        try {
+                            ps.println(v_size);
+                            for (int i = 0; i < v_size; i++) {
+                                ps.println(queryMap.get("vinstance_name" + 0)
+                                        + i);
+
+                            }
+                            ps.close();
+                            wc.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        log.info("WWC Come here Obtain v_size" + v_size);
                         for (int i = 0; i < v_size; i++) {
-                            if (queryMap.get("vinstance_pnodeId" + i)
+                            if (queryMap.get("vinstance_pnodeId" + 0)
                                     .equalsIgnoreCase("auto") == false) {
-                                long pid = Integer.parseInt(
-                                        queryMap.get("vinstance_pnodeId" + i)
-                                                .split("-")[0]);
+                                long pid = Integer.parseInt(queryMap.get(
+                                        "vinstance_pnodeId" + 0).split("-")[0]);
                                 hm.put(pid, hm.get(pid) + 1);
                             }
                         }
+                        log.info("It is hard to say");
                         boolean enoughcapacity = true;
                         for (int i = 0; i < v_size; i++) {
-                            if (queryMap.get("vinstance_pnodeId" + i)
+                            if (queryMap.get("vinstance_pnodeId" + 0)
                                     .equalsIgnoreCase("auto") == false) {
-                                long pid = Integer.parseInt(
-                                        queryMap.get("vinstance_pnodeId" + i)
-                                                .split("-")[0]);
+                                long pid = Integer.parseInt(queryMap.get(
+                                        "vinstance_pnodeId" + 0).split("-")[0]);
                                 Pnode pnode = Pnode.findById(pid);
-                                if (pnode.getCurrentVMNum()
-                                        + hm.get(pid) > pnode.getVmCapacity()) {
+                                if (pnode.getCurrentVMNum() + hm.get(pid) > pnode
+                                        .getVmCapacity()) {
                                     String createvcluster_error = "alert('The Destination Physical Machine cannot hosted any more VM!')";
                                     values.put("createvcluster_error",
                                             createvcluster_error);
@@ -565,19 +629,18 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             }
                         }
                         if (enoughcapacity) {
-                            new CreateVclusterHandler()
-                                    .handleMessage(
-                                            new CreateVclusterMessage(
-                                                    queryMap.get(
-                                                            "vcluster_name"),
-                                                    v_size,
-                                                    session_ip_loginuser
-                                                            .get(remote_ipaddr)
-                                                            .getId()),
-                                            null, null, null);
+                            new CreateVclusterHandler().handleMessage(
+                                    new CreateVclusterMessage(queryMap
+                                            .get("vcluster_name"), v_size,
+                                            session_ip_loginuser.get(
+                                                    remote_ipaddr).getId(),
+                                            queryMap.get("vinstance_name" + 0)
+                                                    + "0"), null, null, null);
+
+                            log.info("Do you ever shine");
                             for (int i = 0; i != v_size; i++) {
                                 String pnodeid_str = queryMap
-                                        .get("vinstance_pnodeId" + i);
+                                        .get("vinstance_pnodeId" + 0);
                                 if (pnodeid_str.equalsIgnoreCase("auto")) {
                                     ChooseBestPnodeHandler handler = new ChooseBestPnodeHandler();
                                     handler.handleMessage(null, null, null,
@@ -585,80 +648,67 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     if (handler.pnodeid != -1) {
                                         pnodeid_str = String
                                                 .valueOf(handler.pnodeid);
-                                        new CreateVnodeHandler().handleMessage(
-                                                new CreateVnodeMessage(
-                                                        queryMap.get(
-                                                                "vinstance_disk"
-                                                                        + i),
-                                                        queryMap.get(
-                                                                "vinstance_name"
-                                                                        + i),
-                                                        Integer.parseInt(
-                                                                queryMap.get(
-                                                                        "vinstance_cpucount"
-                                                                                + i)),
-                                                        Integer.parseInt(
-                                                                queryMap.get(
-                                                                        "vinstance_memsize"
-                                                                                + i)),
-                                                        null,
-                                                        Integer.parseInt(
-                                                                pnodeid_str),
-                                                        i,
-                                                        queryMap.get(
-                                                                "vcluster_name"
-                                                                        + i),
-                                                        false,
-                                                        queryMap.get(
-                                                                "vinstance_hypervisor"
-                                                                        + i),
-                                                        session_ip_loginuser
-                                                                .get(remote_ipaddr)
-                                                                .getId(),
-                                                        Integer.parseInt(
-                                                                queryMap.get(
-                                                                        "vnode_soft_vim"))),
-                                                null, null, null);
+                                        new CreateVnodeHandler()
+                                                .handleMessage(
+                                                        new CreateVnodeMessage(
+                                                                queryMap.get("vinstance_disk" + 0),
+                                                                queryMap.get("vinstance_name" + 0)
+                                                                        + i,
+                                                                Integer.parseInt(queryMap
+                                                                        .get("vinstance_cpucount" + 0)),
+                                                                Integer.parseInt(queryMap
+                                                                        .get("vinstance_memsize" + 0)),
+                                                                null,
+                                                                Integer.parseInt(pnodeid_str),
+                                                                i,
+                                                                queryMap.get("vcluster_name" + 0),
+                                                                false,
+                                                                queryMap.get("vinstance_hypervisor" + 0),
+                                                                session_ip_loginuser
+                                                                        .get(remote_ipaddr)
+                                                                        .getId(),
+                                                                Integer.parseInt(queryMap
+                                                                        .get("vnode_soft_vim")),
+                                                                Integer.parseInt(queryMap
+                                                                        .get("vnode_network"))),
+                                                        null, null, null);
 
                                     } else {
                                         String create_instance_error = "alert('No available Physical Machine Found For "
-                                                + queryMap.get(
-                                                        "vinstance_name" + i)
-                                                + "!')";
+                                                + queryMap.get("vinstance_name"
+                                                        + i) + "!')";
                                         values.put("create_instance_error",
                                                 create_instance_error);
                                         v_size = i;
                                         break;
                                     }
                                 } else {
-                                    new CreateVnodeHandler().handleMessage(
-                                            new CreateVnodeMessage(queryMap
-                                                    .get("vinstance_disk" + i),
-                                                    queryMap.get(
-                                                            "vinstance_name"
-                                                                    + i),
-                                                    Integer.parseInt(queryMap
-                                                            .get("vinstance_cpucount"
-                                                                    + i)),
-                                                    Integer.parseInt(queryMap
-                                                            .get("vinstance_memsize"
-                                                                    + i)),
-                                                    null,
-                                                    Integer.parseInt(pnodeid_str
-                                                            .split("-")[0]),
-                                                    i,
-                                                    queryMap.get("vcluster_name"
-                                                            + i),
-                                                    false,
-                                                    queryMap.get(
-                                                            "vinstance_hypervisor"
-                                                                    + i),
-                                                    session_ip_loginuser
-                                                            .get(remote_ipaddr)
-                                                            .getId(),
-                                                    Integer.parseInt(queryMap
-                                                            .get("vnode_soft_vim"))),
-                                            null, null, null);
+                                    // modified by herb for all the same setting
+                                    new CreateVnodeHandler()
+                                            .handleMessage(
+                                                    new CreateVnodeMessage(
+                                                            queryMap.get("vinstance_disk" + 0),
+                                                            queryMap.get("vinstance_name" + 0)
+                                                                    + i,
+                                                            Integer.parseInt(queryMap
+                                                                    .get("vinstance_cpucount" + 0)),
+                                                            Integer.parseInt(queryMap
+                                                                    .get("vinstance_memsize" + 0)),
+                                                            null,
+                                                            Integer.parseInt(pnodeid_str
+                                                                    .split("-")[0]),
+                                                            i,
+                                                            queryMap.get("vcluster_name" + 0),
+                                                            false,
+                                                            queryMap.get("vinstance_hypervisor" + 0),
+                                                            session_ip_loginuser
+                                                                    .get(remote_ipaddr)
+                                                                    .getId(),
+                                                            Integer.parseInt(queryMap
+                                                                    .get("vnode_soft_vim")),
+                                                            Integer.parseInt(queryMap
+                                                                    .get("vnode_network"))),
+                                                    null, null, null);
                                 }
                             }
 
@@ -667,10 +717,12 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     else if (act.equals("delete_cluster")
                             && !userprivilege.equals("Normal")) {
-                        new DeleteVclusterHandler().handleMessage(
-                                new DeleteVclusterMessage(Integer
-                                        .parseInt(queryMap.get("vcluster_id"))),
-                                null, null, null);
+                        new DeleteVclusterHandler()
+                                .handleMessage(
+                                        new DeleteVclusterMessage(Integer
+                                                .parseInt(queryMap
+                                                        .get("vcluster_id"))),
+                                        null, null, null);
                     }
 
                     // Tianyu: add new operation callback here
@@ -688,8 +740,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     // ------------- root and admin user's vnode
                     // show-------------
                     if (!userprivilege.equals("Normal")) {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "instance.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "instance.html");
 
                         if (!userprivilege.equals("Root")) {
                             fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
@@ -702,26 +754,37 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                             searchvnode = Vnode.all();
                         } else {
                             searchvnode = Vnode
-                                    .getVnodeByUserId(session_ip_loginuser
-                                            .get(remote_ipaddr).getId());
+                                    .getVnodeByUserId(session_ip_loginuser.get(
+                                            remote_ipaddr).getId());
                         }
                         // Tianyu: add new operation in drop-down menu here
                         for (Vnode vnode : searchvnode) {
-                            vnode_show = vnode_show + "<tr><td>" + vnode.getId()
-                                    + "</td><td>" + vnode.getName()
-                                    + "</td><td>" + vnode.getIp() + "</td><td>"
-                                    + vnode.getMemorySize() + "</td><td>"
-                                    + vnode.getHypervisor() + "</td><td>"
-                                    + vnode.getVclusterId() + "</td><td>"
-                                    + vnode.getPmachineId() + "</td><td>"
+                            vnode_show = vnode_show
+                                    + "<tr><td>"
+                                    + vnode.getId()
+                                    + "</td><td>"
+                                    + vnode.getName()
+                                    + "</td><td>"
+                                    + vnode.getIp()
+                                    + "</td><td>"
+                                    + vnode.getMemorySize()
+                                    + "</td><td>"
+                                    + vnode.getHypervisor()
+                                    + "</td><td>"
+                                    + vnode.getVclusterId()
+                                    + "</td><td>"
+                                    + vnode.getPmachineId()
+                                    + "</td><td>"
                                     + vnode.getStatus()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                     + "<ul class='dropdown-menu'> "
                                     + "<li><a href='vncview?vnode_id="
-                                    + vnode.getId() + "'>View</a></li>"
+                                    + vnode.getId()
+                                    + "'>View</a></li>"
                                     + "<li><a href='#Migration_Modal' onclick='migration_process("
-                                    + vnode.getId() + ")" + "'>Migrate</a></li>"
+                                    + vnode.getId() + ")"
+                                    + "'>Migrate</a></li>"
                                     + "<li><a href='start_vnode?vnode_id="
                                     + vnode.getId() + "'>Start</a></li>"
                                     + "<li><a href='wakeup_vnode?vnode_id="
@@ -746,13 +809,20 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                             .get(remote_ipaddr).getId());
                         }
                         for (Vcluster vcluster : searchvcluster) {
-                            vcluster_show = vcluster_show + "<tr><td>"
-                                    + vcluster.getId() + "</td><td>"
-                                    + vcluster.getClusterName() + "</td><td>"
-                                    + vcluster.getFristIp() + "</td><td>"
-                                    + vcluster.getClusterSize() + "</td><td>"
-                                    + vcluster.getSshPublicKey() + "</td><td>"
-                                    + vcluster.getSshPrivateKey() + "</td><td>"
+                            vcluster_show = vcluster_show
+                                    + "<tr><td>"
+                                    + vcluster.getId()
+                                    + "</td><td>"
+                                    + vcluster.getClusterName()
+                                    + "</td><td>"
+                                    + vcluster.getFristIp()
+                                    + "</td><td>"
+                                    + vcluster.getClusterSize()
+                                    + "</td><td>"
+                                    + vcluster.getSshPublicKey()
+                                    + "</td><td>"
+                                    + vcluster.getSshPrivateKey()
+                                    + "</td><td>"
                                     + vcluster.getOsUsername()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -805,11 +875,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + vcluster.getClusterName()
                                     + "').style.display='block';}\n";
 
-                            vcluster_indiv = vcluster_indiv + "<div id='col_"
+                            vcluster_indiv = vcluster_indiv
+                                    + "<div id='col_"
                                     + vcluster.getClusterName()
                                     + "' class='tab-content' style='display:none'>"
-                                    + "<legend>" + vcluster.getClusterName()
-                                    + "\'s Instances" + "</legend>"
+                                    + "<legend>"
+                                    + vcluster.getClusterName()
+                                    + "\'s Instances"
+                                    + "</legend>"
                                     + "<table class='table table-striped table-hover'><thead><tr><th>Id</th><th>Instance Name</th>"
                                     + "<th>Ip Address</th><th>Memery Size</th>"
                                     + "<th>Hypervisor</th><th>Virtual Cluster Id</th>"
@@ -817,10 +890,14 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "<th>Action</th></tr></thead><tbody>";
                             for (Vnode vnode : searchvnode) {
                                 if (vnode.getVclusterId() == vcluster.getId()) {
-                                    vcluster_indiv = vcluster_indiv + "<tr><td>"
-                                            + vnode.getId() + "</td><td>"
-                                            + vnode.getName() + "</td><td>"
-                                            + vnode.getIp() + "</td><td>"
+                                    vcluster_indiv = vcluster_indiv
+                                            + "<tr><td>"
+                                            + vnode.getId()
+                                            + "</td><td>"
+                                            + vnode.getName()
+                                            + "</td><td>"
+                                            + vnode.getIp()
+                                            + "</td><td>"
                                             + vnode.getMemorySize()
                                             + "</td><td>"
                                             + vnode.getHypervisor()
@@ -828,22 +905,27 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                             + vnode.getVclusterId()
                                             + "</td><td>"
                                             + vnode.getPmachineId()
-                                            + "</td><td>" + vnode.getStatus()
+                                            + "</td><td>"
+                                            + vnode.getStatus()
                                             + "</td><td>\n<div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                             + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
                                             + "<ul class='dropdown-menu'> "
                                             + "<li><a href='vncview?vnode_id="
-                                            + vnode.getId() + "'>View</a></li>"
+                                            + vnode.getId()
+                                            + "'>View</a></li>"
                                             + "<li><a href='#Migration_Modal' onclick='migration_process("
-                                            + vnode.getId() + ")"
+                                            + vnode.getId()
+                                            + ")"
                                             + "'>Migrate</a></li>"
                                             + "<li><a href='start_vnode?vnode_id="
-                                            + vnode.getId() + "'>Start</a></li>"
+                                            + vnode.getId()
+                                            + "'>Start</a></li>"
                                             + "<li><a href='wakeup_vnode?vnode_id="
                                             + vnode.getId()
                                             + "'>Wakeup</a></li>"
                                             + "<li><a href='pause_vnode?vnode_id="
-                                            + vnode.getId() + "'>Pause</a></li>"
+                                            + vnode.getId()
+                                            + "'>Pause</a></li>"
                                             + "<li><a href='shutdown_vnode?vnode_id="
                                             + vnode.getId()
                                             + "'> Shutdown </a></li>"
@@ -871,8 +953,9 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         // list all pnode
                         String pnode_list = "";
                         for (Pnode pnode : Pnode.all()) {
-                            pnode_list = pnode_list + "<option>" + pnode.getId()
-                                    + "-" + pnode.getIp() + "</option>";
+                            pnode_list = pnode_list + "<option>"
+                                    + pnode.getId() + "-" + pnode.getIp()
+                                    + "</option>";
                         }
                         values.put("pnode_list", pnode_list);
 
@@ -887,22 +970,31 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     else { // ------------ Normal user's vnode show -----------
 
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "instance_normal.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "instance_normal.html");
 
                         UserRelations ur = UserRelations
-                                .findByNormalId(session_ip_loginuser
-                                        .get(remote_ipaddr).getId());
+                                .findByNormalId(session_ip_loginuser.get(
+                                        remote_ipaddr).getId());
 
-                        for (Vnode vnode : Vnode
-                                .getVnodeByUserId(ur.getAdminUserId())) {
-                            vnode_show = vnode_show + "<tr><td>" + vnode.getId()
-                                    + "</td><td>" + vnode.getName()
-                                    + "</td><td>" + vnode.getIp() + "</td><td>"
-                                    + vnode.getMemorySize() + "</td><td>"
-                                    + vnode.getHypervisor() + "</td><td>"
-                                    + vnode.getVclusterId() + "</td><td>"
-                                    + vnode.getPmachineId() + "</td><td>"
+                        for (Vnode vnode : Vnode.getVnodeByUserId(ur
+                                .getAdminUserId())) {
+                            vnode_show = vnode_show
+                                    + "<tr><td>"
+                                    + vnode.getId()
+                                    + "</td><td>"
+                                    + vnode.getName()
+                                    + "</td><td>"
+                                    + vnode.getIp()
+                                    + "</td><td>"
+                                    + vnode.getMemorySize()
+                                    + "</td><td>"
+                                    + vnode.getHypervisor()
+                                    + "</td><td>"
+                                    + vnode.getVclusterId()
+                                    + "</td><td>"
+                                    + vnode.getPmachineId()
+                                    + "</td><td>"
                                     + vnode.getStatus()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -923,13 +1015,20 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                         for (Vcluster vcluster : Vcluster
                                 .getVclusterByUserId(ur.getAdminUserId())) {
-                            vcluster_show = vcluster_show + "<tr><td>"
-                                    + vcluster.getId() + "</td><td>"
-                                    + vcluster.getClusterName() + "</td><td>"
-                                    + vcluster.getFristIp() + "</td><td>"
-                                    + vcluster.getClusterSize() + "</td><td>"
-                                    + vcluster.getSshPublicKey() + "</td><td>"
-                                    + vcluster.getSshPrivateKey() + "</td><td>"
+                            vcluster_show = vcluster_show
+                                    + "<tr><td>"
+                                    + vcluster.getId()
+                                    + "</td><td>"
+                                    + vcluster.getClusterName()
+                                    + "</td><td>"
+                                    + vcluster.getFristIp()
+                                    + "</td><td>"
+                                    + vcluster.getClusterSize()
+                                    + "</td><td>"
+                                    + vcluster.getSshPublicKey()
+                                    + "</td><td>"
+                                    + vcluster.getSshPrivateKey()
+                                    + "</td><td>"
                                     + vcluster.getOsUsername()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -974,7 +1073,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     values.put("vnc_userid", queryMap.get("vnode_id"));
 
-                    values.put("vnc_username",
+                    values.put(
+                            "vnc_username",
                             Vnode.findById(
                                     Integer.parseInt(queryMap.get("vnode_id")))
                                     .getName());// this is the instance name!!!
@@ -988,18 +1088,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         || act.equals("add_pnode")
                         || act.equals("delete_pnode")) {
 
-                    if (userprivilege.equals("Root")
-                            && act.equals("add_pnode")) {
-                        new AddPnodeHandler()
-                                .handleMessage(
-                                        new AddPnodeMessage(
-                                                new SimpleAddress(
-                                                        queryMap.get(
-                                                                "pnode_ip"),
-                                                        4000),
-                                                Integer.parseInt(queryMap
-                                                        .get("pnode_vmCapacity"))),
-                                        null, null, null);
+                    if (userprivilege.equals("Root") && act.equals("add_pnode")) {
+                        new AddPnodeHandler().handleMessage(
+                                new AddPnodeMessage(new SimpleAddress(queryMap
+                                        .get("pnode_ip"), 4000), Integer
+                                        .parseInt(queryMap
+                                                .get("pnode_vmCapacity"))),
+                                null, null, null);
                     }
 
                     else if (userprivilege.equals("Root")
@@ -1013,15 +1108,23 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     // show all pnode
                     String pnode_show = "";
                     if (userprivilege.equals("Root")) {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "machine.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "machine.html");
                         for (Pnode pnode : Pnode.all()) {
-                            pnode_show = pnode_show + "<tr><td>" + pnode.getId()
-                                    + "</td><td>" + pnode.getIp() + "</td><td>"
-                                    + pnode.getPort() + "</td><td>"
-                                    + pnode.getHostname() + "</td><td>"
-                                    + pnode.getMacAddress() + "</td><td>"
-                                    + pnode.getVmCapacity() + "</td><td>"
+                            pnode_show = pnode_show
+                                    + "<tr><td>"
+                                    + pnode.getId()
+                                    + "</td><td>"
+                                    + pnode.getIp()
+                                    + "</td><td>"
+                                    + pnode.getPort()
+                                    + "</td><td>"
+                                    + pnode.getHostname()
+                                    + "</td><td>"
+                                    + pnode.getMacAddress()
+                                    + "</td><td>"
+                                    + pnode.getVmCapacity()
+                                    + "</td><td>"
                                     + pnode.getStatus()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -1036,15 +1139,23 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "</ul></div></td></tr>";
                         }
                     } else {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "machine1.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "machine1.html");
                         for (Pnode pnode : Pnode.all()) {
-                            pnode_show = pnode_show + "<tr><td>" + pnode.getId()
-                                    + "</td><td>" + pnode.getIp() + "</td><td>"
-                                    + pnode.getPort() + "</td><td>"
-                                    + pnode.getHostname() + "</td><td>"
-                                    + pnode.getMacAddress() + "</td><td>"
-                                    + pnode.getVmCapacity() + "</td><td>"
+                            pnode_show = pnode_show
+                                    + "<tr><td>"
+                                    + pnode.getId()
+                                    + "</td><td>"
+                                    + pnode.getIp()
+                                    + "</td><td>"
+                                    + pnode.getPort()
+                                    + "</td><td>"
+                                    + pnode.getHostname()
+                                    + "</td><td>"
+                                    + pnode.getMacAddress()
+                                    + "</td><td>"
+                                    + pnode.getVmCapacity()
+                                    + "</td><td>"
                                     + pnode.getStatus()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -1065,24 +1176,21 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 // --------------------------- http request from image page
                 // --------------------------
                 else if (!userprivilege.equals("Normal") && act.equals("image")
-                        || act.equals("add_vdisk") || act.equals("delete_vdisk")
+                        || act.equals("add_vdisk")
+                        || act.equals("delete_vdisk")
                         || act.equals("showlaunch")) {
 
-                    if (userprivilege.equals("Root")
-                            && act.equals("add_vdisk")) {
-                        new RegisterVdiskHandler()
-                                .handleMessage(
-                                        new RegisterVdiskMessage(
-                                                queryMap.get(
-                                                        "vdisk_displayname"),
-                                                queryMap.get("vdisk_filename"),
-                                                queryMap.get("vdisk_disktype"),
-                                                queryMap.get("vdisk_osfamily"),
-                                                queryMap.get("vdisk_osname"),
-                                                queryMap.get("vdisk_imgPath"),
-                                                queryMap.get(
-                                                        "vdisk_descrption")),
-                                        null, null, null);
+                    if (userprivilege.equals("Root") && act.equals("add_vdisk")) {
+                        new RegisterVdiskHandler().handleMessage(
+                                new RegisterVdiskMessage(queryMap
+                                        .get("vdisk_displayname"), queryMap
+                                        .get("vdisk_filename"), queryMap
+                                        .get("vdisk_disktype"), queryMap
+                                        .get("vdisk_osfamily"), queryMap
+                                        .get("vdisk_osname"), queryMap
+                                        .get("vdisk_imgPath"), queryMap
+                                        .get("vdisk_descrption")), null, null,
+                                null);
                     }
 
                     else if (userprivilege.equals("Root")
@@ -1095,13 +1203,13 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                     else if (!userprivilege.equals("Normal")
                             && act.equals("showlaunch")) {
-                        String vdisk_launch = Vdisk
-                                .findById(Integer
-                                        .parseInt(queryMap.get("vdisk_id")))
+                        String vdisk_launch = Vdisk.findById(
+                                Integer.parseInt(queryMap.get("vdisk_id")))
                                 .getFileName()
                                 + "."
-                                + Vdisk.findById(Integer
-                                        .parseInt(queryMap.get("vdisk_id")))
+                                + Vdisk.findById(
+                                        Integer.parseInt(queryMap
+                                                .get("vdisk_id")))
                                         .getDiskFormat();
 
                         String launch_module_show = "$('#LaunchInstance_Modal').modal('show');";
@@ -1113,15 +1221,23 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     // list all vdisk
                     String vdisk_show = "";
                     if (userprivilege.equals("Root")) {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "image.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "image.html");
                         for (Vdisk vdisk : Vdisk.all()) {
-                            vdisk_show = vdisk_show + "<tr><td>" + vdisk.getId()
-                                    + "</td><td>" + vdisk.getDisplayName()
-                                    + "</td><td>" + vdisk.getFileName() + "."
-                                    + vdisk.getDiskFormat() + "</td><td>"
-                                    + vdisk.getOsFamily() + "</td><td>"
-                                    + vdisk.getOsName() + "</td><td>"
+                            vdisk_show = vdisk_show
+                                    + "<tr><td>"
+                                    + vdisk.getId()
+                                    + "</td><td>"
+                                    + vdisk.getDisplayName()
+                                    + "</td><td>"
+                                    + vdisk.getFileName()
+                                    + "."
+                                    + vdisk.getDiskFormat()
+                                    + "</td><td>"
+                                    + vdisk.getOsFamily()
+                                    + "</td><td>"
+                                    + vdisk.getOsName()
+                                    + "</td><td>"
                                     + vdisk.getDescription()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -1131,19 +1247,28 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     + "'> Launch Instance </a></li>"
                                     + "<li class='divider'>"
                                     + "<li><a href='delete_vdisk?vdisk_id="
-                                    + vdisk.getId() + "'> Delete Image</a></li>"
+                                    + vdisk.getId()
+                                    + "'> Delete Image</a></li>"
                                     + "</ul></div></td></tr>";
                         }
                     } else {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "image_unroot.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "image_unroot.html");
                         for (Vdisk vdisk : Vdisk.all()) {
-                            vdisk_show = vdisk_show + "<tr><td>" + vdisk.getId()
-                                    + "</td><td>" + vdisk.getDisplayName()
-                                    + "</td><td>" + vdisk.getFileName() + "."
-                                    + vdisk.getDiskFormat() + "</td><td>"
-                                    + vdisk.getOsFamily() + "</td><td>"
-                                    + vdisk.getOsName() + "</td><td>"
+                            vdisk_show = vdisk_show
+                                    + "<tr><td>"
+                                    + vdisk.getId()
+                                    + "</td><td>"
+                                    + vdisk.getDisplayName()
+                                    + "</td><td>"
+                                    + vdisk.getFileName()
+                                    + "."
+                                    + vdisk.getDiskFormat()
+                                    + "</td><td>"
+                                    + vdisk.getOsFamily()
+                                    + "</td><td>"
+                                    + vdisk.getOsName()
+                                    + "</td><td>"
                                     + vdisk.getDescription()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -1168,8 +1293,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
 
                 // --------------------------- http request to show monitor info
                 // --------------------------
-                else if (userprivilege.equals("Root")
-                        && act.equals("monitor")) {
+                else if (userprivilege.equals("Root") && act.equals("monitor")) {
 
                     String pnode_monitor_show = "";
                     String pnode_id_list = "";
@@ -1180,40 +1304,46 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         // show all the pnode monitor info
                         for (Pnode pnd : Pnode.all()) {
 
-                            monitor_data = RRDTools
-                                    .getMonitorInfo((int) pnd.getId());
+                            monitor_data = RRDTools.getMonitorInfo((int) pnd
+                                    .getId());
 
                             pnode_monitor_show += "<div class='row'><div class='span12'><h3>Worker "
-                                    + pnd.getId() + "<small>"
-                                    + "  - Ip Address: " + pnd.getIp()
-                                    + ";</small>" + "<small>"
+                                    + pnd.getId()
+                                    + "<small>"
+                                    + "  - Ip Address: "
+                                    + pnd.getIp()
+                                    + ";</small>"
+                                    + "<small>"
                                     + "&nbsp;&nbsp;&nbsp;&nbsp;Status: "
                                     + pnd.getStatus()
                                     + ";</small></h3> <ul class='thumbnails'><li class='span3'>"
                                     + "<a class='thumbnail'><p>CPU Info: "
-                                    + (int) monitor_data[monitor_data.length
-                                            - 1][2]
+                                    + (int) monitor_data[monitor_data.length - 1][2]
                                     + " Cores, "
                                     + monitor_data[monitor_data.length - 1][1]
-                                    + " Mhz</p><div id='Monitor" + pnd.getId()
+                                    + " Mhz</p><div id='Monitor"
+                                    + pnd.getId()
                                     + "_1" // id_1 presents cpu info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
                                     + "<a class='thumbnail'><p>Memory Info: Total Memory "
                                     + monitor_data[monitor_data.length - 1][5]
-                                    + " MB</p><div id='Monitor" + pnd.getId()
+                                    + " MB</p><div id='Monitor"
+                                    + pnd.getId()
                                     + "_2" // id_2 presents memery info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
                                     + "<a class='thumbnail'><p>Disk Info: Total Disk "
                                     + monitor_data[monitor_data.length - 1][9]
-                                    + " GB</p><div id='Monitor" + pnd.getId()
+                                    + " GB</p><div id='Monitor"
+                                    + pnd.getId()
                                     + "_3" // id_3 presents disk info
                                     + "' class='plotpic'> </div></a></li>"
                                     + "<li class='span3'>"
                                     + "<a class='thumbnail'><p>Network Info: Bandwidth "
                                     + monitor_data[monitor_data.length - 1][10]
-                                    + " Mbps</p><div id='Monitor" + pnd.getId()
+                                    + " Mbps</p><div id='Monitor"
+                                    + pnd.getId()
                                     + "_4" // id_4 presents network info
                                     + "' class='plotpic'> </div></a></li></ul></div></div>";
 
@@ -1223,15 +1353,19 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     } else if (queryMap.containsKey("pnode_id")) {
                         // show one pnode monitor info
 
-                        Pnode pnd = Pnode.findById(
-                                Integer.parseInt(queryMap.get("pnode_id")));
+                        Pnode pnd = Pnode.findById(Integer.parseInt(queryMap
+                                .get("pnode_id")));
 
-                        monitor_data = RRDTools
-                                .getMonitorInfo((int) pnd.getId());
+                        monitor_data = RRDTools.getMonitorInfo((int) pnd
+                                .getId());
 
                         pnode_monitor_show += "<div class='row'><div class='span12'><h3>Worker "
-                                + pnd.getId() + "<small>" + "  - Ip Address: "
-                                + pnd.getIp() + ";</small>" + "<small>"
+                                + pnd.getId()
+                                + "<small>"
+                                + "  - Ip Address: "
+                                + pnd.getIp()
+                                + ";</small>"
+                                + "<small>"
                                 + "&nbsp;&nbsp;&nbsp;&nbsp;Status: "
                                 + pnd.getStatus()
                                 + ";</small></h3> <ul class='thumbnails'><li class='span3'>"
@@ -1239,29 +1373,35 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                 + (int) monitor_data[monitor_data.length - 1][2]
                                 + " Cores, "
                                 + monitor_data[monitor_data.length - 1][1]
-                                + " Mhz</p><div id='Monitor" + pnd.getId()
+                                + " Mhz</p><div id='Monitor"
+                                + pnd.getId()
                                 + "_1" // id_1 presents cpu info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
                                 + "<a class='thumbnail'><p>Memory Info: Total Memory "
                                 + monitor_data[monitor_data.length - 1][5]
-                                + " MB</p><div id='Monitor" + pnd.getId() + "_2" // id_2
-                                                                                 // presents
-                                                                                 // memery
-                                                                                 // info
+                                + " MB</p><div id='Monitor"
+                                + pnd.getId()
+                                + "_2" // id_2
+                                       // presents
+                                       // memery
+                                       // info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
                                 + "<a class='thumbnail'><p>Disk Info: Total Disk "
                                 + monitor_data[monitor_data.length - 1][9]
-                                + " GB</p><div id='Monitor" + pnd.getId() + "_3" // id_3
-                                                                                 // presents
-                                                                                 // disk
-                                                                                 // info
+                                + " GB</p><div id='Monitor"
+                                + pnd.getId()
+                                + "_3" // id_3
+                                       // presents
+                                       // disk
+                                       // info
                                 + "' class='plotpic'> </div></a></li>"
                                 + "<li class='span3'>"
                                 + "<a class='thumbnail'><p>Network Info: Bandwidth "
                                 + monitor_data[monitor_data.length - 1][10]
-                                + " Mbps</p><div id='Monitor" + pnd.getId()
+                                + " Mbps</p><div id='Monitor"
+                                + pnd.getId()
                                 + "_4" // id_4 presents network info
                                 + "' class='plotpic'> </div></a></li></ul></div></div>";
 
@@ -1286,8 +1426,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         && act.equals("getMonitorData")) {
                     double[][] monitor_data;
 
-                    monitor_data = RRDTools.getMonitorInfo(
-                            Integer.parseInt(queryMap.get("pnode_id")));
+                    monitor_data = RRDTools.getMonitorInfo(Integer
+                            .parseInt(queryMap.get("pnode_id")));
 
                     String ret = "";
 
@@ -1295,11 +1435,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         for (int i = 0; i < monitor_data.length; i++) {
                             for (int j = 0; j < monitor_data[i].length; j++) {
                                 if (j < monitor_data[i].length - 1) {
-                                    ret += Util.formatDouble(monitor_data[i][j])
-                                            + ',';
+                                    ret += Util
+                                            .formatDouble(monitor_data[i][j]) + ',';
                                 } else {
-                                    ret += Util.formatDouble(monitor_data[i][j])
-                                            + ';';
+                                    ret += Util
+                                            .formatDouble(monitor_data[i][j]) + ';';
                                 }
                             }
                         }
@@ -1320,14 +1460,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         || act.equals("delete_user")
                         || act.equals("pass_modify")) {
 
-                    if (userprivilege.equals("Root")
-                            && act.equals("add_user")) {
-                        if (Users
-                                .findByName(queryMap.get("username")) != null) {
+                    if (userprivilege.equals("Root") && act.equals("add_user")) {
+                        if (Users.findByName(queryMap.get("username")) != null) {
                             String adduser_error = "alert('The User Name has exist!')";
                             values.put("adduser_error", adduser_error);
-                        } else if (Users
-                                .findByEmail(queryMap.get("email")) != null) {
+                        } else if (Users.findByEmail(queryMap.get("email")) != null) {
                             String adduser_error = "alert('The Email Address has exist!')";
                             values.put("adduser_error", adduser_error);
                         } else {
@@ -1348,76 +1485,66 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                                     usertype = Users.user_type.Individual;
                                 }
 
-                                new AddUserHandler()
-                                        .handleMessage(
-                                                new AddUserMessage(
-                                                        queryMap.get(
-                                                                "username"),
-                                                        queryMap.get("email"),
-                                                        queryMap.get(
-                                                                "password"),
-                                                        usertype, "true",
-                                                        session_ip_loginuser
-                                                                .get(remote_ipaddr)
-                                                                .getId()),
-                                                null, null, null);
+                                new AddUserHandler().handleMessage(
+                                        new AddUserMessage(queryMap
+                                                .get("username"), queryMap
+                                                .get("email"), queryMap
+                                                .get("password"), usertype,
+                                                "true", session_ip_loginuser
+                                                        .get(remote_ipaddr)
+                                                        .getId()), null, null,
+                                        null);
                             }
                         }
                     }
 
                     else if (userprivilege.equals("Enterprise")
                             && act.equals("add_user")) {
-                        if (Users
-                                .findByName(queryMap.get("username")) != null) {
+                        if (Users.findByName(queryMap.get("username")) != null) {
                             String adduser_error = "alert('The User Name has exist!')";
                             values.put("adduser_error", adduser_error);
-                        } else if (Users
-                                .findByEmail(queryMap.get("email")) != null) {
+                        } else if (Users.findByEmail(queryMap.get("email")) != null) {
                             String adduser_error = "alert('The Email Address has exist!')";
                             values.put("adduser_error", adduser_error);
                         } else {
                             new AddUserHandler().handleMessage(
-                                    new AddUserMessage(queryMap.get("username"),
-                                            queryMap.get("email"),
-                                            queryMap.get("password"),
+                                    new AddUserMessage(
+                                            queryMap.get("username"), queryMap
+                                                    .get("email"), queryMap
+                                                    .get("password"),
                                             Users.user_type.Normal, "true",
-                                            session_ip_loginuser
-                                                    .get(remote_ipaddr)
-                                                    .getId()),
+                                            session_ip_loginuser.get(
+                                                    remote_ipaddr).getId()),
                                     null, null, null);
                         }
                     }
 
                     else if (act.equals("active_user")) {
                         new ActiveUserHandler().handleMessage(
-                                new ActiveUserMessage(Integer
-                                        .parseInt(queryMap.get("user_id"))),
-                                null, null, null);
+                                new ActiveUserMessage(Integer.parseInt(queryMap
+                                        .get("user_id"))), null, null, null);
 
                     }
 
                     else if (act.equals("stop_user")) {
                         new StopUserHandler().handleMessage(
-                                new StopUserMessage(Integer
-                                        .parseInt(queryMap.get("user_id"))),
-                                null, null, null);
+                                new StopUserMessage(Integer.parseInt(queryMap
+                                        .get("user_id"))), null, null, null);
                     }
 
                     else if (act.equals("delete_user")) {
                         new DeleteUserHandler().handleMessage(
-                                new DeleteUserMessage(Integer
-                                        .parseInt(queryMap.get("user_id"))),
-                                null, null, null);
+                                new DeleteUserMessage(Integer.parseInt(queryMap
+                                        .get("user_id"))), null, null, null);
                     }
 
                     else if (act.equals("pass_modify")) {
                         Users user = session_ip_loginuser.get(remote_ipaddr);
-                        if (user.getPassword()
-                                .equals(queryMap.get("oldpass"))) {
+                        if (user.getPassword().equals(queryMap.get("oldpass"))) {
                             new ModifyUserPassHandler().handleMessage(
                                     new ModifyUserPassMessage(user.getId(),
-                                            queryMap.get("newpass")),
-                                    null, null, null);
+                                            queryMap.get("newpass")), null,
+                                    null, null);
                         } else {
                             String pass_error = "alert('Old Password Wrong!')";
                             values.put("pass_error", pass_error);
@@ -1431,8 +1558,8 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         users = Users.all();
                     } else if (userprivilege.equals("Enterprise")) {
                         for (UserRelations urre : UserRelations
-                                .getByAdminUserId(session_ip_loginuser
-                                        .get(remote_ipaddr).getId())) {
+                                .getByAdminUserId(session_ip_loginuser.get(
+                                        remote_ipaddr).getId())) {
                             users.add(Users.findById(urre.getNormalUserId()));
                         }
                     }
@@ -1447,11 +1574,18 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                         user_show = "None normal users";
                     } else {
                         for (Users user : users) {
-                            user_show = user_show + "<tr><td>" + user.getId()
-                                    + "</td><td>" + user.getName() + "</td><td>"
-                                    + user.getEmail() + "</td><td>"
-                                    + user.getPassword() + "</td><td>"
-                                    + user.getPrivilege() + "</td><td>"
+                            user_show = user_show
+                                    + "<tr><td>"
+                                    + user.getId()
+                                    + "</td><td>"
+                                    + user.getName()
+                                    + "</td><td>"
+                                    + user.getEmail()
+                                    + "</td><td>"
+                                    + user.getPassword()
+                                    + "</td><td>"
+                                    + user.getPrivilege()
+                                    + "</td><td>"
                                     + user.getActivated()
                                     + "</td><td><div class='btn-group'><button class='btn btn-danger dropdown-toggle' "
                                     + "data-toggle='dropdown'> Action <span class='caret'></span></button>"
@@ -1476,11 +1610,11 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                     }
 
                     if (userprivilege.equals("Root")) {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "account.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "account.html");
                     } else {
-                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www", "master",
-                                "account_unroot.html");
+                        fpath = Utils.pathJoin(Utils.NOVA_HOME, "www",
+                                "master", "account_unroot.html");
                     }
                 }
             }
@@ -1517,8 +1651,7 @@ public class MasterHttpHandler extends SimpleHttpHandler {
                 values.put("root_user_total", root_user_total);
                 values.put("enterprise_user_total", enterprise_user_total);
                 values.put("individual_user_total", individual_user_total);
-                values.put("not_activated_user_total",
-                        not_activated_user_total);
+                values.put("not_activated_user_total", not_activated_user_total);
             } else {
                 values.put("hide_head", "<!--");
                 values.put("hide_tail", "-->");

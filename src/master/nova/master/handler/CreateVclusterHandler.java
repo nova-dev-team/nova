@@ -87,10 +87,13 @@ public class CreateVclusterHandler implements
             log.info("There is not enough Ip address available for VMs.");
         }
 
+        testIpIval = usedIpSegments.get(usedIpSegments.size() - 1) + 1;
         Vcluster vcluster = new Vcluster();
         vcluster.setClusterName(msg.vclusterName);
         vcluster.setClusterSize(msg.vclusterSize);
         vcluster.setFristIp(Utils.integerToIpv4(testIpIval));
+        vcluster.setFristName(msg.firstname);
+        vcluster.setOsUsername(msg.firstname);
         vcluster.setUserId(msg.userId);
         vcluster.save();
         // TODO delete these experiments codes when necessary

@@ -2,22 +2,23 @@ package nova.worker.handler;
 
 import java.util.UUID;
 
+import nova.common.service.SimpleAddress;
+import nova.common.service.SimpleHandler;
+import nova.common.util.Utils;
+import nova.master.models.Vnode;
+import nova.worker.NovaWorker;
+import nova.worker.api.messages.QueryVnodeIPMessage;
+import nova.worker.api.messages.StartExistVnodeMessage;
+import nova.worker.daemons.VnodeStatusDaemon;
+
 import org.apache.log4j.Logger;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.libvirt.Domain;
 import org.libvirt.LibvirtException;
 
-import nova.common.service.SimpleAddress;
-import nova.common.service.SimpleHandler;
-import nova.common.util.Utils;
-import nova.master.models.Vnode;
-import nova.worker.NovaWorker;
-import nova.worker.api.messages.StartExistVnodeMessage;
-import nova.worker.daemons.VnodeStatusDaemon;
-
-public class StartExistVnodeHandler
-        implements SimpleHandler<StartExistVnodeMessage> {
+public class StartExistVnodeHandler implements
+        SimpleHandler<StartExistVnodeMessage> {
     Logger log = Logger.getLogger(StartVnodeHandler.class);
 
     @Override
@@ -25,8 +26,8 @@ public class StartExistVnodeHandler
             ChannelHandlerContext ctx, MessageEvent e, SimpleAddress xreply) {
         // get master instance
         NovaWorker.masteraddr = xreply;
-        if (NovaWorker.getInstance().getMaster() == null || NovaWorker
-                .getInstance().getMaster().isConnected() == false) {
+        if (NovaWorker.getInstance().getMaster() == null
+                || NovaWorker.getInstance().getMaster().isConnected() == false) {
             NovaWorker.getInstance().registerMaster(xreply);
         }
 
@@ -57,6 +58,10 @@ public class StartExistVnodeHandler
                 log.error("failed to connect to domain " + msg.uuid);
                 return;
             }
+            new QueryVnodeIPHandler()
+                    .handleMessage(
+                            new QueryVnodeIPMessage(dom.getName(), dom
+                                    .getUUIDString()), null, null, null);
 
             // temporary hack for lxc container
             // for debug
@@ -86,9 +91,12 @@ public class StartExistVnodeHandler
                     Vnode.Status.PREPARING);
             // remap vnc port
             Utils.WORKER_VNC_MAP.put(msg.uuid, String.valueOf(vncport));
-            NovaWorker.getInstance().getMaster().sendPnodeCreateVnodeMessage(
-                    NovaWorker.getInstance().getAddr().getIp(), msg.vnodeid,
-                    vncport, msg.uuid, msg.hyper);
+            NovaWorker
+                    .getInstance()
+                    .getMaster()
+                    .sendPnodeCreateVnodeMessage(
+                            NovaWorker.getInstance().getAddr().getIp(),
+                            msg.vnodeid, vncport, msg.uuid, msg.hyper);
 
         } catch (LibvirtException ex) {
             log.error("Error starting domain " + msg.uuid, ex);

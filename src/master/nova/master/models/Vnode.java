@@ -113,11 +113,16 @@ public class Vnode extends DbObject {
         return (Vnode) getManager().findBy("uuid", uuid);
     }
 
+    public static Vnode findByName(String name) {
+        return (Vnode) getManager().findBy("name", name);
+    }
+
     public static DbManager getManager() {
         if (manager == null) {
             DbSpec spec = new DbSpec();
             spec.addIndex("ip");
             spec.addIndex("uuid");
+            spec.addIndex("name");
             manager = DbManager.forClass(Vnode.class, spec);
         }
         return manager;
